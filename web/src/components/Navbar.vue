@@ -5,7 +5,7 @@
             <div class="site-title">ImJoy.io<span class="superscript">alpha</span></div>
           </md-button>
 
-          <span v-show="$route.path!='/'" class="md-layout-item md-medium-hide subheader-title">Image process with joy.</span>
+          <span v-show="$route.path!='/'" class="md-layout-item md-medium-hide subheader-title">Image processing with joy.</span>
 
           <div class="md-toolbar-section-end">
             <md-menu md-size="medium" v-if="screenWidth<600">
