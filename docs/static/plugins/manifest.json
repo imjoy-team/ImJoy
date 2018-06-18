@@ -1,0 +1,13 @@
+{
+  "version": "0.0.1",
+  "root_path": "/static/plugins",
+  "plugins": [{
+    "name": "Text File Importer",
+    "version": "0.0.1",
+    "api_version": "0.0.1",
+    "createdAt": "Mon Jun 18 2018 21:46:36",
+    "js_path": "/TextFileImporter/textFileImporter.js",
+    "description": "A plugin for loading localization table from text files.",
+    "tags": ["localization", "importer"]
+  }]
+}
