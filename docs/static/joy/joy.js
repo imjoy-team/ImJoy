@@ -894,7 +894,7 @@ ui.init = function(master){
 	master.container.addEventListener('wheel', function(event){
 		var delta = event.deltaY;
 		master.container.scrollTop += delta;
-		event.preventDefault();
+		// event.preventDefault();
 		return false;
 	});
 
@@ -1425,49 +1425,48 @@ modal.init = function(master){
 };
 modal.show = function(ui){
 
-	modal.dom.style.display = "block"; // hi
+		modal.dom.style.display = "block"; // hi
 
-	// Remember & add UI
-	modal.currentUI = ui;
-	modal.box.appendChild(ui.dom);
+		// Remember & add UI
+		modal.currentUI = ui;
+		modal.box.appendChild(ui.dom);
 
-	// Position the Box
-	var position = ui.config.position || "below";
-	var boxBounds = modal.box.getBoundingClientRect();
-	var sourceBounds = ui.config.source.getBoundingClientRect();
-	var x,y, margin=20;
-	var overflow = false;
-	// HACK: IF BELOW & NO SPACE, do LEFT
-	if(position=="below"){
-		var y = sourceBounds.top + sourceBounds.height + margin; // y: bottom
-		if(y+boxBounds.height > document.body.clientHeight){ // below page!
-			position = "below";
-			overflow = true;
-		}
-	}
-
-	modal.box.setAttribute("position", position);
-	switch(position){ // TODO: smarter positioning
-		case "below":
-			var x = sourceBounds.left + sourceBounds.width/2; // x: middle
+		// Position the Box
+		var position = ui.config.position || "below";
+		var boxBounds = modal.box.getBoundingClientRect();
+		var sourceBounds = ui.config.source.getBoundingClientRect();
+		var bgBounds = modal.bg.getBoundingClientRect();
+		var x,y, margin=20;
+		var overflow = false;
+		// HACK: IF BELOW & NO SPACE, do LEFT
+		if(position=="below"){
 			var y = sourceBounds.top + sourceBounds.height + margin; // y: bottom
-			x -= boxBounds.width/2;
-			break;
-		case "left":
-			var x = sourceBounds.left - margin; // x: left
-			var y = sourceBounds.top + sourceBounds.height/2; // y: middle
-			x -= boxBounds.width;
-			y -= boxBounds.height/2;
-			break;
-	}
-	modal.box.style.left = x + "px";
-	modal.box.style.top = y + "px";
-	if(overflow){
-		modal.box.style.overflow = "auto";
-		modal.box.style.height = "200px";
-	}
-	// On Open
-	if(modal.currentUI.config.onopen) modal.currentUI.config.onopen();
+			if(y+boxBounds.height > document.body.clientHeight){ // below page!
+				position = "left";
+			}
+		}
+
+		modal.box.setAttribute("position", position);
+		switch(position){ // TODO: smarter positioning
+			case "below":
+				var x = sourceBounds.left + sourceBounds.width/2; // x: middle
+				var y = sourceBounds.top + sourceBounds.height + margin; // y: bottom
+				x -= boxBounds.width/2;
+				break;
+			case "left":
+				var x = sourceBounds.left - margin; // x: left
+				var y = sourceBounds.top + sourceBounds.height/2; // y: middle
+				x -= boxBounds.width;
+				y -= boxBounds.height/2;
+				break;
+		}
+		if(x<0) x=1;
+		if(y+boxBounds.height>bgBounds.height) y= bgBounds.height-boxBounds.height-1;
+		modal.box.style.left = x + "px";
+		modal.box.style.top = y + "px";
+
+		// On Open
+		if(modal.currentUI.config.onopen) modal.currentUI.config.onopen();
 
 };
 modal.hide = function(){
