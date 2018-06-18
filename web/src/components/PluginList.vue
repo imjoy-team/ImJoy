@@ -54,6 +54,7 @@ export default {
   data() {
     return {
       editorCode: '',
+      editorPlugin: null,
       editorOptions: {},
       showEditor: false,
       plugins: [],
@@ -120,7 +121,7 @@ export default {
           lineNumbers: true,
           line: true
         }
-        this.$forceUpdate()
+        this.editorPlugin = plugin
         this.showEditor = true
         this.$forceUpdate()
       }).catch((err) => {
@@ -129,7 +130,17 @@ export default {
 
     },
     saveCode() {
-
+      this.editorPlugin.js_code = this.editorCode
+      this.db.get(this.editorPlugin.name).then((doc)=>{
+        this.editorPlugin._id = this.editorPlugin.name
+        this.editorPlugin._rev = doc._rev
+        return this.db.put(this.editorPlugin);
+      }).then((response)=>{
+        this.api.show('changes has been saved.')
+      }).catch( (err)=>{
+        console.error(err);
+        this.api.show('something went wrong during saving.')
+      });
     },
     remove(plugin) {
       // remove if exists
