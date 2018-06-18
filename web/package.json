@@ -1,7 +1,7 @@
 {
   "name": "ImJoy.io",
   "version": "0.0.1",
-  "description": "A platform for sharing localization microscopy data.",
+  "description": "Image processing with joy.",
   "author": "Wei OUYANG <wei.ouyang@pasteur.fr>",
   "private": true,
   "scripts": {
