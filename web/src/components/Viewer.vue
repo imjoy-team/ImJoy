@@ -18,6 +18,7 @@
           <md-button class="md-fab md-primary" @click="showImportDialog=true">
             <md-icon>add</md-icon>
           </md-button>
+          <md-progress-spinner :md-diameter="30" :md-stroke="3" md-mode="indeterminate" v-if="loading"></md-progress-spinner>
         </div>
         <div class="md-toolbar-section-end">
           <md-button class="md-icon-button md-dense md-raised" @click="menuVisible = !menuVisible">
@@ -55,7 +56,14 @@
     </md-app-content>
   </md-app>
   <!-- </md-card-content> -->
+  <md-dialog :md-active.sync="showLoadingDialog">
+    <md-dialog-content>
+      <md-progress-spinner :md-diameter="30" :md-stroke="3" md-mode="indeterminate"></md-progress-spinner>
+    </md-dialog-content>
+    <md-dialog-actions>
 
+    </md-dialog-actions>
+  </md-dialog>
 
   <md-dialog :md-active.sync="showImportDialog">
     <md-dialog-content>
@@ -86,6 +94,8 @@ export default {
     return {
       select_file: null,
       selected_file: null,
+      showLoadingDialog: false,
+      loading: false,
       showImportDialog: false,
       cards: null,
       _action: null,
@@ -94,6 +104,7 @@ export default {
       },
       plugin: null,
       menuVisible: true,
+      db: null,
       store: this.$root.$data.store,
       api: this.$root.$data.store.api,
     }
@@ -104,9 +115,25 @@ export default {
     }
   },
   mounted() {
+    this.loading = true
+    this.db = new PouchDB('imjoy_plugins', {revs_limit: 2, auto_compaction: true})
     const root = location.protocol + '//' + location.host
-    // this.plugin = this.loadPlugin(root + '/static/plugins/filter.js')
-    this.plugin = this.loadPlugin("https://rawgit.com/imodpasteur/shareLoc.xyz/master/web/static/plugins/textFilePlugin.js")//root + '/static/plugins/textFilePlugin.js')
+    setTimeout(()=>{
+      this.db.allDocs({
+        include_docs: true,
+        attachments: true
+      }).then((result)=>{
+        console.log(result)
+        for(let i=0;i<result.total_rows;i++){
+          const plugin = result.rows[i].doc
+          this.loadPlugin(plugin.js_path, plugin.js_code)
+        }
+        this.loading= false
+      }).catch((err)=>{
+        console.error(err)
+        this.loading= false
+      });
+    }, 500)
 
     // this.store.event_bus.$on('message', this.messageHandler)
   },
@@ -142,19 +169,24 @@ export default {
 
       // this.plugin.api.gui_config.onexecute({sfs:1158}).then((joy)=>{console.log('return from',joy)})
     },
-    loadPlugin(path) {
+    loadPlugin(path, code) {
       // exported methods, will be available to the plugin
       this.plugin_api.kk = 999
       this.plugin_api.get_kk = async () => {
         return new ArrayBuffer(1200400)
       }
-      const plugin = new jailed.Plugin(path, this.plugin_api);
+      let plugin
+      if(code){
+        plugin = new jailed.DynamicPlugin(code, this.plugin_api)
+      }
+      else{
+        plugin = new jailed.Plugin(path, this.plugin_api);
+      }
       plugin.whenConnected(() => {
         if (!plugin.api) {
           console.error('error occured when loading plugins.')
         }
         console.log(plugin.api)
-
         plugin.api.register().then((plugin_config) => {
           console.log('register plugin: ', plugin_config)
           const onexecute = async (my) => {
