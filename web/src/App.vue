@@ -33,13 +33,13 @@ export default {
       //window.addEventListener('resize', updateSize);
       document.addEventListener("orientationchange", window.onresize = updateSize);
 
-      window.addEventListener("message", receiveMessage, false);
-      function receiveMessage(event)
-      {
-        if (event.origin !== "http://localhost:8000" || event.origin !== "https://shareloc.xyz")
-          return;
-        this.store.event_bus.$emit('message', event)
-      }
+      // window.addEventListener("message", receiveMessage, false);
+      // function receiveMessage(event)
+      // {
+      //   if (event.origin !== "http://localhost:8000" || event.origin !== "https://shareloc.xyz")
+      //     return;
+      //   this.store.event_bus.$emit('message', event)
+      // }
     })
   },
   methods: {

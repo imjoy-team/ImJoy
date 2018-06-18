@@ -78,47 +78,6 @@
 </template>
 
 <script>
-import {
-  saveAs
-} from 'file-saver';
-
-
-function getBase64Image(img) {
-  // Create an empty canvas element
-  var canvas = document.createElement("canvas");
-  canvas.width = img.width;
-  canvas.height = img.height;
-
-  // Copy the image contents to the canvas
-  var ctx = canvas.getContext("2d");
-  ctx.drawImage(img, 0, 0);
-
-  // Get the data-URL formatted image
-  // Firefox supports PNG and JPEG. You could check img.src to
-  // guess the original format, but be aware the using "image/jpg"
-  // will re-encode the image.
-  var dataURL = canvas.toDataURL("image/png");
-
-  return dataURL.replace(/^data:image\/(png|jpg);base64,/, "");
-}
-
-function dataURItoBlob(dataURI) {
-  if (typeof dataURI !== 'string') {
-    throw new Error('Invalid argument: dataURI must be a string');
-  }
-  dataURI = dataURI.split(',');
-  var type = dataURI[0].split(':')[1].split(';')[0],
-    byteString = atob(dataURI[1]),
-    byteStringLength = byteString.length,
-    arrayBuffer = new ArrayBuffer(byteStringLength),
-    intArray = new Uint8Array(arrayBuffer);
-  for (var i = 0; i < byteStringLength; i++) {
-    intArray[i] = byteString.charCodeAt(i);
-  }
-  return new Blob([intArray], {
-    type: type
-  });
-}
 
 export default {
   name: 'viewer',
@@ -149,13 +108,13 @@ export default {
     // this.plugin = this.loadPlugin(root + '/static/plugins/filter.js')
     this.plugin = this.loadPlugin("https://rawgit.com/imodpasteur/shareLoc.xyz/master/web/static/plugins/textFilePlugin.js")//root + '/static/plugins/textFilePlugin.js')
 
-    this.store.event_bus.$on('message', this.messageHandler)
+    // this.store.event_bus.$on('message', this.messageHandler)
   },
   methods: {
-    messageHandler(e){
-      const data = e.data
-      console.log('recieved message from ', e.origin, ' data: ',  data)
-    },
+    // messageHandler(e){
+    //   const data = e.data
+    //   console.log('recieved message from ', e.origin, ' data: ',  data)
+    // },
     selectFileChanged(file_list) {
       this.selected_file = file_list[0]
     },
