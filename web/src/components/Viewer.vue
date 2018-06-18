@@ -13,10 +13,18 @@
 
     </md-app-toolbar>
     <md-app-drawer :md-active.sync="menuVisible" md-persistent="full">
-      <md-button class="md-fab md-primary" @click="showImportDialog=true">
-        <md-icon>add</md-icon>
-      </md-button>
-
+      <div class="md-toolbar-row">
+        <div class="md-toolbar-section-start">
+          <md-button class="md-fab md-primary" @click="showImportDialog=true">
+            <md-icon>add</md-icon>
+          </md-button>
+        </div>
+        <div class="md-toolbar-section-end">
+          <md-button class="md-icon-button md-dense md-raised" @click="menuVisible = !menuVisible">
+            <md-icon>keyboard_arrow_left</md-icon>
+          </md-button>
+        </div>
+      </div>
       <md-card>
         <md-card-header>
           <!-- <div class="md-toolbar-row" flex>
@@ -55,7 +63,7 @@
         <div class="md-flex">
           <md-field>
             <label>load a file/folder</label>
-            <md-file v-model="select_file" @md-change="selectFileChanged"/>
+            <md-file v-model="select_file" @md-change="selectFileChanged" />
           </md-field>
         </div>
         <joy init="{id:'file_load_workflow', type:'actions'}"></joy>
@@ -70,7 +78,6 @@
 </template>
 
 <script>
-
 import {
   saveAs
 } from 'file-saver';
@@ -141,9 +148,15 @@ export default {
     const root = location.protocol + '//' + location.host
     // this.plugin = this.loadPlugin(root + '/static/plugins/filter.js')
     this.plugin = this.loadPlugin(root + '/static/plugins/textFilePlugin.js')
+
+    this.store.event_bus.$on('message', this.messageHandler)
   },
   methods: {
-    selectFileChanged(file_list){
+    messageHandler(e){
+      const data = e.data
+      console.log('recieved message from ', e.origin, ' data: ',  data)
+    },
+    selectFileChanged(file_list) {
       this.selected_file = file_list[0]
     },
     updateProgress(p) {
@@ -187,14 +200,17 @@ export default {
           console.log('register plugin: ', plugin_config)
           const onexecute = async (my) => {
             return await plugin.api.run({
-              op: {name: my.op.name, type: my.op.type},
+              op: {
+                name: my.op.name,
+                type: my.op.type
+              },
               config: my.data,
               data: my.target,
               progress: this.updateProgress
             })
           }
 
-          for(var i=0;i<plugin_config.ops.length;i++){
+          for (var i = 0; i < plugin_config.ops.length; i++) {
             const op_config = plugin_config.ops[i]
             // res.onexecute()
             op_config.onexecute = onexecute

@@ -28,27 +28,18 @@ export default {
       //window.addEventListener('resize', updateSize);
       document.addEventListener("orientationchange", window.onresize = updateSize);
 
-      this.store.event_bus.$on('connected', (authid)=>{
-        try {
-          ga('set', 'userId', authid);
-        } catch (e) {
-          console.error('google analytics error:', e)
-        }
-      })
+      window.addEventListener("message", receiveMessage, false);
+      function receiveMessage(event)
+      {
+        if (event.origin !== "http://localhost:8000" || event.origin !== "https://shareloc.xyz")
+          return;
+        this.store.event_bus.$emit('message', event)
+      }
     })
   },
   methods: {
   },
   watch: {
-  	'$route': (value) => {
-      // this.store.event_bus.$emit('route_changed', value)
-      try {
-        ga('send', 'pageview', value.path);
-        console.log('pageview:', value.path)
-      } catch (e) {
-        console.error('google analytics error:', e)
-      }
-    }
   }
 }
 </script>
