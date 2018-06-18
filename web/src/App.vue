@@ -1,6 +1,6 @@
 <template>
     <md-app id="app"  md-waterfall md-mode="fixed">
-      <md-app-toolbar class="md-primary">
+      <md-app-toolbar v-if="show_navbar"class="md-primary">
         <navbar/>
       </md-app-toolbar>
       <md-app-content>
@@ -13,11 +13,16 @@ export default {
   name: 'app',
   data () {
     return {
+      show_navbar: true,
       store: this.$root.$data.store,
       api: this.$root.$data.store.api
     }
   },
   mounted(){
+    if(window.location.href.indexOf('navbar=0')>=0){
+      this.show_navbar = false
+    }
+
     this.$nextTick(()=>{
       const updateSize = (e)=>{
         this.store.windowHeight = window.innerHeight

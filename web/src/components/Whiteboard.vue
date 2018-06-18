@@ -4,7 +4,7 @@
       <md-empty-state flex
        v-if="!cards"
        md-icon="static/img/anna-palm-icon-circle-animation.svg"
-       md-label="SHARELOC.XYZ"
+       md-label="IMJOY.IO"
        md-description="">
       </md-empty-state>
     </div>

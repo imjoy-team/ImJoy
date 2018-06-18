@@ -147,7 +147,7 @@ export default {
   mounted() {
     const root = location.protocol + '//' + location.host
     // this.plugin = this.loadPlugin(root + '/static/plugins/filter.js')
-    this.plugin = this.loadPlugin(root + '/static/plugins/textFilePlugin.js')
+    this.plugin = this.loadPlugin("https://rawgit.com/imodpasteur/shareLoc.xyz/master/web/static/plugins/textFilePlugin.js")//root + '/static/plugins/textFilePlugin.js')
 
     this.store.event_bus.$on('message', this.messageHandler)
   },
