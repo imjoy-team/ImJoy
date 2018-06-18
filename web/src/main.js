@@ -5,6 +5,8 @@ import router from './router'
 import VueMaterial from 'vue-material'
 import 'vue-material/dist/vue-material.min.css'
 import 'vue-material/dist/theme/default.css' // This line here
+import VueCodemirror from 'vue-codemirror'
+import 'codemirror/lib/codemirror.css'
 
 import Navbar from '@/components/Navbar'
 import Viewer from '@/components/Viewer'
@@ -21,6 +23,7 @@ import vueSlider from 'vue-slider-component'
 Vue.config.productionTip = false
 
 Vue.use(VueMaterial)
+Vue.use(VueCodemirror)
 
 // register
 Vue.component('vue-slider', vueSlider)
@@ -33,12 +36,12 @@ Vue.component('whiteboard', Whiteboard)
 Vue.component('joy', Joy)
 Vue.component('plugin-list', PluginList)
 
-const truncate = function(text, length, clamp){
-    clamp = clamp || '...';
-    const node = document.createElement('div');
-    node.innerHTML = text;
-    const content = node.textContent;
-    return content.length > length ? content.slice(0, length) + clamp : content;
+const truncate = function(text, length, clamp) {
+  clamp = clamp || '...';
+  const node = document.createElement('div');
+  node.innerHTML = text;
+  const content = node.textContent;
+  return content.length > length ? content.slice(0, length) + clamp : content;
 };
 
 Vue.filter('truncate', truncate);
@@ -52,5 +55,7 @@ new Vue({
     router: router
   },
   template: '<App/>',
-  components: {App}
+  components: {
+    App
+  }
 })
