@@ -71,17 +71,11 @@ html, body
   height:100%;
 }
 
-/* @media screen and (max-width: 800px) {
+@media screen and (max-width: 800px) {
   .md-content {
-    overflow-y: auto;
-    overflow-x: hidden;
     padding: 4px;
   }
 }
-.md-app {
-  max-height: 100vh;
-  border: 1px solid rgba(#000, .12);
-} */
 
 .md-menu-content{
   z-index: 9999;
