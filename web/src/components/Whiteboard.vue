@@ -1,7 +1,7 @@
 <template>
   <div class="whiteboard">
     <div class="md-layout md-gutter md-alignment-center-center">
-      <md-empty-state flex
+      <md-empty-state
        v-if="!cards"
        md-icon="static/img/anna-palm-icon-circle-animation.svg"
        md-label="IMJOY.IO"
@@ -39,5 +39,17 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+
+.whiteboard{
+  height: 100%;
+  position: relative;
+}
+
+.md-empty-state{
+  position: absolute;
+   top: 39%;
+   transform: translateY(-50%);
+  height: 100%;
+}
 
 </style>

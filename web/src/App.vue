@@ -50,7 +50,7 @@ export default {
 </script>
 
 <style>
-/* #app {
+ /* #app {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -61,13 +61,17 @@ export default {
 html, body
 {
     height: 100%;
-    overflow-y: auto; /* has to be scroll, not auto */
+    overflow-y: auto;
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
     -webkit-transform: translate3d(0,0,0);
 }
 
-@media screen and (max-width: 800px) {
+.md-app {
+  height:100%;
+}
+
+/* @media screen and (max-width: 800px) {
   .md-content {
     overflow-y: auto;
     overflow-x: hidden;
@@ -77,17 +81,11 @@ html, body
 .md-app {
   max-height: 100vh;
   border: 1px solid rgba(#000, .12);
-}
+} */
 
 .md-menu-content{
   z-index: 9999;
 }
-
-.table-head-checkbox{
-  margin-top: 5px;
-  width: 50px;
-}
-
 .md-subheader {
   font-size: 22px;
   font-weight: 300;
@@ -97,8 +95,14 @@ html, body
   font-size: 16px !important;
 }
 
+.table-head-checkbox{
+  margin-top: 5px;
+  width: 50px;
+}
+
+/*
 .md-dialog{
   overflow-y: auto !important;
-}
+} */
 
 </style>

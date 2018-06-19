@@ -123,7 +123,7 @@ export default {
   /* background: #eee; */
   overflow-x: hidden;
   overflow-y: auto;
-  font-size: 18px;
+  font-size: 1.2em;
   font-weight: 100;
 }
 </style>

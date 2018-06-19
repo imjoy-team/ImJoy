@@ -3,7 +3,7 @@
   <div class="md-title">{{title}}</div>
   <!-- <md-card >
         <md-card-content > -->
-  <md-app class="viewer-content">
+  <md-app>
     <md-app-toolbar class="md-transparent md-dense" md-elevation="0" v-if="!menuVisible">
       <div class="md-toolbar-row" flex>
         <md-button class="md-fab md-primary" @click="menuVisible=true" v-if="!menuVisible">
@@ -51,7 +51,7 @@
 
     </md-app-drawer>
 
-    <md-app-content class="viewer-content">
+    <md-app-content>
       <whiteboard :cards="cards"></whiteboard>
     </md-app-content>
   </md-app>
@@ -225,32 +225,29 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 .md-empty-state {
-  width: 60%;
-  max-width: 80%;
+  /* width: 60%; */
+  /* max-width: 80%; */
+  height: 100%;
+  width: 100%;
 }
 
-@media screen and (max-width: 800px) {
+/* @media screen and (max-width: 800px) {
   .md-empty-state {
     width: 90%;
     max-width: 100%;
   }
-}
+} */
 
-.md-content {
+/* .md-content {
   overflow-y: auto;
   overflow-x: hidden;
   max-height: 90vh;
-}
-
-.viewer-content {
-  min-height: 90vh;
+} */
+.viewer {
+  height: 100%;
 }
 
 .md-dialog {
   width: 768px;
-}
-
-.app-content {
-  overflow-y: hidden;
 }
 </style>

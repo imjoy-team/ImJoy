@@ -160,8 +160,8 @@ More prefixing to avoid NAME COLLISIONS
 /***************/
 
 .joy-textbox{
-	height:28px;
-	font-size: 0.8em;
+	height: 20px;
+	font-size: 0.9em;
 	border-radius: 5px;
 	border: 1px solid rgba(0,0,0,0.2);
 	width: 100%;
@@ -170,10 +170,9 @@ More prefixing to avoid NAME COLLISIONS
     font-family: inherit;
     padding: 0.3em 0.4em;
     display: block;
-    background: #333;
-    color: #fff;
-    font-size: inherit;
-    font-size: 0.85em;
+    background: #dde2f3;
+    color: #2427de;
+    font-size: 0.9em;
 }
 textarea.joy-textbox{
 	resize: none;
