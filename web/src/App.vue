@@ -94,6 +94,13 @@ html, body
   width: 50px;
 }
 
+.CodeMirror{
+  /* height: 500px!important; */
+  height: calc(100%)!important;
+  width: calc(100%)!important;
+  max-width: 1000px;
+}
+
 /*
 .md-dialog{
   overflow-y: auto !important;

@@ -61,19 +61,18 @@ export default {
   methods: {
     setupJoy() {
       this.$refs.editor.innerHTML = ''
-
       Joy({
         // Where the Joy editor goes:
         container: this.$refs.editor,
 
         // The words & ops inside the editor:
-        init: this.init, //"{id:'localizationWorkflow', type:'actions'} " + // a list of actions
+        init: this.init, //"{id:'localizationWorkflow', type:'ops'} " + // a list of ops
           //"<hr> {type:'save'}", // a save button!
 
         // Load data from URL, otherwise blank:
         data: this.data,
 
-        // Other actions to include, beyond turtle actions:
+        // Other ops to include, beyond turtle ops:
         modules: this.modules,
 
         // What to do when the user makes a change:
@@ -81,24 +80,17 @@ export default {
           // turtle.start();
           // my.turtleInstructions.act(turtle);
           // turtle.draw();
-          this.$emit('onupdate', my)
+          console.log('joy updated: ', my)
+          this.$emit('update', my)
         }
       });
     },
     runJoy() {
-
-      // if (this._action) {
-      //   console.log('run joy.')
-      //   const myTarget = {
-      //     a: 1000
-      //   }
-      //   this._action(myTarget).then((res) => {
-      //     console.log('action finished: ', res)
-      //   })
-      // }
+      console.log('emit run joy')
+      this.$emit('run')
     },
     stopJoy() {
-
+      this.$emit('stop')
     }
   }
 }

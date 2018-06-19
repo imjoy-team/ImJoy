@@ -2,7 +2,8 @@
 <div class="plugin-list">
   <!-- <md-subheader>Options</md-subheader> -->
   <md-subheader>Plugins</md-subheader>
-  <md-card v-for="plugin in plugins" :key="plugin.name">
+  <div class="md-layout md-gutter md-alignment-center">
+  <md-card v-for="plugin in plugins" class="md-layout-item md-large-size-30 md-medium-size-40 md-small-size-50 md-xsmall-size-100" :key="plugin.name">
     <md-card-header>
       {{plugin.createdAt}}
       <h2>{{plugin.name}}</h2>
@@ -16,16 +17,18 @@
       <md-button v-if="plugin.installed" @click="edit(plugin)" class="md-primary">Edit</md-button>
     </md-card-content>
   </md-card>
+
+  </div>
   <br>
   <md-dialog-confirm :md-active.sync="showRemoveConfirmation" md-title="Removing Plugin" md-content="Do you really want to <strong>delete</strong> this plugin" md-confirm-text="Yes" md-cancel-text="Cancel" @md-cancel="showRemoveConfirmation=false" @md-confirm="remove(_plugin2_remove);showRemoveConfirmation=false"
   />
 
-  <md-dialog :md-active.sync="showEditor">
+  <md-dialog class="editor-dialog" :md-active.sync="showEditor">
     <md-dialog-content>
       <div class="md-toolbar-row">
         <h2>Code Editor</h2>
       </div>
-      <codemirror v-model="editorCode" :options="editorOptions"></codemirror>
+      <codemirror class="codemirror" v-model="editorCode" :options="editorOptions"></codemirror>
 
     </md-dialog-content>
     <md-dialog-actions>
@@ -195,7 +198,19 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 .md-card {
-  max-width: 500px;
-  max-height: 1000px;
+  width: 450px;
+  /* max-height: 1000px; */
+  height: 300px;
+  margin-top: 20px;
+}
+
+.editor-dialog{
+  /* width: 80%; */
+  height: 85%;
+}
+
+.codemirror {
+  height: calc(100%)!important;
+  width: calc(100%)!important;
 }
 </style>
