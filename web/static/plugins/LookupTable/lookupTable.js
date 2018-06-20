@@ -11,6 +11,10 @@ class LookupTablePlugin {
       tags: ["image", "op", "LUT"],
       init: "apply LUT {id:'lut', type:'choose', options:['hot', 'rainbow'], placeholder: 'hot'}"
     })
+    api.registerIO({
+      input: {type: "image", tags: ['grayscale']},
+      output: {type: "image", tags: ['color']},
+    })
   }
 
   async run(my){

@@ -1,7 +1,7 @@
 
 /**
  * Contains the code executed in the sandboxed frame under web-browser
- * 
+ *
  * Tries to create a Web-Worker inside the frame and set up the
  * communication between the worker and the parent window. Some
  * browsers restrict creating a worker inside a sandboxed iframe - if
@@ -63,7 +63,9 @@ var initWebworkerPlugin = function() {
         if (m.data.type == 'initialized') {
             clearTimeout(fallbackTimeout);
         }
-
+        else if(m.data.type == 'disconnect'){
+          worker.terminate();
+        }
         parent.postMessage(m.data, '*');
     });
 
@@ -114,7 +116,7 @@ var initIframePlugin = function() {
         parentNode.appendChild(script);
     }
 
-        
+
     // handles script loading error
     // (assuming scripts are loaded one by one in the iframe)
     var currentErrorHandler = function(){};
@@ -136,4 +138,3 @@ try {
 } catch(e) {
     initIframePlugin();
 }
-

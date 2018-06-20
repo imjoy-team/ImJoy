@@ -100,6 +100,13 @@
 </template>
 
 <script>
+import {
+  WINDOW_TEMPLATE,
+  PANEL_TEMPLATE,
+  OP_TEMPLATE,
+  IO_TEMPLATE
+} from '../api.js'
+
 export default {
   name: 'viewer',
   props: ['title'],
@@ -116,6 +123,7 @@ export default {
       panels: [],
       activeWindow: null,
       _workflow_my: null,
+      plugins: [],
       plugin_api: null,
       plugin_loaded: false,
       menuVisible: true,
@@ -135,6 +143,7 @@ export default {
       createPanel: this.createPanel,
       createWindow: this.createWindow,
       createOp: this.createOp,
+      registerIO: this.registerIO,
     }
     this.plugin_loaded = false
     this.loading = true
@@ -150,6 +159,7 @@ export default {
       }).then((result) => {
         console.log(result)
         const promises = []
+        this.plugins = []
         for (let i = 0; i < result.total_rows; i++) {
           const config = result.rows[i].doc
           promises.push(this.loadPlugin(config))
@@ -165,20 +175,23 @@ export default {
         console.error(err)
         this.loading = false
       });
-    }, 500)
+    }, 1000)
 
     // this.store.event_bus.$on('message', this.messageHandler)
   },
+  beforeDestroy() {
+      console.log('terminating plugins')
+      for (let i = 0; i < this.plugins.length; i++) {
+        const plugin = this.plugins[i]
+        plugin.terminate()
+      }
+  },
   methods: {
-    // messageHandler(e){
-    //   const data = e.data
-    //   console.log('recieved message from ', e.origin, ' data: ',  data)
-    // },
-    windowSelected(window){
+    windowSelected(window) {
       console.log('activate window: ', window)
       this.activeWindow = window
     },
-    loadData(){
+    loadData() {
       const window = {
         name: 'Files',
         type: 'files',
@@ -189,12 +202,12 @@ export default {
       }
       this.windows.push(window)
     },
-    updateWorkflow(my){
+    updateWorkflow(my) {
       this._workflow_my = my
       console.log('update workflow', my)
     },
-    runWorkflow(mainOp){
-      if(this._workflow_my){
+    runWorkflow(mainOp) {
+      if (this._workflow_my) {
         console.log('run workflow', mainOp)
         this._workflow_my[mainOp].execute({})
       }
@@ -212,6 +225,7 @@ export default {
 
     },
     createOp(config) {
+      //TODO: verify fields with OP_TEMPLATE
       console.log('creating Op: ', config)
       const onexecute = async (my) => {
         return await plugin.api.run({
@@ -229,13 +243,19 @@ export default {
       return true
     },
     createPanel(config) {
+      //TODO: verify fields with PANEL_TEMPLATE
       console.log('creating panel: ', config)
       this.panels.push(config)
       return true
     },
     createWindow(config) {
+      //TODO: verify fields with WINDOW_TEMPLATE
       console.log('creating window: ', config)
       this.windows.push(config)
+      return true
+    },
+    registerIO(config){
+
       return true
     },
     loadPlugin(config) {
@@ -249,9 +269,9 @@ export default {
         }
         let plugin
         if (code) {
-          plugin = new jailed.DynamicPlugin(code, this.plugin_api)
+          plugin = new jailed.DynamicPlugin(code, this.plugin_api, config)
         } else {
-          plugin = new jailed.Plugin(path, this.plugin_api);
+          plugin = new jailed.Plugin(path, this.plugin_api, config);
         }
         plugin.whenConnected(() => {
           if (!plugin.api) {
@@ -260,6 +280,10 @@ export default {
           console.log(plugin.api)
           plugin.api.setup().then((result) => {
             console.log('sucessfully setup plugin ' + config.name)
+            this.plugins.push(plugin)
+            // setTimeout(()=>{
+            //   plugin.terminate()
+            // }, 10000)
             resolve(plugin)
           }).catch((e) => {
             console.error('error occured when loading plugin ' + config.name + ": ", e)

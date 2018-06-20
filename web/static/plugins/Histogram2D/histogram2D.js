@@ -1,6 +1,6 @@
 class Histogram2dPlugin {
-  async setup(){
-    await api.createOp({
+  setup(){
+    api.createOp({
       name: "render 2D histogram",
       type: "localization/render_2d_histogram",
       tags: ["localization", "op", "histogram"],

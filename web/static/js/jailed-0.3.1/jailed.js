@@ -592,7 +592,14 @@ if (__is__node__) {
      * @param {String} url of a plugin source
      * @param {Object} _interface to provide for the plugin
      */
-    var Plugin = function(url, _interface) {
+    var Plugin = function(url, _interface, config) {
+        if(config){
+          for (var key in config) {
+           if (config.hasOwnProperty(key)) {
+              this[key] = config[key];
+           }
+          }
+        }
         this._path = url;
         this._initialInterface = _interface||{};
         this._connect();
@@ -606,7 +613,14 @@ if (__is__node__) {
      * @param {String} code of the plugin
      * @param {Object} _interface to provide to the plugin
      */
-    var DynamicPlugin = function(code, _interface) {
+    var DynamicPlugin = function(code, _interface, config) {
+        if(config){
+          for (var key in config) {
+           if (config.hasOwnProperty(key)) {
+              this[key] = config[key];
+           }
+          }
+        }
         this._code = code;
         this._initialInterface = _interface||{};
         this._connect();
@@ -800,7 +814,10 @@ if (__is__node__) {
         this._disconnect.whenEmitted(handler);
     }
 
-
+    DynamicPlugin.prototype.terminate =
+           Plugin.prototype.terminate = function() {
+        this._site.disconnect();
+    }
 
     exports.Plugin = Plugin;
     exports.DynamicPlugin = DynamicPlugin;

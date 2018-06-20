@@ -341,7 +341,10 @@ Joy.add({
 Joy.templates = [];
 Joy.add = function(template){
 	var duplicated = Joy.templates.filter(function(t){
-		return t.type == template.type;
+		if(t.name === undefined || template.name === undefined)
+			return false
+		else
+			return t.name == template.name;
 	});
 	if(duplicated.length<=0){
 		Joy.templates.push(template);

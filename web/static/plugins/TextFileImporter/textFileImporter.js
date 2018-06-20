@@ -1,6 +1,6 @@
 class TextFilePlugin {
-  async setup(){
-    await api.createOp({
+  setup(){
+    api.createOp({
       name: "load text file",
       type: "localization/text_loader",
       tags: ["localization", "op", "file_loader"],
