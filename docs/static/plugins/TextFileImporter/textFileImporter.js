@@ -1,21 +1,14 @@
 class TextFilePlugin {
-  constructor() {
-  }
-
-  register(){
-    return {
-      module: "text_file_loader",
-      ops: [{
-        name: "load text file",
-        type: "text_loader/set_delimiter",
-        tags: ["localization", "action", "file_loader"],
-        init: "Load a table from the file (use the following configurations)<hr>"+
-        "add \"{id:'append_header', type:'string', placeholder:''}\" to the first line (optional); " +
-        "{id:'header_row', type:'choose', options:['read headers from the first line','use index as the header'], placeholder:'read headers from the first line'} and " +
-        "use {id:'delimiter', type:'string', placeholder:','} to seperate columns."
-
-      }]
-    }
+  setup(){
+    api.createOp({
+      name: "load text file",
+      type: "localization/text_loader",
+      tags: ["localization", "op", "file_loader"],
+      init: "Load a table from the file: <br>"+
+      "add \"{id:'append_header', type:'string', placeholder:''}\" to the first line (optional); " +
+      "{id:'header_row', type:'choose', options:['read headers from the first line','use index as the header'], placeholder:'read headers from the first line'} and " +
+      "use {id:'delimiter', type:'string', placeholder:','} to seperate columns."
+    })
   }
 
   async run(my){

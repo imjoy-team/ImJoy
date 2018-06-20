@@ -27,8 +27,8 @@ function Joy(options){
 	// Initialize References
 	Joy.initReferences(self);
 
-	// Allow previewing of... actions, numbers, variables?
-	if(self.previewActions==undefined) self.previewActions = true;
+	// Allow previewing of... ops, numbers, variables?
+	if(self.previewOps==undefined) self.previewOps = true;
 	if(self.previewNumbers==undefined) self.previewNumbers = true;
 	//if(self.previewVariables==undefined) self.previewVariables = false;
 	self.activePreview = null;
@@ -139,7 +139,7 @@ Joy.Op = function(options, parent, data){
 
 	// Update
 	self.update = function(){
-		if(self.onupdate) self.onupdate(self); // TODO: make consistent with .act()
+		if(self.onupdate) self.onupdate(self); // TODO: make consistent with .execute()
 		if(self.parent) self.parent.update();
 	};
 
@@ -258,7 +258,7 @@ Joy.Op = function(options, parent, data){
 
 	// Ops can ACT ON targets...
 	self.onexecute = self.onexecute || function(){};
-	self.act = async function(target, altData){
+	self.execute = async function(target, altData){
 
 		// Real or Preview data?
 		var data;
@@ -283,7 +283,7 @@ Joy.Op = function(options, parent, data){
 			target: target,
 			data: data
 		})
-		// On Act!
+		// On Execute!
 		return await self.onexecute({
 			op: self,
 			target: target,
@@ -326,9 +326,9 @@ Joy.Op = function(options, parent, data){
 ACTOR TEMPLATES that future Ops can be made from! Looks like this:
 
 Joy.add({
-	name: "Turn turtle", // what the Actions Widget calls it
+	name: "Turn turtle", // what the Ops Widget calls it
 	type: "turtle/turn", // what it's called in Op & Data
-	tags: ["turtle", "action"], // meta tags
+	tags: ["turtle", "op"], // meta tags
 	init: "Turn {id:'angle', type:'number', placeholder:10} degrees", // for init'ing op & widget
 	onexecute: function(my){
 		my.target.turn(my.data.angle);
@@ -341,7 +341,10 @@ Joy.add({
 Joy.templates = [];
 Joy.add = function(template){
 	var duplicated = Joy.templates.filter(function(t){
-		return t.type == template.type;
+		if(t.name === undefined || template.name === undefined)
+			return false
+		else
+			return t.name == template.name;
 	});
 	if(duplicated.length<=0){
 		Joy.templates.push(template);
@@ -734,7 +737,8 @@ var _selectAll = function(input, collapseToEnd){
     if(collapseToEnd) range.collapse(false); // total hack
     var selection = window.getSelection();
     selection.removeAllRanges();
-    selection.addRange(range);
+		selection.addRange(range);
+
 };
 var _unselectAll = function(){
 	var selection = window.getSelection();
@@ -2226,19 +2230,19 @@ Joy.add({
 	}
 });
 ////////////////////////////////////////////////////////
-// THE BIG ACTOR: A "PROGRAMMABLE" LIST OF ACTIONS <3 //
+// THE BIG ACTOR: A "PROGRAMMABLE" LIST OF OPS <3 //
 ////////////////////////////////////////////////////////
 
 /****************
 
-A nice list of actions.
+A nice list of ops.
 
 WidgetConfig:
-{type:'actions', name:'actions', resetVariables:false}
+{type:'ops', name:'ops', resetVariables:false}
 
 ****************/
 Joy.add({
-	type: "actions",
+	type: "ops",
 	tags: ["ui"],
 	init: function(self){
 
@@ -2253,11 +2257,11 @@ Joy.add({
 	initWidget: function(self){
 
 		var data = self.data;
-		var actions = data.actions;
+		var ops = data.ops;
 
 		// DOM
 		var dom = document.createElement("div");
-		dom.className = "joy-actions";
+		dom.className = "joy-ops";
 		self.dom = dom;
 
 		// List
@@ -2279,28 +2283,28 @@ Joy.add({
 		//////////////////////////////////////////
 
 		var bulletOptions = [
-			{label:"Add action above", value:"action_above"},
-			{label:"Add action below", value:"action_below"},
+			{label:"Add op above", value:"op_above"},
+			{label:"Add op below", value:"op_below"},
 			{label:"Delete", value:"delete"}
 		];
 		var _onBulletChoice = function(entry, choice){
 
 			// ACTION ABOVE or BELOW
-			var newActionWhere = 0;
-			if(choice=="action_above") newActionWhere=-1; // above
-			if(choice=="action_below") newActionWhere=1; // below
-			if(newActionWhere!=0){ // not NOT new action
+			var newOpWhere = 0;
+			if(choice=="op_above") newOpWhere=-1; // above
+			if(choice=="op_below") newOpWhere=1; // below
+			if(newOpWhere!=0){ // not NOT new op
 
 				var newEntryIndex = self.entries.indexOf(entry);
-				if(newActionWhere>0) newEntryIndex+=1;
+				if(newOpWhere>0) newEntryIndex+=1;
 
 				// Chooser Modal!
 				Joy.modal.Chooser({
 					position: "below",
 					source: entry.bullet.dom,
-					options: actionOptions,
+					options: opOptions,
 					onchange: function(value){
-						_addAction(value, newEntryIndex);
+						_addOp(value, newEntryIndex);
 						self.update(); // You oughta know!
 						_updateBullets(); // update the UI, re-number it.
 					}
@@ -2311,7 +2315,7 @@ Joy.add({
 			// DELETE
 			if(choice=="delete"){
 				_removeFromArray(self.entries, entry); // Delete entry from Entries[]
-				_removeFromArray(actions, entry.actionData); // Delete action from Data's Actions[]
+				_removeFromArray(ops, entry.opData); // Delete op from Data's Ops[]
 				self.removeChild(entry.op); // Delete op from Children[]
 				list.removeChild(entry.dom); // Delete entry from DOM
 				self.update(); // You oughta know!
@@ -2342,11 +2346,11 @@ Joy.add({
 			// What index am I?
 			var index = self.entries.indexOf(entry)+1;
 
-			// How many levels deep in "actions" am I?
+			// How many levels deep in "ops" am I?
 			var levelsDeep = 0;
 			var parent = self.parent;
 			while(parent){
-				if(parent.type=="actions") levelsDeep++;
+				if(parent.type=="ops") levelsDeep++;
 				parent = parent.parent;
 			}
 
@@ -2377,7 +2381,7 @@ Joy.add({
 		////////////////////////////////////////////////////////////////////
 
 		self.entries = [];
-		var _addEntry = function(actionData, atIndex){
+		var _addEntry = function(opData, atIndex){
 
 			// New entry
 			var entry = {};
@@ -2394,7 +2398,7 @@ Joy.add({
 			bulletContainer.appendChild(bullet.dom);
 
 			// New Op!
-			var newOp = self.addChild({type:actionData.type}, actionData);
+			var newOp = self.addChild({type:opData.type}, opData);
 
 			// The Widget
 			var newWidget = newOp.createWidget();
@@ -2406,41 +2410,41 @@ Joy.add({
 			entry.bullet = bullet;
 			entry.op = newOp;
 			entry.widget = newWidget;
-			entry.actionData = actionData;
+			entry.opData = opData;
 
 			// PREVIEW ON HOVER
-			// Also tell the action "_PREVIEW": how far in the action to go?
+			// Also tell the op "_PREVIEW": how far in the op to go?
 			var _calculatePreviewParam = function(event){
 				var param = event.offsetY / bullet.dom.getBoundingClientRect().height;
 				if(param<0) param=0;
 				if(param>1) param=1;
-				_previewAction._PREVIEW = param;
+				_previewOp._PREVIEW = param;
 				self.update();
 			};
-			var _previewAction;
+			var _previewOp;
 			var _previewStyle;
 			bulletContainer.onmouseenter = function(event){
 
-				if(!self.top.canPreview("actions")) return;
+				if(!self.top.canPreview("ops")) return;
 
 				self.top.activePreview = self;
 
 				// Create Preview Data
 				self.previewData = _clone(self.data);
-				var actionIndex = self.entries.indexOf(entry);
-				_previewAction = self.previewData.actions[actionIndex];
+				var opIndex = self.entries.indexOf(entry);
+				_previewOp = self.previewData.ops[opIndex];
 
-				// STOP after that action!
-				self.previewData.actions.splice(actionIndex+1, 0, {STOP:true});
+				// STOP after that op!
+				self.previewData.ops.splice(opIndex+1, 0, {STOP:true});
 
-				// How far to go along action?
+				// How far to go along op?
 				_calculatePreviewParam(event);
 
 				// Add in a style
 				_previewStyle = document.createElement("style");
 				document.head.appendChild(_previewStyle);
-				_previewStyle.sheet.insertRule('.joy-actions.joy-previewing > #joy-list > div:nth-child(n+'+(actionIndex+2)+') { opacity:0.1; }');
-				_previewStyle.sheet.insertRule('.joy-actions.joy-previewing > div.joy-bullet { opacity:0.1; }');
+				_previewStyle.sheet.insertRule('.joy-ops.joy-previewing > #joy-list > div:nth-child(n+'+(opIndex+2)+') { opacity:0.1; }');
+				_previewStyle.sheet.insertRule('.joy-ops.joy-previewing > div.joy-bullet { opacity:0.1; }');
 				dom.classList.add("joy-previewing");
 
 			};
@@ -2460,67 +2464,67 @@ Joy.add({
 			return entry;
 
 		};
-		// add all INITIAL actions as widgets
-		for(var i=0;i<actions.length;i++) _addEntry(actions[i]);
+		// add all INITIAL ops as widgets
+		for(var i=0;i<ops.length;i++) _addEntry(ops[i]);
 
 		///////////////////////////////////////
-		// Add Action /////////////////////////
+		// Add Op /////////////////////////
 		///////////////////////////////////////
 
-		// Manually add New Action To Actions + Widgets + DOM
-		var _addAction = function(opType, atIndex){
+		// Manually add New Op To Ops + Widgets + DOM
+		var _addOp = function(opType, atIndex){
 
 			// Create that new entry & everything
-			var newAction = {type:opType};
+			var newOp = {type:opType};
 			if(atIndex===undefined){
-				actions.push(newAction);
+				ops.push(newOp);
 			}else{
-				actions.splice(atIndex, 0, newAction);
+				ops.splice(atIndex, 0, newOp);
 			}
-			var entry = _addEntry(newAction, atIndex);
+			var entry = _addEntry(newOp, atIndex);
 
 			// Focus on that entry's widget!
 			// entry.widget.focus();
 
 		};
 
-		// Actions you can add:
-		// TODO: INCLUDE ALIASED ACTIONS
-		var actionOptions = [];
-		if(self.onlyActions){
-			for(var i=0;i<self.onlyActions.length;i++){
-				var actionType = self.onlyActions[i];
-				var opTemplate = Joy.getTemplateByType(actionType);
-				var notActionTag = opTemplate.tags.filter(function(tag){
-					return tag!="action"; // first tag that's NOT "action"
+		// Ops you can add:
+		// TODO: INCLUDE ALIASED OPS
+		var opOptions = [];
+		if(self.onlyOps){
+			for(var i=0;i<self.onlyOps.length;i++){
+				var opType = self.onlyOps[i];
+				var opTemplate = Joy.getTemplateByType(opType);
+				var notOpTag = opTemplate.tags.filter(function(tag){
+					return tag!="op"; // first tag that's NOT "op"
 				})[0];
-				actionOptions.push({
+				opOptions.push({
 					label: opTemplate.name,
-					value: actionType,
-					category: notActionTag
+					value: opType,
+					category: notOpTag
 				});
 			}
 		}else{
-			var actionOps = Joy.getTemplatesByTag("action");
-			for(var i=0;i<actionOps.length;i++){
-				var actionOp = actionOps[i];
-				var notActionTag = actionOp.tags.filter(function(tag){
-					return tag!="action";
+			var opOps = Joy.getTemplatesByTag("op");
+			for(var i=0;i<opOps.length;i++){
+				var opOp = opOps[i];
+				var notOpTag = opOp.tags.filter(function(tag){
+					return tag!="op";
 				})[0];
-				actionOptions.push({
-					label: actionOp.name,
-					value: actionOp.type,
-					category: notActionTag
+				opOptions.push({
+					label: opOp.name,
+					value: opOp.type,
+					category: notOpTag
 				});
 			}
 		}
 
-		// "+" Button: When clicked, prompt what actions to add!
+		// "+" Button: When clicked, prompt what ops to add!
 		var addButton = new Joy.ui.ChooserButton({
 			staticLabel: "+",
-			options: actionOptions,
+			options: opOptions,
 			onchange: function(value){
-				_addAction(value);
+				_addOp(value);
 				self.update(); // You oughta know!
 			},
 			styles: ["joy-bullet"]
@@ -2536,25 +2540,25 @@ Joy.add({
 		// Reset all of target's variables?
 		if(my.data.resetVariables) my.target._variables = {};
 
-		// Do those actions, baby!!!
-		for(var i=0; i<my.data.actions.length; i++){
+		// Do those ops, baby!!!
+		for(var i=0; i<my.data.ops.length; i++){
 
 			// Stop?
-			var actionData = my.data.actions[i];
-			if(actionData.STOP) return "STOP";
+			var opData = my.data.ops[i];
+			if(opData.STOP) return "STOP";
 
 			// Run
 			var op = my.op.entries[i].op; // TODO: THIS IS A HACK AND SHOULD NOT RELY ON THAT
-			var result = await op.act(my.target, actionData); // use ol' op, but GIVEN data.
+			var result = await op.execute(my.target, opData); // use ol' op, but GIVEN data.
 			if(result && result.target){
 				my.target = result.target;
 			}
 			else if(result.error){
-				console.error('actions stopped with error: ', result);
+				console.error('ops stopped with error: ', result);
 				return result;
 			}
 			else if(result.stop){
-				console.log('actions interrupted at step ', i, result);
+				console.log('ops interrupted at step ', i, result);
 				return result;
 			}
 			else if(result=="STOP") return result;
@@ -2562,7 +2566,7 @@ Joy.add({
 		return my;
 	},
 	placeholder: {
-		actions: [],
+		ops: [],
 		resetVariables: true
 	}
 });
@@ -2575,9 +2579,9 @@ Joy.module("instructions", function(){
 	Joy.add({
 		name: "Repeat the following...",
 		type: "instructions/repeat",
-		tags: ["instructions", "action"],
+		tags: ["instructions", "op"],
 		init: "Repeat the following {id:'count', type:'number', min:1, placeholder:3} times: "+
-			  "{id:'actions', type:'actions', resetVariables:false}",
+			  "{id:'ops', type:'ops', resetVariables:false}",
 		onexecute: async function(my){
 
 			// Previewing? How much to preview?
@@ -2587,16 +2591,16 @@ Joy.module("instructions", function(){
 			// Loop through it... (as far as preview shows, anyway)
 			var loops = Math.floor(my.data.count*param);
 			for(var i=0; i<loops; i++){
-				var result = await my.op.actions.act(my.target);
+				var result = await my.op.ops.execute(my.target);
 				if(result && result.target){
 					my.target = result.target;
 				}
 				else if(result.error){
-					console.error('action stopped with error: ', result)
+					console.error('op stopped with error: ', result)
 					return result;
 				}
 				else if(result.stop){
-					console.log('action interrupted at step ', i, result)
+					console.log('op interrupted at step ', i, result)
 					return result;
 				}
 				else if(result=="STOP") return result; // STOP
@@ -2608,11 +2612,11 @@ Joy.module("instructions", function(){
 	/*Joy.add({
 		name: "If... then...",
 		type: "instructions/if",
-		tags: ["instructions", "action"],
+		tags: ["instructions", "op"],
 		init: "If AHHH, then: "+
-			  "{id:'actions', type:'actions', resetVariables:false}",
+			  "{id:'ops', type:'ops', resetVariables:false}",
 		onexecute: function(my){
-			var message = my.op.actions.act(my.target);
+			var message = my.op.ops.execute(my.target);
 			if(message=="STOP") return message; // STOP
 		}
 	});*/
@@ -2620,7 +2624,7 @@ Joy.module("instructions", function(){
 	Joy.add({
 		name: "// Write a note",
 		type: "instructions/comment",
-		tags: ["instructions", "action"],
+		tags: ["instructions", "op"],
 		initWidget: function(self){
 
 			// DOM
@@ -3310,7 +3314,7 @@ Joy.module("math", function(){
 	Joy.add({
 		name: "Set [number]",
 		type: "math/set",
-		tags: ["math", "action"],
+		tags: ["math", "op"],
 		init: "Set {id:'varname', type:'variableName', variableType:'number'} to {id:'value', type:'number'}",
 		onexecute: function(my){
 			var _variables = my.target._variables;
@@ -3328,7 +3332,7 @@ Joy.module("math", function(){
 
 		name: "Do math to [number]",
 		type: "math/operation",
-		tags: ["math", "action"],
+		tags: ["math", "op"],
 
 		init: JSON.stringify({
 			id:'operation', type:'choose',
@@ -3367,11 +3371,11 @@ Joy.module("math", function(){
 	Joy.add({
 		name: "If [math] then...",
 		type: "math/if",
-		tags: ["math", "action"],
+		tags: ["math", "op"],
 		init: "If {id:'value1', type:'number'} "+
 			  "{id:'test', type:'choose', options:['<','≤','=','≥','>'], placeholder:'='} "+
 			  "{id:'value2', type:'number'}, then: "+
-			  "{id:'actions', type:'actions', resetVariables:false}",
+			  "{id:'ops', type:'ops', resetVariables:false}",
 		onexecute: function(my){
 
 			var value1 = my.data.value1;
@@ -3397,7 +3401,7 @@ Joy.module("math", function(){
 			}
 
 			if(result){
-				var message = my.op.actions.act(my.target);
+				var message = my.op.ops.execute(my.target);
 				if(message=="STOP") return message; // STOP
 			}
 
@@ -3410,14 +3414,14 @@ Joy.module("random", function(){
 	Joy.add({
 		name: "With a X% chance...",
 		type: "random/if",
-		tags: ["random", "action"],
+		tags: ["random", "op"],
 		init: "With a {id:'chance', type:'number', min:0, max:100, placeholder:50}% chance, do:"+
-			  "{id:'actions', type:'actions', resetVariables:false}",
+			  "{id:'ops', type:'ops', resetVariables:false}",
 		onexecute: function(my){
 
 			var probability = my.data.chance/100;
 			if(Math.random() < probability){
-				var message = my.op.actions.act(my.target);
+				var message = my.op.ops.execute(my.target);
 				if(message=="STOP") return message; // STOP
 			}
 
@@ -3432,7 +3436,7 @@ Joy.module("random", function(){
 	Joy.add({
 		name: "Set random [number]",
 		type: "random/set",
-		tags: ["random", "action"],
+		tags: ["random", "op"],
 		init: "Set {id:'varname', type:'variableName', variableType:'number'} to a random "+
 			  "{id:'numtype', type:'choose', options:['number','integer'], placeholder:'number'} between "+
 			  "{id:'min', type:'number', placeholder:1} and {id:'max', type:'number', placeholder:100}",

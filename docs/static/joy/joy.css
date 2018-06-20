@@ -2,7 +2,7 @@
 More prefixing to avoid NAME COLLISIONS
 */
 
-.joy-master, .joy-actions, .joy-button, .joy-scrubber, .joy-modal-chooser{
+.joy-master, .joy-ops, .joy-button, .joy-scrubber, .joy-modal-chooser{
 	-webkit-user-select: none;
 	-moz-user-select: none;
 	-ms-user-select: none;
@@ -19,16 +19,16 @@ More prefixing to avoid NAME COLLISIONS
 /* ACTIONS *****/
 /***************/
 
-.joy-actions{
+.joy-ops{
 	margin-top: 0.5em;
 	margin-bottom: 0.5em;
 	position: relative;
 }
 
-.joy-actions #joy-list{}
+.joy-ops #joy-list{}
 
 /* Entry */
-.joy-actions #joy-list > div{
+.joy-ops #joy-list > div{
 
 	overflow: hidden;
 
@@ -40,7 +40,7 @@ More prefixing to avoid NAME COLLISIONS
 	display: flex;
 
 }
-.joy-actions #joy-list > div #joy-bullet-container{
+.joy-ops #joy-list > div #joy-bullet-container{
 	/*float: left;*/
 	-webkit-box-flex: 1;
 	-moz-box-flex: 1;
@@ -50,7 +50,7 @@ More prefixing to avoid NAME COLLISIONS
 	flex: 1;
 	text-align: left;
 }
-.joy-actions #joy-list > div #joy-widget{
+.joy-ops #joy-list > div #joy-widget{
 	/*float: right;*/
 	width: calc(100% - 2em);
 	margin-bottom: 0.3em;
@@ -160,8 +160,8 @@ More prefixing to avoid NAME COLLISIONS
 /***************/
 
 .joy-textbox{
-	height:28px;
-	font-size: 0.8em;
+	height: 20px;
+	font-size: 0.9em;
 	border-radius: 5px;
 	border: 1px solid rgba(0,0,0,0.2);
 	width: 100%;
@@ -170,10 +170,9 @@ More prefixing to avoid NAME COLLISIONS
     font-family: inherit;
     padding: 0.3em 0.4em;
     display: block;
-    background: #333;
-    color: #fff;
-    font-size: inherit;
-    font-size: 0.85em;
+    background: #dde2f3;
+    color: #2427de;
+    font-size: 0.9em;
 }
 textarea.joy-textbox{
 	resize: none;

@@ -417,9 +417,9 @@
 
             }
             else {
-                cb = once(
-                    this._genRemoteCallback(args.callbackId, i, withPromise)
-                );
+                // cb = once(
+                    var cb = this._genRemoteCallback(args.callbackId, i, withPromise)
+                // );
                 result.push(cb);
             }
         }
