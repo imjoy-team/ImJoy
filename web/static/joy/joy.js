@@ -74,8 +74,21 @@ function Joy(options){
 		});
 
 		// On Update!
-		self.onupdate(my);
-
+		var ret = self.onupdate({data: my.data})
+		if(ret instanceof Promise){
+			ret.then((res)=>{
+				if(res && res.init){
+					self.init = res.init
+					self.children = [];
+					Joy.initializeWithString(self, self.init);
+					self.createWidget();
+					if(self.container){
+						self.container.innerHTML = '';
+						self.container.appendChild(self.dom);
+					}
+				}
+			}); //my
+		}
 	};
 	self.update();
 
@@ -106,6 +119,10 @@ Joy.Op = function(options, parent, data){
 	// Meta
 	self._class_ = "Op";
 	self.options = options;
+	if(parent && options)
+	if(options.id && parent.hasOwnProperty(options.id+'_onupdate')){
+		self.onupdate = parent[options.id+'_onupdate'];
+	}
 	self.parent = parent;
 	self.top = self.parent ? self.parent.top : self; // if no parent, I'M top dog.
 
@@ -136,10 +153,12 @@ Joy.Op = function(options, parent, data){
 		_removeFromArray(self.children, child);
 		child.kill();
 	};
-
 	// Update
 	self.update = function(){
-		if(self.onupdate) self.onupdate(self); // TODO: make consistent with .execute()
+		// if(self.onchange && typeof self.onchange == 'function') self.onchange({});
+		if(self.onupdate && typeof self.onchange == 'function'){
+			self.onupdate({})// TODO: make consistent with .execute()
+		}
 		if(self.parent) self.parent.update();
 	};
 
@@ -257,7 +276,7 @@ Joy.Op = function(options, parent, data){
 	/////////////////////////////////
 
 	// Ops can ACT ON targets...
-	self.onexecute = self.onexecute || function(){};
+	self.onexecute = self.onexecute || (parent && parent.onexecute) || function(){console.log('no execute function found.')};
 	self.execute = async function(target, altData){
 
 		// Real or Preview data?
@@ -278,11 +297,6 @@ Joy.Op = function(options, parent, data){
 				data[dataID] = value;
 			}
 		});
-		console.log({
-			op: self,
-			target: target,
-			data: data
-		})
 		// On Execute!
 		return await self.onexecute({
 			op: self,

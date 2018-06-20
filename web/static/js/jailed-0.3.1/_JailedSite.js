@@ -145,6 +145,7 @@
     /**
      * Handles a message from the remote site
      */
+    var callback_reg = new RegExp("onupdate|run$")
     JailedSite.prototype._processMessage = function(data) {
          switch(data.type) {
          case 'method':
@@ -181,7 +182,12 @@
 
              break;
          case 'callback':
-             var method = this._store.fetch(data.id)[data.num];
+              if(callback_reg.test(data.num)){
+                var method = this._store.retrieve(data.id)[data.num];
+              }
+              else{
+                var method = this._store.fetch(data.id)[data.num];
+              }
              var args = this._unwrap(data.args, true);
              if(data.promise){
                var [resolve, reject] = this._unwrap(data.promise, false);
@@ -591,5 +597,15 @@
         return obj;
     }
 
+
+    /**
+     * Retrieves previously stored object
+     *
+     * @param {Number} id of an object to retrieve
+     */
+    ReferenceStore.prototype.retrieve = function(id) {
+        var obj = this._store[id];
+        return obj;
+    }
 
 })();

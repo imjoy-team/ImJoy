@@ -35,7 +35,7 @@
             </div>
         </md-card-header>
         <md-card-content>
-          <joy init="{id:'analysis_workflow', type:'ops'}" @update="updateWorkflow" @run="runWorkflow('analysis_workflow')" v-if="plugin_loaded"></joy>
+          <joy :config="workflow_joy_config" @update="updateWorkflow" @run="runWorkflow" v-if="plugin_loaded"></joy>
         </md-card-content>
         <md-card-actions>
         </md-card-actions>
@@ -74,7 +74,7 @@
             </md-card-actions>
             <md-card-expand-content>
               <md-card-content>
-                <joy :init="panel.init" v-if="plugin_loaded"></joy>
+                <joy :config=panel v-if="plugin_loaded"></joy>
               </md-card-content>
             </md-card-expand-content>
           </md-card-expand>
@@ -149,6 +149,10 @@ export default {
       panels: [],
       activeWindow: null,
       _workflow_my: null,
+      workflow_joy_config: {
+        init: "{id:'workflow', type:'ops'}",
+        workflow_onupdate: this.workflowOnchange
+      },
       plugins: [],
       plugin_api: null,
       plugin_loaded: false,
@@ -182,7 +186,6 @@ export default {
         include_docs: true,
         attachments: true
       }).then(async (result) => {
-        console.log(result)
         const promises = []
         this.plugins = []
         for (let i = 0; i < result.total_rows; i++) {
@@ -191,6 +194,7 @@ export default {
         }
         this.plugin_loaded = true
         this.loading = false
+        this.$forceUpdate()
       }).catch((err) => {
         console.error(err)
         this.loading = false
@@ -207,6 +211,9 @@ export default {
       }
   },
   methods: {
+    workflowOnchange(){
+      console.log('workflow changed ...')
+    },
     windowSelected(window) {
       console.log('activate window: ', window)
       this.activeWindow = window
@@ -226,10 +233,10 @@ export default {
       this._workflow_my = my
       console.log('update workflow', my)
     },
-    runWorkflow(mainOp) {
-      if (this._workflow_my) {
-        console.log('run workflow', mainOp)
-        this._workflow_my[mainOp].execute({})
+    runWorkflow(joy) {
+      if(joy){
+        console.log('run joy.', joy)
+        joy.workflow.execute({op: {name: 'workflow', type: 'ops'}, data: joy.data, target: {}})
       }
     },
     selectFileChanged(file_list) {
@@ -265,12 +272,14 @@ export default {
         config.onexecute = onexecute
       }
       Joy.add(config);
+      console.log('creating panel: ', config)
+      this.panels.push({name: config.name, init: "{id: 'main', type: '"+config.type+"'}", onexecute: config.onexecute})
       return true
     },
     createPanel(config) {
       //TODO: verify fields with PANEL_TEMPLATE
-      console.log('creating panel: ', config)
-      this.panels.push(config)
+      // console.log('creating panel: ', config)
+      // this.panels.push(config)
       return true
     },
     createWindow(config) {

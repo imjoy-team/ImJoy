@@ -14,35 +14,24 @@
 
 <script>
 export default {
-  name: 'options',
+  name: 'joy',
   props:{
-    init:{
-      type: String,
-      default: ()=>{
-        return "joy workflow."
-      }
-    },
     controlButtons:{
       type: Boolean,
       default: ()=>{
         return true
       }
     },
-    data: {
-      type: String,
+    config: {
+      type: Object,
       default: ()=>{
-        return Joy.loadFromURL()
-      }
-    },
-    modules: {
-      type: Array,
-      default: ()=>{
-        return ["instructions", "math", 'random']
+        return {}
       }
     }
   },
   data () {
     return {
+      joy: null,
       isRunning: false,
       router: this.$root.$data.router,
       store: this.$root.$data.store,
@@ -53,41 +42,54 @@ export default {
     this.setupJoy()
   },
   watch: {
-  	init: function(newVal, oldVal) { // watch it
+  	config: (newVal, oldVal)=>{ // watch it
       console.log('Prop changed: ', newVal, ' | was: ', oldVal)
-      setupJoy()
+      this.setupJoy()
     }
   },
   methods: {
     setupJoy() {
+      console.log(this.config)
       this.$refs.editor.innerHTML = ''
-      Joy({
+      const joy_config = {
         // Where the Joy editor goes:
         container: this.$refs.editor,
 
         // The words & ops inside the editor:
-        init: this.init, //"{id:'localizationWorkflow', type:'ops'} " + // a list of ops
+        init: this.config.init || '', //"{id:'localizationWorkflow', type:'ops'} " + // a list of ops
           //"<hr> {type:'save'}", // a save button!
 
         // Load data from URL, otherwise blank:
-        data: this.data,
+        data: this.config.data || Joy.loadFromURL(),
 
         // Other ops to include, beyond turtle ops:
-        modules: this.modules,
+        modules: this.config.modules || ["instructions", "math", 'random'],
 
+        onexecute: this.config.onexecute
         // What to do when the user makes a change:
-        onupdate: (my) => {
-          // turtle.start();
-          // my.turtleInstructions.act(turtle);
-          // turtle.draw();
-          console.log('joy updated: ', my)
-          this.$emit('update', my)
+        // onupdate: (my) => {
+        //   // turtle.start();
+        //   // my.turtleInstructions.act(turtle);
+        //   // turtle.draw();
+        //   console.log('joy updated: ', my)
+        //   this.$emit('update', my)
+        // }
+      }
+      for(let c in this.config){
+        if(this.config.hasOwnProperty(c)){
+          if(c.endsWith('onupdate') && typeof this.config[c] == 'function'){
+            joy_config[c] = this.config[c]
+          }
         }
-      });
+      }
+      this.joy = Joy(joy_config);
     },
     runJoy() {
-      console.log('emit run joy')
-      this.$emit('run')
+      if(this.joy && this.config.onexecute){
+        console.log('run joy.', this.joy)
+        this.joy.execute({op: {name: this.config.name, type: this.config.type}, data: this.joy.data, target: {}})
+      }
+      this.$emit('run', this.joy)
     },
     stopJoy() {
       this.$emit('stop')
