@@ -156,26 +156,21 @@ export default {
       this.db.allDocs({
         include_docs: true,
         attachments: true
-      }).then((result) => {
+      }).then(async (result) => {
         console.log(result)
         const promises = []
         this.plugins = []
         for (let i = 0; i < result.total_rows; i++) {
           const config = result.rows[i].doc
-          promises.push(this.loadPlugin(config))
+          await this.loadPlugin(config)
         }
-        Promise.all(promises).then(() => {
-          this.plugin_loaded = true
-        }).catch((e) => {
-          console.error(e)
-          this.plugin_loaded = true
-        })
+        this.plugin_loaded = true
         this.loading = false
       }).catch((err) => {
         console.error(err)
         this.loading = false
       });
-    }, 1000)
+    }, 200)
 
     // this.store.event_bus.$on('message', this.messageHandler)
   },
