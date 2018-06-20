@@ -310,11 +310,13 @@ export default {
           }).catch((e) => {
             console.error('error occured when loading plugin ' + config.name + ": ", e)
             reject(e)
+            plugin.terminate()
           })
         });
         plugin.whenFailed((e) => {
           console.error('error occured when loading '+config.name + ":", e)
           alert('error occured when loading ' + config.name)
+          plugin.terminate()
           // reject(e)
         });
 

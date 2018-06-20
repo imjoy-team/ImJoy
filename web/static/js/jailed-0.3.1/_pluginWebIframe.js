@@ -66,7 +66,7 @@ var execute = function(code) {
         eval(code);
     } catch (e) {
         console.error(e)
-        parent.postMessage({type : 'executeFailure', error: {line: e.lineNumber, message: e.toString()}}, '*');
+        parent.postMessage({type : 'executeFailure'}, '*');
         throw e;
     }
 
