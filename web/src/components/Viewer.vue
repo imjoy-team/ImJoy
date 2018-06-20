@@ -247,18 +247,23 @@ export default {
     createOp(config) {
       //TODO: verify fields with OP_TEMPLATE
       console.log('creating Op: ', config)
-      const onexecute = async (my) => {
-        return await config.run({
-          op: {
-            name: my.op.name,
-            type: my.op.type
-          },
-          config: my.data,
-          data: my.target,
-          progress: this.updateProgress
-        })
+      if(!config.run){
+        console.log("WARNING: no run function found in the config, this op won't be able to do anything: " + config.name)
       }
-      config.onexecute = onexecute
+      else{
+        const onexecute = async (my) => {
+          return await config.run({
+            op: {
+              name: my.op.name,
+              type: my.op.type
+            },
+            config: my.data,
+            data: my.target,
+            progress: this.updateProgress
+          })
+        }
+        config.onexecute = onexecute
+      }
       Joy.add(config);
       return true
     },
@@ -308,8 +313,9 @@ export default {
           })
         });
         plugin.whenFailed((e) => {
+          console.error('error occured when loading '+config.name + ":", e)
           alert('error occured when loading ' + config.name)
-          reject(e)
+          // reject(e)
         });
 
       })

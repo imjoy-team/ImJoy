@@ -13,13 +13,11 @@ class LookupTablePlugin {
         tags: ['color']
       },
       init: "apply LUT {id:'lut', type:'choose', options:['hot', 'rainbow'], placeholder: 'hot'}",
-      run: this.run
     })
 
     api.createPanel({
       name: "Choose LUT",
       init: "Choose a LUT: {id:'lut', type:'choose', options:['hot', 'rainbow'], placeholder: 'hot'}",
-      run: this.run
     })
   }
 
@@ -28,7 +26,6 @@ class LookupTablePlugin {
     api.createWindow({
       name: "LUT Window",
       init: "Choose a LUT: {id:'lut', type:'choose', options:['hot', 'rainbow'], placeholder: 'hot'}"
-      panel
     })
     return my
   }

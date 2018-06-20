@@ -74,7 +74,8 @@ self.connection = {};
         try {
             eval(code);
         } catch (e) {
-            self.postMessage({type: 'executeFailure'});
+            console.error(e)
+            self.postMessage({type: 'executeFailure', error: error: {line: e.lineNumber, message: e.toString()}});
             throw e;
         }
 
