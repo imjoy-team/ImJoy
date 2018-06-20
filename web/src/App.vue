@@ -1,6 +1,6 @@
 <template>
     <md-app id="app"  md-waterfall md-mode="fixed">
-      <md-app-toolbar v-if="show_navbar"class="md-primary">
+      <md-app-toolbar v-if="show_navbar" class="md-primary">
         <navbar/>
       </md-app-toolbar>
       <md-app-content>
@@ -69,6 +69,10 @@ html, body
 
 .md-app {
   height:100%;
+}
+
+.md-content {
+  padding: 0px;
 }
 
 @media screen and (max-width: 800px) {

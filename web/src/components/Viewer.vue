@@ -28,6 +28,11 @@
       </div>
       <md-card>
         <md-card-header>
+            <div class="md-toolbar-row panel-header">
+              <div class="md-toolbar-section-start">
+                <span class="panel-title ">Workflow</span>
+              </div>
+            </div>
         </md-card-header>
         <md-card-content>
           <joy init="{id:'analysis_workflow', type:'ops'}" @update="updateWorkflow" @run="runWorkflow('analysis_workflow')" v-if="plugin_loaded"></joy>
@@ -38,21 +43,42 @@
 
       <div class="md-layout">
         <md-card v-for="panel in panels" class="md-layout-item" :key="panel.name">
-          <md-card-header>
-            <div class="md-toolbar-row">
-              <div class="md-toolbar-section-start">
-                <h2>{{panel.name}}</h2>
-              </div>
-              <div class="md-toolbar-section-end">
-                <md-button @click="closePanel(panel)" class="md-icon-button">
-                  <md-icon>close</md-icon>
+          <md-card-expand>
+            <md-card-actions md-alignment="space-between">
+              <md-card-expand-trigger>
+                <md-button class="md-icon-button">
+                  <md-icon>keyboard_arrow_down</md-icon>
                 </md-button>
+              </md-card-expand-trigger>
+              <div>  <span class="panel-title">{{panel.name}}</span></div>
+              <div>
+
+                <!-- <md-button>Action</md-button>
+                <md-button>Action</md-button> -->
+                <md-menu md-size="big" md-direction="bottom-end">
+                  <md-button class="md-icon-button" md-menu-trigger>
+                    <md-icon>more_vert</md-icon>
+                  </md-button>
+                  <md-menu-content>
+                    <md-menu-item @click="closePanel(panel)">
+                      <span>Close</span>
+                      <md-icon>close</md-icon>
+                    </md-menu-item>
+                    <!-- <md-menu-item @click="fullScreenPanel(panel)">
+                      <span>Fullscreen</span>
+                      <md-icon>fullscreen</md-icon>
+                    </md-menu-item> -->
+                  </md-menu-content>
+                </md-menu>
               </div>
-            </div>
-          </md-card-header>
-          <md-card-content>
-            <joy :init="panel.init" v-if="plugin_loaded"></joy>
-          </md-card-content>
+            </md-card-actions>
+            <md-card-expand-content>
+              <md-card-content>
+                <joy :init="panel.init" v-if="plugin_loaded"></joy>
+              </md-card-content>
+            </md-card-expand-content>
+          </md-card-expand>
+
         </md-card>
 
       </div>
@@ -60,7 +86,7 @@
 
     </md-app-drawer>
 
-    <md-app-content>
+    <md-app-content class="whiteboard-content">
       <whiteboard :windows="windows" @select="windowSelected"></whiteboard>
     </md-app-content>
   </md-app>
@@ -143,7 +169,6 @@ export default {
       createPanel: this.createPanel,
       createWindow: this.createWindow,
       createOp: this.createOp,
-      registerIO: this.registerIO,
     }
     this.plugin_loaded = false
     this.loading = true
@@ -223,7 +248,7 @@ export default {
       //TODO: verify fields with OP_TEMPLATE
       console.log('creating Op: ', config)
       const onexecute = async (my) => {
-        return await plugin.api.run({
+        return await config.run({
           op: {
             name: my.op.name,
             type: my.op.type
@@ -247,10 +272,7 @@ export default {
       //TODO: verify fields with WINDOW_TEMPLATE
       console.log('creating window: ', config)
       this.windows.push(config)
-      return true
-    },
-    registerIO(config){
-
+      // create panel for the window
       return true
     },
     loadPlugin(config) {
@@ -304,6 +326,9 @@ export default {
   width: 100%;
 }
 
+.md-content{
+  overflow-x: hidden;
+}
 .viewer {
   height: 100%;
 }
@@ -316,5 +341,19 @@ export default {
   /* width: 100%; */
   /* height: 300px; */
   margin-bottom: 20px;
+}
+
+.whiteboard-content{
+  padding: 0px;
+}
+
+.panel-header{
+  padding-left: 20px;
+  height: 40px;
+  min-height: 20px;
+}
+
+.panel-title{
+  font-size: 1.4em;
 }
 </style>

@@ -4,6 +4,7 @@ export const WINDOW_TEMPLATE = {
   init: "",
   data: {}, //attachments: {}
   config: {},
+  panel: {}
 }
 
 export const PANEL_TEMPLATE = {
@@ -11,6 +12,7 @@ export const PANEL_TEMPLATE = {
   type: "",
   init: "",
   tags: [],
+  run: null
 }
 
 export const OP_TEMPLATE = {
@@ -18,9 +20,5 @@ export const OP_TEMPLATE = {
   type: "",
   init: "",
   tags: [],
-}
-
-export const IO_TEMPLATE = {
-  input: {type: "image", tags: []},
-  output: {type: "image", tags: []},
+  run: null
 }
