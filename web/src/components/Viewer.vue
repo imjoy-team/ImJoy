@@ -183,24 +183,26 @@ export default {
     })
     const root = location.protocol + '//' + location.host
 
-    this.db.allDocs({
-      include_docs: true,
-      attachments: true
-    }).then(async (result) => {
-      const promises = []
-      this.plugins = {}
-      for (let i = 0; i < result.total_rows; i++) {
-        const config = result.rows[i].doc
-        await this.loadPlugin(config)
-      }
-      this.plugin_loaded = true
-      this.loading = false
-      this.$forceUpdate()
-    }).catch((err) => {
-      console.error(err)
-      this.loading = false
-    });
-
+    //TODO: fix this, how to prevent loading failure if remove this timeout
+    setTimeout(()=>{
+      this.db.allDocs({
+        include_docs: true,
+        attachments: true
+      }).then(async (result) => {
+        const promises = []
+        this.plugins = {}
+        for (let i = 0; i < result.total_rows; i++) {
+          const config = result.rows[i].doc
+          await this.loadPlugin(config)
+        }
+        this.plugin_loaded = true
+        this.loading = false
+        this.$forceUpdate()
+      }).catch((err) => {
+        console.error(err)
+        this.loading = false
+      });
+    }, 1000)
   },
   beforeDestroy() {
       console.log('terminating plugins')
