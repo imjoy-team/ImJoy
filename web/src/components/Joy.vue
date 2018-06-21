@@ -39,7 +39,7 @@ export default {
     }
   },
   mounted(){
-    setTimeout(this.setupJoy, 100)
+    setTimeout(this.setupJoy, 500)
   },
   watch: {
   	config: (newVal, oldVal)=>{ // watch it
@@ -84,10 +84,6 @@ export default {
       this.joy = Joy(joy_config);
     },
     runJoy() {
-      if(this.joy && this.config.onexecute){
-        console.log('run joy.', this.joy)
-        this.joy.execute({op: {name: this.config.name, type: this.config.type}, data: this.joy.data, target: {}})
-      }
       this.$emit('run', this.joy)
     },
     stopJoy() {

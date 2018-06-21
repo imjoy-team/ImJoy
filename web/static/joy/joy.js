@@ -243,6 +243,7 @@ Joy.Op = function(options, parent, data){
 
 	// If you didn't already pass in a data object, let's figure it out!
 	self.data = self.data || data;
+
 	if(!self.data){
 		var parent = self.parent;
 		var dataID = self.dataID;
@@ -255,7 +256,6 @@ Joy.Op = function(options, parent, data){
 			self.data = _clone(self.placeholder);
 		}
 	}
-
 	// Get & Set!
 	self.getData = function(dataID){
 		return self.data[dataID];
@@ -342,7 +342,7 @@ Joy.Op = function(options, parent, data){
 	};
 
 	// ...or GET INFO from targets.
-	self.onget = self.onget || function(){};
+	self.onget = self.onget || function(my){return my.data}; // dy default it returns data (my.config)
 	self.get = function(target){
 
 		// Real or Preview data?
@@ -355,6 +355,7 @@ Joy.Op = function(options, parent, data){
 			target: target,
 			data: data
 		});
+
 
 	};
 
@@ -2581,16 +2582,17 @@ Joy.add({
 		dom.appendChild(addButton.dom);
 
 	},
+
 	onexecute: async function(my){
 
-		// Create _vars, if not already there
-		if(!my.target._variables) my.target._variables={};
+			// Create _vars, if not already there
+			if(!my.target._variables) my.target._variables={};
 
-		// Reset all of target's variables?
-		if(my.data.resetVariables) my.target._variables = {};
+			// Reset all of target's variables?
+			if(my.data.resetVariables) my.target._variables = {};
 
-		// Do those ops, baby!!!
-		for(var i=0; i<my.data.ops.length; i++){
+			// Do those ops, baby!!!
+			for(var i=0; i<my.data.ops.length; i++){
 
 			// Stop?
 			var opData = my.data.ops[i];

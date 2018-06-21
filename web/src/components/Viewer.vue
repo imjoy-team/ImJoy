@@ -35,7 +35,7 @@
             </div>
         </md-card-header>
         <md-card-content>
-          <joy :config="workflow_joy_config" @update="updateWorkflow" @run="runWorkflow" v-if="plugin_loaded"></joy>
+          <joy :config="workflow_joy_config" @update="updateWorkflow" ref="workflow" @run="runWorkflow" v-if="plugin_loaded"></joy>
         </md-card-content>
         <md-card-actions>
         </md-card-actions>
@@ -74,7 +74,7 @@
             </md-card-actions>
             <md-card-expand-content>
               <md-card-content>
-                <joy :config="panel" v-if="plugin_loaded"></joy>
+                <joy :config="panel" @run="runPanel($event, panel)" v-if="plugin_loaded"></joy>
               </md-card-content>
             </md-card-expand-content>
           </md-card-expand>
@@ -235,10 +235,13 @@ export default {
       console.log('update workflow', my)
     },
     runWorkflow(joy) {
-      if(joy){
-        console.log('run joy.', joy)
-        joy.workflow.execute({op: {name: 'workflow', type: 'ops'}, data: joy.data, target: {}})
-      }
+        console.log('run joy.')
+        joy.workflow.execute({})
+
+    },
+    runPanel(joy, panel){
+      console.log('run panel.', joy)
+      joy._panel.execute({})
     },
     selectFileChanged(file_list) {
       console.log(file_list)
@@ -264,6 +267,7 @@ export default {
       }
       else{
         const onexecute = async (my) => {
+          //conver the api here data-->config   target--> data
           return await plugin.api.run({
             op: {
               name: my.op.name,
@@ -286,7 +290,10 @@ export default {
         }
       }
       Joy.add(config);
-      const panel_config = {name: config.name, init: "{id: 'default_panel', type: '"+config.type+"'}", onexecute: config.onexecute}
+      //update the joy workflow if new template added, TODO: preserve settings during reload
+      this.$refs.workflow.setupJoy()
+
+      const panel_config = {name: config.name, init: "{id: '_panel', type: '"+config.type+"'}", onexecute: config.onexecute}
       plugin.panel_config = panel_config
       if(config.show_panel){
         console.log('creating panel: ', panel_config)

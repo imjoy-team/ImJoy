@@ -1,6 +1,5 @@
 class LookupTablePlugin {
   setup() {
-    this._init=''
     api.createOp({
       name: "apply LUT",
       type: "image/LUT",
@@ -22,8 +21,7 @@ class LookupTablePlugin {
   }
   update(config){
     console.log('update running in the plugin', config)
-    this._init = this._init + '#'
-    return {init: "apply LUT {id:'lut', type:'choose', options:['hot', 'rainbow', 'hello'], placeholder: 'hot'}" + this._init}
+    return {init: "apply LUT {id:'lut', type:'choose', options:['hot', 'rainbow', 'hello'], placeholder: 'hot'}"}
   }
   async run(my) {
     const lut = my.config.lut
