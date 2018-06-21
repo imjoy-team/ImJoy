@@ -3,6 +3,7 @@
   "root_path": "/static/plugins",
   "plugins": [{
     "name": "Text File Importer",
+    "type": "webworker",
     "version": "0.0.1",
     "api_version": "0.0.1",
     "createdAt": "Mon Jun 18 2018 21:46:36",
@@ -14,6 +15,7 @@
   },
   {
     "name": "2D Histogram",
+    "type": "iframe",
     "version": "0.0.1",
     "api_version": "0.0.1",
     "createdAt": "Mon Jun 19 2018 15:45:30",
@@ -25,6 +27,7 @@
   },
   {
     "name": "Lookup Table",
+    "type": "webworker",
     "version": "0.0.1",
     "api_version": "0.0.1",
     "createdAt": "Mon Jun 19 2018 16:33:11",
