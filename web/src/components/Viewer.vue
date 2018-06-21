@@ -172,8 +172,9 @@ export default {
   mounted() {
     this.plugin_api = {
       alert: alert,
+      register: this.register,
       createWindow: this.createWindow,
-      createOp: this.createOp,
+      showDialog: this.showDialog
     }
     this.plugin_loaded = false
     this.loading = true
@@ -257,7 +258,7 @@ export default {
     closePanel(panel) {
 
     },
-    createOp(config, _plugin) {
+    register(config, _plugin) {
       const plugin = this.plugins[_plugin._id]
       //TODO: verify fields with OP_TEMPLATE
       console.log('creating Op: ', config, _plugin, this.plugins)
@@ -304,6 +305,19 @@ export default {
       return true
     },
     createWindow(config, _plugin) {
+      const plugin = this.plugins[_plugin._id]
+      //TODO: verify fields with WINDOW_TEMPLATE
+      console.log('creating window: ', config, plugin)
+
+      if(config.show_panel && plugin.panel_config){
+        // create panel for the window
+        console.log('creating panel: ', plugin.panel_config)
+        // config.panel = plugin_config
+      }
+      this.windows.unshift(config)
+      return true
+    },
+    showDialog(config, _plugin) {
       const plugin = this.plugins[_plugin._id]
       //TODO: verify fields with WINDOW_TEMPLATE
       console.log('creating window: ', config, plugin)

@@ -1,6 +1,6 @@
 class LookupTablePlugin {
   setup() {
-    api.createOp({
+    api.register({
       name: "apply LUT",
       type: "image/LUT",
       tags: ["image", "op", "LUT"],

@@ -166,6 +166,19 @@ export default {
         }
         plugin.js_code = response.data
         plugin._id = plugin.name
+        if(plugin.dependencies){
+          for(let i=0;i<plugin.dependencies.length;i++){
+            const ps = this.plugins.filter(p => p.name == plugin.dependencies[i]);
+            if(ps.length<=0){
+              alert(plugin.name +' plugin depends on '+plugin.dependencies[i]+', but it can not be found in the repository.')
+            }
+            else{
+              console.log('installing dependency ', ps[0])
+              if(!ps[0].installed)
+              this.install(ps[0])
+            }
+          }
+        }
         const addPlugin = () => {
           this.db.put(plugin, {
             force: true

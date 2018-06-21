@@ -9,7 +9,8 @@
     "js_path": "/TextFileImporter/textFileImporter.js",
     "description": "A plugin for loading localization table from text files.",
     "tags": ["localization", "importer"],
-    "thunbnail": null
+    "thunbnail": null,
+    "dependencies": []
   },
   {
     "name": "2D Histogram",
@@ -19,7 +20,8 @@
     "js_path": "/Histogram2D/histogram2D.js",
     "description": "A plugin for render 2D histogram from a localization table.",
     "tags": ["localization", "render"],
-    "thunbnail": null
+    "thunbnail": null,
+    "dependencies": ["Lookup Table"]
   },
   {
     "name": "Lookup Table",
@@ -29,6 +31,7 @@
     "js_path": "/LookupTable/lookupTable.js",
     "description": "A plugin for applying lookup table to a single-channel image.",
     "tags": ["image", "LUT"],
-    "thunbnail": null
+    "thunbnail": null,
+    "dependencies": []
   }]
 }

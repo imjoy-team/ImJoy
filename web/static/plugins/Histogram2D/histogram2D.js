@@ -1,6 +1,6 @@
 class Histogram2dPlugin {
   setup(){
-    api.createOp({
+    api.register({
       name: "render 2D histogram",
       type: "localization/render_2d_histogram",
       tags: ["localization", "op", "histogram"],
