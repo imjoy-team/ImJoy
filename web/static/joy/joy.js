@@ -2039,6 +2039,37 @@ Joy.add({
 
 /****************
 
+A button widget
+
+Widget Options:
+{id:'direction', type:'button', label:'OK'}
+
+When it's clicked, it will call the corresponding onupdate function
+
+****************/
+
+Joy.add({
+	type: "button",
+	tags: ["op"],
+	initWidget: function(self){
+		// DOM
+		var dom = document.createElement("div");
+		dom.className = "joy-save";
+		self.dom = dom;
+		// Save Button
+		self.saveButton = new Joy.ui.Button({
+			label: self.options.label || "--",
+			onclick: function(){
+				self.update()
+			}
+		});
+		dom.appendChild(self.saveButton.dom);
+	},
+});
+
+
+/****************
+
 A color widget! (for now, same as choose except paints DOM, too)
 
 Widget Options:

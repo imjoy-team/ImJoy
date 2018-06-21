@@ -307,7 +307,7 @@ export default {
         }
         config.onexecute = onexecute
       }
-      if(typeof config.onupdate == 'object'){
+      if(config.onupdate && typeof config.onupdate == 'object'){
         for(let k in config.onupdate){
           if(config.onupdate.hasOwnProperty(k)){
             // replace the string to a real function
@@ -338,12 +338,30 @@ export default {
         console.log('creating panel: ', plugin.panel_config)
         // config.panel = plugin_config
       }
+      if(config.onupdate && typeof config.onupdate == 'object'){
+        for(let k in config.onupdate){
+          if(config.onupdate.hasOwnProperty(k)){
+            // replace the string to a real function
+            const onupdate = plugin.api[config.onupdate[k]]
+            config.onupdate[k] = onupdate
+          }
+        }
+      }
       this.windows.unshift(config)
       return true
     },
     showDialog(config, _plugin) {
       return new Promise((resolve, reject) => {
         const plugin = this.plugins[_plugin._id]
+        if(config.onupdate && typeof config.onupdate == 'object'){
+          for(let k in config.onupdate){
+            if(config.onupdate.hasOwnProperty(k)){
+              // replace the string to a real function
+              const onupdate = plugin.api[config.onupdate[k]]
+              config.onupdate[k] = onupdate
+            }
+          }
+        }
         //TODO: verify fields with WINDOW_TEMPLATE
         console.log('creating window: ', config, plugin)
 
