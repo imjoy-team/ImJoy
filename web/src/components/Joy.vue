@@ -39,7 +39,7 @@ export default {
     }
   },
   mounted(){
-    this.setupJoy()
+    setTimeout(this.setupJoy, 100)
   },
   watch: {
   	config: (newVal, oldVal)=>{ // watch it
@@ -49,7 +49,6 @@ export default {
   },
   methods: {
     setupJoy() {
-      console.log(this.config)
       this.$refs.editor.innerHTML = ''
       const joy_config = {
         // Where the Joy editor goes:

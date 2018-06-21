@@ -37,6 +37,9 @@ if (__is__node__) {
         .join('/')+'/';
 }
 
+function randId() {
+    return Math.random().toString(36).substr(2, 10);
+}
 
 (function (root, factory) {
     if (typeof define === 'function' && define.amd) {
@@ -600,6 +603,9 @@ if (__is__node__) {
            }
           }
         }
+        if(this._id === undefined || !this._id){
+          this._id = randId()
+        }
         this._path = url;
         this._initialInterface = _interface||{};
         this._connect();
@@ -620,6 +626,9 @@ if (__is__node__) {
               this[key] = config[key];
            }
           }
+        }
+        if(this._id === undefined || !this._id){
+          this._id = randId()
         }
         this._code = code;
         this._initialInterface = _interface||{};
@@ -660,7 +669,7 @@ if (__is__node__) {
      */
     DynamicPlugin.prototype._init =
            Plugin.prototype._init = function() {
-        this._site = new JailedSite(this._connection);
+        this._site = new JailedSite(this._connection, this._id);
 
         var me = this;
         this._site.onDisconnect(function() {

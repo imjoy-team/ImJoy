@@ -50,7 +50,7 @@ function Joy(options){
 	Joy.modal.init(self);
 
 	// Update!
-	self.onupdate = self.onupdate || function(my){};
+	// self.onupdate = self.onupdate || function(my){};
 	self.update = function(){
 
 		// Create a fake "my"
@@ -74,20 +74,24 @@ function Joy(options){
 		});
 
 		// On Update!
-		var ret = self.onupdate({data: my.data})
-		if(ret instanceof Promise){
-			ret.then((res)=>{
-				if(res && res.init){
-					self.init = res.init
-					self.children = [];
-					Joy.initializeWithString(self, self.init);
-					self.createWidget();
-					if(self.container){
-						self.container.innerHTML = '';
-						self.container.appendChild(self.dom);
+		if(self.onupdate && typeof self.onupdate == 'function'){
+			var ret = self.onupdate({data: my.data});
+			if(ret instanceof Promise){
+				ret.then((res)=>{
+					if(res && res.init){
+						self.init = res.init;
+						self.children = [];
+						Joy.initializeWithString(self, self.init);
+						self.createWidget();
+						if(self.container){
+							self.container.innerHTML = '';
+							self.container.appendChild(self.dom);
+						}
 					}
-				}
-			}); //my
+				}).catch(()=>{
+					console.error('failed to run onupdate function in ' + self.id)
+				}); //my
+			}
 		}
 	};
 	self.update();
@@ -119,10 +123,6 @@ Joy.Op = function(options, parent, data){
 	// Meta
 	self._class_ = "Op";
 	self.options = options;
-	if(parent && options)
-	if(options.id && parent.hasOwnProperty(options.id+'_onupdate')){
-		self.onupdate = parent[options.id+'_onupdate'];
-	}
 	self.parent = parent;
 	self.top = self.parent ? self.parent.top : self; // if no parent, I'M top dog.
 
@@ -134,10 +134,17 @@ Joy.Op = function(options, parent, data){
 	}
 	_configure(self, self.options);
 
+	if(parent && typeof parent.onupdate == 'object'){
+		self.onupdate = parent.onupdate[self.id]
+	}
+
 	// Adding child ops
 	self.children = [];
 	self.addChild = function(child, data){
-
+		//get onupdate for the child
+		if(typeof self.onupdate == 'object'){
+			child.onupdate = self.onupdate[child.id]
+		}
 		// If child's not an Op, it's options to create a new Op.
 		if(child._class_!="Op") child = new Joy.Op(child, self, data);
 		self.children.push(child);
@@ -156,8 +163,36 @@ Joy.Op = function(options, parent, data){
 	// Update
 	self.update = function(){
 		// if(self.onchange && typeof self.onchange == 'function') self.onchange({});
-		if(self.onupdate && typeof self.onchange == 'function'){
-			self.onupdate({})// TODO: make consistent with .execute()
+		if(self.onupdate && typeof self.onupdate == 'function'){
+			var ret = self.onupdate({data: self.data})// TODO: make consistent with .execute()
+			if(ret instanceof Promise){
+				ret.then((res)=>{
+					try {
+						if(res && res.init){
+							// TODO: update the widget
+							// self.children = [];
+							// replace the entire dom
+							// Joy.initializeWithString(self, res.init);
+							// self.createWidget();
+							// if(self.top && self.top.container){
+							// 	self.top.container.innerHTML=""
+							// 	self.top.container.appendChild(self.dom);
+							// }
+							var old_dom = self.dom
+							self.children = [];
+							Joy.initializeWithString(self, res.init);
+							self.createWidget();
+							if(self.parent && self.parent.dom){
+								self.parent.dom.replaceChild(self.dom, old_dom);
+							}
+						}
+					} catch (e) {
+						console.error(e)
+					}
+				}).catch(()=>{
+					console.error('failed to run onupdate function in ' + self.id)
+				}); //my
+			}
 		}
 		if(self.parent) self.parent.update();
 	};
@@ -276,7 +311,7 @@ Joy.Op = function(options, parent, data){
 	/////////////////////////////////
 
 	// Ops can ACT ON targets...
-	self.onexecute = self.onexecute || (parent && parent.onexecute) || function(){console.log('no execute function found.')};
+	self.onexecute = self.onexecute || function(){console.log('no execute function found.')};
 	self.execute = async function(target, altData){
 
 		// Real or Preview data?
@@ -364,7 +399,7 @@ Joy.add = function(template){
 		Joy.templates.push(template);
 	}
 	else{
-		console.log('replacing template ', template.name, template.type)
+		// console.log('replacing template ', template.name, template.type)
 		_removeFromArray(Joy.templates, duplicated[0]);
 		Joy.templates.push(template);
 	}
@@ -2567,11 +2602,11 @@ Joy.add({
 			if(result && result.target){
 				my.target = result.target;
 			}
-			else if(result.error){
+			else if(result && result.error){
 				console.error('ops stopped with error: ', result);
 				return result;
 			}
-			else if(result.stop){
+			else if(result && result.stop){
 				console.log('ops interrupted at step ', i, result);
 				return result;
 			}

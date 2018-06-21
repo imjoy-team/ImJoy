@@ -5,11 +5,12 @@
       <md-card>
         <md-card-expand>
           <md-card-actions md-alignment="space-between" :class="window.selected?'window-selected':''" class="window-header">
-            <md-card-expand-trigger>
+            <md-card-expand-trigger v-if="window.panel">
               <md-button class="md-icon-button">
                 <md-icon>keyboard_arrow_down</md-icon>
               </md-button>
             </md-card-expand-trigger>
+            <div v-if="!window.panel"></div>
             <div>  <span class="window-title">{{window.name}}</span></div>
             <div>
 
@@ -32,9 +33,9 @@
               </md-menu>
             </div>
           </md-card-actions>
-          <md-card-expand-content>
+          <md-card-expand-content v-if="window.panel">
             <md-card-content>
-              Lorem ipsum dolor sit amet, consectetur adipisicing elit. Optio itaque ea.
+              <joy :config="window.panel"></joy>
             </md-card-content>
           </md-card-expand-content>
         </md-card-expand>

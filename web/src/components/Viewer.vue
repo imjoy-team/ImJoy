@@ -42,7 +42,7 @@
       </md-card>
 
       <div class="md-layout">
-        <md-card v-for="panel in panels" class="md-layout-item" :key="panel.name">
+        <md-card v-for="panel in panels" class="md-layout-item md-size-90" :key="panel.name">
           <md-card-expand>
             <md-card-actions md-alignment="space-between">
               <md-card-expand-trigger>
@@ -74,7 +74,7 @@
             </md-card-actions>
             <md-card-expand-content>
               <md-card-content>
-                <joy :config=panel v-if="plugin_loaded"></joy>
+                <joy :config="panel" v-if="plugin_loaded"></joy>
               </md-card-content>
             </md-card-expand-content>
           </md-card-expand>
@@ -133,6 +133,8 @@ import {
   IO_TEMPLATE
 } from '../api.js'
 
+import { randId } from '../utils.js'
+
 export default {
   name: 'viewer',
   props: ['title'],
@@ -153,7 +155,7 @@ export default {
         init: "{id:'workflow', type:'ops'}",
         workflow_onupdate: this.workflowOnchange
       },
-      plugins: [],
+      plugins: {},
       plugin_api: null,
       plugin_loaded: false,
       menuVisible: true,
@@ -170,7 +172,6 @@ export default {
   mounted() {
     this.plugin_api = {
       alert: alert,
-      createPanel: this.createPanel,
       createWindow: this.createWindow,
       createOp: this.createOp,
     }
@@ -181,33 +182,33 @@ export default {
       auto_compaction: true
     })
     const root = location.protocol + '//' + location.host
-    setTimeout(() => {
-      this.db.allDocs({
-        include_docs: true,
-        attachments: true
-      }).then(async (result) => {
-        const promises = []
-        this.plugins = []
-        for (let i = 0; i < result.total_rows; i++) {
-          const config = result.rows[i].doc
-          await this.loadPlugin(config)
-        }
-        this.plugin_loaded = true
-        this.loading = false
-        this.$forceUpdate()
-      }).catch((err) => {
-        console.error(err)
-        this.loading = false
-      });
-    }, 200)
 
-    // this.store.event_bus.$on('message', this.messageHandler)
+    this.db.allDocs({
+      include_docs: true,
+      attachments: true
+    }).then(async (result) => {
+      const promises = []
+      this.plugins = {}
+      for (let i = 0; i < result.total_rows; i++) {
+        const config = result.rows[i].doc
+        await this.loadPlugin(config)
+      }
+      this.plugin_loaded = true
+      this.loading = false
+      this.$forceUpdate()
+    }).catch((err) => {
+      console.error(err)
+      this.loading = false
+    });
+
   },
   beforeDestroy() {
       console.log('terminating plugins')
-      for (let i = 0; i < this.plugins.length; i++) {
-        const plugin = this.plugins[i]
-        plugin.terminate()
+      for (let k in this.plugins) {
+        if(this.plugins.hasOwnProperty(k)){
+          const plugin = this.plugins[k]
+          plugin.terminate()
+        }
       }
   },
   methods: {
@@ -251,15 +252,19 @@ export default {
     closePanel(panel) {
 
     },
-    createOp(config) {
+    createOp(config, _plugin) {
+      const plugin = this.plugins[_plugin._id]
       //TODO: verify fields with OP_TEMPLATE
-      console.log('creating Op: ', config)
-      if(!config.run){
+      console.log('creating Op: ', config, _plugin, this.plugins)
+      if(!plugin.api.run){
         console.log("WARNING: no run function found in the config, this op won't be able to do anything: " + config.name)
+        config.onexecute = () =>{
+          console.log("WARNING: no run function defined.")
+        }
       }
       else{
         const onexecute = async (my) => {
-          return await config.run({
+          return await plugin.api.run({
             op: {
               name: my.op.name,
               type: my.op.type
@@ -271,22 +276,35 @@ export default {
         }
         config.onexecute = onexecute
       }
+      if(typeof config.onupdate == 'object'){
+        for(let k in config.onupdate){
+          if(config.onupdate.hasOwnProperty(k)){
+            // replace the string to a real function
+            const onupdate = plugin.api[config.onupdate[k]]
+            config.onupdate[k] = onupdate
+          }
+        }
+      }
       Joy.add(config);
-      console.log('creating panel: ', config)
-      this.panels.push({name: config.name, init: "{id: 'main', type: '"+config.type+"'}", onexecute: config.onexecute})
+      const panel_config = {name: config.name, init: "{id: 'default_panel', type: '"+config.type+"'}", onexecute: config.onexecute}
+      plugin.panel_config = panel_config
+      if(config.show_panel){
+        console.log('creating panel: ', panel_config)
+        this.panels.push(panel_config)
+      }
       return true
     },
-    createPanel(config) {
-      //TODO: verify fields with PANEL_TEMPLATE
-      // console.log('creating panel: ', config)
-      // this.panels.push(config)
-      return true
-    },
-    createWindow(config) {
+    createWindow(config, _plugin) {
+      const plugin = this.plugins[_plugin._id]
       //TODO: verify fields with WINDOW_TEMPLATE
-      console.log('creating window: ', config)
-      this.windows.push(config)
-      // create panel for the window
+      console.log('creating window: ', config, plugin)
+
+      if(config.show_panel && plugin.panel_config){
+        // create panel for the window
+        console.log('creating panel: ', plugin.panel_config)
+        // config.panel = plugin_config
+      }
+      this.windows.unshift(config)
       return true
     },
     loadPlugin(config) {
@@ -304,14 +322,13 @@ export default {
         } else {
           plugin = new jailed.Plugin(path, this.plugin_api, config);
         }
+        this.plugins[plugin._id] = plugin
         plugin.whenConnected(() => {
           if (!plugin.api) {
             console.error('error occured when loading plugins.')
           }
-          console.log(plugin.api)
           plugin.api.setup().then((result) => {
-            console.log('sucessfully setup plugin ' + config.name)
-            this.plugins.push(plugin)
+            console.log('sucessfully setup plugin: ', plugin)
             // setTimeout(()=>{
             //   plugin.terminate()
             // }, 10000)
@@ -326,6 +343,7 @@ export default {
           console.error('error occured when loading '+config.name + ":", e)
           alert('error occured when loading ' + config.name)
           plugin.terminate()
+          this.plugins[plugin._id] = null
           // reject(e)
         });
 
