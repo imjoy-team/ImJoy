@@ -2,10 +2,10 @@
   <div class="joy">
     <div class="joy-container">
       <div class="joy-editor" ref="editor"></div>
-      <md-button class="md-button md-primary" :disabled="isRunning" @click="runJoy()">
+      <md-button class="md-button md-primary" v-if="controlButtons" :disabled="isRunning" @click="runJoy()">
         <md-icon>play_arrow</md-icon>Run
       </md-button>
-      <md-button class="md-button md-primary" :disabled="!isRunning" @click="stopJoy()">
+      <md-button class="md-button md-primary" v-if="controlButtons" :disabled="!isRunning" @click="stopJoy()">
         <md-icon>stop</md-icon>Stop
       </md-button>
     </div>

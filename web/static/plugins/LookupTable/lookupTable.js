@@ -29,7 +29,12 @@ class LookupTablePlugin {
     api.createWindow({
       name: "LUT Window",
       init: "Choose a LUT: {id:'lut', type:'choose', options:['hot', 'rainbow'], placeholder: 'hot'}",
-      show_panel: true
+    })
+    api.showDialog({
+      name: "LUT Window",
+      init: "Hey this is a dialog: {id:'heos', type:'choose', options:['1', '3'], placeholder: '1'}",
+    }).then((result)=>{
+      console.log('dialog result', result)
     })
     return my
   }

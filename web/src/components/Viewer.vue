@@ -35,7 +35,7 @@
             </div>
         </md-card-header>
         <md-card-content>
-          <joy :config="workflow_joy_config" @update="updateWorkflow" ref="workflow" @run="runWorkflow" v-if="plugin_loaded"></joy>
+          <joy :config="workflow_joy_config" ref="workflow" @run="runWorkflow" v-if="plugin_loaded"></joy>
         </md-card-content>
         <md-card-actions>
         </md-card-actions>
@@ -100,6 +100,18 @@
     </md-dialog-actions>
   </md-dialog>
 
+  <md-dialog :md-active.sync="showPluginDialog" :md-click-outside-to-close="false">
+    <md-dialog-content>
+      <div v-if="plugin_dialog_config">
+        <joy :config="plugin_dialog_config" :controlButtons="false" ref="plugin_dialog_joy"></joy>
+      </div>
+    </md-dialog-content>
+    <md-dialog-actions>
+      <md-button class="md-primary" @click="closePluginDialog(true)">OK</md-button>
+      <md-button class="md-primary" @click="closePluginDialog(false)">Cancel</md-button>
+    </md-dialog-actions>
+  </md-dialog>
+
   <md-dialog :md-active.sync="showImportDialog">
     <md-dialog-content>
       <div class="md-layout-row md-gutter">
@@ -145,15 +157,17 @@ export default {
       selected_file: null,
       selected_files: null,
       showLoadingDialog: false,
+      showPluginDialog: false,
+      plugin_dialog_config: null,
+      _plugin_dialog_promise: {},
       loading: false,
       showImportDialog: false,
       windows: [],
       panels: [],
       activeWindow: null,
-      _workflow_my: null,
       workflow_joy_config: {
         init: "{id:'workflow', type:'ops'}",
-        workflow_onupdate: this.workflowOnchange
+        onupdate: this.workflowOnchange
       },
       plugins: {},
       plugin_api: null,
@@ -169,22 +183,7 @@ export default {
 
     }
   },
-  mounted() {
-    this.plugin_api = {
-      alert: alert,
-      register: this.register,
-      createWindow: this.createWindow,
-      showDialog: this.showDialog
-    }
-    this.plugin_loaded = false
-    this.loading = true
-    this.db = new PouchDB('imjoy_plugins', {
-      revs_limit: 2,
-      auto_compaction: true
-    })
-    const root = location.protocol + '//' + location.host
-
-    //TODO: fix this, how to prevent loading failure if remove this timeout
+  created(){
     setTimeout(()=>{
       this.db.allDocs({
         include_docs: true,
@@ -205,6 +204,24 @@ export default {
       });
     }, 1000)
   },
+  mounted() {
+    this.plugin_api = {
+      alert: alert,
+      register: this.register,
+      createWindow: this.createWindow,
+      showDialog: this.showDialog
+    }
+    this.plugin_loaded = false
+    this.loading = true
+    this.db = new PouchDB('imjoy_plugins', {
+      revs_limit: 2,
+      auto_compaction: true
+    })
+    const root = location.protocol + '//' + location.host
+
+    //TODO: fix this, how to prevent loading failure if remove this timeout
+
+  },
   beforeDestroy() {
       console.log('terminating plugins')
       for (let k in this.plugins) {
@@ -215,6 +232,17 @@ export default {
       }
   },
   methods: {
+    closePluginDialog(ok){
+      this.showPluginDialog = false
+      let [resolve, reject] = this._plugin_dialog_promise
+      if(ok){
+         resolve(this.$refs.plugin_dialog_joy.joy.data)
+      }
+      else{
+         reject()
+      }
+      this._plugin_dialog_promise = null
+    },
     workflowOnchange(){
       console.log('workflow changed ...')
     },
@@ -232,10 +260,6 @@ export default {
         }
       }
       this.windows.push(window)
-    },
-    updateWorkflow(my) {
-      this._workflow_my = my
-      console.log('update workflow', my)
     },
     runWorkflow(joy) {
         console.log('run joy.')
@@ -318,17 +342,20 @@ export default {
       return true
     },
     showDialog(config, _plugin) {
-      const plugin = this.plugins[_plugin._id]
-      //TODO: verify fields with WINDOW_TEMPLATE
-      console.log('creating window: ', config, plugin)
+      return new Promise((resolve, reject) => {
+        const plugin = this.plugins[_plugin._id]
+        //TODO: verify fields with WINDOW_TEMPLATE
+        console.log('creating window: ', config, plugin)
 
-      if(config.show_panel && plugin.panel_config){
-        // create panel for the window
-        console.log('creating panel: ', plugin.panel_config)
-        // config.panel = plugin_config
-      }
-      this.windows.unshift(config)
-      return true
+        if(config.show_panel && plugin.panel_config){
+          // create panel for the window
+          console.log('creating panel: ', plugin.panel_config)
+          // config.panel = plugin_config
+        }
+        this.plugin_dialog_config = config
+        this.showPluginDialog = true
+        this._plugin_dialog_promise = [resolve, reject]
+      })
     },
     loadPlugin(config) {
       const path = config.js_path,
