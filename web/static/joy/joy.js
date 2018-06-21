@@ -2050,7 +2050,7 @@ When it's clicked, it will call the corresponding onupdate function
 
 Joy.add({
 	type: "button",
-	tags: ["op"],
+	tags: ["ui"],
 	initWidget: function(self){
 		// DOM
 		var dom = document.createElement("div");
