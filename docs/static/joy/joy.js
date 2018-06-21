@@ -50,7 +50,7 @@ function Joy(options){
 	Joy.modal.init(self);
 
 	// Update!
-	self.onupdate = self.onupdate || function(my){};
+	// self.onupdate = self.onupdate || function(my){};
 	self.update = function(){
 
 		// Create a fake "my"
@@ -74,8 +74,25 @@ function Joy(options){
 		});
 
 		// On Update!
-		self.onupdate(my);
-
+		if(self.onupdate && typeof self.onupdate == 'function'){
+			var ret = self.onupdate({data: my.data});
+			if(ret instanceof Promise){
+				ret.then((res)=>{
+					if(res && res.init){
+						self.init = res.init;
+						self.children = [];
+						Joy.initializeWithString(self, self.init);
+						self.createWidget();
+						if(self.container){
+							self.container.innerHTML = '';
+							self.container.appendChild(self.dom);
+						}
+					}
+				}).catch(()=>{
+					console.error('failed to run onupdate function in ' + self.id)
+				}); //my
+			}
+		}
 	};
 	self.update();
 
@@ -117,10 +134,17 @@ Joy.Op = function(options, parent, data){
 	}
 	_configure(self, self.options);
 
+	if(parent && typeof parent.onupdate == 'object'){
+		self.onupdate = parent.onupdate[self.id]
+	}
+
 	// Adding child ops
 	self.children = [];
 	self.addChild = function(child, data){
-
+		//get onupdate for the child
+		if(typeof self.onupdate == 'object'){
+			child.onupdate = self.onupdate[child.id]
+		}
 		// If child's not an Op, it's options to create a new Op.
 		if(child._class_!="Op") child = new Joy.Op(child, self, data);
 		self.children.push(child);
@@ -136,10 +160,40 @@ Joy.Op = function(options, parent, data){
 		_removeFromArray(self.children, child);
 		child.kill();
 	};
-
 	// Update
 	self.update = function(){
-		if(self.onupdate) self.onupdate(self); // TODO: make consistent with .execute()
+		// if(self.onchange && typeof self.onchange == 'function') self.onchange({});
+		if(self.onupdate && typeof self.onupdate == 'function'){
+			var ret = self.onupdate({data: self.data})// TODO: make consistent with .execute()
+			if(ret instanceof Promise){
+				ret.then((res)=>{
+					try {
+						if(res && res.init){
+							// TODO: update the widget
+							// self.children = [];
+							// replace the entire dom
+							// Joy.initializeWithString(self, res.init);
+							// self.createWidget();
+							// if(self.top && self.top.container){
+							// 	self.top.container.innerHTML=""
+							// 	self.top.container.appendChild(self.dom);
+							// }
+							var old_dom = self.dom
+							self.children = [];
+							Joy.initializeWithString(self, res.init);
+							self.createWidget();
+							if(self.parent && self.parent.dom){
+								self.parent.dom.replaceChild(self.dom, old_dom);
+							}
+						}
+					} catch (e) {
+						console.error(e)
+					}
+				}).catch(()=>{
+					console.error('failed to run onupdate function in ' + self.id)
+				}); //my
+			}
+		}
 		if(self.parent) self.parent.update();
 	};
 
@@ -189,6 +243,7 @@ Joy.Op = function(options, parent, data){
 
 	// If you didn't already pass in a data object, let's figure it out!
 	self.data = self.data || data;
+
 	if(!self.data){
 		var parent = self.parent;
 		var dataID = self.dataID;
@@ -201,7 +256,6 @@ Joy.Op = function(options, parent, data){
 			self.data = _clone(self.placeholder);
 		}
 	}
-
 	// Get & Set!
 	self.getData = function(dataID){
 		return self.data[dataID];
@@ -257,7 +311,7 @@ Joy.Op = function(options, parent, data){
 	/////////////////////////////////
 
 	// Ops can ACT ON targets...
-	self.onexecute = self.onexecute || function(){};
+	self.onexecute = self.onexecute || function(){console.log('no execute function found.')};
 	self.execute = async function(target, altData){
 
 		// Real or Preview data?
@@ -278,11 +332,6 @@ Joy.Op = function(options, parent, data){
 				data[dataID] = value;
 			}
 		});
-		console.log({
-			op: self,
-			target: target,
-			data: data
-		})
 		// On Execute!
 		return await self.onexecute({
 			op: self,
@@ -293,7 +342,7 @@ Joy.Op = function(options, parent, data){
 	};
 
 	// ...or GET INFO from targets.
-	self.onget = self.onget || function(){};
+	self.onget = self.onget || function(my){return my.data}; // dy default it returns data (my.config)
 	self.get = function(target){
 
 		// Real or Preview data?
@@ -306,6 +355,7 @@ Joy.Op = function(options, parent, data){
 			target: target,
 			data: data
 		});
+
 
 	};
 
@@ -350,7 +400,7 @@ Joy.add = function(template){
 		Joy.templates.push(template);
 	}
 	else{
-		console.log('replacing template ', template.name, template.type)
+		// console.log('replacing template ', template.name, template.type)
 		_removeFromArray(Joy.templates, duplicated[0]);
 		Joy.templates.push(template);
 	}
@@ -2532,16 +2582,17 @@ Joy.add({
 		dom.appendChild(addButton.dom);
 
 	},
+
 	onexecute: async function(my){
 
-		// Create _vars, if not already there
-		if(!my.target._variables) my.target._variables={};
+			// Create _vars, if not already there
+			if(!my.target._variables) my.target._variables={};
 
-		// Reset all of target's variables?
-		if(my.data.resetVariables) my.target._variables = {};
+			// Reset all of target's variables?
+			if(my.data.resetVariables) my.target._variables = {};
 
-		// Do those ops, baby!!!
-		for(var i=0; i<my.data.ops.length; i++){
+			// Do those ops, baby!!!
+			for(var i=0; i<my.data.ops.length; i++){
 
 			// Stop?
 			var opData = my.data.ops[i];
@@ -2553,11 +2604,11 @@ Joy.add({
 			if(result && result.target){
 				my.target = result.target;
 			}
-			else if(result.error){
+			else if(result && result.error){
 				console.error('ops stopped with error: ', result);
 				return result;
 			}
-			else if(result.stop){
+			else if(result && result.stop){
 				console.log('ops interrupted at step ', i, result);
 				return result;
 			}

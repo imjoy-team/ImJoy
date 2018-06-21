@@ -14,7 +14,8 @@
      * and receive messages from the opposite site (basically it
      * should only provide send() and onMessage() methods)
      */
-    JailedSite = function(connection) {
+    JailedSite = function(connection, _id) {
+        this._id = _id;
         this._interface = {};
         this._remote = null;
         this._remoteUpdateHandler = function(){};
@@ -145,6 +146,7 @@
     /**
      * Handles a message from the remote site
      */
+    // var callback_reg = new RegExp("onupdate|run$")
     JailedSite.prototype._processMessage = function(data) {
          switch(data.type) {
          case 'method':
@@ -157,6 +159,7 @@
                method = this._interface[data.name];
              }
              var args = this._unwrap(data.args, true);
+             if(this._id) args.push({_id: this._id})
              if(data.promise){
                var [resolve, reject] = this._unwrap(data.promise, false);
                try {
@@ -175,14 +178,20 @@
                try {
                  method.apply(this._interface, args);
                } catch (e) {
-                 console.error(e);
+                 console.error(e, method, args);
                }
              }
 
              break;
          case 'callback':
-             var method = this._store.fetch(data.id)[data.num];
+              // if(callback_reg.test(data.num)){
+              //   var method = this._store.retrieve(data.id)[data.num];
+              // }
+              // else{
+              var method = this._store.fetch(data.id)[data.num];
+              // }
              var args = this._unwrap(data.args, true);
+             if(this._id) args.push({_id: this._id})
              if(data.promise){
                var [resolve, reject] = this._unwrap(data.promise, false);
                try {
@@ -201,7 +210,7 @@
                try {
                  method.apply(null, args);
                } catch (e) {
-                 console.error(e);
+                 console.error(e, method, args);
                }
              }
              break;
@@ -324,7 +333,7 @@
         for (var i = 0; i < args.length; i++) {
             if (typeof args[i] == 'function') {
                 callbacks[i] = args[i];
-                wrapped[i] = {type: 'callback', num : i};
+                wrapped[i] = {type: 'callback', num : i, name: args[i].name};
                 callbacksPresent = true;
             }
             else if(typeof args[i] == 'object'){
@@ -333,7 +342,7 @@
                 if (args[i].hasOwnProperty(k)) {
                   if(typeof args[i][k] == 'function'){
                     callbacks[i+'.'+k] = args[i][k];
-                    data[k] = {type: 'callback', num : i+'.'+k}
+                    data[k] = {type: 'callback', num : i+'.'+k, name: args[i].constructor.name +"."+args[i][k]}
                     callbacksPresent = true;
                   }
                   else{
@@ -379,7 +388,7 @@
             return function() {
                 if (!called) {
                     called = true;
-                    cb.apply(this, arguments);
+                    return cb.apply(this, arguments);
                 } else {
                     var msg =
                       'A callback from this set has already been executed';
@@ -399,9 +408,9 @@
                   for(var k in v){
                     if (v.hasOwnProperty(k)) {
                       if(v[k].type == 'callback'){
-                        //cb = once(
-                        var cb = this._genRemoteCallback(args.callbackId, v[k].num, withPromise)
-                        //);
+                        // cb = once(
+                        cb = this._genRemoteCallback(args.callbackId, v[k].num, withPromise)
+                        // );
                         data[k] = cb
                       }
                       else{
@@ -417,9 +426,9 @@
 
             }
             else {
-                // cb = once(
-                    var cb = this._genRemoteCallback(args.callbackId, i, withPromise)
-                // );
+                //cb = once(
+                cb = this._genRemoteCallback(args.callbackId, i, withPromise)
+                //);
                 result.push(cb);
             }
         }
@@ -591,5 +600,15 @@
         return obj;
     }
 
+
+    /**
+     * Retrieves previously stored object
+     *
+     * @param {Number} id of an object to retrieve
+     */
+    ReferenceStore.prototype.retrieve = function(id) {
+        var obj = this._store[id];
+        return obj;
+    }
 
 })();
