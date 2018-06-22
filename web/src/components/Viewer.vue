@@ -1,11 +1,14 @@
 <template>
 <div class="viewer">
-  <md-app-toolbar class="md-primary md-dense">
+  <md-button v-if="!menuVisible" class="md-fab md-primary md-fab-top-left" @click="menuVisible=true">
+    <md-icon>menu</md-icon>
+  </md-button>
+  <md-app-toolbar v-if="menuVisible" class="md-primary md-dense">
     <div class="md-toolbar-row">
       <div class="md-toolbar-section-start">
-        <md-button v-if="!menuVisible" class="md-fab md-primary" @click="menuVisible=true">
+        <!-- <md-button v-if="!menuVisible" class="md-fab md-primary" @click="menuVisible=true">
           <md-icon>menu</md-icon>
-        </md-button>
+        </md-button> -->
         <navbar/>
       </div>
     </div>

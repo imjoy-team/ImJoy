@@ -2,7 +2,7 @@
 <div class="whiteboard">
     <div class="overlay" @click="dragging=false" v-if="dragging"></div>
     <vue-draggable-resizable  @dragging="dragging=true" @dragstop="dragging=false" @resizing="dragging=true" @resizestop="dragging=false" :parent="true" :w="500" :h="500" v-for="(window, wi) in pluginWindows" :key="wi+'_'">
-      <md-card :class="dragging?'md-primary':''">
+      <md-card :class="dragging?'md-primary':''" @click="dragging=true">
         <md-card-content v-show="window.is_plugin_window" class="plugin-iframe-container">
             <div v-once :id="window.window_id" class="plugin-iframe"></div>
         </md-card-content>
