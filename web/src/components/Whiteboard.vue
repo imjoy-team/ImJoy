@@ -11,7 +11,7 @@
               </md-button>
             </md-card-expand-trigger>
             <div v-if="!window.panel"></div>
-            <div>  <span class="window-title">{{window.name}}</span></div>
+            <div> <span class="window-title">{{window.name}}</span></div>
             <div>
 
               <!-- <md-button>Action</md-button>
@@ -39,7 +39,7 @@
             </md-card-content>
           </md-card-expand-content>
         </md-card-expand>
-        <md-card-header>
+        <!-- <md-card-header> -->
           <!-- <div class="md-toolbar-row md-primary" @click.stop.prevent="select(wi)">
             <div class="md-toolbar-section-start">
 
@@ -62,14 +62,16 @@
               </md-menu>
             </div>
           </div> -->
-        </md-card-header>
+        <!-- </md-card-header> -->
         <md-card-content>
           <md-empty-state v-if="window.type=='empty'" md-icon="hourglass_empty" md-label="IMJOY.IO" md-description="">
           </md-empty-state>
           <div v-if="window.type=='files'">
             <md-chip v-for="f in window.data.files" :key="f.name">{{f.name}}</md-chip>
           </div>
-          <div :id="window.window_id"></div>
+          <div v-if="window.window_id" class="plugin-iframe-container">
+            <div :id="window.window_id" class="plugin-iframe"></div>
+          </div>
         </md-card-content>
 
       </md-card>
@@ -157,11 +159,30 @@ export default {
   background-color: var(--md-theme-default-primary, #448aff) !important;
 }
 
-.window-header{
+.window-header {
   height: 40px;
 }
 
-.window-title{
+.window-title {
   font-size: 1.4em;
+}
+
+.plugin-iframe-container {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.plugin-iframe {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  flex-grow: 1;
+  border: none;
+  margin: 0;
+  padding: 0;
 }
 </style>

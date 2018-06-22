@@ -457,6 +457,7 @@ export default {
           });
         }
         if(config.type=='iframe'){
+          // this is a unique id for the iframe to attach
           config.window_id = 'plugin_window_'+config.id
           this.showPluginWindow(config).then(()=>{
             _setupPlugin()

@@ -333,10 +333,14 @@ function randId() {
                     me._frame.src = me._frame.src+'?type='+type;
                     me._frame.id = 'iframe_'+id;
                     if(type == 'iframe'){
-                      var dock = document.getElementById('plugin_window_'+me._frame.id)
-                      console.log('__++++++', dock, 'plugin_window_'+me._frame.id)
+                      var dock = document.getElementById('plugin_window_'+id)
                       if(dock){
-                        me._frame.style.display = 'inline-block';
+                        me._frame.frameBorder="0";
+                        me._frame.style.width = "100%";
+                        me._frame.style.height = "100%";
+                        me._frame.style.margin = "0";
+                        me._frame.style.padding = "0";
+                        me._frame.style.display = 'block';
                         dock.appendChild(me._frame);
                       }
                       else{
