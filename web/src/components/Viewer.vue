@@ -416,7 +416,7 @@ export default {
       })
     },
     loadPlugin(config) {
-      const path = config.script_path
+      const path = config.file_path
       const code = config.js_code
       //generate a random id for the plugin
       config.id = config._id+'_'+randId()

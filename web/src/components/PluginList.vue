@@ -114,11 +114,11 @@ export default {
       for (let i = 0; i < this.available_plugins.length; i++) {
         const plugin = this.available_plugins[i]
         console.log(plugin)
-        if (!plugin.script_path.startsWith('http')) {
-          if (!plugin.script_path.startsWith) {
-            plugin.script_path = '/' + plugin.script_path
+        if (!plugin.file_path.startsWith('http')) {
+          if (!plugin.file_path.startsWith) {
+            plugin.file_path = '/' + plugin.file_path
           }
-          plugin.script_path = this.plugin_dir + plugin.script_path
+          plugin.file_path = this.plugin_dir + plugin.file_path
         }
         plugin._id = plugin._id || plugin.name.replace(/ /g, '_')
         this.db.get(plugin._id).then((doc) => {
@@ -175,9 +175,9 @@ export default {
       });
     },
     install(plugin) {
-      axios.get(plugin.script_path).then(response => {
+      axios.get(plugin.file_path).then(response => {
         if (!response || !response.data || response.data == '') {
-          alert('failed to get plugin code from ' + plugin.script_path)
+          alert('failed to get plugin code from ' + plugin.file_path)
           return
         }
         plugin.js_code = response.data
