@@ -11,13 +11,7 @@
       </div>
     </div>
   </md-app-toolbar>
-  <!-- <md-card>
-    <md-card-header> -->
 
-  <!-- <md-icon class="md-size-5x md-small-hide" md-src="static/img/ImJoy.io-icon-circle.svg" /> -->
-  <md-toolbar class="md-transparent md-dense" md-elevation="0">
-
-  </md-toolbar>
   <div class="md-toolbar-row md-layout md-alignment-center-center">
     <div class="banner-container">
       <img src="static/img/perspective-hr.jpg" alt="banner"></img>
