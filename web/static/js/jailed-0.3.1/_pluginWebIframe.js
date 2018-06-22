@@ -40,7 +40,6 @@ async function importScripts () {
   var args = Array.prototype.slice.call(arguments), len = args.length, i = 0;
   for (; i < len; i++) {
     await _loadJS(args[i])
-    console.log('loading ', args[i])
   }
 };
 
