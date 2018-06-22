@@ -1,10 +1,3 @@
-// Create a new, plain <span> element
-var sp1 = document.createElement("span");
-sp1.innerHTML="Text built by the plugin"
-
-// Insert the new element into the DOM before sp2
-document.body.appendChild(sp1);
-
 class Histogram2dPlugin {
   setup(){
     api.register({

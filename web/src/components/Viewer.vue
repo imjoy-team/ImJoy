@@ -158,6 +158,7 @@ import {
 } from '../api.js'
 
 import { randId } from '../utils.js'
+import { parseComponent } from '../pluginParser.js'
 
 export default {
   name: 'viewer',
@@ -224,6 +225,8 @@ export default {
     }, 1000)
   },
   mounted() {
+
+
     this.plugin_api = {
       alert: alert,
       register: this.register,
