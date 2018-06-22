@@ -14,8 +14,8 @@
      * and receive messages from the opposite site (basically it
      * should only provide send() and onMessage() methods)
      */
-    JailedSite = function(connection, _id) {
-        this._id = _id;
+    JailedSite = function(connection, id) {
+        this.id = id;
         this._interface = {};
         this._remote = null;
         this._remoteUpdateHandler = function(){};
@@ -159,7 +159,7 @@
                method = this._interface[data.name];
              }
              var args = this._unwrap(data.args, true);
-             if(this._id) args.push({_id: this._id})
+             if(this.id) args.push({id: this.id})
              if(data.promise){
                var [resolve, reject] = this._unwrap(data.promise, false);
                try {
@@ -191,7 +191,7 @@
               var method = this._store.fetch(data.id)[data.num];
               // }
              var args = this._unwrap(data.args, true);
-             if(this._id) args.push({_id: this._id})
+             if(this.id) args.push({id: this.id})
              if(data.promise){
                var [resolve, reject] = this._unwrap(data.promise, false);
                try {

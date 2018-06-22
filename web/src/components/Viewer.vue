@@ -88,6 +88,7 @@
 
     <md-app-content class="whiteboard-content">
       <whiteboard :windows="windows" @select="windowSelected"></whiteboard>
+      <div id="plugin_iframe_docking_station" v-show="true"></div>
     </md-app-content>
   </md-app>
   <!-- </md-card-content> -->
@@ -283,7 +284,7 @@ export default {
 
     },
     register(config, _plugin) {
-      const plugin = this.plugins[_plugin._id]
+      const plugin = this.plugins[_plugin.id]
       //TODO: verify fields with OP_TEMPLATE
       console.log('creating Op: ', config, _plugin, this.plugins)
       if(!plugin.api.run){
@@ -329,7 +330,7 @@ export default {
       return true
     },
     createWindow(config, _plugin) {
-      const plugin = this.plugins[_plugin._id]
+      const plugin = this.plugins[_plugin.id]
       //TODO: verify fields with WINDOW_TEMPLATE
       console.log('creating window: ', config, plugin)
 
@@ -352,7 +353,7 @@ export default {
     },
     showDialog(config, _plugin) {
       return new Promise((resolve, reject) => {
-        const plugin = this.plugins[_plugin._id]
+        const plugin = this.plugins[_plugin.id]
         if(config.onupdate && typeof config.onupdate == 'object'){
           for(let k in config.onupdate){
             if(config.onupdate.hasOwnProperty(k)){
@@ -375,9 +376,14 @@ export default {
         this._plugin_dialog_promise = [resolve, reject]
       })
     },
+    showPluginWindow(plugin) {
+
+    },
     loadPlugin(config) {
-      const path = config.js_path,
+      const path = config.script_path,
         code = config.js_code
+      //generate a random id for the plugin
+      config.id = randId()
       new Promise((resolve, reject) => {
         // exported methods, will be available to the plugin
         this.plugin_api.kk = 999
@@ -390,7 +396,7 @@ export default {
         } else {
           plugin = new jailed.Plugin(path, this.plugin_api, config);
         }
-        this.plugins[plugin._id] = plugin
+        this.plugins[plugin.id] = plugin
         plugin.whenConnected(() => {
           if (!plugin.api) {
             console.error('error occured when loading plugins.')
@@ -400,6 +406,9 @@ export default {
             // setTimeout(()=>{
             //   plugin.terminate()
             // }, 10000)
+            if(plugin.type=='iframe' && plugin.show_plugin_window){
+              this.showPluginWindow(plugin)
+            }
             resolve(plugin)
           }).catch((e) => {
             console.error('error occured when loading plugin ' + config.name + ": ", e)
@@ -411,7 +420,7 @@ export default {
           console.error('error occured when loading '+config.name + ":", e)
           alert('error occured when loading ' + config.name)
           plugin.terminate()
-          this.plugins[plugin._id] = null
+          this.plugins[plugin.id] = null
           // reject(e)
         });
 
