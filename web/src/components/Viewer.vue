@@ -417,7 +417,6 @@ export default {
     },
     loadPlugin(config) {
       const path = config.file_path
-      const code = config.js_code
       //generate a random id for the plugin
       config.id = config._id+'_'+randId()
       return new Promise((resolve, reject) => {
@@ -429,10 +428,29 @@ export default {
 
         const _setupPlugin = ()=>{
           let plugin
-          if (code) {
-            plugin = new jailed.DynamicPlugin(code, this.plugin_api, config)
+          if (config.plugin_code) {
+            if(path.endsWith('.vue')){
+              console.log('parsing the plugin file')
+              const pluginComp = parseComponent(config.plugin_code)
+              console.log('code parsed from', path, pluginComp)
+              config.script = pluginComp.script.content
+              if(pluginComp.customBlocks[0].type == 'html'){
+                config.html = pluginComp.customBlocks[0].content
+              }
+              else{
+                console.error('no html tag found in side the plugin file.')
+              }
+              // here we only take the first stylesheet we found
+              config.style = pluginComp.styles[0].content
+            }
+            else{
+              config.script = config.plugin_code
+            }
+
+            plugin = new jailed.DynamicPlugin(config.script, this.plugin_api, config)
           } else {
-            plugin = new jailed.Plugin(path, this.plugin_api, config);
+            alert('no plugin source code found for '+config.name)
+            //plugin = new jailed.Plugin(path, this.plugin_api, config);
           }
           this.plugins[plugin.id] = plugin
           plugin.whenConnected(() => {

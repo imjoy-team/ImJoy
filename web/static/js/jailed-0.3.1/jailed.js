@@ -333,15 +333,16 @@ function randId() {
                     me._frame.src = me._frame.src+'?type='+type;
                     me._frame.id = 'iframe_'+id;
                     if(type == 'iframe'){
-                      var dock = document.getElementById('plugin_window_'+id)
-                      if(dock){
+                      var plugin_window = document.getElementById('plugin_window_'+id)
+                      if(plugin_window){
                         me._frame.frameBorder="0";
                         me._frame.style.width = "100%";
                         me._frame.style.height = "100%";
                         me._frame.style.margin = "0";
                         me._frame.style.padding = "0";
                         me._frame.style.display = 'block';
-                        dock.appendChild(me._frame);
+
+                        plugin_window.appendChild(me._frame);
                       }
                       else{
                         document.body.appendChild(me._frame);
@@ -768,7 +769,9 @@ function randId() {
             me._requestRemote();
         }
 
-        this._connection.execute(this._code, sCb, this._fCb);
+        this._connection.execute({type: 'script', content: this._code}, sCb, this._fCb);
+        if(this.style) this._connection.execute({type: 'style', content: this.style}, sCb, this._fCb);
+        if(this.html) this._connection.execute({type: 'html', content: this.html}, sCb, this._fCb);
     }
 
 

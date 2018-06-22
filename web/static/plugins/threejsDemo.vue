@@ -1,63 +1,21 @@
-<template>
+<html>
+  <div>
+      <div id="info">
+          <a href="https://threejs.org" target="_blank" rel="noopener noreferrer">three.js</a> framebuffer to texture
+          <br/> The area of the white square is copied from the framebuffer to a texture (shown in the top-left corner).
+      </div>
 
-<div>
-    <div id="info">
-        <a href="https://threejs.org" target="_blank" rel="noopener noreferrer">three.js</a> framebuffer to texture
-        <br/> The area of the white square is copied from the framebuffer to a texture (shown in the top-left corner).
-    </div>
-
-    <div id="overlay">
-        <div>
-        </div>
-    </div>
-</div>
-
-</template>
+      <div id="overlay">
+          <div>
+          </div>
+      </div>
+  </div>
+</html>
 
 <script>
 
-// Create a new, plain <span> element
-function htmlToElement(html) {
-    var template = document.createElement('template');
-    html = html.trim(); // Never return a text node of whitespace as the result
-    template.innerHTML = html;
-    return template.content.firstChild;
-}
-
-function addStyleString(str) {
-    var node = document.createElement('style');
-    node.innerHTML = str;
-    document.body.appendChild(node);
-}
-
-// Insert the new element into the DOM
-addStyleString(css);
-document.body.appendChild(htmlToElement(html));
-
-
-var loadJS = function(url, implementationCode) {
-    //url is URL of external file, implementationCode is the code
-    //to be called from the file, location is the location to
-    //insert the <script> element
-    return new Promise((resolve, reject) => {
-        var scriptTag = document.createElement('script');
-        scriptTag.src = url;
-        scriptTag.onload = resolve;
-        scriptTag.onreadystatechange = resolve;
-        document.head.appendChild(scriptTag);
-    })
-};
-//
-// importScripts("https://threejs.org/build/three.js")
-// importScripts("https://threejs.org/js/controls/OrbitControls.js")
-// importScripts("https://threejs.org/js/Detector.js")
-
-loadJS("https://threejs.org/build/three.js").then(() => {
-    loadJS("https://threejs.org/examples/js/controls/OrbitControls.js").then(() => {
-        loadJS("https://threejs.org/examples/js/Detector.js").then(() => {
-            build3d()
-        })
-    })
+importScripts("https://threejs.org/build/three.js", "https://threejs.org/examples/js/controls/OrbitControls.js", "https://threejs.org/examples/js/Detector.js").then(()=>{
+  build3d()
 })
 
 function build3d() {
@@ -163,6 +121,7 @@ function build3d() {
     }
 
 }
+
 
 
 class Histogram2dPlugin {

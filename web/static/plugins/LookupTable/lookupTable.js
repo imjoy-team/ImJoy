@@ -1,3 +1,7 @@
+importScripts("https://threejs.org/build/three.js", "https://threejs.org/examples/js/controls/OrbitControls.js", "https://threejs.org/examples/js/Detector.js").then(()=>{
+  console.log('---------------->script loaded in webworker')
+})
+
 class LookupTablePlugin {
   setup() {
     api.register({

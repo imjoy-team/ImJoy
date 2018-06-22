@@ -132,7 +132,7 @@ export default {
     },
     edit(plugin) {
       this.db.get(plugin._id).then((doc) => {
-        this.editorCode = doc.js_code
+        this.editorCode = doc.plugin_code
         this.editorOptions = {
           tabSize: 4,
           mode: 'text/javascript',
@@ -149,7 +149,7 @@ export default {
 
     },
     saveCode() {
-      this.editorPlugin.js_code = this.editorCode
+      this.editorPlugin.plugin_code = this.editorCode
       this.db.get(this.editorPlugin._id).then((doc)=>{
         this.editorPlugin._id = this.editorPlugin.name.replace(/ /g, '_')
         this.editorPlugin._rev = doc._rev
@@ -180,7 +180,7 @@ export default {
           alert('failed to get plugin code from ' + plugin.file_path)
           return
         }
-        plugin.js_code = response.data
+        plugin.plugin_code = response.data
         plugin._id = plugin.name.replace(/ /g, '_')
         if(plugin.dependencies){
           for(let i=0;i<plugin.dependencies.length;i++){

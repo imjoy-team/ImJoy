@@ -1,10 +1,4 @@
 // Taken from https://github.com/vuejs/vue/blob/dev/packages/vue-template-compiler/browser.js
-(function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
-	typeof define === 'function' && define.amd ? define(['exports'], factory) :
-	(factory((global.VueTemplateCompiler = {})));
-}(this, (function (exports) { 'use strict';
-
 var splitRE = /\r?\n/g;
 var emptyRE = /^\s*$/;
 var needFixRE = /^(\r?\n)*[\t\s]/;
@@ -632,7 +626,7 @@ var isSpecialTag = makeMap('script,style,template', true);
 /**
  * Parse a single-file component (*.vue) file into an SFC Descriptor Object.
  */
-function parseComponent (
+export function parseComponent (
   content,
   options
 ) {
@@ -5219,21 +5213,3 @@ var createCompiler$1 = createCompilerCreator(function baseCompile (
     staticRenderFns: code.staticRenderFns
   }
 });
-
-/*  */
-
-var ref$1 = createCompiler$1(baseOptions);
-var compile$1 = ref$1.compile;
-var compileToFunctions$1 = ref$1.compileToFunctions;
-
-/*  */
-
-exports.parseComponent = parseComponent;
-exports.compile = compile;
-exports.compileToFunctions = compileToFunctions;
-exports.ssrCompile = compile$1;
-exports.ssrCompileToFunctions = compileToFunctions$1;
-
-Object.defineProperty(exports, '__esModule', { value: true });
-
-})));

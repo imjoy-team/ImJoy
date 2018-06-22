@@ -45,7 +45,16 @@ var initWebworkerPlugin = function() {
       '             dedicatedThread : true              ',
       '         });                                     ',
       '     }                                           ',
-      ' });                                             '
+      ' });                                             ',
+      //backup importScripts and replace it with a async version
+      'var _importScripts = importScripts;',
+      'try {',
+      '  function importScripts () {',
+      '    return Promise.resolve(_importScripts(arguments))',
+      '  };',
+      '} catch (e) {',
+      '  importScripts = _importScripts',
+      '}'
     ].join('\n');
 
     var blobUrl = window.URL.createObjectURL(
