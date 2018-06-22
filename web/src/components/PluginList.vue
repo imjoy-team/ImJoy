@@ -1,9 +1,9 @@
 <template>
 <div class="plugin-list">
   <!-- <md-subheader>Options</md-subheader> -->
-  <md-subheader>Plugins</md-subheader>
+  <md-subheader v-if="title">{{title}}</md-subheader>
   <div class="md-layout md-gutter md-alignment-center">
-  <md-card v-for="plugin in plugins" class="md-layout-item md-large-size-30 md-medium-size-40 md-small-size-50 md-xsmall-size-100" :key="plugin.name">
+  <md-card v-for="(plugin, i) in available_plugins" class="md-layout-item md-large-size-30 md-medium-size-40 md-small-size-50 md-xsmall-size-100" :key="i">
     <md-card-header>
       {{plugin.createdAt}}
       <h2>{{plugin.name}}</h2>
@@ -52,6 +52,16 @@ export default {
     configUrl: {
       type: String,
       default: null
+    },
+    title: {
+      type: String,
+      default: null
+    },
+    plugins: {
+      type: Array,
+      default: function(){
+        return null
+      }
     }
   },
   data() {
@@ -60,10 +70,10 @@ export default {
       editorPlugin: null,
       editorOptions: {},
       showEditor: false,
-      plugins: [],
       root_url: null,
       plugin_dir: null,
       manifest: null,
+      available_plugins: [],
       showRemoveConfirmation: false,
       _plugin2_remove: null,
       db: null,
@@ -77,11 +87,15 @@ export default {
       revs_limit: 2,
       auto_compaction: true
     })
-    if (this.configUrl) {
+    if(this.plugins){
+      this.available_plugins = this.plugins
+      this.updatePluginList()
+    }
+    else if (this.configUrl) {
       axios.get(this.configUrl).then(response => {
         if (response && response.data && response.data.plugins) {
           this.manifest = response.data
-          this.plugins = this.manifest.plugins
+          this.available_plugins = this.manifest.plugins
           this.plugin_dir = this.manifest.root_path
           this.root_url = location.protocol + '//' + location.host
           if (!this.plugin_dir.startsWith('http')) {
@@ -93,11 +107,12 @@ export default {
       })
     }
 
+
   },
   methods: {
     updatePluginList() {
-      for (let i = 0; i < this.plugins.length; i++) {
-        const plugin = this.plugins[i]
+      for (let i = 0; i < this.available_plugins.length; i++) {
+        const plugin = this.available_plugins[i]
         console.log(plugin)
         if (!plugin.js_path.startsWith('http')) {
           if (!plugin.js_path.startsWith) {
@@ -105,7 +120,8 @@ export default {
           }
           plugin.js_path = this.plugin_dir + plugin.js_path
         }
-        this.db.get(plugin.name).then((doc) => {
+        plugin._id = plugin._id || plugin.name.replace(/ /g, '_')
+        this.db.get(plugin._id).then((doc) => {
           plugin.installed = true
           this.$forceUpdate()
           console.log(plugin)
@@ -115,7 +131,7 @@ export default {
       }
     },
     edit(plugin) {
-      this.db.get(plugin.name).then((doc) => {
+      this.db.get(plugin._id).then((doc) => {
         this.editorCode = doc.js_code
         this.editorOptions = {
           tabSize: 4,
@@ -134,8 +150,8 @@ export default {
     },
     saveCode() {
       this.editorPlugin.js_code = this.editorCode
-      this.db.get(this.editorPlugin.name).then((doc)=>{
-        this.editorPlugin._id = this.editorPlugin.name
+      this.db.get(this.editorPlugin._id).then((doc)=>{
+        this.editorPlugin._id = this.editorPlugin.name.replace(/ /g, '_')
         this.editorPlugin._rev = doc._rev
         return this.db.put(this.editorPlugin);
       }).then((response)=>{
@@ -147,7 +163,7 @@ export default {
     },
     remove(plugin) {
       // remove if exists
-      this.db.get(plugin.name).then((doc) => {
+      this.db.get(plugin._id).then((doc) => {
         return this.db.remove(doc);
       }).then((result) => {
         console.log('plugin has been removed')
@@ -165,10 +181,10 @@ export default {
           return
         }
         plugin.js_code = response.data
-        plugin._id = plugin.name
+        plugin._id = plugin.name.replace(/ /g, '_')
         if(plugin.dependencies){
           for(let i=0;i<plugin.dependencies.length;i++){
-            const ps = this.plugins.filter(p => p.name == plugin.dependencies[i]);
+            const ps = this.available_plugins.filter(p => p.name == plugin.dependencies[i]);
             if(ps.length<=0){
               alert(plugin.name +' plugin depends on '+plugin.dependencies[i]+', but it can not be found in the repository.')
             }

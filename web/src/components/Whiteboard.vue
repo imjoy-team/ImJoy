@@ -69,6 +69,7 @@
           <div v-if="window.type=='files'">
             <md-chip v-for="f in window.data.files" :key="f.name">{{f.name}}</md-chip>
           </div>
+          <div :id="window.window_id"></div>
         </md-card-content>
 
       </md-card>

@@ -12,7 +12,6 @@ class Histogram2dPlugin {
       type: "localization/render_2d_histogram",
       tags: ["localization", "op", "histogram"],
       init: "Render a histogram with pixel size {id:'pixel_size', type:'number', placeholder: 20}nm",
-      show_plugin_window: true,
     })
   }
 

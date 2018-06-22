@@ -331,10 +331,10 @@ function randId() {
                 if (!me._disconnected) {
                     me._frame = sample.cloneNode(false);
                     me._frame.src = me._frame.src+'?type='+type;
-                    console.log('13u4249204823--------------', id)
-                    me._frame.id = id;
+                    me._frame.id = 'iframe_'+id;
                     if(type == 'iframe'){
-                      var dock = document.getElementById('plugin_iframe_docking_station')
+                      var dock = document.getElementById('plugin_window_'+me._frame.id)
+                      console.log('__++++++', dock, 'plugin_window_'+me._frame.id)
                       if(dock){
                         me._frame.style.display = 'inline-block';
                         dock.appendChild(me._frame);
@@ -677,7 +677,6 @@ function randId() {
             me._fail.emit();
             me.disconnect();
         }
-        console.log('-----------------------1---->', this.type)
         this._connection = new Connection(this.id, this.type);
         this._connection.whenInit(function(){
             me._init();

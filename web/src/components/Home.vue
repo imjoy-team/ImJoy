@@ -36,7 +36,7 @@
     </md-dialog-actions>
   </md-dialog>
   <br>
-  <plugin-list config-url="static/plugins/manifest.json"></plugin-list>
+  <plugin-list config-url="static/plugins/manifest.json" title="Plugins"></plugin-list>
   <br>
   <md-divider></md-divider>
   <main-footer/>

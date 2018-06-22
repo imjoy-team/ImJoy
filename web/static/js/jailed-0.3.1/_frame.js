@@ -21,7 +21,6 @@ var __jailed__path__ = thisScript.src
 
 var getParamValue = function(paramName) {
     var url = window.location.search.substring(1); //get rid of "?" in querystring
-    console.log(url)
     var qArray = url.split('&'); //get key-value pairs
     for (var i = 0; i < qArray.length; i++)
     {
@@ -143,7 +142,6 @@ var initIframePlugin = function() {
 }
 
 var plugin_type = getParamValue('type');
-console.log('-----------------------233-----3-----', plugin_type)
 if(plugin_type=='webworker'){
   try {
       initWebworkerPlugin();

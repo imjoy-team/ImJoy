@@ -18,6 +18,9 @@
           <md-button class="md-fab md-primary" @click="showImportDialog=true">
             <md-icon>add</md-icon>
           </md-button>
+          <md-button class="md-icon-button md-primary" @click="showSettingsDialog=true">
+            <md-icon>settings</md-icon>
+          </md-button>
           <md-progress-spinner :md-diameter="30" :md-stroke="3" md-mode="indeterminate" v-if="loading"></md-progress-spinner>
         </div>
         <div class="md-toolbar-section-end">
@@ -42,7 +45,7 @@
       </md-card>
 
       <div class="md-layout">
-        <md-card v-for="panel in panels" class="md-layout-item md-size-90" :key="panel.name">
+        <md-card v-for="panel in panels" class="md-layout-item md-size-90" :key="panel.id">
           <md-card-expand>
             <md-card-actions md-alignment="space-between">
               <md-card-expand-trigger>
@@ -88,7 +91,6 @@
 
     <md-app-content class="whiteboard-content">
       <whiteboard :windows="windows" @select="windowSelected"></whiteboard>
-      <div id="plugin_iframe_docking_station" v-show="true"></div>
     </md-app-content>
   </md-app>
   <!-- </md-card-content> -->
@@ -110,6 +112,15 @@
     <md-dialog-actions>
       <md-button class="md-primary" @click="closePluginDialog(true)">OK</md-button>
       <md-button class="md-primary" @click="closePluginDialog(false)">Cancel</md-button>
+    </md-dialog-actions>
+  </md-dialog>
+
+  <md-dialog :md-active.sync="showSettingsDialog">
+    <md-dialog-content>
+        <plugin-list :plugins="installed_plugins" title="Installed Plugins"></plugin-list>
+    </md-dialog-content>
+    <md-dialog-actions>
+      <md-button class="md-primary" @click="showSettingsDialog=false">OK</md-button>
     </md-dialog-actions>
   </md-dialog>
 
@@ -159,6 +170,7 @@ export default {
       selected_files: null,
       showLoadingDialog: false,
       showPluginDialog: false,
+      showSettingsDialog: false,
       plugin_dialog_config: null,
       _plugin_dialog_promise: {},
       loading: false,
@@ -171,6 +183,7 @@ export default {
         onupdate: this.workflowOnchange
       },
       plugins: {},
+      installed_plugins: [],
       plugin_api: null,
       plugin_loaded: false,
       menuVisible: true,
@@ -189,13 +202,18 @@ export default {
       this.db.allDocs({
         include_docs: true,
         attachments: true
-      }).then(async (result) => {
+      }).then((result) => {
         const promises = []
         this.plugins = {}
+        this.installed_plugins = []
         for (let i = 0; i < result.total_rows; i++) {
           const config = result.rows[i].doc
-          await this.loadPlugin(config)
+          this.installed_plugins.push(config)
+          promises.push(this.loadPlugin(config))
         }
+        // TODO: setup this promise all, it's now cause unknown problem
+        // Promise.all(promises).then(()=>{
+        // })
         this.plugin_loaded = true
         this.loading = false
         this.$forceUpdate()
@@ -321,7 +339,7 @@ export default {
       //update the joy workflow if new template added, TODO: preserve settings during reload
       this.$refs.workflow.setupJoy()
 
-      const panel_config = {name: config.name, init: "{id: '_panel', type: '"+config.type+"'}", onexecute: config.onexecute}
+      const panel_config = {name: config.name, id: _plugin.id, init: "{id: '_panel', type: '"+config.type+"'}", onexecute: config.onexecute}
       plugin.panel_config = panel_config
       if(config.show_panel){
         console.log('creating panel: ', panel_config)
@@ -333,7 +351,7 @@ export default {
       const plugin = this.plugins[_plugin.id]
       //TODO: verify fields with WINDOW_TEMPLATE
       console.log('creating window: ', config, plugin)
-
+      config.window_id = 'plugin_window_'+plugin._id+randId()
       if(config.show_panel && plugin.panel_config){
         // create panel for the window
         console.log('creating panel: ', plugin.panel_config)
@@ -376,56 +394,78 @@ export default {
         this._plugin_dialog_promise = [resolve, reject]
       })
     },
-    showPluginWindow(plugin) {
-
+    showPluginWindow(config) {
+      return new Promise((resolve, reject) => {
+        //TODO: verify fields with WINDOW_TEMPLATE
+        console.log('creating window: ', config)
+        this.windows.unshift(config)
+              // container IS NOT finished rendering to the DOM
+        // this.$nextTick(()=>{
+        //      resolve()
+        // })
+        setTimeout(()=>{
+        //   const target = document.getElementById(config.window_id)
+        //   const source =  document.getElementById('iframe_'+plugin.id)
+        //     console.log('moving.......', target, source)
+        //   target.parentNode.appendChild(source)
+          resolve()
+        }, 500)
+      })
     },
     loadPlugin(config) {
-      const path = config.script_path,
-        code = config.js_code
+      const path = config.script_path
+      const code = config.js_code
       //generate a random id for the plugin
-      config.id = randId()
-      new Promise((resolve, reject) => {
+      config.id = config._id+'_'+randId()
+      return new Promise((resolve, reject) => {
         // exported methods, will be available to the plugin
         this.plugin_api.kk = 999
         this.plugin_api.get_kk = async () => {
           return new ArrayBuffer(1200400)
         }
-        let plugin
-        if (code) {
-          plugin = new jailed.DynamicPlugin(code, this.plugin_api, config)
-        } else {
-          plugin = new jailed.Plugin(path, this.plugin_api, config);
-        }
-        this.plugins[plugin.id] = plugin
-        plugin.whenConnected(() => {
-          if (!plugin.api) {
-            console.error('error occured when loading plugins.')
+
+        const _setupPlugin = ()=>{
+          let plugin
+          if (code) {
+            plugin = new jailed.DynamicPlugin(code, this.plugin_api, config)
+          } else {
+            plugin = new jailed.Plugin(path, this.plugin_api, config);
           }
-          plugin.api.setup().then((result) => {
-            console.log('sucessfully setup plugin: ', plugin)
-            // setTimeout(()=>{
-            //   plugin.terminate()
-            // }, 10000)
-            if(plugin.type=='iframe' && plugin.show_plugin_window){
-              this.showPluginWindow(plugin)
+          this.plugins[plugin.id] = plugin
+          plugin.whenConnected(() => {
+            if (!plugin.api) {
+              console.error('error occured when loading plugins.')
             }
-            resolve(plugin)
-          }).catch((e) => {
-            console.error('error occured when loading plugin ' + config.name + ": ", e)
-            reject(e)
+            plugin.api.setup().then((result) => {
+              console.log('sucessfully setup plugin: ', plugin)
+              // setTimeout(()=>{
+              //   plugin.terminate()
+              // }, 10000)
+              resolve()
+            }).catch((e) => {
+              console.error('error occured when loading plugin ' + config.name + ": ", e)
+              reject(e)
+              plugin.terminate()
+            })
+          });
+          plugin.whenFailed((e) => {
+            console.error('error occured when loading '+config.name + ":", e)
+            alert('error occured when loading ' + config.name)
             plugin.terminate()
+            this.plugins[plugin.id] = null
+            // reject(e)
+          });
+        }
+        if(config.type=='iframe'){
+          config.window_id = 'plugin_window_'+config.id
+          this.showPluginWindow(config).then(()=>{
+            _setupPlugin()
           })
-        });
-        plugin.whenFailed((e) => {
-          console.error('error occured when loading '+config.name + ":", e)
-          alert('error occured when loading ' + config.name)
-          plugin.terminate()
-          this.plugins[plugin.id] = null
-          // reject(e)
-        });
-
+        }
+        else{
+          _setupPlugin()
+        }
       })
-
     }
   }
 }
