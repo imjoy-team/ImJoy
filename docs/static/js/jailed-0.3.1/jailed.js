@@ -201,7 +201,11 @@ function randId() {
          *
          * For Node.js the plugin is created as a forked process
          */
-        BasicConnection = function() {
+        BasicConnection = function(id, type) {
+            if(type == 'iframe'){
+              throw('You can not use iframe in nodejs.')
+            }
+            this.id = id;
             // in Node.js always has a subprocess
             this.dedicatedThread = true;
             this._disconnected = false;
@@ -317,16 +321,36 @@ function randId() {
          * For the web-browser environment, the plugin is created as a
          * Worker in a sandbaxed frame
          */
-        BasicConnection = function() {
+        BasicConnection = function(id, type) {
             this._init = new Whenable;
             this._disconnected = false;
+            this.id = id;
 
             var me = this;
             platformInit.whenEmitted(function() {
                 if (!me._disconnected) {
                     me._frame = sample.cloneNode(false);
-                    document.body.appendChild(me._frame);
+                    me._frame.src = me._frame.src+'?type='+type;
+                    me._frame.id = 'iframe_'+id;
+                    if(type == 'iframe'){
+                      var plugin_window = document.getElementById('plugin_window_'+id)
+                      if(plugin_window){
+                        me._frame.frameBorder="0";
+                        me._frame.style.width = "100%";
+                        me._frame.style.height = "100%";
+                        me._frame.style.margin = "0";
+                        me._frame.style.padding = "0";
+                        me._frame.style.display = 'block';
 
+                        plugin_window.appendChild(me._frame);
+                      }
+                      else{
+                        document.body.appendChild(me._frame);
+                      }
+                    }
+                    else{
+                      document.body.appendChild(me._frame);
+                    }
                     window.addEventListener('message', function (e) {
                         if (e.source === me._frame.contentWindow) {
                             if (e.data.type == 'initialized') {
@@ -423,8 +447,8 @@ function randId() {
      * methods for loading scripts and executing the given code in the
      * plugin
      */
-    var Connection = function(){
-        this._platformConnection = new BasicConnection;
+    var Connection = function(id, type){
+        this._platformConnection = new BasicConnection(id, type);
 
         this._importCallbacks = {};
         this._executeSCb = function(){};
@@ -603,8 +627,11 @@ function randId() {
            }
           }
         }
-        if(this._id === undefined || !this._id){
-          this._id = randId()
+        if(this.id === undefined || !this.id){
+          this.id = randId()
+        }
+        if(this.type === undefined || !this.type){
+          this.type = 'webworker'
         }
         this._path = url;
         this._initialInterface = _interface||{};
@@ -627,8 +654,8 @@ function randId() {
            }
           }
         }
-        if(this._id === undefined || !this._id){
-          this._id = randId()
+        if(this.id === undefined || !this.id){
+          this.id = randId()
         }
         this._code = code;
         this._initialInterface = _interface||{};
@@ -655,8 +682,7 @@ function randId() {
             me._fail.emit();
             me.disconnect();
         }
-
-        this._connection = new Connection;
+        this._connection = new Connection(this.id, this.type);
         this._connection.whenInit(function(){
             me._init();
         });
@@ -669,7 +695,7 @@ function randId() {
      */
     DynamicPlugin.prototype._init =
            Plugin.prototype._init = function() {
-        this._site = new JailedSite(this._connection, this._id);
+        this._site = new JailedSite(this._connection, this.id);
 
         var me = this;
         this._site.onDisconnect(function() {
@@ -743,7 +769,9 @@ function randId() {
             me._requestRemote();
         }
 
-        this._connection.execute(this._code, sCb, this._fCb);
+        this._connection.execute({type: 'script', content: this._code}, sCb, this._fCb);
+        if(this.style) this._connection.execute({type: 'style', content: this.style}, sCb, this._fCb);
+        if(this.html) this._connection.execute({type: 'html', content: this.html}, sCb, this._fCb);
     }
 
 

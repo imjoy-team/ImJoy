@@ -19,6 +19,16 @@ var __jailed__path__ = thisScript.src
     .slice(0, -1)
     .join('/')+'/';
 
+var getParamValue = function(paramName) {
+    var url = window.location.search.substring(1); //get rid of "?" in querystring
+    var qArray = url.split('&'); //get key-value pairs
+    for (var i = 0; i < qArray.length; i++)
+    {
+        var pArr = qArray[i].split('='); //split key and value
+        if (pArr[0] == paramName)
+            return pArr[1]; //return value
+    }
+}
 
 /**
  * Initializes the plugin inside a webworker. May throw an exception
@@ -34,8 +44,10 @@ var initWebworkerPlugin = function() {
       '             type : "initialized",               ',
       '             dedicatedThread : true              ',
       '         });                                     ',
+
       '     }                                           ',
-      ' });                                             '
+      ' });                                             ',
+
     ].join('\n');
 
     var blobUrl = window.URL.createObjectURL(
@@ -131,10 +143,19 @@ var initIframePlugin = function() {
     );
 }
 
-
-
-try {
-    initWebworkerPlugin();
-} catch(e) {
-    initIframePlugin();
+var plugin_type = getParamValue('type');
+if(plugin_type=='webworker'){
+  try {
+      initWebworkerPlugin();
+  } catch(e) {
+      // fallback to iframe
+      initIframePlugin();
+  }
+}
+else if(plugin_type=='iframe'){
+  initIframePlugin();
+}
+else{
+  console.error("Unsupported plugin type: "+ plugin_type)
+  throw "Unsupported plugin type: "+ plugin_type
 }

@@ -1,6 +1,6 @@
 class TextFilePlugin {
   setup(){
-    api.createOp({
+    api.register({
       name: "load text file",
       type: "localization/text_loader",
       tags: ["localization", "op", "file_loader"],

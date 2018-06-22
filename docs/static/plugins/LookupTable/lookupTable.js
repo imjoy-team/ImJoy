@@ -1,6 +1,6 @@
 class LookupTablePlugin {
   setup() {
-    api.createOp({
+    api.register({
       name: "apply LUT",
       type: "image/LUT",
       tags: ["image", "op", "LUT"],
@@ -15,12 +15,16 @@ class LookupTablePlugin {
       init: "apply LUT {id:'lut', type:'choose', options:['hot', 'rainbow'], placeholder: 'hot'}",
       show_panel: true,
       onupdate: {
-        'lut': 'update'
+        lut: 'update'
       }
     })
   }
   update(config){
     console.log('update running in the plugin', config)
+    return {init: "apply LUT {id:'lut', type:'choose', options:['hot', 'rainbow', 'hello'], placeholder: 'hot'}"}
+  }
+  buttonCallback(config){
+    console.log('button callback running in the plugin', config)
     return {init: "apply LUT {id:'lut', type:'choose', options:['hot', 'rainbow', 'hello'], placeholder: 'hot'}"}
   }
   async run(my) {
@@ -29,7 +33,15 @@ class LookupTablePlugin {
     api.createWindow({
       name: "LUT Window",
       init: "Choose a LUT: {id:'lut', type:'choose', options:['hot', 'rainbow'], placeholder: 'hot'}",
-      show_panel: true
+    })
+    api.showDialog({
+      name: "LUT Window",
+      init: "Hey this is a dialog: {id:'heos', type:'choose', options:['1', '3'], placeholder: '1'}",
+      onupdate:{
+        btt: 'buttonCallback'
+      }
+    }).then((result)=>{
+      console.log('dialog result', result)
     })
     return my
   }

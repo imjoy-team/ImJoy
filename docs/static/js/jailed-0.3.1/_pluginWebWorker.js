@@ -71,15 +71,21 @@ self.connection = {};
      * @param {String} code code to execute
      */
     var execute = function(code) {
+      if(code.type == 'script'){
         try {
-            eval(code);
+            eval(code.content);
         } catch (e) {
             console.error(e.stack)
             self.postMessage({type: 'executeFailure'});
             throw e;
         }
-
         self.postMessage({type: 'executeSuccess'});
+      }
+      else{
+        throw "unsupported code type."
+      }
+
+
     }
 
 

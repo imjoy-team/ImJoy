@@ -12,6 +12,39 @@ window.application = {};
 window.connection = {};
 window.api = null;
 
+// Create a new, plain <span> element
+function _htmlToElement(html) {
+    var template = document.createElement('template');
+    html = html.trim(); // Never return a text node of whitespace as the result
+    template.innerHTML = html;
+    return template.content.firstChild;
+}
+
+var _loadJS = function(url) {
+    //url is URL of external file, implementationCode is the code
+    //to be called from the file, location is the location to
+    //insert the <script> element
+    return new Promise((resolve, reject) => {
+        var scriptTag = document.createElement('script');
+        scriptTag.src = url;
+        scriptTag.onload = resolve;
+        scriptTag.onreadystatechange = resolve;
+        scriptTag.onerror = reject;
+        document.head.appendChild(scriptTag);
+    })
+};
+
+// support importScripts outside webworker
+
+async function importScripts () {
+  var args = Array.prototype.slice.call(arguments), len = args.length, i = 0;
+  for (; i < len; i++) {
+    await _loadJS(args[i])
+  }
+};
+
+
+
 // event listener for the plugin message
 window.addEventListener('message', function(e) {
     var m = e.data.data;
@@ -62,14 +95,26 @@ var importScript = function(url) {
 
 // evaluates the provided string
 var execute = function(code) {
-    try {
-        eval(code);
-    } catch (e) {
-        console.error(e)
-        parent.postMessage({type : 'executeFailure'}, '*');
-        throw e;
+    if(code.type == 'script'){
+      try {
+          eval(code.content);
+      } catch (e) {
+          console.error(e)
+          parent.postMessage({type : 'executeFailure'}, '*');
+          throw e;
+      }
     }
-
+    else if (code.type == 'style'){
+        var style_node = document.createElement('style');
+        style_node.innerHTML = code.content;
+        document.head.appendChild(style_node)
+    }
+    else if (code.type == 'html'){
+         document.body.appendChild(_htmlToElement(code.content));
+    }
+    else{
+      throw "unsupported code type."
+    }
     parent.postMessage({type : 'executeSuccess'}, '*');
 }
 
