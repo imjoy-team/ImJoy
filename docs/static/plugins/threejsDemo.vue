@@ -124,8 +124,6 @@ function build3d() {
 
 }
 
-
-
 class Histogram2dPlugin {
   setup() {
     api.register({
