@@ -1,8 +1,5 @@
 <template>
     <md-app id="app"  md-waterfall md-mode="fixed">
-      <md-app-toolbar v-if="show_navbar" class="md-primary">
-        <navbar/>
-      </md-app-toolbar>
       <md-app-content>
         <router-view/>
       </md-app-content>

@@ -1,11 +1,8 @@
 <template>
 <div class="home">
-  <!-- <md-card>
-    <md-card-header> -->
-
-  <!-- <md-icon class="md-size-5x md-small-hide" md-src="static/img/ImJoy.io-icon-circle.svg" /> -->
-  <md-toolbar class="md-transparent md-dense" md-elevation="0">
+  <md-app-toolbar class="md-primary">
     <div class="md-toolbar-row" flex>
+      <navbar/>
       <div class="md-toolbar-section-end">
         <md-button href="https://github.com/oeway/ImJoy" target="_blank">
           <md-icon md-src="static/img/github.svg" class="md-size-1x svg-icon"></md-icon>source code</md-button>
@@ -13,6 +10,13 @@
           <md-icon md-src="static/img/twitter.svg" class="md-size-1x svg-icon"></md-icon>share</md-button>
       </div>
     </div>
+  </md-app-toolbar>
+  <!-- <md-card>
+    <md-card-header> -->
+
+  <!-- <md-icon class="md-size-5x md-small-hide" md-src="static/img/ImJoy.io-icon-circle.svg" /> -->
+  <md-toolbar class="md-transparent md-dense" md-elevation="0">
+
   </md-toolbar>
   <div class="md-toolbar-row md-layout md-alignment-center-center">
     <div class="banner-container">

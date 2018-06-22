@@ -1,7 +1,7 @@
 <template>
   <div class="md-toolbar-row">
       <div class="md-toolbar-row" flex>
-          <md-button to="/">
+          <md-button>
             <div class="site-title">ImJoy.io<span class="superscript">alpha</span></div>
           </md-button>
 

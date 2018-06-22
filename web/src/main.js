@@ -7,6 +7,8 @@ import 'vue-material/dist/vue-material.min.css'
 import 'vue-material/dist/theme/default.css' // This line here
 import VueCodemirror from 'vue-codemirror'
 import 'codemirror/lib/codemirror.css'
+import VueDraggableResizable from 'vue-draggable-resizable'
+
 
 import Navbar from '@/components/Navbar'
 import Viewer from '@/components/Viewer'
@@ -19,6 +21,7 @@ import PluginList from '@/components/PluginList'
 import store from './store.js'
 import App from './App'
 import vueSlider from 'vue-slider-component'
+import draggable from 'vuedraggable'
 
 Vue.config.productionTip = false
 
@@ -35,6 +38,8 @@ Vue.component('about', About)
 Vue.component('whiteboard', Whiteboard)
 Vue.component('joy', Joy)
 Vue.component('plugin-list', PluginList)
+Vue.component('vue-draggable-resizable', VueDraggableResizable)
+Vue.component('draggable', draggable)
 
 const truncate = function(text, length, clamp) {
   clamp = clamp || '...';

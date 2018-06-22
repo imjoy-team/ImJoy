@@ -1,17 +1,16 @@
 <template>
 <div class="viewer">
-  <div class="md-title">{{title}}</div>
-  <!-- <md-card >
-        <md-card-content > -->
-  <md-app>
-    <md-app-toolbar class="md-transparent md-dense" md-elevation="0" v-if="!menuVisible">
-      <div class="md-toolbar-row" flex>
-        <md-button class="md-fab md-primary" @click="menuVisible=true" v-if="!menuVisible">
+  <md-app-toolbar class="md-primary md-dense">
+    <div class="md-toolbar-row">
+      <div class="md-toolbar-section-start">
+        <md-button v-if="!menuVisible" class="md-fab md-primary" @click="menuVisible=true">
           <md-icon>menu</md-icon>
         </md-button>
+        <navbar/>
       </div>
-
-    </md-app-toolbar>
+    </div>
+  </md-app-toolbar>
+  <md-app>
     <md-app-drawer :md-active.sync="menuVisible" md-persistent="full">
       <div class="md-toolbar-row">
         <div class="md-toolbar-section-start">
@@ -31,11 +30,11 @@
       </div>
       <md-card>
         <md-card-header>
-            <div class="md-toolbar-row panel-header">
-              <div class="md-toolbar-section-start">
-                <span class="panel-title ">Workflow</span>
-              </div>
+          <div class="md-toolbar-row panel-header">
+            <div class="md-toolbar-section-start">
+              <span class="panel-title ">Workflow</span>
             </div>
+          </div>
         </md-card-header>
         <md-card-content>
           <joy :config="workflow_joy_config" ref="workflow" @run="runWorkflow" v-if="plugin_loaded"></joy>
@@ -53,7 +52,7 @@
                   <md-icon>keyboard_arrow_down</md-icon>
                 </md-button>
               </md-card-expand-trigger>
-              <div>  <span class="panel-title">{{panel.name}}</span></div>
+              <div> <span class="panel-title">{{panel.name}}</span></div>
               <div>
 
                 <!-- <md-button>Action</md-button>
@@ -90,7 +89,7 @@
     </md-app-drawer>
 
     <md-app-content class="whiteboard-content">
-      <whiteboard :windows="windows" @select="windowSelected"></whiteboard>
+      <whiteboard :windows="windows" :plugin-windows="plugin_windows" @select="windowSelected"></whiteboard>
     </md-app-content>
   </md-app>
   <!-- </md-card-content> -->
@@ -117,7 +116,7 @@
 
   <md-dialog :md-active.sync="showSettingsDialog">
     <md-dialog-content>
-        <plugin-list :plugins="installed_plugins" title="Installed Plugins"></plugin-list>
+      <plugin-list :plugins="installed_plugins" title="Installed Plugins"></plugin-list>
     </md-dialog-content>
     <md-dialog-actions>
       <md-button class="md-primary" @click="showSettingsDialog=false">OK</md-button>
@@ -157,8 +156,12 @@ import {
   IO_TEMPLATE
 } from '../api.js'
 
-import { randId } from '../utils.js'
-import { parseComponent } from '../pluginParser.js'
+import {
+  randId
+} from '../utils.js'
+import {
+  parseComponent
+} from '../pluginParser.js'
 
 export default {
   name: 'viewer',
@@ -177,6 +180,7 @@ export default {
       loading: false,
       showImportDialog: false,
       windows: [],
+      plugin_windows: [],
       panels: [],
       activeWindow: null,
       workflow_joy_config: {
@@ -198,8 +202,8 @@ export default {
 
     }
   },
-  created(){
-    setTimeout(()=>{
+  created() {
+    setTimeout(() => {
       this.db.allDocs({
         include_docs: true,
         attachments: true
@@ -245,27 +249,26 @@ export default {
 
   },
   beforeDestroy() {
-      console.log('terminating plugins')
-      for (let k in this.plugins) {
-        if(this.plugins.hasOwnProperty(k)){
-          const plugin = this.plugins[k]
-          plugin.terminate()
-        }
+    console.log('terminating plugins')
+    for (let k in this.plugins) {
+      if (this.plugins.hasOwnProperty(k)) {
+        const plugin = this.plugins[k]
+        plugin.terminate()
       }
+    }
   },
   methods: {
-    closePluginDialog(ok){
+    closePluginDialog(ok) {
       this.showPluginDialog = false
       let [resolve, reject] = this._plugin_dialog_promise
-      if(ok){
-         resolve(this.$refs.plugin_dialog_joy.joy.data)
-      }
-      else{
-         reject()
+      if (ok) {
+        resolve(this.$refs.plugin_dialog_joy.joy.data)
+      } else {
+        reject()
       }
       this._plugin_dialog_promise = null
     },
-    workflowOnchange(){
+    workflowOnchange() {
       console.log('workflow changed ...')
     },
     windowSelected(window) {
@@ -284,11 +287,11 @@ export default {
       this.windows.push(window)
     },
     runWorkflow(joy) {
-        console.log('run joy.')
-        joy.workflow.execute({})
+      console.log('run joy.')
+      joy.workflow.execute({})
 
     },
-    runPanel(joy, panel){
+    runPanel(joy, panel) {
       console.log('run panel.', joy)
       joy._panel.execute({})
     },
@@ -308,13 +311,12 @@ export default {
       const plugin = this.plugins[_plugin.id]
       //TODO: verify fields with OP_TEMPLATE
       console.log('creating Op: ', config, _plugin, this.plugins)
-      if(!plugin.api.run){
+      if (!plugin.api.run) {
         console.log("WARNING: no run function found in the config, this op won't be able to do anything: " + config.name)
-        config.onexecute = () =>{
+        config.onexecute = () => {
           console.log("WARNING: no run function defined.")
         }
-      }
-      else{
+      } else {
         const onexecute = async (my) => {
           //conver the api here data-->config   target--> data
           return await plugin.api.run({
@@ -329,9 +331,9 @@ export default {
         }
         config.onexecute = onexecute
       }
-      if(config.onupdate && typeof config.onupdate == 'object'){
-        for(let k in config.onupdate){
-          if(config.onupdate.hasOwnProperty(k)){
+      if (config.onupdate && typeof config.onupdate == 'object') {
+        for (let k in config.onupdate) {
+          if (config.onupdate.hasOwnProperty(k)) {
             // replace the string to a real function
             const onupdate = plugin.api[config.onupdate[k]]
             config.onupdate[k] = onupdate
@@ -342,9 +344,14 @@ export default {
       //update the joy workflow if new template added, TODO: preserve settings during reload
       this.$refs.workflow.setupJoy()
 
-      const panel_config = {name: config.name, id: _plugin.id, init: "{id: '_panel', type: '"+config.type+"'}", onexecute: config.onexecute}
+      const panel_config = {
+        name: config.name,
+        id: _plugin.id,
+        init: "{id: '_panel', type: '" + config.type + "'}",
+        onexecute: config.onexecute
+      }
       plugin.panel_config = panel_config
-      if(config.show_panel){
+      if (config.show_panel) {
         console.log('creating panel: ', panel_config)
         this.panels.push(panel_config)
       }
@@ -354,15 +361,15 @@ export default {
       const plugin = this.plugins[_plugin.id]
       //TODO: verify fields with WINDOW_TEMPLATE
       console.log('creating window: ', config, plugin)
-      config.window_id = 'plugin_window_'+plugin._id+randId()
-      if(config.show_panel && plugin.panel_config){
+      // config.window_id = 'plugin_window_'+plugin._id+randId()
+      if (config.show_panel && plugin.panel_config) {
         // create panel for the window
         console.log('creating panel: ', plugin.panel_config)
         // config.panel = plugin_config
       }
-      if(config.onupdate && typeof config.onupdate == 'object'){
-        for(let k in config.onupdate){
-          if(config.onupdate.hasOwnProperty(k)){
+      if (config.onupdate && typeof config.onupdate == 'object') {
+        for (let k in config.onupdate) {
+          if (config.onupdate.hasOwnProperty(k)) {
             // replace the string to a real function
             const onupdate = plugin.api[config.onupdate[k]]
             config.onupdate[k] = onupdate
@@ -375,9 +382,9 @@ export default {
     showDialog(config, _plugin) {
       return new Promise((resolve, reject) => {
         const plugin = this.plugins[_plugin.id]
-        if(config.onupdate && typeof config.onupdate == 'object'){
-          for(let k in config.onupdate){
-            if(config.onupdate.hasOwnProperty(k)){
+        if (config.onupdate && typeof config.onupdate == 'object') {
+          for (let k in config.onupdate) {
+            if (config.onupdate.hasOwnProperty(k)) {
               // replace the string to a real function
               const onupdate = plugin.api[config.onupdate[k]]
               config.onupdate[k] = onupdate
@@ -387,11 +394,12 @@ export default {
         //TODO: verify fields with WINDOW_TEMPLATE
         console.log('creating window: ', config, plugin)
 
-        if(config.show_panel && plugin.panel_config){
+        if (config.show_panel && plugin.panel_config) {
           // create panel for the window
           console.log('creating panel: ', plugin.panel_config)
           // config.panel = plugin_config
         }
+
         this.plugin_dialog_config = config
         this.showPluginDialog = true
         this._plugin_dialog_promise = [resolve, reject]
@@ -401,16 +409,16 @@ export default {
       return new Promise((resolve, reject) => {
         //TODO: verify fields with WINDOW_TEMPLATE
         console.log('creating window: ', config)
-        this.windows.unshift(config)
-              // container IS NOT finished rendering to the DOM
+        this.plugin_windows.push(config)
+        // container IS NOT finished rendering to the DOM
         // this.$nextTick(()=>{
         //      resolve()
         // })
-        setTimeout(()=>{
-        //   const target = document.getElementById(config.window_id)
-        //   const source =  document.getElementById('iframe_'+plugin.id)
-        //     console.log('moving.......', target, source)
-        //   target.parentNode.appendChild(source)
+        setTimeout(() => {
+          //   const target = document.getElementById(config.window_id)
+          //   const source =  document.getElementById('iframe_'+plugin.id)
+          //     console.log('moving.......', target, source)
+          //   target.parentNode.appendChild(source)
           resolve()
         }, 500)
       })
@@ -418,7 +426,7 @@ export default {
     loadPlugin(config) {
       const path = config.file_path
       //generate a random id for the plugin
-      config.id = config._id+'_'+randId()
+      config.id = config._id + '_' + randId()
       return new Promise((resolve, reject) => {
         // exported methods, will be available to the plugin
         this.plugin_api.kk = 999
@@ -426,30 +434,28 @@ export default {
           return new ArrayBuffer(1200400)
         }
 
-        const _setupPlugin = ()=>{
+        const _setupPlugin = () => {
           let plugin
           if (config.plugin_code) {
-            if(path.endsWith('.vue')){
+            if (path.endsWith('.vue')) {
               console.log('parsing the plugin file')
               const pluginComp = parseComponent(config.plugin_code)
               console.log('code parsed from', path, pluginComp)
               config.script = pluginComp.script.content
-              if(pluginComp.customBlocks[0].type == 'html'){
+              if (pluginComp.customBlocks[0].type == 'html') {
                 config.html = pluginComp.customBlocks[0].content
-              }
-              else{
+              } else {
                 console.error('no html tag found in side the plugin file.')
               }
               // here we only take the first stylesheet we found
               config.style = pluginComp.styles[0].content
-            }
-            else{
+            } else {
               config.script = config.plugin_code
             }
 
             plugin = new jailed.DynamicPlugin(config.script, this.plugin_api, config)
           } else {
-            alert('no plugin source code found for '+config.name)
+            alert('no plugin source code found for ' + config.name)
             //plugin = new jailed.Plugin(path, this.plugin_api, config);
           }
           this.plugins[plugin.id] = plugin
@@ -470,21 +476,21 @@ export default {
             })
           });
           plugin.whenFailed((e) => {
-            console.error('error occured when loading '+config.name + ":", e)
+            console.error('error occured when loading ' + config.name + ":", e)
             alert('error occured when loading ' + config.name)
             plugin.terminate()
             this.plugins[plugin.id] = null
             // reject(e)
           });
         }
-        if(config.type=='iframe'){
+        if (config.type == 'iframe') {
           // this is a unique id for the iframe to attach
-          config.window_id = 'plugin_window_'+config.id
-          this.showPluginWindow(config).then(()=>{
+          config.is_plugin_window = true
+          config.window_id = 'plugin_window_' + config.id
+          this.showPluginWindow(config).then(() => {
             _setupPlugin()
           })
-        }
-        else{
+        } else {
           _setupPlugin()
         }
       })
@@ -500,9 +506,10 @@ export default {
   width: 100%;
 }
 
-.md-content{
+.md-content {
   overflow-x: hidden;
 }
+
 .viewer {
   height: 100%;
 }
@@ -517,17 +524,21 @@ export default {
   margin-bottom: 20px;
 }
 
-.whiteboard-content{
+.whiteboard-content {
   padding: 0px;
 }
 
-.panel-header{
+.panel-header {
   padding-left: 20px;
   height: 40px;
   min-height: 20px;
 }
 
-.panel-title{
+.panel-title {
   font-size: 1.4em;
 }
+
+/* .floating-fab{
+  position: absolute;
+} */
 </style>
