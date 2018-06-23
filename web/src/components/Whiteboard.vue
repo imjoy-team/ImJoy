@@ -116,10 +116,10 @@ export default {
 
     },
     stopDragging(){
-      setTimeout(()=>{
+      // setTimeout(()=>{
         this.dragging=false
-        this.$forceUpdate()
-      }, 500)
+        // this.$forceUpdate()
+      // }, 500)
     }
   }
 }

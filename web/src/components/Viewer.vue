@@ -295,12 +295,12 @@ export default {
     },
     runWorkflow(joy) {
       console.log('run joy.')
-      joy.workflow.execute({})
+      joy.workflow.execute(this.activeWindow)
 
     },
     runPanel(joy, panel) {
       console.log('run panel.', joy)
-      joy._panel.execute({})
+      joy._panel.execute(this.activeWindow)
     },
     selectFileChanged(file_list) {
       console.log(file_list)
@@ -437,6 +437,7 @@ export default {
           //update the joy workflow if new template added, TODO: preserve settings during reload
           this.$refs.workflow.setupJoy()
           this.registered.ops[config.type] = config
+          plugin.config.type = config.type
           const panel_config = {
             name: config.name,
             id: _plugin.id,
