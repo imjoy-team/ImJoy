@@ -1,11 +1,11 @@
 <template>
 <div class="whiteboard">
     <div class="overlay" @click="dragging=false" v-if="dragging"></div>
-    <vue-draggable-resizable  @dragging="dragging=true" @dragstop="dragging=false" @resizing="dragging=true" @resizestop="dragging=false" :parent="true" :w="500" :h="500" v-for="(window, wi) in pluginWindows" :key="wi+'_'">
-      <md-card :class="dragging?'md-primary':''" @click="dragging=true">
-        <md-card-content v-show="window.is_plugin_window" class="plugin-iframe-container">
-            <div v-once :id="window.window_id" class="plugin-iframe"></div>
-        </md-card-content>
+    <vue-draggable-resizable :grid="[30,30]"  @dragging="" @dragstop="dragging=false" @resizing="dragging=true" @resizestop="dragging=false" :parent="true" :w="500" :h="500" v-for="(window, wi) in windows" :key="window.iframe_container">
+      <!-- <md-card :class="dragging?'md-primary':''" @click.stop.prevent="dragging=true">
+        <md-card-content class="plugin-iframe-container">
+            <div v-once :id="window.iframe_container" class="plugin-iframe"></div>
+        </md-card-content> -->
         <!-- <md-card-actions>
           <div v-if="!window.panel"></div>
           <div> <span class="window-title">{{window.name}}</span></div>
@@ -23,59 +23,65 @@
             </md-menu>
           </div>
         </md-card-actions> -->
-      </md-card>
-    </vue-draggable-resizable>
-    <draggable :list="windows">
-    <div v-for="(window, wi) in windows" :key="wi" @click.stop.prevent="select(wi)" class="md-layout-item md-large-size-50 md-medium-size-60 md-small-size-80 md-xsmall-size-100">
-      <md-card>
-        <md-card-expand>
-          <md-card-actions md-alignment="space-between" :class="window.selected?'window-selected':''" class="window-header">
-            <md-card-expand-trigger v-if="window.panel">
-              <md-button class="md-icon-button">
-                <md-icon>keyboard_arrow_down</md-icon>
-              </md-button>
-            </md-card-expand-trigger>
-            <div v-if="!window.panel"></div>
-            <div> <span class="window-title">{{window.name}}</span></div>
-            <div>
-
-              <!-- <md-button>Action</md-button>
-              <md-button>Action</md-button> -->
-              <md-menu md-size="big" md-direction="bottom-end">
-                <md-button class="md-icon-button" md-menu-trigger>
-                  <md-icon>more_vert</md-icon>
+      <!-- </md-card> -->
+      <!-- <div v-for="(window, wi) in windows" :key="wi" @click.stop.prevent="select(wi)" class="md-layout-item md-large-size-50 md-medium-size-60 md-small-size-80 md-xsmall-size-100"> -->
+        <md-card :class="dragging?'md-primary':''">
+          <md-card-expand>
+            <md-card-actions md-alignment="space-between" :class="window.selected?'window-selected':''" class="window-header">
+              <md-card-expand-trigger v-if="window.panel">
+                <md-button class="md-icon-button">
+                  <md-icon>keyboard_arrow_down</md-icon>
                 </md-button>
-                <md-menu-content>
-                  <md-menu-item @click="close(wi)">
-                    <span>Close</span>
-                    <md-icon>close</md-icon>
-                  </md-menu-item>
-                  <md-menu-item @click="fullScreen(wi)">
-                    <span>Fullscreen</span>
-                    <md-icon>fullscreen</md-icon>
-                  </md-menu-item>
-                </md-menu-content>
-              </md-menu>
+              </md-card-expand-trigger>
+              <div v-if="!window.panel"></div>
+              <div> <span class="window-title">{{window.name}}</span></div>
+              <div>
+                <!-- <md-button>Action</md-button>
+                <md-button>Action</md-button> -->
+                <md-menu md-size="big" md-direction="bottom-end">
+                  <md-button class="md-icon-button" @click.stop md-menu-trigger>
+                    <md-icon>more_vert</md-icon>
+                  </md-button>
+                  <md-menu-content>
+                    <md-menu-item @click="close(wi)">
+                      <span>Close</span>
+                      <md-icon>close</md-icon>
+                    </md-menu-item>
+                    <md-menu-item @click="fullScreen(wi)">
+                      <span>Fullscreen</span>
+                      <md-icon>fullscreen</md-icon>
+                    </md-menu-item>
+                  </md-menu-content>
+                </md-menu>
+              </div>
+            </md-card-actions>
+            <md-card-expand-content v-if="window.panel">
+              <md-card-content>
+                <joy :config="window.panel"></joy>
+              </md-card-content>
+            </md-card-expand-content>
+          </md-card-expand>
+
+          <md-card-content class="plugin-iframe-container">
+            <md-empty-state v-if="window.type=='empty'" md-icon="hourglass_empty" md-label="IMJOY.IO" md-description="">
+            </md-empty-state>
+            <div v-if="window.type=='files'">
+              <md-chip v-for="f in window.data.files" :key="f.name">{{f.name}}</md-chip>
             </div>
-          </md-card-actions>
-          <md-card-expand-content v-if="window.panel">
-            <md-card-content>
-              <joy :config="window.panel"></joy>
-            </md-card-content>
-          </md-card-expand-content>
-        </md-card-expand>
+            <div v-if="window.type=='joy_panel'">
+              <joy :config="window.config"></joy>
+            </div>
+            <!-- <md-card-content class="plugin-iframe-container"> -->
+            <div v-once :id="window.iframe_container" class="plugin-iframe"></div>
+            <!-- </md-card-content> -->
+          </md-card-content>
 
-        <md-card-content>
-          <md-empty-state v-if="window.type=='empty'" md-icon="hourglass_empty" md-label="IMJOY.IO" md-description="">
-          </md-empty-state>
-          <div v-if="window.type=='files'">
-            <md-chip v-for="f in window.data.files" :key="f.name">{{f.name}}</md-chip>
-          </div>
-        </md-card-content>
+        </md-card>
+      <!-- </div> -->
+    </vue-draggable-resizable>
+  <!-- <draggable :list="windows">
 
-      </md-card>
-    </div>
-  </draggable>
+  </draggable> -->
   <div class="md-layout md-gutter md-alignment-top-left">
     <md-empty-state v-if="!windows" md-icon="static/img/anna-palm-icon-circle-animation.svg" md-label="IMJOY.IO" md-description="">
     </md-empty-state>
@@ -111,6 +117,7 @@ export default {
   mounted() {
     setTimeout(()=>{
       this.dragging = false
+      this.$forceUpdate()
     }, 500)
   },
   methods: {
@@ -183,12 +190,12 @@ export default {
   z-index: 1;
   display: flex;
   width: 100%;
-  height: 100%;
+  height: calc(100% - 40px);;
   flex-direction: column;
   overflow: hidden;
   padding-left: 5px;
   padding-right: 5px;
-  padding-top: 25px;
+  padding-top: 5px;
   padding-bottom: 5px;
 }
 
@@ -199,8 +206,6 @@ export default {
   padding: 0;
   flex-grow: 1;
   border: none;
-  margin: 0;
-  padding: 0;
 }
 .draggable{
   z-index: 998!important;

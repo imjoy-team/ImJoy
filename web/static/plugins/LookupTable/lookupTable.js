@@ -32,7 +32,8 @@ class LookupTablePlugin {
     console.log('running in the plugin', my)
     api.createWindow({
       name: "LUT Window",
-      init: "Choose a LUT: {id:'lut', type:'choose', options:['hot', 'rainbow'], placeholder: 'hot'}",
+      type: "joy_panel",
+      config: {init: "Choose a LUT: {id:'lut', type:'choose', options:['hot', 'rainbow'], placeholder: 'hot'}"}
     })
     api.showDialog({
       name: "LUT Window",

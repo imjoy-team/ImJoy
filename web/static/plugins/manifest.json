@@ -3,7 +3,7 @@
   "root_path": "/static/plugins",
   "plugins": [{
     "name": "Text File Importer",
-    "type": "webworker",
+    "mode": "webworker",
     "version": "0.0.1",
     "api_version": "0.0.1",
     "createdAt": "Mon Jun 18 2018 21:46:36",
@@ -15,7 +15,7 @@
   },
   {
     "name": "2D Histogram",
-    "type": "webworker",
+    "mode": "webworker",
     "version": "0.0.1",
     "api_version": "0.0.1",
     "createdAt": "Mon Jun 19 2018 15:45:30",
@@ -27,7 +27,7 @@
   },
   {
     "name": "Lookup Table",
-    "type": "webworker",
+    "mode": "webworker",
     "version": "0.0.1",
     "api_version": "0.0.1",
     "createdAt": "Mon Jun 19 2018 16:33:11",
@@ -39,7 +39,7 @@
   },
   {
     "name": "Threejs Demo",
-    "type": "iframe",
+    "mode": "iframe",
     "version": "0.0.1",
     "api_version": "0.0.1",
     "createdAt": "Mon Jun 19 2018 15:45:30",
@@ -51,7 +51,7 @@
   },
   {
     "name": "Threejs Demo (Vue)",
-    "type": "iframe",
+    "mode": "iframe",
     "version": "0.0.1",
     "api_version": "0.0.1",
     "createdAt": "Mon Jun 19 2018 15:45:30",

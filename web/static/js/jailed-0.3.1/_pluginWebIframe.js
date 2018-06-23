@@ -99,7 +99,7 @@ var execute = function(code) {
       try {
           eval(code.content);
       } catch (e) {
-          console.error(e)
+          console.error(e.message, e.stack)
           parent.postMessage({type : 'executeFailure'}, '*');
           throw e;
       }

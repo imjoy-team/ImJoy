@@ -13,12 +13,7 @@
 </html>
 
 <script>
-importScripts("https://threejs.org/build/three.js",
-              "https://threejs.org/examples/js/controls/OrbitControls.js",
-              "https://threejs.org/examples/js/Detector.js"
-            ).then(() => {
-  build3d()
-})
+
 
 function build3d() {
   if (!Detector.webgl) Detector.addGetWebGLMessage();
@@ -124,23 +119,39 @@ function build3d() {
 
 }
 
-class Histogram2dPlugin {
+class ThreejsDemoPlugin {
   setup() {
     api.register({
-      name: "render 2D histogram",
-      type: "localization/render_2d_histogram",
-      tags: ["localization", "op", "histogram"],
-      init: "Render a histogram with pixel size {id:'pixel_size', type:'number', placeholder: 20}nm",
+      name: "Three.js Demo",
+      type: "threejs/demo",
+      mode: "iframe",
+      tags: ["3d", "op", "window"],
+      init: "show three.js demo",
+      show_panel: true
+    })
+    importScripts("https://threejs.org/build/three.js",
+                  "https://threejs.org/examples/js/controls/OrbitControls.js",
+                  "https://threejs.org/examples/js/Detector.js"
+    ).then(()=>{
+      build3d()
     })
   }
 
-  async run(my) {
-    const pixel_size = my.config.pixel_size
-    return my
+  run(my) {
+    api.createWindow({
+      name: "3D Demo Window",
+      type: "threejs/demo",
+      data: {},
+      config: {},
+      panel: {init: "this is a contorl panel."}
+    }).catch((e)=>{
+      console.error(e)
+    })
+
   }
 }
 
-api.export(new Histogram2dPlugin())
+api.export(new ThreejsDemoPlugin())
 </script>
 
 <style>
