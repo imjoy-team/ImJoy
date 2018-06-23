@@ -30,11 +30,7 @@ class LookupTablePlugin {
   async run(my) {
     const lut = my.config.lut
     console.log('running in the plugin', my)
-    api.createWindow({
-      name: "LUT Window",
-      type: "joy_panel",
-      config: {init: "Choose a LUT: {id:'lut', type:'choose', options:['hot', 'rainbow'], placeholder: 'hot'}"}
-    })
+
     api.showDialog({
       name: "LUT Window",
       init: "Hey this is a dialog: {id:'heos', type:'choose', options:['1', '3'], placeholder: '1'}",
@@ -43,6 +39,12 @@ class LookupTablePlugin {
       }
     }).then((result)=>{
       console.log('dialog result', result)
+    }).then(()=>{
+      api.createWindow({
+        name: "LUT Window",
+        type: "joy_panel",
+        config: {init: "Choose a LUT: {id:'lut', type:'choose', options:['hot', 'rainbow'], placeholder: 'hot'}", width: 500, height: 200}
+      })
     })
     return my
   }

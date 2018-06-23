@@ -3,7 +3,7 @@
   <!-- <md-subheader>Options</md-subheader> -->
   <md-subheader v-if="title">{{title}}</md-subheader>
   <div class="md-layout md-gutter md-alignment-center">
-  <md-card v-for="(plugin, i) in available_plugins" class="md-layout-item md-large-size-30 md-medium-size-40 md-small-size-50 md-xsmall-size-100" :key="i">
+  <md-card v-for="(plugin, i) in available_plugins" class="md-layout-item md-medium-size-40 md-xsmall-size-100" :key="i">
     <md-card-header>
       {{plugin.createdAt}}
       <h2>{{plugin.name}}</h2>
@@ -11,10 +11,10 @@
       <md-chip v-for="tag in plugin.tags" :key="tag">{{tag}}</md-chip>
     </md-card-header>
     <md-card-content>
-      <md-button v-if="!plugin.installed" @click="install(plugin)" class="md-primary">Install</md-button>
-      <md-button v-if="plugin.installed" @click="install(plugin)" class="md-primary">Update</md-button>
-      <md-button v-if="plugin.installed" @click="_plugin2_remove=plugin;showRemoveConfirmation=true;" class="md-accent">Remove</md-button>
-      <md-button v-if="plugin.installed" @click="edit(plugin)" class="md-primary">Edit</md-button>
+      <md-button v-if="!plugin.installed" @click="install(plugin)" class="md-icon-button md-primary"><md-icon>cloud_download</md-icon></md-button>
+      <md-button v-if="plugin.installed" @click="install(plugin)" class="md-icon-button md-primary"><md-icon>update</md-icon></md-button>
+      <md-button v-if="plugin.installed" @click="_plugin2_remove=plugin;showRemoveConfirmation=true;" class="md-accent"><md-icon>delete_forever</md-icon></md-button>
+      <md-button v-if="plugin.installed" @click="edit(plugin)" class="md-icon-button md-primary"><md-icon>edit</md-icon></md-button>
     </md-card-content>
   </md-card>
 

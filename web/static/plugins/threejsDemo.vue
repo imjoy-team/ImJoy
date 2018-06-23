@@ -142,7 +142,7 @@ class ThreejsDemoPlugin {
       name: "3D Demo Window",
       type: "threejs/demo",
       data: {},
-      config: {},
+      config: {width:500, height:500},
       panel: {init: "this is a contorl panel."}
     }).catch((e)=>{
       console.error(e)

@@ -24,7 +24,7 @@ export const REGISTER_SCHEMA= schema({
 export const WINDOW_SCHEMA= schema({
   name: String,
   type: String,
-  config: [null, Object],
+  config: Object,
   data: [null, Object], //attachments: {}
   panel: [null, Object]
 })

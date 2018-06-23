@@ -194,6 +194,7 @@ export default {
         init: "{id:'workflow', type:'ops'}",
         onupdate: this.workflowOnchange
       },
+      default_window_pos: [0, 0, 0],
       plugins: {},
       registered: {ops: {}, windows: {}},
       installed_plugins: [],
@@ -333,6 +334,11 @@ export default {
               config.script = pluginComp.script.content
               if (pluginComp.customBlocks[0].type == 'html') {
                 config.html = pluginComp.customBlocks[0].content
+                //show the iframe if there is html defined
+                config.iframe_container = 'plugin_window_' + config.id + randId()
+                config.iframe_window = null
+                config.type = 'main'
+                this.showPluginWindow(config)
               } else {
                 console.error('no html tag found inside the plugin file.')
               }
@@ -377,137 +383,172 @@ export default {
             // reject(e)
           });
         }
+
           config.iframe_container = null
           config.iframe_window = null
           _setupPlugin()
       })
     },
     register(config, _plugin) {
-      const plugin = this.plugins[_plugin.id]
-      config.mode = config.mode || 'webworker'
-      if(!REGISTER_SCHEMA(config)){
-        const error = REGISTER_SCHEMA.errors(config)
-        console.error("Error occured during registering "+config.name, error)
-        throw error
-      }
-      if(config.tags.includes('op')){
-        console.log('creating Op: ', config, _plugin, this.plugins)
-        if (!plugin.api.run) {
-          console.log("WARNING: no run function found in the config, this op won't be able to do anything: " + config.name)
-          config.onexecute = () => {
-            console.log("WARNING: no run function defined.")
-          }
-        } else {
-          const onexecute = async (my) => {
-            //conver the api here data-->config   target--> data
-            return await plugin.api.run({
-              op: {
-                name: my.op.name,
-                type: my.op.type
-              },
-              config: my.data,
-              data: my.target,
-              progress: this.updateProgress
-            })
-          }
-          config.onexecute = onexecute
+      try {
+        const plugin = this.plugins[_plugin.id]
+        config.mode = config.mode || 'webworker'
+        if(!REGISTER_SCHEMA(config)){
+          const error = REGISTER_SCHEMA.errors(config)
+          console.error("Error occured during registering "+config.name, error)
+          throw error
         }
-        if (config.onupdate && typeof config.onupdate == 'object') {
-          for (let k in config.onupdate) {
-            if (config.onupdate.hasOwnProperty(k)) {
-              // replace the string to a real function
-              const onupdate = plugin.api[config.onupdate[k]]
-              config.onupdate[k] = onupdate
+        if(this.registered.ops[config.type]){
+          console.log('plugin already registered')
+          return
+        }
+        if(config.tags.includes('op')){
+          console.log('creating Op: ', config, plugin)
+          if (!plugin.api.run) {
+            console.log("WARNING: no run function found in the config, this op won't be able to do anything: " + config.name)
+            config.onexecute = () => {
+              console.log("WARNING: no run function defined.")
+            }
+          } else {
+            const onexecute = async (my) => {
+              //conver the api here data-->config   target--> data
+              return await plugin.api.run({
+                op: {
+                  name: my.op.name,
+                  type: my.op.type
+                },
+                config: my.data,
+                data: my.target,
+                progress: this.updateProgress
+              })
+            }
+            config.onexecute = onexecute
+          }
+          if (config.onupdate && typeof config.onupdate == 'object') {
+            for (let k in config.onupdate) {
+              if (config.onupdate.hasOwnProperty(k)) {
+                // replace the string to a real function
+                const onupdate = plugin.api[config.onupdate[k]]
+                config.onupdate[k] = onupdate
+              }
             }
           }
+          Joy.add(config);
+          //update the joy workflow if new template added, TODO: preserve settings during reload
+          this.$refs.workflow.setupJoy()
+          this.registered.ops[config.type] = config
+          const panel_config = {
+            name: config.name,
+            id: _plugin.id,
+            init: "{id: '_panel', type: '" + config.type + "'}",
+            onexecute: config.onexecute
+          }
+          plugin.panel_config = panel_config
+          if (config.show_panel) {
+            console.log('creating panel: ', panel_config)
+            this.panels.push(panel_config)
+          }
         }
-        Joy.add(config);
-        //update the joy workflow if new template added, TODO: preserve settings during reload
-        this.$refs.workflow.setupJoy()
-        this.registered.ops[config.type] = config
-        const panel_config = {
-          name: config.name,
-          id: _plugin.id,
-          init: "{id: '_panel', type: '" + config.type + "'}",
-          onexecute: config.onexecute
+        if(config.tags.includes('window')){
+          if(config.mode != 'iframe'){
+            throw 'Window plugin must be with type "iframe"'
+          }
+          this.registered.windows[config.type] = plugin
         }
-        plugin.panel_config = panel_config
-        if (config.show_panel) {
-          console.log('creating panel: ', panel_config)
-          this.panels.push(panel_config)
+        if(config.tags.includes('file_importer')){
+          throw "file importer not supported yet"
         }
-      }
-      if(config.tags.includes('window')){
-        if(config.mode != 'iframe'){
-          throw 'Window plugin must be with type "iframe"'
+        if(config.tags.includes('file_exporter')){
+          throw "file importer not supported yet"
         }
-        this.registered.windows[config.type] = plugin
+        return true
+      } catch (e) {
+          console.error(e)
+          throw e
       }
-      if(config.tags.includes('file_importer')){
-        throw "file importer not supported yet"
-      }
-      if(config.tags.includes('file_exporter')){
-        throw "file importer not supported yet"
-      }
-      return true
+
     },
     createWindow(config, _plugin) {
-      config.type = config.type || "joy_panel"
-      config.data = config.data || null
-      config.config = config.config || null
-      config.panel = config.panel || null
-      if(!WINDOW_SCHEMA(config)){
-        const error = WINDOW_SCHEMA.errors(config)
-        console.error("Error occured during creating window "+config.name, error)
-        throw error
-      }
-      const source_plugin = this.plugins[_plugin.id]
-      if(config.type == 'joy_panel'){
-        console.log('creating joy_panel', config)
-        // config.window_id = 'plugin_window_'+plugin._id+randId()
-        this.windows.unshift(config)
-      }
-      else{
-        const window_plugin = this.registered.windows[config.type]
-        console.log(window_plugin)
-        if(!window_plugin){
-          console.error('no plugin registered for window type: ', config.type)
-          throw 'no plugin registered for window type: ', config.type
+      try {
+        config.type = config.type || "joy_panel"
+        config.data = config.data || null
+        config.config = config.config || {}
+        config.panel = config.panel || null
+        config.config.width = config.config.width || 300
+        config.config.height = config.config.height || 100
+        if(!config.config.x || !config.config.y){
+          config.config.x = this.default_window_pos[0]
+          config.config.y = this.default_window_pos[1]
+          this.default_window_pos[0] = this.default_window_pos[0]+10
+          this.default_window_pos[1] = this.default_window_pos[1]+10
         }
-        console.log(window_plugin.config)
-        const pconfig = _clone(window_plugin.config)
-        //generate a new window id
-        pconfig.id = pconfig._id + '_' + randId()
-        console.log('creating window: ', pconfig, source_plugin)
-        if(pconfig.mode != 'iframe'){
-          throw 'Window plugin must be with type "iframe"'
+        if(!config.config.z){
+          config.config.z = this.default_window_pos[2]
+          this.default_window_pos[2] = this.default_window_pos[2]+1
         }
-        //
-        const _setupPlugin = () => {
-          const plugin = new jailed.DynamicPlugin(pconfig, this.plugin_api)
-          plugin.whenConnected(() => {
-            if (!plugin.api) {
-              console.error('the window plugin seems not ready.')
-            }
-            plugin.api.setup().then((result) => {
-              console.log('sucessfully setup the window plugin: ', plugin)
-            }).catch((e) => {
-              console.error('error occured when loading the window plugin ' + pconfig.name + ": ", e)
+        if(!WINDOW_SCHEMA(config)){
+          const error = WINDOW_SCHEMA.errors(config)
+          console.error("Error occured during creating window "+config.name, error)
+          throw error
+        }
+        const source_plugin = this.plugins[_plugin.id]
+        if(config.type == 'joy_panel'){
+          console.log('creating joy_panel', config)
+          // config.window_id = 'plugin_window_'+plugin._id+randId()
+          this.windows.unshift(config)
+        }
+        else{
+          const window_plugin = this.registered.windows[config.type]
+          console.log(window_plugin)
+          if(!window_plugin){
+            console.error('no plugin registered for window type: ', config.type)
+            throw 'no plugin registered for window type: ', config.type
+          }
+          console.log(window_plugin.config)
+          const pconfig = _clone(window_plugin.config)
+          //generate a new window id
+          pconfig.id = pconfig._id + '_' + randId()
+          pconfig.config = config.config
+          pconfig.data = config.data
+          pconfig.config.width = config.config.width
+          pconfig.config.height = config.config.height
+          pconfig.config.x = config.config.x
+          pconfig.config.y = config.config.y
+          pconfig.config.z = config.config.z
+          console.log('creating window: ', pconfig, source_plugin)
+          if(pconfig.mode != 'iframe'){
+            throw 'Window plugin must be with type "iframe"'
+          }
+          //
+          const _setupPlugin = () => {
+            const plugin = new jailed.DynamicPlugin(pconfig, this.plugin_api)
+            plugin.whenConnected(() => {
+              if (!plugin.api) {
+                console.error('the window plugin seems not ready.')
+              }
+              plugin.api.setup().then((result) => {
+                console.log('sucessfully setup the window plugin: ', plugin)
+              }).catch((e) => {
+                console.error('error occured when loading the window plugin ' + pconfig.name + ": ", e)
+                plugin.terminate()
+              })
+            });
+            plugin.whenFailed((e) => {
+              console.error('error occured when loading ' + pconfig.name + ":", e)
+              alert('error occured when loading ' + pconfig.name)
               plugin.terminate()
-            })
-          });
-          plugin.whenFailed((e) => {
-            console.error('error occured when loading ' + pconfig.name + ":", e)
-            alert('error occured when loading ' + pconfig.name)
-            plugin.terminate()
-          });
+            });
+          }
+          // this is a unique id for the iframe to attach
+          pconfig.iframe_container = 'plugin_window_' + pconfig.id + randId()
+          pconfig.iframe_window = null
+          this.showPluginWindow(pconfig).then(() => {
+            _setupPlugin()
+          })
         }
-        // this is a unique id for the iframe to attach
-        pconfig.iframe_container = 'plugin_window_' + pconfig.id + randId()
-        pconfig.iframe_window = null
-        this.showPluginWindow(pconfig).then(() => {
-          _setupPlugin()
-        })
+      } catch (e) {
+        console.error(e)
+        throw e
       }
       return true
     },
@@ -539,6 +580,27 @@ export default {
     },
     showPluginWindow(config) {
       return new Promise((resolve, reject) => {
+        config.type = config.type || "joy_panel"
+        config.data = config.data || null
+        config.config = config.config || {}
+        config.panel = config.panel || null
+        config.config.width = config.config.width || 500
+        config.config.height = config.config.height || 300
+        if(!config.config.x || !config.config.y){
+          config.config.x = this.default_window_pos[0]
+          config.config.y = this.default_window_pos[1]
+          this.default_window_pos[0] = this.default_window_pos[0]+10
+          this.default_window_pos[1] = this.default_window_pos[1]+10
+        }
+        if(!config.config.z){
+          config.config.z = this.default_window_pos[2]
+          this.default_window_pos[2] = this.default_window_pos[2]+1
+        }
+        if(!WINDOW_SCHEMA(config)){
+          const error = WINDOW_SCHEMA.errors(config)
+          console.error("Error occured during creating window "+config.name, error)
+          throw error
+        }
         //TODO: verify fields with WINDOW_TEMPLATE
         console.log('creating window: ', config)
         this.windows.push(config)
@@ -571,7 +633,7 @@ export default {
 }
 
 .md-dialog {
-  width: 768px;
+  width: 90%;
 }
 
 .md-card {
