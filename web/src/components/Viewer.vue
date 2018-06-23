@@ -212,30 +212,7 @@ export default {
     }
   },
   created() {
-    setTimeout(() => {
-      this.db.allDocs({
-        include_docs: true,
-        attachments: true
-      }).then((result) => {
-        const promises = []
-        this.plugins = {}
-        this.installed_plugins = []
-        for (let i = 0; i < result.total_rows; i++) {
-          const config = result.rows[i].doc
-          this.installed_plugins.push(config)
-          promises.push(this.loadPlugin(config))
-        }
-        // TODO: setup this promise all, it's now cause unknown problem
-        // Promise.all(promises).then(()=>{
-        // })
-        this.plugin_loaded = true
-        this.loading = false
-        this.$forceUpdate()
-      }).catch((err) => {
-        console.error(err)
-        this.loading = false
-      });
-    }, 1000)
+
   },
   mounted() {
     this.plugin_api = {
@@ -253,7 +230,38 @@ export default {
     const root = location.protocol + '//' + location.host
 
     //TODO: fix this, how to prevent loading failure if remove this timeout
-
+    setTimeout(() => {
+      this.db.allDocs({
+        include_docs: true,
+        attachments: true
+      }).then((result) => {
+        const promises = []
+        this.plugins = {}
+        this.installed_plugins = []
+        for (let i = 0; i < result.total_rows; i++) {
+          const config = result.rows[i].doc
+          this.installed_plugins.push(config)
+          const c = this.parsePluginCode(config.plugin_code, config.file_path)
+          if(c.mode == 'iframe' && c.tags.includes('window')){
+            this.registered.windows[c.type] = c
+            // this is a unique id for the iframe to attach
+            c.iframe_container = 'plugin_window_' + c.id + randId()
+            c.iframe_window = null
+            this.createWindow(c, {id: c.id})
+          }
+          promises.push(this.loadPlugin(c))
+        }
+        // TODO: setup this promise all, it's now cause unknown problem
+        // Promise.all(promises).then(()=>{
+        // })
+        this.plugin_loaded = true
+        this.loading = false
+        this.$forceUpdate()
+      }).catch((err) => {
+        console.error(err)
+        this.loading = false
+      });
+    }, 1000)
   },
   beforeDestroy() {
     console.log('terminating plugins')
@@ -313,80 +321,77 @@ export default {
     closePanel(panel) {
 
     },
-    loadPlugin(config) {
-      const path = config.file_path
-      //generate a random id for the plugin
-      config.id = config._id + '_' + randId()
-      return new Promise((resolve, reject) => {
-        // exported methods, will be available to the plugin
-        this.plugin_api.kk = 999
-        this.plugin_api.get_kk = async () => {
-          return new ArrayBuffer(1200400)
-        }
-
-        const _setupPlugin = () => {
-          let plugin
-          if (config.plugin_code) {
-            if (path.endsWith('.vue')) {
-              console.log('parsing the plugin file')
-              const pluginComp = parseComponent(config.plugin_code)
-              console.log('code parsed from', path, pluginComp)
-              config.script = pluginComp.script.content
-              if (pluginComp.customBlocks[0].type == 'html') {
-                config.html = pluginComp.customBlocks[0].content
-                //show the iframe if there is html defined
-                config.iframe_container = 'plugin_window_' + config.id + randId()
-                config.iframe_window = null
-                config.type = 'main'
-                this.showPluginWindow(config)
-              } else {
-                console.error('no html tag found inside the plugin file.')
-              }
-              // here we only take the first stylesheet we found
-              config.style = pluginComp.styles[0].content
-            } else {
-              config.script = config.plugin_code
-              config.style = null
-              config.html = null
-            }
-            if(!PLUGIN_SCHEMA(config)){
-              const error = PLUGIN_SCHEMA.errors(config)
-              console.error("Invalid plugin config: "+config.name, error)
-              throw error
-            }
-            plugin = new jailed.DynamicPlugin(_clone(config), this.plugin_api)
-            this.plugins[plugin.id] = plugin
-          } else {
-            alert('no plugin source code found for ' + config.name)
-            // plugin = new jailed.Plugin(path, this.plugin_api, config);
-            throw 'no plugin source code found for ' + config.name
+    parsePluginCode(code, file_path){
+      let config = {}
+      if (file_path.endsWith('.vue')) {
+        console.log('parsing the plugin file')
+        const pluginComp = parseComponent(code)
+        console.log('code parsed from', pluginComp)
+        for(let i=0;i<pluginComp.customBlocks.length;i++){
+          if(pluginComp.customBlocks[i].type == 'config'){
+            // find the first config block
+            config = JSON.parse(pluginComp.customBlocks[i].content)
+            break
           }
-
-          plugin.whenConnected(() => {
-            if (!plugin.api) {
-              console.error('error occured when loading plugins.')
-            }
-            plugin.api.setup().then((result) => {
-              console.log('sucessfully setup plugin: ', plugin)
-              resolve()
-            }).catch((e) => {
-              console.error('error occured when loading plugin ' + config.name + ": ", e)
-              reject(e)
-              plugin.terminate()
-            })
-          });
-          plugin.whenFailed((e) => {
-            console.error('error occured when loading ' + config.name + ":", e)
-            alert('error occured when loading ' + config.name)
-            plugin.terminate()
-            this.plugins[plugin.id] = null
-            // reject(e)
-          });
         }
-
-          config.iframe_container = null
-          config.iframe_window = null
-          _setupPlugin()
+        config.script = pluginComp.script.content
+        for(let i=0;i<pluginComp.customBlocks.length;i++){
+          if (pluginComp.customBlocks[i].type == 'html') {
+            // find the first html block
+            config.html = pluginComp.customBlocks[i].content
+            break
+            //show the iframe if there is html defined
+            // config.iframe_container = 'plugin_window_' + config.id + randId()
+            // config.iframe_window = null
+            // config.type = 'main'
+            // this.showPluginWindow(config)
+          }
+        }
+        // here we only take the first stylesheet we found
+        config.style = pluginComp.styles[0].content
+      } else {
+        config.script = code
+        config.style = null
+        config.html = null
+      }
+      config._id = config._id || null
+      config.file_path = file_path
+      config.plugin_code = code
+      config.id = config.name + '_' + randId()
+      config.iframe_container = null
+      config.iframe_window = null
+      if(!PLUGIN_SCHEMA(config)){
+        const error = PLUGIN_SCHEMA.errors(config)
+        console.error("Invalid plugin config: "+config.name, error)
+        throw error
+      }
+      return config
+    },
+    loadPlugin(config) {
+      //generate a random id for the plugin
+      return new Promise((resolve, reject) => {
+        const plugin = new jailed.DynamicPlugin(_clone(config), this.plugin_api)
+        plugin.whenConnected(() => {
+          if (!plugin.api) {
+            console.error('error occured when loading plugin.')
+            throw 'error occured when loading plugin.'
+          }
+          this.plugins[plugin.id] = plugin
+          plugin.api.setup().then((result) => {
+            console.log('sucessfully setup plugin: ', plugin)
+            resolve()
+          }).catch((e) => {
+            console.error('error occured when loading plugin ' + config.name + ": ", e)
+            reject(e)
+            plugin.terminate()
+          })
+        });
+        plugin.whenFailed((e) => {
+          console.error('error occured when loading ' + config.name + ":", e)
+          alert('error occured when loading ' + config.name)
+          plugin.terminate()
+          // reject(e)
+        });
       })
     },
     register(config, _plugin) {
@@ -454,7 +459,7 @@ export default {
           if(config.mode != 'iframe'){
             throw 'Window plugin must be with type "iframe"'
           }
-          this.registered.windows[config.type] = plugin
+          this.registered.windows[config.type] = plugin.config
         }
         if(config.tags.includes('file_importer')){
           throw "file importer not supported yet"
@@ -499,14 +504,14 @@ export default {
           this.windows.unshift(config)
         }
         else{
-          const window_plugin = this.registered.windows[config.type]
-          console.log(window_plugin)
-          if(!window_plugin){
+          const window_config = this.registered.windows[config.type]
+          console.log(window_config)
+          if(!window_config){
             console.error('no plugin registered for window type: ', config.type)
             throw 'no plugin registered for window type: ', config.type
           }
-          console.log(window_plugin.config)
-          const pconfig = _clone(window_plugin.config)
+          console.log(window_config)
+          const pconfig = _clone(window_config)
           //generate a new window id
           pconfig.id = pconfig._id + '_' + randId()
           pconfig.config = config.config
@@ -518,7 +523,7 @@ export default {
           pconfig.config.z = config.config.z
           console.log('creating window: ', pconfig, source_plugin)
           if(pconfig.mode != 'iframe'){
-            throw 'Window plugin must be with type "iframe"'
+            throw 'Window plugin must be with mode "iframe"'
           }
           //
           const _setupPlugin = () => {

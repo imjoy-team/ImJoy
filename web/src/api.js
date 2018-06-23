@@ -1,7 +1,7 @@
 import schema from 'js-schema'
 
 export const PLUGIN_SCHEMA= schema({
-  _id: String,
+  _id: [null, String],
   name: String,
   file_path: [null, String],
   plugin_code: String,

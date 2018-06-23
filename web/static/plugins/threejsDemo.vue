@@ -1,3 +1,26 @@
+<config>
+{
+  "name": "Three.js Demo",
+  "type": "threejs/demo",
+  "mode": "iframe",
+  "tags": ["3d", "op", "window"],
+  "init": "show three.js demo",
+  "show_panel": true,
+  "version": "0.0.1",
+  "api_version": "0.0.1",
+  "createdAt": "Mon Jun 19 2018 15:45:30",
+  "file_path": "/ThreejsDemo/threejsDemo.js",
+  "description": "A plugin for demonstrate that one can use Three.js in a plugin.",
+  "thunbnail": null,
+  "dependencies": []
+}
+</config>
+
+<docs>
+This plugin shows a demo for Three.js.
+
+</docs>
+
 <html>
   <div>
       <div id="info">
