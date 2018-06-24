@@ -1,11 +1,12 @@
 <template>
-<div class="whiteboard">
+<div class="whiteboard noselect" ref="whiteboard">
   <div class="overlay" @click="dragging=false" v-if="dragging"></div>
-  <vue-draggable-resizable :grid="[30,30]" drag-handle=".md-card-expand" :w="w.config.width" :h="w.config.height" :x="w.config.x" :y="w.config.y" :z="w.config.z" :active.sync="w.selected" @dragging="startDragging(w)" @dragstop="dragging=false" @resizing="startDragging(w)"
-    @resizestop="dragging=false" :parent="true" v-for="(w, wi) in windows" :key="w.iframe_container">
+  <vue-draggable-resizable :grid="[30,30]" drag-handle=".md-card-expand" :w="w.config.width" :h="w.config.height" :x="w.config.x" :y="w.config.y" :z="w.config.z"
+   :active.sync="w.selected" @dragging="startDragging(w)" @dragstop="stopDragging()" @resizing="startDragging(w)"
+    @resizestop="stopDragging()" :handles="['br', 'bl']" :parent="false" v-for="(w, wi) in windows" :key="w.iframe_container">
     <md-card>
       <md-card-expand>
-        <md-card-actions md-alignment="space-between" :class="w.selected?'window-selected':''" class="window-header">
+        <md-card-actions md-alignment="space-between" :class="w.selected?'window-selected':'window-header'">
           <md-card-expand-trigger v-if="w.panel">
             <md-button class="md-icon-button">
               <md-icon>keyboard_arrow_down</md-icon>
@@ -25,7 +26,7 @@
                   <span>Close</span>
                   <md-icon>close</md-icon>
                 </md-menu-item>
-                <md-menu-item @click="fullScreen(wi)">
+                <md-menu-item @click.stop="fullScreen(w)">
                   <span>Fullscreen</span>
                   <md-icon>fullscreen</md-icon>
                 </md-menu-item>
@@ -59,8 +60,8 @@
     </md-card>
     <!-- </div> -->
   </vue-draggable-resizable>
-  <div class="md-layout md-gutter md-alignment-top-left">
-    <md-empty-state v-if="!windows" md-icon="static/img/anna-palm-icon-circle-animation.svg" md-label="IMJOY.IO" md-description="">
+  <div class="md-layout md-gutter md-alignment-center-center">
+    <md-empty-state v-if="!windows || windows.length==0" md-icon="static/img/anna-palm-icon-circle-animation.svg" md-label="IMJOY.IO" md-description="">
     </md-empty-state>
   </div>
 </div>
@@ -103,7 +104,7 @@ export default {
       console.log('close', wi)
       this.windows.splice(wi, 1)
     },
-    fullScreen(wi) {
+    fullScreen(w) {
 
     },
     startDragging(w) {
@@ -120,7 +121,7 @@ export default {
       setTimeout(() => {
         this.dragging = false
         this.$forceUpdate()
-      }, 100)
+      }, 300)
     }
   }
 }
@@ -131,6 +132,7 @@ export default {
 .whiteboard {
   height: 100%;
   position: relative;
+  overflow: auto !important;
 }
 
 .md-empty-state {
@@ -151,16 +153,19 @@ export default {
 }
 
 .window-selected {
-  color: var(--md-theme-default-text-primary-on-primary, #fff) !important;
+  color: var(--md-theme-default-text-accent-on-primary, #fff) !important;
   background-color: var(--md-theme-default-primary, #448aff) !important;
+  height: 30px;
 }
 
 .window-header {
-  height: 40px;
+  color: var(--md-theme-default-text-primary-on-primary, #fff) !important;
+  background-color: #ddd !important;
+  height: 30px;
 }
 
 .window-title {
-  font-size: 1.4em;
+  font-size: 1.2em;
 }
 
 .plugin-iframe-container {
@@ -170,10 +175,10 @@ export default {
   ;
   flex-direction: column;
   overflow: hidden;
-  padding-left: 5px;
-  padding-right: 5px;
-  padding-top: 5px;
-  padding-bottom: 5px;
+  padding-left: 2px;
+  padding-right: 2px;
+  padding-top: 2px;
+  padding-bottom: 2px;
 }
 
 .plugin-iframe {
@@ -193,21 +198,5 @@ export default {
   position: fixed;
   right: 0;
   top: 0;
-}
-
-.noselect {
-  -webkit-touch-callout: none;
-  /* iOS Safari */
-  -webkit-user-select: none;
-  /* Safari */
-  -khtml-user-select: none;
-  /* Konqueror HTML */
-  -moz-user-select: none;
-  /* Firefox */
-  -ms-user-select: none;
-  /* Internet Explorer/Edge */
-  user-select: none;
-  /* Non-prefixed version, currently
-                                  supported by Chrome and Opera */
 }
 </style>

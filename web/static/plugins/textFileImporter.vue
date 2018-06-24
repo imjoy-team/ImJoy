@@ -3,7 +3,7 @@
   "name": "Text File Importer",
   "mode": "webworker",
   "version": "0.0.1",
-  "api_version": "0.0.1",
+  "api_version": "0.1.0",
   "createdAt": "Mon Jun 18 2018 21:46:36",
   "file_path": "/TextFileImporter/textFileImporter.js",
   "description": "A plugin for loading localization table from text files.",
@@ -20,16 +20,20 @@ function _parseFile(file, reading_callback, finish_callback) {
     var self       = this; // we need a reference to the current object
     var chunkReaderBlock = null;
     if(!file){
-      finish_callback(false)
+      finish_callback(false, 'no file to read')
       return
     }
     var readEventHandler = function(evt) {
         if (evt.target.error == null) {
             offset += evt.target.result.length;
-            reading_callback(evt.target.result); // callback for handling read chunk
+            var ret = reading_callback(evt.target.result); // callback for handling read chunk
+            if(!ret){
+              finish_callback(false, 'wrong format');
+              return
+            }
         } else {
-            console.log("Read error: " + evt.target.error);
-            finish_callback(false);
+            console.error("Read error: " + evt.target.error);
+            finish_callback(false, "Read error: " + evt.target.error);
             return;
         }
         if (offset >= fileSize) {
@@ -126,8 +130,8 @@ function _loadFile(file, format) {
           isFirstBlock = false;
           table_data.headers = transformedHeaders;
           if(transformedHeaders.indexOf('x')<0 || !transformedHeaders.indexOf('y')<0){
-            reject('wrong file format')
-            return
+            console.log(transformedHeaders)
+            return false
           }
         }
         var endsWithNewLine = (lines[lines.length - 1] != "");
@@ -176,12 +180,13 @@ function _loadFile(file, format) {
         }
         rows += (lineNum - skipped);
         arrayBuffersList.push(arrayBuffers)
+        return true
       };
 
-      var finish_callback = function(sucess){
+      var finish_callback = function(sucess, message){
         if(!sucess){
-          console.log('finished with error')
-          reject('loading error')
+          console.log('finished with error: ', message)
+          reject(message)
           return
         }
 
@@ -250,7 +255,7 @@ class TextFilePlugin {
         header_row: my.config.header_row.startsWith('read headers')? 0 : -1,
         delimiter: my.config.delimiter,
         append_header: my.config.append_header,
-        header_transform: {}
+        header_transform: {'x [nm]': 'x', 'y [nm]':'y', 'sigma [nm]': 'sigma'}
       }
       const table = await _loadFile(my.data.files[0], format)
       my.data.table = table
@@ -259,9 +264,6 @@ class TextFilePlugin {
       console.error(e)
     }
   }
-
-
-
 }
 
 api.export(new TextFilePlugin())

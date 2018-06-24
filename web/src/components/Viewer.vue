@@ -1,20 +1,31 @@
 <template>
-<div class="viewer">
+<div class="viewer noselect">
   <md-button v-if="!menuVisible" class="md-fab md-primary md-fab-top-left" @click="menuVisible=true">
     <md-icon>menu</md-icon>
   </md-button>
-  <md-app-toolbar v-if="menuVisible" class="md-primary md-dense">
-    <div class="md-toolbar-row">
-      <div class="md-toolbar-section-start">
-        <!-- <md-button v-if="!menuVisible" class="md-fab md-primary" @click="menuVisible=true">
-          <md-icon>menu</md-icon>
-        </md-button> -->
-        <navbar/>
-      </div>
-    </div>
-  </md-app-toolbar>
+
   <md-app>
+    <!-- <md-app-toolbar v-if="menuVisible" class="md-primary md-dense">
+
+    </md-app-toolbar> -->
     <md-app-drawer :md-active.sync="menuVisible" md-persistent="full">
+      <!-- <md-app-toolbar class="md-primary md-dense"> -->
+      <div class="md-toolbar-row">
+        <div class="md-toolbar-section-start">
+          <!-- <md-button v-if="!menuVisible" class="md-fab md-primary" @click="menuVisible=true">
+            <md-icon>menu</md-icon>
+          </md-button> -->
+          <md-button>
+            <div class="site-title">ImJoy.io<span class="superscript">alpha</span></div>
+          </md-button>
+        </div>
+        <div class="md-toolbar-section-end">
+          <md-button class="md-icon-button md-dense md-raised" @click="menuVisible = !menuVisible">
+            <md-icon>keyboard_arrow_left</md-icon>
+          </md-button>
+        </div>
+      </div>
+      <!-- </md-app-toolbar> -->
       <div class="md-toolbar-row">
         <div class="md-toolbar-section-start">
           <md-button class="md-fab md-primary" @click="showImportDialog=true">
@@ -23,14 +34,13 @@
           <md-button class="md-icon-button md-primary" @click="showSettingsDialog=true">
             <md-icon>settings</md-icon>
           </md-button>
+
           <md-progress-spinner :md-diameter="30" :md-stroke="3" md-mode="indeterminate" v-if="loading"></md-progress-spinner>
         </div>
-        <div class="md-toolbar-section-end">
-          <md-button class="md-icon-button md-dense md-raised" @click="menuVisible = !menuVisible">
-            <md-icon>keyboard_arrow_left</md-icon>
-          </md-button>
-        </div>
+
       </div>
+
+
       <md-card>
         <md-card-header>
           <div class="md-toolbar-row panel-header">
@@ -302,12 +312,16 @@ export default {
     runWorkflow(joy) {
       console.log('run workflow.', this.activeWindow)
       const w = this.activeWindow || {}
-      joy.workflow.execute(w.data)
+      joy.workflow.execute(w.data|| {}).then((my)=>{
+        console.log('result', my)
+      })
     },
     runPanel(joy, panel) {
       console.log('run panel.', this.activeWindow)
       const w = this.activeWindow || {}
-      joy._panel.execute(w.data)
+      joy._panel.execute(w.data|| {}).then((my)=>{
+        console.log('result', my)
+      })
     },
     selectFileChanged(file_list) {
       console.log(file_list)
@@ -666,6 +680,32 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+
+.site-title {
+  font-size: 30px;
+  font-weight: 300;
+}
+
+@media screen and (max-width: 600px) {
+  .site-title {
+    font-size: 25px;
+    font-weight: 250;
+  }
+}
+@media screen and (max-width: 400px) {
+  .site-title {
+    font-size: 20px;
+    font-weight: 220;
+  }
+}
+
+.superscript {
+  font-size: 16px;
+  text-transform: none;
+  vertical-align: super;
+  color: #ff5253;
+}
+
 .md-empty-state {
   height: 100%;
   width: 100%;
@@ -703,6 +743,18 @@ export default {
   font-size: 1.4em;
 }
 
+
+/* The sticky class is added to the header with JS when it reaches its scroll position */
+.sticky {
+  position: fixed;
+  top: 0;
+  width: 100%
+}
+
+/* Add some top padding to the page content to prevent sudden quick movement (as the header gets a new position at the top of the page (position:fixed and top:0) */
+.sticky + .content {
+  padding-top: 102px;
+}
 /* .floating-fab{
   position: absolute;
 } */

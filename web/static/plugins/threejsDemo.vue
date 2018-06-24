@@ -36,6 +36,8 @@ This plugin shows a demo for Three.js.
 </html>
 
 <script>
+
+
 function build3d(text) {
   if (!Detector.webgl) Detector.addGetWebGLMessage();
   var camera, scene, renderer;
@@ -152,7 +154,9 @@ class ThreejsDemoPlugin {
                   "https://threejs.org/examples/js/Detector.js"
     )
   }
+
   run(my) {
+    console.log('running in the plugin ', my)
     build3d(my.data.text)
   }
 }
