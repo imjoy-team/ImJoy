@@ -1,3 +1,18 @@
+<config>
+{
+  "name": "Lookup Table",
+  "mode": "webworker",
+  "version": "0.0.1",
+  "api_version": "0.0.1",
+  "createdAt": "Mon Jun 19 2018 16:33:11",
+  "file_path": "/LookupTable/lookupTable.js",
+  "description": "A plugin for applying lookup table to a single-channel image.",
+  "tags": ["image", "LUT"],
+  "thunbnail": null,
+  "dependencies": []
+}
+</config>
+<script>
 class LookupTablePlugin {
   setup() {
     api.register({
@@ -51,3 +66,4 @@ class LookupTablePlugin {
 }
 
 api.export(new LookupTablePlugin())
+</script>

@@ -1,3 +1,18 @@
+<config>
+{
+  "name": "2D Histogram",
+  "mode": "webworker",
+  "version": "0.0.1",
+  "api_version": "0.0.1",
+  "createdAt": "Mon Jun 19 2018 15:45:30",
+  "file_path": "/Histogram2D/histogram2D.js",
+  "description": "A plugin for render 2D histogram from a localization table.",
+  "tags": ["localization", "render"],
+  "thunbnail": null,
+  "dependencies": ["Lookup Table"]
+}
+<config>
+<script>
 class Histogram2dPlugin {
   setup(){
     api.register({
@@ -15,3 +30,4 @@ class Histogram2dPlugin {
 }
 
 api.export(new Histogram2dPlugin())
+</script>

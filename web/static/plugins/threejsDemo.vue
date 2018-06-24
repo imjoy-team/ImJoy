@@ -36,9 +36,7 @@ This plugin shows a demo for Three.js.
 </html>
 
 <script>
-
-
-function build3d() {
+function build3d(text) {
   if (!Detector.webgl) Detector.addGetWebGLMessage();
   var camera, scene, renderer;
   var mesh, sprite, texture;
@@ -102,6 +100,11 @@ function build3d() {
     controls.enablePan = false;
     //
     window.addEventListener('resize', onWindowResize, false);
+
+    var dom = document.createElement("p");
+  	dom.innerHTML = text
+    var info = document.getElementById("info")
+  	info.appendChild(dom)
   }
 
   function onWindowResize() {
@@ -143,34 +146,14 @@ function build3d() {
 }
 
 class ThreejsDemoPlugin {
-  setup() {
-    api.register({
-      name: "Three.js Demo",
-      type: "threejs/demo",
-      mode: "iframe",
-      tags: ["3d", "op", "window"],
-      init: "show three.js demo",
-      show_panel: true
-    })
-    importScripts("https://threejs.org/build/three.js",
+  async setup() {
+    await importScripts("https://threejs.org/build/three.js",
                   "https://threejs.org/examples/js/controls/OrbitControls.js",
                   "https://threejs.org/examples/js/Detector.js"
-    ).then(()=>{
-      build3d()
-    })
+    )
   }
-
   run(my) {
-    api.createWindow({
-      name: "3D Demo Window",
-      type: "threejs/demo",
-      data: {},
-      config: {width:500, height:500},
-      panel: {init: "this is a contorl panel."}
-    }).catch((e)=>{
-      console.error(e)
-    })
-
+    build3d(my.data.text)
   }
 }
 

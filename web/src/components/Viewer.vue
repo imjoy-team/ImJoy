@@ -189,7 +189,7 @@ export default {
       showImportDialog: false,
       windows: [],
       panels: [],
-      activeWindow: null,
+      activeWindow: {},
       workflow_joy_config: {
         init: "{id:'workflow', type:'ops'}",
         onupdate: this.workflowOnchange
@@ -243,13 +243,11 @@ export default {
           this.installed_plugins.push(config)
           const c = this.parsePluginCode(config.plugin_code, config.file_path)
           if(c.mode == 'iframe' && c.tags.includes('window')){
-            this.registered.windows[c.type] = c
-            // this is a unique id for the iframe to attach
-            c.iframe_container = 'plugin_window_' + c.id + randId()
-            c.iframe_window = null
-            this.createWindow(c, {id: c.id})
+            promises.push(this.preLoadPlugin(c))
           }
-          promises.push(this.loadPlugin(c))
+          else{
+            promises.push(this.loadPlugin(c))
+          }
         }
         // TODO: setup this promise all, it's now cause unknown problem
         // Promise.all(promises).then(()=>{
@@ -302,13 +300,14 @@ export default {
       this.windows.push(w)
     },
     runWorkflow(joy) {
-      console.log('run joy.')
-      joy.workflow.execute(this.activeWindow)
-
+      console.log('run workflow.', this.activeWindow)
+      const w = this.activeWindow || {}
+      joy.workflow.execute(w.data)
     },
     runPanel(joy, panel) {
-      console.log('run panel.', joy)
-      joy._panel.execute(this.activeWindow)
+      console.log('run panel.', this.activeWindow)
+      const w = this.activeWindow || {}
+      joy._panel.execute(w.data)
     },
     selectFileChanged(file_list) {
       console.log(file_list)
@@ -347,8 +346,14 @@ export default {
             // this.showPluginWindow(config)
           }
         }
-        // here we only take the first stylesheet we found
-        config.style = pluginComp.styles[0].content
+        config.html = config.html || null
+        if(pluginComp.styles.length>0){
+          // here we only take the first stylesheet we found
+          config.style = pluginComp.styles[0].content
+        }
+        else{
+          config.style = null
+        }
       } else {
         config.script = code
         config.style = null
@@ -366,6 +371,25 @@ export default {
         throw error
       }
       return config
+    },
+    preLoadPlugin(config) {
+      //generate a random id for the plugin
+      return new Promise((resolve, reject) => {
+        const plugin = {id: config.id, config: _clone(config)}
+        this.plugins[plugin.id] = plugin
+        config.force_show = false
+        plugin.api = {run: (my)=>{
+          const c = _clone(config)
+          c.op = my.op
+          c.progress = my.progress
+          c.data = my.data
+          c.config = my.config
+          this.createWindow(c, {id: c.id})}
+        }
+        this.register(config, {id: config.id})
+        console.log('sucessfully registered plugin: ', plugin)
+        resolve()
+      })
     },
     loadPlugin(config) {
       //generate a random id for the plugin
@@ -398,6 +422,7 @@ export default {
       try {
         const plugin = this.plugins[_plugin.id]
         config.mode = config.mode || 'webworker'
+        config.show_panel = config.show_panel || true
         if(!REGISTER_SCHEMA(config)){
           const error = REGISTER_SCHEMA.errors(config)
           console.error("Error occured during registering "+config.name, error)
@@ -409,7 +434,7 @@ export default {
         }
         if(config.tags.includes('op')){
           console.log('creating Op: ', config, plugin)
-          if (!plugin.api.run) {
+          if (!plugin|| !plugin.api || !plugin.api.run) {
             console.log("WARNING: no run function found in the config, this op won't be able to do anything: " + config.name)
             config.onexecute = () => {
               console.log("WARNING: no run function defined.")
@@ -440,7 +465,7 @@ export default {
           }
           Joy.add(config);
           //update the joy workflow if new template added, TODO: preserve settings during reload
-          this.$refs.workflow.setupJoy()
+          if(this.$refs.workflow) this.$refs.workflow.setupJoy()
           this.registered.ops[config.type] = config
           plugin.config.type = config.type
           const panel_config = {
@@ -474,10 +499,34 @@ export default {
       }
 
     },
+    renderWindow(pconfig) {
+      const plugin = new jailed.DynamicPlugin(pconfig, this.plugin_api)
+      plugin.whenConnected(() => {
+        if (!plugin.api) {
+          console.error('the window plugin seems not ready.')
+        }
+        this.plugins[plugin.id] = plugin
+        plugin.api.setup().then((result) => {
+          console.log('sucessfully setup the window plugin: ', plugin, pconfig)
+          plugin.api.run({data: pconfig.data, config: pconfig.config, op: pconfig.op, progress: pconfig.progress}).catch((e)=>{
+            console.error('error in run function: ', e)
+          })
+        }).catch((e) => {
+          console.error('error occured when loading the window plugin ' + pconfig.name + ": ", e)
+          plugin.terminate()
+        })
+      });
+      plugin.whenFailed((e) => {
+        console.error('error occured when loading ' + pconfig.name + ":", e)
+        alert('error occured when loading ' + pconfig.name)
+        plugin.terminate()
+      });
+    },
     createWindow(config, _plugin) {
       try {
         config.type = config.type || "joy_panel"
         config.data = config.data || null
+        config.force_show = config.force_show || false
         config.config = config.config || {}
         config.panel = config.panel || null
         config.config.width = config.config.width || 300
@@ -513,7 +562,7 @@ export default {
           console.log(window_config)
           const pconfig = _clone(window_config)
           //generate a new window id
-          pconfig.id = pconfig._id + '_' + randId()
+          pconfig.id = pconfig.name + '_' + randId()
           pconfig.config = config.config
           pconfig.data = config.data
           pconfig.config.width = config.config.width
@@ -521,36 +570,28 @@ export default {
           pconfig.config.x = config.config.x
           pconfig.config.y = config.config.y
           pconfig.config.z = config.config.z
+          pconfig.force_show = config.force_show
           console.log('creating window: ', pconfig, source_plugin)
           if(pconfig.mode != 'iframe'){
             throw 'Window plugin must be with mode "iframe"'
           }
-          //
-          const _setupPlugin = () => {
-            const plugin = new jailed.DynamicPlugin(pconfig, this.plugin_api)
-            plugin.whenConnected(() => {
-              if (!plugin.api) {
-                console.error('the window plugin seems not ready.')
-              }
-              plugin.api.setup().then((result) => {
-                console.log('sucessfully setup the window plugin: ', plugin)
-              }).catch((e) => {
-                console.error('error occured when loading the window plugin ' + pconfig.name + ": ", e)
-                plugin.terminate()
-              })
-            });
-            plugin.whenFailed((e) => {
-              console.error('error occured when loading ' + pconfig.name + ":", e)
-              alert('error occured when loading ' + pconfig.name)
-              plugin.terminate()
-            });
-          }
           // this is a unique id for the iframe to attach
           pconfig.iframe_container = 'plugin_window_' + pconfig.id + randId()
           pconfig.iframe_window = null
-          this.showPluginWindow(pconfig).then(() => {
-            _setupPlugin()
-          })
+
+          if(config.force_show){
+            pconfig.click2load = false
+            pconfig.loadWindow = null
+            this.showPluginWindow(pconfig).then(() => {
+              this.renderWindow(pconfig)
+            })
+          }
+          else{
+            pconfig.click2load = true
+            pconfig.renderWindow = this.renderWindow
+            this.showPluginWindow(pconfig)
+          }
+
         }
       } catch (e) {
         console.error(e)

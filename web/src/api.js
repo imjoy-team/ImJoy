@@ -26,7 +26,8 @@ export const WINDOW_SCHEMA= schema({
   type: String,
   config: Object,
   data: [null, Object], //attachments: {}
-  panel: [null, Object]
+  panel: [null, Object],
+  force_show: Boolean
 })
 
 export const OP_SCHEMA = {
