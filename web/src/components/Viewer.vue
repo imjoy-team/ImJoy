@@ -204,7 +204,7 @@ export default {
         init: "{id:'workflow', type:'ops'}",
         onupdate: this.workflowOnchange
       },
-      default_window_pos: [0, 0, 0],
+      default_window_pos: {i: 0, x:0, y:0, w: 5, h:5},
       plugins: {},
       registered: {ops: {}, windows: {}},
       installed_plugins: [],
@@ -298,6 +298,20 @@ export default {
       console.log('activate window: ', w)
       this.activeWindow = w
     },
+    generateGridPosition(config){
+      config.i = this.default_window_pos.i
+      config.w = this.default_window_pos.w
+      config.h = this.default_window_pos.h
+      config.x = this.default_window_pos.x
+      config.y = this.default_window_pos.y
+      this.default_window_pos.x = this.default_window_pos.x + this.default_window_pos.w
+      if(this.default_window_pos.x>=20){
+        this.default_window_pos.x = 0
+        this.default_window_pos.y = this.default_window_pos.y + this.default_window_pos.h
+      }
+
+      this.default_window_pos.i = this.default_window_pos.i + 1
+    },
     loadData() {
       const w = {
         name: 'Files',
@@ -376,7 +390,7 @@ export default {
       config._id = config._id || null
       config.file_path = file_path
       config.plugin_code = code
-      config.id = config.name + '_' + randId()
+      config.id = config.name.trim().replace(/ /g, '_') + '_' + randId()
       config.iframe_container = null
       config.iframe_window = null
       if(!PLUGIN_SCHEMA(config)){
@@ -514,6 +528,7 @@ export default {
 
     },
     renderWindow(pconfig) {
+      console.log('rendering window', pconfig)
       const plugin = new jailed.DynamicPlugin(pconfig, this.plugin_api)
       plugin.whenConnected(() => {
         if (!plugin.api) {
@@ -536,56 +551,41 @@ export default {
         plugin.terminate()
       });
     },
-    createWindow(config, _plugin) {
+    createWindow(wconfig, _plugin) {
       try {
-        config.type = config.type || "joy_panel"
-        config.data = config.data || null
-        config.force_show = config.force_show || false
-        config.config = config.config || {}
-        config.panel = config.panel || null
-        config.config.width = config.config.width || 300
-        config.config.height = config.config.height || 100
-        if(!config.config.x || !config.config.y){
-          config.config.x = this.default_window_pos[0]
-          config.config.y = this.default_window_pos[1]
-          this.default_window_pos[0] = this.default_window_pos[0]+10
-          this.default_window_pos[1] = this.default_window_pos[1]+10
-        }
-        if(!config.config.z){
-          config.config.z = this.default_window_pos[2]
-          this.default_window_pos[2] = this.default_window_pos[2]+1
-        }
-        if(!WINDOW_SCHEMA(config)){
-          const error = WINDOW_SCHEMA.errors(config)
-          console.error("Error occured during creating window "+config.name, error)
+        wconfig.type = wconfig.type || "joy_panel"
+        wconfig.data = wconfig.data || null
+        wconfig.force_show = wconfig.force_show || false
+        wconfig.panel = wconfig.panel || null
+        this.generateGridPosition(wconfig)
+        console.log('xxxxxxxxxx', wconfig)
+        if(!WINDOW_SCHEMA(wconfig)){
+          const error = WINDOW_SCHEMA.errors(wconfig)
+          console.error("Error occured during creating window "+wconfig.name, error)
           throw error
         }
         const source_plugin = this.plugins[_plugin.id]
-        if(config.type == 'joy_panel'){
-          console.log('creating joy_panel', config)
-          // config.window_id = 'plugin_window_'+plugin._id+randId()
-          this.windows.unshift(config)
+        if(wconfig.type == 'joy_panel'){
+          console.log('creating joy_panel', wconfig)
+          // wconfig.window_id = 'plugin_window_'+plugin._id+randId()
+          this.windows.unshift(wconfig)
         }
         else{
-          const window_config = this.registered.windows[config.type]
+          const window_config = this.registered.windows[wconfig.type]
           console.log(window_config)
           if(!window_config){
-            console.error('no plugin registered for window type: ', config.type)
-            throw 'no plugin registered for window type: ', config.type
+            console.error('no plugin registered for window type: ', wconfig.type)
+            throw 'no plugin registered for window type: ', wconfig.type
           }
           console.log(window_config)
           const pconfig = _clone(window_config)
           //generate a new window id
-          pconfig.id = pconfig.name + '_' + randId()
-          pconfig.config = config.config
-          pconfig.data = config.data
-          pconfig.config.width = config.config.width
-          pconfig.config.height = config.config.height
-          pconfig.config.x = config.config.x
-          pconfig.config.y = config.config.y
-          pconfig.config.z = config.config.z
-          pconfig.force_show = config.force_show
-          console.log('creating window: ', pconfig, source_plugin)
+          pconfig.id = pconfig.name.trim().replace(/ /g, '_') + '_' + randId()
+          pconfig.config = wconfig.config
+          pconfig.data = wconfig.data
+          pconfig.config = wconfig.config
+          pconfig.force_show = wconfig.force_show
+          console.log('creating window----: ', pconfig, source_plugin)
           if(pconfig.mode != 'iframe'){
             throw 'Window plugin must be with mode "iframe"'
           }
@@ -593,7 +593,7 @@ export default {
           pconfig.iframe_container = 'plugin_window_' + pconfig.id + randId()
           pconfig.iframe_window = null
 
-          if(config.force_show){
+          if(wconfig.force_show){
             pconfig.click2load = false
             pconfig.loadWindow = null
             this.showPluginWindow(pconfig).then(() => {
@@ -626,7 +626,7 @@ export default {
           }
         }
         //TODO: verify fields with WINDOW_TEMPLATE
-        console.log('creating window: ', config, plugin)
+        console.log('creating dialog: ', config, plugin)
 
         if (config.show_panel && plugin.panel_config) {
           // create panel for the window
@@ -645,18 +645,7 @@ export default {
         config.data = config.data || null
         config.config = config.config || {}
         config.panel = config.panel || null
-        config.config.width = config.config.width || 500
-        config.config.height = config.config.height || 300
-        if(!config.config.x || !config.config.y){
-          config.config.x = this.default_window_pos[0]
-          config.config.y = this.default_window_pos[1]
-          this.default_window_pos[0] = this.default_window_pos[0]+10
-          this.default_window_pos[1] = this.default_window_pos[1]+10
-        }
-        if(!config.config.z){
-          config.config.z = this.default_window_pos[2]
-          this.default_window_pos[2] = this.default_window_pos[2]+1
-        }
+        this.generateGridPosition(config)
         if(!WINDOW_SCHEMA(config)){
           const error = WINDOW_SCHEMA.errors(config)
           console.error("Error occured during creating window "+config.name, error)

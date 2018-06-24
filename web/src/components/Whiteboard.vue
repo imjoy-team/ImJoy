@@ -1,65 +1,65 @@
 <template>
 <div class="whiteboard noselect" ref="whiteboard">
   <div class="overlay" @click="dragging=false" v-if="dragging"></div>
-  <vue-draggable-resizable :grid="[30,30]" drag-handle=".md-card-expand" :w="w.config.width" :h="w.config.height" :x="w.config.x" :y="w.config.y" :z="w.config.z"
-   :active.sync="w.selected" @dragging="startDragging(w)" @dragstop="stopDragging()" @resizing="startDragging(w)"
-    @resizestop="stopDragging()" :handles="['br', 'bl']" :parent="false" v-for="(w, wi) in windows" :key="w.iframe_container">
-    <md-card>
-      <md-card-expand>
-        <md-card-actions md-alignment="space-between" :class="w.selected?'window-selected':'window-header'">
-          <md-card-expand-trigger v-if="w.panel">
-            <md-button class="md-icon-button">
-              <md-icon>keyboard_arrow_down</md-icon>
-            </md-button>
-          </md-card-expand-trigger>
-          <div v-if="!w.panel"></div>
-          <div> <span class="window-title noselect">{{w.name}}</span></div>
-          <div>
-            <!-- <md-button>Action</md-button>
-                <md-button>Action</md-button> -->
-            <md-menu md-size="big" md-direction="bottom-end">
-              <md-button class="md-icon-button" md-menu-trigger>
-                <md-icon>more_vert</md-icon>
+  <grid-layout :layout="windows" :col-num="18" :row-height="30" :is-draggable="true" :is-resizable="true" :vertical-compact="true" :margin="[10, 10]" :use-css-transforms="true">
+    <grid-item v-for="(w, wi) in windows" :x="w.x" :y="w.y" :w="w.w" :h="w.h" :i="w.i" :key="w.iframe_container">
+      <md-card>
+        <md-card-expand>
+          <md-card-actions md-alignment="space-between" :class="w.selected?'window-selected':'window-header'">
+            <md-card-expand-trigger v-if="w.panel">
+              <md-button class="md-icon-button">
+                <md-icon>keyboard_arrow_down</md-icon>
               </md-button>
-              <md-menu-content>
-                <md-menu-item v-if="w.type!='main'" @click="close(wi)">
-                  <span>Close</span>
-                  <md-icon>close</md-icon>
-                </md-menu-item>
-                <md-menu-item @click.stop="fullScreen(w)">
-                  <span>Fullscreen</span>
-                  <md-icon>fullscreen</md-icon>
-                </md-menu-item>
-              </md-menu-content>
-            </md-menu>
+            </md-card-expand-trigger>
+            <div v-if="!w.panel"></div>
+            <div> <span class="window-title noselect">{{w.name}}</span></div>
+            <div>
+              <!-- <md-button>Action</md-button>
+                <md-button>Action</md-button> -->
+              <md-menu md-size="big" md-direction="bottom-end">
+                <md-button class="md-icon-button" md-menu-trigger>
+                  <md-icon>more_vert</md-icon>
+                </md-button>
+                <md-menu-content>
+                  <md-menu-item v-if="w.type!='main'" @click="close(wi)">
+                    <span>Close</span>
+                    <md-icon>close</md-icon>
+                  </md-menu-item>
+                  <md-menu-item @click.stop="fullScreen(w)">
+                    <span>Fullscreen</span>
+                    <md-icon>fullscreen</md-icon>
+                  </md-menu-item>
+                </md-menu-content>
+              </md-menu>
+            </div>
+          </md-card-actions>
+          <md-card-expand-content v-if="w.panel">
+            <md-card-content>
+              <joy :config="w.panel"></joy>
+            </md-card-content>
+          </md-card-expand-content>
+        </md-card-expand>
+
+        <md-card-content class="plugin-iframe-container">
+          <md-empty-state v-if="w.type=='empty'" md-icon="hourglass_empty" md-label="IMJOY.IO" md-description="">
+          </md-empty-state>
+          <div v-if="w.type=='files'">
+            <md-chip v-for="f in w.data.files" :key="f.name">{{f.name}}</md-chip>
           </div>
-        </md-card-actions>
-        <md-card-expand-content v-if="w.panel">
-          <md-card-content>
-            <joy :config="w.panel"></joy>
-          </md-card-content>
-        </md-card-expand-content>
-      </md-card-expand>
+          <div v-if="w.type=='joy_panel'">
+            <joy :config="w.config"></joy>
+          </div>
+          <!-- <md-card-content class="plugin-iframe-container"> -->
+          <md-button class="plugin-iframe" @click="w.click2load=false;w.renderWindow(w)" v-if="w.click2load">Click to load window</md-button>
+          <div :id="w.iframe_container" class="plugin-iframe">
+          </div>
+          <!-- </md-card-content> -->
+        </md-card-content>
 
-      <md-card-content class="plugin-iframe-container">
-        <md-empty-state v-if="w.type=='empty'" md-icon="hourglass_empty" md-label="IMJOY.IO" md-description="">
-        </md-empty-state>
-        <div v-if="w.type=='files'">
-          <md-chip v-for="f in w.data.files" :key="f.name">{{f.name}}</md-chip>
-        </div>
-        <div v-if="w.type=='joy_panel'">
-          <joy :config="w.config"></joy>
-        </div>
-        <!-- <md-card-content class="plugin-iframe-container"> -->
-        <md-button class="plugin-iframe" @click="w.click2load=false;w.renderWindow(w)" v-if="w.click2load">Click to load window</md-button>
-        <div v-once :id="w.iframe_container" class="plugin-iframe">
-        </div>
-        <!-- </md-card-content> -->
-      </md-card-content>
-
-    </md-card>
-    <!-- </div> -->
-  </vue-draggable-resizable>
+      </md-card>
+      <!-- </div> -->
+    </grid-item>
+  </grid-layout>
   <div class="md-layout md-gutter md-alignment-center-center">
     <md-empty-state v-if="!windows || windows.length==0" md-icon="static/img/anna-palm-icon-circle-animation.svg" md-label="IMJOY.IO" md-description="">
     </md-empty-state>

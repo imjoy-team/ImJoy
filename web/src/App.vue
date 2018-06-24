@@ -102,7 +102,9 @@ html, body
   max-width: 1000px;
 }
 
-
+.vue-resizable-handle{
+  z-index: 9999 !important;
+}
 /*
 .md-dialog{
   overflow-y: auto !important;

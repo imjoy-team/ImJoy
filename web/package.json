@@ -29,6 +29,7 @@
     "vue": "^2.5.2",
     "vue-codemirror": "^4.0.5",
     "vue-draggable-resizable": "^1.7.1",
+    "vue-grid-layout": "^2.1.13",
     "vue-material": "^1.0.0-beta-10.2",
     "vue-router": "^3.0.1",
     "vue-slider-component": "^2.6.2",
