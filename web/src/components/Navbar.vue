@@ -90,6 +90,7 @@ export default {
   vertical-align: super;
   color: #ff5253;
 }
+
 .subheader-title {
   font-size: 16px;
   font-weight: 500;

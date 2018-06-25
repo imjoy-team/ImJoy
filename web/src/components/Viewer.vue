@@ -19,6 +19,7 @@
         <md-button class="md-icon-button"><md-icon>share</md-icon></md-button>
         <md-button class="md-icon-button"><md-icon>help</md-icon></md-button>
       </div>
+
     </md-app-toolbar>
     <md-app-drawer :md-active.sync="menuVisible" md-persistent="full">
       <!-- <md-app-toolbar class="md-primary md-dense"> -->
@@ -51,7 +52,6 @@
         </div>
 
       </div>
-
 
       <md-card>
         <md-card-header>
@@ -109,23 +109,13 @@
         </md-card>
 
       </div>
-
-
     </md-app-drawer>
-
     <md-app-content class="whiteboard-content">
+      <md-progress-bar md-mode="determinate" :md-value="progress"></md-progress-bar>
       <whiteboard :windows="windows" @select="windowSelected"></whiteboard>
     </md-app-content>
   </md-app>
   <!-- </md-card-content> -->
-  <md-dialog :md-active.sync="showLoadingDialog">
-    <md-dialog-content>
-      <md-progress-spinner :md-diameter="30" :md-stroke="3" md-mode="indeterminate"></md-progress-spinner>
-    </md-dialog-content>
-    <md-dialog-actions>
-
-    </md-dialog-actions>
-  </md-dialog>
 
   <md-dialog :md-active.sync="showPluginDialog" :md-click-outside-to-close="false">
     <md-dialog-content>
@@ -202,12 +192,12 @@ export default {
       file_model: null,
       selected_file: null,
       selected_files: null,
-      showLoadingDialog: false,
       showPluginDialog: false,
       showSettingsDialog: false,
       plugin_dialog_config: null,
       _plugin_dialog_promise: {},
       loading: false,
+      progress: 0,
       showImportDialog: false,
       windows: [],
       panels: [],
@@ -366,6 +356,7 @@ export default {
     },
     updateProgress(p) {
       console.log(p)
+      this.progress = p
     },
     closePanel(panel) {
 
