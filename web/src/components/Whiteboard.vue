@@ -2,7 +2,8 @@
 <div class="whiteboard noselect" ref="whiteboard">
   <div class="overlay" @click="dragging=false" v-if="dragging"></div>
   <grid-layout :layout="windows" :col-num="18" :row-height="30" :is-draggable="true" :is-resizable="true" :vertical-compact="true" :margin="[10, 10]" :use-css-transforms="true">
-    <grid-item v-for="(w, wi) in windows" :x="w.x" :y="w.y" :w="w.w" :h="w.h" :i="w.i" :key="w.iframe_container">
+    <grid-item v-for="(w, wi) in windows" :x="w.x" :y="w.y" :w="w.w" :h="w.h" :i="w.i" @resize="dragging=true"
+                   @move="dragging=true" @resized="dragging=false" @moved="dragging=false" :key="w.iframe_container">
       <md-card>
         <md-card-expand>
           <md-card-actions md-alignment="space-between" :class="w.selected?'window-selected':'window-header'">
