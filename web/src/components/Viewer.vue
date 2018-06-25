@@ -15,7 +15,7 @@
           <!-- <md-button v-if="!menuVisible" class="md-fab md-primary" @click="menuVisible=true">
             <md-icon>menu</md-icon>
           </md-button> -->
-          <md-button>
+          <md-button to="/">
             <div class="site-title">ImJoy.io<span class="superscript">alpha</span></div>
           </md-button>
         </div>
@@ -222,7 +222,17 @@ export default {
     }
   },
   created() {
-
+    window.onbeforeunload = s => modified ? "" : null;
+  },
+  beforeRouteLeave (to, from, next) {
+    if(this.windows && this.windows.length>0){
+      const answer = window.confirm('Do you really want to leave? you have unsaved changes!')
+      if (answer) {
+        next()
+      } else {
+        next(false)
+      }
+    }
   },
   mounted() {
     this.plugin_api = {
@@ -276,7 +286,7 @@ export default {
     for (let k in this.plugins) {
       if (this.plugins.hasOwnProperty(k)) {
         const plugin = this.plugins[k]
-        plugin.terminate()
+        if(typeof plugin.terminate == 'function') plugin.terminate()
       }
     }
   },
@@ -299,7 +309,7 @@ export default {
       this.activeWindow = w
     },
     generateGridPosition(config){
-      config.i = this.default_window_pos.i
+      config.i = this.default_window_pos.i.toString()
       config.w = this.default_window_pos.w
       config.h = this.default_window_pos.h
       config.x = this.default_window_pos.x

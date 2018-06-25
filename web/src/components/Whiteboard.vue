@@ -2,8 +2,8 @@
 <div class="whiteboard noselect" ref="whiteboard">
   <div class="overlay" @click="dragging=false" v-if="dragging"></div>
   <grid-layout :layout="windows" :col-num="18" :row-height="30" :is-draggable="true" :is-resizable="true" :vertical-compact="true" :margin="[10, 10]" :use-css-transforms="true">
-    <grid-item v-for="(w, wi) in windows" :x="w.x" :y="w.y" :w="w.w" :h="w.h" :i="w.i" @resize="dragging=true"
-                   @move="dragging=true" @resized="dragging=false" @moved="dragging=false" :key="w.iframe_container">
+    <grid-item v-for="(w, wi) in windows" :x="w.x" :y="w.y" :w="w.w" :h="w.h" :i="w.i" @resize="startDragging(w)"
+                   @move="startDragging(w)" @resized="dragging=false" @moved="dragging=false" :key="w.iframe_container">
       <md-card>
         <md-card-expand>
           <md-card-actions md-alignment="space-between" :class="w.selected?'window-selected':'window-header'">
@@ -13,7 +13,7 @@
               </md-button>
             </md-card-expand-trigger>
             <div v-if="!w.panel"></div>
-            <div> <span class="window-title noselect">{{w.name}}</span></div>
+            <md-button class="window-title noselect" @mousedown="selectWindow(w)">{{w.name}}</md-button>
             <div>
               <!-- <md-button>Action</md-button>
                 <md-button>Action</md-button> -->
@@ -108,15 +108,23 @@ export default {
     fullScreen(w) {
 
     },
-    startDragging(w) {
-      setTimeout(() => {
-        this.dragging = true
-        this.$forceUpdate()
-      }, 100)
+    selectWindow(w){
       if (this.active_window !== w) {
-        this.$emit('select', w)
+        if(this.active_window && this.active_window.selected){
+          this.active_window.selected = false
+        }
         this.active_window = w
+        w.selected = true
+        this.$emit('select', w)
+        this.$forceUpdate()
       }
+    },
+    startDragging(w) {
+      // setTimeout(() => {
+        this.dragging = true
+        // this.$forceUpdate()
+      // }, 100)
+        this.selectWindow(w)
     },
     stopDragging() {
       setTimeout(() => {
