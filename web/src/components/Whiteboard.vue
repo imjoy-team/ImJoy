@@ -13,7 +13,7 @@
               </md-button>
             </md-card-expand-trigger>
             <div v-if="!w.panel"></div>
-            <div class="window-title noselect" @mousedown="selectWindow(w)">{{w.name+'(#'+w.i+')'}}</div>
+            <div class="window-title noselect" @click="selectWindow(w, $event)">{{w.name+'(#'+w.i+')'}}</div>
             <div>
               <!-- <md-button>Action</md-button>
                 <md-button>Action</md-button> -->
@@ -91,7 +91,7 @@ export default {
   },
   data() {
     return {
-      active_window: null,
+      active_windows: [],
       dragging: false,
       router: this.$root.$data.router,
       store: this.$root.$data.store,
@@ -112,14 +112,22 @@ export default {
     fullScreen(w) {
 
     },
-    selectWindow(w){
-      if (this.active_window !== w) {
-        if(this.active_window && this.active_window.selected){
-          this.active_window.selected = false
-        }
-        this.active_window = w
+    selectWindow(w, evt){
+      if (this.active_windows.length<=0 || this.active_windows[this.active_windows.length - 1] !== w) {
         w.selected = true
-        this.$emit('select', w)
+        //unselect previous windows if no shift key pressed
+        if(!evt.shiftKey){
+          for(let i=0;i<this.active_windows.length;i++){
+            this.active_windows[i].selected = false
+          }
+        }
+        if(evt.shiftKey && this.active_windows.length>0){
+          this.active_windows.push(w)
+        }
+        else{
+          this.active_windows = [w]
+        }
+        this.$emit('select', this.active_windows, w)
         this.$forceUpdate()
       }
     },

@@ -94,7 +94,7 @@
   <md-dialog :md-active.sync="showPluginDialog" :md-click-outside-to-close="false">
     <md-dialog-content>
       <div v-if="plugin_dialog_config">
-        <joy :config="plugin_dialog_config" :controlButtons="false" ref="plugin_dialog_joy"></joy>
+        <joy :config="plugin_dialog_config" :showHeader="false" :controlButtons="false" ref="plugin_dialog_joy"></joy>
       </div>
     </md-dialog-content>
     <md-dialog-actions>
@@ -176,7 +176,7 @@ export default {
       showImportDialog: false,
       windows: [],
       panels: [],
-      activeWindow: {},
+      activeWindows: [],
       workflow_joy_config: {
         expanded: true,
         name: "Workflow",
@@ -298,9 +298,9 @@ export default {
     workflowOnchange() {
       console.log('workflow changed ...')
     },
-    windowSelected(w) {
-      console.log('activate window: ', w)
-      this.activeWindow = w
+    windowSelected(ws) {
+      console.log('activate window: ', ws)
+      this.activeWindows = ws
     },
     generateGridPosition(config) {
       config.i = this.default_window_pos.i.toString()
@@ -328,15 +328,15 @@ export default {
       this.windows.push(w)
     },
     runWorkflow(joy) {
-      console.log('run workflow.', this.activeWindow)
-      const w = this.activeWindow || {}
+      console.log('run workflow.', this.activeWindows)
+      const w = this.activeWindows[this.activeWindows.length-1] || {}
       joy.workflow.execute(w.data || {}).then((my) => {
         console.log('result', my)
       })
     },
     runPanel(joy, panel) {
-      console.log('run panel.', this.activeWindow)
-      const w = this.activeWindow || {}
+      console.log('run panel.', this.activeWindows)
+      const w = this.activeWindows[this.activeWindows.length-1] || {}
       joy._panel.execute(w.data || {}).then((my) => {
         console.log('result', my)
       })
@@ -583,7 +583,6 @@ export default {
         wconfig.force_show = wconfig.force_show || false
         wconfig.panel = wconfig.panel || null
         this.generateGridPosition(wconfig)
-        console.log('xxxxxxxxxx', wconfig)
         if (!WINDOW_SCHEMA(wconfig)) {
           const error = WINDOW_SCHEMA.errors(wconfig)
           console.error("Error occured during creating window " + wconfig.name, error)

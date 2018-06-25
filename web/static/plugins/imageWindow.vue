@@ -71,12 +71,6 @@ class ImageWindowPlugin {
         }
       }
     }
-    //test
-    // var img = new Image();
-    // img.onload = ()=>{
-    //   console.log('xxxxx', img.height, img.width)
-    // };
-    // img.src = imageUrl;
 
     this.inputLayer = L.imageOverlay(imageUrl, bounds)
     this.inputLayer.addTo(map);
