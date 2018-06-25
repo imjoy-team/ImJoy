@@ -1,35 +1,48 @@
 <template>
-  <div class="joy">
-    <div class="joy-container">
-      <div class="joy-editor" ref="editor"></div>
-      <md-button class="md-button md-primary" v-if="controlButtons" :disabled="isRunning" @click="runJoy()">
-        <md-icon>play_arrow</md-icon>Run
-      </md-button>
-      <md-button class="md-button md-primary" v-if="controlButtons" :disabled="!isRunning" @click="stopJoy()">
-        <md-icon>stop</md-icon>Stop
-      </md-button>
+<div class="joy">
+  <md-button class="md-icon-button" v-if="showHeader" @click="config.expanded=!config.expanded; $forceUpdate()">
+    <md-icon v-if="!config.expanded">expand_more</md-icon>
+    <md-icon v-else>expand_less</md-icon>
+  </md-button>
+  <md-button class="run-button md-primary" v-if="showHeader" @click="runJoy()">{{config.name}}</md-button>
+    <div class="joy-container" v-show="config.expanded ||!showHeader">
+        <div class="joy-editor" ref="editor"></div>
+        <md-button class="md-button md-primary" v-if="controlButtons" :disabled="isRunning" @click="runJoy()">
+          <md-icon>play_arrow</md-icon>Run
+        </md-button>
+        <md-button class="md-button md-primary" v-if="controlButtons" :disabled="!isRunning" @click="stopJoy()">
+          <md-icon>stop</md-icon>Stop
+        </md-button>
+
+      </div>
+
     </div>
-  </div>
 </template>
 
 <script>
 export default {
   name: 'joy',
-  props:{
-    controlButtons:{
+  props: {
+    showHeader: {
       type: Boolean,
-      default: ()=>{
+      default: () => {
+        return true
+      }
+    },
+    controlButtons: {
+      type: Boolean,
+      default: () => {
         return true
       }
     },
     config: {
       type: Object,
-      default: ()=>{
+      default: () => {
         return {}
       }
     }
   },
-  data () {
+  data() {
     return {
       joy: null,
       isRunning: false,
@@ -38,11 +51,11 @@ export default {
       api: this.$root.$data.store.api
     }
   },
-  mounted(){
+  mounted() {
     setTimeout(this.setupJoy, 500)
   },
   watch: {
-  	config: (newVal, oldVal)=>{ // watch it
+    config: (newVal, oldVal) => { // watch it
       console.log('Prop changed: ', newVal, ' | was: ', oldVal)
       this.setupJoy()
     }
@@ -56,7 +69,7 @@ export default {
 
         // The words & ops inside the editor:
         init: this.config.init || '', //"{id:'localizationWorkflow', type:'ops'} " + // a list of ops
-          //"<hr> {type:'save'}", // a save button!
+        //"<hr> {type:'save'}", // a save button!
 
         // Load data from URL, otherwise blank:
         data: this.config.data || Joy.loadFromURL(),
@@ -74,9 +87,9 @@ export default {
         //   this.$emit('update', my)
         // }
       }
-      for(let c in this.config){
-        if(this.config.hasOwnProperty(c)){
-          if(c.endsWith('onupdate') && typeof this.config[c] == 'function'){
+      for (let c in this.config) {
+        if (this.config.hasOwnProperty(c)) {
+          if (c.endsWith('onupdate') && typeof this.config[c] == 'function') {
             joy_config[c] = this.config[c]
           }
         }
@@ -115,4 +128,10 @@ export default {
   font-size: 1.2em;
   font-weight: 100;
 }
+.run-button{
+  width: 80%;
+  text-transform: none;
+  font-size: 1.2em;
+}
+
 </style>

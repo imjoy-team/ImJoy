@@ -13,7 +13,7 @@
               </md-button>
             </md-card-expand-trigger>
             <div v-if="!w.panel"></div>
-            <div class="window-title noselect" @mousedown="selectWindow(w)">{{w.name}}</div>
+            <div class="window-title noselect" @mousedown="selectWindow(w)">{{w.name+'(#'+w.i+')'}}</div>
             <div>
               <!-- <md-button>Action</md-button>
                 <md-button>Action</md-button> -->
