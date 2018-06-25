@@ -57,7 +57,7 @@ class LookupTablePlugin {
     }).then(()=>{
       api.createWindow({
         name: "LUT Window",
-        type: "joy_panel",
+        type: "imjoy/panel",
         config: {init: "Choose a LUT: {id:'lut', type:'choose', options:['hot', 'rainbow'], placeholder: 'hot'}", width: 500, height: 200}
       })
     })

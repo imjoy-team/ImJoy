@@ -13,7 +13,7 @@
               </md-button>
             </md-card-expand-trigger>
             <div v-if="!w.panel"></div>
-            <md-button class="window-title noselect" @mousedown="selectWindow(w)">{{w.name}}</md-button>
+            <div class="window-title noselect" @mousedown="selectWindow(w)">{{w.name}}</div>
             <div>
               <!-- <md-button>Action</md-button>
                 <md-button>Action</md-button> -->
@@ -44,21 +44,25 @@
         <md-card-content class="plugin-iframe-container">
           <md-empty-state v-if="w.type=='empty'" md-icon="hourglass_empty" md-label="IMJOY.IO" md-description="">
           </md-empty-state>
-          <div v-if="w.type=='files'">
+          <div v-if="w.type=='imjoy/files'">
             <md-chip v-for="f in w.data.files" :key="f.name">{{f.name}}</md-chip>
           </div>
-          <div v-if="w.type=='joy_panel'">
+          <div v-else-if="w.type=='imjoy/image'">
+            <img :src="w.data.image"></img>
+          </div>
+          <div v-else-if="w.type=='imjoy/images'">
+            <img :src="img" v-for="img in w.data.images"></img>
+          </div>
+          <div v-else-if="w.type=='imjoy/panel'">
             <joy :config="w.config"></joy>
           </div>
-          <!-- <md-card-content class="plugin-iframe-container"> -->
-          <md-button class="plugin-iframe" @click="w.click2load=false;w.renderWindow(w)" v-if="w.click2load">Click to load window</md-button>
-          <div :id="w.iframe_container" class="plugin-iframe">
+          <div v-else class="plugin-iframe">
+            <md-button class="iframe-load-button" @click="w.click2load=false;w.renderWindow(w)" v-if="w.click2load">Click to load the window</md-button>
+            <div :id="w.iframe_container" class="plugin-iframe">
+            </div>
           </div>
-          <!-- </md-card-content> -->
         </md-card-content>
-
       </md-card>
-      <!-- </div> -->
     </grid-item>
   </grid-layout>
   <div class="md-layout md-gutter md-alignment-center-center">
@@ -190,6 +194,11 @@ export default {
   padding-bottom: 2px;
 }
 
+.iframe-load-button{
+  width: 100%;
+  height: 100%;
+}
+
 .plugin-iframe {
   width: 100%;
   height: 100%;
@@ -201,7 +210,7 @@ export default {
 
 .overlay {
   z-index: 8888 !important;
-  background-color: rgba(1, 1, 1, 0.1);
+  background-color: rgba(1, 1, 1, 0.05);
   bottom: 0;
   left: 0;
   position: fixed;

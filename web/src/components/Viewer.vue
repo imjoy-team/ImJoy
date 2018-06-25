@@ -1,13 +1,25 @@
 <template>
 <div class="viewer noselect">
-  <md-button v-if="!menuVisible" class="md-fab md-primary md-fab-top-left" @click="menuVisible=true">
+  <!-- <md-button v-if="!menuVisible" class="md-fab floating-fab md-primary md-fab-top-left" @click="menuVisible=true">
     <md-icon>menu</md-icon>
-  </md-button>
-
+  </md-button> -->
   <md-app>
-    <!-- <md-app-toolbar v-if="menuVisible" class="md-primary md-dense">
-
-    </md-app-toolbar> -->
+    <md-app-toolbar class="md-dense"  md-elevation="0">
+      <div class="md-toolbar-section-start">
+        <md-button v-if="!menuVisible" class="md-primary md-icon-button" @click="menuVisible=true">
+          <md-icon>menu</md-icon>
+        </md-button>
+        <md-button to="/" v-if="!menuVisible">
+          <div class="site-title">ImJoy.io<span class="superscript">alpha</span></div>
+        </md-button>
+        <span class="subheader-title md-small-hide" style="flex: 1">Image Processing with Joy</span>
+      </div>
+      <div class="md-toolbar-section-end">
+        <md-button class="md-icon-button"><md-icon>save</md-icon></md-button>
+        <md-button class="md-icon-button"><md-icon>share</md-icon></md-button>
+        <md-button class="md-icon-button"><md-icon>help</md-icon></md-button>
+      </div>
+    </md-app-toolbar>
     <md-app-drawer :md-active.sync="menuVisible" md-persistent="full">
       <!-- <md-app-toolbar class="md-primary md-dense"> -->
       <div class="md-toolbar-row">
@@ -325,7 +337,7 @@ export default {
     loadData() {
       const w = {
         name: 'Files',
-        type: 'files',
+        type: 'imjoy/files',
         config: {},
         data: {
           files: this.selected_files
@@ -563,7 +575,7 @@ export default {
     },
     createWindow(wconfig, _plugin) {
       try {
-        wconfig.type = wconfig.type || "joy_panel"
+        wconfig.type = wconfig.type || "imjoy/panel"
         wconfig.data = wconfig.data || null
         wconfig.force_show = wconfig.force_show || false
         wconfig.panel = wconfig.panel || null
@@ -576,7 +588,7 @@ export default {
         }
         const source_plugin = this.plugins[_plugin.id]
         if(wconfig.type == 'joy_panel'){
-          console.log('creating joy_panel', wconfig)
+          console.log('creating imjoy/panel', wconfig)
           // wconfig.window_id = 'plugin_window_'+plugin._id+randId()
           this.windows.unshift(wconfig)
         }
@@ -698,6 +710,11 @@ export default {
   }
 }
 
+.subheader-title {
+  font-size: 16px;
+  font-weight: 500;
+  margin-top: 10px;
+}
 .superscript {
   font-size: 16px;
   text-transform: none;
@@ -754,7 +771,8 @@ export default {
 .sticky + .content {
   padding-top: 102px;
 }
-/* .floating-fab{
-  position: absolute;
-} */
+
+.floating-fab{
+  margin-top: 40px;
+}
 </style>
