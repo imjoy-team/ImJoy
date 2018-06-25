@@ -173,15 +173,15 @@ function randId() {
         }
 
         platformInit = new Whenable;
-        var origOnload = window.onload || function(){};
-
-        window.onload = function(){
-            origOnload();
+        // var origOnload = window.onload || function(){};
+        var wload = function(){
+            // origOnload();
             load(
                 __jailed__path__+'_JailedSite.js',
                 function(){ platformInit.emit(); }
             );
         }
+        window.addEventListener("load", wload, false)
     }
 
 
