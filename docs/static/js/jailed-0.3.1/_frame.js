@@ -143,8 +143,8 @@ var initIframePlugin = function() {
     );
 }
 
-var plugin_type = getParamValue('type');
-if(plugin_type=='webworker'){
+var plugin_mode = getParamValue('mode');
+if(plugin_mode =='webworker'){
   try {
       initWebworkerPlugin();
   } catch(e) {
@@ -152,10 +152,10 @@ if(plugin_type=='webworker'){
       initIframePlugin();
   }
 }
-else if(plugin_type=='iframe'){
+else if(plugin_mode=='iframe'){
   initIframePlugin();
 }
 else{
-  console.error("Unsupported plugin type: "+ plugin_type)
-  throw "Unsupported plugin type: "+ plugin_type
+  console.error("Unsupported plugin type: "+ plugin_mode)
+  throw "Unsupported plugin type: "+ plugin_mode
 }

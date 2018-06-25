@@ -1,3 +1,26 @@
+<config>
+{
+  "name": "Three.js Demo",
+  "type": "threejs/demo",
+  "mode": "iframe",
+  "tags": ["3d", "op", "window"],
+  "init": "show three.js demo",
+  "show_panel": true,
+  "version": "0.0.1",
+  "api_version": "0.0.1",
+  "createdAt": "Mon Jun 19 2018 15:45:30",
+  "file_path": "/ThreejsDemo/threejsDemo.js",
+  "description": "A plugin for demonstrate that one can use Three.js in a plugin.",
+  "thunbnail": null,
+  "dependencies": []
+}
+</config>
+
+<docs>
+This plugin shows a demo for Three.js.
+
+</docs>
+
 <html>
   <div>
       <div id="info">
@@ -13,14 +36,9 @@
 </html>
 
 <script>
-importScripts("https://threejs.org/build/three.js",
-              "https://threejs.org/examples/js/controls/OrbitControls.js",
-              "https://threejs.org/examples/js/Detector.js"
-            ).then(() => {
-  build3d()
-})
 
-function build3d() {
+
+function build3d(text) {
   if (!Detector.webgl) Detector.addGetWebGLMessage();
   var camera, scene, renderer;
   var mesh, sprite, texture;
@@ -84,6 +102,11 @@ function build3d() {
     controls.enablePan = false;
     //
     window.addEventListener('resize', onWindowResize, false);
+
+    var dom = document.createElement("p");
+  	dom.innerHTML = text
+    var info = document.getElementById("info")
+  	info.appendChild(dom)
   }
 
   function onWindowResize() {
@@ -124,23 +147,21 @@ function build3d() {
 
 }
 
-class Histogram2dPlugin {
-  setup() {
-    api.register({
-      name: "render 2D histogram",
-      type: "localization/render_2d_histogram",
-      tags: ["localization", "op", "histogram"],
-      init: "Render a histogram with pixel size {id:'pixel_size', type:'number', placeholder: 20}nm",
-    })
+class ThreejsDemoPlugin {
+  async setup() {
+    await importScripts("https://threejs.org/build/three.js",
+                  "https://threejs.org/examples/js/controls/OrbitControls.js",
+                  "https://threejs.org/examples/js/Detector.js"
+    )
   }
 
-  async run(my) {
-    const pixel_size = my.config.pixel_size
-    return my
+  run(my) {
+    console.log('running in the plugin ', my)
+    build3d(my.data.text)
   }
 }
 
-api.export(new Histogram2dPlugin())
+api.export(new ThreejsDemoPlugin())
 </script>
 
 <style>

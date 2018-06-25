@@ -407,7 +407,7 @@
                   var data = {}
                   for(var k in v){
                     if (v.hasOwnProperty(k)) {
-                      if(v[k].type == 'callback'){
+                      if(v[k]&&v[k].type == 'callback'){
                         // cb = once(
                         cb = this._genRemoteCallback(args.callbackId, v[k].num, withPromise)
                         // );

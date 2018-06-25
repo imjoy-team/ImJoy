@@ -173,15 +173,15 @@ function randId() {
         }
 
         platformInit = new Whenable;
-        var origOnload = window.onload || function(){};
-
-        window.onload = function(){
-            origOnload();
+        // var origOnload = window.onload || function(){};
+        var wload = function(){
+            // origOnload();
             load(
                 __jailed__path__+'_JailedSite.js',
                 function(){ platformInit.emit(); }
             );
         }
+        window.addEventListener("load", wload, false)
     }
 
 
@@ -201,7 +201,7 @@ function randId() {
          *
          * For Node.js the plugin is created as a forked process
          */
-        BasicConnection = function(id, type) {
+        BasicConnection = function(id, mode) {
             if(type == 'iframe'){
               throw('You can not use iframe in nodejs.')
             }
@@ -310,6 +310,11 @@ function randId() {
         var sample = document.createElement('iframe');
         sample.src = __jailed__path__ + '_frame.html';
         sample.sandbox = perm.join(' ');
+        sample.frameBorder="0";
+        sample.style.width = "100%";
+        sample.style.height = "100%";
+        sample.style.margin = "0";
+        sample.style.padding = "0";
         sample.style.display = 'none';
 
 
@@ -321,7 +326,7 @@ function randId() {
          * For the web-browser environment, the plugin is created as a
          * Worker in a sandbaxed frame
          */
-        BasicConnection = function(id, type) {
+        BasicConnection = function(id, mode, iframe_container, iframe_window) {
             this._init = new Whenable;
             this._disconnected = false;
             this.id = id;
@@ -330,19 +335,15 @@ function randId() {
             platformInit.whenEmitted(function() {
                 if (!me._disconnected) {
                     me._frame = sample.cloneNode(false);
-                    me._frame.src = me._frame.src+'?type='+type;
+                    me._frame.src = me._frame.src+'?mode='+mode;
                     me._frame.id = 'iframe_'+id;
-                    if(type == 'iframe'){
-                      var plugin_window = document.getElementById('plugin_window_'+id)
-                      if(plugin_window){
-                        me._frame.frameBorder="0";
-                        me._frame.style.width = "100%";
-                        me._frame.style.height = "100%";
-                        me._frame.style.margin = "0";
-                        me._frame.style.padding = "0";
+                    if(mode == 'iframe'){
+                      if(typeof iframe_container == 'string'){
+                        iframe_container = document.getElementById(iframe_container)
+                      }
+                      if(iframe_container){
                         me._frame.style.display = 'block';
-
-                        plugin_window.appendChild(me._frame);
+                        iframe_container.appendChild(me._frame);
                       }
                       else{
                         document.body.appendChild(me._frame);
@@ -447,8 +448,8 @@ function randId() {
      * methods for loading scripts and executing the given code in the
      * plugin
      */
-    var Connection = function(id, type){
-        this._platformConnection = new BasicConnection(id, type);
+    var Connection = function(id, mode, iframe_container, iframe_window){
+        this._platformConnection = new BasicConnection(id, mode, iframe_container, iframe_window);
 
         this._importCallbacks = {};
         this._executeSCb = function(){};
@@ -619,21 +620,11 @@ function randId() {
      * @param {String} url of a plugin source
      * @param {Object} _interface to provide for the plugin
      */
-    var Plugin = function(url, _interface, config) {
-        if(config){
-          for (var key in config) {
-           if (config.hasOwnProperty(key)) {
-              this[key] = config[key];
-           }
-          }
-        }
-        if(this.id === undefined || !this.id){
-          this.id = randId()
-        }
-        if(this.type === undefined || !this.type){
-          this.type = 'webworker'
-        }
-        this._path = url;
+    var Plugin = function( config, _interface) {
+        this.config = config
+        this.id = config.id || randId()
+        this.mode = config.mode || 'webworker'
+        this._path = config.file_path;
         this._initialInterface = _interface||{};
         this._connect();
     };
@@ -646,18 +637,13 @@ function randId() {
      * @param {String} code of the plugin
      * @param {Object} _interface to provide to the plugin
      */
-    var DynamicPlugin = function(code, _interface, config) {
-        if(config){
-          for (var key in config) {
-           if (config.hasOwnProperty(key)) {
-              this[key] = config[key];
-           }
-          }
+    var DynamicPlugin = function(config, _interface) {
+        this.config = config
+        if(!this.config.script){
+          throw "you must specify the script for the plugin to run."
         }
-        if(this.id === undefined || !this.id){
-          this.id = randId()
-        }
-        this._code = code;
+        this.id = config.id || randId()
+        this.mode = config.mode || 'webworker'
         this._initialInterface = _interface||{};
         this._connect();
     };
@@ -682,7 +668,7 @@ function randId() {
             me._fail.emit();
             me.disconnect();
         }
-        this._connection = new Connection(this.id, this.type);
+        this._connection = new Connection(this.id, this.mode, this.config.iframe_container, this.config.iframe_window);
         this._connection.whenInit(function(){
             me._init();
         });
@@ -769,9 +755,9 @@ function randId() {
             me._requestRemote();
         }
 
-        this._connection.execute({type: 'script', content: this._code}, sCb, this._fCb);
-        if(this.style) this._connection.execute({type: 'style', content: this.style}, sCb, this._fCb);
-        if(this.html) this._connection.execute({type: 'html', content: this.html}, sCb, this._fCb);
+        this._connection.execute({type: 'script', content: this.config.script}, sCb, this._fCb);
+        if(this.config.style) this._connection.execute({type: 'style', content: this.config.style}, sCb, this._fCb);
+        if(this.config.html) this._connection.execute({type: 'html', content: this.config.html}, sCb, this._fCb);
     }
 
 
