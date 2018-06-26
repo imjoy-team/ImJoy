@@ -102,11 +102,13 @@ export default {
       api: this.$root.$data.store.api
     }
   },
+  created() {
+    this.store.event_bus.$on('add_window', (w)=>{
+      this.selectWindow(w, {})
+    })
+  },
   mounted() {
-    setTimeout(() => {
-      this.dragging = false
-      this.$forceUpdate()
-    }, 500)
+
   },
   methods: {
     close(wi) {

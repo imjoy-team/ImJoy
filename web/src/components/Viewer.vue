@@ -316,6 +316,10 @@ export default {
     }
   },
   methods: {
+    addWindow(w){
+      this.windows.push(w)
+      this.store.event_bus.$emit('add_window', w)
+    },
     closePluginDialog(ok) {
       this.showPluginDialog = false
       let [resolve, reject] = this._plugin_dialog_promise
@@ -357,7 +361,7 @@ export default {
         }
       }
       this.generateGridPosition(w)
-      this.windows.push(w)
+      this.addWindow(w)
     },
     runWorkflow(joy) {
       console.log('run workflow.', this.activeWindows)
@@ -655,7 +659,7 @@ export default {
         if (wconfig.type.startsWith('imjoy')) {
           console.log('creating imjoy window', wconfig)
           // wconfig.window_id = 'plugin_window_'+plugin._id+randId()
-          this.windows.push(wconfig)
+          this.addWindow(wconfig)
           return true
         } else {
           const window_config = this.registered.windows[wconfig.type]
@@ -736,7 +740,7 @@ export default {
         }
         //TODO: verify fields with WINDOW_TEMPLATE
         console.log('creating plugin window: ', config)
-        this.windows.push(config)
+        this.addWindow(config)
         // container IS NOT finished rendering to the DOM
         // this.$nextTick(()=>{
         //      resolve()
