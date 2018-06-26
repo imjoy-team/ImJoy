@@ -2,13 +2,13 @@
 {
   "name": "Text File Importer",
   "mode": "webworker",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "api_version": "0.1.0",
   "createdAt": "Mon Jun 18 2018 21:46:36",
   "url": "/textFileImporter.vue",
   "description": "A plugin for loading localization table from text files.",
   "tags": ["localization", "importer"],
-  "thunbnail": null,
+  "icon": null,
   "dependencies": []
 }
 </config>

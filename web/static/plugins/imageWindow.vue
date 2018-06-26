@@ -11,7 +11,7 @@
   "createdAt": "Mon Jun 19 2018 15:45:30",
   "url": "/imageWindow.vue",
   "description": "A plugin for display simple image.",
-  "thunbnail": null,
+  "icon": null,
   "dependencies": []
 }
 </config>

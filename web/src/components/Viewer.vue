@@ -398,13 +398,16 @@ export default {
         console.log('parsing the plugin file')
         const pluginComp = parseComponent(code)
         console.log('code parsed from', pluginComp)
+        let c = null
         for (let i = 0; i < pluginComp.customBlocks.length; i++) {
           if (pluginComp.customBlocks[i].type == 'config') {
             // find the first config block
-            config = JSON.parse(pluginComp.customBlocks[i].content)
+             config = JSON.parse(pluginComp.customBlocks[i].content)
+             console.log('loading config from .vue file', config)
             break
           }
         }
+
         config.script = pluginComp.script.content
         config.lang = pluginComp.script.attrs.lang || 'javascript'
         for (let i = 0; i < pluginComp.customBlocks.length; i++) {
@@ -436,8 +439,6 @@ export default {
       config.url = url
       config.code = code
       config.id = config.name.trim().replace(/ /g, '_') + '_' + randId()
-      config.iframe_container = null
-      config.iframe_window = null
       if (!PLUGIN_SCHEMA(config)) {
         const error = PLUGIN_SCHEMA.errors(config)
         console.error("Invalid plugin config: " + config.name, error)

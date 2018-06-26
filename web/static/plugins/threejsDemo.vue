@@ -6,12 +6,12 @@
   "tags": ["3d", "op", "window"],
   "ui": "show three.js demo",
   "show_panel": true,
-  "version": "0.0.1",
-  "api_version": "0.0.1",
+  "version": "0.1.0",
+  "api_version": "0.1.0",
   "createdAt": "Mon Jun 19 2018 15:45:30",
   "url": "/threejsDemo.vue",
   "description": "A plugin for demonstrate that one can use Three.js in a plugin.",
-  "thunbnail": null,
+  "icon": null,
   "dependencies": []
 }
 </config>

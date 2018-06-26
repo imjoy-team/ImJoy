@@ -1,0 +1,64 @@
+<config>
+{
+  "name": "tSNE",
+  "mode": "iframe",
+  "type": "visualization/tSNE",
+  "version": "0.1.0",
+  "api_version": "0.1.0",
+  "url": "/tSNE.vue",
+  "tags": ["op", "window"],
+  "ui": "show tSNE plot",
+  "show_panel": true,
+  "description": "A plugin for doing tSNE visualization, using a library from https://cs.stanford.edu/people/karpathy/tsnejs/.",
+  "icon": null,
+  "dependencies": []
+}
+</config>
+<docs>
+This plugin shows a demo for Three.js.
+
+</docs>
+
+<html>
+  <div>
+      <div id="info">
+          <a href="https://threejs.org" target="_blank" rel="noopener noreferrer">three.js</a> framebuffer to texture
+          <br/> The area of the white square is copied from the framebuffer to a texture (shown in the top-left corner).
+      </div>
+
+      <div id="overlay">
+          <div>
+          </div>
+      </div>
+  </div>
+</html>
+
+<script lang="javascript">
+class TSNEPlugin {
+  async setup() {
+    await importScripts("https://rawgit.com/karpathy/tsnejs/master/tsne.js"
+    )
+  }
+
+  run(my) {
+    var opt = {}
+    opt.epsilon = 10; // epsilon is learning rate (10 = default)
+    opt.perplexity = 30; // roughly how many neighbors each point influences (30 = default)
+    opt.dim = 2; // dimensionality of the embedding (2 = default)
+
+    var tsne = new tsnejs.tSNE(opt); // create a tSNE instance
+
+    // initialize data. Here we have 3 points and some example pairwise dissimilarities
+    var dists = [[1.0, 0.1, 0.2], [0.1, 1.0, 0.3], [0.2, 0.1, 1.0]];
+    tsne.initDataDist(dists);
+
+    for(var k = 0; k < 500; k++) {
+      tsne.step(); // every time you call this, solution gets better
+    }
+
+    var Y = tsne.getSolution(); // Y is an array of 2-D points that you can plot
+  }
+}
+
+api.export(new TSNEPlugin())
+</script>

@@ -2,13 +2,13 @@
 {
   "name": "Lookup Table",
   "mode": "webworker",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "api_version": "0.1.0",
   "createdAt": "Mon Jun 19 2018 16:33:11",
   "url": "/LookupTable.vue",
   "description": "A plugin for applying lookup table to a single-channel image.",
   "tags": ["image", "LUT"],
-  "thunbnail": null,
+  "icon": null,
   "dependencies": []
 }
 </config>
