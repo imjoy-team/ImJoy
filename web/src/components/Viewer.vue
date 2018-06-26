@@ -16,8 +16,8 @@
           <div class="site-title">ImJoy.io<span class="superscript">alpha</span></div>
         </md-button>
         <span class="subheader-title md-small-hide" style="flex: 1">Image Processing with Joy</span>
-        <span class="status-text md-small-hide">{{status_text}}</span>
       </div>
+      <span class="status-text md-small-hide">{{status_text}}</span>
       <div class="md-toolbar-section-end">
         <md-button class="md-icon-button">
           <md-icon>save</md-icon>
@@ -184,7 +184,7 @@ export default {
         expanded: true,
         name: "Workflow",
         ui: "{id:'workflow', type:'ops'}",
-        onupdate: this.workflowOnchange
+        // onupdate: this.workflowOnchange
       },
       default_window_pos: {
         i: 0,
@@ -260,6 +260,8 @@ export default {
       register: this.register,
       createWindow: this.createWindow,
       showDialog: this.showDialog,
+      showProgress: this.showProgress,
+      showStatus: this.showStatus,
       run: this.runPlugin,
     }
     this.plugin_loaded = false
@@ -316,6 +318,15 @@ export default {
     }
   },
   methods: {
+    showProgress(p){
+      if (p < 1) this.progress = p * 100
+      else this.progress = p
+      // this.$forceUpdate()
+    },
+    showStatus(s){
+      this.status_text = s
+      // this.$forceUpdate()
+    },
     addWindow(w){
       this.windows.push(w)
       this.store.event_bus.$emit('add_window', w)
@@ -330,9 +341,9 @@ export default {
       }
       this._plugin_dialog_promise = null
     },
-    workflowOnchange() {
-      console.log('workflow changed ...')
-    },
+    // workflowOnchange() {
+    //   // console.log('workflow changed ...')
+    // },
     windowSelected(ws) {
       console.log('activate window: ', ws)
       this.activeWindows = ws
@@ -367,33 +378,44 @@ export default {
       console.log('run workflow.', this.activeWindows)
       const w = this.activeWindows[this.activeWindows.length - 1] || {}
       joy.workflow.execute(w.data || {}).then((my) => {
-        console.log('result', my)
+        if(my){
+          console.log('result', my)
+          my.name = 'result'
+          my.type = 'imjoy/generic'
+          my.config = my.data
+          my.data = my.target
+          this.createWindow(my)
+        }
+        this.progress = 100
+        this.status_text = ''
+      }).catch((e)=>{
+        console.error(e)
+        this.status_text = e.toString() || "Error."
       })
     },
     runPanel(joy, panel) {
       console.log('run panel.', this.activeWindows)
       const w = this.activeWindows[this.activeWindows.length - 1] || {}
       joy._panel.execute(w.data || {}).then((my) => {
-        console.log('result', my)
-        my.name = 'result'
-        my.type = 'imjoy/generic'
-        this.createWindow(my)
+        if(my){
+          console.log('result', my)
+          my.name = 'result'
+          my.type = 'imjoy/generic'
+          my.config = my.data
+          my.data = my.target
+          this.createWindow(my)
+        }
+        this.progress = 100
+        this.status_text = ''
+      }).catch((e)=>{
+        console.error(e)
+        this.status_text = e.toString() || "Error."
       })
     },
     selectFileChanged(file_list) {
       console.log(file_list)
       this.selected_file = file_list[0]
       this.selected_files = file_list
-    },
-    updateProgress(p) {
-      console.log(p)
-      if (typeof p == 'number') {
-        if (p < 1) this.progress = p * 100
-        else this.progress = p
-      } else {
-        this.progress = p.value
-        this.status_text = p.text
-      }
     },
     closePanel(panel) {
 
@@ -478,7 +500,6 @@ export default {
             c.type = template.type
             c.name = template.name
             // c.op = my.op
-            c.progress = my.progress
             c.data = my.data
             c.config = my.config
             this.createWindow(c)
@@ -550,15 +571,17 @@ export default {
           } else {
             const onexecute = async (my) => {
               //conver the api here data-->config   target--> data
-              return await plugin.api.run({
+              const result = await plugin.api.run({
                 op: {
                   name: my.op.name,
                   type: my.op.type
                 },
                 config: my.data,
-                data: my.target,
-                progress: this.updateProgress
+                data: my.target
               })
+              my.data = result && result.config
+              my.target = result && result.data
+              return my
             }
             config.onexecute = onexecute
           }
@@ -628,7 +651,6 @@ export default {
             data: pconfig.data,
             config: pconfig.config,
             op: pconfig.op,
-            progress: pconfig.progress
           }).catch((e) => {
             console.error('error in run function: ', e)
           })

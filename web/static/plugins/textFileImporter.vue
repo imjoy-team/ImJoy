@@ -152,7 +152,8 @@ function _loadFile(file, format) {
             localization_num += 1;
             bytesRead += lines[line].length
             if(localization_num%100000 == 0){
-                self.postMessage({progress: bytesRead/totalBytes*100, localization_num: localization_num});
+                api.showProgress(bytesRead/totalBytes*100);
+                api.showStatus('loading...' + localization_num/1000000 + 'M localizations');
             }
             val = lines[line].split(delimiter);
             if(lines[line] == '' || headers.length != val.length){
@@ -258,7 +259,7 @@ class TextFilePlugin {
         header_transform: {'x [nm]': 'x', 'y [nm]':'y', 'sigma [nm]': 'sigma'}
       }
       const table = await _loadFile(my.data.files[0], format)
-      my.data.table = table
+      my.data = {table: table}
       return my
     } catch (e) {
       console.error(e)

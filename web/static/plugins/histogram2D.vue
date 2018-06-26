@@ -20,17 +20,17 @@ class Histogram2dPlugin {
       name: "render 2D histogram",
       type: "localization/render_2d_histogram",
       tags: ["localization", "op", "histogram"],
-      ui: "Render a histogram with pixel size={id:'pixel_size', type:'number', placeholder: 20}nm<br> width={id:'width', type:'number', placeholder: 2560} <br> height={id:'height', type:'number', placeholder: 2560}",
+      ui: "Render a 2D histogram with: <br>pixel size={id:'pixel_size', type:'number', placeholder: 20}nm<br> width={id:'width', type:'number', placeholder: 2560} <br> height={id:'height', type:'number', placeholder: 2560}",
     })
   }
 
   async run(my){
     try {
-      var pixel_size = my.config.pixel_size
-      var data = my.data.table
       var width = my.config.width
       var height = my.config.height
       var canvas_data = new Uint16Array(new ArrayBuffer(width*height*2)); //uint16
+      var pixel_size = my.config.pixel_size
+      var data = my.data.table
       var xx = data.tableDict.x
       var yy = data.tableDict.y
       var ff = data.tableDict.frame
@@ -42,9 +42,7 @@ class Histogram2dPlugin {
           var newProgress = Math.floor(100 * line / (rows+0.5));
           if(newProgress != progress){
               progress = newProgress
-              // self.postMessage({progress:progress});
-              console.log(progress)
-              // my.progress(progress)
+              api.showProgress(progress)
           }
           if(isFiltered && !isFiltered[line]) continue
           var f = parseInt(ff[line])
@@ -58,10 +56,11 @@ class Histogram2dPlugin {
           canvas_data[s] = canvas_data[s]+1
       }
       my.data = {}
-      my.data.canvas_data = canvas_data
+      my.data.image = {type: 'image/grayscale', array: canvas_data, height: height, width: width}
       return my
     } catch (e) {
       console.error(e)
+      throw e
     }
   }
 }

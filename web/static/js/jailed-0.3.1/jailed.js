@@ -641,7 +641,6 @@ function randId() {
     var DynamicPlugin = function(template, config, _interface) {
         this.template = template
         this.config = config
-        console.log('template: ', template, 'config: ', config)
         if(!this.template.script){
           throw "you must specify the script for the plugin to run."
         }
