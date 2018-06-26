@@ -259,7 +259,8 @@ export default {
       alert: alert,
       register: this.register,
       createWindow: this.createWindow,
-      showDialog: this.showDialog
+      showDialog: this.showDialog,
+      run: this.runPlugin,
     }
     this.plugin_loaded = false
     this.loading = true
@@ -510,6 +511,12 @@ export default {
           // reject(e)
         });
       })
+    },
+    async runPlugin(plugin_type, my, _plugin) {
+      console.log('run plugin', plugin_type, my, _plugin)
+      const target_plugin = this.plugins[plugin_type]
+      //conver the api here data-->config   target--> data
+      return await target_plugin.api.run(my)
     },
     register(config, _plugin) {
       try {
