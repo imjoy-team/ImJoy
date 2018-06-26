@@ -22,13 +22,7 @@ This plugin shows a demo for Three.js.
 <html>
   <div>
       <div id="info">
-          <a href="https://threejs.org" target="_blank" rel="noopener noreferrer">three.js</a> framebuffer to texture
-          <br/> The area of the white square is copied from the framebuffer to a texture (shown in the top-left corner).
-      </div>
-
-      <div id="overlay">
-          <div>
-          </div>
+          This is a demo for using tSNE, <a href="https://cs.stanford.edu/people/karpathy/tsnejs/"> more details</a>.
       </div>
   </div>
 </html>
@@ -57,6 +51,8 @@ class TSNEPlugin {
     }
 
     var Y = tsne.getSolution(); // Y is an array of 2-D points that you can plot
+    console.log(Y)
+    return Y
   }
 }
 
