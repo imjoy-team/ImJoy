@@ -113,8 +113,8 @@ export default {
 
     },
     selectWindow(w, evt){
+      w.selected = true
       if (this.active_windows.length<=0 || this.active_windows[this.active_windows.length - 1] !== w) {
-        w.selected = true
         //unselect previous windows if no shift key pressed
         if(!evt.shiftKey){
           for(let i=0;i<this.active_windows.length;i++){
@@ -128,8 +128,16 @@ export default {
           this.active_windows = [w]
         }
         this.$emit('select', this.active_windows, w)
-        this.$forceUpdate()
+
       }
+      else if(!evt.shiftKey && this.active_windows.length>1 ){
+        for(let i=0;i<this.active_windows.length;i++){
+          if(this.active_windows[i] !== w)
+            this.active_windows[i].selected = false
+        }
+        this.active_windows = [w]
+      }
+      this.$forceUpdate()
     },
     startDragging(w) {
       // setTimeout(() => {
