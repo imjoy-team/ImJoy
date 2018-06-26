@@ -3,6 +3,9 @@
   <!-- <md-button v-if="!menuVisible" class="md-fab floating-fab md-primary md-fab-top-left" @click="menuVisible=true">
     <md-icon>menu</md-icon>
   </md-button> -->
+  <div style="visibility:hidden; opacity:0" id="dropzone">
+    <div id="textnode">Drop files to add data.</div>
+  </div>
   <md-app>
     <md-app-toolbar class="md-dense" md-elevation="0">
       <div class="md-toolbar-section-start">
@@ -73,14 +76,14 @@
             <span class="md-subheading">Plugins</span>
           </md-card-header>
           <md-card-content>
-          <div v-for="panel in panels" :key="panel.id">
-            <md-divider></md-divider>
+            <div v-for="panel in panels" :key="panel.id">
+              <md-divider></md-divider>
               <joy :config="panel" @run="runPanel($event, panel)"></joy>
 
-          </div>
+            </div>
             <md-divider></md-divider>
-      </md-card-content>
-    </md-card>
+          </md-card-content>
+        </md-card>
       </div>
 
     </md-app-drawer>
@@ -211,6 +214,33 @@ export default {
   },
   created() {
     window.onbeforeunload = s => modified ? "" : null;
+    window.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      document.querySelector("#dropzone").style.visibility = "";
+      document.querySelector("#dropzone").style.opacity = 1;
+      document.querySelector("#textnode").style.fontSize = "48px";
+    });
+    window.addEventListener("dragenter", (e) => {
+      e.preventDefault();
+      document.querySelector("#dropzone").style.visibility = "";
+      document.querySelector("#dropzone").style.opacity = 1;
+      document.querySelector("#textnode").style.fontSize = "48px";
+    });
+    window.addEventListener("dragleave", (e) => {
+      e.preventDefault();
+      document.querySelector("#dropzone").style.visibility = "hidden";
+      document.querySelector("#dropzone").style.opacity = 0;
+      document.querySelector("#textnode").style.fontSize = "42px";
+    });
+    window.addEventListener("drop", (e) => {
+      e.preventDefault();
+      document.querySelector("#dropzone").style.visibility = "hidden";
+      document.querySelector("#dropzone").style.opacity = 0;
+      document.querySelector("#textnode").style.fontSize = "42px";
+      this.selected_files = e.dataTransfer.files;
+      this.loadData()
+    });
+
   },
   beforeRouteLeave(to, from, next) {
     if (this.windows && this.windows.length > 0) {
@@ -220,8 +250,7 @@ export default {
       } else {
         next(false)
       }
-    }
-    else{
+    } else {
       next()
     }
   },
@@ -261,7 +290,7 @@ export default {
             }
           } catch (e) {
             console.error(e)
-              alert('error occured when loading plugin "'+config.name+'": '+e.toString())
+            alert('error occured when loading plugin "' + config.name + '": ' + e.toString())
           }
         }
         // TODO: setup this promise all, it's now cause unknown problem
@@ -326,18 +355,19 @@ export default {
           files: this.selected_files
         }
       }
+      this.generateGridPosition(w)
       this.windows.push(w)
     },
     runWorkflow(joy) {
       console.log('run workflow.', this.activeWindows)
-      const w = this.activeWindows[this.activeWindows.length-1] || {}
+      const w = this.activeWindows[this.activeWindows.length - 1] || {}
       joy.workflow.execute(w.data || {}).then((my) => {
         console.log('result', my)
       })
     },
     runPanel(joy, panel) {
       console.log('run panel.', this.activeWindows)
-      const w = this.activeWindows[this.activeWindows.length-1] || {}
+      const w = this.activeWindows[this.activeWindows.length - 1] || {}
       joy._panel.execute(w.data || {}).then((my) => {
         console.log('result', my)
       })
@@ -414,7 +444,13 @@ export default {
       return config
     },
     preLoadPlugin(template) {
-      const config = {name: template.name, mode: template.mode, type: template.type, tags: template.tags, init: template.init}
+      const config = {
+        name: template.name,
+        mode: template.mode,
+        type: template.type,
+        tags: template.tags,
+        init: template.init
+      }
       //generate a random id for the plugin
       return new Promise((resolve, reject) => {
         config.id = template.name.trim().replace(/ /g, '_') + '_' + randId()
@@ -615,7 +651,7 @@ export default {
             throw 'no plugin registered for window type: ', wconfig.type
           }
           // console.log(window_config)
-          const pconfig = _clone(wconfig)//_clone(window_config)
+          const pconfig = _clone(wconfig) //_clone(window_config)
           //generate a new window id
           pconfig.mode = window_config.mode
           pconfig.id = window_config.name.trim().replace(/ /g, '_') + '_' + randId()
@@ -788,5 +824,29 @@ export default {
 
 .floating-fab {
   margin-top: 40px;
+}
+
+
+div#dropzone {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 9999999999;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  transition: visibility 175ms, opacity 175ms;
+  display: table;
+  text-shadow: 1px 1px 2px #000;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.45);
+  font: bold 42px Oswald, DejaVu Sans, Tahoma, sans-serif;
+}
+
+div#textnode {
+  display: table-cell;
+  text-align: center;
+  vertical-align: middle;
+  transition: font-size 175ms;
 }
 </style>
