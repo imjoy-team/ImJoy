@@ -56,6 +56,10 @@
           <div v-else-if="w.type=='imjoy/panel'">
             <joy :config="w.config"></joy>
           </div>
+          <div v-else-if="w.type=='imjoy/generic'">
+            <p>generic data</p>
+            <!-- <p v-for="(v, k) in w.data">{{k}}:{{v}}</p> -->
+          </div>
           <div v-else class="plugin-iframe">
             <md-button class="iframe-load-button" @click="w.click2load=false;w.renderWindow(w)" v-if="w.click2load">Click to load the window</md-button>
             <div :id="w.iframe_container" class="plugin-iframe">

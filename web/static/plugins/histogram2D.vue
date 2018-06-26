@@ -20,45 +20,31 @@ class Histogram2dPlugin {
       name: "render 2D histogram",
       type: "localization/render_2d_histogram",
       tags: ["localization", "op", "histogram"],
-      ui: "Render a histogram with pixel size {id:'pixel_size', type:'number', placeholder: 20}nm",
+      ui: "Render a histogram with pixel size={id:'pixel_size', type:'number', placeholder: 20}nm<br> width={id:'width', type:'number', placeholder: 2560} <br> height={id:'height', type:'number', placeholder: 2560}",
     })
   }
 
   async run(my){
-    const pixel_size = my.config.pixel_size
     try {
-      var data = e.data
-      var options = data.options
-      var canvas_data = data.canvas_img_data.data;  // the array of RGBA values
-      var xx = options.tableDict.x
-      var yy = options.tableDict.y
-      var ff = options.tableDict.frame
-      var rows = options.rows
-      var xy_range = options.xy_range
-      var width = options.histogram_width
-      var height = options.histogram_height
-      var table_dict = options.tableDict
-      var pixel_size = options.pixel_size
-      var isFiltered = options.isFiltered
-
-      var i = canvas_data.length
-      while(i--){
-        if(i%4 == 3){
-          canvas_data[i] = 255
-        }
-        else {
-          canvas_data[i] = 0
-        }
-      }
+      var pixel_size = my.config.pixel_size
+      var data = my.data.table
+      var width = my.config.width
+      var height = my.config.height
+      var canvas_data = new Uint16Array(new ArrayBuffer(width*height*2)); //uint16
+      var xx = data.tableDict.x
+      var yy = data.tableDict.y
+      var ff = data.tableDict.frame
+      var rows = data.rows
+      var table_dict = data.tableDict
+      var isFiltered = data.isFiltered
       var progress = 0
-
       for (var line = 0; line < rows; line++) {
           var newProgress = Math.floor(100 * line / (rows+0.5));
           if(newProgress != progress){
               progress = newProgress
               // self.postMessage({progress:progress});
               console.log(progress)
-              my.progress(progress)
+              // my.progress(progress)
           }
           if(isFiltered && !isFiltered[line]) continue
           var f = parseInt(ff[line])
@@ -67,29 +53,15 @@ class Histogram2dPlugin {
           if(!f || !x || !y ){
             continue
           }
-          if(y-xy_range[2]>height || x-xy_range[0]>width) continue
-
-          var s = 4 * (y-xy_range[2]) * width + 4 * (x-xy_range[0]);  // calculate the index in the array
-          if(isNaN(canvas_data[s] )){
-            continue
-          }
-          if(!canvas_data[s]){
-            canvas_data[s] = 0
-          }
-          var v = canvas_data[s]+1
-          if(v<=255){
-            canvas_data[s] = v
-            canvas_data[s+1] = v
-            canvas_data[s+2] = v
-            canvas_data[s+3] = 255
-          }
+          if(y>height || x>width) continue
+          var s =y * width + x;  // calculate the index in the array
+          canvas_data[s] = canvas_data[s]+1
       }
       my.data = {}
-      my.data.canvas_data = data.canvas_img_data
+      my.data.canvas_data = canvas_data
       return my
     } catch (e) {
       console.error(e)
-      throw e
     }
   }
 }

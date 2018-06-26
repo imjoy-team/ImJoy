@@ -371,6 +371,9 @@ export default {
       const w = this.activeWindows[this.activeWindows.length - 1] || {}
       joy._panel.execute(w.data || {}).then((my) => {
         console.log('result', my)
+        my.name = 'result'
+        my.type = 'imjoy/generic'
+        this.createWindow(my)
       })
     },
     selectFileChanged(file_list) {
@@ -474,9 +477,7 @@ export default {
             c.progress = my.progress
             c.data = my.data
             c.config = my.config
-            this.createWindow(c, {
-              id: c.id
-            })
+            this.createWindow(c)
           }
         }
         this.register(config, {
@@ -567,7 +568,7 @@ export default {
             }
           }
           console.log('adding joy op', config)
-          const joy_template = _clone(config)
+          const joy_template = config
           joy_template.init = joy_template.ui
           joy_template.ui = null
           Joy.add(joy_template);
@@ -651,11 +652,11 @@ export default {
           throw error
         }
         console.log('window config', wconfig)
-        const source_plugin = this.plugins[_plugin.id]
         if (wconfig.type.startsWith('imjoy')) {
           console.log('creating imjoy window', wconfig)
           // wconfig.window_id = 'plugin_window_'+plugin._id+randId()
-          this.windows.unshift(wconfig)
+          this.windows.push(wconfig)
+          return true
         } else {
           const window_config = this.registered.windows[wconfig.type]
           console.log(window_config)
@@ -668,7 +669,7 @@ export default {
           //generate a new window id
           pconfig.mode = window_config.mode
           pconfig.id = window_config.name.trim().replace(/ /g, '_') + '_' + randId()
-          console.log('creating window: ', pconfig, source_plugin)
+          console.log('creating window: ', pconfig)
           if (pconfig.mode != 'iframe') {
             throw 'Window plugin must be with mode "iframe"'
           }
