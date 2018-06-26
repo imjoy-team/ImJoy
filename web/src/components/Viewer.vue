@@ -60,7 +60,7 @@
 
       <md-card>
         <md-card-header>
-          <h3>Workflow</h3>
+          <span class="md-subheading">Workflow</span>
         </md-card-header>
         <md-card-content>
           <joy :config="workflow_joy_config" :showHeader="false" ref="workflow" @run="runWorkflow" v-if="plugin_loaded"></joy>
@@ -70,7 +70,7 @@
       <div v-if="plugin_loaded">
         <md-card>
           <md-card-header>
-            <h3>Plugins</h3>
+            <span class="md-subheading">Plugins</span>
           </md-card-header>
           <md-card-content>
           <div v-for="panel in panels" :key="panel.id">
@@ -314,7 +314,7 @@ export default {
         this.default_window_pos.x = 0
         this.default_window_pos.y = this.default_window_pos.y + this.default_window_pos.h
       }
-
+      console.log('set window position to ', config.x, config.y, config.w, config.h, config.i)
       this.default_window_pos.i = this.default_window_pos.i + 1
     },
     loadData() {
@@ -678,7 +678,7 @@ export default {
         config.data = config.data || null
         config.config = config.config || {}
         config.panel = config.panel || null
-        this.generateGridPosition(config)
+        // this.generateGridPosition(config)
         if (!WINDOW_SCHEMA(config)) {
           const error = WINDOW_SCHEMA.errors(config)
           console.error("Error occured during creating window " + config.name, error)
@@ -703,20 +703,20 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 .site-title {
-  font-size: 30px;
+  font-size: 35px;
   font-weight: 300;
 }
 
 @media screen and (max-width: 600px) {
   .site-title {
-    font-size: 25px;
+    font-size: 26px;
     font-weight: 250;
   }
 }
 
 @media screen and (max-width: 400px) {
   .site-title {
-    font-size: 20px;
+    font-size: 22px;
     font-weight: 220;
   }
 }

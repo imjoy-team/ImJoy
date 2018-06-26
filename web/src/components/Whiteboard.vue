@@ -1,7 +1,7 @@
 <template>
 <div class="whiteboard noselect" ref="whiteboard">
   <div class="overlay" @click="dragging=false" v-if="dragging"></div>
-  <grid-layout :layout="windows" :col-num="18" :row-height="30" :is-draggable="true" :is-resizable="true" :vertical-compact="true" :margin="[10, 10]" :use-css-transforms="true">
+  <grid-layout :layout="windows" :col-num="20" :is-mirrored="false" :auto-size="true" :row-height="30" :is-draggable="true" :is-resizable="true" :vertical-compact="false" :margin="[10, 10]" :use-css-transforms="true">
     <grid-item v-for="(w, wi) in windows" :x="w.x" :y="w.y" :w="w.w" :h="w.h" :i="w.i" @resize="startDragging(w)"
                    @move="startDragging(w)" @resized="dragging=false" @moved="dragging=false" :key="w.iframe_container">
       <md-card>
