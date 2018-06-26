@@ -5,13 +5,14 @@
   "version": "0.0.1",
   "api_version": "0.1.0",
   "createdAt": "Mon Jun 19 2018 15:45:30",
-  "file_path": "/Histogram2D/histogram2D.js",
+  "file_path": "/histogram2D.vue",
   "description": "A plugin for render 2D histogram from a localization table.",
   "tags": ["localization", "render"],
   "thunbnail": null,
   "dependencies": ["Lookup Table"]
 }
-<config>
+</config>
+
 <script>
 class Histogram2dPlugin {
   setup(){

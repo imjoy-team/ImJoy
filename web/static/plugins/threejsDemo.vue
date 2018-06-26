@@ -9,7 +9,7 @@
   "version": "0.0.1",
   "api_version": "0.0.1",
   "createdAt": "Mon Jun 19 2018 15:45:30",
-  "file_path": "/ThreejsDemo/threejsDemo.js",
+  "file_path": "/threejsDemo.vue",
   "description": "A plugin for demonstrate that one can use Three.js in a plugin.",
   "thunbnail": null,
   "dependencies": []

@@ -620,11 +620,12 @@ function randId() {
      * @param {String} url of a plugin source
      * @param {Object} _interface to provide for the plugin
      */
-    var Plugin = function( config, _interface) {
+    var Plugin = function( template, config, _interface) {
+        this.template = template
         this.config = config
         this.id = config.id || randId()
-        this.mode = config.mode || 'webworker'
-        this._path = config.file_path;
+        this.mode = template.mode || 'webworker'
+        this._path = template.file_path;
         this._initialInterface = _interface||{};
         this._connect();
     };
@@ -637,13 +638,15 @@ function randId() {
      * @param {String} code of the plugin
      * @param {Object} _interface to provide to the plugin
      */
-    var DynamicPlugin = function(config, _interface) {
+    var DynamicPlugin = function(template, config, _interface) {
+        this.template = template
         this.config = config
-        if(!this.config.script){
+        console.log('template: ', template, 'config: ', config)
+        if(!this.template.script){
           throw "you must specify the script for the plugin to run."
         }
         this.id = config.id || randId()
-        this.mode = config.mode || 'webworker'
+        this.mode = template.mode || 'webworker'
         this._initialInterface = _interface||{};
         this._connect();
     };
@@ -755,9 +758,9 @@ function randId() {
             me._requestRemote();
         }
 
-        this._connection.execute({type: 'script', content: this.config.script}, sCb, this._fCb);
-        if(this.config.style) this._connection.execute({type: 'style', content: this.config.style}, sCb, this._fCb);
-        if(this.config.html) this._connection.execute({type: 'html', content: this.config.html}, sCb, this._fCb);
+        this._connection.execute({type: 'script', content: this.template.script}, sCb, this._fCb);
+        if(this.template.style) this._connection.execute({type: 'style', content: this.template.style}, sCb, this._fCb);
+        if(this.template.html) this._connection.execute({type: 'html', content: this.template.html}, sCb, this._fCb);
     }
 
 

@@ -253,13 +253,14 @@ export default {
           const config = result.rows[i].doc
           this.installed_plugins.push(config)
           try {
-            const c = this.parsePluginCode(config.plugin_code, config.file_path)
-            if (c.mode == 'iframe' && c.tags.includes('window')) {
-              promises.push(this.preLoadPlugin(c))
+            const template = this.parsePluginCode(config.plugin_code, config)
+            if (template.mode == 'iframe' && template.tags.includes('window')) {
+              promises.push(this.preLoadPlugin(template))
             } else {
-              promises.push(this.loadPlugin(c))
+              promises.push(this.loadPlugin(template))
             }
           } catch (e) {
+            console.error(e)
               alert('error occured when loading plugin "'+config.name+'": '+e.toString())
           }
         }
@@ -359,14 +360,16 @@ export default {
     closePanel(panel) {
 
     },
-    parsePluginCode(code, file_path) {
-      let config = {}
+    parsePluginCode(code, config) {
+      config = config || {}
+      const file_path = config.file_path
       if (file_path.endsWith('.vue')) {
         console.log('parsing the plugin file')
         const pluginComp = parseComponent(code)
         console.log('code parsed from', pluginComp)
         for (let i = 0; i < pluginComp.customBlocks.length; i++) {
           if (pluginComp.customBlocks[i].type == 'config') {
+            console.log(pluginComp.customBlocks[i].content)
             // find the first config block
             config = JSON.parse(pluginComp.customBlocks[i].content)
             break
@@ -410,19 +413,25 @@ export default {
       }
       return config
     },
-    preLoadPlugin(config) {
+    preLoadPlugin(template) {
+      const config = {name: template.name, mode: template.mode, type: template.type, tags: template.tags, init: template.init}
       //generate a random id for the plugin
       return new Promise((resolve, reject) => {
+        config.id = template.name.trim().replace(/ /g, '_') + '_' + randId()
         const plugin = {
           id: config.id,
-          config: _clone(config)
+          config: config,
+          template: template,
+          mode: template.mode
         }
         this.plugins[plugin.id] = plugin
         config.force_show = false
         plugin.api = {
           run: (my) => {
-            const c = _clone(config)
-            c.op = my.op
+            const c = {}
+            c.type = template.type
+            c.name = template.name
+            // c.op = my.op
             c.progress = my.progress
             c.data = my.data
             c.config = my.config
@@ -434,14 +443,15 @@ export default {
         this.register(config, {
           id: config.id
         })
-        console.log('sucessfully registered plugin: ', plugin)
+        console.log('sucessfully preloaded plugin: ', plugin)
         resolve()
       })
     },
     loadPlugin(config) {
+      config = _clone(config)
       //generate a random id for the plugin
       return new Promise((resolve, reject) => {
-        const plugin = new jailed.DynamicPlugin(_clone(config), this.plugin_api)
+        const plugin = new jailed.DynamicPlugin(config, {}, this.plugin_api)
         plugin.whenConnected(() => {
           if (!plugin.api) {
             console.error('error occured when loading plugin.')
@@ -470,6 +480,7 @@ export default {
         const plugin = this.plugins[_plugin.id]
         config.mode = config.mode || 'webworker'
         config.show_panel = config.show_panel || true
+        console.log('registering op', config)
         if (!REGISTER_SCHEMA(config)) {
           const error = REGISTER_SCHEMA.errors(config)
           console.error("Error occured during registering " + config.name, error)
@@ -513,8 +524,9 @@ export default {
           Joy.add(config);
           //update the joy workflow if new template added, TODO: preserve settings during reload
           if (this.$refs.workflow) this.$refs.workflow.setupJoy()
-          this.registered.ops[config.type] = config
           plugin.config.type = config.type
+          console.log('register op plugin: ', plugin.template)
+          this.registered.ops[config.type] = plugin.template
           const panel_config = {
             name: config.name,
             id: _plugin.id,
@@ -532,7 +544,8 @@ export default {
           if (config.mode != 'iframe') {
             throw 'Window plugin must be with type "iframe"'
           }
-          this.registered.windows[config.type] = plugin.config
+          console.log('register window plugin: ', plugin.template)
+          this.registered.windows[config.type] = plugin.template
         }
         if (config.tags.includes('file_importer')) {
           throw "file importer not supported yet"
@@ -549,7 +562,7 @@ export default {
     },
     renderWindow(pconfig) {
       console.log('rendering window', pconfig)
-      const plugin = new jailed.DynamicPlugin(pconfig, this.plugin_api)
+      const plugin = new jailed.DynamicPlugin(pconfig.plugin, pconfig, this.plugin_api)
       plugin.whenConnected(() => {
         if (!plugin.api) {
           console.error('the window plugin seems not ready.')
@@ -578,7 +591,7 @@ export default {
     },
     createWindow(wconfig, _plugin) {
       try {
-        wconfig.type = wconfig.type || "imjoy/panel"
+        // wconfig.type = wconfig.type || "imjoy/panel"
         wconfig.data = wconfig.data || null
         wconfig.force_show = wconfig.force_show || false
         wconfig.panel = wconfig.panel || null
@@ -588,6 +601,7 @@ export default {
           console.error("Error occured during creating window " + wconfig.name, error)
           throw error
         }
+        console.log('window config', wconfig)
         const source_plugin = this.plugins[_plugin.id]
         if (wconfig.type == 'joy_panel') {
           console.log('creating imjoy/panel', wconfig)
@@ -600,14 +614,11 @@ export default {
             console.error('no plugin registered for window type: ', wconfig.type)
             throw 'no plugin registered for window type: ', wconfig.type
           }
-          console.log(window_config)
-          const pconfig = _clone(window_config)
+          // console.log(window_config)
+          const pconfig = _clone(wconfig)//_clone(window_config)
           //generate a new window id
-          pconfig.id = pconfig.name.trim().replace(/ /g, '_') + '_' + randId()
-          pconfig.config = wconfig.config
-          pconfig.data = wconfig.data
-          pconfig.config = wconfig.config
-          pconfig.force_show = wconfig.force_show
+          pconfig.mode = window_config.mode
+          pconfig.id = window_config.name.trim().replace(/ /g, '_') + '_' + randId()
           console.log('creating window: ', pconfig, source_plugin)
           if (pconfig.mode != 'iframe') {
             throw 'Window plugin must be with mode "iframe"'
@@ -615,7 +626,7 @@ export default {
           // this is a unique id for the iframe to attach
           pconfig.iframe_container = 'plugin_window_' + pconfig.id + randId()
           pconfig.iframe_window = null
-
+          pconfig.plugin = window_config
           if (wconfig.force_show) {
             pconfig.click2load = false
             pconfig.loadWindow = null
@@ -674,7 +685,7 @@ export default {
           throw error
         }
         //TODO: verify fields with WINDOW_TEMPLATE
-        console.log('creating window: ', config)
+        console.log('creating plugin window: ', config)
         this.windows.push(config)
         // container IS NOT finished rendering to the DOM
         // this.$nextTick(()=>{
