@@ -136,7 +136,7 @@ export default {
         this.dragging = true
         // this.$forceUpdate()
       // }, 100)
-        this.selectWindow(w)
+        this.selectWindow(w, {})
     },
     stopDragging() {
       setTimeout(() => {

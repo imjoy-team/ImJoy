@@ -608,7 +608,7 @@ export default {
           pconfig.data = wconfig.data
           pconfig.config = wconfig.config
           pconfig.force_show = wconfig.force_show
-          console.log('creating window----: ', pconfig, source_plugin)
+          console.log('creating window: ', pconfig, source_plugin)
           if (pconfig.mode != 'iframe') {
             throw 'Window plugin must be with mode "iframe"'
           }
