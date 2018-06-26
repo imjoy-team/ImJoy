@@ -46,10 +46,10 @@ function build3d(text) {
   var dpr = window.devicePixelRatio;
   var textureSize = 128 * dpr;
   var vector = new THREE.Vector2();
-  ui();
+  init();
   animate();
 
-  function ui() {
+  function init() {
     //
     var width = window.innerWidth;
     var height = window.innerHeight;

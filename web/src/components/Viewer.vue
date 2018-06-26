@@ -566,7 +566,11 @@ export default {
               }
             }
           }
-          Joy.add(config);
+          console.log('adding joy op', config)
+          const joy_template = _clone(config)
+          joy_template.init = joy_template.ui
+          joy_template.ui = null
+          Joy.add(joy_template);
           //update the joy workflow if new template added, TODO: preserve settings during reload
           if (this.$refs.workflow) this.$refs.workflow.setupJoy()
           plugin.config.type = config.type

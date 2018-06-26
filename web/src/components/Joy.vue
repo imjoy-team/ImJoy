@@ -94,6 +94,7 @@ export default {
           }
         }
       }
+      console.log('setting up joy ', this.config)
       this.joy = Joy(joy_config);
     },
     runJoy() {

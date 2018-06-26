@@ -118,7 +118,7 @@ function _loadFile(file, format) {
               else{
                 transformedHeaders[header] = escapedTitle.replace(/[^a-zA-Z0-9]+/g,'_').trim()
               }
-              if(transformedHeaders[header] .startsWith('_')){
+              if(transformedHeaders[header].startsWith('_')){
                 transformedHeaders[header]  = transformedHeaders[header].slice(1)
               }
               min[header] = Number.POSITIVE_INFuiY;
@@ -250,7 +250,7 @@ class TextFilePlugin {
   }
   async run(my){
     try {
-      console.log(my)
+      console.log('running in the plugin', my)
       const format = {
         header_row: my.config.header_row.startsWith('read headers')? 0 : -1,
         delimiter: my.config.delimiter,
