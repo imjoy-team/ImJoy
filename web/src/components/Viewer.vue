@@ -603,8 +603,8 @@ export default {
         }
         console.log('window config', wconfig)
         const source_plugin = this.plugins[_plugin.id]
-        if (wconfig.type == 'joy_panel') {
-          console.log('creating imjoy/panel', wconfig)
+        if (wconfig.type.startsWith('imjoy')) {
+          console.log('creating imjoy window', wconfig)
           // wconfig.window_id = 'plugin_window_'+plugin._id+randId()
           this.windows.unshift(wconfig)
         } else {
