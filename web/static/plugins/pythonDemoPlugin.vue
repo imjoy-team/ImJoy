@@ -1,6 +1,6 @@
 <config>
 {
-  "name": "2D Histogram",
+  "name": "Python Demo Plugin",
   "mode": "webworker",
   "version": "0.0.1",
   "api_version": "0.1.0",

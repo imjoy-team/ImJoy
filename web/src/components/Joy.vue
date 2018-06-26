@@ -68,7 +68,7 @@ export default {
         container: this.$refs.editor,
 
         // The words & ops inside the editor:
-        init: this.config.init || '', //"{id:'localizationWorkflow', type:'ops'} " + // a list of ops
+        init: this.config.ui || '', //"{id:'localizationWorkflow', type:'ops'} " + // a list of ops
         //"<hr> {type:'save'}", // a save button!
 
         // Load data from URL, otherwise blank:

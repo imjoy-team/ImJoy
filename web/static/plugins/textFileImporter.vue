@@ -5,7 +5,7 @@
   "version": "0.0.1",
   "api_version": "0.1.0",
   "createdAt": "Mon Jun 18 2018 21:46:36",
-  "file_path": "/textFileImporter.vue",
+  "url": "/textFileImporter.vue",
   "description": "A plugin for loading localization table from text files.",
   "tags": ["localization", "importer"],
   "thunbnail": null,
@@ -121,8 +121,8 @@ function _loadFile(file, format) {
               if(transformedHeaders[header] .startsWith('_')){
                 transformedHeaders[header]  = transformedHeaders[header].slice(1)
               }
-              min[header] = Number.POSITIVE_INFINITY;
-              max[header] = Number.NEGATIVE_INFINITY;
+              min[header] = Number.POSITIVE_INFuiY;
+              max[header] = Number.NEGATIVE_INFuiY;
               avg[header] = 0;
           }
 
@@ -242,7 +242,7 @@ class TextFilePlugin {
       name: "load text file",
       type: "localization/text_loader",
       tags: ["localization", "op", "file_loader"],
-      init: "Load a table from the file: <br>"+
+      ui: "Load a table from the file: <br>"+
       "add \"{id:'append_header', type:'string', placeholder:''}\" to the first line (optional); " +
       "{id:'header_row', type:'choose', options:['read headers from the first line','use index as the header'], placeholder:'read headers from the first line'} and " +
       "use {id:'delimiter', type:'string', placeholder:','} to seperate columns."

@@ -4,12 +4,12 @@
   "type": "threejs/demo",
   "mode": "iframe",
   "tags": ["3d", "op", "window"],
-  "init": "show three.js demo",
+  "ui": "show three.js demo",
   "show_panel": true,
   "version": "0.0.1",
   "api_version": "0.0.1",
   "createdAt": "Mon Jun 19 2018 15:45:30",
-  "file_path": "/threejsDemo.vue",
+  "url": "/threejsDemo.vue",
   "description": "A plugin for demonstrate that one can use Three.js in a plugin.",
   "thunbnail": null,
   "dependencies": []
@@ -46,10 +46,10 @@ function build3d(text) {
   var dpr = window.devicePixelRatio;
   var textureSize = 128 * dpr;
   var vector = new THREE.Vector2();
-  init();
+  ui();
   animate();
 
-  function init() {
+  function ui() {
     //
     var width = window.innerWidth;
     var height = window.innerHeight;

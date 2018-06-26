@@ -5,7 +5,7 @@
   "version": "0.0.1",
   "api_version": "0.1.0",
   "createdAt": "Mon Jun 19 2018 16:33:11",
-  "file_path": "/LookupTable.vue",
+  "url": "/LookupTable.vue",
   "description": "A plugin for applying lookup table to a single-channel image.",
   "tags": ["image", "LUT"],
   "thunbnail": null,
@@ -27,7 +27,7 @@ class LookupTablePlugin {
         type: "image",
         tags: ['color']
       },
-      init: "apply LUT {id:'lut', type:'choose', options:['hot', 'rainbow'], placeholder: 'hot'}",
+      ui: "apply LUT {id:'lut', type:'choose', options:['hot', 'rainbow'], placeholder: 'hot'}",
       show_panel: true,
       onupdate: {
         lut: 'update'
@@ -36,11 +36,11 @@ class LookupTablePlugin {
   }
   update(config){
     console.log('update running in the plugin', config)
-    return {init: "apply LUT {id:'lut', type:'choose', options:['hot', 'rainbow', 'hello'], placeholder: 'hot'}"}
+    return {ui: "apply LUT {id:'lut', type:'choose', options:['hot', 'rainbow', 'hello'], placeholder: 'hot'}"}
   }
   buttonCallback(config){
     console.log('button callback running in the plugin', config)
-    return {init: "apply LUT {id:'lut', type:'choose', options:['hot', 'rainbow', 'hello'], placeholder: 'hot'}"}
+    return {ui: "apply LUT {id:'lut', type:'choose', options:['hot', 'rainbow', 'hello'], placeholder: 'hot'}"}
   }
   async run(my) {
     const lut = my.config.lut
@@ -48,7 +48,7 @@ class LookupTablePlugin {
 
     api.showDialog({
       name: "LUT Window",
-      init: "Hey this is a dialog: {id:'heos', type:'choose', options:['1', '3'], placeholder: '1'}",
+      ui: "Hey this is a dialog: {id:'heos', type:'choose', options:['1', '3'], placeholder: '1'}",
       onupdate:{
         btt: 'buttonCallback'
       }
@@ -58,7 +58,7 @@ class LookupTablePlugin {
       api.createWindow({
         name: "LUT Window",
         type: "imjoy/panel",
-        config: {init: "Choose a LUT: {id:'lut', type:'choose', options:['hot', 'rainbow'], placeholder: 'hot'}", width: 500, height: 200}
+        config: {ui: "Choose a LUT: {id:'lut', type:'choose', options:['hot', 'rainbow'], placeholder: 'hot'}", width: 500, height: 200}
       })
     })
     return my

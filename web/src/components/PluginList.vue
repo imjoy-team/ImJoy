@@ -1,4 +1,4 @@
-<template>
+url<template>
 <div class="plugin-list">
   <!-- <md-subheader>Options</md-subheader> -->
   <md-subheader v-if="title">{{title}}</md-subheader>
@@ -114,11 +114,11 @@ export default {
       for (let i = 0; i < this.available_plugins.length; i++) {
         const plugin = this.available_plugins[i]
         console.log(plugin)
-        if (!plugin.file_path.startsWith('http')) {
-          if (!plugin.file_path.startsWith) {
-            plugin.file_path = '/' + plugin.file_path
+        if (!plugin.url.startsWith('http')) {
+          if (!plugin.url.startsWith) {
+            plugin.url = '/' + plugin.url
           }
-          plugin.file_path = this.plugin_dir + plugin.file_path
+          plugin.url = this.plugin_dir + plugin.url
         }
         plugin._id = plugin._id || plugin.name.replace(/ /g, '_')
         this.db.get(plugin._id).then((doc) => {
@@ -132,7 +132,7 @@ export default {
     },
     edit(plugin) {
       this.db.get(plugin._id).then((doc) => {
-        this.editorCode = doc.plugin_code
+        this.editorCode = doc.code
         this.editorOptions = {
           tabSize: 4,
           mode: 'text/javascript',
@@ -149,7 +149,7 @@ export default {
 
     },
     saveCode() {
-      this.editorPlugin.plugin_code = this.editorCode
+      this.editorPlugin.code = this.editorCode
       this.db.get(this.editorPlugin._id).then((doc)=>{
         this.editorPlugin._id = this.editorPlugin.name.replace(/ /g, '_')
         this.editorPlugin._rev = doc._rev
@@ -175,12 +175,12 @@ export default {
       });
     },
     install(plugin) {
-      axios.get(plugin.file_path).then(response => {
+      axios.get(plugin.url).then(response => {
         if (!response || !response.data || response.data == '') {
-          alert('failed to get plugin code from ' + plugin.file_path)
+          alert('failed to get plugin code from ' + plugin.url)
           return
         }
-        plugin.plugin_code = response.data
+        plugin.code = response.data
         plugin._id = plugin.name.replace(/ /g, '_')
         if(plugin.dependencies){
           for(let i=0;i<plugin.dependencies.length;i++){

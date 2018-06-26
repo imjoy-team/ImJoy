@@ -105,9 +105,9 @@ function build3d(){
   var dpr = window.devicePixelRatio;
   var textureSize = 128 * dpr;
   var vector = new THREE.Vector2();
-  init();
+  ui();
   animate();
-  function init() {
+  function ui() {
   	//
   	var width = window.innerWidth;
   	var height = window.innerHeight;
@@ -198,7 +198,7 @@ class Histogram2dPlugin {
       name: "render 2D histogram",
       type: "localization/render_2d_histogram",
       tags: ["localization", "op", "histogram"],
-      init: "Render a histogram with pixel size {id:'pixel_size', type:'number', placeholder: 20}nm",
+      ui: "Render a histogram with pixel size {id:'pixel_size', type:'number', placeholder: 20}nm",
     })
   }
 

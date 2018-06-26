@@ -129,7 +129,7 @@
             <md-file v-model="file_model" @md-change="selectFileChanged" webkitdirectory mozdirectory msdirectory odirectory directory multiple/>
           </md-field>
         </div>
-        <joy init="{id:'file_load_workflow', type:'ops'}" v-if="plugin_loaded"></joy>
+        <joy ui="{id:'file_load_workflow', type:'ops'}" v-if="plugin_loaded"></joy>
       </div>
     </md-dialog-content>
     <md-dialog-actions>
@@ -183,7 +183,7 @@ export default {
       workflow_joy_config: {
         expanded: true,
         name: "Workflow",
-        init: "{id:'workflow', type:'ops'}",
+        ui: "{id:'workflow', type:'ops'}",
         onupdate: this.workflowOnchange
       },
       default_window_pos: {
@@ -283,7 +283,7 @@ export default {
           const config = result.rows[i].doc
           this.installed_plugins.push(config)
           try {
-            const template = this.parsePluginCode(config.plugin_code, config)
+            const template = this.parsePluginCode(config.code, config)
             if (template.mode == 'iframe' && template.tags.includes('window')) {
               promises.push(this.preLoadPlugin(template))
             } else {
@@ -393,20 +393,20 @@ export default {
     },
     parsePluginCode(code, config) {
       config = config || {}
-      const file_path = config.file_path
-      if (file_path.endsWith('.vue')) {
+      const url = config.url
+      if (url.endsWith('.vue')) {
         console.log('parsing the plugin file')
         const pluginComp = parseComponent(code)
         console.log('code parsed from', pluginComp)
         for (let i = 0; i < pluginComp.customBlocks.length; i++) {
           if (pluginComp.customBlocks[i].type == 'config') {
-            console.log(pluginComp.customBlocks[i].content)
             // find the first config block
             config = JSON.parse(pluginComp.customBlocks[i].content)
             break
           }
         }
         config.script = pluginComp.script.content
+        config.lang = pluginComp.script.attrs.lang || 'javascript'
         for (let i = 0; i < pluginComp.customBlocks.length; i++) {
           if (pluginComp.customBlocks[i].type == 'html') {
             // find the first html block
@@ -427,13 +427,14 @@ export default {
           config.style = null
         }
       } else {
+        config.lang = config.lang || 'javascript'
         config.script = code
         config.style = null
         config.html = null
       }
       config._id = config._id || null
-      config.file_path = file_path
-      config.plugin_code = code
+      config.url = url
+      config.code = code
       config.id = config.name.trim().replace(/ /g, '_') + '_' + randId()
       config.iframe_container = null
       config.iframe_window = null
@@ -450,7 +451,7 @@ export default {
         mode: template.mode,
         type: template.type,
         tags: template.tags,
-        init: template.init
+        ui: template.ui
       }
       //generate a random id for the plugin
       return new Promise((resolve, reject) => {
@@ -573,7 +574,7 @@ export default {
           const panel_config = {
             name: config.name,
             id: _plugin.id,
-            init: "{id: '_panel', type: '" + config.type + "'}",
+            ui: "{id: '_panel', type: '" + config.type + "'}",
             onexecute: config.onexecute
           }
           plugin.panel_config = panel_config

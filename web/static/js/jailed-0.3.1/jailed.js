@@ -625,7 +625,7 @@ function randId() {
         this.config = config
         this.id = config.id || randId()
         this.mode = template.mode || 'webworker'
-        this._path = template.file_path;
+        this._path = template.url;
         this._initialInterface = _interface||{};
         this._connect();
     };

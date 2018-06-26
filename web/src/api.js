@@ -3,13 +3,12 @@ import schema from 'js-schema'
 export const PLUGIN_SCHEMA= schema({
   _id: [null, String],
   name: String,
-  file_path: [null, String],
-  plugin_code: String,
-  script: String,
+  url: [null, String],
+  code: String,
+  lang: [null, String],
+  script: [null, String],
   style: [null, String],
-  html: [null, String],
-  iframe_container: [null, String, Object],
-  iframe_window: [null, Object]
+  html: [null, String]
 })
 
 export const REGISTER_SCHEMA= schema({
@@ -17,7 +16,7 @@ export const REGISTER_SCHEMA= schema({
   type: String,
   mode: String,
   tags: Array,
-  init: String,
+  ui: String,
   show_panel: Boolean
 })
 
@@ -33,7 +32,7 @@ export const WINDOW_SCHEMA= schema({
 export const OP_SCHEMA = {
   name: String,
   type: String,
-  init: String,
+  ui: String,
   tags: Array,
   run: [null, String]
 }
