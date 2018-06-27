@@ -5,8 +5,6 @@ import router from './router'
 import VueMaterial from 'vue-material'
 import 'vue-material/dist/vue-material.min.css'
 import 'vue-material/dist/theme/default.css' // This line here
-import VueCodemirror from 'vue-codemirror'
-import 'codemirror/lib/codemirror.css'
 import vueSlider from 'vue-slider-component'
 
 import Navbar from '@/components/Navbar'
@@ -17,6 +15,7 @@ import Whiteboard from '@/components/Whiteboard'
 import Joy from '@/components/Joy'
 import FAQ from '@/components/FAQ'
 import PluginList from '@/components/PluginList'
+import PluginEditor from '@/components/PluginEditor'
 import store from './store.js'
 import App from './App'
 import VueGridLayout from 'vue-grid-layout'
@@ -25,7 +24,6 @@ import VueGridLayout from 'vue-grid-layout'
 Vue.config.productionTip = false
 
 Vue.use(VueMaterial)
-Vue.use(VueCodemirror)
 
 // register
 Vue.component('vue-slider', vueSlider)
@@ -37,6 +35,7 @@ Vue.component('about', About)
 Vue.component('whiteboard', Whiteboard)
 Vue.component('joy', Joy)
 Vue.component('plugin-list', PluginList)
+Vue.component('plugin-editor', PluginEditor)
 Vue.component('grid-layout', VueGridLayout.GridLayout)
 Vue.component('grid-item', VueGridLayout.GridItem)
 

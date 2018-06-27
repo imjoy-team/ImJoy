@@ -28,7 +28,7 @@ url<template>
       <div class="md-toolbar-row">
         <h2>Code Editor</h2>
       </div>
-      <codemirror class="codemirror" v-model="editorCode" :options="editorOptions"></codemirror>
+      <plugin-editor class="code-editor" v-model="editorCode" :options="editorOptions"></plugin-editor>
 
     </md-dialog-content>
     <md-dialog-actions>
@@ -41,10 +41,6 @@ url<template>
 
 <script>
 import axios from 'axios';
-// language js
-import 'codemirror/mode/javascript/javascript.js'
-// theme css
-import 'codemirror/theme/base16-dark.css'
 
 export default {
   name: 'plugin-list',
@@ -134,11 +130,8 @@ export default {
       this.db.get(plugin._id).then((doc) => {
         this.editorCode = doc.code
         this.editorOptions = {
-          tabSize: 4,
-          mode: 'text/javascript',
-          theme: 'base16-dark',
-          lineNumbers: true,
-          line: true
+          mode: "ace/mode/javascript",
+          selectionStyle: "text"
         }
         this.editorPlugin = plugin
         this.showEditor = true
@@ -234,11 +227,11 @@ export default {
 }
 
 .editor-dialog{
-  /* width: 80%; */
+  width: 80%;
   height: 85%;
 }
 
-.codemirror {
+.code-editor {
   height: calc(100%)!important;
   width: calc(100%)!important;
 }
