@@ -57,8 +57,8 @@
             <joy :config="w.config"></joy>
           </div>
           <div v-else-if="w.type=='imjoy/generic'">
-            <p>generic data</p>
-            <!-- <p v-for="(v, k) in w.data">{{k}}:{{v}}</p> -->
+            <!-- <p>generic data</p> -->
+            <md-chip v-for="(v, k) in w.data">{{k}}</md-chip>
           </div>
           <div v-else class="plugin-iframe">
             <md-button class="iframe-load-button" @click="w.click2load=false;w.renderWindow(w)" v-if="w.click2load">Click to load the window</md-button>
@@ -102,11 +102,13 @@ export default {
       api: this.$root.$data.store.api
     }
   },
+  created() {
+    this.store.event_bus.$on('add_window', (w)=>{
+      this.selectWindow(w, {})
+    })
+  },
   mounted() {
-    setTimeout(() => {
-      this.dragging = false
-      this.$forceUpdate()
-    }, 500)
+
   },
   methods: {
     close(wi) {
@@ -163,7 +165,7 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 .whiteboard {
-  height: 100%;
+  height: calc(100% - 8px);
   position: relative;
   overflow: auto !important;
 }

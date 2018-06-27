@@ -2665,7 +2665,6 @@ Joy.module("instructions", function(){
 		init: "Repeat the following {id:'count', type:'number', min:1, placeholder:3} times: "+
 			  "{id:'ops', type:'ops', resetVariables:false}",
 		onexecute: async function(my){
-
 			// Previewing? How much to preview?
 			var param = 1;
 			if(my.data._PREVIEW!==undefined) param=my.data._PREVIEW;

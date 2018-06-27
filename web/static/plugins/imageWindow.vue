@@ -4,7 +4,7 @@
   "type": "simple 2D image window",
   "mode": "iframe",
   "tags": ["2d", "op", "window"],
-  "ui": "show image in 2D",
+  "ui": "show image",
   "show_panel": true,
   "version": "0.1.0",
   "api_version": "0.1.0",
@@ -26,16 +26,51 @@ This plugin is for dispalying 2d image.
    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.1/dist/leaflet.css"
    integrity="sha512-Rksm5RenBEKSKFjgI3a41vrjkw4EVPlJ3+OiI65vTjIdo9brlAacEuKOiQ5OFh7cOI1bkDwLqdLw3Zg0cRJAAQ=="
    crossorigin=""/>
+   <link rel="stylesheet" href="https://cdn.rawgit.com/leongersen/noUiSlider/aa64a6d9/distribute/nouislider.min.css"/>
    <div id="leaflet_canvas"></div>
+   <div id="slider" />
   </div>
 </html>
 
 <script>
 
-
+function array2url(imageArr, w, h, low, high){
+  var canvas = document.createElement('canvas');
+  canvas.width = w
+  canvas.height = h
+  var ctx = canvas.getContext("2d");
+  var canvas_img = ctx.getImageData(0, 0, canvas.width, canvas.height)
+  var canvas_img_data = canvas_img.data;
+  var count = w*h
+  var range = high -low
+  var v
+  for(let i=0;i<count;i++){
+      v = (imageArr[i]-low)/range * 255
+      v = v>255?255:v
+      canvas_img_data[i*4] = v
+      canvas_img_data[i*4+1] = v
+      canvas_img_data[i*4+2] = v
+      canvas_img_data[i*4+3] = 255
+  }
+  ctx.putImageData(canvas_img, 0, 0);
+  return canvas.toDataURL("image/png")
+}
 class ImageWindowPlugin {
   async setup() {
+    await importScripts("https://cdn.rawgit.com/leongersen/noUiSlider/aa64a6d9/distribute/nouislider.min.js")
     await importScripts("https://unpkg.com/leaflet@1.3.1/dist/leaflet.js")
+    this._slider = document.getElementById('slider');
+
+    noUiSlider.create(this._slider, {
+    	start: [0, 255],
+    	connect: true,
+    	range: {
+    		'min': 0,
+    		'max': 255
+    	}
+    });
+    this._slider.noUiSlider.on('update', this.run)
+
     const map = L.map('leaflet_canvas', {
       minZoom: -3,
       maxZoom: 3,
@@ -45,11 +80,14 @@ class ImageWindowPlugin {
       zoomControl: false
     });
     this.leafletMap = map
+    this._my = null
   }
   run(my) {
-    const imageUrl = my.data.image.url
-    const w = my.data.image.w, h = my.data.image.h
-
+    my = my || this._my
+    const range = this._slider.noUiSlider.get()
+    console.log('pixel range: ', range)
+    const imageUrl = array2url(my.data.image.array, my.data.image.width, my.data.image.height, parseInt(range[0]), parseInt(range[1]))
+    const w = my.data.image.width, h = my.data.image.height
     const map = this.leafletMap
     map.eachLayer(function(layer) {
       map.removeLayer(layer);
@@ -71,7 +109,6 @@ class ImageWindowPlugin {
         }
       }
     }
-
     this.inputLayer = L.imageOverlay(imageUrl, bounds)
     this.inputLayer.addTo(map);
     if (!this.layerControl) {
@@ -90,6 +127,8 @@ class ImageWindowPlugin {
     this.layerControl.addBaseLayer(this.inputLayer, 'input')
     // tell leaflet that the map is exactly as big as the image
     map.setMaxBounds(bounds);
+    this._my = my;
+
   }
 }
 
@@ -97,5 +136,22 @@ api.export(new ImageWindowPlugin())
 </script>
 
 <style>
-#mapid { height: 100%; }
+#leaflet_canvas {
+  height: 100%;
+  width:100%;
+}
+.noUi-horizontal {
+    height: 8px!important;
+    left: 8px;
+    width: calc(100% - 16px);
+}
+.noUi-horizontal .noUi-handle{
+  height: 18px!important;
+}
+.noUi-handle:after, .noUi-handle:before{
+  top:2px!important;
+}
+.noUi-connect{
+  background: #abc1ff!important;
+}
 </style>

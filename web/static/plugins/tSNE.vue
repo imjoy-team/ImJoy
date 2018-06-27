@@ -30,7 +30,7 @@ This plugin shows a demo for Three.js.
 <script lang="javascript">
 class TSNEPlugin {
   async setup() {
-    await importScripts("https://rawgit.com/karpathy/tsnejs/master/tsne.js"
+    await importScripts("https://cdn.rawgit.com/karpathy/tsnejs/13ece5d7/tsne.js"
     )
   }
 
