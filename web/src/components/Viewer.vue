@@ -19,8 +19,8 @@
       </div>
       <span class="status-text md-small-hide">{{status_text}}</span>
       <div class="md-toolbar-section-end">
-        <md-button class="md-icon-button md-accent">
-          <md-icon>cancel_presentation</md-icon>
+        <md-button @click="closeAll" class="md-icon-button md-accent">
+          <md-icon>cancel</md-icon>
         </md-button>
         <md-button class="md-icon-button">
           <md-icon>autorenew</md-icon>
@@ -321,6 +321,16 @@ export default {
     }
   },
   methods: {
+    closeAll(){
+      this.windows = []
+      this.default_window_pos = {
+        i: 0,
+        x: 0,
+        y: 0,
+        w: 5,
+        h: 5
+      }
+    },
     showProgress(p){
       if (p < 1) this.progress = p * 100
       else this.progress = p
@@ -381,7 +391,7 @@ export default {
       console.log('run workflow.', this.activeWindows)
       const w = this.activeWindows[this.activeWindows.length - 1] || {}
       joy.workflow.execute(w.data || {}).then((my) => {
-        if(my){
+        if(my && !my.op.tags.includes('window')){
           console.log('result', my)
           my.name = 'result'
           my.type = 'imjoy/generic'
@@ -400,7 +410,7 @@ export default {
       console.log('run panel.', this.activeWindows)
       const w = this.activeWindows[this.activeWindows.length - 1] || {}
       joy._panel.execute(w.data || {}).then((my) => {
-        if(my){
+        if(my && !my.op.tags.includes('window')){
           console.log('result', my)
           my.name = 'result'
           my.type = 'imjoy/generic'
