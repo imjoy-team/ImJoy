@@ -46,7 +46,7 @@
           <md-button @click="$refs.folder_select.openPicker()" class="md-icon-button md-primary">
             <md-icon>folder_open</md-icon>
           </md-button>
-          <md-button @click="showImportDialog=true" class="md-icon-button md-accent">
+          <md-button @click="addPlugin" class="md-icon-button md-accent">
             <md-icon>extension</md-icon>
           </md-button>
         </md-speed-dial-content>
@@ -138,6 +138,7 @@ import {
   WINDOW_SCHEMA,
   OP_SCHEMA,
   PLUGIN_SCHEMA,
+  PLUGIN_TEMPLATE
 } from '../api.js'
 
 import {
@@ -165,7 +166,6 @@ export default {
       loading: false,
       progress: 0,
       status_text: '',
-      showImportDialog: false,
       windows: [],
       panels: [],
       activeWindows: [],
@@ -276,6 +276,17 @@ export default {
     }
   },
   methods: {
+    addPlugin(){
+      const w = {
+        name: 'New Plugin',
+        type: 'imjoy/plugin-editor',
+        config: {},
+        data: {
+          code: JSON.parse(JSON.stringify(PLUGIN_TEMPLATE))
+        }
+      }
+      this.addWindow(w)
+    },
     reloadPlugins(){
       if(this.plugins){
         for (let k in this.plugins) {
@@ -338,6 +349,7 @@ export default {
       // this.$forceUpdate()
     },
     addWindow(w){
+      this.generateGridPosition(w)
       this.windows.push(w)
       this.store.event_bus.$emit('add_window', w)
     },
@@ -381,7 +393,6 @@ export default {
           files: this.selected_files
         }
       }
-      this.generateGridPosition(w)
       this.addWindow(w)
     },
     runWorkflow(joy) {
@@ -684,7 +695,6 @@ export default {
         wconfig.force_show = wconfig.force_show || false
         wconfig.panel = wconfig.panel || null
         console.log('--------------------------', wconfig)
-        this.generateGridPosition(wconfig)
         if (!WINDOW_SCHEMA(wconfig)) {
           const error = WINDOW_SCHEMA.errors(wconfig)
           console.error("Error occured during creating window " + wconfig.name, error)
@@ -766,7 +776,6 @@ export default {
         config.data = config.data || null
         config.config = config.config || {}
         config.panel = config.panel || null
-        // this.generateGridPosition(config)
         if (!WINDOW_SCHEMA(config)) {
           const error = WINDOW_SCHEMA.errors(config)
           console.error("Error occured during creating window " + config.name, error)

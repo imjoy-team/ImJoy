@@ -2,7 +2,7 @@
 <div class="whiteboard noselect" ref="whiteboard">
   <div class="overlay" @click="dragging=false" v-if="dragging"></div>
   <grid-layout :layout="windows" :col-num="20" :is-mirrored="false" :auto-size="true" :row-height="30" :is-draggable="true" :is-resizable="true" :vertical-compact="false" :margin="[10, 10]" :use-css-transforms="true">
-    <grid-item v-for="(w, wi) in windows" :x="w.x" :y="w.y" :w="w.w" :h="w.h" :i="w.i" @resize="startDragging(w)"
+    <grid-item v-for="(w, wi) in windows" drag-ignore-from=".ace_editor" :x="w.x" :y="w.y" :w="w.w" :h="w.h" :i="w.i" @resize="startDragging(w)"
                    @move="startDragging(w)" @resized="dragging=false" @moved="dragging=false" :key="w.iframe_container">
       <md-card>
         <md-card-expand>
@@ -63,6 +63,13 @@
           <div v-else-if="w.type=='imjoy/generic'">
             <!-- <p>generic data</p> -->
             <md-chip v-for="(v, k) in w.data" :key="k">{{k}}</md-chip>
+          </div>
+          <div v-else-if="w.type=='imjoy/plugin-editor'">
+              <plugin-editor v-model="w.data.code"></plugin-editor>
+              <!-- <div class="md-toolbar">
+                <md-button class="md-parimary">Save</md-button>
+                <md-button class="md-parimary">Reload</md-button>
+              </div> -->
           </div>
           <div v-else class="plugin-iframe">
             <md-button class="iframe-load-button" @click="w.click2load=false;w.renderWindow(w)" v-if="w.click2load">Click to load the window</md-button>

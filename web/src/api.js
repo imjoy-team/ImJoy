@@ -1,5 +1,44 @@
 import schema from 'js-schema'
 
+export const PLUGIN_TEMPLATE= `
+<config>
+{
+  "name": "Untitled Plugin",
+  "type": "image/processing",
+  "mode": "webworker",
+  "tags": ["op", "image"],
+  "ui": "image processing",
+  "show_panel": true,
+  "version": "0.1.0",
+  "api_version": "0.1.0",
+  "url": "",
+  "description": "A plugin for image processing.",
+  "icon": "extension",
+  "dependencies": []
+}
+</config>
+
+<docs>
+Describe your plugin here.
+</docs>
+
+<script>
+class UntitledPlugin {
+  async setup() {
+    //await importScripts("http://xxxx/xxx.js")
+  }
+
+  run(my) {
+    console.log('running in the plugin ', my)
+
+  }
+}
+
+api.export(new UntitledPlugin())
+</script>
+
+`
+
 export const PLUGIN_SCHEMA= schema({
   _id: [null, String],
   name: String,

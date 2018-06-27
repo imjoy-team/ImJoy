@@ -25,11 +25,7 @@ url<template>
 
   <md-dialog class="editor-dialog" :md-active.sync="showEditor">
     <md-dialog-content>
-      <div class="md-toolbar-row">
-        <h2>Code Editor</h2>
-      </div>
-      <plugin-editor class="code-editor" v-model="editorCode" :options="editorOptions"></plugin-editor>
-
+      <plugin-editor class="code-editor" v-model="editorCode" title="Plugin Editor" :options="editorOptions"></plugin-editor>
     </md-dialog-content>
     <md-dialog-actions>
       <md-button class="md-primary" @click="saveCode(); showEditor=false">Save</md-button>
@@ -130,7 +126,7 @@ export default {
       this.db.get(plugin._id).then((doc) => {
         this.editorCode = doc.code
         this.editorOptions = {
-          mode: "ace/mode/javascript",
+          mode: "ace/mode/html",
           selectionStyle: "text"
         }
         this.editorPlugin = plugin
