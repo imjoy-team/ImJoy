@@ -22,13 +22,17 @@
                   <md-icon>more_vert</md-icon>
                 </md-button>
                 <md-menu-content>
-                  <md-menu-item v-if="w.type!='main'" @click="close(wi)">
-                    <span>Close</span>
-                    <md-icon>close</md-icon>
+                  <md-menu-item @click.stop="duplicate(w)">
+                    <span>Duplicate</span>
+                    <md-icon>filter</md-icon>
                   </md-menu-item>
                   <md-menu-item @click.stop="fullScreen(w)">
                     <span>Fullscreen</span>
                     <md-icon>fullscreen</md-icon>
+                  </md-menu-item>
+                  <md-menu-item v-if="w.type!='main'" @click="close(wi)">
+                    <span>Close</span>
+                    <md-icon>close</md-icon>
                   </md-menu-item>
                 </md-menu-content>
               </md-menu>
@@ -77,6 +81,7 @@
 </template>
 
 <script>
+
 export default {
   name: 'whiteboard',
   props: {
@@ -117,6 +122,18 @@ export default {
     },
     fullScreen(w) {
 
+    },
+    duplicate(w){
+      const nw = Object.assign({}, w)
+      if(nw.iframe_container)
+      nw.iframe_container = 'plugin_window_' + nw.id + randId()
+      nw.i = nw.i+"_"
+      if(!nw.click2load)
+      nw.click2load = true
+      if(w.renderWindow){
+        nw.renderWindow = w.renderWindow
+      }
+      this.windows.push(nw)
     },
     selectWindow(w, evt){
       w.selected = true

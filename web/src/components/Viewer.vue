@@ -19,6 +19,12 @@
       </div>
       <span class="status-text md-small-hide">{{status_text}}</span>
       <div class="md-toolbar-section-end">
+        <md-button class="md-icon-button md-accent">
+          <md-icon>cancel_presentation</md-icon>
+        </md-button>
+        <md-button class="md-icon-button">
+          <md-icon>autorenew</md-icon>
+        </md-button>
         <md-button class="md-icon-button">
           <md-icon>save</md-icon>
         </md-button>
@@ -149,16 +155,13 @@ import {
 } from '../api.js'
 
 import {
+  _clone,
   randId
 } from '../utils.js'
 import {
   parseComponent
 } from '../pluginParser.js'
 
-// Deep clone
-var _clone = function(json) {
-  return JSON.parse(JSON.stringify(json));
-};
 
 export default {
   name: 'viewer',
@@ -668,9 +671,11 @@ export default {
     createWindow(wconfig, _plugin) {
       try {
         // wconfig.type = wconfig.type || "imjoy/panel"
+        wconfig.config = wconfig.config || {}
         wconfig.data = wconfig.data || null
         wconfig.force_show = wconfig.force_show || false
         wconfig.panel = wconfig.panel || null
+        console.log('--------------------------', wconfig)
         this.generateGridPosition(wconfig)
         if (!WINDOW_SCHEMA(wconfig)) {
           const error = WINDOW_SCHEMA.errors(wconfig)
@@ -691,7 +696,7 @@ export default {
             throw 'no plugin registered for window type: ', wconfig.type
           }
           // console.log(window_config)
-          const pconfig = _clone(wconfig) //_clone(window_config)
+          const pconfig = wconfig //_clone(window_config)
           //generate a new window id
           pconfig.mode = window_config.mode
           pconfig.id = window_config.name.trim().replace(/ /g, '_') + '_' + randId()
@@ -714,7 +719,6 @@ export default {
             pconfig.renderWindow = this.renderWindow
             this.showPluginWindow(pconfig)
           }
-
         }
       } catch (e) {
         console.error(e)
@@ -763,13 +767,14 @@ export default {
         //TODO: verify fields with WINDOW_TEMPLATE
         console.log('creating plugin window: ', config)
         this.addWindow(config)
+        console.log('added the window')
         // container IS NOT finished rendering to the DOM
         // this.$nextTick(()=>{
         //      resolve()
         // })
-        setTimeout(() => {
-          resolve()
-        }, 500)
+        // setTimeout(() => {
+        //   resolve()
+        // }, 500)
       })
     },
   }

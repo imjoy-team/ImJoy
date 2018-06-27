@@ -18,6 +18,20 @@ export function randId() {
      return Math.random().toString(36).substr(2, 10);
 }
 
+// Deep clone
+export function _clone(aObject) {
+  if (!aObject) {
+   return aObject;
+ }
+ var bObject, v, k;
+ bObject = Array.isArray(aObject) ? [] : {};
+ for (k in aObject) {
+   v = aObject[k];
+   bObject[k] = (typeof v === "object") ? _clone(v) : v;
+ }
+ return bObject;
+};
+
 export const Filters = {}
 
 Filters.getPixels = function(canvas) {

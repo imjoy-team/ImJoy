@@ -59,18 +59,25 @@ class ImageWindowPlugin {
   async setup() {
     await importScripts("https://cdn.rawgit.com/leongersen/noUiSlider/aa64a6d9/distribute/nouislider.min.js")
     await importScripts("https://unpkg.com/leaflet@1.3.1/dist/leaflet.js")
-    this._slider = document.getElementById('slider');
-
-    noUiSlider.create(this._slider, {
-    	start: [0, 255],
-    	connect: true,
-    	range: {
-    		'min': 0,
-    		'max': 255
-    	}
-    });
-    this._slider.noUiSlider.on('update', this.run)
-
+    // this._slider = document.getElementById('slider');
+    //
+    // noUiSlider.create(this._slider, {
+    // 	start: [0, 255],
+    // 	connect: true,
+    // 	range: {
+    // 		'min': 0,
+    // 		'max': 255
+    // 	}
+    // });
+    // this._slider.noUiSlider.on('update', this.run)
+    // this._my = null
+  }
+  run(my) {
+    // my = my || this._my
+    const range = [0, 10] // this._slider.noUiSlider.get()
+    console.log('pixel range: ', range)
+    const imageUrl = array2url(my.data.image.array, my.data.image.width, my.data.image.height, parseInt(range[0]), parseInt(range[1]))
+    const w = my.data.image.width, h = my.data.image.height
     const map = L.map('leaflet_canvas', {
       minZoom: -3,
       maxZoom: 3,
@@ -79,16 +86,6 @@ class ImageWindowPlugin {
       crs: L.CRS.Simple,
       zoomControl: false
     });
-    this.leafletMap = map
-    this._my = null
-  }
-  run(my) {
-    my = my || this._my
-    const range = this._slider.noUiSlider.get()
-    console.log('pixel range: ', range)
-    const imageUrl = array2url(my.data.image.array, my.data.image.width, my.data.image.height, parseInt(range[0]), parseInt(range[1]))
-    const w = my.data.image.width, h = my.data.image.height
-    const map = this.leafletMap
     map.eachLayer(function(layer) {
       map.removeLayer(layer);
     });
@@ -127,7 +124,7 @@ class ImageWindowPlugin {
     this.layerControl.addBaseLayer(this.inputLayer, 'input')
     // tell leaflet that the map is exactly as big as the image
     map.setMaxBounds(bounds);
-    this._my = my;
+    // this._my = my;
 
   }
 }
