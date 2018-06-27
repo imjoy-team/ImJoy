@@ -1,8 +1,5 @@
 <template>
 <div class="viewer noselect">
-  <!-- <md-button v-if="!menuVisible" class="md-fab floating-fab md-primary md-fab-top-left" @click="menuVisible=true">
-    <md-icon>menu</md-icon>
-  </md-button> -->
   <div style="visibility:hidden; opacity:0" id="dropzone">
     <div id="textnode">Drop files to add data.</div>
   </div>
@@ -38,35 +35,47 @@
     </md-app-toolbar>
     <md-app-drawer :md-active.sync="menuVisible" md-persistent="full">
       <!-- <md-app-toolbar class="md-primary md-dense"> -->
+      <md-speed-dial class="md-top-left speed-dial" md-effect="scale" md-direction="bottom">
+        <md-speed-dial-target class="md-primary">
+          <md-icon>add</md-icon>
+        </md-speed-dial-target>
+        <md-speed-dial-content>
+          <md-button @click="$refs.file_select.openPicker()" class="md-icon-button md-primary">
+            <md-icon>insert_drive_file</md-icon>
+          </md-button>
+          <md-button @click="$refs.folder_select.openPicker()" class="md-icon-button md-primary">
+            <md-icon>folder_open</md-icon>
+          </md-button>
+          <md-button @click="showImportDialog=true" class="md-icon-button md-accent">
+            <md-icon>extension</md-icon>
+          </md-button>
+        </md-speed-dial-content>
+      </md-speed-dial>
       <div class="md-toolbar-row">
         <div class="md-toolbar-section-start">
           <!-- <md-button v-if="!menuVisible" class="md-fab md-primary" @click="menuVisible=true">
             <md-icon>menu</md-icon>
           </md-button> -->
-          <md-button to="/">
+          <md-field v-show="false">
+            <md-file v-show="false" v-model="folder_select" ref="file_select" @md-change="selectFileChanged" />
+          </md-field>
+          <md-field v-show="false">
+            <md-file v-model="file_select" ref="folder_select" @md-change="selectFileChanged" webkitdirectory mozdirectory msdirectory odirectory directory multiple/>
+          </md-field>
+          <md-button class="site-button" to="/">
             <div class="site-title">ImJoy.io<span class="superscript">alpha</span></div>
           </md-button>
         </div>
         <div class="md-toolbar-section-end">
+          <md-button class="md-icon-button md-primary" @click="showSettingsDialog=true">
+            <md-icon>settings</md-icon>
+          </md-button>
           <md-button class="md-icon-button md-dense md-raised" @click="menuVisible = !menuVisible">
             <md-icon>keyboard_arrow_left</md-icon>
           </md-button>
         </div>
       </div>
-      <!-- </md-app-toolbar> -->
-      <div class="md-toolbar-row">
-        <div class="md-toolbar-section-start">
-          <md-button class="md-fab md-primary" @click="showImportDialog=true">
-            <md-icon>add</md-icon>
-          </md-button>
-          <md-button class="md-icon-button md-primary" @click="showSettingsDialog=true">
-            <md-icon>settings</md-icon>
-          </md-button>
-          <md-progress-spinner :md-diameter="30" :md-stroke="3" md-mode="indeterminate" v-if="loading"></md-progress-spinner>
-        </div>
-
-      </div>
-
+      <br>
       <md-card>
         <md-card-header>
           <span class="md-subheading">Workflow</span>
@@ -120,29 +129,6 @@
       <md-button class="md-primary" @click="showSettingsDialog=false">OK</md-button>
     </md-dialog-actions>
   </md-dialog>
-
-  <md-dialog :md-active.sync="showImportDialog">
-    <md-dialog-content>
-      <div class="md-layout-row md-gutter">
-        <div class="md-flex">
-          <md-switch v-model="folder_mode">{{folder_mode?"Load data from a folder":"Load data from a file"}}</md-switch>
-          <md-field v-if="!folder_mode">
-            <label>load a file</label>
-            <md-file v-model="file_model" @md-change="selectFileChanged" />
-          </md-field>
-          <md-field v-if="folder_mode">
-            <label>load a folder</label>
-            <md-file v-model="file_model" @md-change="selectFileChanged" webkitdirectory mozdirectory msdirectory odirectory directory multiple/>
-          </md-field>
-        </div>
-        <joy ui="{id:'file_load_workflow', type:'ops'}" v-if="plugin_loaded"></joy>
-      </div>
-    </md-dialog-content>
-    <md-dialog-actions>
-      <md-button class="md-primary" @click="loadData(); showImportDialog=false">OK</md-button>
-      <md-button class="md-primary" @click="showImportDialog=false">Cancel</md-button>
-    </md-dialog-actions>
-  </md-dialog>
 </div>
 </template>
 
@@ -168,8 +154,8 @@ export default {
   props: ['title'],
   data() {
     return {
-      folder_mode: false,
-      file_model: null,
+      file_select: null,
+      folder_select: null,
       selected_file: null,
       selected_files: null,
       showPluginDialog: false,
@@ -918,5 +904,14 @@ div#textnode {
   text-align: center;
   vertical-align: middle;
   transition: font-size 175ms;
+}
+
+.speed-dial {
+  top: 8px;
+  left: 15px;
+}
+
+.site-button{
+  left: 80px;
 }
 </style>
