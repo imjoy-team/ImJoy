@@ -17,12 +17,12 @@
         </md-button>
         <span class="subheader-title md-small-hide" style="flex: 1">Image Processing with Joy</span>
       </div>
-      <span class="status-text md-small-hide">{{status_text}}</span>
+      <span class="status-text md-small-hide" :class="status_text.includes('rror')?'error-message':''">{{status_text}}</span>
       <div class="md-toolbar-section-end">
         <md-button @click="closeAll" class="md-icon-button md-accent">
           <md-icon>cancel</md-icon>
         </md-button>
-        <md-button class="md-icon-button">
+        <md-button @click="reloadPlugins()" class="md-icon-button">
           <md-icon>autorenew</md-icon>
         </md-button>
         <md-button class="md-icon-button">
@@ -196,7 +196,7 @@ export default {
         w: 5,
         h: 5
       },
-      plugins: {},
+      plugins: null,
       registered: {
         ops: {},
         windows: {}
@@ -277,6 +277,28 @@ export default {
 
     //TODO: fix this, how to prevent loading failure if remove this timeout
     this.$nextTick(() => {
+      this.reloadPlugins()
+    })
+  },
+  beforeDestroy() {
+    console.log('terminating plugins')
+    for (let k in this.plugins) {
+      if (this.plugins.hasOwnProperty(k)) {
+        const plugin = this.plugins[k]
+        if (typeof plugin.terminate == 'function') plugin.terminate()
+      }
+    }
+  },
+  methods: {
+    reloadPlugins(){
+      if(this.plugins){
+        for (let k in this.plugins) {
+          if (this.plugins.hasOwnProperty(k)) {
+            const plugin = this.plugins[k]
+            if (typeof plugin.terminate == 'function') plugin.terminate()
+          }
+        }
+      }
       this.db.allDocs({
         include_docs: true,
         attachments: true
@@ -309,18 +331,7 @@ export default {
         console.error(err)
         this.loading = false
       });
-    })
-  },
-  beforeDestroy() {
-    console.log('terminating plugins')
-    for (let k in this.plugins) {
-      if (this.plugins.hasOwnProperty(k)) {
-        const plugin = this.plugins[k]
-        if (typeof plugin.terminate == 'function') plugin.terminate()
-      }
-    }
-  },
-  methods: {
+    },
     closeAll(){
       this.windows = []
       this.default_window_pos = {
@@ -665,6 +676,7 @@ export default {
             config: pconfig.config,
             op: pconfig.op,
           }).catch((e) => {
+            this.status_text = "Error occured when running plugin "+plugin.name
             console.error('error in run function: ', e)
           })
         }).catch((e) => {
@@ -881,6 +893,9 @@ export default {
   margin-top: 40px;
 }
 
+.error-message{
+  color: red;
+}
 
 div#dropzone {
   position: fixed;
