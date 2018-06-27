@@ -2,30 +2,66 @@
 {
   "name": "2D Histogram",
   "mode": "webworker",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "api_version": "0.1.0",
   "createdAt": "Mon Jun 19 2018 15:45:30",
-  "file_path": "/Histogram2D/histogram2D.js",
+  "url": "/histogram2D.vue",
   "description": "A plugin for render 2D histogram from a localization table.",
   "tags": ["localization", "render"],
-  "thunbnail": null,
+  "icon": null,
   "dependencies": ["Lookup Table"]
 }
-<config>
-<script>
+</config>
+
+<script lang="javascript">
 class Histogram2dPlugin {
   setup(){
     api.register({
       name: "render 2D histogram",
       type: "localization/render_2d_histogram",
       tags: ["localization", "op", "histogram"],
-      init: "Render a histogram with pixel size {id:'pixel_size', type:'number', placeholder: 20}nm",
+      ui: "Render a 2D histogram with: <br>pixel size={id:'pixel_size', type:'number', placeholder: 20}nm<br> width={id:'width', type:'number', placeholder: 2560} <br> height={id:'height', type:'number', placeholder: 2560}",
     })
   }
 
   async run(my){
-    const pixel_size = my.config.pixel_size
-    return my
+    try {
+      var width = my.config.width
+      var height = my.config.height
+      var canvas_data = new Uint16Array(new ArrayBuffer(width*height*2)); //uint16
+      var pixel_size = my.config.pixel_size
+      var data = my.data.table
+      var xx = data.tableDict.x
+      var yy = data.tableDict.y
+      var ff = data.tableDict.frame
+      var rows = data.rows
+      var table_dict = data.tableDict
+      var isFiltered = data.isFiltered
+      var progress = 0
+      for (var line = 0; line < rows; line++) {
+          var newProgress = Math.floor(100 * line / (rows+0.5));
+          if(newProgress != progress){
+              progress = newProgress
+              api.showProgress(progress)
+          }
+          if(isFiltered && !isFiltered[line]) continue
+          var f = parseInt(ff[line])
+          var x = parseInt(xx[line]/pixel_size)
+          var y = parseInt(yy[line]/pixel_size)
+          if(!f || !x || !y ){
+            continue
+          }
+          if(y>height || x>width) continue
+          var s =y * width + x;  // calculate the index in the array
+          canvas_data[s] = canvas_data[s]+1
+      }
+      my.data = {}
+      my.data.image = {type: 'image/grayscale', array: canvas_data, height: height, width: width}
+      return my
+    } catch (e) {
+      console.error(e)
+      throw e
+    }
   }
 }
 

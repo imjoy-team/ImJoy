@@ -2,13 +2,13 @@
 {
   "name": "Text File Importer",
   "mode": "webworker",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "api_version": "0.1.0",
   "createdAt": "Mon Jun 18 2018 21:46:36",
-  "file_path": "/TextFileImporter/textFileImporter.js",
+  "url": "/textFileImporter.vue",
   "description": "A plugin for loading localization table from text files.",
   "tags": ["localization", "importer"],
-  "thunbnail": null,
+  "icon": null,
   "dependencies": []
 }
 </config>
@@ -118,11 +118,11 @@ function _loadFile(file, format) {
               else{
                 transformedHeaders[header] = escapedTitle.replace(/[^a-zA-Z0-9]+/g,'_').trim()
               }
-              if(transformedHeaders[header] .startsWith('_')){
+              if(transformedHeaders[header].startsWith('_')){
                 transformedHeaders[header]  = transformedHeaders[header].slice(1)
               }
-              min[header] = Number.POSITIVE_INFINITY;
-              max[header] = Number.NEGATIVE_INFINITY;
+              min[header] = Number.POSITIVE_INFuiY;
+              max[header] = Number.NEGATIVE_INFuiY;
               avg[header] = 0;
           }
 
@@ -152,7 +152,8 @@ function _loadFile(file, format) {
             localization_num += 1;
             bytesRead += lines[line].length
             if(localization_num%100000 == 0){
-                self.postMessage({progress: bytesRead/totalBytes*100, localization_num: localization_num});
+                api.showProgress(bytesRead/totalBytes*100);
+                api.showStatus('loading...' + localization_num/1000000 + 'M localizations');
             }
             val = lines[line].split(delimiter);
             if(lines[line] == '' || headers.length != val.length){
@@ -242,7 +243,7 @@ class TextFilePlugin {
       name: "load text file",
       type: "localization/text_loader",
       tags: ["localization", "op", "file_loader"],
-      init: "Load a table from the file: <br>"+
+      ui: "Load a table from the file: <br>"+
       "add \"{id:'append_header', type:'string', placeholder:''}\" to the first line (optional); " +
       "{id:'header_row', type:'choose', options:['read headers from the first line','use index as the header'], placeholder:'read headers from the first line'} and " +
       "use {id:'delimiter', type:'string', placeholder:','} to seperate columns."
@@ -250,7 +251,7 @@ class TextFilePlugin {
   }
   async run(my){
     try {
-      console.log(my)
+      console.log('running in the plugin', my)
       const format = {
         header_row: my.config.header_row.startsWith('read headers')? 0 : -1,
         delimiter: my.config.delimiter,
@@ -258,7 +259,7 @@ class TextFilePlugin {
         header_transform: {'x [nm]': 'x', 'y [nm]':'y', 'sigma [nm]': 'sigma'}
       }
       const table = await _loadFile(my.data.files[0], format)
-      my.data.table = table
+      my.data = {table: table}
       return my
     } catch (e) {
       console.error(e)
