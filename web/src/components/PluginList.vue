@@ -1,4 +1,4 @@
-url<template>
+<template>
 <div class="plugin-list">
   <!-- <md-subheader>Options</md-subheader> -->
   <md-subheader v-if="title">{{title}}</md-subheader>

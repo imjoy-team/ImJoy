@@ -121,9 +121,9 @@
     </md-dialog-actions>
   </md-dialog>
 
-  <md-dialog :md-active.sync="showSettingsDialog">
+  <md-dialog class="fullscreen" :md-active.sync="showSettingsDialog">
     <md-dialog-content>
-      <plugin-list :plugins="installed_plugins" title="Installed Plugins"></plugin-list>
+        <plugin-list :plugins="installed_plugins" title="Installed Plugins"></plugin-list>
     </md-dialog-content>
     <md-dialog-actions>
       <md-button class="md-primary" @click="showSettingsDialog=false">OK</md-button>
@@ -930,7 +930,7 @@ export default {
 }
 
 .md-dialog {
-  width: 90%;
+  width: 100%;
 }
 
 .md-card {
@@ -1013,5 +1013,12 @@ div#textnode {
 }
 .site-button{
   left: 80px;
+}
+
+.fullscreen{
+  max-width: 100%;
+  width: 100%;
+  height: 100%;
+  max-height: 100%;
 }
 </style>
