@@ -1,11 +1,15 @@
 <template>
 <div class="plugin-editor">
-
-    <!-- <div class="md-toolbar-row">
-      <h2>{{title}}</h2>
-    </div> -->
+    <md-toolbar class="md-dense">
+      <md-button @click="reload()" class="md-icon-button">
+        <md-icon>autorenew</md-icon>
+      </md-button>
+      <md-button @click="save()" class="md-icon-button">
+        <md-icon>save</md-icon>
+      </md-button>
+    </md-toolbar>
     <md-content>
-    <div :id="editorId"></div>
+    <div :id="'editor_'+pluginId"></div>
   </md-content>
 </div>
 </template>
@@ -13,7 +17,7 @@
 <script>
 export default {
   name: 'joy',
-  props: ['value', 'options', 'title', 'editorId'],
+  props: ['value', 'options', 'title', 'pluginId', 'window'],
   data() {
     return {
       router: this.$root.$data.router,
@@ -27,18 +31,23 @@ export default {
     }
   },
   mounted() {
+    const editorId = 'editor_'+this.pluginId
     ace.require('ace/tooltip').Tooltip.prototype.setPosition = function (x, y) {
-        var rect = document.getElementById("editor").getBoundingClientRect()
-        y -= rect.top;
+        var rect = document.getElementById(editorId).getBoundingClientRect()
+        y -= (rect.top-64);
         x -= rect.left;
         this.getElement().style.left = x + "px";
         this.getElement().style.top = y + "px";
      };
-    this.editor = ace.edit(this.editorId);
+    // ace.require("ace/ext/language_tools");
+
+    this.editor = ace.edit(editorId);
     ace.config.set('basePath', '/static/ace')
     this.editor.setOptions({
-        useWrapMode : true,
-        maxLines: Infinity
+        wrap: false,
+        maxLines: Infinity,
+        // enableBasicAutocompletion: true,
+        // enableLiveAutocompletion: true
     });
     this.editor.setTheme("ace/theme/chrome");
     this.editor.session.setMode("ace/mode/html");
@@ -59,6 +68,16 @@ export default {
 
   },
   methods: {
+    save(){
+      this.window.misc.save({pluginId: this.pluginId, code: this.editor.getValue()})
+      //this.$emit('save', {pluginId: this.pluginId, code: this.editor.getValue()})
+    },
+    reload(){
+      this.window.misc.reload({pluginId: this.pluginId, code: this.editor.getValue(), plugin: this.window.plugin}).then((plugin)=>{
+        this.window.plugin = plugin
+      })
+      //this.$emit('reload', {pluginId: this.pluginId, code: this.editor.getValue()})
+    }
 
   }
 }

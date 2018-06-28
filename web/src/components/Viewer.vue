@@ -91,7 +91,7 @@
             <span class="md-subheading">Plugins</span>
           </md-card-header>
           <md-card-content>
-            <div v-for="panel in panels" :key="panel.id">
+            <div v-for="(panel, t) in panels" :key="panel.id">
               <md-divider></md-divider>
               <joy :config="panel" @run="runPanel($event, panel)"></joy>
 
@@ -167,7 +167,7 @@ export default {
       progress: 0,
       status_text: '',
       windows: [],
-      panels: [],
+      panels: {},
       activeWindows: [],
       workflow_joy_config: {
         expanded: true,
@@ -262,9 +262,9 @@ export default {
     const root = location.protocol + '//' + location.host
 
     //TODO: fix this, how to prevent loading failure if remove this timeout
-    this.$nextTick(() => {
+    setTimeout(() => {
       this.reloadPlugins()
-    })
+    }, 100)
   },
   beforeDestroy() {
     console.log('terminating plugins')
@@ -281,11 +281,75 @@ export default {
         name: 'New Plugin',
         type: 'imjoy/plugin-editor',
         config: {},
+        misc: {reload: this.reloadPlugin, save: this.savePlugin},
         data: {
+          name: 'new plugin',
+          id: 'plugin_'+randId(),
           code: JSON.parse(JSON.stringify(PLUGIN_TEMPLATE))
         }
       }
       this.addWindow(w)
+    },
+    reloadPlugin(pconfig){
+      return new Promise((resolve, reject) => {
+        if(pconfig.plugin && pconfig.plugin.id)
+        delete this.panels[pconfig.plugin.id]
+        if(pconfig.plugin && pconfig.plugin.type)
+          Joy.remove(pconfig.plugin.type)
+        if(pconfig.plugin && pconfig.plugin.terminate){
+          try {
+            console.log('terminating plugin ', pconfig.plugin)
+            pconfig.plugin.terminate()
+          }
+          finally {
+            delete pconfig.plugin
+          }
+        }
+
+        console.log('reloading plugin ', pconfig)
+        const template = this.parsePluginCode(pconfig.code, pconfig)
+        console.log(template)
+        let p
+        if (template.mode == 'iframe' && template.tags.includes('window')) {
+          p = this.preLoadPlugin(template)
+        } else {
+          p = this.loadPlugin(template)
+        }
+        p.then((plugin)=>{
+          resolve(plugin)
+          console.log('new plugin loaded', plugin)
+          if (this.$refs.workflow) this.$refs.workflow.setupJoy()
+        }).catch((e)=>{
+          reject(e)
+        })
+        // this.$forceUpdate()
+      })
+    },
+    savePlugin(pconfig){
+      console.log('saving plugin ', pconfig)
+      const code = pconfig.code
+      const template = this.parsePluginCode(code, {})
+      template.code = code
+      template._id = template.name
+      const addPlugin = () => {
+        this.db.put(template, {
+          force: true
+        }).then((result) => {
+          console.log('Successfully installed!');
+          this.api.show(template.name + ' has been sucessfully saved.')
+        }).catch((err) => {
+          this.api.show('failed to save the plugin.')
+          console.error(err)
+        })
+      }
+      // remove if exists
+      this.db.get(template.name).then((doc) => {
+        return this.db.remove(doc);
+      }).then((result) => {
+        addPlugin()
+      }).catch((err) => {
+        addPlugin()
+      });
     },
     reloadPlugins(){
       if(this.plugins){
@@ -297,12 +361,15 @@ export default {
                 plugin.terminate()
               } catch (e) {
                 console.error(e)
+              }finally {
+                this.plugins[k] = null
               }
             }
           }
         }
-        this.plugins = null
       }
+      this.plugins = {}
+      this.panels = {}
       this.db.allDocs({
         include_docs: true,
         attachments: true
@@ -451,7 +518,13 @@ export default {
     parsePluginCode(code, config) {
       config = config || {}
       const url = config.url
-      if (url.endsWith('.vue')) {
+      if(url && url.endsWith('.js')){
+        config.lang = config.lang || 'javascript'
+        config.script = code
+        config.style = null
+        config.window = null
+      }
+      else{
         console.log('parsing the plugin file')
         const pluginComp = parseComponent(code)
         console.log('code parsed from', pluginComp)
@@ -486,11 +559,6 @@ export default {
         } else {
           config.style = null
         }
-      } else {
-        config.lang = config.lang || 'javascript'
-        config.script = code
-        config.style = null
-        config.window = null
       }
       config._id = config._id || null
       config.url = url
@@ -537,13 +605,14 @@ export default {
           id: config.id
         })
         console.log('sucessfully preloaded plugin: ', plugin)
-        resolve()
+        resolve(plugin)
       })
     },
     loadPlugin(config) {
       config = _clone(config)
       //generate a random id for the plugin
       return new Promise((resolve, reject) => {
+        config.id = config.name.trim().replace(/ /g, '_') + '_' + randId()
         const plugin = new jailed.DynamicPlugin(config, {}, this.plugin_api)
         plugin.whenConnected(() => {
           if (!plugin.api) {
@@ -551,9 +620,14 @@ export default {
             throw 'error occured when loading plugin.'
           }
           this.plugins[plugin.id] = plugin
+          if(config.type && config.ui){
+            this.register(config, {
+              id: plugin.id
+            })
+          }
           plugin.api.setup().then((result) => {
             console.log('sucessfully setup plugin: ', plugin)
-            resolve()
+            resolve(plugin)
           }).catch((e) => {
             console.error('error occured when loading plugin ' + config.name + ": ", e)
             reject(e)
@@ -585,10 +659,10 @@ export default {
           console.error("Error occured during registering " + config.name, error)
           throw error
         }
-        if (this.registered.ops[config.type]) {
-          console.log('plugin already registered')
-          return
-        }
+        // if (this.registered.ops[config.type]) {
+        //   console.log('plugin already registered')
+        //   return
+        // }
         if (config.tags.includes('op')) {
           console.log('creating Op: ', config, plugin)
           if (!plugin || !plugin.api || !plugin.api.run) {
@@ -641,7 +715,7 @@ export default {
           plugin.panel_config = panel_config
           if (config.show_panel) {
             console.log('creating panel: ', panel_config)
-            this.panels.push(panel_config)
+            this.panels[panel_config.id] = panel_config
             this.$forceUpdate()
           }
         }
@@ -731,6 +805,7 @@ export default {
           }
           // this is a unique id for the iframe to attach
           pconfig.iframe_container = 'plugin_window_' + pconfig.id + randId()
+          console.log('changing id...')
           pconfig.iframe_window = null
           pconfig.plugin = window_config
           if (wconfig.force_show) {
@@ -897,6 +972,7 @@ export default {
 
 .error-message{
   color: red;
+  user-select: text;
 }
 
 div#dropzone {

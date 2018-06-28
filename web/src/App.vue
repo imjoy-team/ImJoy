@@ -21,6 +21,7 @@ export default {
     }
 
     this.$nextTick(()=>{
+      this.store.api.show = this.show
       const updateSize = (e)=>{
         this.store.windowHeight = window.innerHeight
         this.store.windowWidth = window.innerWidth
@@ -40,6 +41,11 @@ export default {
     })
   },
   methods: {
+    show(info, duration) {
+        this.snackbar_info = info
+        this.snackbar_duration = duration || 3000
+        this.showSnackbar = true
+    },
   },
   watch: {
   }

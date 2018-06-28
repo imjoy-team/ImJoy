@@ -59,7 +59,6 @@ export default {
     }
   },
   mounted(){
-    this.store.api.show = this.show
     // this.api.connect(["anonymous"]).then((session, connection)=>{
     //   session.subscribe('org.imod.public.message', this.api.handle_notification).then(()=>{
     //     console.log('subscribed to org.imod.public.message')
@@ -72,11 +71,7 @@ export default {
     this.store.event_bus.$on('resize',updateSize)
   },
   methods: {
-    show(info, duration) {
-        this.snackbar_info = info
-        this.snackbar_duration = duration || 3000
-        this.showSnackbar = true
-    },
+
   }
 }
 </script>
