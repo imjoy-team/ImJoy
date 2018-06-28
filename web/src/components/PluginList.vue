@@ -2,23 +2,36 @@ url<template>
 <div class="plugin-list">
   <!-- <md-subheader>Options</md-subheader> -->
   <md-subheader v-if="title">{{title}}</md-subheader>
-  <div class="md-layout md-gutter md-alignment-center">
-  <md-card v-for="(plugin, i) in available_plugins" class="md-layout-item md-medium-size-40 md-xsmall-size-100" :key="i">
-    <md-card-header>
-      {{plugin.createdAt}}
-      <h2>{{plugin.name}}</h2>
-      <p>{{plugin.description}}</p>
-      <md-chip v-for="tag in plugin.tags" :key="tag">{{tag}}</md-chip>
-    </md-card-header>
-    <md-card-content>
-      <md-button v-if="!plugin.installed" @click="install(plugin)" class="md-icon-button md-primary"><md-icon>cloud_download</md-icon></md-button>
-      <md-button v-if="plugin.installed" @click="install(plugin)" class="md-icon-button md-primary"><md-icon>update</md-icon></md-button>
-      <md-button v-if="plugin.installed" @click="_plugin2_remove=plugin;showRemoveConfirmation=true;" class="md-accent"><md-icon>delete_forever</md-icon></md-button>
-      <md-button v-if="plugin.installed" @click="edit(plugin)" class="md-icon-button md-primary"><md-icon>edit</md-icon></md-button>
-    </md-card-content>
-  </md-card>
 
-  </div>
+  <grid
+   :center="false"
+   :draggable="true"
+   :sortable="true"
+   :items="available_plugins"
+   :height="80"
+   :width="80"
+   :cell-width="480"
+   :cell-height="320"
+
+   >
+   <template slot="cell" scope="props">
+     <md-card>
+       <md-card-header>
+         {{props.item.createdAt}}
+         <h2>{{props.item.name}}</h2>
+         <p>{{props.item.description}}</p>
+         <md-chip v-for="tag in props.item.tags" :key="tag">{{tag}}</md-chip>
+       </md-card-header>
+       <md-card-content>
+         <md-button v-if="!props.item.installed" @click="install(props.item)" class="md-icon-button md-primary"><md-icon>cloud_download</md-icon></md-button>
+         <md-button v-if="props.item.installed" @click="install(props.item)" class="md-icon-button md-primary"><md-icon>update</md-icon></md-button>
+         <md-button v-if="props.item.installed" @click="_plugin2_remove=props.item;showRemoveConfirmation=true;" class="md-accent"><md-icon>delete_forever</md-icon></md-button>
+         <md-button v-if="props.item.installed" @click="edit(props.item)" class="md-icon-button md-primary"><md-icon>edit</md-icon></md-button>
+       </md-card-content>
+     </md-card>
+   </template>
+ </grid>
+
   <br>
   <md-dialog-confirm :md-active.sync="showRemoveConfirmation" md-title="Removing Plugin" md-content="Do you really want to <strong>delete</strong> this plugin" md-confirm-text="Yes" md-cancel-text="Cancel" @md-cancel="showRemoveConfirmation=false" @md-confirm="remove(_plugin2_remove);showRemoveConfirmation=false"
   />
