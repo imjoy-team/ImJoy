@@ -91,7 +91,7 @@
             <span class="md-subheading">Plugins</span>
           </md-card-header>
           <md-card-content>
-            <div v-for="(panel, t) in panels" :key="panel.name">
+            <div v-for="(panel, t) in panels" :key="panel.id">
               <md-divider></md-divider>
               <joy :config="panel" @run="runPanel($event, panel)"></joy>
 
