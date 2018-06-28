@@ -927,6 +927,12 @@ div#textnode {
   left: 15px;
 }
 
+.md-speed-dial-content {
+  left: 40px;
+  top: -20px;
+  display: flex;
+  flex-direction: row;
+}
 .site-button{
   left: 80px;
 }

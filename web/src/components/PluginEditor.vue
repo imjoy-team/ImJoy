@@ -1,18 +1,19 @@
 <template>
 <div class="plugin-editor">
 
-    <div class="md-toolbar-row">
+    <!-- <div class="md-toolbar-row">
       <h2>{{title}}</h2>
-    </div>
-    <div id="editor"></div>
-
+    </div> -->
+    <md-content>
+    <div :id="editorId"></div>
+  </md-content>
 </div>
 </template>
 
 <script>
 export default {
   name: 'joy',
-  props: ['value', 'options', 'title'],
+  props: ['value', 'options', 'title', 'editorId'],
   data() {
     return {
       router: this.$root.$data.router,
@@ -27,16 +28,17 @@ export default {
   },
   mounted() {
     ace.require('ace/tooltip').Tooltip.prototype.setPosition = function (x, y) {
-        var rect = document.getElementById("editor").getBoundingClientRect();
+        var rect = document.getElementById("editor").getBoundingClientRect()
         y -= rect.top;
         x -= rect.left;
         this.getElement().style.left = x + "px";
         this.getElement().style.top = y + "px";
      };
-    this.editor = ace.edit("editor");
+    this.editor = ace.edit(this.editorId);
     ace.config.set('basePath', '/static/ace')
     this.editor.setOptions({
-        maxLines: 30//Infinity
+        useWrapMode : true,
+        maxLines: Infinity
     });
     this.editor.setTheme("ace/theme/chrome");
     this.editor.session.setMode("ace/mode/html");
@@ -45,10 +47,9 @@ export default {
     });
     this.editor.setValue(this.value)
 
-    // var editorDiv = document.getElementById("editor");     // its container
+    // var editorDiv = document.getElementById(this.editorId);     // its container
     // var doc = this.editor.getSession().getDocument();  // a reference to the doc
-    //
-    // this.editor.on("change", function() {
+    // this.editor.on("change", ()=>{
     //     var lineHeight = this.editor.renderer.lineHeight;
     //     editorDiv.style.height = lineHeight * doc.getLength() + "px";
     //     this.editor.resize();
@@ -65,6 +66,10 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+
+.plugin-editor{
+  overflow: auto;
+}
 #editor {
     position: fixed;
     top: 30px;

@@ -64,13 +64,7 @@
             <!-- <p>generic data</p> -->
             <md-chip v-for="(v, k) in w.data" :key="k">{{k}}</md-chip>
           </div>
-          <div v-else-if="w.type=='imjoy/plugin-editor'">
-              <plugin-editor v-model="w.data.code"></plugin-editor>
-              <!-- <div class="md-toolbar">
-                <md-button class="md-parimary">Save</md-button>
-                <md-button class="md-parimary">Reload</md-button>
-              </div> -->
-          </div>
+          <plugin-editor  v-else-if="w.type=='imjoy/plugin-editor'" v-model="w.data.code" :editorId="'editor_'+w.i"></plugin-editor>
           <div v-else class="plugin-iframe">
             <md-button class="iframe-load-button" @click="w.click2load=false;w.renderWindow(w)" v-if="w.click2load">Click to load the window</md-button>
             <div :id="w.iframe_container" class="plugin-iframe">
