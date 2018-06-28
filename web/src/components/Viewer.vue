@@ -19,9 +19,6 @@
         <md-button @click="closeAll" class="md-icon-button md-accent">
           <md-icon>cancel</md-icon>
         </md-button>
-        <md-button @click="reloadPlugins()" class="md-icon-button">
-          <md-icon>autorenew</md-icon>
-        </md-button>
         <md-button class="md-icon-button">
           <md-icon>save</md-icon>
         </md-button>
@@ -88,7 +85,16 @@
       <div v-if="plugin_loaded">
         <md-card>
           <md-card-header>
-            <span class="md-subheading">Plugins</span>
+            <div class="md-layout md-gutter md-alignment-center-space-between">
+              <div class="md-layout-item md-size-70">
+                <span class="md-subheading">Plugins</span>
+              </div>
+              <div class="md-layout-item">
+                <md-button @click="reloadPlugins()" class="md-icon-button">
+                  <md-icon>autorenew</md-icon>
+                </md-button>
+              </div>
+            </div>
           </md-card-header>
           <md-card-content>
             <div v-for="(panel, t) in panels" :key="panel.id">
@@ -123,7 +129,7 @@
 
   <md-dialog class="fullscreen" :md-active.sync="showSettingsDialog">
     <md-dialog-content>
-        <plugin-list :plugins="installed_plugins" title="Installed Plugins"></plugin-list>
+      <plugin-list :plugins="installed_plugins" title="Installed Plugins"></plugin-list>
     </md-dialog-content>
     <md-dialog-actions>
       <md-button class="md-primary" @click="showSettingsDialog=false">OK</md-button>
@@ -277,32 +283,34 @@ export default {
     }
   },
   methods: {
-    addPlugin(){
+    addPlugin() {
       const w = {
         name: 'New Plugin',
         type: 'imjoy/plugin-editor',
         config: {},
-        misc: {reload: this.reloadPlugin, save: this.savePlugin},
+        misc: {
+          reload: this.reloadPlugin,
+          save: this.savePlugin
+        },
         data: {
           name: 'new plugin',
-          id: 'plugin_'+randId(),
+          id: 'plugin_' + randId(),
           code: JSON.parse(JSON.stringify(PLUGIN_TEMPLATE))
         }
       }
       this.addWindow(w)
     },
-    reloadPlugin(pconfig){
+    reloadPlugin(pconfig) {
       return new Promise((resolve, reject) => {
-        if(pconfig.plugin && pconfig.plugin.id)
-        delete this.panels[pconfig.plugin.id]
-        if(pconfig.plugin && pconfig.plugin.type)
+        if (pconfig.plugin && pconfig.plugin.id)
+          delete this.panels[pconfig.plugin.id]
+        if (pconfig.plugin && pconfig.plugin.type)
           Joy.remove(pconfig.plugin.type)
-        if(pconfig.plugin && pconfig.plugin.terminate){
+        if (pconfig.plugin && pconfig.plugin.terminate) {
           try {
             console.log('terminating plugin ', pconfig.plugin)
             pconfig.plugin.terminate()
-          }
-          finally {
+          } finally {
             delete pconfig.plugin
           }
         }
@@ -316,17 +324,17 @@ export default {
         } else {
           p = this.loadPlugin(template)
         }
-        p.then((plugin)=>{
+        p.then((plugin) => {
           resolve(plugin)
           console.log('new plugin loaded', plugin)
           if (this.$refs.workflow) this.$refs.workflow.setupJoy()
-        }).catch((e)=>{
+        }).catch((e) => {
           reject(e)
         })
         // this.$forceUpdate()
       })
     },
-    savePlugin(pconfig){
+    savePlugin(pconfig) {
       console.log('saving plugin ', pconfig)
       const code = pconfig.code
       const template = this.parsePluginCode(code, {})
@@ -352,17 +360,17 @@ export default {
         addPlugin()
       });
     },
-    reloadPlugins(){
-      if(this.plugins){
+    reloadPlugins() {
+      if (this.plugins) {
         for (let k in this.plugins) {
           if (this.plugins.hasOwnProperty(k)) {
             const plugin = this.plugins[k]
-            if (typeof plugin.terminate == 'function'){
+            if (typeof plugin.terminate == 'function') {
               try {
                 plugin.terminate()
               } catch (e) {
                 console.error(e)
-              }finally {
+              } finally {
                 this.plugins[k] = null
               }
             }
@@ -405,7 +413,7 @@ export default {
         this.loading = false
       });
     },
-    closeAll(){
+    closeAll() {
       this.windows = []
       this.default_window_pos = {
         i: 0,
@@ -415,16 +423,16 @@ export default {
         h: 5
       }
     },
-    showProgress(p){
+    showProgress(p) {
       if (p < 1) this.progress = p * 100
       else this.progress = p
       // this.$forceUpdate()
     },
-    showStatus(s){
+    showStatus(s) {
       this.status_text = s
       // this.$forceUpdate()
     },
-    addWindow(w){
+    addWindow(w) {
       this.generateGridPosition(w)
       this.windows.push(w)
       this.store.event_bus.$emit('add_window', w)
@@ -475,7 +483,7 @@ export default {
       console.log('run workflow.', this.activeWindows)
       const w = this.activeWindows[this.activeWindows.length - 1] || {}
       joy.workflow.execute(w.data || {}).then((my) => {
-        if(my && !my.op.tags.includes('window')){
+        if (my && !my.op.tags.includes('window')) {
           console.log('result', my)
           my.name = 'result'
           my.type = 'imjoy/generic'
@@ -485,7 +493,7 @@ export default {
         }
         this.progress = 100
         this.status_text = ''
-      }).catch((e)=>{
+      }).catch((e) => {
         console.error(e)
         this.status_text = e.toString() || "Error."
       })
@@ -494,7 +502,7 @@ export default {
       console.log('run panel.', this.activeWindows)
       const w = this.activeWindows[this.activeWindows.length - 1] || {}
       joy._panel.execute(w.data || {}).then((my) => {
-        if(my && !my.op.tags.includes('window')){
+        if (my && !my.op.tags.includes('window')) {
           console.log('result', my)
           my.name = 'result'
           my.type = 'imjoy/generic'
@@ -504,7 +512,7 @@ export default {
         }
         this.progress = 100
         this.status_text = ''
-      }).catch((e)=>{
+      }).catch((e) => {
         console.error(e)
         this.status_text = e.toString() || "Error."
       })
@@ -520,13 +528,12 @@ export default {
     parsePluginCode(code, config) {
       config = config || {}
       const url = config.url
-      if(url && url.endsWith('.js')){
+      if (url && url.endsWith('.js')) {
         config.lang = config.lang || 'javascript'
         config.script = code
         config.style = null
         config.window = null
-      }
-      else{
+      } else {
         console.log('parsing the plugin file')
         const pluginComp = parseComponent(code)
         console.log('code parsed from', pluginComp)
@@ -534,8 +541,8 @@ export default {
         for (let i = 0; i < pluginComp.customBlocks.length; i++) {
           if (pluginComp.customBlocks[i].type == 'config') {
             // find the first config block
-             config = JSON.parse(pluginComp.customBlocks[i].content)
-             console.log('loading config from .vue file', config)
+            config = JSON.parse(pluginComp.customBlocks[i].content)
+            console.log('loading config from .vue file', config)
             break
           }
         }
@@ -622,7 +629,7 @@ export default {
             throw 'error occured when loading plugin.'
           }
           this.plugins[plugin.id] = plugin
-          if(config.type && config.ui){
+          if (config.type && config.ui) {
             this.register(config, {
               id: plugin.id
             })
@@ -756,7 +763,7 @@ export default {
             config: pconfig.config,
             op: pconfig.op,
           }).catch((e) => {
-            this.status_text = "Error occured when running plugin "+plugin.name
+            this.status_text = "Error occured when running plugin " + plugin.name
             console.error('error in run function: ', e)
           })
         }).catch((e) => {
@@ -844,9 +851,9 @@ export default {
         console.log('creating dialog: ', config, plugin)
 
         // if (config.show_panel && plugin.panel_config) {
-          // create panel for the window
-          // console.log('creating panel: ', plugin.panel_config)
-          // config.panel = plugin_config
+        // create panel for the window
+        // console.log('creating panel: ', plugin.panel_config)
+        // config.panel = plugin_config
         // }
 
         this.plugin_dialog_config = config
@@ -972,7 +979,7 @@ export default {
   margin-top: 40px;
 }
 
-.error-message{
+.error-message {
   color: red;
   user-select: text;
 }
@@ -1001,21 +1008,22 @@ div#textnode {
 }
 
 .speed-dial {
-  top: 8px!important;
-  left: 15px!important;
+  top: 8px !important;
+  left: 15px !important;
 }
 
 .md-speed-dial-content {
-  left: 40px!important;
-  top: -20px!important;
+  left: 40px !important;
+  top: -20px !important;
   display: flex;
   flex-direction: row;
 }
-.site-button{
+
+.site-button {
   left: 80px;
 }
 
-.fullscreen{
+.fullscreen {
   max-width: 100%;
   width: 100%;
   height: 100%;
