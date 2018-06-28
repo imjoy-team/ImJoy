@@ -4,14 +4,14 @@ url<template>
   <md-subheader v-if="title">{{title}}</md-subheader>
 
   <grid
-   :center="false"
-   :draggable="true"
+   :center="true"
+   :draggable="false"
    :sortable="true"
    :items="available_plugins"
-   :height="80"
-   :width="80"
+   :height="40"
+   :width="40"
    :cell-width="480"
-   :cell-height="320"
+   :cell-height="280"
 
    >
    <template slot="cell" scope="props">
@@ -23,10 +23,10 @@ url<template>
          <md-chip v-for="tag in props.item.tags" :key="tag">{{tag}}</md-chip>
        </md-card-header>
        <md-card-content>
-         <md-button v-if="!props.item.installed" @click="install(props.item)" class="md-icon-button md-primary"><md-icon>cloud_download</md-icon></md-button>
-         <md-button v-if="props.item.installed" @click="install(props.item)" class="md-icon-button md-primary"><md-icon>update</md-icon></md-button>
-         <md-button v-if="props.item.installed" @click="_plugin2_remove=props.item;showRemoveConfirmation=true;" class="md-accent"><md-icon>delete_forever</md-icon></md-button>
-         <md-button v-if="props.item.installed" @click="edit(props.item)" class="md-icon-button md-primary"><md-icon>edit</md-icon></md-button>
+         <md-button v-if="!props.item.installed" @click="install(props.item)" class="md-button md-primary"><md-icon>cloud_download</md-icon>Install</md-button>
+         <md-button v-if="props.item.installed" @click="install(props.item)" class="md-button md-primary"><md-icon>update</md-icon>Update</md-button>
+         <md-button v-if="props.item.installed" @click="_plugin2_remove=props.item;showRemoveConfirmation=true;" class="md-accent"><md-icon>delete_forever</md-icon>Delete</md-button>
+         <md-button v-if="props.item.installed" @click="edit(props.item)" class="md-button md-primary"><md-icon>edit</md-icon>Edit</md-button>
        </md-card-content>
      </md-card>
    </template>
@@ -231,7 +231,7 @@ export default {
 .md-card {
   width: 450px;
   /* max-height: 1000px; */
-  height: 300px;
+  height: 250px;
   margin-top: 20px;
 }
 
