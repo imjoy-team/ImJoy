@@ -99,7 +99,7 @@
           <md-card-content>
             <div v-for="(panel, t) in panels" :key="panel.id">
               <md-divider></md-divider>
-              <joy :config="panel" @run="runPanel($event, panel)"></joy>
+              <joy :config="panel" @edit="editPlugin" @run="runPanel($event, panel)"></joy>
 
             </div>
             <md-divider></md-divider>
@@ -288,6 +288,25 @@ export default {
     this.plugins = null
   },
   methods: {
+    editPlugin(pconfig) {
+      const plugin = this.plugins[pconfig.id]
+      const template = plugin.template
+      const w = {
+        name: template.name,
+        type: 'imjoy/plugin-editor',
+        config: {},
+        misc: {
+          reload: this.reloadPlugin,
+          save: this.savePlugin
+        },
+        data: {
+          name: template.name,
+          id: plugin.id,
+          code: template.code
+        }
+      }
+      this.addWindow(w)
+    },
     addPlugin() {
       const w = {
         name: 'New Plugin',

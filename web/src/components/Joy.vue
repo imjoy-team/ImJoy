@@ -1,7 +1,7 @@
 <template>
 <div class="joy">
 
-  <md-button class="md-icon-button" v-if="showHeader" @click="config.expanded=!config.expanded; $forceUpdate()">
+  <md-button class="md-icon-button" v-if="showHeader" @click="editSource">
     <md-icon v-if="config.icon">{{config.icon}}</md-icon>
     <md-icon v-else>extension</md-icon>
   </md-button>
@@ -68,6 +68,9 @@ export default {
     }
   },
   methods: {
+    editSource(){
+      this.$emit('edit', this.config)
+    },
     setupJoy() {
       this.$refs.editor.innerHTML = ''
       const joy_config = {
