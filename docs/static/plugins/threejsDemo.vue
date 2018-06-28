@@ -21,7 +21,7 @@ This plugin shows a demo for Three.js.
 
 </docs>
 
-<html>
+<window>
   <div>
       <div id="info">
           <a href="https://threejs.org" target="_blank" rel="noopener noreferrer">three.js</a> framebuffer to texture
@@ -33,7 +33,7 @@ This plugin shows a demo for Three.js.
           </div>
       </div>
   </div>
-</html>
+</window>
 
 <script>
 

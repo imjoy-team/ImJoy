@@ -21,19 +21,18 @@ This plugin is for dispalying 2d image.
 
 </docs>
 
-<html>
+<window>
   <div>
    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.1/dist/leaflet.css"
    integrity="sha512-Rksm5RenBEKSKFjgI3a41vrjkw4EVPlJ3+OiI65vTjIdo9brlAacEuKOiQ5OFh7cOI1bkDwLqdLw3Zg0cRJAAQ=="
    crossorigin=""/>
    <link rel="stylesheet" href="https://cdn.rawgit.com/leongersen/noUiSlider/aa64a6d9/distribute/nouislider.min.css"/>
    <div id="leaflet_canvas"></div>
-   <div id="slider" />
+   <div id="slider"></div>
   </div>
-</html>
+</window>
 
 <script>
-
 function array2url(imageArr, w, h, low, high){
   var canvas = document.createElement('canvas');
   canvas.width = w
@@ -59,8 +58,8 @@ class ImageWindowPlugin {
   async setup() {
     await importScripts("https://cdn.rawgit.com/leongersen/noUiSlider/aa64a6d9/distribute/nouislider.min.js")
     await importScripts("https://unpkg.com/leaflet@1.3.1/dist/leaflet.js")
-    // this._slider = document.getElementById('slider');
-    //
+    this._slider = document.getElementById('slider');
+
     // noUiSlider.create(this._slider, {
     // 	start: [0, 255],
     // 	connect: true,
@@ -74,7 +73,7 @@ class ImageWindowPlugin {
   }
   run(my) {
     // my = my || this._my
-    const range = [0, 10] // this._slider.noUiSlider.get()
+    const range = [0,10]//this._slider.noUiSlider.get()
     console.log('pixel range: ', range)
     const imageUrl = array2url(my.data.image.array, my.data.image.width, my.data.image.height, parseInt(range[0]), parseInt(range[1]))
     const w = my.data.image.width, h = my.data.image.height

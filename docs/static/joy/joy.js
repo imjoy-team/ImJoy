@@ -391,18 +391,28 @@ Joy.add({
 Joy.templates = [];
 Joy.add = function(template){
 	var duplicated = Joy.templates.filter(function(t){
-		if(t.name === undefined || template.name === undefined)
+		if(t.type === undefined || template.type === undefined)
 			return false
 		else
-			return t.name == template.name;
+			return t.type == template.type;
 	});
 	if(duplicated.length<=0){
 		Joy.templates.push(template);
 	}
 	else{
 		// console.log('replacing template ', template.name, template.type)
-		_removeFromArray(Joy.templates, duplicated[0]);
+		for(var i=0;i<duplicated.length;i++) _removeFromArray(Joy.templates, duplicated[i]);
 		Joy.templates.push(template);
+	}
+};
+
+Joy.remove = function(type){
+	var duplicated = Joy.templates.filter(function(t){
+		if(t.type == type) return true
+	});
+	if(duplicated.length>0){
+		// console.log('replacing template ', template.name, template.type)
+		for(var i=0;i<duplicated.length;i++) _removeFromArray(Joy.templates, duplicated[i]);
 	}
 };
 
