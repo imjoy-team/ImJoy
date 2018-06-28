@@ -28,6 +28,7 @@
     "vega-embed": "^3.7.2",
     "vue": "^2.5.2",
     "vue-grid-layout": "^2.1.13",
+    "vue-js-grid": "^1.0.1",
     "vue-material": "^1.0.0-beta-10.2",
     "vue-router": "^3.0.1",
     "vue-slider-component": "^2.6.2"

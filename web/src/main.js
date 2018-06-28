@@ -19,11 +19,13 @@ import PluginEditor from '@/components/PluginEditor'
 import store from './store.js'
 import App from './App'
 import VueGridLayout from 'vue-grid-layout'
+import Grid from "vue-js-grid"
 
 
 Vue.config.productionTip = false
 
 Vue.use(VueMaterial)
+Vue.use(Grid)
 
 // register
 Vue.component('vue-slider', vueSlider)

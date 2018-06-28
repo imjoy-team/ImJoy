@@ -47,7 +47,7 @@ export const PLUGIN_SCHEMA= schema({
   lang: [null, String],
   script: [null, String],
   style: [null, String],
-  html: [null, String]
+  window: [null, String]
 })
 
 export const REGISTER_SCHEMA= schema({

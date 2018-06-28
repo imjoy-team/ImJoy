@@ -35,7 +35,7 @@
     </md-app-toolbar>
     <md-app-drawer :md-active.sync="menuVisible" md-persistent="full">
       <!-- <md-app-toolbar class="md-primary md-dense"> -->
-      <md-speed-dial class="md-top-left speed-dial" md-effect="scale" md-direction="bottom">
+      <md-speed-dial class="md-top-left speed-dial" md-event="hover" md-effect="scale" md-direction="bottom">
         <md-speed-dial-target class="md-primary">
           <md-icon>add</md-icon>
         </md-speed-dial-target>
@@ -292,9 +292,16 @@ export default {
         for (let k in this.plugins) {
           if (this.plugins.hasOwnProperty(k)) {
             const plugin = this.plugins[k]
-            if (typeof plugin.terminate == 'function') plugin.terminate()
+            if (typeof plugin.terminate == 'function'){
+              try {
+                plugin.terminate()
+              } catch (e) {
+                console.error(e)
+              }
+            }
           }
         }
+        this.plugins = null
       }
       this.db.allDocs({
         include_docs: true,
@@ -461,9 +468,9 @@ export default {
         config.script = pluginComp.script.content
         config.lang = pluginComp.script.attrs.lang || 'javascript'
         for (let i = 0; i < pluginComp.customBlocks.length; i++) {
-          if (pluginComp.customBlocks[i].type == 'html') {
+          if (pluginComp.customBlocks[i].type == 'window') {
             // find the first html block
-            config.html = pluginComp.customBlocks[i].content
+            config.window = pluginComp.customBlocks[i].content
             break
             //show the iframe if there is html defined
             // config.iframe_container = 'plugin_window_' + config.id + randId()
@@ -472,7 +479,7 @@ export default {
             // this.showPluginWindow(config)
           }
         }
-        config.html = config.html || null
+        config.window = config.window || null
         if (pluginComp.styles.length > 0) {
           // here we only take the first stylesheet we found
           config.style = pluginComp.styles[0].content
@@ -483,7 +490,7 @@ export default {
         config.lang = config.lang || 'javascript'
         config.script = code
         config.style = null
-        config.html = null
+        config.window = null
       }
       config._id = config._id || null
       config.url = url
