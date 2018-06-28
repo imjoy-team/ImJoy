@@ -91,7 +91,7 @@
             <span class="md-subheading">Plugins</span>
           </md-card-header>
           <md-card-content>
-            <div v-for="(panel, t) in panels" :key="panel.id">
+            <div v-for="(panel, t) in panels" :key="panel.name">
               <md-divider></md-divider>
               <joy :config="panel" @run="runPanel($event, panel)"></joy>
 
@@ -149,6 +149,7 @@ import {
   parseComponent
 } from '../pluginParser.js'
 
+import _ from 'lodash'
 
 export default {
   name: 'viewer',
@@ -372,7 +373,8 @@ export default {
       this.panels = {}
       this.db.allDocs({
         include_docs: true,
-        attachments: true
+        attachments: true,
+        sort: 'name'
       }).then((result) => {
         const promises = []
         this.plugins = {}
@@ -652,7 +654,7 @@ export default {
       try {
         const plugin = this.plugins[_plugin.id]
         config.mode = config.mode || 'webworker'
-        config.show_panel = config.show_panel || true
+        config.show_panel = config.show_panel || false
         console.log('registering op', config)
         if (!REGISTER_SCHEMA(config)) {
           const error = REGISTER_SCHEMA.errors(config)
@@ -713,11 +715,11 @@ export default {
             onexecute: config.onexecute
           }
           plugin.panel_config = panel_config
-          if (config.show_panel) {
-            console.log('creating panel: ', panel_config)
-            this.panels[panel_config.id] = panel_config
-            this.$forceUpdate()
-          }
+
+          console.log('creating panel: ', panel_config)
+          this.panels[panel_config.id] = panel_config
+          this.$forceUpdate()
+
         }
         if (config.tags.includes('window')) {
           if (config.mode != 'iframe') {
@@ -841,11 +843,11 @@ export default {
         //TODO: verify fields with WINDOW_TEMPLATE
         console.log('creating dialog: ', config, plugin)
 
-        if (config.show_panel && plugin.panel_config) {
+        // if (config.show_panel && plugin.panel_config) {
           // create panel for the window
-          console.log('creating panel: ', plugin.panel_config)
+          // console.log('creating panel: ', plugin.panel_config)
           // config.panel = plugin_config
-        }
+        // }
 
         this.plugin_dialog_config = config
         this.showPluginDialog = true

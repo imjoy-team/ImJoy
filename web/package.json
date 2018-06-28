@@ -19,6 +19,7 @@
     "file-saver": "^1.3.3",
     "glfx": "0.0.4",
     "js-schema": "^1.0.1",
+    "lodash": "^4.17.10",
     "marked": "^0.4.0",
     "pica": "^4.0.1",
     "uglify-es": "github:mishoo/UglifyJS2#harmony",

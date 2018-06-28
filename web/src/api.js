@@ -8,7 +8,6 @@ export const PLUGIN_TEMPLATE= `
   "mode": "webworker",
   "tags": ["op", "image"],
   "ui": "image processing",
-  "show_panel": true,
   "version": "0.1.0",
   "api_version": "0.1.0",
   "url": "",
@@ -56,7 +55,7 @@ export const REGISTER_SCHEMA= schema({
   mode: String,
   tags: Array,
   ui: String,
-  show_panel: Boolean
+  show_panel: [null, Boolean]
 })
 
 export const WINDOW_SCHEMA= schema({

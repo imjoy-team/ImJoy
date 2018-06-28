@@ -14,7 +14,7 @@ url<template>
    :cell-height="280"
 
    >
-   <template slot="cell" scope="props">
+   <template slot="cell" slot-scope="props">
      <md-card>
        <md-card-header>
          {{props.item.createdAt}}
@@ -50,6 +50,10 @@ url<template>
 
 <script>
 import axios from 'axios';
+import {
+  _clone,
+  randId
+} from '../utils.js'
 
 export default {
   name: 'plugin-list',
