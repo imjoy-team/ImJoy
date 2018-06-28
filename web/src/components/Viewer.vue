@@ -1001,13 +1001,13 @@ div#textnode {
 }
 
 .speed-dial {
-  top: 8px;
-  left: 15px;
+  top: 8px!important;
+  left: 15px!important;
 }
 
 .md-speed-dial-content {
-  left: 40px;
-  top: -20px;
+  left: 40px!important;
+  top: -20px!important;
   display: flex;
   flex-direction: row;
 }
