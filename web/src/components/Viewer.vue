@@ -278,9 +278,14 @@ export default {
     for (let k in this.plugins) {
       if (this.plugins.hasOwnProperty(k)) {
         const plugin = this.plugins[k]
-        if (typeof plugin.terminate == 'function') plugin.terminate()
+        try {
+          if (typeof plugin.terminate == 'function') plugin.terminate()
+        } catch (e) {
+
+        }
       }
     }
+    this.plugins = null
   },
   methods: {
     addPlugin() {
@@ -310,11 +315,12 @@ export default {
           try {
             console.log('terminating plugin ', pconfig.plugin)
             pconfig.plugin.terminate()
+            console.log('terminated.')
           } finally {
             delete pconfig.plugin
           }
         }
-
+        pconfig.plugin = null
         console.log('reloading plugin ', pconfig)
         const template = this.parsePluginCode(pconfig.code, pconfig)
         console.log(template)
@@ -712,7 +718,7 @@ export default {
           Joy.add(joy_template);
           //update the joy workflow if new template added, TODO: preserve settings during reload
           if (this.$refs.workflow) this.$refs.workflow.setupJoy()
-          plugin.config.type = config.type
+          plugin.type = config.type
           console.log('register op plugin: ', plugin.template)
           this.registered.ops[config.type] = plugin.template
           const panel_config = {
