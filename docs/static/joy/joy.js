@@ -416,6 +416,10 @@ Joy.remove = function(type){
 	}
 };
 
+Joy.reset = function(){
+	Joy.templates = []
+};
+
 // Get Template
 Joy.getTemplateByType = function(type){
 	var template = Joy.templates.find(function(template){

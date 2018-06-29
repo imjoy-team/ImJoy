@@ -19,13 +19,13 @@ This plugin shows a demo for Three.js.
 
 </docs>
 
-<html>
+<window>
   <div>
       <div id="info">
           This is a demo for using tSNE, <a href="https://cs.stanford.edu/people/karpathy/tsnejs/"> more details</a>.
       </div>
   </div>
-</html>
+</window>
 
 <script lang="javascript">
 class TSNEPlugin {
