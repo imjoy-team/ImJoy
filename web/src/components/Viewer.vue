@@ -75,7 +75,16 @@
       <br>
       <md-card>
         <md-card-header>
-          <span class="md-subheading">Workflow</span>
+          <div class="md-layout md-gutter md-alignment-center-space-between">
+            <div class="md-layout-item md-size-70">
+              <span class="md-subheading">Workflow</span>
+            </div>
+            <div class="md-layout-item">
+              <md-button @click="reloadOps()" class="md-icon-button">
+                <md-icon>autorenew</md-icon>
+              </md-button>
+            </div>
+          </div>
         </md-card-header>
         <md-card-content>
           <joy :config="workflow_joy_config" :showHeader="false" ref="workflow" @run="runWorkflow" v-if="plugin_loaded"></joy>
@@ -352,15 +361,17 @@ export default {
         p.then((plugin) => {
           resolve(plugin)
           console.log('new plugin loaded', plugin)
+          pconfig.plugin = plugin
           if (this.$refs.workflow) this.$refs.workflow.setupJoy()
         }).catch((e) => {
+          pconfig.plugin = plugin
           reject(e)
         })
         // this.$forceUpdate()
       })
     },
     savePlugin(pconfig) {
-      console.log('saving plugin ', pconfig)
+      //console.log('saving plugin ', pconfig)
       const code = pconfig.code
       const template = this.parsePluginCode(code, {})
       template.code = code
@@ -384,6 +395,9 @@ export default {
       }).catch((err) => {
         addPlugin()
       });
+    },
+    reloadOps(){
+      if (this.$refs.workflow) this.$refs.workflow.setupJoy()
     },
     reloadPlugins() {
       if (this.plugins) {
@@ -437,6 +451,7 @@ export default {
         console.error(err)
         this.loading = false
       });
+
     },
     closeAll() {
       this.windows = []
@@ -809,7 +824,6 @@ export default {
         wconfig.data = wconfig.data || null
         wconfig.force_show = wconfig.force_show || false
         wconfig.panel = wconfig.panel || null
-        console.log('--------------------------', wconfig)
         if (!WINDOW_SCHEMA(wconfig)) {
           const error = WINDOW_SCHEMA.errors(wconfig)
           console.error("Error occured during creating window " + wconfig.name, error)

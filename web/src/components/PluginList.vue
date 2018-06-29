@@ -123,8 +123,8 @@ export default {
       for (let i = 0; i < this.available_plugins.length; i++) {
         const plugin = this.available_plugins[i]
         console.log(plugin)
-        if (!plugin.url.startsWith('http')) {
-          if (!plugin.url.startsWith) {
+        if (plugin.url) {
+          if (!plugin.url.startsWith('http')) {
             plugin.url = '/' + plugin.url
           }
           plugin.url = this.plugin_dir + plugin.url
