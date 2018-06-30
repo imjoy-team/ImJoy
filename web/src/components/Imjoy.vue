@@ -358,10 +358,9 @@ export default {
         name: template.name,
         type: 'imjoy/plugin-editor',
         config: {},
-        misc: {
-          reload: this.reloadPlugin,
-          save: this.savePlugin
-        },
+        plugin: plugin,
+        reload: this.reloadPlugin,
+        save: this.savePlugin,
         data: {
           name: template.name,
           id: plugin.id,
@@ -375,10 +374,8 @@ export default {
         name: 'New Plugin',
         type: 'imjoy/plugin-editor',
         config: {},
-        misc: {
-          reload: this.reloadPlugin,
-          save: this.savePlugin
-        },
+        reload: this.reloadPlugin,
+        save: this.savePlugin,
         data: {
           name: 'new plugin',
           id: 'plugin_' + randId(),
@@ -405,7 +402,7 @@ export default {
         pconfig.plugin = null
         console.log('reloading plugin ', pconfig)
         const template = this.parsePluginCode(pconfig.code, pconfig)
-        console.log(template)
+        console.log('-------------------------------------', template)
         let p
         if (template.mode == 'iframe' && template.tags.includes('window')) {
           p = this.preLoadPlugin(template)
@@ -686,6 +683,8 @@ export default {
         config.id = template.name.trim().replace(/ /g, '_') + '_' + randId()
         const plugin = {
           id: config.id,
+          name: config.name,
+          type: config.type,
           config: config,
           template: template,
           mode: template.mode
@@ -712,6 +711,7 @@ export default {
     },
     loadPlugin(config) {
       config = _clone(config)
+      console.log('xxxxx------------------', config)
       //generate a random id for the plugin
       return new Promise((resolve, reject) => {
         config.id = config.name.trim().replace(/ /g, '_') + '_' + randId()

@@ -82,6 +82,9 @@
 </template>
 
 <script>
+import {
+  randId
+} from '../utils.js'
 
 export default {
   name: 'whiteboard',

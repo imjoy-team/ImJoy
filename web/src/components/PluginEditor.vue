@@ -9,6 +9,10 @@
         <md-icon>save</md-icon>
         <md-tooltip>Save the plugin</md-tooltip>
       </md-button>
+      <md-button @click="saveAs()" class="md-icon-button">
+        <md-icon>cloud_download</md-icon>
+        <md-tooltip>Export the plugin</md-tooltip>
+      </md-button>
     </md-toolbar>
     <md-content class="editor">
     <div :id="'editor_'+pluginId"></div>
@@ -17,6 +21,10 @@
 </template>
 
 <script>
+import { saveAs } from 'file-saver';
+import {
+  randId
+} from '../utils.js'
 export default {
   name: 'joy',
   props: ['value', 'options', 'title', 'pluginId', 'window'],
@@ -71,14 +79,19 @@ export default {
   },
   methods: {
     save(){
-      this.window.misc.save({pluginId: this.pluginId, code: this.editor.getValue()})
+      this.window.save({pluginId: this.pluginId, code: this.editor.getValue()})
       //this.$emit('save', {pluginId: this.pluginId, code: this.editor.getValue()})
     },
     reload(){
-      this.window.misc.reload({pluginId: this.pluginId, code: this.editor.getValue(), plugin: this.window.plugin}).then((plugin)=>{
+      this.window.reload({pluginId: this.pluginId, code: this.editor.getValue(), plugin: this.window.plugin}).then((plugin)=>{
         this.window.plugin = plugin
       })
       //this.$emit('reload', {pluginId: this.pluginId, code: this.editor.getValue()})
+    },
+    saveAs(){
+      const filename = this.window.plugin&&this.window.plugin.name?this.window.plugin.name+"_"+randId()+'.imjoy.vue':'plugin_'+randId()+'.imjoy.vue'
+      const file = new Blob([this.editor.getValue()], {type: "text/plain;charset=utf-8"})
+      saveAs(file, filename);
     }
 
   }
