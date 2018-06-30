@@ -14,7 +14,7 @@
           <div class="site-title">ImJoy.io<span class="superscript">alpha</span></div>
           <md-tooltip>ImJoy home</md-tooltip>
         </md-button>
-        <span class="subheader-title md-small-hide" style="flex: 1">Image Processing with Joy</span>
+        <span class="subheader-title md-medium-hide" style="flex: 1">Image Processing with Joy</span>
       </div>
       <span class="status-text md-small-hide" :class="status_text.includes('rror')?'error-message':''">{{status_text}}</span>
       <div class="md-toolbar-section-end">

@@ -1,18 +1,28 @@
 <template>
-<div class="plugin-list">
+<div class="plugin-list" ref="container">
   <!-- <md-subheader>Options</md-subheader> -->
   <md-subheader v-if="title">{{title}}</md-subheader>
-
-  <grid
+  <md-card v-if="containerWidth<=500" v-for="plugin in available_plugins">
+    <md-card-header>
+      {{plugin.createdAt}}
+      <h2>{{plugin.name}}</h2>
+      <p>{{plugin.description}}</p>
+      <md-chip v-for="tag in plugin.tags" :key="tag">{{tag}}</md-chip>
+    </md-card-header>
+    <md-card-content>
+      <md-button v-if="!plugin.installed" @click="install(plugin)" class="md-button md-primary"><md-icon>cloud_download</md-icon>Install</md-button>
+      <md-button v-if="plugin.installed" @click="install(plugin)" class="md-button md-primary"><md-icon>update</md-icon>Update</md-button>
+      <md-button v-if="plugin.installed" @click="_plugin2_remove=plugin;showRemoveConfirmation=true;" class="md-accent"><md-icon>delete_forever</md-icon>Delete</md-button>
+      <md-button v-if="plugin.installed" @click="edit(plugin)" class="md-button md-primary"><md-icon>edit</md-icon>Edit</md-button>
+    </md-card-content>
+  </md-card>
+  <grid v-if="containerWidth>500"
    :center="true"
    :draggable="false"
    :sortable="true"
    :items="available_plugins"
-   :height="40"
-   :width="40"
-   :cell-width="480"
+   :cell-width="380"
    :cell-height="280"
-
    >
    <template slot="cell" slot-scope="props">
      <md-card>
@@ -79,6 +89,7 @@ export default {
       editorPlugin: null,
       editorOptions: {},
       showEditor: false,
+      containerWidth: 500,
       root_url: null,
       plugin_dir: null,
       manifest: null,
@@ -92,6 +103,12 @@ export default {
     }
   },
   mounted() {
+    this.containerWidth = this.$refs.container.offsetWidth;
+    const updateSize = (e)=>{
+      this.containerWidth = this.$refs.container.offsetWidth;
+    }
+    this.store.event_bus.$on('resize',updateSize)
+
     this.db = new PouchDB('imjoy_plugins', {
       revs_limit: 2,
       auto_compaction: true
@@ -233,10 +250,10 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 .md-card {
-  width: 450px;
+  width: 95%;
   /* max-height: 1000px; */
   height: 250px;
-  margin-top: 20px;
+  margin-top: 20px
 }
 
 .editor-dialog{
