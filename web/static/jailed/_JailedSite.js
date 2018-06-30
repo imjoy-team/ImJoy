@@ -5,6 +5,29 @@
  */
 
 (function(){
+    var _dtype2typedarray = {
+      int8: 'Int8Array',
+      int16: 'Int16Array',
+      int32: 'Int32Array',
+      uint8: 'Uint8Array',
+      uint16: 'Uint16Array',
+      uint32: 'Uint32Array',
+      float32: 'Float32Array',
+      float64: 'Float64Array',
+      array: 'Array'
+    }
+    var _typedarray2dtype = {
+      Int8Array: 'int8',
+      Int16Array: 'int16',
+      Int32Array: 'int32',
+      Uint8Array: 'uint8',
+      Uint16Array: 'uint16',
+      Uint32Array: 'uint32',
+      Float32Array: 'float32',
+      Float64Array: 'float64',
+      Array: 'array'
+    };
+    var ArrayBufferView = Object.getPrototypeOf(Object.getPrototypeOf(new Uint8Array)).constructor;
 
     /**
      * JailedSite object represents a single site in the
@@ -240,6 +263,14 @@
         this._connection.send({type:'getInterface'});
     }
 
+    JailedSite.prototype.Tensor = function(typedArray, shape, dtype) {
+      var _dtype = _typedarray2dtype[typedArray.constructor.name]
+      if(dtype && dtype != _dtype){
+        throw "dtype doesn't match the type of the array: "+_dtype+' != '+dtype
+      }
+      shape = shape || [typedArray.length]
+      return {__jailed_type__: 'tensor', __value__ : typedArray, __shape__: shape, __dtype__: _dtype}
+    };
 
     /**
      * Sets the new remote interface provided by the other site
@@ -247,7 +278,7 @@
      * @param {Array} names list of function names
      */
     JailedSite.prototype._setRemote = function(api) {
-        this._remote = {};
+        this._remote = {Tensor: this.Tensor};
         var i, name;
         for (i = 0; i < api.length; i++) {
             name = api[i].name;
@@ -316,30 +347,7 @@
         this._connection.send({type:'interfaceSetAsRemote'});
     }
 
-    JailedSite.prototype._dtype2typedarray = {
-      int8: 'Int8Array',
-      int16: 'Int16Array',
-      int32: 'Int32Array',
-      uint8: 'Uint8Array',
-      uint16: 'Uint16Array',
-      uint32: 'Uint32Array',
-      float32: 'Float32Array',
-      float64: 'Float64Array',
-      array: 'Array'
-    }
-    JailedSite.prototype._typedarray2dtype = {
-      Int8Array: 'int8',
-      Int16Array: 'int16',
-      Int32Array: 'int32',
-      Uint8Array: 'uint8',
-      Uint16Array: 'uint16',
-      Uint32Array: 'uint32',
-      Float32Array: 'float32',
-      Float64Array: 'float64',
-      Array: 'array'
-    };
-    var ArrayBufferView = Object.getPrototypeOf(Object.getPrototypeOf(new Uint8Array)).constructor;
-    /**
+     /**
      * Prepares the provided set of remote method arguments for
      * sending to the remote site, replaces all the callbacks with
      * identifiers
@@ -371,7 +379,7 @@
               bObject[k] = {__jailed_type__: 'tensor', __value__ : v.dataSync(), __shape__: v.shape, __dtype__: v.dtype}
             }
             else if(typeof nj != 'undefined' && nj.NdArray && v instanceof nj.NdArray){
-              var dtype = this._typedarray2dtype[v.selection.data.constructor.name]
+              var dtype = _typedarray2dtype[v.selection.data.constructor.name]
               bObject[k] = {__jailed_type__: 'tensor', __value__ : v.selection.data, __shape__: v.shape, __dtype__: dtype}
             }
             else if( v instanceof Error){
