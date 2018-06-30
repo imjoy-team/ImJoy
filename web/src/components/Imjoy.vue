@@ -160,6 +160,7 @@
 </template>
 
 <script>
+import axios from 'axios';
 import {
   REGISTER_SCHEMA,
   WINDOW_SCHEMA,
@@ -197,6 +198,13 @@ export default {
       windows: [],
       panels: {},
       activeWindows: [],
+      preload_main: ['/static/tfjs/tfjs.js'],
+      builtin_scripts_url: {
+        tfjs: '/static/tfjs/tfjs.js'
+      },
+      builtin_scripts: {
+
+      },
       workflow_joy_config: {
         expanded: true,
         name: "Workflow",
@@ -257,7 +265,9 @@ export default {
       this.selected_files = e.dataTransfer.files;
       this.loadData()
     });
-
+    this.importScripts(this.preload_main).then(()=>{
+      console.log('preload done.')
+    })
   },
   beforeRouteLeave(to, from, next) {
     if (this.windows && this.windows.length > 0) {
@@ -272,6 +282,19 @@ export default {
     }
   },
   mounted() {
+    for(let u in this.builtin_scripts_url){
+      if(this.builtin_scripts_url.hasOwnProperty(u)){
+        axios.get(this.builtin_scripts_url[u]).then(response => {
+          if (!response || !response.data || response.data == '') {
+            alert('failed to get plugin code from ' + plugin.url)
+            return
+          }
+          this.builtin_scripts[u] = response.data
+          console.log('downloaded script: ', u)
+        })
+      }
+    }
+
     this.plugin_api = {
       alert: alert,
       register: this.register,
@@ -309,6 +332,25 @@ export default {
     this.plugins = null
   },
   methods: {
+    importScript(url) {
+        //url is URL of external file, implementationCode is the code
+        //to be called from the file, location is the location to
+        //insert the <script> element
+        return new Promise((resolve, reject) => {
+            var scriptTag = document.createElement('script');
+            scriptTag.src = url;
+            scriptTag.onload = resolve;
+            scriptTag.onreadystatechange = resolve;
+            scriptTag.onerror = reject;
+            document.head.appendChild(scriptTag);
+        })
+    },
+    async importScripts () {
+      var args = Array.prototype.slice.call(arguments), len = args.length, i = 0;
+      for (; i < len; i++) {
+        await this.importScript(args[i])
+      }
+    },
     editPlugin(pconfig) {
       const plugin = this.plugins[pconfig.id]
       const template = plugin.template

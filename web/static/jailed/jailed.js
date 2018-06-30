@@ -756,7 +756,6 @@ function randId() {
         var sCb = function() {
             me._requestRemote();
         }
-
         this._connection.execute({type: 'script', content: this.template.script}, sCb, this._fCb);
         if(this.template.style) this._connection.execute({type: 'style', content: this.template.style}, sCb, this._fCb);
         if(this.template.window) this._connection.execute({type: 'html', content: this.template.window}, sCb, this._fCb);

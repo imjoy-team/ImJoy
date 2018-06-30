@@ -20,7 +20,7 @@ function _htmlToElement(html) {
     return template.content.firstChild;
 }
 
-var _loadJS = function(url) {
+var _importScript = function(url) {
     //url is URL of external file, implementationCode is the code
     //to be called from the file, location is the location to
     //insert the <script> element
@@ -39,7 +39,7 @@ var _loadJS = function(url) {
 async function importScripts () {
   var args = Array.prototype.slice.call(arguments), len = args.length, i = 0;
   for (; i < len; i++) {
-    await _loadJS(args[i])
+    await _importScript(args[i])
   }
 };
 

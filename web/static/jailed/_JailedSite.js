@@ -425,6 +425,9 @@
                 }
 
             }
+            else if(arg.type == 'tensor'){
+                result.push(arg.value);
+            }
             else {
                 //cb = once(
                 cb = this._genRemoteCallback(args.callbackId, i, withPromise)
