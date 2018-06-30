@@ -263,13 +263,13 @@
         this._connection.send({type:'getInterface'});
     }
 
-    JailedSite.prototype.Tensor = function(typedArray, shape, dtype) {
+    JailedSite.prototype._ndarray = function(typedArray, shape, dtype) {
       var _dtype = _typedarray2dtype[typedArray.constructor.name]
       if(dtype && dtype != _dtype){
         throw "dtype doesn't match the type of the array: "+_dtype+' != '+dtype
       }
       shape = shape || [typedArray.length]
-      return {__jailed_type__: 'tensor', __value__ : typedArray, __shape__: shape, __dtype__: _dtype}
+      return {__jailed_type__: 'ndarray', __value__ : typedArray, __shape__: shape, __dtype__: _dtype}
     };
 
     /**
@@ -278,7 +278,7 @@
      * @param {Array} names list of function names
      */
     JailedSite.prototype._setRemote = function(api) {
-        this._remote = {Tensor: this.Tensor};
+        this._remote = {ndarray: this._ndarray};
         var i, name;
         for (i = 0; i < api.length; i++) {
             name = api[i].name;
@@ -376,11 +376,11 @@
               bObject[k] = {__jailed_type__: 'callback', __value__ : v.constructor.name, num: id}
             }
             else if(typeof tf != 'undefined' && tf.Tensor && v instanceof tf.Tensor){
-              bObject[k] = {__jailed_type__: 'tensor', __value__ : v.dataSync(), __shape__: v.shape, __dtype__: v.dtype}
+              bObject[k] = {__jailed_type__: 'ndarray', __value__ : v.dataSync(), __shape__: v.shape, __dtype__: v.dtype}
             }
             else if(typeof nj != 'undefined' && nj.NdArray && v instanceof nj.NdArray){
               var dtype = _typedarray2dtype[v.selection.data.constructor.name]
-              bObject[k] = {__jailed_type__: 'tensor', __value__ : v.selection.data, __shape__: v.shape, __dtype__: dtype}
+              bObject[k] = {__jailed_type__: 'ndarray', __value__ : v.selection.data, __shape__: v.shape, __dtype__: dtype}
             }
             else if( v instanceof Error){
               bObject[k] = {__jailed_type__: 'error', __value__ : v.toString()}
@@ -412,13 +412,13 @@
           if(aObject.__jailed_type__ == 'callback'){
             bObject = this._genRemoteCallback(callbackId, aObject.num, withPromise)
           }
-          else if(aObject.__jailed_type__ == 'tensor'){
-            //create build tensor if used in the plugin
-            if(this.id == '__plugin__' && typeof tf != 'undefined' && tf.Tensor){
-              bObject = tf.tensor(aObject.__value__, aObject.__shape__, aObject.__dtype__)
-            }
-            else if(this.id == '__plugin__' && typeof nj != 'undefined' && nj.array){
+          else if(aObject.__jailed_type__ == 'ndarray'){
+            //create build array/tensor if used in the plugin
+            if(this.id == '__plugin__' && typeof nj != 'undefined' && nj.array){
               bObject = nj.array(aObject.__value__, aObject.__dtype__).reshape(aObject.__shape__)
+            }
+            else if(this.id == '__plugin__' && typeof tf != 'undefined' && tf.Tensor){
+              bObject = tf.tensor(aObject.__value__, aObject.__shape__, aObject.__dtype__)
             }
             else{
               //keep it as regular if transfered to the main app
