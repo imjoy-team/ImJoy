@@ -89,7 +89,7 @@ export default {
       //this.$emit('reload', {pluginId: this.pluginId, code: this.editor.getValue()})
     },
     saveAs(){
-      const filename = this.window.plugin&&this.window.plugin.name?this.window.plugin.name+"_"+randId()+'.imjoy.vue':'plugin_'+randId()+'.imjoy.vue'
+      const filename = this.window.plugin&&this.window.plugin.name?this.window.plugin.name+"_"+randId()+'.imjoy.html':'plugin_'+randId()+'.imjoy.html'
       const file = new Blob([this.editor.getValue()], {type: "text/plain;charset=utf-8"})
       saveAs(file, filename);
     }

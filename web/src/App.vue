@@ -34,6 +34,7 @@ export default {
       // window.addEventListener("message", receiveMessage, false);
       // function receiveMessage(event)
       // {
+      //   console.log('message reveived: ', event)
       //   if (event.origin !== "http://localhost:8000" || event.origin !== "https://imjoy.io")
       //     return;
       //   this.store.event_bus.$emit('message', event)

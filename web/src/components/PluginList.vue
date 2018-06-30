@@ -2,7 +2,7 @@
 <div class="plugin-list" ref="container">
   <!-- <md-subheader>Options</md-subheader> -->
   <md-subheader v-if="title">{{title}}</md-subheader>
-  <md-card v-if="containerWidth<=500" v-for="plugin in available_plugins">
+  <md-card v-if="containerWidth<=500" v-for="(plugin, k) in available_plugins" :key="k">
     <md-card-header>
       {{plugin.createdAt}}
       <h2>{{plugin.name}}</h2>

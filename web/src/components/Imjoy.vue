@@ -631,7 +631,7 @@ export default {
           if (pluginComp.customBlocks[i].type == 'config') {
             // find the first config block
             config = JSON.parse(pluginComp.customBlocks[i].content)
-            console.log('loading config from .vue file', config)
+            console.log('loading config from .html file', config)
             break
           }
         }
