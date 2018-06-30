@@ -188,6 +188,7 @@
               //   var method = this._store.retrieve(data.id)[data.num];
               // }
               // else{
+              console.log('xxxxxxx', data)
               var method = this._store.fetch(data.id)[data.num];
               // }
              var args = this._unwrap(data.args, true);
@@ -298,7 +299,7 @@
             me._connection.send({
                 type: 'method',
                 name: name,
-                args: me._wrap(arguments),
+                args: me._wrap(Array.prototype.slice.call(arguments)),
                 promise: me._wrap([resolve, reject])
             });
           });
@@ -326,45 +327,94 @@
      *
      * @returns {Array} wrapped arguments
      */
-    JailedSite.prototype._wrap = function(args) {
-        var wrapped = [];
-        var callbacks = {};
-        var callbacksPresent = false;
-        for (var i = 0; i < args.length; i++) {
-            if (typeof args[i] == 'function') {
-                callbacks[i] = args[i];
-                wrapped[i] = {type: 'callback', num : i, name: args[i].name};
-                callbacksPresent = true;
-            }
-            else if(typeof args[i] == 'object'){
-              var data = {}
-              for(var k in args[i]){
-                if (args[i].hasOwnProperty(k)) {
-                  if(typeof args[i][k] == 'function'){
-                    callbacks[i+'.'+k] = args[i][k];
-                    data[k] = {type: 'callback', num : i+'.'+k, name: args[i].constructor.name +"."+args[i][k]}
-                    callbacksPresent = true;
-                  }
-                  else{
-                    data[k] = args[i][k]
-                  }
-                }
-              }
-              wrapped[i] = {type: 'argument', value : data};
-            }
-            else {
-                wrapped[i] = {type: 'argument', value : args[i]};
-            }
-
-
+     var ArrayBufferView = Object.getPrototypeOf(Object.getPrototypeOf(new Uint8Array)).constructor;
+     JailedSite.prototype._encode = function(aObject, callbacks) {
+        if (!aObject) {
+          return aObject;
         }
+        var bObject, v, k;
+        var isarray = Array.isArray(aObject)
+        bObject = isarray ? [] : {};
+        //skip if already encoded
+        if(typeof aObject == 'object' && aObject.hasOwnProperty('__jailed_type__') && aObject.hasOwnProperty('__value__')){
+          return aObject
+        }
+        for (k in aObject) {
+          if (isarray || aObject.hasOwnProperty(k)) {
+            v = aObject[k];
+            if(typeof v == 'function'){
+              var id = (Date.now().toString(36) + Math.random().toString(36).substr(2, 5)).toUpperCase()
+              callbacks[id] = v
+              bObject[k] = {__jailed_type__: 'callback', __value__ : v.constructor.name, num: id}
+            }
+            else if(typeof tf != 'undefined' && tf.Tensor && v instanceof tf.Tensor){
+              bObject[k] = {__jailed_type__: 'tensor', __value__ : v.dataSync(), __shape__: v.shape, __dtype__: v.dtype}
+            }
+            // send objects supported by structure clone algorithm
+            // https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Structured_clone_algorithm
+            else if(v !== Object(v) || v instanceof Boolean || v instanceof String || v instanceof Date || v instanceof RegExp || v instanceof Blob || v instanceof File || v instanceof FileList || v instanceof ArrayBuffer || v instanceof ArrayBufferView || v instanceof ImageData){
+              bObject[k] =  {__jailed_type__: 'argument', __value__ : v}
+            }
+            //TODO: support also Map and Set
+            else if(typeof v == "object" || typeof v == "array"){
+              bObject[k] = this._encode(v, callbacks)
+            }
+            else{
+              throw "Unsupported data type for transferring between the plugin and the main app: "+ k+','+v
+            }
+          }
+        }
+        return bObject;
+     };
 
+     JailedSite.prototype._decode = function(aObject, callbackId, withPromise) {
+        if (!aObject) {
+          return aObject;
+        }
+        var bObject, v, k;
+
+        if(aObject.hasOwnProperty('__jailed_type__') && aObject.hasOwnProperty('__value__')){
+          if(aObject.__jailed_type__ == 'callback'){
+            bObject = this._genRemoteCallback(callbackId, aObject.num, withPromise)
+          }
+          else if(aObject.__jailed_type__ == 'tensor'){
+            //create build tensor if used in the plugin
+            if(this.id == '__plugin__' && typeof tf != 'undefined' && tf.Tensor){
+              bObject = tf.tensor(aObject.__value__, aObject.__shape__, aObject.__dtype__)
+            }
+            else{
+              //keep it as regular if transfered to the main app
+              bObject = aObject
+            }
+          }
+          else if(aObject.__jailed_type__ == 'argument'){
+             bObject = aObject.__value__
+          }
+          return bObject
+        }
+        else{
+           var isarray = Array.isArray(aObject)
+           bObject = isarray ? [] : {};
+           for (k in aObject) {
+            if (isarray || aObject.hasOwnProperty(k)) {
+                v = aObject[k];
+                if(typeof v == "object" || typeof v == "array"){
+                  bObject[k] = this._decode(v, callbackId, withPromise)
+                }
+             }
+           }
+           return bObject;
+         }
+     };
+
+    JailedSite.prototype._wrap = function(args) {
+        var callbacks = {};
+        var wrapped = this._encode(args, callbacks)
         var result = {args: wrapped};
-
-        if (callbacksPresent) {
+        if (Object.keys(callbacks).length > 0 && callbacks.constructor === Object) {
             result.callbackId = this._store.put(callbacks);
         }
-
+        console.log('--------------------', result)
         return result;
     }
 
@@ -381,6 +431,7 @@
      * @returns {Array} unwrapped args
      */
     JailedSite.prototype._unwrap = function(args, withPromise) {
+      console.log('3239239239239', args)
         var called = false;
 
         // wraps each callback so that the only one could be called
@@ -396,46 +447,7 @@
                 }
             };
         }
-
-        var result = [];
-        var i, arg, cb, me = this;
-        for (i = 0; i < args.args.length; i++) {
-            arg = args.args[i];
-            if (arg.type == 'argument') {
-                var v = arg.value
-                if(typeof v == 'object'){
-                  var data = {}
-                  for(var k in v){
-                    if (v.hasOwnProperty(k)) {
-                      if(v[k]&&v[k].type == 'callback'){
-                        // cb = once(
-                        cb = this._genRemoteCallback(args.callbackId, v[k].num, withPromise)
-                        // );
-                        data[k] = cb
-                      }
-                      else{
-                        data[k] = v[k]
-                      }
-                    }
-                  }
-                  result.push(data);
-                }
-                else{
-                  result.push(arg.value);
-                }
-
-            }
-            else if(arg.type == 'tensor'){
-                result.push(arg.value);
-            }
-            else {
-                //cb = once(
-                cb = this._genRemoteCallback(args.callbackId, i, withPromise)
-                //);
-                result.push(cb);
-            }
-        }
-
+        var result = this._decode(args.args, args.callbackId, withPromise)
         return result;
     }
 
@@ -462,7 +474,7 @@
                 type : 'callback',
                 id   : id,
                 num  : argNum,
-                args : me._wrap(arguments),
+                args : me._wrap(Array.prototype.slice.call(arguments)),
                 promise : me._wrap([resolve, reject])
             });
           });
@@ -475,7 +487,7 @@
                 type : 'callback',
                 id   : id,
                 num  : argNum,
-                args : me._wrap(arguments)
+                args : me._wrap(Array.prototype.slice.call(arguments))
             });
         };
         return remoteCallback;
