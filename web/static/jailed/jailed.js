@@ -624,6 +624,7 @@ function randId() {
         this.template = template
         this.config = config
         this.id = config.id || randId()
+        this.name = config.name
         this.mode = template.mode || 'webworker'
         this._path = template.url;
         this._initialInterface = _interface||{};
@@ -645,6 +646,7 @@ function randId() {
           throw "you must specify the script for the plugin to run."
         }
         this.id = config.id || randId()
+        this.name = config.name
         this.mode = template.mode || 'webworker'
         this._initialInterface = _interface||{};
         this._connect();

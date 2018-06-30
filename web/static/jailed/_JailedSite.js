@@ -164,7 +164,7 @@
                var [resolve, reject] = this._unwrap(data.promise, false);
                try {
                  var result = method.apply(this._interface, args);
-                 if(result instanceof Promise){
+                 if(result instanceof Promise || method.constructor.name === 'AsyncFunction'){
                    result.then(resolve).catch(reject);
                  }
                  else{
@@ -188,7 +188,6 @@
               //   var method = this._store.retrieve(data.id)[data.num];
               // }
               // else{
-              console.log('xxxxxxx', data)
               var method = this._store.fetch(data.id)[data.num];
               // }
              var args = this._unwrap(data.args, true);
@@ -197,7 +196,7 @@
                var [resolve, reject] = this._unwrap(data.promise, false);
                try {
                  var result = method.apply(null, args);
-                 if(result instanceof Promise){
+                 if(result instanceof Promise || method.constructor.name === 'AsyncFunction'){
                    result.then(resolve).catch(reject);
                  }
                  else{
@@ -375,6 +374,9 @@
               var dtype = this._typedarray2dtype[v.selection.data.constructor.name]
               bObject[k] = {__jailed_type__: 'tensor', __value__ : v.selection.data, __shape__: v.shape, __dtype__: dtype}
             }
+            else if( v instanceof Error){
+              bObject[k] = {__jailed_type__: 'error', __value__ : v.toString()}
+            }
             // send objects supported by structure clone algorithm
             // https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Structured_clone_algorithm
             else if(v !== Object(v) || v instanceof Boolean || v instanceof String || v instanceof Date || v instanceof RegExp || v instanceof Blob || v instanceof File || v instanceof FileList || v instanceof ArrayBuffer || v instanceof ArrayBufferView || v instanceof ImageData){
@@ -415,6 +417,9 @@
               bObject = aObject
             }
           }
+          else if(aObject.__jailed_type__ == 'error'){
+            bObject = new Error(aObject.__value__)
+          }
           else if(aObject.__jailed_type__ == 'argument'){
              bObject = aObject.__value__
           }
@@ -442,7 +447,6 @@
         if (Object.keys(callbacks).length > 0 && callbacks.constructor === Object) {
             result.callbackId = this._store.put(callbacks);
         }
-        console.log('--------------------', result)
         return result;
     }
 
@@ -459,7 +463,6 @@
      * @returns {Array} unwrapped args
      */
     JailedSite.prototype._unwrap = function(args, withPromise) {
-      console.log('3239239239239', args)
         var called = false;
 
         // wraps each callback so that the only one could be called

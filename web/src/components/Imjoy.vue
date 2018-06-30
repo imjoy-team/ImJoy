@@ -559,7 +559,6 @@ export default {
         this.default_window_pos.x = 0
         this.default_window_pos.y = this.default_window_pos.y + this.default_window_pos.h
       }
-      console.log('set window position to ', config.x, config.y, config.w, config.h, config.i)
       this.default_window_pos.i = this.default_window_pos.i + 1
     },
     loadData() {
@@ -608,7 +607,7 @@ export default {
         this.status_text = ''
       }).catch((e) => {
         console.error(e)
-        this.status_text = e.toString() || "Error."
+        this.status_text = panel.name +'->'+ (e.toString() || "Error.")
       })
     },
     selectFileChanged(file_list) {
@@ -746,7 +745,6 @@ export default {
       })
     },
     async runPlugin(plugin_type, my, _plugin) {
-      console.log('run plugin', plugin_type, my, _plugin)
       const target_plugin = this.plugins[plugin_type]
       //conver the api here data-->config   target--> data
       return await target_plugin.api.run(my)
@@ -857,8 +855,8 @@ export default {
             config: pconfig.config,
             op: pconfig.op,
           }).catch((e) => {
-            this.status_text = "Error occured when running plugin " + plugin.name
-            console.error('error in run function: ', e)
+            this.status_text = plugin.name +'->'+ e
+            console.error('error in the run function of plugin '+plugin.name, e)
           })
         }).catch((e) => {
           console.error('error occured when loading the window plugin ' + pconfig.name + ": ", e)
