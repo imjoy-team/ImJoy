@@ -317,7 +317,29 @@
         this._connection.send({type:'interfaceSetAsRemote'});
     }
 
-
+    JailedSite.prototype._dtype2typedarray = {
+      int8: 'Int8Array',
+      int16: 'Int16Array',
+      int32: 'Int32Array',
+      uint8: 'Uint8Array',
+      uint16: 'Uint16Array',
+      uint32: 'Uint32Array',
+      float32: 'Float32Array',
+      float64: 'Float64Array',
+      array: 'Array'
+    }
+    JailedSite.prototype._typedarray2dtype = {
+      Int8Array: 'int8',
+      Int16Array: 'int16',
+      Int32Array: 'int32',
+      Uint8Array: 'uint8',
+      Uint16Array: 'uint16',
+      Uint32Array: 'uint32',
+      Float32Array: 'float32',
+      Float64Array: 'float64',
+      Array: 'array'
+    };
+    var ArrayBufferView = Object.getPrototypeOf(Object.getPrototypeOf(new Uint8Array)).constructor;
     /**
      * Prepares the provided set of remote method arguments for
      * sending to the remote site, replaces all the callbacks with
@@ -327,7 +349,6 @@
      *
      * @returns {Array} wrapped arguments
      */
-     var ArrayBufferView = Object.getPrototypeOf(Object.getPrototypeOf(new Uint8Array)).constructor;
      JailedSite.prototype._encode = function(aObject, callbacks) {
         if (!aObject) {
           return aObject;
@@ -349,6 +370,10 @@
             }
             else if(typeof tf != 'undefined' && tf.Tensor && v instanceof tf.Tensor){
               bObject[k] = {__jailed_type__: 'tensor', __value__ : v.dataSync(), __shape__: v.shape, __dtype__: v.dtype}
+            }
+            else if(typeof nj != 'undefined' && nj.NdArray && v instanceof nj.NdArray){
+              var dtype = this._typedarray2dtype[v.selection.data.constructor.name]
+              bObject[k] = {__jailed_type__: 'tensor', __value__ : v.selection.data, __shape__: v.shape, __dtype__: dtype}
             }
             // send objects supported by structure clone algorithm
             // https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Structured_clone_algorithm
@@ -381,6 +406,9 @@
             //create build tensor if used in the plugin
             if(this.id == '__plugin__' && typeof tf != 'undefined' && tf.Tensor){
               bObject = tf.tensor(aObject.__value__, aObject.__shape__, aObject.__dtype__)
+            }
+            else if(this.id == '__plugin__' && typeof nj != 'undefined' && nj.array){
+              bObject = nj.array(aObject.__value__, aObject.__dtype__).reshape(aObject.__shape__)
             }
             else{
               //keep it as regular if transfered to the main app

@@ -198,13 +198,13 @@ export default {
       windows: [],
       panels: {},
       activeWindows: [],
-      preload_main: ['/static/tfjs/tfjs.js'],
-      builtin_scripts_url: {
-        tfjs: '/static/tfjs/tfjs.js'
-      },
-      builtin_scripts: {
-
-      },
+      preload_main: ['/static/tfjs/tfjs.js', 'https://rawgit.com/nicolaspanel/numjs/893016ec40e62eaaa126e1024dbe250aafb3014b/dist/numjs.min.js'],
+      // builtin_scripts_url: {
+      //   tfjs: '/static/tfjs/tfjs.js'
+      // },
+      // builtin_scripts: {
+      //
+      // },
       workflow_joy_config: {
         expanded: true,
         name: "Workflow",
@@ -265,7 +265,7 @@ export default {
       this.selected_files = e.dataTransfer.files;
       this.loadData()
     });
-    this.importScripts(this.preload_main).then(()=>{
+    this.importScripts.apply(null, this.preload_main).then(()=>{
       console.log('preload done.')
     })
   },
@@ -282,18 +282,18 @@ export default {
     }
   },
   mounted() {
-    for(let u in this.builtin_scripts_url){
-      if(this.builtin_scripts_url.hasOwnProperty(u)){
-        axios.get(this.builtin_scripts_url[u]).then(response => {
-          if (!response || !response.data || response.data == '') {
-            alert('failed to get plugin code from ' + plugin.url)
-            return
-          }
-          this.builtin_scripts[u] = response.data
-          console.log('downloaded script: ', u)
-        })
-      }
-    }
+    // for(let u in this.builtin_scripts_url){
+    //   if(this.builtin_scripts_url.hasOwnProperty(u)){
+    //     axios.get(this.builtin_scripts_url[u]).then(response => {
+    //       if (!response || !response.data || response.data == '') {
+    //         alert('failed to get plugin code from ' + plugin.url)
+    //         return
+    //       }
+    //       this.builtin_scripts[u] = response.data
+    //       console.log('downloaded script: ', u)
+    //     })
+    //   }
+    // }
 
     this.plugin_api = {
       alert: alert,
