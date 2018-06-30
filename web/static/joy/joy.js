@@ -117,7 +117,6 @@ To create an Op, you need to pass it a "options" object like so:
 *****************/
 
 Joy.Op = function(options, parent, data){
-
 	var self = this;
 
 	// Meta
@@ -2961,7 +2960,7 @@ Joy.module("math", function(){
 				if(typeof originalValue==="number"){
 					self.setData("value",undefined,true); // delete "value", no update
 					self.setData("chain",[
-						{type:"number_raw", value:originalValue}
+						{type:"number_raw", min:self.min, max:self.max, step:self.step, value:originalValue}
 					],true); // create "chain", no update
 				}
 
@@ -2975,7 +2974,7 @@ Joy.module("math", function(){
 
 						// Elements
 						case "number_raw":
-							chainOp = self.addChild({type:type}, chainItem);
+							chainOp = self.addChild({type:type, min: chainItem.min, max:chainItem.max, step:chainItem.step}, chainItem);
 							break;
 						case "variableName":
 							chainOp = self.addChild({

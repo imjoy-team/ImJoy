@@ -197,7 +197,7 @@ export default {
       status_text: '',
       windows: [],
       panels: {},
-      activeWindows: [],
+      active_windows: [],
       preload_main: ['/static/tfjs/tfjs.js', 'https://rawgit.com/nicolaspanel/numjs/893016ec40e62eaaa126e1024dbe250aafb3014b/dist/numjs.min.js'],
       // builtin_scripts_url: {
       //   tfjs: '/static/tfjs/tfjs.js'
@@ -402,7 +402,6 @@ export default {
         pconfig.plugin = null
         console.log('reloading plugin ', pconfig)
         const template = this.parsePluginCode(pconfig.code, pconfig)
-        console.log('-------------------------------------', template)
         let p
         if (template.mode == 'iframe' && template.tags.includes('window')) {
           p = this.preLoadPlugin(template)
@@ -543,7 +542,7 @@ export default {
     // },
     windowSelected(ws) {
       console.log('activate window: ', ws)
-      this.activeWindows = ws
+      this.active_windows = ws
     },
     generateGridPosition(config) {
       config.i = this.default_window_pos.i.toString()
@@ -570,8 +569,8 @@ export default {
       this.addWindow(w)
     },
     runWorkflow(joy) {
-      console.log('run workflow.', this.activeWindows)
-      const w = this.activeWindows[this.activeWindows.length - 1] || {}
+      console.log('run workflow.', this.active_windows)
+      const w = this.active_windows[this.active_windows.length - 1] || {}
       joy.workflow.execute(w.data || {}).then((my) => {
         if (my && !my.op.tags.includes('window')) {
           console.log('result', my)
@@ -589,8 +588,8 @@ export default {
       })
     },
     runPanel(joy, panel) {
-      console.log('run panel.', this.activeWindows)
-      const w = this.activeWindows[this.activeWindows.length - 1] || {}
+      console.log('run panel.', this.active_windows)
+      const w = this.active_windows[this.active_windows.length - 1] || {}
       joy._panel.execute(w.data || {}).then((my) => {
         if (my && !my.op.tags.includes('window')) {
           console.log('result', my)
@@ -711,7 +710,6 @@ export default {
     },
     loadPlugin(config) {
       config = _clone(config)
-      console.log('xxxxx------------------', config)
       //generate a random id for the plugin
       return new Promise((resolve, reject) => {
         config.id = config.name.trim().replace(/ /g, '_') + '_' + randId()
@@ -883,7 +881,7 @@ export default {
         }
         console.log('window config', wconfig)
         if (wconfig.type.startsWith('imjoy')) {
-          console.log('creating imjoy window', wconfig)
+          // console.log('creating imjoy window', wconfig)
           // wconfig.window_id = 'plugin_window_'+plugin._id+randId()
           this.addWindow(wconfig)
           return true

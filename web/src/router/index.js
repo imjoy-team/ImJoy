@@ -22,7 +22,7 @@ export default new Router({
     },
     {
       path: '/:)',
-      name: 'Imjoy',
+      name: ':)',
       component: Imjoy
     },
     {
