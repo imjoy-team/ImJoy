@@ -1,5 +1,5 @@
 <template>
-<div class="viewer noselect">
+<div class="imjoy noselect">
   <div style="visibility:hidden; opacity:0" id="dropzone">
     <div id="textnode">Drop files to add data.</div>
   </div>
@@ -122,7 +122,6 @@
             <div v-for="(panel, t) in panels" :key="panel.id">
               <md-divider></md-divider>
               <joy :config="panel" @edit="editPlugin" @run="runPanel($event, panel)"></joy>
-
             </div>
             <md-divider></md-divider>
           </md-card-content>
@@ -180,7 +179,7 @@ import {
 import _ from 'lodash'
 
 export default {
-  name: 'viewer',
+  name: 'imjoy',
   props: ['title'],
   data() {
     return {
@@ -984,7 +983,7 @@ export default {
   overflow-x: hidden;
 }
 
-.viewer {
+.imjoy {
   height: 100%;
 }
 

@@ -20,8 +20,8 @@
     <md-dialog-title>Getting Started with ImJoy</md-dialog-title>
     <md-dialog-content>
       <p>With the ImJoy web app, you process your images within the browser, instantly, no installation.</p>
-      <md-button class="md-raised md-primary" to="viewer">Start</md-button>
-      <p>You can process your data with the viewer locally and anonymously, by default, no data will be transferred to the internet (also depends on the plugin you installed).</p>
+      <md-button class="md-raised md-primary" to=":)">Start</md-button>
+      <p>You can process your data with the Imjoy app locally and anonymously, by default, no data will be transferred to the internet (also depends on the plugin you installed).</p>
     </md-dialog-content>
     <md-dialog-actions>
       <md-button class="md-primary" @click="showDialog=false">OK</md-button>
@@ -50,12 +50,6 @@ export default {
     this.$nextTick(() => {})
   },
   methods: {
-    shareOnTwitter() {
-      const url = "https://imjoy.io";
-      const text = " #ImJoy ";
-      window.open('http://twitter.com/share?url=' + encodeURIComponent(url) + '&text=' + encodeURIComponent(text), '', 'left=0,top=0,width=550,height=450,personalbar=0,toolbar=0,scrollbars=0,resizable=0');
-    }
-
   }
 }
 </script>

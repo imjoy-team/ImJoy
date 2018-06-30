@@ -1,7 +1,7 @@
 <template>
   <div class="md-toolbar-row">
       <div class="md-toolbar-row" flex>
-          <md-button>
+          <md-button to="/">
             <div class="site-title">ImJoy.io<span class="superscript">alpha</span></div>
           </md-button>
 
@@ -15,7 +15,7 @@
               </md-button>
               <md-menu-content>
                 <md-menu-item class="md-primary md-button menu-button" v-show="$route.path != '/'" to="/">Home</md-menu-item>
-                <md-menu-item class="md-primary md-button menu-button" v-show="$route.path != '/viewer' && $route.path != '/view'" to="/viewer">Start ImJoy</md-menu-item>
+                <md-menu-item class="md-primary md-button menu-button" v-show="$route.path != '/:)'" to="/:)">Start ImJoy</md-menu-item>
                 <md-menu-item class="md-primary md-button menu-button" href="https://github.com/oeway/ImJoy">Source</md-menu-item>
                 <md-menu-item class="md-primary md-button menu-button" @click="shareOnTwitter">Share</md-menu-item>
                 <md-menu-item class="md-primary md-button menu-button" v-show="$route.path != '/about'" to="/about">About</md-menu-item>
@@ -27,7 +27,7 @@
               <md-tooltip>Home Page</md-tooltip>
             </md-button>
             &nbsp;
-            <md-button v-show="$route.path != '/viewer' && $route.path != '/view'" class="md-accent" v-if="screenWidth>=600" to="/viewer">
+            <md-button v-show="$route.path != '/:)'" class="md-accent" v-if="screenWidth>=600" to="/:)">
               <md-icon>sentiment_very_satisfied</md-icon> ImJoy
               <md-tooltip>Start ImJoy App</md-tooltip>
             </md-button>
@@ -84,7 +84,11 @@ export default {
     this.store.event_bus.$on('resize',updateSize)
   },
   methods: {
-
+    shareOnTwitter() {
+      const url = "https://imjoy.io";
+      const text = " #ImJoy ";
+      window.open('http://twitter.com/share?url=' + encodeURIComponent(url) + '&text=' + encodeURIComponent(text), '', 'left=0,top=0,width=550,height=450,personalbar=0,toolbar=0,scrollbars=0,resizable=0');
+    }
   }
 }
 </script>

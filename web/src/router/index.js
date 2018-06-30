@@ -1,13 +1,14 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import Home from '@/components/Home'
-import Viewer from '@/components/Viewer'
+import Imjoy from '@/components/Imjoy'
 import About from '@/components/About'
 import FAQ from '@/components/FAQ'
 
 Vue.use(Router)
 
 export default new Router({
+  mode: 'history',
   base: window.location.pathName,
   routes: [
     {
@@ -16,14 +17,18 @@ export default new Router({
       component: Home
     },
     {
-      path: '/viewer',
-      name: 'Viewer',
-      component: Viewer
+      path: '/home',
+      redirect: '/',
     },
     {
-      path: '/view',
-      name: 'Viewe',
-      component: Viewer
+      path: '/:)',
+      name: 'Imjoy',
+      component: Imjoy
+    },
+    {
+      path: '/imjoy',
+      name: 'Imjoy',
+      component: Imjoy
     },
     {
       path: '/about',

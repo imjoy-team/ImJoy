@@ -8,7 +8,7 @@ import 'vue-material/dist/theme/default.css' // This line here
 import vueSlider from 'vue-slider-component'
 
 import Navbar from '@/components/Navbar'
-import Viewer from '@/components/Viewer'
+import Imjoy from '@/components/Imjoy'
 import Footer from '@/components/Footer'
 import About from '@/components/About'
 import Whiteboard from '@/components/Whiteboard'
@@ -31,7 +31,7 @@ Vue.use(Grid)
 Vue.component('vue-slider', vueSlider)
 Vue.component('navbar', Navbar)
 Vue.component('faq', FAQ)
-Vue.component('viewer', Viewer)
+Vue.component('imjoy', Imjoy)
 Vue.component('main-footer', Footer)
 Vue.component('about', About)
 Vue.component('whiteboard', Whiteboard)

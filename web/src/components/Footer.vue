@@ -1,5 +1,5 @@
 <template>
-  <div class="footer" v-if="$route.path != '/viewer' && $route.path != '/view'">
+  <div class="footer" v-if="$route.path != '/:)' && $route.path != '/:)'">
     <div class="md-layout md-alignment-center-center">
       <md-button class="md-accent footer-button" target="_blank" @click="contact()">Ask a question</md-button>
       <md-button class="md-accent footer-button" target="_blank" href="https://github.com/oeway/ImJoy/issues">Create an issue on Github</md-button>
