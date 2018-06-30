@@ -1,6 +1,10 @@
 import schema from 'js-schema'
 
 export const PLUGIN_TEMPLATE= `
+<docs>
+Describe your plugin here.
+</docs>
+
 <config>
 {
   "name": "Untitled Plugin",
@@ -16,10 +20,6 @@ export const PLUGIN_TEMPLATE= `
   "dependencies": []
 }
 </config>
-
-<docs>
-Describe your plugin here.
-</docs>
 
 <script>
 class UntitledPlugin {
