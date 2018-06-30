@@ -92,8 +92,8 @@ export default {
   overflow: auto;
 }
 .editor-toolbar{
-  min-height: 10px!important;
-  height: 80px!important;
+  min-height: 40px!important;
+  height: 40px!important;
 }
 .plugin-editor {
   display: flex;
