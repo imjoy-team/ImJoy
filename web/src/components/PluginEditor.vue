@@ -1,6 +1,6 @@
 <template>
 <div class="plugin-editor">
-    <md-toolbar class="md-dense">
+    <md-toolbar class="md-dense editor-toolbar" md-elevation="1">
       <md-button @click="reload()" class="md-icon-button">
         <md-icon>autorenew</md-icon>
       </md-button>
@@ -8,7 +8,7 @@
         <md-icon>save</md-icon>
       </md-button>
     </md-toolbar>
-    <md-content>
+    <md-content class="editor">
     <div :id="'editor_'+pluginId"></div>
   </md-content>
 </div>
@@ -86,14 +86,18 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 
-.plugin-editor{
+.editor{
   overflow: auto;
 }
-#editor {
-    position: fixed;
-    top: 30px;
-    right: 1px;
-    bottom: 30px;
-    left: 1px;
+.editor-toolbar{
+  min-height: 10px;
+  height: 80px;
+}
+.plugin-editor {
+  display: flex;
+  width: 100%;
+  height: calc(100% + 5px);
+  flex-direction: column;
+  overflow: auto;
 }
 </style>
