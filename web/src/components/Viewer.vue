@@ -8,9 +8,11 @@
       <div class="md-toolbar-section-start">
         <md-button v-if="!menuVisible" class="md-primary md-icon-button" @click="menuVisible=true">
           <md-icon>menu</md-icon>
+          <md-tooltip>show sidebar</md-tooltip>
         </md-button>
         <md-button to="/" v-if="!menuVisible">
           <div class="site-title">ImJoy.io<span class="superscript">alpha</span></div>
+          <md-tooltip>ImJoy home</md-tooltip>
         </md-button>
         <span class="subheader-title md-small-hide" style="flex: 1">Image Processing with Joy</span>
       </div>
@@ -18,15 +20,19 @@
       <div class="md-toolbar-section-end">
         <md-button @click="closeAll" class="md-icon-button md-accent">
           <md-icon>cancel</md-icon>
+          <md-tooltip>Close all windows</md-tooltip>
         </md-button>
-        <md-button class="md-icon-button">
+        <md-button :disabled="true" class="md-icon-button">
           <md-icon>save</md-icon>
+          <md-tooltip>Save all windows</md-tooltip>
         </md-button>
-        <md-button class="md-icon-button">
+        <md-button :disabled="true" class="md-icon-button">
           <md-icon>share</md-icon>
+          <md-tooltip>Share ImJoy on social media</md-tooltip>
         </md-button>
         <md-button class="md-icon-button">
           <md-icon>help</md-icon>
+          <md-tooltip>Open help information.</md-tooltip>
         </md-button>
       </div>
     </md-app-toolbar>
@@ -39,12 +45,15 @@
         <md-speed-dial-content>
           <md-button @click="$refs.file_select.openPicker()" class="md-icon-button md-primary">
             <md-icon>insert_drive_file</md-icon>
+            <md-tooltip>Open a file</md-tooltip>
           </md-button>
           <md-button @click="$refs.folder_select.openPicker()" class="md-icon-button md-primary">
             <md-icon>folder_open</md-icon>
+            <md-tooltip>Open a folder</md-tooltip>
           </md-button>
           <md-button @click="addPlugin" class="md-icon-button md-accent">
             <md-icon>extension</md-icon>
+            <md-tooltip>Create a new plugin</md-tooltip>
           </md-button>
         </md-speed-dial-content>
       </md-speed-dial>
@@ -66,9 +75,11 @@
         <div class="md-toolbar-section-end">
           <md-button class="md-icon-button md-primary" @click="showSettingsDialog=true">
             <md-icon>settings</md-icon>
+            <md-tooltip>Show settings and installed plugins</md-tooltip>
           </md-button>
           <md-button class="md-icon-button md-dense md-raised" @click="menuVisible = !menuVisible">
             <md-icon>keyboard_arrow_left</md-icon>
+            <md-tooltip>Hide sidebar</md-tooltip>
           </md-button>
         </div>
       </div>
@@ -82,6 +93,7 @@
             <div class="md-layout-item">
               <md-button @click="reloadOps()" class="md-icon-button">
                 <md-icon>autorenew</md-icon>
+                <md-tooltip>Reload workflow</md-tooltip>
               </md-button>
             </div>
           </div>
@@ -101,6 +113,7 @@
               <div class="md-layout-item">
                 <md-button @click="reloadPlugins()" class="md-icon-button">
                   <md-icon>autorenew</md-icon>
+                  <md-tooltip>Reload plugins</md-tooltip>
                 </md-button>
               </div>
             </div>

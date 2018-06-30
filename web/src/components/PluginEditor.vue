@@ -3,9 +3,11 @@
     <md-toolbar class="md-dense editor-toolbar" md-elevation="1">
       <md-button @click="reload()" class="md-icon-button">
         <md-icon>autorenew</md-icon>
+        <md-tooltip>Reload the plugin</md-tooltip>
       </md-button>
       <md-button @click="save()" class="md-icon-button">
         <md-icon>save</md-icon>
+        <md-tooltip>Save the plugin</md-tooltip>
       </md-button>
     </md-toolbar>
     <md-content class="editor">
@@ -90,8 +92,8 @@ export default {
   overflow: auto;
 }
 .editor-toolbar{
-  min-height: 10px;
-  height: 80px;
+  min-height: 10px!important;
+  height: 80px!important;
 }
 .plugin-editor {
   display: flex;

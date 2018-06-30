@@ -3,12 +3,6 @@
   <md-app-toolbar class="md-primary">
     <div class="md-toolbar-row" flex>
       <navbar/>
-      <div class="md-toolbar-section-end">
-        <md-button href="https://github.com/oeway/ImJoy" target="_blank">
-          <md-icon md-src="static/img/github.svg" class="md-size-1x svg-icon"></md-icon>source code</md-button>
-        <md-button @click="shareOnTwitter">
-          <md-icon md-src="static/img/twitter.svg" class="md-size-1x svg-icon"></md-icon>share</md-button>
-      </div>
     </div>
   </md-app-toolbar>
 
@@ -109,10 +103,6 @@ export default {
   .subtitle {
     font-size: 1.3em;
   }
-}
-
-.svg-icon {
-  display: inline-block;
 }
 
 .carousel-img {

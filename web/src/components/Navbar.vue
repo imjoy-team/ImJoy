@@ -7,6 +7,7 @@
 
           <span v-show="$route.path!='/'" class="md-layout-item md-medium-hide subheader-title">Image processing with joy.</span>
 
+
           <div class="md-toolbar-section-end">
             <md-menu md-size="medium" v-if="screenWidth<600">
               <md-button class="md-primary md-icon-button" md-menu-trigger>
@@ -14,7 +15,9 @@
               </md-button>
               <md-menu-content>
                 <md-menu-item class="md-primary md-button menu-button" v-show="$route.path != '/'" to="/">Home</md-menu-item>
-                <md-menu-item class="md-primary md-button menu-button" v-show="$route.path != '/viewer' && $route.path != '/view'" to="/viewer">Viewer</md-menu-item>
+                <md-menu-item class="md-primary md-button menu-button" v-show="$route.path != '/viewer' && $route.path != '/view'" to="/viewer">Start ImJoy</md-menu-item>
+                <md-menu-item class="md-primary md-button menu-button" href="https://github.com/oeway/ImJoy">Source</md-menu-item>
+                <md-menu-item class="md-primary md-button menu-button" @click="shareOnTwitter">Share</md-menu-item>
                 <md-menu-item class="md-primary md-button menu-button" v-show="$route.path != '/about'" to="/about">About</md-menu-item>
               </md-menu-content>
              </md-menu>
@@ -25,8 +28,18 @@
             </md-button>
             &nbsp;
             <md-button v-show="$route.path != '/viewer' && $route.path != '/view'" class="md-accent" v-if="screenWidth>=600" to="/viewer">
-              <md-icon>pageview</md-icon> Viewer
-              <md-tooltip>SMLM data viewer</md-tooltip>
+              <md-icon>sentiment_very_satisfied</md-icon> ImJoy
+              <md-tooltip>Start ImJoy App</md-tooltip>
+            </md-button>
+            &nbsp;
+            <md-button href="https://github.com/oeway/ImJoy" class="md-accent" v-if="screenWidth>=600" target="_blank">
+              <md-icon md-src="static/img/github.svg" class="md-size-1x svg-icon"></md-icon>source
+              <md-tooltip>Source code on Github</md-tooltip>
+            </md-button>
+            &nbsp;
+            <md-button @click="shareOnTwitter" class="md-accent" v-if="screenWidth>=600">
+              <md-icon md-src="static/img/twitter.svg" class="md-size-1x svg-icon"></md-icon>share
+              <md-tooltip>Share ImJoy on Twitter</md-tooltip>
             </md-button>
             &nbsp;
             <md-button v-show="$route.path != '/about'" class="md-accent" v-if="screenWidth>=600" to="/about">
@@ -111,5 +124,9 @@ export default {
     font-size: 20px;
     font-weight: 220;
   }
+}
+
+.svg-icon {
+  display: inline-block;
 }
 </style>
