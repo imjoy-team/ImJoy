@@ -28,7 +28,7 @@
             </md-button>
             &nbsp;
             <md-button v-show="$route.path != '/:)'" class="md-accent" v-if="screenWidth>=600" to="/:)">
-              <md-icon>sentiment_very_satisfied</md-icon> ImJoy
+              <md-icon>mood</md-icon> ImJoy
               <md-tooltip>Start ImJoy App</md-tooltip>
             </md-button>
             &nbsp;
