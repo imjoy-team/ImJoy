@@ -5,6 +5,29 @@
  */
 
 (function(){
+    var _dtype2typedarray = {
+      int8: 'Int8Array',
+      int16: 'Int16Array',
+      int32: 'Int32Array',
+      uint8: 'Uint8Array',
+      uint16: 'Uint16Array',
+      uint32: 'Uint32Array',
+      float32: 'Float32Array',
+      float64: 'Float64Array',
+      array: 'Array'
+    }
+    var _typedarray2dtype = {
+      Int8Array: 'int8',
+      Int16Array: 'int16',
+      Int32Array: 'int32',
+      Uint8Array: 'uint8',
+      Uint16Array: 'uint16',
+      Uint32Array: 'uint32',
+      Float32Array: 'float32',
+      Float64Array: 'float64',
+      Array: 'array'
+    };
+    var ArrayBufferView = Object.getPrototypeOf(Object.getPrototypeOf(new Uint8Array)).constructor;
 
     /**
      * JailedSite object represents a single site in the
@@ -164,7 +187,7 @@
                var [resolve, reject] = this._unwrap(data.promise, false);
                try {
                  var result = method.apply(this._interface, args);
-                 if(result instanceof Promise){
+                 if(result instanceof Promise || method.constructor.name === 'AsyncFunction'){
                    result.then(resolve).catch(reject);
                  }
                  else{
@@ -196,7 +219,7 @@
                var [resolve, reject] = this._unwrap(data.promise, false);
                try {
                  var result = method.apply(null, args);
-                 if(result instanceof Promise){
+                 if(result instanceof Promise || method.constructor.name === 'AsyncFunction'){
                    result.then(resolve).catch(reject);
                  }
                  else{
@@ -240,6 +263,14 @@
         this._connection.send({type:'getInterface'});
     }
 
+    JailedSite.prototype._ndarray = function(typedArray, shape, dtype) {
+      var _dtype = _typedarray2dtype[typedArray.constructor.name]
+      if(dtype && dtype != _dtype){
+        throw "dtype doesn't match the type of the array: "+_dtype+' != '+dtype
+      }
+      shape = shape || [typedArray.length]
+      return {__jailed_type__: 'ndarray', __value__ : typedArray, __shape__: shape, __dtype__: _dtype}
+    };
 
     /**
      * Sets the new remote interface provided by the other site
@@ -247,7 +278,7 @@
      * @param {Array} names list of function names
      */
     JailedSite.prototype._setRemote = function(api) {
-        this._remote = {};
+        this._remote = {ndarray: this._ndarray};
         var i, name;
         for (i = 0; i < api.length; i++) {
             name = api[i].name;
@@ -298,7 +329,7 @@
             me._connection.send({
                 type: 'method',
                 name: name,
-                args: me._wrap(arguments),
+                args: me._wrap(Array.prototype.slice.call(arguments)),
                 promise: me._wrap([resolve, reject])
             });
           });
@@ -316,8 +347,7 @@
         this._connection.send({type:'interfaceSetAsRemote'});
     }
 
-
-    /**
+     /**
      * Prepares the provided set of remote method arguments for
      * sending to the remote site, replaces all the callbacks with
      * identifiers
@@ -326,45 +356,105 @@
      *
      * @returns {Array} wrapped arguments
      */
-    JailedSite.prototype._wrap = function(args) {
-        var wrapped = [];
-        var callbacks = {};
-        var callbacksPresent = false;
-        for (var i = 0; i < args.length; i++) {
-            if (typeof args[i] == 'function') {
-                callbacks[i] = args[i];
-                wrapped[i] = {type: 'callback', num : i, name: args[i].name};
-                callbacksPresent = true;
-            }
-            else if(typeof args[i] == 'object'){
-              var data = {}
-              for(var k in args[i]){
-                if (args[i].hasOwnProperty(k)) {
-                  if(typeof args[i][k] == 'function'){
-                    callbacks[i+'.'+k] = args[i][k];
-                    data[k] = {type: 'callback', num : i+'.'+k, name: args[i].constructor.name +"."+args[i][k]}
-                    callbacksPresent = true;
-                  }
-                  else{
-                    data[k] = args[i][k]
-                  }
-                }
-              }
-              wrapped[i] = {type: 'argument', value : data};
-            }
-            else {
-                wrapped[i] = {type: 'argument', value : args[i]};
-            }
-
-
+     JailedSite.prototype._encode = function(aObject, callbacks) {
+        if (!aObject) {
+          return aObject;
         }
+        var bObject, v, k;
+        var isarray = Array.isArray(aObject)
+        bObject = isarray ? [] : {};
+        //skip if already encoded
+        if(typeof aObject == 'object' && aObject.hasOwnProperty('__jailed_type__') && aObject.hasOwnProperty('__value__')){
+          return aObject
+        }
+        for (k in aObject) {
+          if (isarray || aObject.hasOwnProperty(k)) {
+            v = aObject[k];
+            if(typeof v == 'function'){
+              var id = (Date.now().toString(36) + Math.random().toString(36).substr(2, 5)).toUpperCase()
+              callbacks[id] = v
+              bObject[k] = {__jailed_type__: 'callback', __value__ : v.constructor.name, num: id}
+            }
+            else if(typeof tf != 'undefined' && tf.Tensor && v instanceof tf.Tensor){
+              bObject[k] = {__jailed_type__: 'ndarray', __value__ : v.dataSync(), __shape__: v.shape, __dtype__: v.dtype}
+            }
+            else if(typeof nj != 'undefined' && nj.NdArray && v instanceof nj.NdArray){
+              var dtype = _typedarray2dtype[v.selection.data.constructor.name]
+              bObject[k] = {__jailed_type__: 'ndarray', __value__ : v.selection.data, __shape__: v.shape, __dtype__: dtype}
+            }
+            else if( v instanceof Error){
+              bObject[k] = {__jailed_type__: 'error', __value__ : v.toString()}
+            }
+            // send objects supported by structure clone algorithm
+            // https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Structured_clone_algorithm
+            else if(v !== Object(v) || v instanceof Boolean || v instanceof String || v instanceof Date || v instanceof RegExp || v instanceof Blob || v instanceof File || v instanceof FileList || v instanceof ArrayBuffer || v instanceof ArrayBufferView || v instanceof ImageData){
+              bObject[k] =  {__jailed_type__: 'argument', __value__ : v}
+            }
+            //TODO: support also Map and Set
+            else if(typeof v == "object" || typeof v == "array"){
+              bObject[k] = this._encode(v, callbacks)
+            }
+            else{
+              throw "Unsupported data type for transferring between the plugin and the main app: "+ k+','+v
+            }
+          }
+        }
+        return bObject;
+     };
 
+     JailedSite.prototype._decode = function(aObject, callbackId, withPromise) {
+        if (!aObject) {
+          return aObject;
+        }
+        var bObject, v, k;
+
+        if(aObject.hasOwnProperty('__jailed_type__') && aObject.hasOwnProperty('__value__')){
+          if(aObject.__jailed_type__ == 'callback'){
+            bObject = this._genRemoteCallback(callbackId, aObject.num, withPromise)
+          }
+          else if(aObject.__jailed_type__ == 'ndarray'){
+            //create build array/tensor if used in the plugin
+            if(this.id == '__plugin__' && typeof nj != 'undefined' && nj.array){
+              bObject = nj.array(aObject.__value__, aObject.__dtype__).reshape(aObject.__shape__)
+            }
+            else if(this.id == '__plugin__' && typeof tf != 'undefined' && tf.Tensor){
+              bObject = tf.tensor(aObject.__value__, aObject.__shape__, aObject.__dtype__)
+            }
+            else{
+              //keep it as regular if transfered to the main app
+              bObject = aObject
+            }
+          }
+          else if(aObject.__jailed_type__ == 'error'){
+            bObject = new Error(aObject.__value__)
+          }
+          else if(aObject.__jailed_type__ == 'argument'){
+             bObject = aObject.__value__
+          }
+          return bObject
+        }
+        else{
+           var isarray = Array.isArray(aObject)
+           bObject = isarray ? [] : {};
+           for (k in aObject) {
+            if (isarray || aObject.hasOwnProperty(k)) {
+                v = aObject[k];
+                if(typeof v == "object" || typeof v == "array"){
+                  bObject[k] = this._decode(v, callbackId, withPromise)
+                }
+             }
+           }
+           return bObject;
+         }
+     };
+
+    JailedSite.prototype._wrap = function(args) {
+        var callbacks = {};
+        var wrapped = this._encode(args, callbacks)
         var result = {args: wrapped};
-
-        if (callbacksPresent) {
+        if (Object.keys(callbacks).length > 0 && callbacks.constructor === Object) {
             result.callbackId = this._store.put(callbacks);
         }
-
         return result;
     }
 
@@ -396,43 +486,7 @@
                 }
             };
         }
-
-        var result = [];
-        var i, arg, cb, me = this;
-        for (i = 0; i < args.args.length; i++) {
-            arg = args.args[i];
-            if (arg.type == 'argument') {
-                var v = arg.value
-                if(typeof v == 'object'){
-                  var data = {}
-                  for(var k in v){
-                    if (v.hasOwnProperty(k)) {
-                      if(v[k]&&v[k].type == 'callback'){
-                        // cb = once(
-                        cb = this._genRemoteCallback(args.callbackId, v[k].num, withPromise)
-                        // );
-                        data[k] = cb
-                      }
-                      else{
-                        data[k] = v[k]
-                      }
-                    }
-                  }
-                  result.push(data);
-                }
-                else{
-                  result.push(arg.value);
-                }
-
-            }
-            else {
-                //cb = once(
-                cb = this._genRemoteCallback(args.callbackId, i, withPromise)
-                //);
-                result.push(cb);
-            }
-        }
-
+        var result = this._decode(args.args, args.callbackId, withPromise)
         return result;
     }
 
@@ -459,7 +513,7 @@
                 type : 'callback',
                 id   : id,
                 num  : argNum,
-                args : me._wrap(arguments),
+                args : me._wrap(Array.prototype.slice.call(arguments)),
                 promise : me._wrap([resolve, reject])
             });
           });
@@ -472,7 +526,7 @@
                 type : 'callback',
                 id   : id,
                 num  : argNum,
-                args : me._wrap(arguments)
+                args : me._wrap(Array.prototype.slice.call(arguments))
             });
         };
         return remoteCallback;
