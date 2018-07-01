@@ -800,8 +800,10 @@ var _selectAll = function(input, collapseToEnd){
     if(collapseToEnd) range.collapse(false); // total hack
     var selection = window.getSelection();
     selection.removeAllRanges();
-		selection.addRange(range);
-
+		try {
+			selection.addRange(range);
+		} catch (e) {
+		}
 };
 var _unselectAll = function(){
 	var selection = window.getSelection();

@@ -34,6 +34,13 @@
 
     <title>ImJoy.io</title>
     <script type="text/javascript">
+    (function(){
+        var redirect = sessionStorage.redirect;
+        delete sessionStorage.redirect;
+        if (redirect && redirect != location.href) {
+            history.replaceState(null, null, redirect);
+        }
+    })();
      (function(){
        document.addEventListener('DOMContentLoaded', function(){
          // Get IE or Edge browser version
