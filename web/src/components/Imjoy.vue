@@ -1,4 +1,4 @@
-<template>
+Engine<template>
 <div class="imjoy noselect">
   <div style="visibility:hidden; opacity:0" id="dropzone">
     <div id="textnode">Drop files to add data.</div>
@@ -18,6 +18,10 @@
       </div>
       <span class="status-text md-small-hide" :class="status_text.includes('rror')?'error-message':''">{{status_text}}</span>
       <div class="md-toolbar-section-end">
+        <md-snackbar :md-position="'center'" class="md-accent" :md-active.sync="show_snackbar" :md-duration="snackbar_duration">
+         <span>{{snackbar_info}}</span>
+         <md-button class="md-accent" @click="show_snackbar=false">close</md-button>
+        </md-snackbar>
         <md-button @click="closeAll" class="md-icon-button md-accent">
           <md-icon>cancel</md-icon>
           <md-tooltip>Close all windows</md-tooltip>
@@ -26,10 +30,25 @@
           <md-icon>save</md-icon>
           <md-tooltip>Save all windows</md-tooltip>
         </md-button>
-        <md-button :disabled="true" class="md-icon-button">
-          <md-icon>share</md-icon>
-          <md-tooltip>Share ImJoy on social media</md-tooltip>
-        </md-button>
+        <md-menu md-size="big" md-direction="bottom-end">
+          <md-button class="md-icon-button" :class="engine_connected?'md-primary':'md-accent'" md-menu-trigger>
+            <md-icon>{{engine_connected?'sync':'sync_disabled'}}</md-icon>
+            <md-tooltip>Connection to the Plugin Engine</md-tooltip>
+          </md-button>
+          <md-menu-content>
+            <md-menu-item :disabled="true">
+              <span>{{engine_status}}</span>
+            </md-menu-item>
+            <md-menu-item @click="connectEngine(engine_url)">
+              <span>Connect</span>
+              <md-icon>settings_ethernet</md-icon>
+            </md-menu-item>
+            <md-menu-item @click="disconnectEngine()">
+              <span>Disconnect</span>
+              <md-icon>clear</md-icon>
+            </md-menu-item>
+          </md-menu-content>
+        </md-menu>
         <md-button class="md-icon-button">
           <md-icon>help</md-icon>
           <md-tooltip>Open help information.</md-tooltip>
@@ -152,8 +171,13 @@
     <md-dialog-content>
       <md-tabs>
       <md-tab id="tab-settings" md-label="General Settings">
-        <md-button class="md-primary" @click="connectBackend()">Connect Backend</md-button>
-        <md-button class="md-primary" @click="disconnectBackend()">Disconnect Backend</md-button>
+        <md-field>
+          <label for="engine_url">Plugin Engine URL</label>
+          <md-input type="text" v-model="engine_url" name="engine_url"></md-input>
+        </md-field>
+        <md-button class="md-primary" @click="connectEngine(engine_url)">Connect Plugin Engine</md-button>
+        <md-button class="md-primary" @click="disconnectEngine()">Disconnect Plugin Engine</md-button>
+        <p>{{engine_status}}</p>
       </md-tab>
       <md-tab id="tab-installed" md-label="Installed Plugins">
         <plugin-list :plugins="installed_plugins" title="Installed Plugins"></plugin-list>
@@ -198,6 +222,8 @@ import {
   parseComponent
 } from '../pluginParser.js'
 
+import io from 'socket.io-client'
+
 import _ from 'lodash'
 
 export default {
@@ -217,6 +243,9 @@ export default {
       loading: false,
       progress: 0,
       status_text: '',
+      engine_status: 'disconnected',
+      engine_connected: false,
+      engine_url: 'http://localhost:8080/imjoy_plugin_engine',
       windows: [],
       panels: {},
       active_windows: [],
@@ -249,6 +278,9 @@ export default {
       plugin_api: null,
       plugin_loaded: false,
       menuVisible: true,
+      snackbar_info: '',
+      snackbar_duration: 3000,
+      show_snackbar: false,
       db: null,
       store: this.$root.$data.store,
       api: this.$root.$data.store.api,
@@ -352,13 +384,46 @@ export default {
       }
     }
     this.plugins = null
+    this.disconnectEngine()
   },
   methods: {
-    connectBackend() {
-
+    show(info, duration) {
+        this.snackbar_info = info
+        this.snackbar_duration = duration || 3000
+        this.show_snackbar = true
     },
-    disconnectBackend(){
-
+    connectEngine(url) {
+      if(this.socket){
+        this.socket.disconnect()
+      }
+      this.engine_status = 'Connecting, please wait...'
+      const socket = io(url);
+      const timer = setTimeout(()=>{
+        if(socket){
+          this.engine_status = 'Error: connection timeout, please make sure you have started the plugin engine.'
+          this.show('Error: connection timeout, please make sure you have started the plugin engine.', 5000)
+          socket.disconnect()
+        }
+      }, 3000)
+      socket.on('connect', (d)=>{
+        console.log('plugin engine connected.')
+        clearTimeout(timer)
+        this.engine_connected = true
+        this.engine_status = 'Plugin Engine connected.'
+        this.store.event_bus.$emit('engine_connected', d)
+      })
+      socket.on('disconnect', () => {
+        console.log('plugin engine disconnected.')
+        this.engine_connected = false
+        this.engine_status = 'Plugin Engine disconnected.'
+        this.socket = null
+      });
+      this.socket = socket
+    },
+    disconnectEngine(){
+      if(this.socket){
+        this.socket.disconnect()
+      }
     },
     importScript(url) {
         //url is URL of external file, implementationCode is the code
