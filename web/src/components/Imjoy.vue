@@ -11,7 +11,7 @@ Engine<template>
           <md-tooltip>show sidebar</md-tooltip>
         </md-button>
         <md-button to="/" v-if="!menuVisible">
-          <div class="site-title">ImJoy.io<span class="superscript">alpha</span></div>
+          <div class="site-title">ImJoy.io<span class="superscript md-small-hide">alpha</span></div>
           <md-tooltip>ImJoy home</md-tooltip>
         </md-button>
         <span class="subheader-title md-medium-hide" style="flex: 1">Image Processing with Joy</span>
