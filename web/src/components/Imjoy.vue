@@ -51,9 +51,9 @@
             <md-icon>folder_open</md-icon>
             <md-tooltip>Open a folder</md-tooltip>
           </md-button>
-          <md-button @click="addPlugin" class="md-icon-button md-accent">
+          <md-button @click="showAddPluginDialog=true" class="md-icon-button md-accent">
             <md-icon>extension</md-icon>
-            <md-tooltip>Create a new plugin</md-tooltip>
+            <md-tooltip>Install or create a new plugin</md-tooltip>
           </md-button>
         </md-speed-dial-content>
       </md-speed-dial>
@@ -150,10 +150,31 @@
 
   <md-dialog class="fullscreen" :md-active.sync="showSettingsDialog">
     <md-dialog-content>
-      <plugin-list :plugins="installed_plugins" title="Installed Plugins"></plugin-list>
+      <md-tabs>
+      <md-tab id="tab-settings" md-label="General Settings">
+        <md-button class="md-primary" @click="connectBackend()">Connect Backend</md-button>
+        <md-button class="md-primary" @click="disconnectBackend()">Disconnect Backend</md-button>
+      </md-tab>
+      <md-tab id="tab-installed" md-label="Installed Plugins">
+        <plugin-list :plugins="installed_plugins" title="Installed Plugins"></plugin-list>
+      </md-tab>
+      <md-tab id="tab-plugin-store" md-label="Plugin Store" >
+        <plugin-list config-url="static/plugins/manifest.json" title="Available Plugins"></plugin-list>
+      </md-tab>
+    </md-tabs>
     </md-dialog-content>
     <md-dialog-actions>
       <md-button class="md-primary" @click="showSettingsDialog=false">OK</md-button>
+    </md-dialog-actions>
+  </md-dialog>
+  <md-dialog class="fullscreen" :md-active.sync="showAddPluginDialog">
+    <md-dialog-content>
+      <md-subheader>Create a New Plugin</md-subheader>
+      <md-button class="md-primary md-raised" @click="addPlugin();showAddPluginDialog=false">Create</md-button>
+      <plugin-list config-url="static/plugins/manifest.json" title="Or, install from the Plugin Store"></plugin-list>
+    </md-dialog-content>
+    <md-dialog-actions>
+      <md-button class="md-primary" @click="showAddPluginDialog=false">OK</md-button>
     </md-dialog-actions>
   </md-dialog>
 </div>
@@ -190,6 +211,7 @@ export default {
       selected_files: null,
       showPluginDialog: false,
       showSettingsDialog: false,
+      showAddPluginDialog: false,
       plugin_dialog_config: null,
       _plugin_dialog_promise: {},
       loading: false,
@@ -332,6 +354,12 @@ export default {
     this.plugins = null
   },
   methods: {
+    connectBackend() {
+
+    },
+    disconnectBackend(){
+
+    },
     importScript(url) {
         //url is URL of external file, implementationCode is the code
         //to be called from the file, location is the location to
