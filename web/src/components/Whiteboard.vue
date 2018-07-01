@@ -112,14 +112,18 @@ export default {
     }
   },
   created() {
-    this.store.event_bus.$on('add_window', (w)=>{
-      this.selectWindow(w, {})
-    })
+    this.store.event_bus.$on('add_window', this.onWindowAdd)
   },
   mounted() {
 
   },
+  beforeDestroy() {
+    this.store.event_bus.$off('add_window', this.onWindowAdd)
+  },
   methods: {
+    onWindowAdd(w){
+      this.selectWindow(w, {})
+    },
     close(wi) {
       console.log('close', wi)
       this.windows.splice(wi, 1)

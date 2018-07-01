@@ -104,10 +104,7 @@ export default {
   },
   mounted() {
     this.containerWidth = this.$refs.container.offsetWidth;
-    const updateSize = (e)=>{
-      this.containerWidth = this.$refs.container.offsetWidth;
-    }
-    this.store.event_bus.$on('resize',updateSize)
+    this.store.event_bus.$on('resize',this.updateSize)
 
     this.db = new PouchDB('imjoy_plugins', {
       revs_limit: 2,
@@ -135,7 +132,13 @@ export default {
 
 
   },
+  beforeDestroy() {
+    this.store.event_bus.$off('resize',this.updateSize)
+  },
   methods: {
+    updateSize(){
+      this.containerWidth = this.$refs.container.offsetWidth;
+    },
     updatePluginList() {
       for (let i = 0; i < this.available_plugins.length; i++) {
         const plugin = this.available_plugins[i]
