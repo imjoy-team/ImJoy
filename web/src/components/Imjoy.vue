@@ -263,7 +263,7 @@ export default {
       status_text: '',
       engine_status: 'disconnected',
       engine_connected: false,
-      engine_url: 'http://localhost:8080/imjoy_plugin_engine',
+      engine_url: 'http://localhost:8080',
       windows: [],
       panels: {},
       active_windows: [],
@@ -294,6 +294,7 @@ export default {
       },
       installed_plugins: [],
       plugin_api: null,
+      plugin_context: null,
       plugin_loaded: false,
       menuVisible: true,
       snackbar_info: '',
@@ -376,6 +377,7 @@ export default {
       showStatus: this.showStatus,
       run: this.runPlugin,
     }
+    this.pluing_context = {}
     this.plugin_loaded = false
     this.loading = true
     this.db = new PouchDB('imjoy_plugins', {
@@ -426,6 +428,7 @@ export default {
       socket.on('connect', (d)=>{
         console.log('plugin engine connected.')
         clearTimeout(timer)
+        this.socket = socket
         this.engine_connected = true
         this.engine_status = 'Plugin Engine connected.'
         this.show('Plugin Engine connected.')
@@ -437,8 +440,10 @@ export default {
         this.show('Plugin Engine disconnected.')
         this.engine_status = 'Plugin Engine disconnected.'
         this.socket = null
+        this.pluing_context.socket = null
       });
       this.socket = socket
+      this.pluing_context.socket = socket
     },
     disconnectEngine(){
       if(this.socket){
@@ -527,7 +532,7 @@ export default {
           pconfig.plugin = plugin
           if (this.$refs.workflow) this.$refs.workflow.setupJoy()
         }).catch((e) => {
-          pconfig.plugin = plugin
+          pconfig.plugin = null
           reject(e)
         })
         // this.$forceUpdate()
@@ -821,20 +826,27 @@ export default {
         resolve(plugin)
       })
     },
-    loadPlugin(config) {
-      config = _clone(config)
+    loadPlugin(template) {
+      template = _clone(template)
       //generate a random id for the plugin
       return new Promise((resolve, reject) => {
-        config.id = config.name.trim().replace(/ /g, '_') + '_' + randId()
-        const plugin = new jailed.DynamicPlugin(config, {}, this.plugin_api)
+        const config = {}
+        config.id = template.name.trim().replace(/ /g, '_') + '_' + randId()
+        config.context = this.pluing_context
+        if(template.mode == 'pyworker'){
+          if(!this.socket){
+            console.error("plugin engine is not connected.")
+          }
+        }
+        const plugin = new jailed.DynamicPlugin(template, config, this.plugin_api)
         plugin.whenConnected(() => {
           if (!plugin.api) {
             console.error('error occured when loading plugin.')
             throw 'error occured when loading plugin.'
           }
           this.plugins[plugin.id] = plugin
-          if (config.type && config.ui) {
-            this.register(config, {
+          if (template.type && template.ui) {
+            this.register(template, {
               id: plugin.id
             })
           }
@@ -842,14 +854,14 @@ export default {
             console.log('sucessfully setup plugin: ', plugin)
             resolve(plugin)
           }).catch((e) => {
-            console.error('error occured when loading plugin ' + config.name + ": ", e)
+            console.error('error occured when loading plugin ' + template.name + ": ", e)
             reject(e)
             plugin.terminate()
           })
         });
         plugin.whenFailed((e) => {
-          console.error('error occured when loading ' + config.name + ":", e)
-          alert('error occured when loading ' + config.name)
+          console.error('error occured when loading ' + template.name + ":", e)
+          alert('error occured when loading ' + template.name)
           plugin.terminate()
           // reject(e)
         });
@@ -1019,6 +1031,7 @@ export default {
           console.log('changing id...')
           pconfig.iframe_window = null
           pconfig.plugin = window_config
+          pconfig.context = this.pluing_context
           if (wconfig.force_show) {
             pconfig.click2load = false
             pconfig.loadWindow = null
