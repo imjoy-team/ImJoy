@@ -1,5 +1,8 @@
 {
  "name": "ImJoy.io",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "orientation": "portrait",
  "icons": [
   {
    "src": "\/android-icon-36x36.png",
