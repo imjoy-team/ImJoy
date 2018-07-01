@@ -47,6 +47,10 @@ Engine<template>
               <span>Disconnect</span>
               <md-icon>clear</md-icon>
             </md-menu-item>
+            <md-menu-item @click="showAboutEngineDialog=true">
+              <span>About Plugin Engine</span>
+              <md-icon>info</md-icon>
+            </md-menu-item>
           </md-menu-content>
         </md-menu>
         <md-button class="md-icon-button">
@@ -154,6 +158,19 @@ Engine<template>
     </md-app-content>
   </md-app>
   <!-- </md-card-content> -->
+  <md-dialog :md-active.sync="showAboutEngineDialog" :md-click-outside-to-close="false">
+    <md-dialog-content>
+      <h2>About Plugin Engine</h2>
+      <p>Plugin Engine is a Python program running locally(or remotely) on your computer in order to utilize the full computation power of your computer.</p>
+      <p>With the Plugin Engine running in the background, you can send heavy compuation to the python backend.</p>
+      <p>TODO: how to setup the plugin engine?</p>
+      <p>For developers, develop plugin which run in the plugin engine is as easy as javascript plugins.</p>
+      <p>TODO: how it works?</p>
+    </md-dialog-content>
+    <md-dialog-actions>
+      <md-button class="md-primary" @click="showAboutEngineDialog=false">OK</md-button>
+    </md-dialog-actions>
+  </md-dialog>
 
   <md-dialog :md-active.sync="showPluginDialog" :md-click-outside-to-close="false">
     <md-dialog-content>
@@ -238,6 +255,7 @@ export default {
       showPluginDialog: false,
       showSettingsDialog: false,
       showAddPluginDialog: false,
+      showAboutEngineDialog: false,
       plugin_dialog_config: null,
       _plugin_dialog_promise: {},
       loading: false,
@@ -410,11 +428,13 @@ export default {
         clearTimeout(timer)
         this.engine_connected = true
         this.engine_status = 'Plugin Engine connected.'
+        this.show('Plugin Engine connected.')
         this.store.event_bus.$emit('engine_connected', d)
       })
       socket.on('disconnect', () => {
         console.log('plugin engine disconnected.')
         this.engine_connected = false
+        this.show('Plugin Engine disconnected.')
         this.engine_status = 'Plugin Engine disconnected.'
         this.socket = null
       });
