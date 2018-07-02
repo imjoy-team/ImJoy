@@ -8,7 +8,7 @@ import FAQ from '@/components/FAQ'
 Vue.use(Router)
 
 export default new Router({
-  mode: 'history',
+  // mode: 'history',
   base: window.location.pathName,
   routes: [{
       path: '/',
