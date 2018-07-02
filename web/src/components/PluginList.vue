@@ -17,12 +17,14 @@
     </md-card-content>
   </md-card>
   <grid v-if="containerWidth>500"
-   :center="true"
+   :center="center"
    :draggable="false"
    :sortable="true"
    :items="available_plugins"
    :cell-width="380"
    :cell-height="280"
+   :grid-width="containerWidth"
+   class="grid-container"
    >
    <template slot="cell" slot-scope="props">
      <md-card>
@@ -75,6 +77,10 @@ export default {
     title: {
       type: String,
       default: null
+    },
+    center: {
+      type: Boolean,
+      default: true
     },
     plugins: {
       type: Array,
@@ -266,6 +272,9 @@ export default {
 
 .code-editor {
   height: calc(100%)!important;
+  width: calc(100%)!important;
+}
+.grid-container{
   width: calc(100%)!important;
 }
 </style>

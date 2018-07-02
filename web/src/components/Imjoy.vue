@@ -184,7 +184,7 @@ Engine<template>
     </md-dialog-actions>
   </md-dialog>
 
-  <md-dialog class="fullscreen" :md-active.sync="showSettingsDialog">
+  <md-dialog :md-active.sync="showSettingsDialog">
     <md-dialog-content>
       <md-tabs>
       <md-tab id="tab-settings" md-label="General Settings">
@@ -208,7 +208,7 @@ Engine<template>
       <md-button class="md-primary" @click="showSettingsDialog=false">OK</md-button>
     </md-dialog-actions>
   </md-dialog>
-  <md-dialog class="fullscreen" :md-active.sync="showAddPluginDialog">
+  <md-dialog :md-active.sync="showAddPluginDialog">
     <md-dialog-content>
       <md-subheader>Create a New Plugin</md-subheader>
       <md-button class="md-primary md-raised" @click="addPlugin();showAddPluginDialog=false">Create</md-button>
@@ -1152,7 +1152,13 @@ export default {
 }
 
 .md-dialog {
-  width: 100%;
+  width: 80%;
+}
+
+@media screen and (max-width: 700px) {
+  .md-dialog {
+    width: 100%;
+  }
 }
 
 .md-card {
