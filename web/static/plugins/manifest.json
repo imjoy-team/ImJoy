@@ -70,6 +70,18 @@
     "description": "A plugin for doing tSNE visualization, using a library from https://cs.stanford.edu/people/karpathy/tsnejs/.",
     "icon": null,
     "dependencies": []
+  },
+  {
+    "name": "Python Demo Plugin",
+    "mode": "pyworker",
+    "version": "0.1.0",
+    "api_version": "0.1.0",
+    "createdAt": "Mon Jun 26 2018 15:45:30",
+    "url": "/pythonDemoPlugin.html",
+    "description": "A plugin for demonstrate python plugin.",
+    "tags": ["demo", "op"],
+    "icon": null,
+    "dependencies": []
   }
 ]
 }
