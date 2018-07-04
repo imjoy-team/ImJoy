@@ -1,3 +1,4 @@
 socketIO-client
 python-socketio
+websocket-client-py3
 aiohttp

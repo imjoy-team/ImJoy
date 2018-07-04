@@ -9,6 +9,8 @@ import traceback
 import time
 import platform
 import signal
+import random
+import string
 from subprocess import Popen, PIPE, STDOUT
 try:
     from Queue import Queue, Empty
@@ -19,7 +21,6 @@ NAME_SPACE = '/'
 sio = socketio.AsyncServer()
 app = web.Application()
 sio.attach(app)
-secretKey = 'osdfu3dosru39727oeu420'
 plugins = {}
 
 @sio.on('connect', namespace=NAME_SPACE)
@@ -29,20 +30,45 @@ def connect(sid, environ):
 @sio.on('init_plugin', namespace=NAME_SPACE)
 async def on_init_plugin(sid, kwargs):
     print("init_plugin: ", kwargs)
+    secretKey = ''.join(random.choices(string.ascii_uppercase + string.digits, k=10))
     pid = kwargs['id']
     plugins[pid] = {'secret': secretKey}
+    @sio.on('message_'+secretKey, namespace=NAME_SPACE)
+    async def message_from_plugin(sid, kwargs):
+        print('forwarding message_'+secretKey, kwargs)
+        if kwargs['type'] in ['initialized', 'importSuccess', 'importFailure', 'executeSuccess', 'executeFailure']:
+            await sio.emit('message_from_plugin_'+pid,  kwargs)
+        else:
+            await sio.emit('message_from_plugin_'+pid, {'type': 'message', 'data': kwargs})
+
+    @sio.on('message_to_plugin_'+pid, namespace=NAME_SPACE)
+    async def message_to_plugin(sid, kwargs):
+        print('forwarding message_to_plugin_'+pid, kwargs)
+        if kwargs['type'] == 'message':
+            await sio.emit('plugin_message_'+secretKey, kwargs['data'])
+        elif kwargs['type'] == 'importSuccess':
+            print('========>importSuccess')
+        elif kwargs['type'] == 'importFailure':
+            print('========>importFailure')
+        elif kwargs['type'] == 'executeSuccess':
+            print('========>executeSuccess')
+        elif kwargs['type'] == 'executeFailure':
+            print('========>executeFailure')
     #TODO: start a plugin with the id
     abort = threading.Event()
-    plugins[pid]['abort'] = abort
-    taskThread = threading.Thread(target=execute, args=['python pythonWorkerTemplate.py --id='+pid+' --secret='+secretKey, './', abort, pid])
+    plugins[pid]['abort'] = abort #
+    taskThread = threading.Thread(target=execute, args=['source activate python2 && python pythonWorkerTemplate.py --id='+pid+' --secret='+secretKey, './', abort, pid])
     taskThread.daemon = True
     taskThread.start()
     # execute('python pythonWorkerTemplate.py', './', abort, pid)
     return {'success': True, 'secret': secretKey}
 
+
 @sio.on('message', namespace=NAME_SPACE)
 async def on_message(sid, kwargs):
-    print("message: ", kwargs)
+    print("message recieved: ", kwargs)
+
+
 
 @sio.on('disconnect', namespace=NAME_SPACE)
 def disconnect(sid):
@@ -63,6 +89,7 @@ logger = logging.getLogger('task_processor')
 
 def process_output(line):
     print(line)
+    return True
 
 def execute(args, workdir, abort, name):
     env = os.environ.copy()
@@ -149,17 +176,15 @@ def execute(args, workdir, abort, name):
         # Report that this task is finished
         logger.error('%s task failed with error code %s' %
                           (name, str(p.returncode)))
-        if exception is None:
-            exception = 'error code %s' % str(p.returncode)
-            if unrecognized_output:
-                if traceback is None:
-                    traceback = '\n'.join(unrecognized_output)
-                else:
-                    traceback = traceback + \
-                        ('\n'.join(unrecognized_output))
-        after_runtime_error()
-        print('error from task, taskName:{} taskId:{} widgetId:{}'.format(task.get('name'), task.id, task.get('widgetId')))
-        task.set('status.error', '%s task failed with error code %s' % (name, str(p.returncode)))
+        # if exception is None:
+        #     exception = 'error code %s' % str(p.returncode)
+        #     if unrecognized_output:
+        #         if traceback is None:
+        #             traceback = '\n'.join(unrecognized_output)
+        #         else:
+        #             traceback = traceback + \
+        #                 ('\n'.join(unrecognized_output))
+        print('error from task'+str(p.returncode))
         return False
     else:
         logger.info('%s task completed.' % name)
