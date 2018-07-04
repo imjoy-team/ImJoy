@@ -2,7 +2,6 @@ from ..transport import Transport
 from ..parser import Packet
 from ..utils import format_long
 import requests
-import gevent
 import json
 
 import logging
