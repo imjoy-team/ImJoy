@@ -56,7 +56,11 @@ async def on_init_plugin(sid, kwargs):
             print('========>executeFailure')
     #TODO: start a plugin with the id
     abort = threading.Event()
+<<<<<<< HEAD
     plugins[pid]['abort'] = abort #
+=======
+    plugins[pid]['abort'] = abort
+>>>>>>> 798a061b33a45247573cb47241f212def1c7467b
     taskThread = threading.Thread(target=execute, args=['source activate python2 && python pythonWorkerTemplate.py --id='+pid+' --secret='+secretKey, './', abort, pid])
     taskThread.daemon = True
     taskThread.start()
