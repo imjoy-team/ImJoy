@@ -33,7 +33,7 @@ async def on_init_plugin(sid, kwargs):
     secretKey = ''.join(random.choices(string.ascii_uppercase + string.digits, k=10))
     pid = kwargs['id']
     plugins[pid] = {'secret': secretKey}
-    @sio.on('message_'+secretKey, namespace=NAME_SPACE)
+    @sio.on('from_plugin_'+secretKey, namespace=NAME_SPACE)
     async def message_from_plugin(sid, kwargs):
         print('forwarding message_'+secretKey, kwargs)
         if kwargs['type'] in ['initialized', 'importSuccess', 'importFailure', 'executeSuccess', 'executeFailure']:
@@ -45,15 +45,9 @@ async def on_init_plugin(sid, kwargs):
     async def message_to_plugin(sid, kwargs):
         print('forwarding message_to_plugin_'+pid, kwargs)
         if kwargs['type'] == 'message':
-            await sio.emit('plugin_message_'+secretKey, kwargs['data'])
-        elif kwargs['type'] == 'importSuccess':
-            print('========>importSuccess')
-        elif kwargs['type'] == 'importFailure':
-            print('========>importFailure')
-        elif kwargs['type'] == 'executeSuccess':
-            print('========>executeSuccess')
-        elif kwargs['type'] == 'executeFailure':
-            print('========>executeFailure')
+            await sio.emit('to_plugin_'+secretKey, kwargs['data'])
+        else:
+            print(kwargs)
     #TODO: start a plugin with the id
     abort = threading.Event()
     plugins[pid]['abort'] = abort #
