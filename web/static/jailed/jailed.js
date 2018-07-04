@@ -449,18 +449,20 @@ function randId() {
             this._disconnected = false;
             this.id = id;
             this.context = context
-            if (!this._disconnected) {
-              this.context.socket.on('message_from_plugin_'+this.id,  (data)=>{
-                  console.log('message_from_plugin_'+this.id, data)
-                  if (data.type == 'initialized') {
-                      this.dedicatedThread =
-                          data.dedicatedThread;
-                      this._init.emit();
-                  } else {
-                      this._messageHandler(data);
-                  }
-              })
-            }
+            platformInit.whenEmitted(() =>{
+              if (!this._disconnected) {
+                this.context.socket.on('message_from_plugin_'+this.id,  (data)=>{
+                    console.log('message_from_plugin_'+this.id, data)
+                    if (data.type == 'initialized') {
+                        this.dedicatedThread =
+                            data.dedicatedThread;
+                        this._init.emit();
+                    } else {
+                        this._messageHandler(data);
+                    }
+                })
+              }
+
             // create a plugin here
             this.context.socket.emit('init_plugin', {id: id, mode: mode}, (result) => {
               console.log('init_plugin: ', result)
@@ -472,6 +474,7 @@ function randId() {
                 throw('failed to initialize plugin on the plugin engine')
               }
             })
+          })
 
         }
 

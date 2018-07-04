@@ -440,7 +440,7 @@ export default {
         this.show('Plugin Engine disconnected.')
         this.engine_status = 'Plugin Engine disconnected.'
         this.socket = null
-        this.pluing_context.socket = null
+        // this.pluing_context.socket = null
       });
       this.socket = socket
       this.pluing_context.socket = socket
