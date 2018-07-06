@@ -1,11 +1,12 @@
 <config>
 {
   "name": "Python Demo Plugin",
-  "mode": "restrictedPython",
+  "type": "demo/pyworker",
+  "mode": "pyworker",
   "version": "0.1.0",
   "api_version": "0.1.0",
   "createdAt": "Mon Jun 26 2018 15:45:30",
-  "url": "/pythonDemoPlugin.vue",
+  "url": "/pythonDemoPlugin.html",
   "description": "A plugin for demonstrate python plugin.",
   "tags": ["demo", "op"],
   "icon": null,
@@ -13,13 +14,21 @@
 }
 </config>
 
-<script lang="python">
-class Histogram2dPlugin():
-  def setup():
-    pass
+<script lang="javascript">
+class PythonPlugin {
+  async setup() {
+    api.register({
+      name: "Python Demo Plugin",
+      "type": "demo/pyworker",
+      "tags": ["demo", "op"],
+      ui: "run python plugin",
+    })
+  }
 
-  def run(my):
-    return my
+  run(my) {
 
-api.export(Histogram2dPlugin())
+  }
+}
+
+api.export(new PythonPlugin())
 </script>
