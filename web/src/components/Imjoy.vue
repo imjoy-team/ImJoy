@@ -10,11 +10,24 @@ Engine<template>
           <md-icon>menu</md-icon>
           <md-tooltip>show sidebar</md-tooltip>
         </md-button>
-        <md-button to="/" v-if="!menuVisible">
+        <md-button to="/" v-if="!menuVisible" class="md-medium-hide">
           <div class="site-title">ImJoy.io<span class="superscript md-small-hide">alpha</span></div>
           <md-tooltip>ImJoy home</md-tooltip>
         </md-button>
-        <span class="subheader-title md-medium-hide" style="flex: 1">Image Processing with Joy</span>
+        <md-menu md-size="big">
+          <md-button class="md-button" md-menu-trigger>
+            <span class="subheader-title" style="flex: 1">Image Processing with Joy</span>
+            <md-tooltip>Switch workspace</md-tooltip>
+          </md-button>
+          <md-menu-content>
+            <md-menu-item @click="switchWorkspace(w)" v-for="w in workspace_list">
+              <span>{{w}}</span>
+            </md-menu-item>
+            <md-menu-item @click="showNewWorkspaceDialog=true">
+              <span>New Workspace</span>
+            </md-menu-item>
+          </md-menu-content>
+        </md-menu>
       </div>
       <span class="status-text md-small-hide" :class="status_text.includes('rror')?'error-message':''">{{status_text}}</span>
       <div class="md-toolbar-section-end">
@@ -184,6 +197,19 @@ Engine<template>
     </md-dialog-actions>
   </md-dialog>
 
+  <md-dialog :md-active.sync="showNewWorkspaceDialog" :md-click-outside-to-close="false">
+    <md-dialog-content>
+      <md-field>
+        <label for="workspace_name">Name</label>
+        <md-input type="text" v-model="new_workspace_name" name="workspace_name"></md-input>
+      </md-field>
+    </md-dialog-content>
+    <md-dialog-actions>
+      <md-button class="md-primary" @click="showNewWorkspaceDialog=false;switchWorkspace(new_workspace_name)">OK</md-button>
+      <md-button class="md-primary" @click="showNewWorkspaceDialog=false">Cancel</md-button>
+    </md-dialog-actions>
+  </md-dialog>
+
   <md-dialog :md-active.sync="showSettingsDialog">
     <md-dialog-content>
       <md-tabs>
@@ -197,10 +223,10 @@ Engine<template>
         <p>{{engine_status}}</p>
       </md-tab>
       <md-tab id="tab-installed" md-label="Installed Plugins">
-        <plugin-list :plugins="installed_plugins" title="Installed Plugins"></plugin-list>
+        <plugin-list :plugins="installed_plugins" :workspace="selected_workspace" title="Installed Plugins"></plugin-list>
       </md-tab>
       <md-tab id="tab-plugin-store" md-label="Plugin Store" >
-        <plugin-list config-url="static/plugins/manifest.json" title="Available Plugins"></plugin-list>
+        <plugin-list config-url="static/plugins/manifest.json" :workspace="selected_workspace"  title="Available Plugins"></plugin-list>
       </md-tab>
     </md-tabs>
     </md-dialog-content>
@@ -212,7 +238,7 @@ Engine<template>
     <md-dialog-content>
       <md-subheader>Create a New Plugin</md-subheader>
       <md-button class="md-primary md-raised" @click="addPlugin();showAddPluginDialog=false">Create</md-button>
-      <plugin-list config-url="static/plugins/manifest.json" title="Or, install from the Plugin Store"></plugin-list>
+      <plugin-list config-url="static/plugins/manifest.json" :workspace="selected_workspace" title="Or, install from the Plugin Store"></plugin-list>
     </md-dialog-content>
     <md-dialog-actions>
       <md-button class="md-primary" @click="showAddPluginDialog=false">OK</md-button>
@@ -269,6 +295,10 @@ export default {
       windows: [],
       panels: {},
       active_windows: [],
+      selected_workspace: null,
+      workspace_list: [],
+      showNewWorkspaceDialog: false,
+      new_workspace_name: 'default',
       preload_main: ['/static/tfjs/tfjs.js', 'https://rawgit.com/nicolaspanel/numjs/893016ec40e62eaaa126e1024dbe250aafb3014b/dist/numjs.min.js'],
       // builtin_scripts_url: {
       //   tfjs: '/static/tfjs/tfjs.js'
@@ -382,16 +412,41 @@ export default {
     this.pluing_context = {}
     this.plugin_loaded = false
     this.loading = true
-    this.db = new PouchDB('imjoy_plugins', {
+    this.config_db = new PouchDB('imjoy_config', {
       revs_limit: 2,
       auto_compaction: true
     })
-    const root = location.protocol + '//' + location.host
-
-    //TODO: fix this, how to prevent loading failure if remove this timeout
-    setTimeout(() => {
+    let default_ws = null
+    console.log('loading workspace: ', this.$route.query.w)
+    this.config_db.get('workspace_list').then((doc) => {
+      this.workspace_list = doc.list
+      default_ws = doc.default
+    }).catch((err) => {
+      console.error(err)
+      this.config_db.put({_id: 'workspace_list', list: ['default'], default: 'default'})
+      this.workspace_list = ['default']
+      default_ws = 'default'
+    }).then(()=>{
+      this.selected_workspace = this.$route.query.w || default_ws
+      if(!this.workspace_list.includes(this.selected_workspace) || this.selected_workspace!=default_ws){
+        if(!this.workspace_list.includes(this.selected_workspace)){
+          this.workspace_list.push(this.selected_workspace)
+        }
+        this.config_db.get('workspace_list').then((doc) => {
+          this.config_db.put({_id: doc._id, _rev: doc._rev, list: this.workspace_list, default: 'default'})
+        })
+      }
+      if(this.selected_workspace != 'default'){
+        this.$router.replace({query: {w: this.selected_workspace}})
+      }
+      this.db = new PouchDB(this.selected_workspace+ '_workspace', {
+        revs_limit: 2,
+        auto_compaction: true
+      })
+    }).then(()=>{
       this.reloadPlugins()
-    }, 100)
+    });
+
   },
   beforeDestroy() {
     console.log('terminating plugins')
@@ -409,6 +464,15 @@ export default {
     this.disconnectEngine()
   },
   methods: {
+    switchWorkspace(w) {
+      console.log('switch to ', w)
+      let q = {w:w}
+      if(w == 'default'){
+        q = null
+      }
+      this.$router.push({ name: ':)', query: q})
+      this.$router.go()
+    },
     show(info, duration) {
         this.snackbar_info = info
         this.snackbar_duration = duration || 3000
@@ -1131,6 +1195,7 @@ export default {
   font-size: 16px;
   font-weight: 500;
   margin-top: 10px;
+  text-transform: none;
 }
 
 .superscript {

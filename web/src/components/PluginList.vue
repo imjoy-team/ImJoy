@@ -74,6 +74,10 @@ export default {
       type: String,
       default: null
     },
+    workspace: {
+      type: String,
+      default: 'default'
+    },
     title: {
       type: String,
       default: null
@@ -112,7 +116,7 @@ export default {
     this.containerWidth = this.$refs.container.offsetWidth;
     this.store.event_bus.$on('resize',this.updateSize)
 
-    this.db = new PouchDB('imjoy_plugins', {
+    this.db = new PouchDB(this.workspace + '_workspace', {
       revs_limit: 2,
       auto_compaction: true
     })
