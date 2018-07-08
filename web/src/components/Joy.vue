@@ -1,28 +1,8 @@
 <template>
 <div class="joy">
-
-  <md-button class="md-icon-button" v-if="showHeader" @click="editSource">
-    <md-icon v-if="config.icon">{{config.icon}}</md-icon>
-    <md-icon v-else>extension</md-icon>
-  </md-button>
-  <md-button class="joy-run-button md-primary" v-if="showHeader" @click="runJoy()">
-    {{config.name}}
-  </md-button>
-  <md-button class="md-icon-button" v-if="showHeader" @click="config.expanded=!config.expanded; $forceUpdate()">
-    <md-icon v-if="!config.expanded">expand_more</md-icon>
-    <md-icon v-else>expand_less</md-icon>
-  </md-button>
-    <div class="joy-container" v-show="config.expanded ||!showHeader">
+    <div class="joy-container" v-show="show">
         <div class="joy-editor" ref="editor"></div>
-        <md-button class="md-button md-primary" v-if="controlButtons" :disabled="isRunning" @click="runJoy()">
-          <md-icon>play_arrow</md-icon>Run
-        </md-button>
-        <md-button class="md-button md-primary" v-if="controlButtons" :disabled="!isRunning" @click="stopJoy()">
-          <md-icon>stop</md-icon>Stop
-        </md-button>
-
       </div>
-
     </div>
 </template>
 
@@ -31,13 +11,7 @@ import {Joy} from '../joy'
 export default {
   name: 'joy',
   props: {
-    showHeader: {
-      type: Boolean,
-      default: () => {
-        return true
-      }
-    },
-    controlButtons: {
+    show: {
       type: Boolean,
       default: () => {
         return true
@@ -86,7 +60,7 @@ export default {
         data: this.config.data || Joy.loadFromURL(),
 
         // Other ops to include, beyond turtle ops:
-        modules: this.config.modules || ["instructions", "math", 'random'],
+        modules: this.config.modules || ["instructions", "math"],
 
         onexecute: this.config.onexecute
         // What to do when the user makes a change:
@@ -106,7 +80,8 @@ export default {
         }
       }
       console.log('setting up joy ', this.config)
-      this.joy = new Joy(joy_config);
+      this.joy = new Joy(joy_config)
+      this.config.joy = this.joy
     },
     runJoy() {
       this.$emit('run', this.joy)

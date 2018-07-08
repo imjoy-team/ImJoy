@@ -135,7 +135,29 @@ Engine<template>
           </div>
         </md-card-header>
         <md-card-content>
-          <joy :config="workflow_joy_config" :showHeader="false" ref="workflow" @run="runWorkflow" v-if="plugin_loaded"></joy>
+          <joy :config="workflow_joy_config" ref="workflow" v-if="plugin_loaded && !updating_workflow"></joy>
+          <md-button class="md-button md-primary" v-if="plugin_loaded" @click="runWorkflow(workflow_joy_config.joy)">
+            <md-icon>play_arrow</md-icon>Run
+            <md-tooltip>run the workflow</md-tooltip>
+          </md-button>
+
+          <md-button class="md-button md-primary" v-if="plugin_loaded" @click="saveWorkflow(workflow_joy_config.joy)">
+            <md-icon>save</md-icon>Save
+            <md-tooltip>save the workflow</md-tooltip>
+          </md-button>
+
+          <md-menu>
+            <md-button class="md-button md-primary" md-menu-trigger>
+              <md-icon>more_horiz</md-icon> Load
+              <md-tooltip>load a workflow</md-tooltip>
+            </md-button>
+            <md-menu-content>
+              <md-menu-item @click="loadWorkflow(w)" v-for="w in workflow_list" :key="w.name">
+                <span>{{w.name}}</span>
+              </md-menu-item>
+            </md-menu-content>
+          </md-menu>
+
         </md-card-content>
       </md-card>
 
@@ -155,11 +177,31 @@ Engine<template>
             </div>
           </md-card-header>
           <md-card-content>
-            <div v-for="(panel, t) in panels" :key="panel.id">
+            <div v-for="plugin in this.plugins" :key="plugin.id">
               <md-divider></md-divider>
-              <joy :config="panel" @edit="editPlugin" @run="runPanel($event, panel)"></joy>
+              <md-button class="md-icon-button" @click="editPlugin(plugin.id)">
+                <md-icon v-if="plugin.icon">{{plugin.icon}}</md-icon>
+                <md-icon v-else>extension</md-icon>
+              </md-button>
+              <md-button class="joy-run-button md-primary" @click="plugin.ops && plugin.ops[0] && runOp(plugin.ops[0])">
+                {{plugin.name}}
+              </md-button>
+              <md-button class="md-icon-button" @click="plugin.panel_expanded=!plugin.panel_expanded; $forceUpdate()">
+                <md-icon v-if="!plugin.panel_expanded">expand_more</md-icon>
+                <md-icon v-else>expand_less</md-icon>
+              </md-button>
+              <div v-for="op in plugin.ops" :key="op.name + op.type">
+                <joy :config="op" :show="plugin.panel_expanded || false"></joy>
+                <md-button class="md-button md-primary" v-show="plugin.panel_expanded" @click="runOp(op)">
+                  <md-icon>play_arrow</md-icon>Run
+                </md-button>
+                <!-- <md-button class="md-button md-primary">
+                  <md-icon>stop</md-icon>Stop
+                </md-button> -->
+                <md-divider></md-divider>
+              </div>
             </div>
-            <md-divider></md-divider>
+
           </md-card-content>
         </md-card>
       </div>
@@ -293,10 +335,10 @@ export default {
       engine_connected: false,
       engine_url: 'http://localhost:8080',
       windows: [],
-      panels: {},
       active_windows: [],
       selected_workspace: null,
       workspace_list: [],
+      workflow_list: [],
       showNewWorkspaceDialog: false,
       new_workspace_name: 'default',
       preload_main: ['/static/tfjs/tfjs.js', 'https://rawgit.com/nicolaspanel/numjs/893016ec40e62eaaa126e1024dbe250aafb3014b/dist/numjs.min.js'],
@@ -324,6 +366,7 @@ export default {
         ops: {},
         windows: {}
       },
+      updating_workflow: false,
       installed_plugins: [],
       plugin_api: null,
       plugin_context: null,
@@ -535,8 +578,8 @@ export default {
         await this.importScript(args[i])
       }
     },
-    editPlugin(pconfig) {
-      const plugin = this.plugins[pconfig.id]
+    editPlugin(pid) {
+      const plugin = this.plugins[pid]
       const template = plugin.template
       const w = {
         name: template.name,
@@ -571,7 +614,7 @@ export default {
     reloadPlugin(pconfig) {
       return new Promise((resolve, reject) => {
         if (pconfig.plugin && pconfig.plugin.id)
-          delete this.panels[pconfig.plugin.id]
+          delete this.plugins[pconfig.plugin.id]
         if (pconfig.plugin && pconfig.plugin.type)
           Joy.remove(pconfig.plugin.type)
         if (pconfig.plugin && pconfig.plugin.terminate) {
@@ -651,7 +694,6 @@ export default {
         }
       }
       this.plugins = {}
-      this.panels = {}
       this.db.allDocs({
         include_docs: true,
         attachments: true,
@@ -662,17 +704,22 @@ export default {
         this.installed_plugins = []
         for (let i = 0; i < result.total_rows; i++) {
           const config = result.rows[i].doc
-          this.installed_plugins.push(config)
-          try {
-            const template = this.parsePluginCode(config.code, config)
-            if (template.mode == 'iframe' && template.tags.includes('window')) {
-              promises.push(this.preLoadPlugin(template))
-            } else {
-              promises.push(this.loadPlugin(template))
+          if(config.workflow){
+            this.workflow_list.push(config)
+          }
+          else {
+            this.installed_plugins.push(config)
+            try {
+              const template = this.parsePluginCode(config.code, config)
+              if (template.mode == 'iframe' && template.tags.includes('window')) {
+                promises.push(this.preLoadPlugin(template))
+              } else {
+                promises.push(this.loadPlugin(template))
+              }
+            } catch (e) {
+              console.error(e)
+              alert('error occured when loading plugin "' + config.name + '": ' + e.toString())
             }
-          } catch (e) {
-            console.error(e)
-            alert('error occured when loading plugin "' + config.name + '": ' + e.toString())
           }
         }
         // TODO: setup this promise all, it's now cause unknown problem
@@ -771,10 +818,45 @@ export default {
         this.status_text = e.toString() || "Error."
       })
     },
-    runPanel(joy, panel) {
-      console.log('run panel.', this.active_windows)
+    saveWorkflow(joy){
+      // remove if exists
+      const name = prompt("Please enter a name for the workflow","default");
+      if(name == null){
+        return
+      }
+      const data = _.cloneDeep(joy.top.data)
+      data.name = name
+      data._id = name + '_workflow'
+      delete data._references
+      console.log('saving workflow: ', data)
+      this.db.put(data, {
+        force: true
+      }).then((result) => {
+        console.log('Successfully saved!');
+        this.workflow_list.push(data)
+        this.api.show(name + ' has been sucessfully saved.')
+      }).catch((err) => {
+        this.api.show('failed to save the workflow.')
+        console.error(err)
+        alert('error occured: '+err.toString())
+      })
+    },
+    loadWorkflow(w){
+      this.updating_workflow = false
+      this.$forceUpdate()
+      this.workflow_joy_config.data = w.workflow
+      setTimeout( ()=> {
+        this.updating_workflow = true
+        console.log(this.workflow_joy_config)
+        this.$forceUpdate()
+      }, 500);
+      console.log(w)
+
+    },
+    runOp(op) {
+      console.log('run op.', this.active_windows)
       const w = this.active_windows[this.active_windows.length - 1] || {}
-      joy._panel.execute(w.data || {}).then((my) => {
+      op.joy._panel.execute(w.data || {}).then((my) => {
         if (my && !my.op.tags.includes('window')) {
           console.log('result', my)
           my.name = 'result'
@@ -787,7 +869,7 @@ export default {
         this.status_text = ''
       }).catch((e) => {
         console.error(e)
-        this.status_text = panel.name +'->'+ (e.toString() || "Error.")
+        this.status_text = op.name +'->'+ (e.toString() || "Error.")
       })
     },
     selectFileChanged(file_list) {
@@ -996,16 +1078,16 @@ export default {
           plugin.type = config.type
           console.log('register op plugin: ', plugin.template)
           this.registered.ops[config.type] = plugin.template
-          const panel_config = {
+          const op_config = {
             name: config.name,
             id: _plugin.id,
             ui: "{id: '_panel', type: '" + config.type + "'}",
             onexecute: config.onexecute
           }
-          plugin.panel_config = panel_config
+          plugin.ops = plugin.ops || []
+          plugin.ops.push(op_config)
 
-          console.log('creating panel: ', panel_config)
-          this.panels[panel_config.id] = panel_config
+          console.log('creating panel: ', op_config)
           this.$forceUpdate()
 
         }
@@ -1131,9 +1213,9 @@ export default {
         //TODO: verify fields with WINDOW_TEMPLATE
         console.log('creating dialog: ', config, plugin)
 
-        // if (config.show_panel && plugin.panel_config) {
+        // if (config.show_panel && plugin.op_config) {
         // create panel for the window
-        // console.log('creating panel: ', plugin.panel_config)
+        // console.log('creating panel: ', plugin.op_config)
         // config.panel = plugin_config
         // }
 
