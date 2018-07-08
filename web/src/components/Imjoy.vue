@@ -243,6 +243,8 @@ import io from 'socket.io-client'
 
 import _ from 'lodash'
 
+import {Joy} from '../joy'
+
 export default {
   name: 'imjoy',
   props: ['title'],
