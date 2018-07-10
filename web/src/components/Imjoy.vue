@@ -809,9 +809,13 @@ export default {
           const plugins = this.registered.extensions[ext]
           file.loaders = {}
           for(let i=0;i<plugins.length;i++){
-            console.log('trying to open the file with ', plugins[i].name)
-            file.loaders[plugins[i].name] = ()=>{
-              plugins[i].api.run({op: {}, config:{}, data: {file: file}}).then((my)=>{
+            console.log('trying to open the file with ', plugins[i].name, plugins[i])
+            file.loaders[plugins[i].name] = async ()=>{
+              let config = {}
+              if(plugins[i].template && plugins[i].template.ui){
+                config = await this.showDialog(plugins[i].template)
+              }
+              plugins[i].api.run({op: {}, config:config, data: {file: file}}).then((my)=>{
                 if(my){
                   console.log('result', my)
                   my.name = my.name || 'result'
@@ -1108,7 +1112,7 @@ export default {
           console.log('adding joy op', config)
           const joy_template = config
           joy_template.init = joy_template.ui
-          joy_template.ui = null
+          // joy_template.ui = null
           Joy.add(joy_template);
           //update the joy workflow if new template added, TODO: preserve settings during reload
           if (this.$refs.workflow) this.$refs.workflow.setupJoy()

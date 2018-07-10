@@ -357,6 +357,7 @@ Joy.Op = function(options, parent, data){
 				data[dataID] = value;
 			}
 		});
+		console.log('-------------------------', self.children, target, self)
 		return data
 	}
 
