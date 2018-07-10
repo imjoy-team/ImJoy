@@ -8,6 +8,7 @@
   "url": "/textFileImporter.html",
   "description": "A plugin for loading localization table from text files.",
   "tags": ["localization", "importer"],
+  "extensions": [".csv"],
   "icon": null,
   "dependencies": []
 }
@@ -250,20 +251,24 @@ class TextFilePlugin {
     })
   }
   async run(my){
-    try {
-      console.log('running in the plugin', my)
-      const format = {
-        header_row: my.config.header_row.startsWith('read headers')? 0 : -1,
-        delimiter: my.config.delimiter,
-        append_header: my.config.append_header,
-        header_transform: {'x [nm]': 'x', 'y [nm]':'y', 'sigma [nm]': 'sigma'}
-      }
-      const table = await _loadFile(my.data.files[0], format)
-      my.data = {table: table}
-      return my
-    } catch (e) {
-      console.error(e)
+    my.config = my.config || await api.showDialog({
+      name: "LUT Window",
+      ui: "Load a table from the file: <br>"+
+      "add \"{id:'append_header', type:'string', placeholder:''}\" to the first line (optional); " +
+      "{id:'header_row', type:'choose', options:['read headers from the first line','use index as the header'], placeholder:'read headers from the first line'} and " +
+      "use {id:'delimiter', type:'string', placeholder:','} to seperate columns.",
+    })
+    console.log('running in the plugin', my)
+    const format = {
+      header_row: my.config.header_row.startsWith('read headers')? 0 : -1,
+      delimiter: my.config.delimiter,
+      append_header: my.config.append_header,
+      header_transform: {'x [nm]': 'x', 'y [nm]':'y', 'sigma [nm]': 'sigma'}
     }
+    const table = await _loadFile(my.data.files&&my.data.files[0]||my.data.file, format)
+    my.type = 'imjoy/generic'
+    my.data = {table: table}
+    return my
   }
 }
 

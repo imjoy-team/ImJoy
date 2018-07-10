@@ -340,6 +340,26 @@ Joy.Op = function(options, parent, data){
 
 	};
 
+	self.get_config = function(target){
+		target = target || {}
+		// Real or Preview data?
+		var data;
+		if(self.previewData){
+			data = _clone(self.previewData);
+		}else{
+			data = _clone(self.data);
+		}
+		// Try to pre-evaluate all data beforehand!
+		self.children.forEach(function(childOp){
+			var dataID = childOp.dataID;
+			if(dataID && target){
+				var value = childOp.get(target);
+				data[dataID] = value;
+			}
+		});
+		return data
+	}
+
 	// ...or GET INFO from targets.
 	self.onget = self.onget || function(my){return my.data}; // dy default it returns data (my.config)
 	self.get = function(target){

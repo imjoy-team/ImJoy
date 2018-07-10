@@ -20,7 +20,7 @@ Engine<template>
             <md-tooltip>Switch workspace</md-tooltip>
           </md-button>
           <md-menu-content>
-            <md-menu-item @click="switchWorkspace(w)" v-for="w in workspace_list">
+            <md-menu-item @click="switchWorkspace(w)" v-for="w in workspace_list" :key="w.name">
               <span>{{w}}</span>
             </md-menu-item>
             <md-menu-item @click="showNewWorkspaceDialog=true">
@@ -364,7 +364,8 @@ export default {
       plugins: null,
       registered: {
         ops: {},
-        windows: {}
+        windows: {},
+        extensions: {}
       },
       updating_workflow: false,
       installed_plugins: [],
@@ -411,7 +412,7 @@ export default {
       document.querySelector("#dropzone").style.opacity = 0;
       document.querySelector("#textnode").style.fontSize = "42px";
       this.selected_files = e.dataTransfer.files;
-      this.loadData()
+      this.loadFiles()
     });
     this.importScripts.apply(null, this.preload_main).then(()=>{
       console.log('preload done.')
@@ -507,6 +508,17 @@ export default {
     this.disconnectEngine()
   },
   methods: {
+    registerExtension(exts, plugin){
+      for(let i=0;i<exts.length;i++){
+        exts[i] = exts[i].replace('.', '')
+        if(this.registered.extensions[exts[i]]){
+          this.registered.extensions[exts[i]].push(plugin)
+        }
+        else{
+          this.registered.extensions[exts[i]] = [plugin]
+        }
+      }
+    },
     switchWorkspace(w) {
       console.log('switch to ', w)
       let q = {w:w}
@@ -762,7 +774,7 @@ export default {
       this.showPluginDialog = false
       let [resolve, reject] = this._plugin_dialog_promise
       if (ok) {
-        resolve(this.$refs.plugin_dialog_joy.joy.data)
+        resolve(this.$refs.plugin_dialog_joy.joy.get_config())
       } else {
         reject()
       }
@@ -788,7 +800,27 @@ export default {
       }
       this.default_window_pos.i = this.default_window_pos.i + 1
     },
-    loadData() {
+    loadFiles() {
+      if(this.selected_files.length == 1){
+        const file = this.selected_files[0]
+        const tmp = file.name.split('.')
+        const ext = tmp[tmp.length-1]
+        if(this.registered.extensions[ext]){
+          const plugins = this.registered.extensions[ext]
+          for(let i=0;i<plugins.length;i++){
+            console.log('trying to open the file with ', plugins[i].name)
+            plugins[i].api.run({op: {}, config:{}, data: {file: file}}).then((my)=>{
+              if(my){
+                console.log('result', my)
+                my.name = my.name || 'result'
+                my.type = my.type || 'imjoy/generic'
+                this.addWindow(my)
+              }
+            })
+            return
+          }
+        }
+      }
       const w = {
         name: 'Files',
         type: 'imjoy/files',
@@ -998,6 +1030,9 @@ export default {
               id: plugin.id
             })
           }
+          if(template.extensions && template.extensions.length>0){
+            this.registerExtension(template.extensions, plugin)
+          }
           plugin.api.setup().then((result) => {
             console.log('sucessfully setup plugin: ', plugin)
             resolve(plugin)
@@ -1200,18 +1235,18 @@ export default {
     },
     showDialog(config, _plugin) {
       return new Promise((resolve, reject) => {
-        const plugin = this.plugins[_plugin.id]
-        if (config.onupdate && typeof config.onupdate == 'object') {
-          for (let k in config.onupdate) {
-            if (config.onupdate.hasOwnProperty(k)) {
-              // replace the string to a real function
-              const onupdate = plugin.api[config.onupdate[k]]
-              config.onupdate[k] = onupdate
-            }
-          }
-        }
+        // const plugin = this.plugins[_plugin.id]
+        // if (config.onupdate && typeof config.onupdate == 'object') {
+        //   for (let k in config.onupdate) {
+        //     if (config.onupdate.hasOwnProperty(k)) {
+        //       // replace the string to a real function
+        //       const onupdate = plugin.api[config.onupdate[k]]
+        //       config.onupdate[k] = onupdate
+        //     }
+        //   }
+        // }
         //TODO: verify fields with WINDOW_TEMPLATE
-        console.log('creating dialog: ', config, plugin)
+        // console.log('creating dialog: ', config, plugin)
 
         // if (config.show_panel && plugin.op_config) {
         // create panel for the window
