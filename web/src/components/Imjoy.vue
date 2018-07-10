@@ -801,23 +801,25 @@ export default {
       this.default_window_pos.i = this.default_window_pos.i + 1
     },
     loadFiles() {
-      if(this.selected_files.length == 1){
-        const file = this.selected_files[0]
+      for(let f=0;f<this.selected_files.length;f++){
+        const file = this.selected_files[f]
         const tmp = file.name.split('.')
         const ext = tmp[tmp.length-1]
         if(this.registered.extensions[ext]){
           const plugins = this.registered.extensions[ext]
+          file.loaders = {}
           for(let i=0;i<plugins.length;i++){
             console.log('trying to open the file with ', plugins[i].name)
-            plugins[i].api.run({op: {}, config:{}, data: {file: file}}).then((my)=>{
-              if(my){
-                console.log('result', my)
-                my.name = my.name || 'result'
-                my.type = my.type || 'imjoy/generic'
-                this.addWindow(my)
-              }
-            })
-            return
+            file.loaders[plugins[i].name] = ()=>{
+              plugins[i].api.run({op: {}, config:{}, data: {file: file}}).then((my)=>{
+                if(my){
+                  console.log('result', my)
+                  my.name = my.name || 'result'
+                  my.type = my.type || 'imjoy/generic'
+                  this.addWindow(my)
+                }
+              })
+            }
           }
         }
       }
