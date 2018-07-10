@@ -58,7 +58,7 @@
                     <md-icon>more_horiz</md-icon>
                   </md-button>
                   <md-menu-content>
-                    <md-menu-item v-for="(loader, name) in f.loaders" @click="loader()">
+                    <md-menu-item v-for="(loader, name) in f.loaders" :key="name" @click="loader()">
                       <span>{{name}}</span>
                       <md-icon>play_arrow</md-icon>
                     </md-menu-item>
