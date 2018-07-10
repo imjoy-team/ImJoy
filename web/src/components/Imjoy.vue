@@ -841,7 +841,7 @@ export default {
       console.log('run workflow.', this.active_windows)
       const w = this.active_windows[this.active_windows.length - 1] || {}
       joy.workflow.execute(w.data || {}).then((my) => {
-        if (my && !my.op.tags.includes('window')) {
+        if (my.target) {
           console.log('result', my)
           my.name = 'result'
           my.type = 'imjoy/generic'
@@ -895,7 +895,7 @@ export default {
       console.log('run op.', this.active_windows)
       const w = this.active_windows[this.active_windows.length - 1] || {}
       op.joy._panel.execute(w.data || {}).then((my) => {
-        if (my && !my.op.tags.includes('window')) {
+        if ( my.target) {
           console.log('result', my)
           my.name = 'result'
           my.type = 'imjoy/generic'
