@@ -56,6 +56,7 @@ export default {
     this.editor.setOptions({
         wrap: false,
         maxLines: Infinity,
+        // autoScrollEditorIntoView : false,
         // enableBasicAutocompletion: true,
         // enableLiveAutocompletion: true
     });
@@ -83,6 +84,7 @@ export default {
       //this.$emit('save', {pluginId: this.pluginId, code: this.editor.getValue()})
     },
     reload(){
+      this.editor.resize()
       this.window.reload({pluginId: this.pluginId, code: this.editor.getValue(), plugin: this.window.plugin}).then((plugin)=>{
         this.window.plugin = plugin
         this.window.name = plugin.name

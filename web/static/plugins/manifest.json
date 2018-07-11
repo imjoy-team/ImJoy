@@ -82,6 +82,21 @@
     "tags": ["demo", "op"],
     "icon": null,
     "dependencies": []
+  },
+  {
+    "name": "Tif File Importer",
+    "mode": "webworker",
+    "version": "0.1.0",
+    "api_version": "0.1.0",
+    "createdAt": "Mon Jun 18 2018 21:46:36",
+    "url": "/tifFileImporter.html",
+    "description": "A plugin for loading tif images.",
+    "type": "image/tif_loader",
+    "tags": ["image", "op", "file_loader"],
+    "ui": "load a tif image.",
+    "extensions": [".tif", ".tiff"],
+    "icon": null,
+    "dependencies": ["Image Window"]
   }
 ]
 }

@@ -1159,7 +1159,7 @@ export default {
         if (!plugin.api) {
           console.error('the window plugin seems not ready.')
         }
-        this.plugins[plugin.id] = plugin
+        // this.plugins[plugin.id] = plugin
         plugin.api.setup().then((result) => {
           console.log('sucessfully setup the window plugin: ', plugin, pconfig)
           plugin.api.run({
