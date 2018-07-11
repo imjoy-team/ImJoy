@@ -7,7 +7,10 @@
   "createdAt": "Mon Jun 18 2018 21:46:36",
   "url": "/textFileImporter.html",
   "description": "A plugin for loading localization table from text files.",
-  "tags": ["localization", "importer"],
+  "type": "localization/text_loader",
+  "tags": ["localization", "op", "file_loader"],
+  "ui": "Load a table from the file: add {id:'append_header', type:'string', placeholder:''} to the first line (optional) {id:'header_row', type:'choose', options:['read headers from the first line','use index as the header'], placeholder:'read headers from the first line'} and use {id:'delimiter', type:'string', placeholder:','} to seperate columns.",
+  "extensions": [".csv"],
   "icon": null,
   "dependencies": []
 }
@@ -239,31 +242,19 @@ function _loadFile(file, format) {
 
 class TextFilePlugin {
   setup(){
-    api.register({
-      name: "load text file",
-      type: "localization/text_loader",
-      tags: ["localization", "op", "file_loader"],
-      ui: "Load a table from the file: <br>"+
-      "add \"{id:'append_header', type:'string', placeholder:''}\" to the first line (optional); " +
-      "{id:'header_row', type:'choose', options:['read headers from the first line','use index as the header'], placeholder:'read headers from the first line'} and " +
-      "use {id:'delimiter', type:'string', placeholder:','} to seperate columns."
-    })
   }
   async run(my){
-    try {
-      console.log('running in the plugin', my)
-      const format = {
-        header_row: my.config.header_row.startsWith('read headers')? 0 : -1,
-        delimiter: my.config.delimiter,
-        append_header: my.config.append_header,
-        header_transform: {'x [nm]': 'x', 'y [nm]':'y', 'sigma [nm]': 'sigma'}
-      }
-      const table = await _loadFile(my.data.files[0], format)
-      my.data = {table: table}
-      return my
-    } catch (e) {
-      console.error(e)
+    console.log('running in the plugin', my)
+    const format = {
+      header_row: my.config.header_row.startsWith('read headers')? 0 : -1,
+      delimiter: my.config.delimiter,
+      append_header: my.config.append_header,
+      header_transform: {'x [nm]': 'x', 'y [nm]':'y', 'sigma [nm]': 'sigma'}
     }
+    const table = await _loadFile(my.data.files&&my.data.files[0]||my.data.file, format)
+    my.type = 'imjoy/generic'
+    my.data = {table: table}
+    return my
   }
 }
 

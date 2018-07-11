@@ -171,7 +171,6 @@
      */
     // var callback_reg = new RegExp("onupdate|run$")
     JailedSite.prototype._processMessage = function(data) {
-         console.log('----->', data)
          switch(data.type) {
          case 'method':
              var method;

@@ -55,9 +55,8 @@ class Histogram2dPlugin {
           var s =y * width + x;  // calculate the index in the array
           canvas_data[s] = canvas_data[s]+1
       }
-      my.data = {}
-      my.data.image = {type: 'image/grayscale', array: canvas_data, height: height, width: width}
-      return my
+      const image = {type: 'image/grayscale', array: canvas_data, height: height, width: width}
+      api.createWindow({name: 'Histogram', type: 'image/zoomable_2d', data: {image: image}, config: {}})
     } catch (e) {
       console.error(e)
       throw e
