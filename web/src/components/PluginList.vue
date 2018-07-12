@@ -1,7 +1,9 @@
 <template>
 <div class="plugin-list" ref="container">
   <!-- <md-subheader>Options</md-subheader> -->
-  <md-subheader v-if="title">{{title}}</md-subheader>
+  <md-subheader v-if="title">{{title}}
+    <md-button v-if="available_plugins" @click="updateAll()" class="md-button md-primary"><md-icon>update</md-icon>Update All</md-button>
+  </md-subheader>
   <md-card v-if="containerWidth<=500" v-for="(plugin, k) in available_plugins" :key="k">
     <md-card-header>
       {{plugin.createdAt}}
@@ -209,6 +211,13 @@ export default {
       }).catch((err) => {
         console.log('error occured when removing ', plugin.name, err)
       });
+    },
+    updateAll(){
+      for(let plugin of this.available_plugins){
+        if(plugin.installed){
+          this.install(plugin)
+        }
+      }
     },
     install(plugin) {
       axios.get(plugin.url).then(response => {

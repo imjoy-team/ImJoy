@@ -50,7 +50,7 @@
           </md-empty-state>
           <div v-if="w.type=='imjoy/files'">
             <md-list>
-              <md-list-item v-for="f in w.data.files" :key="f.name">
+              <md-list-item v-for="f in w.data.files" @click="f.loaders&&Object.keys(f.loaders).length > 0&&f.loaders[Object.keys(f.loaders)[0]]()" :key="f.name">
                 <md-icon>insert_drive_file</md-icon>
                 <span class="md-list-item-text">{{f.name}}</span>
                 <md-menu md-size="big" md-direction="bottom-end" v-if="f.loaders && Object.keys(f.loaders).length > 0">

@@ -1031,7 +1031,7 @@ export default {
             throw 'error occured when loading plugin.'
           }
           this.plugins[plugin.id] = plugin
-          if (template.type && template.ui) {
+          if (template.type) {
             this.register(template, {
               id: plugin.id
             })
@@ -1111,7 +1111,7 @@ export default {
           }
           console.log('adding joy op', config)
           const joy_template = config
-          joy_template.init = joy_template.ui
+          joy_template.init = joy_template.ui || joy_template.name
           // joy_template.ui = null
           Joy.add(joy_template);
           //update the joy workflow if new template added, TODO: preserve settings during reload
@@ -1130,7 +1130,6 @@ export default {
 
           console.log('creating panel: ', op_config)
           this.$forceUpdate()
-
         }
         if (config.tags.includes('window')) {
           if (config.mode != 'iframe') {

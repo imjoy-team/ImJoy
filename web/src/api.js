@@ -54,7 +54,7 @@ export const REGISTER_SCHEMA= schema({
   type: String,
   mode: String,
   tags: Array,
-  ui: String,
+  ui: [null, String],
   show_panel: [null, Boolean]
 })
 
@@ -70,7 +70,7 @@ export const WINDOW_SCHEMA= schema({
 export const OP_SCHEMA = {
   name: String,
   type: String,
-  ui: String,
+  ui: [null, String],
   tags: Array,
   run: [null, String]
 }
