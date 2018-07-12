@@ -78,7 +78,23 @@
           </div>
           <div v-else-if="w.type=='imjoy/generic'">
             <!-- <p>generic data</p> -->
-            <md-chip v-for="(v, k) in w.data" :key="k">{{k}}</md-chip>
+            <md-list>
+              <md-list-item v-for="(v, k) in w.data" :key="k">
+                <md-icon>insert_drive_file</md-icon>
+                <span class="md-list-item-text">{{k}}</span>
+                <!-- <md-menu md-size="big" md-direction="bottom-end" v-if="f.loaders && Object.keys(f.loaders).length > 0">
+                  <md-button class="md-icon-button" md-menu-trigger>
+                    <md-icon>more_horiz</md-icon>
+                  </md-button>
+                  <md-menu-content>
+                    <md-menu-item v-for="(loader, name) in f.loaders" :key="name" @click="loader()">
+                      <span>{{name}}</span>
+                      <md-icon>play_arrow</md-icon>
+                    </md-menu-item>
+                  </md-menu-content>
+                </md-menu> -->
+              </md-list-item>
+            </md-list>
           </div>
           <plugin-editor v-else-if="w.type=='imjoy/plugin-editor'" :pluginId="w.data.id" :window="w" v-model="w.data.code" :editorId="'editor_'+w.data.id"></plugin-editor>
           <div v-else class="plugin-iframe">
