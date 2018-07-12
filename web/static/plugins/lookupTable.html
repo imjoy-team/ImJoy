@@ -8,6 +8,8 @@
   "url": "/LookupTable.html",
   "description": "A plugin for applying lookup table to a single-channel image.",
   "tags": ["image", "LUT"],
+  "inputs": {"image":"image/grayscale"},
+  "outputs": {"image":"image/color"},
   "icon": null,
   "dependencies": []
 }
@@ -19,14 +21,8 @@ class LookupTablePlugin {
       name: "apply LUT",
       type: "image/LUT",
       tags: ["image", "op", "LUT"],
-      input: {
-        type: "image",
-        tags: ['grayscale']
-      },
-      output: {
-        type: "image",
-        tags: ['color']
-      },
+      inputs: {"image":"image/grayscale"},
+      outputs: {"image":"image/color"},
       ui: "apply LUT {id:'lut', type:'choose', options:['hot', 'rainbow'], placeholder: 'hot'}",
       show_panel: true,
       onupdate: {

@@ -979,7 +979,9 @@ export default {
         mode: template.mode,
         type: template.type,
         tags: template.tags,
-        ui: template.ui
+        ui: template.ui,
+        inputs: template.inputs,
+        outputs: template.outputs
       }
       //generate a random id for the plugin
       return new Promise((resolve, reject) => {
