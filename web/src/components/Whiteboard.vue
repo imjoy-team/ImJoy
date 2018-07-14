@@ -1,9 +1,8 @@
 <template>
 <div class="whiteboard noselect" ref="whiteboard">
-  <div class="overlay" @click="dragging=false" v-if="dragging"></div>
+  <div class="overlay" @click="show_overlay=false" v-if="show_overlay"></div>
   <grid-layout :layout="windows" :col-num="20" :is-mirrored="false" :auto-size="true" :row-height="30" :is-draggable="true" :is-resizable="true" :vertical-compact="true" :margin="[10, 10]" :use-css-transforms="true">
-    <grid-item v-for="(w, wi) in windows" drag-ignore-from=".ace_editor" :x="w.x" :y="w.y" :w="w.w" :h="w.h" :i="w.i" @resize="startDragging(w)"
-                   @move="startDragging(w)" @resized="dragging=false" @moved="dragging=false" :key="w.iframe_container">
+    <grid-item v-for="(w, wi) in windows" drag-ignore-from=".ace_editor" :x="w.x" :y="w.y" :w="w.w" :h="w.h" :i="w.i" @resize="focusWindow(w)" @move="focusWindow(w)" @resized="show_overlay=false" @moved="show_overlay=false" :key="w.iframe_container">
       <md-card>
         <md-card-expand>
           <md-card-actions md-alignment="space-between" :class="w.selected?'window-selected':'window-header'">
@@ -15,8 +14,6 @@
             <div v-if="!w.panel"></div>
             <div class="window-title noselect" @click="selectWindow(w, $event)">{{w.name+'(#'+w.i+')'}}</div>
             <div>
-              <!-- <md-button>Action</md-button>
-                <md-button>Action</md-button> -->
               <md-menu md-size="big" md-direction="bottom-end">
                 <md-button class="md-icon-button" md-menu-trigger>
                   <md-icon>more_vert</md-icon>
@@ -82,17 +79,6 @@
               <md-list-item v-for="(v, k) in w.data" :key="k">
                 <md-icon>insert_drive_file</md-icon>
                 <span class="md-list-item-text">{{k}}</span>
-                <!-- <md-menu md-size="big" md-direction="bottom-end" v-if="f.loaders && Object.keys(f.loaders).length > 0">
-                  <md-button class="md-icon-button" md-menu-trigger>
-                    <md-icon>more_horiz</md-icon>
-                  </md-button>
-                  <md-menu-content>
-                    <md-menu-item v-for="(loader, name) in f.loaders" :key="name" @click="loader()">
-                      <span>{{name}}</span>
-                      <md-icon>play_arrow</md-icon>
-                    </md-menu-item>
-                  </md-menu-content>
-                </md-menu> -->
               </md-list-item>
             </md-list>
           </div>
@@ -137,7 +123,7 @@ export default {
   data() {
     return {
       active_windows: [],
-      dragging: false,
+      show_overlay: false,
       router: this.$root.$data.router,
       store: this.$root.$data.store,
       api: this.$root.$data.store.api
@@ -153,7 +139,7 @@ export default {
     this.store.event_bus.$off('add_window', this.onWindowAdd)
   },
   methods: {
-    onWindowAdd(w){
+    onWindowAdd(w) {
       this.selectWindow(w, {})
     },
     close(wi) {
@@ -163,55 +149,53 @@ export default {
     fullScreen(w) {
 
     },
-    duplicate(w){
+    duplicate(w) {
       const nw = Object.assign({}, w)
-      if(nw.iframe_container)
-      nw.iframe_container = 'plugin_window_' + nw.id + randId()
-      nw.i = nw.i+"_"
-      if(!nw.click2load)
-      nw.click2load = true
-      if(w.renderWindow){
+      if (nw.iframe_container)
+        nw.iframe_container = 'plugin_window_' + nw.id + randId()
+      nw.i = nw.i + "_"
+      if (!nw.click2load)
+        nw.click2load = true
+      if (w.renderWindow) {
         nw.renderWindow = w.renderWindow
       }
       this.windows.push(nw)
     },
-    selectWindow(w, evt){
+    selectWindow(w, evt) {
       w.selected = true
-      if (this.active_windows.length<=0 || this.active_windows[this.active_windows.length - 1] !== w) {
+      if (this.active_windows.length <= 0 || this.active_windows[this.active_windows.length - 1] !== w) {
         //unselect previous windows if no shift key pressed
-        if(!evt.shiftKey){
-          for(let i=0;i<this.active_windows.length;i++){
+        if (!evt.shiftKey) {
+          for (let i = 0; i < this.active_windows.length; i++) {
             this.active_windows[i].selected = false
           }
         }
-        if(evt.shiftKey && this.active_windows.length>0){
+        if (evt.shiftKey && this.active_windows.length > 0) {
           this.active_windows.push(w)
-        }
-        else{
+        } else {
           this.active_windows = [w]
         }
         this.$emit('select', this.active_windows, w)
 
-      }
-      else if(!evt.shiftKey && this.active_windows.length>1 ){
-        for(let i=0;i<this.active_windows.length;i++){
-          if(this.active_windows[i] !== w)
+      } else if (!evt.shiftKey && this.active_windows.length > 1) {
+        for (let i = 0; i < this.active_windows.length; i++) {
+          if (this.active_windows[i] !== w)
             this.active_windows[i].selected = false
         }
         this.active_windows = [w]
       }
       this.$forceUpdate()
     },
-    startDragging(w) {
+    focusWindow(w) {
       // setTimeout(() => {
-        this.dragging = true
-        // this.$forceUpdate()
+      this.show_overlay = true
+      // this.$forceUpdate()
       // }, 100)
-        this.selectWindow(w, {})
+      this.selectWindow(w, {})
     },
     stopDragging() {
       setTimeout(() => {
-        this.dragging = false
+        this.show_overlay = false
         this.$forceUpdate()
       }, 300)
     }
@@ -273,7 +257,7 @@ export default {
   padding-bottom: 2px;
 }
 
-.iframe-load-button{
+.iframe-load-button {
   width: 100%;
   height: 100%;
 }

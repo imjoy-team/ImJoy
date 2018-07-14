@@ -311,7 +311,9 @@ import io from 'socket.io-client'
 
 import _ from 'lodash'
 
-import {Joy} from '../joy'
+import {
+  Joy
+} from '../joy'
 
 export default {
   name: 'imjoy',
@@ -342,12 +344,6 @@ export default {
       showNewWorkspaceDialog: false,
       new_workspace_name: 'default',
       preload_main: ['/static/tfjs/tfjs.js', 'https://rawgit.com/nicolaspanel/numjs/893016ec40e62eaaa126e1024dbe250aafb3014b/dist/numjs.min.js'],
-      // builtin_scripts_url: {
-      //   tfjs: '/static/tfjs/tfjs.js'
-      // },
-      // builtin_scripts: {
-      //
-      // },
       workflow_joy_config: {
         expanded: true,
         name: "Workflow",
@@ -414,7 +410,7 @@ export default {
       this.selected_files = e.dataTransfer.files;
       this.loadFiles()
     });
-    this.importScripts.apply(null, this.preload_main).then(()=>{
+    this.importScripts.apply(null, this.preload_main).then(() => {
       console.log('preload done.')
     })
   },
@@ -467,27 +463,40 @@ export default {
       default_ws = doc.default
     }).catch((err) => {
       console.error(err)
-      this.config_db.put({_id: 'workspace_list', list: ['default'], default: 'default'})
+      this.config_db.put({
+        _id: 'workspace_list',
+        list: ['default'],
+        default: 'default'
+      })
       this.workspace_list = ['default']
       default_ws = 'default'
-    }).then(()=>{
+    }).then(() => {
       this.selected_workspace = this.$route.query.w || default_ws
-      if(!this.workspace_list.includes(this.selected_workspace) || this.selected_workspace!=default_ws){
-        if(!this.workspace_list.includes(this.selected_workspace)){
+      if (!this.workspace_list.includes(this.selected_workspace) || this.selected_workspace != default_ws) {
+        if (!this.workspace_list.includes(this.selected_workspace)) {
           this.workspace_list.push(this.selected_workspace)
         }
         this.config_db.get('workspace_list').then((doc) => {
-          this.config_db.put({_id: doc._id, _rev: doc._rev, list: this.workspace_list, default: 'default'})
+          this.config_db.put({
+            _id: doc._id,
+            _rev: doc._rev,
+            list: this.workspace_list,
+            default: 'default'
+          })
         })
       }
-      if(this.selected_workspace != 'default'){
-        this.$router.replace({query: {w: this.selected_workspace}})
+      if (this.selected_workspace != 'default') {
+        this.$router.replace({
+          query: {
+            w: this.selected_workspace
+          }
+        })
       }
-      this.db = new PouchDB(this.selected_workspace+ '_workspace', {
+      this.db = new PouchDB(this.selected_workspace + '_workspace', {
         revs_limit: 2,
         auto_compaction: true
       })
-    }).then(()=>{
+    }).then(() => {
       this.reloadPlugins()
     });
 
@@ -508,45 +517,49 @@ export default {
     this.disconnectEngine()
   },
   methods: {
-    registerExtension(exts, plugin){
-      for(let i=0;i<exts.length;i++){
+    registerExtension(exts, plugin) {
+      for (let i = 0; i < exts.length; i++) {
         exts[i] = exts[i].replace('.', '')
-        if(this.registered.extensions[exts[i]]){
+        if (this.registered.extensions[exts[i]]) {
           this.registered.extensions[exts[i]].push(plugin)
-        }
-        else{
+        } else {
           this.registered.extensions[exts[i]] = [plugin]
         }
       }
     },
     switchWorkspace(w) {
       console.log('switch to ', w)
-      let q = {w:w}
-      if(w == 'default'){
+      let q = {
+        w: w
+      }
+      if (w == 'default') {
         q = null
       }
-      this.$router.push({ name: ':)', query: q})
+      this.$router.push({
+        name: ':)',
+        query: q
+      })
       this.$router.go()
     },
     show(info, duration) {
-        this.snackbar_info = info
-        this.snackbar_duration = duration || 3000
-        this.show_snackbar = true
+      this.snackbar_info = info
+      this.snackbar_duration = duration || 3000
+      this.show_snackbar = true
     },
     connectEngine(url) {
-      if(this.socket){
+      if (this.socket) {
         this.socket.disconnect()
       }
       this.engine_status = 'Connecting, please wait...'
       const socket = io(url);
-      const timer = setTimeout(()=>{
-        if(socket){
+      const timer = setTimeout(() => {
+        if (socket) {
           this.engine_status = 'Error: connection timeout, please make sure you have started the plugin engine.'
           this.show('Error: connection timeout, please make sure you have started the plugin engine.', 5000)
           socket.disconnect()
         }
       }, 3000)
-      socket.on('connect', (d)=>{
+      socket.on('connect', (d) => {
         console.log('plugin engine connected.')
         clearTimeout(timer)
         this.socket = socket
@@ -566,26 +579,28 @@ export default {
       this.socket = socket
       this.pluing_context.socket = socket
     },
-    disconnectEngine(){
-      if(this.socket){
+    disconnectEngine() {
+      if (this.socket) {
         this.socket.disconnect()
       }
     },
     importScript(url) {
-        //url is URL of external file, implementationCode is the code
-        //to be called from the file, location is the location to
-        //insert the <script> element
-        return new Promise((resolve, reject) => {
-            var scriptTag = document.createElement('script');
-            scriptTag.src = url;
-            scriptTag.onload = resolve;
-            scriptTag.onreadystatechange = resolve;
-            scriptTag.onerror = reject;
-            document.head.appendChild(scriptTag);
-        })
+      //url is URL of external file, implementationCode is the code
+      //to be called from the file, location is the location to
+      //insert the <script> element
+      return new Promise((resolve, reject) => {
+        var scriptTag = document.createElement('script');
+        scriptTag.src = url;
+        scriptTag.onload = resolve;
+        scriptTag.onreadystatechange = resolve;
+        scriptTag.onerror = reject;
+        document.head.appendChild(scriptTag);
+      })
     },
-    async importScripts () {
-      var args = Array.prototype.slice.call(arguments), len = args.length, i = 0;
+    async importScripts() {
+      var args = Array.prototype.slice.call(arguments),
+        len = args.length,
+        i = 0;
       for (; i < len; i++) {
         await this.importScript(args[i])
       }
@@ -685,7 +700,7 @@ export default {
         addPlugin()
       });
     },
-    reloadOps(){
+    reloadOps() {
       if (this.$refs.workflow) this.$refs.workflow.setupJoy()
     },
     reloadPlugins() {
@@ -716,10 +731,9 @@ export default {
         this.installed_plugins = []
         for (let i = 0; i < result.total_rows; i++) {
           const config = result.rows[i].doc
-          if(config.workflow){
+          if (config.workflow) {
             this.workflow_list.push(config)
-          }
-          else {
+          } else {
             this.installed_plugins.push(config)
             try {
               const template = this.parsePluginCode(config.code, config)
@@ -801,22 +815,28 @@ export default {
       this.default_window_pos.i = this.default_window_pos.i + 1
     },
     loadFiles() {
-      for(let f=0;f<this.selected_files.length;f++){
+      for (let f = 0; f < this.selected_files.length; f++) {
         const file = this.selected_files[f]
         const tmp = file.name.split('.')
-        const ext = tmp[tmp.length-1]
-        if(this.registered.extensions[ext]){
+        const ext = tmp[tmp.length - 1]
+        if (this.registered.extensions[ext]) {
           const plugins = this.registered.extensions[ext]
           file.loaders = {}
-          for(let i=0;i<plugins.length;i++){
+          for (let i = 0; i < plugins.length; i++) {
             console.log('trying to open the file with ', plugins[i].name, plugins[i])
-            file.loaders[plugins[i].name] = async ()=>{
+            file.loaders[plugins[i].name] = async () => {
               let config = {}
-              if(plugins[i].template && plugins[i].template.ui){
+              if (plugins[i].template && plugins[i].template.ui) {
                 config = await this.showDialog(plugins[i].template)
               }
-              plugins[i].api.run({op: {}, config:config, data: {file: file}}).then((my)=>{
-                if(my){
+              plugins[i].api.run({
+                op: {},
+                config: config,
+                data: {
+                  file: file
+                }
+              }).then((my) => {
+                if (my) {
                   console.log('result', my)
                   my.name = my.name || 'result'
                   my.type = my.type || 'imjoy/generic'
@@ -856,10 +876,10 @@ export default {
         this.status_text = e.toString() || "Error."
       })
     },
-    saveWorkflow(joy){
+    saveWorkflow(joy) {
       // remove if exists
-      const name = prompt("Please enter a name for the workflow","default");
-      if(name == null){
+      const name = prompt("Please enter a name for the workflow", "default");
+      if (name == null) {
         return
       }
       const data = _.cloneDeep(joy.top.data)
@@ -876,14 +896,14 @@ export default {
       }).catch((err) => {
         this.api.show('failed to save the workflow.')
         console.error(err)
-        alert('error occured: '+err.toString())
+        alert('error occured: ' + err.toString())
       })
     },
-    loadWorkflow(w){
+    loadWorkflow(w) {
       this.updating_workflow = false
       this.$forceUpdate()
       this.workflow_joy_config.data = w.workflow
-      setTimeout( ()=> {
+      setTimeout(() => {
         this.updating_workflow = true
         console.log(this.workflow_joy_config)
         this.$forceUpdate()
@@ -907,7 +927,7 @@ export default {
         this.status_text = ''
       }).catch((e) => {
         console.error(e)
-        this.status_text = op.name +'->'+ (e.toString() || "Error.")
+        this.status_text = op.name + '->' + (e.toString() || "Error.")
       })
     },
     selectFileChanged(file_list) {
@@ -1021,8 +1041,8 @@ export default {
         const config = {}
         config.id = template.name.trim().replace(/ /g, '_') + '_' + randId()
         config.context = this.pluing_context
-        if(template.mode == 'pyworker'){
-          if(!this.socket){
+        if (template.mode == 'pyworker') {
+          if (!this.socket) {
             console.error("plugin engine is not connected.")
           }
         }
@@ -1038,7 +1058,7 @@ export default {
               id: plugin.id
             })
           }
-          if(template.extensions && template.extensions.length>0){
+          if (template.extensions && template.extensions.length > 0) {
             this.registerExtension(template.extensions, plugin)
           }
           plugin.api.setup().then((result) => {
@@ -1168,8 +1188,8 @@ export default {
             config: pconfig.config,
             op: pconfig.op,
           }).catch((e) => {
-            this.status_text = plugin.name +'->'+ e
-            console.error('error in the run function of plugin '+plugin.name, e)
+            this.status_text = plugin.name + '->' + e
+            console.error('error in the run function of plugin ' + plugin.name, e)
           })
         }).catch((e) => {
           console.error('error occured when loading the window plugin ' + pconfig.name + ": ", e)

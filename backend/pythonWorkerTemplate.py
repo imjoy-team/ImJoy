@@ -8,6 +8,8 @@ from inspect import isfunction
 from gevent import monkey;
 monkey.patch_socket()
 from socketio_client.manager import Manager
+from RestrictedPython import compile_restricted
+from RestrictedPython import safe_builtins
 
 def _encode(aObject, callbacks):
     if aObject is None:
@@ -55,6 +57,7 @@ def _start_socketio(secret, protocol='http', host='localhost', port=8080, namesp
     io = Manager(protocol, host, port)
     sio = io.socket(namespace)
     _init = False
+    _loc = {}
     @sio.on_connect()
     def sio_connect():
         global _init
@@ -70,12 +73,13 @@ def _start_socketio(secret, protocol='http', host='localhost', port=8080, namesp
             sio.emit('from_plugin_'+secret,  {'type':'importSuccess', 'url': data['url']})
         else:
             if data['type']== 'execute':
+                byte_code = compile_restricted(data['code'], '<inline>', 'exec')
+                exec(byte_code, safe_builtins, _loc)
                 sio.emit('from_plugin_'+secret,  {'type':'executeSuccess'})
             elif data['type']== 'message':
                 d = data['data']
                 if d['type'] == 'getInterface':
                     sio.emit('from_plugin_'+secret, {'type':'setInterface', 'api': [{'name': 'setup', 'data': None}, {'name': 'run', 'data': None}]})
-
                 elif d['type'] == 'setInterface':
                     sio.emit('from_plugin_'+secret, {'type':'interfaceSetAsRemote'})
                     if not _init:
@@ -86,6 +90,8 @@ def _start_socketio(secret, protocol='http', host='localhost', port=8080, namesp
                     #sio.emit('from_plugin_'+secret, {'type':'getInterface'})
                     pass
                 elif d['type'] == 'method':
+                    if d['name'] in _loc:
+                        func = _loc[d['name']]
                     if d['name'] == 'setup':
                         arg = { 'name': 'Python Demo Plugin', 'type': 'demo/pyworker', 'tags': ['demo', 'op'], 'ui': 'run python plugin'}
                         call_register = {'type':'method', 'name': 'register', 'args': _wrap([arg]) }
@@ -97,7 +103,6 @@ def _start_socketio(secret, protocol='http', host='localhost', port=8080, namesp
                             result = {'data': {'result from python': '123'}}
                             call_promise = {'type':'callback','id': callbackId,  'num': resolve['num'], 'args': _wrap([result]) }
                             sio.emit('from_plugin_'+secret, call_promise)
-
     io.connect()
 
 if __name__ == "__main__":
@@ -106,5 +111,4 @@ if __name__ == "__main__":
     parser.add_argument('--secret', type=str, required=True, help='plugin secret')
     opt = parser.parse_args()
     _start_socketio(opt.secret)
-
     gevent.wait()

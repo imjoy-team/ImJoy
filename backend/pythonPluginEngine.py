@@ -48,6 +48,7 @@ async def on_init_plugin(sid, kwargs):
             await sio.emit('to_plugin_'+secretKey, kwargs['data'])
         else:
             print(kwargs)
+
     #TODO: start a plugin with the id
     abort = threading.Event()
     plugins[pid]['abort'] = abort #
