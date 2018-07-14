@@ -8,9 +8,11 @@
   "url": "/tifFileImporter.html",
   "description": "A plugin for loading tif images.",
   "type": "image/tif_loader",
+  "ui": null,
   "tags": ["image", "op", "file_loader"],
-  "ui": "load a tif image.",
   "extensions": [".tif", ".tiff"],
+  "inputs": {"file": ["file/*.tif", "file/*.tiff"]},
+  "outputs": {"image":"image/grayscale"},
   "icon": null,
   "dependencies": []
 }

@@ -11,6 +11,8 @@
   "tags": ["localization", "op", "file_loader"],
   "ui": "Load a table from the file: add {id:'append_header', type:'string', placeholder:''} to the first line (optional) {id:'header_row', type:'choose', options:['read headers from the first line','use index as the header'], placeholder:'read headers from the first line'} and use {id:'delimiter', type:'string', placeholder:','} to seperate columns.",
   "extensions": [".csv"],
+  "inputs": {"file": ["file/*.csv"]},
+  "outputs": {"table":"localization/table"},
   "icon": null,
   "dependencies": []
 }
