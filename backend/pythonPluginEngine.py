@@ -35,7 +35,7 @@ async def on_init_plugin(sid, kwargs):
     plugins[pid] = {'secret': secretKey}
     @sio.on('from_plugin_'+secretKey, namespace=NAME_SPACE)
     async def message_from_plugin(sid, kwargs):
-        print('forwarding message_'+secretKey, kwargs)
+        # print('forwarding message_'+secretKey, kwargs)
         if kwargs['type'] in ['initialized', 'importSuccess', 'importFailure', 'executeSuccess', 'executeFailure']:
             await sio.emit('message_from_plugin_'+pid,  kwargs)
         else:
@@ -43,7 +43,7 @@ async def on_init_plugin(sid, kwargs):
 
     @sio.on('message_to_plugin_'+pid, namespace=NAME_SPACE)
     async def message_to_plugin(sid, kwargs):
-        print('forwarding message_to_plugin_'+pid, kwargs)
+        # print('forwarding message_to_plugin_'+pid, kwargs)
         if kwargs['type'] == 'message':
             await sio.emit('to_plugin_'+secretKey, kwargs['data'])
         else:

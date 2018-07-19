@@ -9,6 +9,7 @@
   "url": "/pythonDemoPlugin.html",
   "description": "A plugin for demonstrate python plugin.",
   "tags": ["demo", "op"],
+  "ui": "run python plugin",
   "inputs": null,
   "outputs": null,
   "icon": null,
@@ -16,21 +17,13 @@
 }
 </config>
 
-<script lang="javascript">
-class PythonPlugin {
-  async setup() {
-    api.register({
-      name: "Python Demo Plugin",
-      "type": "demo/pyworker",
-      "tags": ["demo", "op"],
-      ui: "run python plugin",
-    })
-  }
+<script lang="python">
+class PythonPlugin():
+  def setup(self):
+    print('setup in python')
 
-  run(my) {
+  def run(self, my):
+    print('hello world.')
 
-  }
-}
-
-api.export(new PythonPlugin())
+api.export(PythonPlugin())
 </script>
