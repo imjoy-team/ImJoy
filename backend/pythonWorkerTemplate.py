@@ -107,31 +107,27 @@ class PluginConnection():
         keys = range(len(aObject)) if isarray else aObject.keys()
         for k in keys:
             v = aObject[k]
+            value = None
             if isfunction(v):
                 cid = str(random.random())
                 callbacks[cid] = v
-                if isarray:
-                    bObject.append({'__jailed_type__': 'callback', '__value__' : 'f', 'num': cid})
-                else:
-                    bObject[k] = {'__jailed_type__': 'callback', '__value__' : 'f', 'num': cid}
+                vObj = {'__jailed_type__': 'callback', '__value__' : 'f', 'num': cid}
           # // send objects supported by structure clone algorithm
           # // https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Structured_clone_algorithm
             #if(v !== Object(v) || v instanceof Boolean || v instanceof String || v instanceof Date || v instanceof RegExp || v instanceof Blob || v instanceof File || v instanceof FileList || v instanceof ArrayBuffer || v instanceof ArrayBufferView || v instanceof ImageData){
+            elif 'np' in self._local and isinstance(v, (self._local['np'].ndarray, self._local['np'].generic)):
+                vObj = {'__jailed_type__': 'ndarray', '__value__' : v.tobytes(), '__shape__': v.shape, '__is_bytes__': True, '__dtype__': str(v.dtype)}
             elif type(v) is dict or type(v) is list:
-                if isarray:
-                     bObject.append(self._encode(v, callbacks))
-                else:
-                    bObject[k] = self._encode(v, callbacks)
+                vObj = self._encode(v, callbacks)
             elif isinstance(v, Exception):
-                if isarray:
-                     bObject.append({'__jailed_type__': 'error', '__value__' : str(v)})
-                else:
-                    bObject[k] = {'__jailed_type__': 'error', '__value__' : str(v)}
+                vObj = {'__jailed_type__': 'error', '__value__' : str(v)}
             else:
-                if isarray:
-                    bObject.append({'__jailed_type__': 'argument', '__value__' : v})
-                else:
-                    bObject[k] =  {'__jailed_type__': 'argument', '__value__' : v}
+                vObj = {'__jailed_type__': 'argument', '__value__' : v}
+
+            if isarray:
+                bObject.append(vObj)
+            else:
+                bObject[k] = vObj
 
         return bObject
 
@@ -154,16 +150,27 @@ class PluginConnection():
             elif aObject['__jailed_type__'] == 'ndarray':
                 # create build array/tensor if used in the plugin
                 try:
-                    bObject = np.array(aObject['__value__'], aObject['__dtype__']).reshape(aObject['__shape__'])
+                    np = self._local['np']
+                    if isinstance(aObject['__value__'], unicode):
+                        aObject['__value__'] = bytearray(aObject['__value__'], encoding="utf-8")
+                    if aObject['__is_bytes__']:
+                        bObject = np.frombuffer(aObject['__value__'], dtype=aObject['__dtype__']).reshape(tuple(aObject['__shape__']))
+                    else:
+                        bObject = np.array(aObject['__value__'], aObject['__dtype__']).reshape(aObject['__shape__'])
                 except Exception as e:
-                    try:
-                        bObject = tf.Tensor(aObject['__value__'], aObject['__shape__'], aObject['__dtype__'])
-                    except Exception as e:
-                        # keep it as regular if transfered to the main app
-                        bObject = aObject
+                    print('Error in converting: '+str(e), aObject)
+                    # try:
+                    #     tf = self._local['tf']
+                    #     bObject = tf.Tensor(aObject['__value__'], aObject['__shape__'], aObject['__dtype__'])
+                    # except Exception as e:
+                    # keep it as regular if transfered to the main app
+                    bObject = aObject
+                    raise e
             elif aObject['__jailed_type__'] == 'error':
                 bObject = Exception(aObject['__value__'])
             elif aObject['__jailed_type__'] == 'argument':
+                bObject = aObject['__value__']
+            else:
                 bObject = aObject['__value__']
             return bObject
         else:
@@ -294,7 +301,7 @@ class PluginConnection():
                         args = self._unwrap(d['args'], True)
                         # if self.id:
                         #     args.append({"id": self.id})
-                        if d['promise']:
+                        if 'promise' in d:
                             resolve, reject = self._unwrap(d['promise'], False)
                             try:
                                 result = method(*args)
@@ -314,7 +321,7 @@ class PluginConnection():
                     #     args.append({"id": self.id})
                     method = self._store.fetch(d['id'])[d['num']]
 
-                    if d['promise']:
+                    if 'promise' in d:
                         resolve, reject = self._unwrap(d['promise'], False)
                         try:
                             result = method(*args)

@@ -18,12 +18,15 @@
 </config>
 
 <script lang="python">
+import numpy as np
 class PythonPlugin():
   def setup(self):
     print('setup in python')
 
   def run(self, my):
+    my['data']['array'] = np.zeros(10)
     print('hello world.')
+    return my
 
 api.export(PythonPlugin())
 </script>
