@@ -22,6 +22,14 @@ import numpy as np
 class PythonPlugin():
   def setup(self):
     print('setup in python')
+    api.register({
+      "name": "python plugin",
+      "type": "demo/python-2",
+      "tags": ["op"],
+      "inputs": None,
+      "outputs": None,
+      "ui": "Test plugin {id:'p', type:'choose', options:['option1', 'option2'], placeholder: 'option1'}",
+    })
 
   def run(self, my):
     my['data']['array'] = np.zeros(10)
