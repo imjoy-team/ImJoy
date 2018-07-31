@@ -4,7 +4,7 @@ import asyncio
 import socketio
 import logging
 import threading
-import os
+import sys
 import traceback
 import time
 import platform
@@ -53,7 +53,7 @@ async def on_init_plugin(sid, kwargs):
     try:
         abort = threading.Event()
         plugins[pid]['abort'] = abort #
-        taskThread = threading.Thread(target=execute, args=[env+' '+'pythonWorkerTemplate.py --id='+pid+' --secret='+secretKey, './', abort, pid])
+        taskThread = threading.Thread(target=execute, args=[env+' '+'workerTemplate.py --id='+pid+' --secret='+secretKey, './', abort, pid])
         taskThread.daemon = True
         taskThread.start()
         # execute('python pythonWorkerTemplate.py', './', abort, pid)
@@ -109,7 +109,6 @@ def execute(args, workdir, abort, name):
     args = [str(x) for x in args if str(x) != '']
     logger.info('%s task started.' % name)
     unrecognized_output = []
-    import sys
     env['PYTHONPATH'] = os.pathsep.join(
         ['.', workdir, env.get('PYTHONPATH', '')] + sys.path)
     # https://docs.python.org/2/library/subprocess.html#converting-argument-sequence
@@ -118,15 +117,31 @@ def execute(args, workdir, abort, name):
     args = ' '.join(args)
     logger.info('Task subprocess args: {}'.format(args))
     print('Task subprocess args: {}'.format(args))
+
+
+    # set system/version dependent "start_new_session" analogs
+    kwargs = {}
+    if platform.system() == 'Windows':
+        # from msdn [1]
+        CREATE_NEW_PROCESS_GROUP = 0x00000200  # note: could get it from subprocess
+        DETACHED_PROCESS = 0x00000008          # 0x8 | 0x200 == 0x208
+        kwargs.update(creationflags=DETACHED_PROCESS | CREATE_NEW_PROCESS_GROUP)
+    # elif sys.version_info < (3, 2):  # assume posix
+    #     kwargs.update(preexec_fn=os.setsid)
+    else:  # Python 3.2+ and Unix
+        # kwargs.update(start_new_session=True)
+        kwargs.update(preexec_fn=os.setsid)
+
     try:
         # we use shell mode, so it won't work nicely on windows
         p = Popen(args, bufsize=0, stdout=PIPE, stderr=STDOUT,
-                  shell=True, universal_newlines=True)
+                  shell=True, universal_newlines=True, **kwargs)
+        pid = p.pid
     except Exception as e:
         print('error from task:', e)
         # traceback.print_exc()
         #task.set('status.error', # traceback.format_exc())
-        end(force_quit=True)
+        # end(force_quit=True)
         return False
     # run the shell as a subprocess:
 
@@ -162,8 +177,9 @@ def execute(args, workdir, abort, name):
             if abort.is_set():
                 if sigterm_time is None:
                     # Attempt graceful shutdown
-                    p.send_signal(signal.SIGINT)
-                    p.send_signal(signal.SIGTERM)
+                    # p.send_signal(signal.SIGINT)
+                    # p.send_signal(signal.SIGTERM)
+                    os.killpg(os.getpgid(pid), signal.SIGTERM)
                     sigterm_time = time.time()
             if sigterm_time is not None and (time.time() - sigterm_time > sigterm_timeout):
                 p.send_signal(signal.SIGKILL)
