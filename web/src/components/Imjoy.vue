@@ -273,7 +273,7 @@ Engine<template>
     </md-tabs>
     </md-dialog-content>
     <md-dialog-actions>
-      <md-button class="md-primary" @click="showSettingsDialog=false">OK</md-button>
+      <md-button class="md-primary" @click="showSettingsDialog=false; reloadPlugins()">OK</md-button>
     </md-dialog-actions>
   </md-dialog>
   <md-dialog :md-active.sync="showAddPluginDialog">
@@ -283,7 +283,7 @@ Engine<template>
       <plugin-list config-url="static/plugins/manifest.json" :workspace="selected_workspace" title="Or, install from the Plugin Store"></plugin-list>
     </md-dialog-content>
     <md-dialog-actions>
-      <md-button class="md-primary" @click="showAddPluginDialog=false">OK</md-button>
+      <md-button class="md-primary" @click="showAddPluginDialog=false; reloadPlugins()">OK</md-button>
     </md-dialog-actions>
   </md-dialog>
 </div>
@@ -496,6 +496,9 @@ export default {
         revs_limit: 2,
         auto_compaction: true
       })
+
+      this.connectEngine(this.engine_url)
+
     }).then(() => {
       this.reloadPlugins()
     });
