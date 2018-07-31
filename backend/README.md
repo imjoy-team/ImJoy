@@ -7,4 +7,4 @@
   * Run `source activate python2 && pip install -r requirements-py2.txt`
 
 ## Usage
-  * Run `python pythonPluginEngine.py`
+  * Run `python pluginEngine.py`
