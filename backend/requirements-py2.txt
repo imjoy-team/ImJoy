@@ -1,0 +1,4 @@
+six
+requests
+gevent
+websocket-client
