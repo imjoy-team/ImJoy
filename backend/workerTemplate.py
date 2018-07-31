@@ -81,6 +81,10 @@ class PluginConnection():
             self._init = False
             self.emit({"type": "initialized", "dedicatedThread": True})
 
+        @sio.on_disconnect()
+        def sio_disconnect():
+            sys.exit(1)
+
         sio.on('to_plugin_'+secret, self.sio_plugin_message)
         self.sio = sio
         _remote = API()
@@ -273,6 +277,8 @@ class PluginConnection():
         # sys.stdout.flush()
         if data['type']== 'import':
             self.emit({'type':'importSuccess', 'url': data['url']})
+        elif data['type']== 'disconnect':
+            sys.exit(0)
         else:
             if data['type'] == 'execute':
                 type = data['code']['type']

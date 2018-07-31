@@ -22,7 +22,7 @@ sio = socketio.AsyncServer()
 app = web.Application()
 sio.attach(app)
 plugins = {}
-
+plugin_sids = {}
 @sio.on('connect', namespace=NAME_SPACE)
 def connect(sid, environ):
     print("connect ", sid)
@@ -33,7 +33,8 @@ async def on_init_plugin(sid, kwargs):
     secretKey = ''.join(random.choices(string.ascii_uppercase + string.digits, k=10))
     pid = kwargs['id']
     env = kwargs.get('env', 'source activate python2 && python')
-    plugins[pid] = {'secret': secretKey}
+    plugins[pid] = {'secret': secretKey, 'id': pid, 'sid': sid}
+    plugin_sids[sid] = plugins[pid]
     @sio.on('from_plugin_'+secretKey, namespace=NAME_SPACE)
     async def message_from_plugin(sid, kwargs):
         # print('forwarding message_'+secretKey, kwargs)
@@ -68,7 +69,9 @@ async def on_init_plugin(sid, kwargs):
 async def on_kill_plugin(sid, kwargs):
     pid = kwargs['id']
     if pid in plugins:
+        await sio.emit('to_plugin_'+plugins[pid]['secret'], {'type': 'disconnect'})
         plugins[pid]['abort'].set()
+        del plugins[pid]
         print('killing plugin ' + pid)
     return {'success': True}
 
@@ -79,7 +82,10 @@ async def on_message(sid, kwargs):
 
 
 @sio.on('disconnect', namespace=NAME_SPACE)
-def disconnect(sid):
+async def disconnect(sid):
+    if sid in plugin_sids:
+        await on_kill_plugin(sid, plugin_sids[sid])
+        del plugin_sids[sid]
     print('disconnect ', sid)
 
 
@@ -177,9 +183,12 @@ def execute(args, workdir, abort, name):
             if abort.is_set():
                 if sigterm_time is None:
                     # Attempt graceful shutdown
-                    # p.send_signal(signal.SIGINT)
-                    # p.send_signal(signal.SIGTERM)
-                    os.killpg(os.getpgid(pid), signal.SIGTERM)
+                    p.send_signal(signal.SIGINT)
+                    p.send_signal(signal.SIGTERM)
+                    try:
+                        os.killpg(os.getpgid(pid), signal.SIGTERM)
+                    except Exception as e:
+                        pass
                     sigterm_time = time.time()
             if sigterm_time is not None and (time.time() - sigterm_time > sigterm_timeout):
                 p.send_signal(signal.SIGKILL)
