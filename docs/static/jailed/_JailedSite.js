@@ -474,18 +474,18 @@
         var called = false;
 
         // wraps each callback so that the only one could be called
-        var once = function(cb) {
-            return function() {
-                if (!called) {
-                    called = true;
-                    return cb.apply(this, arguments);
-                } else {
-                    var msg =
-                      'A callback from this set has already been executed';
-                    throw new Error(msg);
-                }
-            };
-        }
+        // var once = function(cb) {
+        //     return function() {
+        //         if (!called) {
+        //             called = true;
+        //             return cb.apply(this, arguments);
+        //         } else {
+        //             var msg =
+        //               'A callback from this set has already been executed';
+        //             throw new Error(msg);
+        //         }
+        //     };
+        // }
         var result = this._decode(args.args, args.callbackId, withPromise)
         return result;
     }
