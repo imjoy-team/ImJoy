@@ -464,7 +464,7 @@ function randId() {
               }
 
             // create a plugin here
-            this.context.socket && this.context.socket.emit('init_plugin', {id: id, mode: mode}, (result) => {
+            this.context.socket && this.context.socket.emit('init_plugin', {id: id, mode: mode, env: this.context.env}, (result) => {
               console.log('init_plugin: ', result)
               if(result.success){
                 this.secret = result.secret
@@ -534,6 +534,10 @@ function randId() {
             if (!this._disconnected) {
                 this._disconnected = true;
             }
+            this.context.socket.emit('kill_plugin',
+                 {id: this.id}
+            );
+            console.log('kill plugin '+this.id)
         }
 
     }
