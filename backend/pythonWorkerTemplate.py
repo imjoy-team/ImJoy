@@ -237,9 +237,9 @@ class PluginConnection():
     def _genRemoteMethod(self, name):
         def remoteMethod(*arguments):
             call_func = {
-                type: 'method',
-                name: name,
-                args: self._wrap(arguments),
+                'type': 'method',
+                'name': name,
+                'args': self._wrap(arguments),
             }
             self.emit(call_func)
         return remoteMethod
@@ -248,21 +248,21 @@ class PluginConnection():
         _remote = API()
         for i in range(len(api)):
             name = api[i]["name"]
-        data = api[i]["data"]
-        if data is not None:
-            if type(data) == 'dict':
-                data2 = {}
-                for key in data:
-                    if key in data:
-                        if data[key] == "**@@FUNCTION@@**:"+key:
-                            data2[key] = self._genRemoteMethod(name+'.'+key)
-                        else:
-                            data2[key] = data[key]
-                _remote[name] = data2
+            data = api[i]["data"]
+            if data is not None:
+                if type(data) == 'dict':
+                    data2 = {}
+                    for key in data:
+                        if key in data:
+                            if data[key] == "**@@FUNCTION@@**:"+key:
+                                data2[key] = self._genRemoteMethod(name+'.'+key)
+                            else:
+                                data2[key] = data[key]
+                    _remote[name] = data2
+                else:
+                    _remote[name] = data
             else:
-                _remote[name] = data
-        else:
-            _remote[name] = self._genRemoteMethod(name)
+                _remote[name] = self._genRemoteMethod(name)
         _remote["ndarray"] = self._ndarray
         _remote["export"] = self._sendInterface
         self._local["api"] = _remote
