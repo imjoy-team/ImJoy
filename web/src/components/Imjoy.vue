@@ -1043,7 +1043,8 @@ export default {
       return new Promise((resolve, reject) => {
         const config = {}
         config.id = template.name.trim().replace(/ /g, '_') + '_' + randId()
-        config.context = this.pluing_context
+        config.context = _.clone(this.pluing_context)
+        config.context.env = template.env
         if (template.mode == 'pyworker') {
           if (!this.socket) {
             console.error("plugin engine is not connected.")

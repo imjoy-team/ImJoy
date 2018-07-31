@@ -32,6 +32,7 @@ async def on_init_plugin(sid, kwargs):
     print("init_plugin: ", kwargs)
     secretKey = ''.join(random.choices(string.ascii_uppercase + string.digits, k=10))
     pid = kwargs['id']
+    env = kwargs.get('env', 'source activate python2 && python')
     plugins[pid] = {'secret': secretKey}
     @sio.on('from_plugin_'+secretKey, namespace=NAME_SPACE)
     async def message_from_plugin(sid, kwargs):
@@ -49,20 +50,32 @@ async def on_init_plugin(sid, kwargs):
         else:
             print(kwargs)
 
-    #TODO: start a plugin with the id
-    abort = threading.Event()
-    plugins[pid]['abort'] = abort #
-    taskThread = threading.Thread(target=execute, args=['source activate python2 && python pythonWorkerTemplate.py --id='+pid+' --secret='+secretKey, './', abort, pid])
-    taskThread.daemon = True
-    taskThread.start()
-    # execute('python pythonWorkerTemplate.py', './', abort, pid)
-    return {'success': True, 'secret': secretKey}
+    try:
+        abort = threading.Event()
+        plugins[pid]['abort'] = abort #
+        taskThread = threading.Thread(target=execute, args=[env+' '+'pythonWorkerTemplate.py --id='+pid+' --secret='+secretKey, './', abort, pid])
+        taskThread.daemon = True
+        taskThread.start()
+        # execute('python pythonWorkerTemplate.py', './', abort, pid)
+        return {'success': True, 'secret': secretKey}
+    except Exception as e:
+        print(e)
+        return {'success': False}
+
+
+
+@sio.on('kill_plugin', namespace=NAME_SPACE)
+async def on_kill_plugin(sid, kwargs):
+    pid = kwargs['id']
+    if pid in plugins:
+        plugins[pid]['abort'].set()
+        print('killing plugin ' + pid)
+    return {'success': True}
 
 
 @sio.on('message', namespace=NAME_SPACE)
 async def on_message(sid, kwargs):
     print("message recieved: ", kwargs)
-
 
 
 @sio.on('disconnect', namespace=NAME_SPACE)
@@ -94,7 +107,6 @@ def execute(args, workdir, abort, name):
         args = []
     # Convert them all to strings
     args = [str(x) for x in args if str(x) != '']
-    print('executing ', args)
     logger.info('%s task started.' % name)
     unrecognized_output = []
     import sys
