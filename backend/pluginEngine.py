@@ -32,7 +32,7 @@ async def on_init_plugin(sid, kwargs):
     print("init_plugin: ", kwargs)
     secretKey = ''.join(random.choices(string.ascii_uppercase + string.digits, k=10))
     pid = kwargs['id']
-    env = kwargs.get('env', 'source activate python2 || activate python2 && pip install six requests gevent websocket-client numpy && python')
+    env = kwargs.get('env', 'python')
     plugins[pid] = {'secret': secretKey, 'id': pid, 'sid': sid}
     plugin_sids[sid] = plugins[pid]
     @sio.on('from_plugin_'+secretKey, namespace=NAME_SPACE)

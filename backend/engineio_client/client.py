@@ -183,6 +183,8 @@ class Client(Emitter):
             self.pong_event.set()
         elif packet.type == Packet.MESSAGE:
             self.emit('message', packet.data)
+        elif packet.type == Packet.NOOP:
+            pass
         else:
             logger.warning("Invalid message type: %s", packet.type_string)
 

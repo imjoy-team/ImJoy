@@ -4,3 +4,4 @@ websocket-client-py3
 python-socketio
 # RestrictedPython
 aiohttp
+numpy

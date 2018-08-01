@@ -4,8 +4,10 @@ import time
 import sys
 import gevent
 import random
+import traceback
 from inspect import isfunction
 from gevent import monkey;
+import six
 monkey.patch_socket()
 from socketio_client.manager import Manager
 # from RestrictedPython import compile_restricted
@@ -120,9 +122,15 @@ class PluginConnection():
           # // https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Structured_clone_algorithm
             #if(v !== Object(v) || v instanceof Boolean || v instanceof String || v instanceof Date || v instanceof RegExp || v instanceof Blob || v instanceof File || v instanceof FileList || v instanceof ArrayBuffer || v instanceof ArrayBufferView || v instanceof ImageData){
             elif 'np' in self._local and isinstance(v, (self._local['np'].ndarray, self._local['np'].generic)):
-                vObj = {'__jailed_type__': 'ndarray', '__value__' : v.tobytes(), '__shape__': v.shape, '__is_bytes__': True, '__dtype__': str(v.dtype)}
+                if sys.version_info >= (3, 0):
+                    v_bytes = v.tobytes().decode()
+                else:
+                    v_bytes = v.tobytes()
+                vObj = {'__jailed_type__': 'ndarray', '__value__' : v_bytes, '__shape__': v.shape, '__is_bytes__': True, '__dtype__': str(v.dtype)}
             elif type(v) is dict or type(v) is list:
                 vObj = self._encode(v, callbacks)
+            elif not isinstance(v, six.string_types) and type(v) is bytes:
+                v = v.decode() # covert python3 bytes to str
             elif isinstance(v, Exception):
                 vObj = {'__jailed_type__': 'error', '__value__' : str(v)}
             else:
@@ -155,21 +163,28 @@ class PluginConnection():
                 # create build array/tensor if used in the plugin
                 try:
                     np = self._local['np']
-                    if isinstance(aObject['__value__'], unicode):
+                    if sys.version_info < (3, 0) and isinstance(aObject['__value__'], unicode):
                         aObject['__value__'] = bytearray(aObject['__value__'], encoding="utf-8")
+                    elif sys.version_info >= (3, 0) and isinstance(aObject['__value__'], str):
+                        aObject['__value__'] = bytearray(aObject['__value__'], encoding="utf-8")
+                    else:
+                        raise Exception('type error')
+
                     if aObject['__is_bytes__']:
                         bObject = np.frombuffer(aObject['__value__'], dtype=aObject['__dtype__']).reshape(tuple(aObject['__shape__']))
                     else:
                         bObject = np.array(aObject['__value__'], aObject['__dtype__']).reshape(aObject['__shape__'])
                 except Exception as e:
                     print('Error in converting: '+str(e), aObject)
+                    sys.stdout.flush()
                     # try:
                     #     tf = self._local['tf']
                     #     bObject = tf.Tensor(aObject['__value__'], aObject['__shape__'], aObject['__dtype__'])
                     # except Exception as e:
                     # keep it as regular if transfered to the main app
                     bObject = aObject
-                    raise e
+                    return e
+                    # raise e
             elif aObject['__jailed_type__'] == 'error':
                 bObject = Exception(aObject['__value__'])
             elif aObject['__jailed_type__'] == 'argument':
@@ -313,12 +328,14 @@ class PluginConnection():
                                 result = method(*args)
                                 resolve(result)
                             except Exception as e:
+                                print(traceback.format_exc())
                                 reject(e)
                         else:
                             try:
                                 method(*args)
                             except Exception as e:
-                                print(e, method, args)
+                                print(traceback.format_exc())
+                                print(e)
                     else:
                         raise Exception('method '+d['name'] +' is not found.')
                 elif d['type'] == 'callback':
@@ -333,12 +350,14 @@ class PluginConnection():
                             result = method(*args)
                             resolve(result)
                         except Exception as e:
+                            print(traceback.format_exc())
                             reject(e)
                     else:
                         try:
                             method(*args)
                         except Exception as e:
-                            print(e, method, args)
+                            print(traceback.format_exc(), method)
+                            print(e)
 
                 sys.stdout.flush()
 
