@@ -91,9 +91,10 @@ class PluginConnection():
         self.sio = sio
         _remote = API()
         _remote["ndarray"] = self._ndarray
-        _remote["export"] = self._sendInterface
+        _remote["export"] = self.setInterface
         self._local = {"api": _remote}
         self._interface = {}
+        self._remote_set = False
         self._store = ReferenceStore()
 
     def start(self):
@@ -230,10 +231,13 @@ class PluginConnection():
         shape = shape or (len(typedArray), )
         return {"__jailed_type__": 'ndarray', "__value__" : typedArray, "__shape__": shape, "__dtype__": _dtype}
 
-    def _sendInterface(self, api):
+    def setInterface(self, api):
         if inspect.isclass(type(api)):
             api = {a:getattr(api, a) for a in dir(api) if not a.startswith('_')}
         self._interface = api
+        self._sendInterface()
+
+    def _sendInterface(self):
         names = []
         for name in self._interface:
             if callable(self._interface[name]):
@@ -282,7 +286,7 @@ class PluginConnection():
             else:
                 _remote[name] = self._genRemoteMethod(name)
         _remote["ndarray"] = self._ndarray
-        _remote["export"] = self._sendInterface
+        _remote["export"] = self.setInterface
         self._local["api"] = _remote
         return _remote
 
@@ -306,17 +310,16 @@ class PluginConnection():
             elif data['type'] == 'message':
                 d = data['data']
                 if d['type'] == 'getInterface':
-                    pass
+                    self._sendInterface()
                 elif d['type'] == 'setInterface':
                     self._setRemote(d['api'])
                     self.emit({'type':'interfaceSetAsRemote'})
                     if not self._init:
                         self.emit({'type':'getInterface'})
                         self._init = True
-
                 elif d['type'] == 'interfaceSetAsRemote':
                     #self.emit({'type':'getInterface'})
-                    pass
+                    self._remote_set = True
                 elif d['type'] == 'method':
                     if d['name'] in self._interface:
                         method = self._interface[d['name']]

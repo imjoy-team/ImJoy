@@ -3,7 +3,7 @@
     <md-toolbar class="md-dense editor-toolbar" md-elevation="1">
       <md-button @click="reload()" class="md-icon-button">
         <md-icon>autorenew</md-icon>
-        <md-tooltip>Reload the plugin</md-tooltip>
+        <md-tooltip>Update the plugin</md-tooltip>
       </md-button>
       <md-button @click="save()" class="md-icon-button">
         <md-icon>save</md-icon>
@@ -85,7 +85,7 @@ export default {
     },
     reload(){
       this.editor.resize()
-      this.window.reload({pluginId: this.pluginId, code: this.editor.getValue(), plugin: this.window.plugin}).then((plugin)=>{
+      this.window.reload({pluginId: this.pluginId, type:this.window.plugin.type, name:this.window.plugin.name, code: this.editor.getValue(), plugin: this.window.plugin}).then((plugin)=>{
         this.window.plugin = plugin
         this.window.name = plugin.name
       })

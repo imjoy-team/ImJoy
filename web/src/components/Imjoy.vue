@@ -643,15 +643,37 @@ export default {
     },
     reloadPlugin(pconfig) {
       return new Promise((resolve, reject) => {
+
+        if(pconfig.type){
+          for (let k in this.plugins) {
+            if (this.plugins.hasOwnProperty(k)) {
+              const plugin = this.plugins[k]
+              if(plugin.type == pconfig.type || plugin.name == pconfig.name){
+                  try {
+                    delete this.plugins[k]
+                    Joy.remove(pconfig.type)
+                    if (typeof plugin.terminate == 'function') plugin.terminate()
+                  } catch (e) {
+
+                  }
+
+              }
+            }
+          }
+        }
+
         if (pconfig.plugin && pconfig.plugin.id)
           delete this.plugins[pconfig.plugin.id]
-        if (pconfig.plugin && pconfig.plugin.type)
+        if (pconfig.type)
           Joy.remove(pconfig.plugin.type)
+
         if (pconfig.plugin && pconfig.plugin.terminate) {
           try {
             console.log('terminating plugin ', pconfig.plugin)
-            pconfig.plugin.terminate()
-            console.log('terminated.')
+            if (typeof pconfig.plugin.terminate == 'function'){
+              pconfig.plugin.terminate()
+              console.log('terminated.')
+            }
           } finally {
             delete pconfig.plugin
           }
@@ -666,11 +688,15 @@ export default {
           p = this.loadPlugin(template)
         }
         p.then((plugin) => {
-          resolve(plugin)
           console.log('new plugin loaded', plugin)
+          pconfig.name = plugin.name
+          pconfig.type = plugin.type
           pconfig.plugin = plugin
           if (this.$refs.workflow) this.$refs.workflow.setupJoy()
+          resolve(plugin)
         }).catch((e) => {
+          pconfig.name = null
+          pconfig.type = null
           pconfig.plugin = null
           reject(e)
         })
