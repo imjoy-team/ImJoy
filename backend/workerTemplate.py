@@ -183,8 +183,7 @@ class PluginConnection():
                     # except Exception as e:
                     # keep it as regular if transfered to the main app
                     bObject = aObject
-                    return e
-                    # raise e
+                    raise e
             elif aObject['__jailed_type__'] == 'error':
                 bObject = Exception(aObject['__value__'])
             elif aObject['__jailed_type__'] == 'argument':
@@ -298,10 +297,12 @@ class PluginConnection():
             if data['type'] == 'execute':
                 type = data['code']['type']
                 content = data['code']['content']
-                exec(content, self._local)
-                # byte_code = compile_restricted(data['code'], '<inline>', 'exec')
-                # exec(byte_code, safe_builtins, self._local)
-                self.emit({'type':'executeSuccess'})
+                try:
+                    exec(content, self._local)
+                    self.emit({'type':'executeSuccess'})
+                except Exception as e:
+                    print(traceback.format_exc())
+                    self.emit({'type':'executeFailure'})
             elif data['type'] == 'message':
                 d = data['data']
                 if d['type'] == 'getInterface':
@@ -319,12 +320,10 @@ class PluginConnection():
                 elif d['type'] == 'method':
                     if d['name'] in self._interface:
                         method = self._interface[d['name']]
-                        args = self._unwrap(d['args'], True)
-                        # if self.id:
-                        #     args.append({"id": self.id})
                         if 'promise' in d:
                             resolve, reject = self._unwrap(d['promise'], False)
                             try:
+                                args = self._unwrap(d['args'], True)
                                 result = method(*args)
                                 resolve(result)
                             except Exception as e:
@@ -332,6 +331,7 @@ class PluginConnection():
                                 reject(e)
                         else:
                             try:
+                                args = self._unwrap(d['args'], True)
                                 method(*args)
                             except Exception as e:
                                 print(traceback.format_exc())
@@ -339,14 +339,12 @@ class PluginConnection():
                     else:
                         raise Exception('method '+d['name'] +' is not found.')
                 elif d['type'] == 'callback':
-                    args = self._unwrap(d['args'], True)
-                    # if self.id:
-                    #     args.append({"id": self.id})
                     method = self._store.fetch(d['id'])[d['num']]
 
                     if 'promise' in d:
                         resolve, reject = self._unwrap(d['promise'], False)
                         try:
+                            args = self._unwrap(d['args'], True)
                             result = method(*args)
                             resolve(result)
                         except Exception as e:
@@ -354,11 +352,11 @@ class PluginConnection():
                             reject(e)
                     else:
                         try:
+                            args = self._unwrap(d['args'], True)
                             method(*args)
                         except Exception as e:
                             print(traceback.format_exc(), method)
                             print(e)
-
                 sys.stdout.flush()
 
 if __name__ == "__main__":
