@@ -452,7 +452,7 @@ function randId() {
             platformInit.whenEmitted(() =>{
               if (!this._disconnected && this.context.socket) {
                 this.context.socket.on('message_from_plugin_'+this.id,  (data)=>{
-                    console.log('message_from_plugin_'+this.id, data)
+                    // console.log('message_from_plugin_'+this.id, data)
                     if (data.type == 'initialized') {
                         this.dedicatedThread = data.dedicatedThread;
                         this._init.emit();
@@ -462,7 +462,7 @@ function randId() {
                 })
                 // create a plugin here
                 this.context.socket.emit('init_plugin', {id: id, mode: mode, env: this.context.env}, (result) => {
-                  console.log('init_plugin: ', result)
+                  // console.log('init_plugin: ', result)
                   if(result.success){
                     this.secret = result.secret
                   }
