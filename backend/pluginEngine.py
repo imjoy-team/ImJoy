@@ -60,6 +60,10 @@ async def on_init_plugin(sid, kwargs):
             elif pname is not None:
                 env_name = pname.replace(' ', '_')
                 env = env.replace('create', 'create -n '+env_name)
+
+            if '-y' not in parms:
+                env = env.replace('create', 'create -y')
+
             print('creating environment: ' + env)
             if env not in cmd_history:
                 os.system(env)
