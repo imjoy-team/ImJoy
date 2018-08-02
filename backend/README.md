@@ -2,10 +2,10 @@
 ## Installation
   * Download Annaconda3 (Python3.6 version) from https://www.anaconda.com/download/
   * Install Annaconda
-  * Run `pip install -e git+https://github.com/oeway/ImJoy#subdirectory=backend`
+  * Run `pip install -e "git+https://github.com/oeway/ImJoy#egg=imjoy&subdirectory=backend"`
 
 ## Usage
-  * Run `python pluginEngine.py`
+  * Run `python -m imjoy`
   * Go to https://imjoy.io, create a plugin, here is a python `hello world` example:
 ```html
 <config>
