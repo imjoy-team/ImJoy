@@ -190,11 +190,14 @@ Engine<template>
                 <md-icon v-if="!plugin.panel_expanded">expand_more</md-icon>
                 <md-icon v-else>expand_less</md-icon>
               </md-button>
-              <div v-for="op in plugin.ops" :key="op.name + op.type">
+              <div v-for="(op, i) in plugin.ops" :key="op.name + op.type">
+                <div class="centered-button">
+                  <md-button class="md-button md-primary centered-button" v-show="plugin.panel_expanded && i != 0" @click="runOp(op)">
+                    {{op.name}}
+                  </md-button>
+                </div>
                 <joy :config="op" :show="plugin.panel_expanded || false"></joy>
-                <md-button class="md-button md-primary" v-show="plugin.panel_expanded" @click="runOp(op)">
-                  <md-icon>play_arrow</md-icon>Run
-                </md-button>
+
                 <!-- <md-button class="md-button md-primary">
                   <md-icon>stop</md-icon>Stop
                 </md-button> -->
@@ -1491,5 +1494,10 @@ div#textnode {
   width: 100%;
   height: 100%;
   max-height: 100%;
+}
+
+.centered-button{
+  text-align: center;
+  text-transform: none;
 }
 </style>

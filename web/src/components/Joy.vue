@@ -135,7 +135,8 @@ More prefixing to avoid NAME COLLISIONS
 
 .joy-master{
 	display: block;
-    margin: 1.2em;
+  margin: 0.3em;
+  margin-bottom: 1.2em;
 }
 
 /***************/
