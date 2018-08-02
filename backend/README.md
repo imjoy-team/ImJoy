@@ -46,7 +46,7 @@ api.export(PythonPlugin())
 ```
 
 ## Switch virtual environments
-  Python Plugins for ImJoy can have different conda environments, which provides a way to isolate plugins. You can therefore run python plugins with different versions of Python, or use different pip packages.
+  Python plugins for ImJoy can have different conda environments, which provides a way to isolate plugins. You can therefore run python plugins with different versions of Python, or use different pip packages.
   
   
   
@@ -55,7 +55,7 @@ api.export(PythonPlugin())
   It is also important to specify the pip packages required by the plugin, this can be done with the `requirements` field in `<config>`.
 
   Examples:
-   * If you want to run your plugin with Python 2.7, you just needed to add the following fields to your `<config>`:
+   * If you want to run your plugin with Python 2.7, you just need to add the following fields to your `<config>`:
   ```json
   <config>
     ...
@@ -66,7 +66,7 @@ api.export(PythonPlugin())
   </config>
   ```
 
-   * Similarly, if you want to run your plugin with Python 3.6, you just needed to add the following fields to your `<config>`:
+   * Similarly, if you want to run your plugin with Python 3.6, you just need to add the following fields to your `<config>`:
   ```json
   <config>
     ...
