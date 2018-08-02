@@ -28,6 +28,10 @@ plugin_sids = {}
 cmd_history = []
 default_requirements_py2 = ["six", "requests", "gevent", "websocket-client"]
 default_requirements_py3 = ["six", "requests", "gevent", "websocket-client-py3"]
+
+script_dir = os.path.dirname(os.path.normpath(__file__))
+template_script = os.path.join(script_dir, 'workerTemplate.py')
+
 @sio.on('connect', namespace=NAME_SPACE)
 def connect(sid, environ):
     print("connect ", sid)
@@ -112,7 +116,7 @@ async def on_init_plugin(sid, kwargs):
     try:
         abort = threading.Event()
         plugins[pid]['abort'] = abort #
-        taskThread = threading.Thread(target=execute, args=[cmd+' '+'workerTemplate.py --id='+pid+' --secret='+secretKey, './', abort, pid])
+        taskThread = threading.Thread(target=execute, args=[cmd+' '+template_script+' --id='+pid+' --secret='+secretKey, './', abort, pid])
         taskThread.daemon = True
         taskThread.start()
         # execute('python pythonWorkerTemplate.py', './', abort, pid)

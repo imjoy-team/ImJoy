@@ -2,8 +2,7 @@
 ## Installation
   * Download Annaconda3 (Python3.6 version) from https://www.anaconda.com/download/
   * Install Annaconda
-  * Run `git clone https://github.com/oeway/ImJoy`
-  * Run `cd ImJoy/backend && pip install -r requirements.txt`
+  * Run `pip install -e git+https://github.com/oeway/ImJoy#subdirectory=backend`
 
 ## Usage
   * Run `python pluginEngine.py`
@@ -47,11 +46,11 @@ api.export(PythonPlugin())
 
 ## Switch virtual environments
   Python plugins for ImJoy can have different conda environments, which provides a way to isolate plugins. You can therefore run python plugins with different versions of Python, or use different pip packages.
-  
-  
-  
+
+
+
   By default, python plugins from ImJoy will be executed in the default conda environment(Python 3.6). If you want to run a plugin in a different conda environment, you can specify it by setting the `env` field in the `<config>` section of the plugin.
-  
+
   It is also important to specify the pip packages required by the plugin, this can be done with the `requirements` field in `<config>`.
 
   Examples:
@@ -77,5 +76,5 @@ api.export(PythonPlugin())
   </config>
   ```
   **Note 1**: in `requirements`, you can also specify the version number, for example `numpy>=1.15.0`.
-  
+
   **Note 2**: in the `env` field, you need to use `-n XXXX` to name your environment, otherwise, it will use the plugin name to name the environment.
