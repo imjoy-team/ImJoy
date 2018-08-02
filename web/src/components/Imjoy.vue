@@ -205,7 +205,7 @@ Engine<template>
                   <md-icon v-if="!op.panel_expanded">expand_more</md-icon>
                   <md-icon v-else>expand_less</md-icon>
                 </md-button>
-                <joy :config="op" :show="plugin.panel_expanded && ((plugin.panel_expanded && i == 0) || op.panel_expanded || false)"></joy>
+                <joy :config="op" :show="(plugin.panel_expanded || false) && (((plugin.panel_expanded || false)  && i == 0) || op.panel_expanded || false )"></joy>
                 <md-divider></md-divider>
               </div>
             </div>
