@@ -14,17 +14,17 @@ Engine<template>
           <div class="site-title">ImJoy.io<span class="superscript md-small-hide">alpha</span></div>
           <md-tooltip>ImJoy home</md-tooltip>
         </md-button>
-        <md-menu md-size="big">
+        <md-menu>
           <md-button class="md-button" md-menu-trigger>
             <span class="subheader-title" style="flex: 1">Image Processing with Joy</span>
             <md-tooltip>Switch workspace</md-tooltip>
           </md-button>
           <md-menu-content>
             <md-menu-item @click="switchWorkspace(w)" v-for="w in workspace_list" :key="w.name">
-              <span>{{w}}</span>
+              <span>{{w}}</span><md-icon>forward</md-icon>
             </md-menu-item>
             <md-menu-item @click="showNewWorkspaceDialog=true">
-              <span>New Workspace</span>
+              <md-icon>add</md-icon>New Workspace
             </md-menu-item>
           </md-menu-content>
         </md-menu>
@@ -146,14 +146,16 @@ Engine<template>
             <md-tooltip>save the workflow</md-tooltip>
           </md-button>
 
-          <md-menu>
-            <md-button class="md-button md-primary" md-menu-trigger>
+          <md-menu md-size="big">
+            <md-button class="md-button md-primary" :disabled="workflow_list.length==0" md-menu-trigger>
               <md-icon>more_horiz</md-icon> Load
               <md-tooltip>load a workflow</md-tooltip>
             </md-button>
             <md-menu-content>
               <md-menu-item @click="loadWorkflow(w)" v-for="w in workflow_list" :key="w.name">
-                <span>{{w.name}}</span>
+                <span>{{w.name}}</span> <md-button @click.stop="removeWorkflow(w)" class="md-icon-button md-accent">
+                  <md-icon>clear</md-icon>
+                </md-button>
               </md-menu-item>
             </md-menu-content>
           </md-menu>
@@ -760,6 +762,7 @@ export default {
       }).then((result) => {
         const promises = []
         this.plugins = {}
+        this.workflow_list = []
         this.installed_plugins = []
         for (let i = 0; i < result.total_rows; i++) {
           const config = result.rows[i].doc
@@ -914,10 +917,11 @@ export default {
       if (name == null) {
         return
       }
-      const data = _.cloneDeep(joy.top.data)
+      const data = {}
       data.name = name
       data._id = name + '_workflow'
-      delete data._references
+      // delete data._references
+      data.workflow = JSON.stringify(joy.top.data)
       console.log('saving workflow: ', data)
       this.db.put(data, {
         force: true
@@ -932,16 +936,26 @@ export default {
       })
     },
     loadWorkflow(w) {
-      this.updating_workflow = false
-      this.$forceUpdate()
-      this.workflow_joy_config.data = w.workflow
-      setTimeout(() => {
-        this.updating_workflow = true
-        console.log(this.workflow_joy_config)
-        this.$forceUpdate()
-      }, 500);
+      this.workflow_joy_config.data = JSON.parse(w.workflow)
+      this.$refs.workflow.setupJoy()
       console.log(w)
-
+    },
+    removeWorkflow(w) {
+      console.log('removing: ', w)
+      this.db.get(w._id).then((doc) => {
+        return this.db.remove(doc);
+      }).then((result) => {
+        var index = this.workflow_list.indexOf(w);
+        if (index > -1) {
+          this.workflow_list.splice(index, 1);
+        }
+        console.log('Successfully removed!');
+        this.api.show(name + ' has been sucessfully removed.')
+      }).catch((err) => {
+        this.api.show('failed to remove the workflow.')
+        console.error(err)
+        alert('error occured: ' + err.toString())
+      })
     },
     runOp(op) {
       console.log('run op.', this.active_windows)
@@ -1499,5 +1513,9 @@ div#textnode {
 .centered-button{
   text-align: center;
   text-transform: none;
+}
+
+.md-button {
+  margin: 0;
 }
 </style>
