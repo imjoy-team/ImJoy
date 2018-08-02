@@ -11,6 +11,7 @@ import platform
 import signal
 import random
 import string
+import shlex
 from subprocess import Popen, PIPE, STDOUT
 try:
     from Queue import Queue, Empty
@@ -23,6 +24,10 @@ app = web.Application()
 sio.attach(app)
 plugins = {}
 plugin_sids = {}
+
+cmd_history = []
+default_requirements_py2 = ["six", "requests", "gevent", "websocket-client"]
+default_requirements_py3 = ["six", "requests", "gevent", "websocket-client-py3"]
 @sio.on('connect', namespace=NAME_SPACE)
 def connect(sid, environ):
     print("connect ", sid)
@@ -30,9 +35,58 @@ def connect(sid, environ):
 @sio.on('init_plugin', namespace=NAME_SPACE)
 async def on_init_plugin(sid, kwargs):
     print("init_plugin: ", kwargs)
+    sys.stdout.flush()
     secretKey = ''.join(random.choices(string.ascii_uppercase + string.digits, k=10))
     pid = kwargs['id']
-    env = kwargs.get('env', 'python')
+    config = kwargs.get('config', {})
+    env = config.get('env', None)
+    cmd = config.get('cmd', 'python')
+    pname = config.get('name', None)
+    requirements = config.get('requirements', []) or []
+
+    env_name = None
+    is_py2 = False
+
+    if env is not None:
+        try:
+
+            if 'python=2' in env:
+                is_py2 = True
+            parms = shlex.split(env)
+            if '-n' in parms:
+                env_name = parms[parms.index('-n') + 1]
+            elif '--name' in parms:
+                env_name = parms[parms.index('--name') + 1]
+            elif pname is not None:
+                env_name = pname.replace(' ', '_')
+                env = env.replace('create', 'create -n '+env_name)
+            print('creating environment: ' + env)
+            if env not in cmd_history:
+                os.system(env)
+                cmd_history.append(env)
+            else:
+                print('skip command: '+ env)
+        except Exception as e:
+            await sio.emit('message_from_plugin_'+pid,  {"type": "executeFailure", "error": "failed to create environment."})
+            raise
+
+    requirements += (default_requirements_py2 if is_py2 else default_requirements_py3)
+    pip_cmd = "pip install "+" ".join(requirements)
+    if env_name is not None:
+        pip_cmd = "source activate "+env_name + " || activate "+env_name + " && " + pip_cmd
+    if env_name is not None:
+        cmd = "source activate "+env_name + " || activate "+env_name + " && " + cmd
+    try:
+        print('installing requirements: ' + pip_cmd)
+        if pip_cmd not in cmd_history:
+            os.system(pip_cmd)
+            cmd_history.append(pip_cmd)
+        else:
+            print('skip command: '+ pip_cmd)
+    except Exception as e:
+        await sio.emit('message_from_plugin_'+pid,  {"type": "executeFailure", "error": "failed to install requirements."})
+        raise
+
     plugins[pid] = {'secret': secretKey, 'id': pid, 'sid': sid}
     plugin_sids[sid] = plugins[pid]
     @sio.on('from_plugin_'+secretKey, namespace=NAME_SPACE)
@@ -54,7 +108,7 @@ async def on_init_plugin(sid, kwargs):
     try:
         abort = threading.Event()
         plugins[pid]['abort'] = abort #
-        taskThread = threading.Thread(target=execute, args=[env+' '+'workerTemplate.py --id='+pid+' --secret='+secretKey, './', abort, pid])
+        taskThread = threading.Thread(target=execute, args=[cmd+' '+'workerTemplate.py --id='+pid+' --secret='+secretKey, './', abort, pid])
         taskThread.daemon = True
         taskThread.start()
         # execute('python pythonWorkerTemplate.py', './', abort, pid)

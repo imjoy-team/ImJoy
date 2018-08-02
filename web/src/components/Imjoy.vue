@@ -610,18 +610,18 @@ export default {
     },
     editPlugin(pid) {
       const plugin = this.plugins[pid]
-      const template = plugin.template
+      const pconfig = plugin.config
       const w = {
-        name: template.name,
+        name: pconfig.name,
         type: 'imjoy/plugin-editor',
         config: {},
         plugin: plugin,
         reload: this.reloadPlugin,
         save: this.savePlugin,
         data: {
-          name: template.name,
+          name: pconfig.name,
           id: plugin.id,
-          code: template.code
+          code: pconfig.code
         }
       }
       this.addWindow(w)
@@ -1076,7 +1076,8 @@ export default {
             console.error("plugin engine is not connected.")
           }
         }
-        const plugin = new jailed.DynamicPlugin(template, config, this.plugin_api)
+        const tconfig = _.assign({}, template, config)
+        const plugin = new jailed.DynamicPlugin(tconfig, this.plugin_api)
         plugin.whenConnected(() => {
           if (!plugin.api) {
             console.error('error occured when loading plugin.')
@@ -1169,8 +1170,8 @@ export default {
           //update the joy workflow if new template added, TODO: preserve settings during reload
           if (this.$refs.workflow) this.$refs.workflow.setupJoy()
           plugin.type = config.type
-          console.log('register op plugin: ', plugin.template)
-          this.registered.ops[config.type] = plugin.template
+          console.log('register op plugin: ', plugin.config)
+          this.registered.ops[config.type] = plugin.config
           const op_config = {
             name: config.name,
             id: _plugin.id,
@@ -1187,8 +1188,8 @@ export default {
           if (config.mode != 'iframe') {
             throw 'Window plugin must be with type "iframe"'
           }
-          console.log('register window plugin: ', plugin.template)
-          this.registered.windows[config.type] = plugin.template
+          console.log('register window plugin: ', plugin.config)
+          this.registered.windows[config.type] = plugin.config
         }
         if (config.tags.includes('file_importer')) {
           throw "file importer not supported yet"
