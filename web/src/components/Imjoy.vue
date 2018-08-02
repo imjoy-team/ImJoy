@@ -193,16 +193,19 @@ Engine<template>
                 <md-icon v-else>expand_less</md-icon>
               </md-button>
               <div v-for="(op, i) in plugin.ops" :key="op.name + op.type">
-                <div class="centered-button">
-                  <md-button class="md-button md-primary centered-button" v-show="plugin.panel_expanded && i != 0" @click="runOp(op)">
+                <!-- <div class="centered-button"> -->
+                <md-button class="md-icon-button" v-show="plugin.panel_expanded && i != 0" :disabled="true">
+                  <md-icon>remove</md-icon>
+                </md-button>
+                <md-button class="joy-run-button md-primary" v-show="plugin.panel_expanded && i != 0" @click="runOp(op)">
                     {{op.name}}
                   </md-button>
-                </div>
-                <joy :config="op" :show="plugin.panel_expanded || false"></joy>
-
-                <!-- <md-button class="md-button md-primary">
-                  <md-icon>stop</md-icon>Stop
-                </md-button> -->
+                <!-- </div> -->
+                <md-button class="md-icon-button" v-show="plugin.panel_expanded && i != 0" @click="op.panel_expanded=!op.panel_expanded; $forceUpdate()">
+                  <md-icon v-if="!op.panel_expanded">expand_more</md-icon>
+                  <md-icon v-else>expand_less</md-icon>
+                </md-button>
+                <joy :config="op" :show="plugin.panel_expanded && ((plugin.panel_expanded && i == 0) || op.panel_expanded || false)"></joy>
                 <md-divider></md-divider>
               </div>
             </div>
@@ -1494,7 +1497,7 @@ div#textnode {
 
 .md-speed-dial-content {
   left: 40px !important;
-  top: -20px !important;
+  top: -10px !important;
   display: flex;
   flex-direction: row;
 }
