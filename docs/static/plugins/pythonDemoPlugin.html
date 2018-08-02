@@ -4,7 +4,7 @@
   "type": "demo/pyworker",
   "mode": "pyworker",
   "version": "0.1.0",
-  "api_version": "0.1.0",
+  "api_version": "0.1.1",
   "createdAt": "Mon Jun 26 2018 15:45:30",
   "url": "/pythonDemoPlugin.html",
   "description": "A plugin for demonstrate python plugin.",
@@ -13,7 +13,9 @@
   "inputs": null,
   "outputs": null,
   "icon": null,
-  "env": "python",
+  "env": "conda create -y -n python3 python=3.6 anaconda",
+  "requirements": ["numpy"],
+  "cmd": "python",
   "dependencies": []
 }
 </config>

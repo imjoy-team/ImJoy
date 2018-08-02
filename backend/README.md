@@ -7,7 +7,7 @@
 
 ## Usage
   * Run `python pluginEngine.py`
-  * Go to https://imjoy.io to create a Python Plugin, here is an example:
+  * Go to https://imjoy.io, create a plugin, here is a python `hello world` example:
 ```html
 <config>
 {
@@ -45,6 +45,7 @@ api.export(PythonPlugin())
 
 ```
 
+## Switch virtual environments
   By default, python plugins from ImJoy will be executed in the default conda environment(Python 3.6). If you want to run a plugin in a different conda environment, you can specify it by setting the `env` field in the `<config>` section of the plugin.
 
   Examples:

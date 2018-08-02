@@ -201,7 +201,7 @@ function randId() {
          *
          * For Node.js the plugin is created as a forked process
          */
-        BasicConnection = function(id, mode) {
+        BasicConnection = function(id, mode, config) {
             if(type == 'iframe'){
               throw('You can not use iframe in nodejs.')
             }
@@ -326,10 +326,12 @@ function randId() {
          * For the web-browser environment, the plugin is created as a
          * Worker in a sandbaxed frame
          */
-        BasicConnection = function(id, mode, iframe_container, iframe_window) {
+        BasicConnection = function(id, mode, config) {
             this._init = new Whenable;
             this._disconnected = false;
             this.id = id;
+            iframe_container = config.iframe_container
+            iframe_window = config.iframe_window
 
             var me = this;
             platformInit.whenEmitted(function() {
@@ -444,15 +446,18 @@ function randId() {
          * For the web-browser environment, the plugin is created as a
          * Worker in a sandbaxed frame
          */
-        SocketioConnection = function(id, mode, context) {
+        SocketioConnection = function(id, mode, config) {
             this._init = new Whenable;
             this._disconnected = false;
             this.id = id;
-            this.context = context
+            this.context = config.context
+            if(!this.context){
+              throw('connection is not established.')
+            }
             platformInit.whenEmitted(() =>{
-              if (!this._disconnected && this.context.socket) {
+              if (!this._disconnected && this.context && this.context.socket) {
                 this.context.socket.on('message_from_plugin_'+this.id,  (data)=>{
-                    console.log('message_from_plugin_'+this.id, data)
+                    // console.log('message_from_plugin_'+this.id, data)
                     if (data.type == 'initialized') {
                         this.dedicatedThread = data.dedicatedThread;
                         this._init.emit();
@@ -460,9 +465,10 @@ function randId() {
                         this._messageHandler(data);
                     }
                 })
+                const config_ = {api_version: config.api_version, env: config.env, requirements: config.requirements, cmd: config.cmd, name: config.name, type: config.type, inputs: config.inputs, outputs: config.outputs}
                 // create a plugin here
-                this.context.socket.emit('init_plugin', {id: id, mode: mode, env: this.context.env}, (result) => {
-                  console.log('init_plugin: ', result)
+                this.context.socket.emit('init_plugin', {id: id, mode: mode, config: config_}, (result) => {
+                  // console.log('init_plugin: ', result)
                   if(result.success){
                     this.secret = result.secret
                   }
@@ -563,12 +569,12 @@ function randId() {
      * methods for loading scripts and executing the given code in the
      * plugin
      */
-    var Connection = function(id, mode, iframe_container, iframe_window, context){
+    var Connection = function(id, mode, config){
         if(mode == 'pyworker'){
-          this._platformConnection = new SocketioConnection(id, mode, context);
+          this._platformConnection = new SocketioConnection(id, mode, config);
         }
         else{
-          this._platformConnection = new BasicConnection(id, mode, iframe_container, iframe_window);
+          this._platformConnection = new BasicConnection(id, mode, config);
         }
 
         this._importCallbacks = {};
@@ -740,13 +746,12 @@ function randId() {
      * @param {String} url of a plugin source
      * @param {Object} _interface to provide for the plugin
      */
-    var Plugin = function( template, config, _interface) {
-        this.template = template
+    var Plugin = function( config, _interface) {
         this.config = config
         this.id = config.id || randId()
-        this.name = template.name
-        this.mode = template.mode || 'webworker'
-        this._path = template.url;
+        this.name = config.name
+        this.mode = config.mode || 'webworker'
+        this._path = config.url;
         this._initialInterface = _interface||{};
         this._connect();
     };
@@ -759,15 +764,14 @@ function randId() {
      * @param {String} code of the plugin
      * @param {Object} _interface to provide to the plugin
      */
-    var DynamicPlugin = function(template, config, _interface) {
-        this.template = template
+    var DynamicPlugin = function(config, _interface) {
         this.config = config
-        if(!this.template.script){
+        if(!this.config.script){
           throw "you must specify the script for the plugin to run."
         }
         this.id = config.id || randId()
-        this.name = template.name
-        this.mode = template.mode || 'webworker'
+        this.name = config.name
+        this.mode = config.mode || 'webworker'
         this._initialInterface = _interface||{};
         this._connect();
     };
@@ -792,7 +796,7 @@ function randId() {
             me._fail.emit();
             me.disconnect();
         }
-        this._connection = new Connection(this.id, this.mode, this.config.iframe_container, this.config.iframe_window, this.config.context);
+        this._connection = new Connection(this.id, this.mode, this.config);
         this._connection.whenInit(function(){
             me._init();
         });
@@ -878,9 +882,9 @@ function randId() {
         var sCb = function() {
             me._requestRemote();
         }
-        this._connection.execute({type: 'script', content: this.template.script, lang: this.template.lang}, sCb, this._fCb);
-        if(this.template.style) this._connection.execute({type: 'style', content: this.template.style}, sCb, this._fCb);
-        if(this.template.window) this._connection.execute({type: 'html', content: this.template.window}, sCb, this._fCb);
+        this._connection.execute({type: 'script', content: this.config.script, lang: this.config.lang}, sCb, this._fCb);
+        if(this.config.style) this._connection.execute({type: 'style', content: this.config.style}, sCb, this._fCb);
+        if(this.config.window) this._connection.execute({type: 'html', content: this.config.window}, sCb, this._fCb);
     }
 
 
