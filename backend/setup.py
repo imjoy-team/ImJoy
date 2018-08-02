@@ -1,6 +1,6 @@
 import sys
 if sys.version_info < (3,0):
-    sys.exit('Sorry, Python < 2.7 is not supported')
+    sys.exit('Sorry, Python < 3.0 is not supported, please Anaconda with Python 3.6.')
 from setuptools import setup, find_packages
 
 setup(name='imjoy',
