@@ -1,6 +1,7 @@
 import argparse
 import logging
 import time
+import os
 import sys
 import gevent
 import random
@@ -9,10 +10,15 @@ from inspect import isfunction
 from gevent import monkey;
 import six
 monkey.patch_socket()
+
+sys.path.append(os.path.dirname(os.path.normpath(__file__)))
+
 from socketio_client.manager import Manager
 # from RestrictedPython import compile_restricted
 # from RestrictedPython import safe_builtins
 import inspect
+
+
 
 class ReferenceStore():
     def __init__(self):
