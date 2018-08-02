@@ -1,7 +1,7 @@
 
 ## Installation
-  * Download Annaconda3 (Python3.6 version) from https://www.anaconda.com/download/
-  * Install Annaconda
+  * Download Anaconda (Python 3.6 version, not Python 2.7) from https://www.anaconda.com/download/
+  * Install Anaconda
   * Run `pip install "git+https://github.com/oeway/ImJoy#egg=imjoy&subdirectory=backend"`
 
 ## Usage
