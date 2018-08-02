@@ -8,11 +8,16 @@ Image processing with Joy
 ## Installation
   * Download Annaconda3 (Python3.6 version) from https://www.anaconda.com/download/
   * Install Annaconda
-  * Run `pip install "git+https://github.com/oeway/ImJoy#egg=imjoy&subdirectory=backend"`
+  * Run `pip install -U "git+https://github.com/oeway/ImJoy#egg=imjoy&subdirectory=backend"` in a terminal window
 
 ## Usage
-  * Run `python -m imjoy`
-  * Go to https://imjoy.io, create a plugin, here is a python `hello world` example:
+  * Run `python -m imjoy` in a terminal and keep the window running.
+  * Go to https://imjoy.io, connect to the plugin engine
+  * Now you can start to use plugins written in Python
+ 
+For plugin developers, you can create a python plugin within the browser. 
+
+Here is a python `hello world` example:
 ```html
 <config>
 {
