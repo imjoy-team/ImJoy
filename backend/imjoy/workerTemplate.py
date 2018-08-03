@@ -84,16 +84,6 @@ class PluginConnection():
             sio.emit('from_plugin_'+ secret, msg)
         self.emit = emit
 
-        @sio.on_connect()
-        def sio_connect():
-            self._init = False
-            self.emit({"type": "initialized", "dedicatedThread": True})
-
-        @sio.on_disconnect()
-        def sio_disconnect():
-            sys.exit(1)
-
-        sio.on('to_plugin_'+secret, self.sio_plugin_message)
         self.sio = sio
         _remote = API()
         _remote["ndarray"] = self._ndarray
@@ -102,6 +92,16 @@ class PluginConnection():
         self._interface = {}
         self._remote_set = False
         self._store = ReferenceStore()
+
+        @sio.on_connect()
+        def sio_connect():
+            self._init = False
+            sio.on('to_plugin_'+secret, self.sio_plugin_message)
+            self.emit({"type": "initialized", "dedicatedThread": True})
+
+        @sio.on_disconnect()
+        def sio_disconnect():
+            sys.exit(1)
 
     def start(self):
         self.io.connect()
