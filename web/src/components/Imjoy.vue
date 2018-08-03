@@ -1226,7 +1226,8 @@ export default {
     },
     renderWindow(pconfig) {
       console.log('rendering window', pconfig)
-      const plugin = new jailed.DynamicPlugin(pconfig.plugin, pconfig, this.plugin_api)
+      const tconfig = _.assign({}, pconfig.plugin, pconfig)
+      const plugin = new jailed.DynamicPlugin(tconfig, this.plugin_api)
       plugin.whenConnected(() => {
         if (!plugin.api) {
           console.error('the window plugin seems not ready.')
