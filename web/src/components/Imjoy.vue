@@ -1055,12 +1055,12 @@ export default {
       //generate a random id for the plugin
       return new Promise((resolve, reject) => {
         config.id = template.name.trim().replace(/ /g, '_') + '_' + randId()
+        const tconfig = _.assign({}, template, config)
         const plugin = {
           id: config.id,
           name: config.name,
           type: config.type,
-          config: config,
-          template: template,
+          config: tconfig,
           mode: template.mode
         }
         this.plugins[plugin.id] = plugin
