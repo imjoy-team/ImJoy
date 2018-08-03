@@ -127,9 +127,9 @@ Engine<template>
               <span class="md-subheading">Workflow</span>
             </div>
             <div class="md-layout-item">
-              <md-button @click="reloadOps()" class="md-icon-button">
-                <md-icon>autorenew</md-icon>
-                <md-tooltip>Reload workflow</md-tooltip>
+              <md-button @click="clearWorkflow()" class="md-icon-button">
+                <md-icon>clear</md-icon>
+                <md-tooltip>Clear workflow</md-tooltip>
               </md-button>
             </div>
           </div>
@@ -737,9 +737,6 @@ export default {
         addPlugin()
       });
     },
-    reloadOps() {
-      if (this.$refs.workflow) this.$refs.workflow.setupJoy()
-    },
     reloadPlugins() {
       if (this.plugins) {
         for (let k in this.plugins) {
@@ -894,6 +891,10 @@ export default {
         }
       }
       this.addWindow(w)
+    },
+    clearWorkflow() {
+      this.workflow_joy_config.data = ''
+      this.$refs.workflow.setupJoy()
     },
     runWorkflow(joy) {
       console.log('run workflow.', this.active_windows)
