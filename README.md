@@ -15,7 +15,7 @@ Image processing with Joy
   * Go to https://imjoy.io, connect to the plugin engine
   * Now you can start to use plugins written in Python
 
-For plugin developers, you can create a python plugin within the browser.
+For plugin developers, you can now create a python plugin within the browser.
 
 Here is a python `hello world` example:
 ```html
