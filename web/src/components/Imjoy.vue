@@ -864,8 +864,8 @@ export default {
             console.log('trying to open the file with ', plugins[i].name, plugins[i])
             file.loaders[plugins[i].name] = async () => {
               let config = {}
-              if (plugins[i].template && plugins[i].template.ui) {
-                config = await this.showDialog(plugins[i].template)
+              if (plugins[i].config && plugins[i].config.ui) {
+                config = await this.showDialog(plugins[i].config)
               }
               plugins[i].api.run({
                 op: {},
