@@ -193,14 +193,14 @@ Engine<template>
                 <md-icon v-else>expand_less</md-icon>
               </md-button>
               <div v-for="(op, i) in plugin.ops" :key="op.name + op.type">
-                <!-- <div class="centered-button"> -->
+
                 <md-button class="md-icon-button" v-show="plugin.panel_expanded && i != 0" :disabled="true">
                   <md-icon>remove</md-icon>
                 </md-button>
                 <md-button class="joy-run-button md-primary" v-show="plugin.panel_expanded && i != 0" @click="runOp(op)">
                     {{op.name}}
                   </md-button>
-                <!-- </div> -->
+
                 <md-button class="md-icon-button" v-show="plugin.panel_expanded && i != 0" @click="op.panel_expanded=!op.panel_expanded; $forceUpdate()">
                   <md-icon v-if="!op.panel_expanded">expand_more</md-icon>
                   <md-icon v-else>expand_less</md-icon>
@@ -287,7 +287,9 @@ Engine<template>
   <md-dialog :md-active.sync="showAddPluginDialog">
     <md-dialog-content>
       <md-subheader>Create a New Plugin</md-subheader>
-      <md-button class="md-primary md-raised" @click="addPlugin();showAddPluginDialog=false">Create</md-button>
+      <md-button class="md-primary md-raised centered-button" @click="newPlugin(template);showAddPluginDialog=false" v-for="(template, k) in plugin_templates" :key="k">
+        <md-icon>add</md-icon>{{k}}
+      </md-button>
       <plugin-list config-url="static/plugins/manifest.json" :workspace="selected_workspace" title="Or, install from the Plugin Store"></plugin-list>
     </md-dialog-content>
     <md-dialog-actions>
@@ -304,7 +306,9 @@ import {
   WINDOW_SCHEMA,
   OP_SCHEMA,
   PLUGIN_SCHEMA,
-  PLUGIN_TEMPLATE
+  PYWORKER_PLUGIN_TEMPLATE,
+  WEBWORKER_PLUGIN_TEMPLATE,
+  IFRAME_PLUGIN_TEMPLATE
 } from '../api.js'
 
 import {
@@ -370,6 +374,11 @@ export default {
         ops: {},
         windows: {},
         extensions: {}
+      },
+      plugin_templates: {
+        "PyWorker(Python)": PYWORKER_PLUGIN_TEMPLATE,
+        "Webworker(Javascript)": WEBWORKER_PLUGIN_TEMPLATE,
+        "Iframe(Javascript and HTML)": WEBWORKER_PLUGIN_TEMPLATE,
       },
       updating_workflow: false,
       installed_plugins: [],
@@ -634,17 +643,18 @@ export default {
       }
       this.addWindow(w)
     },
-    addPlugin() {
+    newPlugin(template) {
       const w = {
         name: 'New Plugin',
         type: 'imjoy/plugin-editor',
         config: {},
         reload: this.reloadPlugin,
         save: this.savePlugin,
+        plugin: {},
         data: {
           name: 'new plugin',
           id: 'plugin_' + randId(),
-          code: JSON.parse(JSON.stringify(PLUGIN_TEMPLATE))
+          code: JSON.parse(JSON.stringify(template))
         }
       }
       this.addWindow(w)
@@ -1521,6 +1531,6 @@ div#textnode {
 }
 
 .md-button {
-  margin: 0;
+  margin: 1px;
 }
 </style>

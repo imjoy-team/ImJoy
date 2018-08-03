@@ -1,6 +1,6 @@
 import schema from 'js-schema'
 
-export const PLUGIN_TEMPLATE= `
+export const WEBWORKER_PLUGIN_TEMPLATE= `
 <docs>
 Describe your plugin here.
 </docs>
@@ -17,11 +17,13 @@ Describe your plugin here.
   "url": "",
   "description": "A plugin for image processing.",
   "icon": "extension",
+  "inputs": null,
+  "outputs": null,
   "dependencies": []
 }
 </config>
 
-<script>
+<script lang="javascript">
 class UntitledPlugin {
   async setup() {
     //await importScripts("http://xxxx/xxx.js")
@@ -34,6 +36,87 @@ class UntitledPlugin {
 }
 
 api.export(new UntitledPlugin())
+</script>
+
+`
+
+export const IFRAME_PLUGIN_TEMPLATE= `
+<docs>
+Describe your plugin here.
+</docs>
+
+<config>
+{
+  "name": "Untitled Plugin",
+  "type": "image/display",
+  "mode": "iframe",
+  "tags": ["op", "window"],
+  "ui": "image display with iframe",
+  "version": "0.1.0",
+  "api_version": "0.1.0",
+  "url": "",
+  "description": "A plugin for image display.",
+  "icon": "extension",
+  "inputs": null,
+  "outputs": null,
+  "dependencies": []
+}
+</config>
+
+<script lang="javascript">
+class UntitledPlugin {
+  async setup() {
+    //await importScripts("http://xxxx/xxx.js")
+  }
+
+  run(my) {
+    console.log('running in the plugin ', my)
+
+  }
+}
+
+api.export(new UntitledPlugin())
+</script>
+
+`
+
+export const PYWORKER_PLUGIN_TEMPLATE= `
+<docs>
+Describe your plugin here.
+</docs>
+
+<config>
+{
+  "name": "Untitled Plugin",
+  "type": "image/processing",
+  "mode": "pyworker",
+  "version": "0.1.0",
+  "api_version": "0.1.1",
+  "createdAt": "Mon Jun 26 2018 15:45:30",
+  "description": "A plugin for demonstrate python plugin.",
+  "tags": ["demo", "op"],
+  "ui": "image processing with python",
+  "inputs": null,
+  "outputs": null,
+  "icon": null,
+  "env": null,
+  "requirements": [],
+  "cmd": "python",
+  "dependencies": []
+}
+</config>
+
+<script lang="python">
+import numpy as np
+class PythonPlugin():
+  def setup(self):
+    print('setup in python')
+
+  def run(self, my):
+    print('hello world.')
+    return my
+
+api.export(PythonPlugin())
 </script>
 
 `
