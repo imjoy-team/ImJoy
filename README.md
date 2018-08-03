@@ -14,8 +14,8 @@ Image processing with Joy
   * Run `python -m imjoy` in a terminal and keep the window running.
   * Go to https://imjoy.io, connect to the plugin engine
   * Now you can start to use plugins written in Python
- 
-For plugin developers, you can create a python plugin within the browser. 
+
+For plugin developers, you can create a python plugin within the browser.
 
 Here is a python `hello world` example:
 ```html
@@ -89,3 +89,18 @@ api.export(PythonPlugin())
   **Note 1**: in `requirements`, you can also specify the version number, for example `numpy>=1.15.0`.
 
   **Note 2**: in the `env` field, you need to use `-n XXXX` to name your environment, otherwise, it will use the plugin name to name the environment.
+
+## TODO: Use Docker Containers
+
+ Python plugin can also be ran with Docker.
+ Examples:
+  * If you want to run your plugin with tensorflow docker, you need to add the following fields to your `<config>`:
+ ```json
+ <config>
+   ...
+   "env": "docker pull tensorflow/tensorflow:1.9.0-py3",
+   "requirements": ["numpy", "scipy"],
+   "cmd": "python",
+   ...
+ </config>
+ ```
