@@ -67,4 +67,3 @@ class TransportException(Exception):
 
 class TransportNotOpenException(TransportException):
     pass
-

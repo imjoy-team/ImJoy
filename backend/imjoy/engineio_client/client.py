@@ -35,6 +35,7 @@ class Client(Emitter):
         self.ping_interval = None
         self.ping_timeout = None
         self.upgrades = None
+        self.transport_ready_event = gevent.event.Event()
         self.pong_event = gevent.event.Event()
         self.send_queue = gevent.queue.JoinableQueue()
         self.transport = None
@@ -65,14 +66,16 @@ class Client(Emitter):
                                      self.port, self.path, self.parser)
 
     def set_transport(self, transport):
-        if self.transport:
-            logger.debug('Clearing existing transport')
-            self.transport.removeAllListeners()
+        _transport = self.transport
 
         self.transport = transport
         self.transport.on('close', self.handle_close)
         self.transport.on('packet', self.handle_packet)
         self.transport.on('error', self.handle_error)
+
+        if _transport:
+            logger.debug('Clearing existing transport')
+            _transport.removeAllListeners()
 
     def send_packet(self, packet):
         if self.state in ['closing', 'closed']:
@@ -94,8 +97,10 @@ class Client(Emitter):
                     packets.append(packet)
             except gevent.queue.Empty:
                 pass
-
+            self.transport_ready_event.wait()
+            # self.transport_ready_event.clear()
             self.transport.send(packets)
+            # self.transport_ready_event.set()
             for packet in packets:
                 self.send_queue.task_done()
 
@@ -135,9 +140,11 @@ class Client(Emitter):
         def on_pause():
             self.set_transport(transport)
             self.transport.send([Packet(Packet.UPGRADE, '')])
+            self.transport_ready_event.set()
 
         def on_packet(packet):
             if packet.type == Packet.PONG and packet.data == 'probe':
+                self.transport_ready_event.clear()
                 self.transport.once('pause', on_pause)
                 self.transport.pause()
 

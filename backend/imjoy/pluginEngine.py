@@ -19,7 +19,7 @@ except ImportError:
     from queue import Queue, Empty  # python 3.x
 
 NAME_SPACE = '/'
-sio = socketio.AsyncServer()
+sio = socketio.AsyncServer(ping_timeout=20)
 app = web.Application()
 sio.attach(app)
 plugins = {}

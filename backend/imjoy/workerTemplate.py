@@ -11,6 +11,9 @@ from gevent import monkey;
 import six
 monkey.patch_socket()
 
+# import logging
+# logging.basicConfig(level=logging.DEBUG)
+
 sys.path.append(os.path.dirname(os.path.normpath(__file__)))
 
 from socketio_client.manager import Manager
