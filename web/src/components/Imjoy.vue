@@ -332,6 +332,7 @@ export default {
   props: ['title'],
   data() {
     return {
+      client_id: null,
       file_select: null,
       folder_select: null,
       selected_file: null,
@@ -456,7 +457,11 @@ export default {
     //     })
     //   }
     // }
-
+    this.client_id = localStorage.getItem("imjoy_client_id")
+    if(!this.client_id){
+      this.client_id = 'imjoy_web_'+randId()
+      localStorage.setItem("imjoy_client_id", this.client_id);
+    }
     this.plugin_api = {
       alert: alert,
       register: this.register,
@@ -583,8 +588,10 @@ export default {
         console.log('plugin engine connected.')
         clearTimeout(timer)
         this.socket = socket
+        this.pluing_context.socket = socket
         this.engine_connected = true
         this.engine_status = 'Plugin Engine connected.'
+        socket.emit('register_client', {id: this.client_id})
         this.show('Plugin Engine connected.')
         this.store.event_bus.$emit('engine_connected', d)
       })
@@ -594,10 +601,11 @@ export default {
         this.show('Plugin Engine disconnected.')
         this.engine_status = 'Plugin Engine disconnected.'
         this.socket = null
+        this.pluing_context.socket = null
         // this.pluing_context.socket = null
       });
       this.socket = socket
-      this.pluing_context.socket = socket
+
     },
     disconnectEngine() {
       if (this.socket) {
@@ -1100,8 +1108,7 @@ export default {
       return new Promise((resolve, reject) => {
         const config = {}
         config.id = template.name.trim().replace(/ /g, '_') + '_' + randId()
-        config.context = _.clone(this.pluing_context)
-        config.context.env = template.env
+        config.context = this.pluing_context
         if (template.mode == 'pyworker') {
           if (!this.socket) {
             console.error("plugin engine is not connected.")

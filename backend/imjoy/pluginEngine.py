@@ -23,7 +23,9 @@ sio = socketio.AsyncServer(ping_timeout=20)
 app = web.Application()
 sio.attach(app)
 plugins = {}
-plugin_sids = {}
+plugin_cids = {}
+clients = {}
+clients_sids = {}
 
 cmd_history = []
 default_requirements_py2 = ["six", "requests", "gevent", "websocket-client"]
@@ -40,6 +42,15 @@ def connect(sid, environ):
 async def on_init_plugin(sid, kwargs):
     print("init_plugin: ", kwargs)
     sys.stdout.flush()
+    if sid in clients_sids:
+        client_id = clients_sids[sid]
+    else:
+        client_id = ''
+        clients_sids[sid] = client_id
+        if client_id in clients:
+            clients[client_id].append(sid)
+        else:
+            clients[client_id] = [sid]
     secretKey = ''.join(random.choices(string.ascii_uppercase + string.digits, k=10))
     pid = kwargs['id']
     config = kwargs.get('config', {})
@@ -95,8 +106,12 @@ async def on_init_plugin(sid, kwargs):
         await sio.emit('message_from_plugin_'+pid,  {"type": "executeFailure", "error": "failed to install requirements."})
         raise
 
-    plugins[pid] = {'secret': secretKey, 'id': pid, 'sid': sid}
-    plugin_sids[sid] = plugins[pid]
+    plugins[pid] = {'secret': secretKey, 'id': pid, 'client_id': client_id}
+    if client_id in plugin_cids:
+        plugin_cids[client_id].append(plugins[pid])
+    else:
+        plugin_cids[client_id] = [plugins[pid]]
+
     @sio.on('from_plugin_'+secretKey, namespace=NAME_SPACE)
     async def message_from_plugin(sid, kwargs):
         # print('forwarding message_'+secretKey, kwargs)
@@ -138,6 +153,16 @@ async def on_kill_plugin(sid, kwargs):
     return {'success': True}
 
 
+@sio.on('register_client', namespace=NAME_SPACE)
+async def on_message(sid, kwargs):
+    cid = kwargs['id']
+    if cid in clients:
+        clients[cid].append(sid)
+    else:
+        clients[cid] = [sid]
+    clients_sids[sid] = cid
+    print("register client: ", kwargs)
+
 @sio.on('message', namespace=NAME_SPACE)
 async def on_message(sid, kwargs):
     print("message recieved: ", kwargs)
@@ -145,9 +170,16 @@ async def on_message(sid, kwargs):
 
 @sio.on('disconnect', namespace=NAME_SPACE)
 async def disconnect(sid):
-    if sid in plugin_sids:
-        await on_kill_plugin(sid, plugin_sids[sid])
-        del plugin_sids[sid]
+    if sid in clients_sids:
+        cid = clients_sids[sid]
+        del clients_sids[sid]
+        if cid in clients and sid in clients[cid]:
+            clients[cid].remove(sid)
+        if cid in clients or len(clients[cid])==0:
+            if cid in plugin_cids:
+                for plugin in plugin_cids[cid]:
+                    await on_kill_plugin(sid, plugin)
+                del plugin_cids[cid]
     print('disconnect ', sid)
 
 
