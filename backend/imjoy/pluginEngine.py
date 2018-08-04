@@ -22,6 +22,9 @@ NAME_SPACE = '/'
 sio = socketio.AsyncServer(ping_timeout=20)
 app = web.Application()
 sio.attach(app)
+
+print("Now you can run Python plugins from https://imjoy.io ")
+
 plugins = {}
 plugin_cids = {}
 clients = {}
