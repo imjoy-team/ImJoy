@@ -265,7 +265,6 @@ class PluginConnection():
                 else:
                   names.push({"name":name, "data": data})
         self.emit({'type':'setInterface', 'api': names})
-        print('----------', {'type':'setInterface', 'api': names})
 
     def _genRemoteMethod(self, name):
         def remoteMethod(*arguments):
@@ -302,14 +301,12 @@ class PluginConnection():
         return _remote
 
     def sio_plugin_message(self, data):
-        # print('------------------------------------------------', data)
         # sys.stdout.flush()
         if data['type']== 'import':
             self.emit({'type':'importSuccess', 'url': data['url']})
         elif data['type']== 'disconnect':
             sys.exit(0)
         else:
-            print(data)
             if data['type'] == 'execute':
                 if not self._executed:
                     type = data['code']['type']
