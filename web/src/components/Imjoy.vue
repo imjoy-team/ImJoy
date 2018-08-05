@@ -593,7 +593,7 @@ export default {
         this.engine_connected = true
         this.engine_status = 'Plugin Engine connected.'
         socket.emit('register_client', {id: this.client_id}, (ret)=>{
-          this.resumable_plugins = ret.plugins
+          this.resumable_plugins = []//ret.plugins
           console.log('these python plugins can be resumed: ', ret.plugins)
         })
         this.show('Plugin Engine connected.')
@@ -677,7 +677,6 @@ export default {
     },
     reloadPlugin(pconfig) {
       return new Promise((resolve, reject) => {
-
         if(pconfig.type){
           for (let k in this.plugins) {
             if (this.plugins.hasOwnProperty(k)) {
@@ -686,7 +685,10 @@ export default {
                   try {
                     delete this.plugins[k]
                     Joy.remove(pconfig.type)
-                    if (typeof plugin.terminate == 'function') plugin.terminate()
+                    console.log('terminating ',plugin)
+                    if (typeof plugin.terminate == 'function') {
+                      plugin.terminate()
+                    }
                   } catch (e) {
 
                   }
@@ -715,17 +717,17 @@ export default {
         pconfig.plugin = null
         console.log('reloading plugin ', pconfig)
         const template = this.parsePluginCode(pconfig.code, pconfig)
-        const rplugins = this.resumable_plugins.filter(p => p.name==template.name && p.type==template.type)
-        let rplugin = null
-        if(rplugins.length>0){
-          rplugin = rplugins.shift()
-        }
+        // const rplugins = this.resumable_plugins.filter(p => p.name==template.name && p.type==template.type)
+        // let rplugin = null
+        // if(rplugins.length>0){
+        //   rplugin = rplugins[0]
+        // }
 
         let p
         if (template.mode == 'iframe' && template.tags.includes('window')) {
-          p = this.preLoadPlugin(template, rplugin)
+          p = this.preLoadPlugin(template)
         } else {
-          p = this.loadPlugin(template, rplugin)
+          p = this.loadPlugin(template)
         }
         p.then((plugin) => {
           console.log('new plugin loaded', plugin)
@@ -808,7 +810,7 @@ export default {
 
               let rplugin = null
               if(rplugins.length>0){
-                rplugin = rplugins.shift()
+                rplugin = rplugins[0]
               }
 
               if (template.mode == 'iframe' && template.tags.includes('window')) {
@@ -1165,7 +1167,7 @@ export default {
           if (template.extensions && template.extensions.length > 0) {
             this.registerExtension(template.extensions, plugin)
           }
-          if(!config.initialized){
+          // if(!config.initialized){
             plugin.api.setup().then((result) => {
               console.log('sucessfully setup plugin: ', plugin)
               resolve(plugin)
@@ -1174,10 +1176,10 @@ export default {
               reject(e)
               plugin.terminate()
             })
-          }
-          else{
-            resolve(plugin)
-          }
+          // }
+          // else{
+          //   resolve(plugin)
+          // }
         });
         plugin.whenFailed((e) => {
           console.error('error occured when loading ' + template.name + ":", e)

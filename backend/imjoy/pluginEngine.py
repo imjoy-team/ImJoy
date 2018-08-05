@@ -64,6 +64,10 @@ async def on_init_plugin(sid, kwargs):
     requirements = config.get('requirements', []) or []
 
     if pid in plugins:
+        if client_id in plugin_cids:
+            plugin_cids[client_id].append(plugins[pid])
+        else:
+            plugin_cids[client_id] = [plugins[pid]]
         print('plugin already initialized: ', pid)
         await sio.emit('message_from_plugin_'+pid, {"type": "initialized", "dedicatedThread": True})
         return {'success': True, 'secret': plugins[pid]['secret']}
@@ -125,13 +129,10 @@ async def on_init_plugin(sid, kwargs):
     async def message_from_plugin(sid, kwargs):
         # print('forwarding message_'+secretKey, kwargs)
         if kwargs['type'] in ['initialized', 'importSuccess', 'importFailure', 'executeSuccess', 'executeFailure']:
-            try:
+            if pid in plugins:
                 plugin_sids[sid] = plugins[pid]
-            except Exception as e:
-                print(plugin_sids, plugins)
-                raise
-
             await sio.emit('message_from_plugin_'+pid,  kwargs)
+            print(pid, kwargs)
         else:
             await sio.emit('message_from_plugin_'+pid, {'type': 'message', 'data': kwargs})
 
@@ -161,10 +162,18 @@ async def on_init_plugin(sid, kwargs):
 async def on_kill_plugin(sid, kwargs):
     pid = kwargs['id']
     if pid in plugins:
+        print('killing plugin ' + pid)
         await sio.emit('to_plugin_'+plugins[pid]['secret'], {'type': 'disconnect'})
         plugins[pid]['abort'].set()
-        # del plugins[pid]
-        print('killing plugin ' + pid)
+        del plugins[pid]
+        for cid in plugin_cids.keys():
+            exist = False
+            for p in plugin_cids[cid]:
+                if p['id'] == pid:
+                    exist = p
+                    break
+            if exist:
+                plugin_cids[cid].remove(exist)
     return {'success': True}
 
 
@@ -191,11 +200,11 @@ async def disconnect(sid):
         del clients_sids[sid]
         if cid in clients and sid in clients[cid]:
             clients[cid].remove(sid)
-        # if cid in clients or len(clients[cid])==0:
-        #     if cid in plugin_cids:
-        #         for plugin in plugin_cids[cid]:
-        #             await on_kill_plugin(sid, plugin)
-        #         del plugin_cids[cid]
+        if cid in clients or len(clients[cid])==0:
+            if cid in plugin_cids:
+                for plugin in plugin_cids[cid]:
+                    await on_kill_plugin(sid, plugin)
+                del plugin_cids[cid]
 
     # plugin is terminating
     if sid in plugin_sids:
@@ -203,7 +212,13 @@ async def disconnect(sid):
         if pid in plugins:
             del plugins[pid]
         del plugin_sids[sid]
-
+        for cid in plugin_cids.keys():
+            exist = False
+            for p in plugin_cids[cid]:
+                if p['id'] == pid:
+                    exist = p
+            if exist:
+                plugin_cids[cid].remove(exist)
     print('disconnect ', sid)
 
 
