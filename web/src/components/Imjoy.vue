@@ -354,6 +354,7 @@ export default {
       selected_workspace: null,
       workspace_list: [],
       workflow_list: [],
+      resumable_plugins: [],
       showNewWorkspaceDialog: false,
       new_workspace_name: 'default',
       preload_main: ['/static/tfjs/tfjs.js', 'https://rawgit.com/nicolaspanel/numjs/893016ec40e62eaaa126e1024dbe250aafb3014b/dist/numjs.min.js'],
@@ -591,7 +592,10 @@ export default {
         this.pluing_context.socket = socket
         this.engine_connected = true
         this.engine_status = 'Plugin Engine connected.'
-        socket.emit('register_client', {id: this.client_id})
+        socket.emit('register_client', {id: this.client_id}, (ret)=>{
+          this.resumable_plugins = ret.plugins
+          console.log('these python plugins can be resumed: ', ret.plugins)
+        })
         this.show('Plugin Engine connected.')
         this.store.event_bus.$emit('engine_connected', d)
       })
@@ -667,6 +671,10 @@ export default {
       }
       this.addWindow(w)
     },
+    resumePlugin(pconfig) {
+
+
+    },
     reloadPlugin(pconfig) {
       return new Promise((resolve, reject) => {
 
@@ -707,11 +715,17 @@ export default {
         pconfig.plugin = null
         console.log('reloading plugin ', pconfig)
         const template = this.parsePluginCode(pconfig.code, pconfig)
+        const rplugins = this.resumable_plugins.filter(p => p.name==template.name && p.type==template.type)
+        let rplugin = null
+        if(rplugins.length>0){
+          rplugin = rplugins.shift()
+        }
+
         let p
         if (template.mode == 'iframe' && template.tags.includes('window')) {
-          p = this.preLoadPlugin(template)
+          p = this.preLoadPlugin(template, rplugin)
         } else {
-          p = this.loadPlugin(template)
+          p = this.loadPlugin(template, rplugin)
         }
         p.then((plugin) => {
           console.log('new plugin loaded', plugin)
@@ -790,10 +804,17 @@ export default {
             this.installed_plugins.push(config)
             try {
               const template = this.parsePluginCode(config.code, config)
+              const rplugins = this.resumable_plugins.filter(p => p.name==template.name && p.type==template.type)
+
+              let rplugin = null
+              if(rplugins.length>0){
+                rplugin = rplugins.shift()
+              }
+
               if (template.mode == 'iframe' && template.tags.includes('window')) {
-                promises.push(this.preLoadPlugin(template))
+                promises.push(this.preLoadPlugin(template, rplugin))
               } else {
-                promises.push(this.loadPlugin(template))
+                promises.push(this.loadPlugin(template, rplugin))
               }
             } catch (e) {
               console.error(e)
@@ -1061,7 +1082,7 @@ export default {
       }
       return config
     },
-    preLoadPlugin(template) {
+    preLoadPlugin(template, rplugin) {
       const config = {
         name: template.name,
         mode: template.mode,
@@ -1073,7 +1094,14 @@ export default {
       }
       //generate a random id for the plugin
       return new Promise((resolve, reject) => {
-        config.id = template.name.trim().replace(/ /g, '_') + '_' + randId()
+        if(!rplugin){
+          config.id = template.name.trim().replace(/ /g, '_') + '_' + randId()
+          config.initialized = false
+        }
+        else{
+          config.id = rplugin.id
+          config.initialized = true
+        }
         const tconfig = _.assign({}, template, config)
         const plugin = {
           id: config.id,
@@ -1102,12 +1130,19 @@ export default {
         resolve(plugin)
       })
     },
-    loadPlugin(template) {
+    loadPlugin(template, rplugin) {
       template = _clone(template)
       //generate a random id for the plugin
       return new Promise((resolve, reject) => {
         const config = {}
-        config.id = template.name.trim().replace(/ /g, '_') + '_' + randId()
+        if(!rplugin){
+          config.id = template.name.trim().replace(/ /g, '_') + '_' + randId()
+          config.initialized = false
+        }
+        else{
+          config.id = rplugin.id
+          config.initialized = true
+        }
         config.context = this.pluing_context
         if (template.mode == 'pyworker') {
           if (!this.socket) {
@@ -1130,14 +1165,19 @@ export default {
           if (template.extensions && template.extensions.length > 0) {
             this.registerExtension(template.extensions, plugin)
           }
-          plugin.api.setup().then((result) => {
-            console.log('sucessfully setup plugin: ', plugin)
+          if(!config.initialized){
+            plugin.api.setup().then((result) => {
+              console.log('sucessfully setup plugin: ', plugin)
+              resolve(plugin)
+            }).catch((e) => {
+              console.error('error occured when loading plugin ' + template.name + ": ", e)
+              reject(e)
+              plugin.terminate()
+            })
+          }
+          else{
             resolve(plugin)
-          }).catch((e) => {
-            console.error('error occured when loading plugin ' + template.name + ": ", e)
-            reject(e)
-            plugin.terminate()
-          })
+          }
         });
         plugin.whenFailed((e) => {
           console.error('error occured when loading ' + template.name + ":", e)

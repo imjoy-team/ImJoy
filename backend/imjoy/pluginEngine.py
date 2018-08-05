@@ -19,7 +19,7 @@ except ImportError:
     from queue import Queue, Empty  # python 3.x
 
 NAME_SPACE = '/'
-sio = socketio.AsyncServer(ping_timeout=20)
+sio = socketio.AsyncServer()
 app = web.Application()
 sio.attach(app)
 
@@ -27,6 +27,7 @@ print("Now you can run Python plugins from https://imjoy.io ")
 
 plugins = {}
 plugin_cids = {}
+plugin_sids = {}
 clients = {}
 clients_sids = {}
 
@@ -54,7 +55,7 @@ async def on_init_plugin(sid, kwargs):
             clients[client_id].append(sid)
         else:
             clients[client_id] = [sid]
-    secretKey = ''.join(random.choices(string.ascii_uppercase + string.digits, k=10))
+
     pid = kwargs['id']
     config = kwargs.get('config', {})
     env = config.get('env', None)
@@ -62,12 +63,16 @@ async def on_init_plugin(sid, kwargs):
     pname = config.get('name', None)
     requirements = config.get('requirements', []) or []
 
+    if pid in plugins:
+        print('plugin already initialized: ', pid)
+        await sio.emit('message_from_plugin_'+pid, {"type": "initialized", "dedicatedThread": True})
+        return {'success': True, 'secret': plugins[pid]['secret']}
+
     env_name = None
     is_py2 = False
 
     if env is not None:
         try:
-
             if 'python=2' in env:
                 is_py2 = True
             parms = shlex.split(env)
@@ -109,7 +114,8 @@ async def on_init_plugin(sid, kwargs):
         await sio.emit('message_from_plugin_'+pid,  {"type": "executeFailure", "error": "failed to install requirements."})
         raise
 
-    plugins[pid] = {'secret': secretKey, 'id': pid, 'client_id': client_id}
+    secretKey = ''.join(random.choices(string.ascii_uppercase + string.digits, k=10))
+    plugins[pid] = {'secret': secretKey, 'id': pid, 'name': config['name'], 'type': config['type'], 'client_id': client_id}
     if client_id in plugin_cids:
         plugin_cids[client_id].append(plugins[pid])
     else:
@@ -119,6 +125,12 @@ async def on_init_plugin(sid, kwargs):
     async def message_from_plugin(sid, kwargs):
         # print('forwarding message_'+secretKey, kwargs)
         if kwargs['type'] in ['initialized', 'importSuccess', 'importFailure', 'executeSuccess', 'executeFailure']:
+            try:
+                plugin_sids[sid] = plugins[pid]
+            except Exception as e:
+                print(plugin_sids, plugins)
+                raise
+
             await sio.emit('message_from_plugin_'+pid,  kwargs)
         else:
             await sio.emit('message_from_plugin_'+pid, {'type': 'message', 'data': kwargs})
@@ -151,7 +163,7 @@ async def on_kill_plugin(sid, kwargs):
     if pid in plugins:
         await sio.emit('to_plugin_'+plugins[pid]['secret'], {'type': 'disconnect'})
         plugins[pid]['abort'].set()
-        del plugins[pid]
+        # del plugins[pid]
         print('killing plugin ' + pid)
     return {'success': True}
 
@@ -165,6 +177,7 @@ async def on_message(sid, kwargs):
         clients[cid] = [sid]
     clients_sids[sid] = cid
     print("register client: ", kwargs)
+    return {'plugins': [ {"id": p['id'], "name": p['name'], "type": p['type']} for p in plugin_cids[cid] ] if cid in plugin_cids else []}
 
 @sio.on('message', namespace=NAME_SPACE)
 async def on_message(sid, kwargs):
@@ -178,11 +191,19 @@ async def disconnect(sid):
         del clients_sids[sid]
         if cid in clients and sid in clients[cid]:
             clients[cid].remove(sid)
-        if cid in clients or len(clients[cid])==0:
-            if cid in plugin_cids:
-                for plugin in plugin_cids[cid]:
-                    await on_kill_plugin(sid, plugin)
-                del plugin_cids[cid]
+        # if cid in clients or len(clients[cid])==0:
+        #     if cid in plugin_cids:
+        #         for plugin in plugin_cids[cid]:
+        #             await on_kill_plugin(sid, plugin)
+        #         del plugin_cids[cid]
+
+    # plugin is terminating
+    if sid in plugin_sids:
+        pid = plugin_sids[sid]['id']
+        if pid in plugins:
+            del plugins[pid]
+        del plugin_sids[sid]
+
     print('disconnect ', sid)
 
 

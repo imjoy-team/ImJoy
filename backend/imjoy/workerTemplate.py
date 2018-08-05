@@ -95,6 +95,7 @@ class PluginConnection():
         self._interface = {}
         self._remote_set = False
         self._store = ReferenceStore()
+        self._executed = False
 
         @sio.on_connect()
         def sio_connect():
@@ -264,6 +265,7 @@ class PluginConnection():
                 else:
                   names.push({"name":name, "data": data})
         self.emit({'type':'setInterface', 'api': names})
+        print('----------', {'type':'setInterface', 'api': names})
 
     def _genRemoteMethod(self, name):
         def remoteMethod(*arguments):
@@ -307,15 +309,21 @@ class PluginConnection():
         elif data['type']== 'disconnect':
             sys.exit(0)
         else:
+            print(data)
             if data['type'] == 'execute':
-                type = data['code']['type']
-                content = data['code']['content']
-                try:
-                    exec(content, self._local)
+                if not self._executed:
+                    type = data['code']['type']
+                    content = data['code']['content']
+                    try:
+                        exec(content, self._local)
+                        self.emit({'type':'executeSuccess'})
+                        self._executed = True
+                    except Exception as e:
+                        print(traceback.format_exc())
+                        self.emit({'type':'executeFailure'})
+                else:
+                    print('skip execution.')
                     self.emit({'type':'executeSuccess'})
-                except Exception as e:
-                    print(traceback.format_exc())
-                    self.emit({'type':'executeFailure'})
             elif data['type'] == 'message':
                 d = data['data']
                 if d['type'] == 'getInterface':

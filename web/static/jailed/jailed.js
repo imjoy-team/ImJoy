@@ -864,12 +864,13 @@ function randId() {
      * Plugin)
      */
     Plugin.prototype._loadPlugin = function() {
-        var me = this;
-        var sCb = function() {
-            me._requestRemote();
-        }
+      this._requestRemote();
+      var me = this;
+      var sCb = function() {
+          me._requestRemote();
+      }
 
-        this._connection.importJailedScript(this._path, sCb, this._fCb);
+      this._connection.importJailedScript(this._path, sCb, this._fCb);
     }
 
 
@@ -878,13 +879,14 @@ function randId() {
      * DynamicPlugin)
      */
     DynamicPlugin.prototype._loadPlugin = function() {
-        var me = this;
-        var sCb = function() {
-            me._requestRemote();
-        }
-        this._connection.execute({type: 'script', content: this.config.script, lang: this.config.lang}, sCb, this._fCb);
-        if(this.config.style) this._connection.execute({type: 'style', content: this.config.style}, sCb, this._fCb);
-        if(this.config.window) this._connection.execute({type: 'html', content: this.config.window}, sCb, this._fCb);
+      var me = this;
+      var sCb = function() {
+          me._requestRemote();
+      }
+      this._connection.execute({type: 'script', content: this.config.script, lang: this.config.lang}, sCb, this._fCb);
+      if(this.config.style) this._connection.execute({type: 'style', content: this.config.style}, sCb, this._fCb);
+      if(this.config.window) this._connection.execute({type: 'html', content: this.config.window}, sCb, this._fCb);
+
     }
 
 
