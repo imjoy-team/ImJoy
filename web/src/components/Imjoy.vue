@@ -757,20 +757,20 @@ export default {
       const code = pconfig.code
       const template = this.parsePluginCode(code, {})
       template.code = code
-      template._id = template.name
+      template._id = template.name.replace(/ /g, '_')
       const addPlugin = () => {
         this.db.put(template, {
           force: true
         }).then((result) => {
           console.log('Successfully installed!');
-          this.api.show(template.name + ' has been sucessfully saved.')
+          this.show(template.name + ' has been sucessfully saved.')
         }).catch((err) => {
-          this.api.show('failed to save the plugin.')
+          this.show('failed to save the plugin.')
           console.error(err)
         })
       }
       // remove if exists
-      this.db.get(template.name).then((doc) => {
+      this.db.get(template._id).then((doc) => {
         return this.db.remove(doc);
       }).then((result) => {
         addPlugin()
@@ -982,9 +982,9 @@ export default {
       }).then((result) => {
         console.log('Successfully saved!');
         this.workflow_list.push(data)
-        this.api.show(name + ' has been sucessfully saved.')
+        this.show(name + ' has been sucessfully saved.')
       }).catch((err) => {
-        this.api.show('failed to save the workflow.')
+        this.show('failed to save the workflow.')
         console.error(err)
         alert('error occured: ' + err.toString())
       })
@@ -1004,9 +1004,9 @@ export default {
           this.workflow_list.splice(index, 1);
         }
         console.log('Successfully removed!');
-        this.api.show(name + ' has been sucessfully removed.')
+        this.show(name + ' has been sucessfully removed.')
       }).catch((err) => {
-        this.api.show('failed to remove the workflow.')
+        this.show('failed to remove the workflow.')
         console.error(err)
         alert('error occured: ' + err.toString())
       })
