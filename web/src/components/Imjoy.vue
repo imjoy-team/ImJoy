@@ -947,6 +947,7 @@ export default {
           my.type = 'imjoy/generic'
           my.config = my.data
           my.data = my.target
+          my.variables = my.target && my.target._variables
           this.createWindow(my)
         }
         this.progress = 100
@@ -1012,6 +1013,7 @@ export default {
           my.type = 'imjoy/generic'
           my.config = my.data
           my.data = my.target
+          my.variables = my.target && my.target._variables
           this.createWindow(my)
         }
         this.progress = 100
@@ -1226,7 +1228,8 @@ export default {
                   type: my.op.type
                 },
                 config: my.data,
-                data: my.target
+                data: my.target,
+                variables: my.target && my.target._variables
               })
               my.data = result && result.config
               my.target = result && result.data
