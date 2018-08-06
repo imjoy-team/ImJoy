@@ -73,13 +73,13 @@ function randId() {
      * all future subscibed listeners will be immideately issued
      * instead of being stored)
      */
-    Whenable.prototype.emit = function(){
+    Whenable.prototype.emit = function(e){
         if (!this._emitted) {
             this._emitted = true;
 
             var handler;
             while(handler = this._handlers.pop()) {
-                setTimeout(handler,0);
+                setTimeout(handler.bind(null, e),0);
             }
         }
     }
@@ -602,7 +602,7 @@ function randId() {
                 me._executeSCb();
                 break;
             case 'executeFailure':
-                me._executeFCb();
+                me._executeFCb(m.error);
                 break;
             }
         });
@@ -792,8 +792,9 @@ function randId() {
         var me = this;
 
         // binded failure callback
-        this._fCb = function(){
-            me._fail.emit();
+        this._fCb = function(error){
+            console.error('execute failure:', error);
+            me._fail.emit(error);
             me.disconnect();
         }
         this._connection = new Connection(this.id, this.mode, this.config);
