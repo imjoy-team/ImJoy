@@ -602,7 +602,7 @@ function randId() {
                 me._executeSCb();
                 break;
             case 'executeFailure':
-                me._executeFCb();
+                me._executeFCb(m.error);
                 break;
             }
         });
@@ -792,7 +792,8 @@ function randId() {
         var me = this;
 
         // binded failure callback
-        this._fCb = function(){
+        this._fCb = function(error){
+            console.error('execute failure:', error);
             me._fail.emit();
             me.disconnect();
         }

@@ -3,14 +3,17 @@ import logging
 import time
 import os
 import sys
+import six
 import gevent
 import random
 import traceback
 from inspect import isfunction
 from gevent import monkey;
-import six
 monkey.patch_socket()
 
+logging.basicConfig()
+logger = logging.getLogger('plugin')
+logger.setLevel(logging.INFO)
 # import logging
 # logging.basicConfig(level=logging.DEBUG)
 
@@ -187,8 +190,7 @@ class PluginConnection():
                     else:
                         bObject = np.array(aObject['__value__'], aObject['__dtype__']).reshape(aObject['__shape__'])
                 except Exception as e:
-                    print('Error in converting: '+str(e), aObject)
-                    sys.stdout.flush()
+                    logger.debug('Error in converting: %s, %s', e, aObject)
                     # try:
                     #     tf = self._local['tf']
                     #     bObject = tf.Tensor(aObject['__value__'], aObject['__shape__'], aObject['__dtype__'])
@@ -302,7 +304,6 @@ class PluginConnection():
         return _remote
 
     def sio_plugin_message(self, data):
-        # sys.stdout.flush()
         if data['type']== 'import':
             self.emit({'type':'importSuccess', 'url': data['url']})
         elif data['type']== 'disconnect':
@@ -317,10 +318,10 @@ class PluginConnection():
                         self.emit({'type':'executeSuccess'})
                         self._executed = True
                     except Exception as e:
-                        print(traceback.format_exc())
-                        self.emit({'type':'executeFailure'})
+                        logger.info('error during execution: %s', traceback.format_exc())
+                        self.emit({'type':'executeFailure', 'error': str(e)})
                 else:
-                    print('skip execution.')
+                    logger.debug('skip execution.')
                     self.emit({'type':'executeSuccess'})
             elif data['type'] == 'message':
                 d = data['data']
@@ -345,20 +346,18 @@ class PluginConnection():
                                 result = method(*args)
                                 resolve(result)
                             except Exception as e:
-                                print(traceback.format_exc())
+                                logger.info('error in method %s, %s: %s', d['name'], d['args'], traceback.format_exc())
                                 reject(e)
                         else:
                             try:
                                 args = self._unwrap(d['args'], True)
                                 method(*args)
                             except Exception as e:
-                                print(traceback.format_exc())
-                                print(e)
+                                logger.info('error in method %s %s: %s', d['name'], d['args'], traceback.format_exc())
                     else:
                         raise Exception('method '+d['name'] +' is not found.')
                 elif d['type'] == 'callback':
                     method = self._store.fetch(d['id'])[d['num']]
-
                     if 'promise' in d:
                         resolve, reject = self._unwrap(d['promise'], False)
                         try:
@@ -366,15 +365,14 @@ class PluginConnection():
                             result = method(*args)
                             resolve(result)
                         except Exception as e:
-                            print(traceback.format_exc())
+                            logger.info('error in method %s, %s: %s', d['id'], d['args'], traceback.format_exc())
                             reject(e)
                     else:
                         try:
                             args = self._unwrap(d['args'], True)
                             method(*args)
                         except Exception as e:
-                            print(traceback.format_exc(), method)
-                            print(e)
+                            logger.info('error in method %s, %s: %s', d['id'], d['args'], traceback.format_exc())
                 sys.stdout.flush()
 
 if __name__ == "__main__":

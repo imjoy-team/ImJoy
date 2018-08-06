@@ -4,7 +4,7 @@ if sys.version_info < (3,0):
 
 from setuptools import setup, find_packages
 setup(name='imjoy',
-      version='0.1.4',
+      version='0.1.5',
       description='Python plugin engine for ImJoy.io',
       url='http://github.com/oeway/ImJoy',
       author='Wei OUYANG',

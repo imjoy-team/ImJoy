@@ -12,6 +12,8 @@ import signal
 import random
 import string
 import shlex
+import logging
+
 from subprocess import Popen, PIPE, STDOUT
 try:
     from Queue import Queue, Empty
@@ -23,7 +25,11 @@ sio = socketio.AsyncServer()
 app = web.Application()
 sio.attach(app)
 
-print("Now you can run Python plugins from https://imjoy.io ")
+logging.basicConfig()
+logger = logging.getLogger('PluginEngine')
+logger.setLevel(logging.INFO)
+
+logger.info("Now you can run Python plugins from https://imjoy.io ")
 
 plugins = {}
 plugin_cids = {}
@@ -40,11 +46,11 @@ template_script = os.path.join(script_dir, 'workerTemplate.py')
 
 @sio.on('connect', namespace=NAME_SPACE)
 def connect(sid, environ):
-    print("connect ", sid)
+    logger.info("connect %s", sid)
 
 @sio.on('init_plugin', namespace=NAME_SPACE)
 async def on_init_plugin(sid, kwargs):
-    print("init_plugin: ", kwargs)
+    logger.info("initialize the plugin: "+str(kwargs))
     sys.stdout.flush()
     if sid in clients_sids:
         client_id = clients_sids[sid]
@@ -68,7 +74,7 @@ async def on_init_plugin(sid, kwargs):
             plugin_cids[client_id].append(plugins[pid])
         else:
             plugin_cids[client_id] = [plugins[pid]]
-        print('plugin already initialized: ', pid)
+        logger.debug('plugin already initialized: %s', pid)
         await sio.emit('message_from_plugin_'+pid, {"type": "initialized", "dedicatedThread": True})
         return {'success': True, 'secret': plugins[pid]['secret']}
 
@@ -91,12 +97,12 @@ async def on_init_plugin(sid, kwargs):
             if '-y' not in parms:
                 env = env.replace('create', 'create -y')
 
-            print('creating environment: ' + env)
+            logger.info('creating environment: %s', env)
             if env not in cmd_history:
                 os.system(env)
                 cmd_history.append(env)
             else:
-                print('skip command: '+ env)
+                logger.debug('skip command: %s', env)
         except Exception as e:
             await sio.emit('message_from_plugin_'+pid,  {"type": "executeFailure", "error": "failed to create environment."})
             raise
@@ -108,12 +114,12 @@ async def on_init_plugin(sid, kwargs):
     if env_name is not None:
         cmd = "source activate "+env_name + " || activate "+env_name + " && " + cmd
     try:
-        print('installing requirements: ' + pip_cmd)
+        logger.info('installing requirements: %s', pip_cmd)
         if pip_cmd not in cmd_history:
             os.system(pip_cmd)
             cmd_history.append(pip_cmd)
         else:
-            print('skip command: '+ pip_cmd)
+            logger.debug('skip command: %s', pip_cmd)
     except Exception as e:
         await sio.emit('message_from_plugin_'+pid,  {"type": "executeFailure", "error": "failed to install requirements."})
         raise
@@ -132,7 +138,7 @@ async def on_init_plugin(sid, kwargs):
             if pid in plugins:
                 plugin_sids[sid] = plugins[pid]
             await sio.emit('message_from_plugin_'+pid,  kwargs)
-            print(pid, kwargs)
+            logger.debug('message from %s: %s', pid, kwargs)
         else:
             await sio.emit('message_from_plugin_'+pid, {'type': 'message', 'data': kwargs})
 
@@ -141,8 +147,7 @@ async def on_init_plugin(sid, kwargs):
         # print('forwarding message_to_plugin_'+pid, kwargs)
         if kwargs['type'] == 'message':
             await sio.emit('to_plugin_'+secretKey, kwargs['data'])
-        else:
-            print(kwargs)
+        logger.debug('message to plugin %s: %s', secretKey, kwargs)
 
     try:
         abort = threading.Event()
@@ -185,12 +190,12 @@ async def on_message(sid, kwargs):
     else:
         clients[cid] = [sid]
     clients_sids[sid] = cid
-    print("register client: ", kwargs)
+    logger.info("register client: %s", kwargs)
     return {'plugins': [ {"id": p['id'], "name": p['name'], "type": p['type']} for p in plugin_cids[cid] ] if cid in plugin_cids else []}
 
 @sio.on('message', namespace=NAME_SPACE)
 async def on_message(sid, kwargs):
-    print("message recieved: ", kwargs)
+    logger.info("message recieved: %s", kwargs)
 
 
 @sio.on('disconnect', namespace=NAME_SPACE)
@@ -219,7 +224,7 @@ async def disconnect(sid):
                     exist = p
             if exist:
                 plugin_cids[cid].remove(exist)
-    print('disconnect ', sid)
+    logger.info('disconnect %s', sid)
 
 
 async def index(request):
@@ -231,8 +236,6 @@ async def index(request):
 
 # app.router.add_static('/files', 'data-files')
 app.router.add_get('/', index)
-
-logger = logging.getLogger('task_processor')
 
 def process_output(line):
     print(line)
@@ -246,7 +249,7 @@ def execute(args, workdir, abort, name):
         args = []
     # Convert them all to strings
     args = [str(x) for x in args if str(x) != '']
-    logger.info('%s task started.' % name)
+    logger.info('%s task started.', name)
     unrecognized_output = []
     env['PYTHONPATH'] = os.pathsep.join(
         ['.', workdir, env.get('PYTHONPATH', '')] + sys.path)
@@ -254,8 +257,7 @@ def execute(args, workdir, abort, name):
     #if platform.system() == 'Windows':
         #args = ' '.join(args)
     args = ' '.join(args)
-    logger.info('Task subprocess args: {}'.format(args))
-    print('Task subprocess args: {}'.format(args))
+    logger.info('Task subprocess args: %s', args)
 
 
     # set system/version dependent "start_new_session" analogs
@@ -303,8 +305,7 @@ def execute(args, workdir, abort, name):
             if line:
                 try:
                     if not process_output(line):
-                        logger.warning('%s unrecognized output: %s' % (
-                            name, line.strip()))
+                        logger.warning('%s unrecognized output: %s' % (name, line.strip()))
                         unrecognized_output.append(line)
                 except Exception as e:
                     print('error from task:', e)
@@ -325,15 +326,14 @@ def execute(args, workdir, abort, name):
                     sigterm_time = time.time()
             if sigterm_time is not None and (time.time() - sigterm_time > sigterm_timeout):
                 p.send_signal(signal.SIGKILL)
-                logger.warning(
-                    'Sent SIGKILL to task "%s"' % name)
+                logger.warning('Sent SIGKILL to task "%s"' % name)
                 time.sleep(0.1)
     except:
         # traceback.print_exc()
         try:
             p.terminate()
         except Exception as e:
-            print('error occured during terminating a process.')
+            logger.info('error occured during terminating a process.')
         raise
     if abort.is_set():
         return False
@@ -349,10 +349,10 @@ def execute(args, workdir, abort, name):
         #         else:
         #             traceback = traceback + \
         #                 ('\n'.join(unrecognized_output))
-        print('error from task'+str(p.returncode))
+        logger.info('error from task %s', p.returncode)
         return False
     else:
-        logger.info('%s task completed.' % name)
+        logger.info('%s task completed.', name)
         return True
 
 class NonBlockingStreamReader:
