@@ -771,6 +771,7 @@ function randId() {
         }
         this.id = config.id || randId()
         this.name = config.name
+        this.type = config.type
         this.mode = config.mode || 'webworker'
         this._initialInterface = _interface||{};
         this._connect();
