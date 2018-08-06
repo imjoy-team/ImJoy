@@ -5,7 +5,7 @@ Image processing with Joy
 # Getting Started
 ## Use Imjoy for image processing
 
-Go to https://imjoy.io/#:), click the + button to install new plugins or open an image.
+Go to the [ImJoy web app](https://imjoy.io/#:\)), click the + button to install new plugins or open an image.
 
 When images is opened in the workspace, you need to first click the title bar of the window to select an active window, then click on the plugin menu to run the plugin.
 
