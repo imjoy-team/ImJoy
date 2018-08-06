@@ -94,7 +94,7 @@ update the progress bar on the Imjoy GUI, example: `api.showProgress(85)`
 ## `api.showStatus`
 update the status text on the Imjoy GUI, example: `api.showStatus('processing...')`
 ## `api.run`
-run another plugin by the plugin type, example: `api.run("image/processing", my)`
+run another plugin by the plugin name, example: `api.run("Python Demo Plugin")`
 
 
 
@@ -187,7 +187,7 @@ api.export(PythonPlugin())
 
 ## TODO: Use Docker Containers
  **Not supported yet**
- 
+
  Python plugin can also be ran with Docker.
  Examples:
   * If you want to run your plugin with tensorflow docker, you need to add the following fields to your `<config>`:

@@ -372,7 +372,7 @@ export default {
         h: 5
       },
       plugins: {},
-      plugin_types: {},
+      plugin_names: {},
       registered: {
         ops: {},
         windows: {},
@@ -541,7 +541,7 @@ export default {
       }
     }
     this.plugins = null
-    this.plugin_types = null
+    this.plugin_names = null
     this.disconnectEngine()
   },
   methods: {
@@ -686,7 +686,7 @@ export default {
               if(plugin.type == pconfig.type || plugin.name == pconfig.name){
                   try {
                     delete this.plugins[k]
-                    delete this.plugin_types[pconfig.type]
+                    delete this.plugin_names[pconfig.name]
                     Joy.remove(pconfig.type)
                     console.log('terminating ',plugin)
                     if (typeof plugin.terminate == 'function') {
@@ -703,7 +703,7 @@ export default {
 
         if (pconfig.plugin && pconfig.plugin.id){
           if(this.plugins[pconfig.plugin.id]){
-            delete this.plugin_types[this.plugins[pconfig.plugin.id].type]
+            delete this.plugin_names[this.plugins[pconfig.plugin.id].name]
             delete this.plugins[pconfig.plugin.id]
           }
         }
@@ -790,14 +790,14 @@ export default {
                 console.error(e)
               } finally {
                 this.plugins[k] = null
-                this.plugin_types[plugin.type] = null
+                this.plugin_names[plugin.name] = null
               }
             }
           }
         }
       }
       this.plugins = {}
-      this.plugin_types = {}
+      this.plugin_names = {}
       this.db.allDocs({
         include_docs: true,
         attachments: true,
@@ -1123,7 +1123,7 @@ export default {
           mode: template.mode
         }
         this.plugins[plugin.id] = plugin
-        this.plugin_types[plugin.type] = plugin
+        this.plugin_names[plugin.name] = plugin
         config.force_show = false
         plugin.api = {
           run: (my) => {
@@ -1170,7 +1170,7 @@ export default {
             throw 'error occured when loading plugin.'
           }
           this.plugins[plugin.id] = plugin
-          this.plugin_types[plugin.type] = plugin
+          this.plugin_names[plugin.name] = plugin
           if (template.type) {
             this.register(template, {
               id: plugin.id
@@ -1202,14 +1202,26 @@ export default {
         });
       })
     },
-    async runPlugin(plugin_type, my, _plugin) {
-      const target_plugin = this.plugin_types[plugin_type]
+    async runPlugin(plugin_name, my, _plugin) {
+      let source_plugin
+      if(_plugin && _plugin.id){
+        source_plugin = this.plugins[_plugin.id]
+      }
+      else{
+        source_plugin = this.plugins[my.id]
+        my = null
+      }
+      const target_plugin = this.plugin_names[plugin_name]
       if(target_plugin){
         my = my || {}
+        my.op = {type: source_plugin.type, name:source_plugin.name}
+        my.config = my.config || {}
+        my.data = my.data || {}
+        my.variables = my.variables || {}
         return await target_plugin.api.run(my)
       }
       else{
-        throw 'plugin with type '+plugin_type+ ' not found.'
+        throw 'plugin with type '+plugin_name+ ' not found.'
       }
     },
     register(config, _plugin) {
