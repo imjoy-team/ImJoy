@@ -2,6 +2,101 @@
 
 Image processing with Joy
 
+# Getting Started
+## Use Imjoy for image processing
+
+Go to https://imjoy.io/#:), click the + button to install new plugins or open an image.
+
+When images is opened in the workspace, you need to first click the title bar of the window to select an active window, then click on the plugin menu to run the plugin.
+
+# Develop Plugins
+Click the + button and select the plugin dropdown option, then create a plugin.
+
+Plugins can be written in Javascript or Python, a minimal plugin needs to implement two functions: `setup()` and `run(my)`.
+## The `<config>` tag
+
+```json
+{
+  "name": "Untitled Plugin",
+  "type": "image/processing",
+  "mode": "webworker",
+  "tags": ["op", "image"],
+  "ui": "image processing",
+  "version": "0.1.0",
+  "api_version": "0.1.0",
+  "url": "",
+  "description": "A plugin for image processing.",
+  "icon": "extension",
+  "inputs": null,
+  "outputs": null,
+  "dependencies": []
+}
+```
+
+## The `<script>` tag
+
+### `setup()` function
+`setup` function used to get the plugin prepared for running, it will be exectued when the plugin during initialization.
+
+### `run(my)` function
+`run` function will be called each time a user click on the menu or the container workflow is executed. While executed, an object(for Javascript) or a dictionary(for Python) called `my` will be passed into the function. The plugin can use variables stored in `my`.
+
+Here are the variables stored in `my`:
+ * `my['op']`
+ Give information about which op is executed, the plugin can use `my['op']['type']` to determine the op by its type.
+ * `my['config']`
+ The config values from the user interface defined with the `ui` string (from the plugin config or `api.register`).
+ * `my['data']`
+ It stores the data from current active window while running the plugin.
+ * `my['variables']`
+ When the plugin is executed in a workflow, variables setted in the workflow will be passed as `my['variables']`.
+
+### Javascript example
+```javascript
+class UntitledPlugin {
+  async setup() {
+    //await importScripts("http://xxxx/xxx.js")
+  }
+
+  run(my) {
+    console.log('running in the plugin ', my)
+
+  }
+}
+api.export(new UntitledPlugin())
+```
+
+### Python example
+```python
+import numpy as np
+class PythonPlugin():
+  def setup(self):
+    print('setup in python')
+
+  def run(self, my):
+    print('hello world.')
+    return my
+
+api.export(PythonPlugin())
+```
+
+# Plugin API
+## `api.alert`
+show alert dialog with message, example: `api.alert('hello world')`
+## `api.register`
+register an new op.
+## `createWindow`
+create an new window and add to the workspace.
+## `api.showDialog`
+show an dialog with customized GUI.
+## `api.showProgress`
+update the progress bar on the Imjoy GUI, example: `api.showProgress(85)`
+## `api.showStatus`
+update the status text on the Imjoy GUI, example: `api.showStatus('processing...')`
+## `api.run`
+run another plugin by the plugin type, example: `api.run("image/processing", my)`
+
+
 
 # Use Python Plugin Engine
 
