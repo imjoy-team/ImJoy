@@ -91,7 +91,8 @@ api.export(PythonPlugin())
   **Note 2**: in the `env` field, you need to use `-n XXXX` to name your environment, otherwise, it will use the plugin name to name the environment.
 
 ## TODO: Use Docker Containers
-
+ **Not supported yet**
+ 
  Python plugin can also be ran with Docker.
  Examples:
   * If you want to run your plugin with tensorflow docker, you need to add the following fields to your `<config>`:
