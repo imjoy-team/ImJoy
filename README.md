@@ -2,13 +2,33 @@
 
 Image processing with Joy
 
+# Key Features
+ * Serverless solution with offline-first design
+ * Easy-to-use workflow composition
+ * Extendable with plugin interface
+  * Support Python and Javascript
+  * Plugins are isolated with secured sandboxes
+  * Built-in code editor, no extra IDEs or tools are needed
+  * Support virtual environment and pip packages for Python
+  * Support libraries hosted on Github or CDNs for javascript
+ * Native support for Deep Learning
+  * Use ndarrays or tensors for data exchange
+  * Support Tensorflow.js and native Tensorflow
+
+
+
 # Use Imjoy for image processing
+
+![imjoy-screenshot](./docs/img/imjoy-screenshot.png)
 
 Go to the [ImJoy web app](https://imjoy.io/#/:\)), click the + button to install new plugins or open an image.
 
 When images is opened in the workspace, you need to first click the title bar of the window to select an active window, then click on the plugin menu to run the plugin.
 
 # Developing Plugins for ImJoy
+
+![imjoy-code-screenshot](./docs/img/imjoy-code-screenshot.png)
+
 Click the + button and select the plugin dropdown option, then create a plugin.
 
 Plugins can be written in Javascript or Python, a minimal plugin needs to implement two functions: `setup()` and `run(my)`.
