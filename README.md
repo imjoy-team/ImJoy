@@ -37,7 +37,6 @@ Plugins can be written in Javascript or Python, a minimal plugin needs to implem
 ```json
 {
   "name": "Untitled Plugin",
-  "type": "image/processing",
   "mode": "webworker",
   "tags": ["op", "image"],
   "ui": "image processing",
@@ -139,7 +138,6 @@ Here is a python `hello world` example:
 <config>
 {
   "name": "Python Hello World Plugin",
-  "type": "demo/hello-world",
   "mode": "pyworker",
   "version": "0.1.0",
   "api_version": "0.1.1",

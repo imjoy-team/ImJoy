@@ -1114,6 +1114,7 @@ export default {
           config.style = null
         }
       }
+      config.type = config.type || config.name
       config._id = config._id || null
       config.url = url
       config.code = code
@@ -1259,6 +1260,7 @@ export default {
     register(config, _plugin) {
       try {
         const plugin = this.plugins[_plugin.id]
+        config.type = config.type || config.name
         config.mode = config.mode || 'webworker'
         config.show_panel = config.show_panel || false
         console.log('registering op', config)

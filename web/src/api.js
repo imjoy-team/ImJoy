@@ -8,13 +8,11 @@ Describe your plugin here.
 <config>
 {
   "name": "Untitled Plugin",
-  "type": "image/processing",
   "mode": "webworker",
   "tags": ["op", "image"],
   "ui": "image processing",
   "version": "0.1.0",
   "api_version": "0.1.0",
-  "url": "",
   "description": "A plugin for image processing.",
   "icon": "extension",
   "inputs": null,
@@ -48,13 +46,11 @@ Describe your plugin here.
 <config>
 {
   "name": "Untitled Plugin",
-  "type": "image/display",
   "mode": "iframe",
   "tags": ["op", "window"],
   "ui": "image display with iframe",
   "version": "0.1.0",
   "api_version": "0.1.0",
-  "url": "",
   "description": "A plugin for image display.",
   "icon": "extension",
   "inputs": null,
@@ -88,7 +84,6 @@ Describe your plugin here.
 <config>
 {
   "name": "Untitled Plugin",
-  "type": "image/processing",
   "mode": "pyworker",
   "version": "0.1.0",
   "api_version": "0.1.1",

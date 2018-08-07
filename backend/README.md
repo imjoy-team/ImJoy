@@ -9,15 +9,14 @@
   * Run `python -m imjoy` in a terminal and keep the window running.
   * Go to https://imjoy.io, connect to the plugin engine
   * Now you can start to use plugins written in Python
- 
-For plugin developers, you can create a python plugin within the browser. 
+
+For plugin developers, you can create a python plugin within the browser.
 
 Here is a python `hello world` example:
 ```html
 <config>
 {
   "name": "Python Hello World Plugin",
-  "type": "demo/hello-world",
   "mode": "pyworker",
   "version": "0.1.0",
   "api_version": "0.1.1",
