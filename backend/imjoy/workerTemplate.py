@@ -319,7 +319,7 @@ class PluginConnection():
                         self._executed = True
                     except Exception as e:
                         logger.info('error during execution: %s', traceback.format_exc())
-                        self.emit({'type':'executeFailure', 'error': str(e)})
+                        self.emit({'type':'executeFailure', 'error': repr(e)})
                 else:
                     logger.debug('skip execution.')
                     self.emit({'type':'executeSuccess'})
