@@ -57,8 +57,8 @@ class UntitledPlugin {
     console.log('setup in python');
   }
 
-  run(my) {
-    console.log('hello world.')
+  async run(my) {
+    console.log('hello world.');
     return my
   }
 }
