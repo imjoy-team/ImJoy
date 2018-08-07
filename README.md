@@ -55,20 +55,20 @@ Here are the variables stored in `my`:
 ```javascript
 class UntitledPlugin {
   async setup() {
-    //await importScripts("http://xxxx/xxx.js")
+    console.log('setup in python');
   }
 
   run(my) {
-    console.log('running in the plugin ', my)
-
+    console.log('hello world.')
+    return my
   }
 }
+
 api.export(new UntitledPlugin())
 ```
 
 ### Python example
 ```python
-import numpy as np
 class PythonPlugin():
   def setup(self):
     print('setup in python')
@@ -84,17 +84,17 @@ api.export(PythonPlugin())
 ## `api.alert`
 show alert dialog with message, example: `api.alert('hello world')`
 ## `api.register`
-register an new op.
-## `createWindow`
-create an new window and add to the workspace.
+register a new op.
+## `api.createWindow`
+create a new window and add to the workspace.
 ## `api.showDialog`
-show an dialog with customized GUI.
+show a dialog with customized GUI.
 ## `api.showProgress`
 update the progress bar on the Imjoy GUI, example: `api.showProgress(85)`
 ## `api.showStatus`
 update the status text on the Imjoy GUI, example: `api.showStatus('processing...')`
 ## `api.run`
-run another plugin by the plugin name, example: `api.run("Python Demo Plugin")`
+run another plugin by the plugin name, example: `api.run("Python Demo Plugin")` or `api.run("Python Demo Plugin", my)`
 
 
 
