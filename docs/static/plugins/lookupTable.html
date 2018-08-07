@@ -19,7 +19,6 @@ class LookupTablePlugin {
   setup() {
     api.register({
       name: "apply LUT",
-      type: "image/LUT",
       tags: ["image", "op", "LUT"],
       inputs: {"image":"image/grayscale"},
       outputs: {"image":"image/color"},
