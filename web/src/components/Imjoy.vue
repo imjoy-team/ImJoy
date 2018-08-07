@@ -1175,6 +1175,7 @@ export default {
       })
     },
     loadPlugin(template, rplugin) {
+      this.status_text = ''
       template = _clone(template)
       //generate a random id for the plugin
       return new Promise((resolve, reject) => {
