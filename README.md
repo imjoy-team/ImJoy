@@ -54,12 +54,12 @@ Here are the variables stored in `my`:
 ```javascript
 class UntitledPlugin {
   async setup() {
-    console.log('setup in python');
+    console.log('initialized from Javascript.');
   }
 
   async run(my) {
     console.log('hello world.');
-    return my
+    return my;
   }
 }
 
@@ -70,7 +70,7 @@ api.export(new UntitledPlugin())
 ```python
 class PythonPlugin():
   def setup(self):
-    print('setup in python')
+    print('initialized from python.')
 
   def run(self, my):
     print('hello world.')
