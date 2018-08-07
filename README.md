@@ -42,7 +42,7 @@ Plugins can be written in Javascript or Python, a minimal plugin needs to implem
 
 Here are the variables stored in `my`:
  * `my['op']`
- Give information about which op is executed, the plugin can use `my['op']['type']` to determine the op by its type.
+ Give information about which op is executed, the plugin can use `my['op']['type']` to determine the op by its type, or use `my['op']['name']` to determine the op by its name.
  * `my['config']`
  The config values from the user interface defined with the `ui` string (from the plugin config or `api.register`).
  * `my['data']`
