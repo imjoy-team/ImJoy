@@ -81,19 +81,22 @@ api.export(PythonPlugin())
 ```
 
 # Plugin API
-## `api.alert`
+
+Within the plugin, there is a variable called `api` which exposes a set of internal functions which can be used by the plugin to interact with the GUI, talk with another plugin etc.
+
+## `api.alert(...)`
 show alert dialog with message, example: `api.alert('hello world')`
-## `api.register`
+## `api.register(...)`
 register a new op.
-## `api.createWindow`
+## `api.createWindow(...)`
 create a new window and add to the workspace.
-## `api.showDialog`
+## `api.showDialog(...)`
 show a dialog with customized GUI.
-## `api.showProgress`
+## `api.showProgress(...)`
 update the progress bar on the Imjoy GUI, example: `api.showProgress(85)`
-## `api.showStatus`
+## `api.showStatus(...)`
 update the status text on the Imjoy GUI, example: `api.showStatus('processing...')`
-## `api.run`
+## `api.run(...)`
 run another plugin by the plugin name, example: `api.run("Python Demo Plugin")` or `api.run("Python Demo Plugin", my)`
 
 
