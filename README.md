@@ -6,14 +6,14 @@ Image processing with Joy
  * Serverless solution with offline-first design
  * Easy-to-use workflow composition
  * Extendable with plugin interface
-  * Support Python and Javascript
-  * Plugins are isolated with secured sandboxes
-  * Built-in code editor, no extra IDEs or tools are needed
-  * Support virtual environment and pip packages for Python
-  * Support libraries hosted on Github or CDNs for javascript
+   - Support Python and Javascript
+   - Plugins are isolated with secured sandboxes
+   - Built-in code editor, no extra IDEs or tools are needed
+   - Support virtual environment and pip packages for Python
+   - Support libraries hosted on Github or CDNs for javascript
  * Native support for Deep Learning
-  * Use ndarrays or tensors for data exchange
-  * Support Tensorflow.js and native Tensorflow
+   - Use ndarrays or tensors for data exchange
+   - Support Tensorflow.js and native Tensorflow
 
 
 
