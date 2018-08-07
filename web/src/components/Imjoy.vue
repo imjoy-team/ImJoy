@@ -379,9 +379,9 @@ export default {
         extensions: {}
       },
       plugin_templates: {
-        "PyWorker(Python)": PYWORKER_PLUGIN_TEMPLATE,
         "Webworker(Javascript)": WEBWORKER_PLUGIN_TEMPLATE,
         "Iframe(Javascript and HTML)": WEBWORKER_PLUGIN_TEMPLATE,
+        "PyWorker(Python)": PYWORKER_PLUGIN_TEMPLATE,
       },
       updating_workflow: false,
       installed_plugins: [],
@@ -521,7 +521,7 @@ export default {
         auto_compaction: true
       })
 
-      this.connectEngine(this.engine_url)
+      this.connectEngine(this.engine_url, true)
 
     }).then(() => {
       this.reloadPlugins()
@@ -574,7 +574,7 @@ export default {
       this.snackbar_duration = duration || 3000
       this.show_snackbar = true
     },
-    connectEngine(url) {
+    connectEngine(url, auto) {
       if (this.socket) {
         this.socket.disconnect()
       }
@@ -583,7 +583,7 @@ export default {
       const timer = setTimeout(() => {
         if (socket) {
           this.engine_status = 'Error: connection timeout, please make sure you have started the plugin engine.'
-          this.show('Error: connection timeout, please make sure you have started the plugin engine.', 5000)
+          if(!auto) this.show('Error: connection timeout, please make sure you have started the plugin engine.', 5000)
           socket.disconnect()
         }
       }, 3000)
@@ -600,6 +600,7 @@ export default {
         })
         this.show('Plugin Engine connected.')
         this.store.event_bus.$emit('engine_connected', d)
+        this.reloadPythonPlugins()
       })
       socket.on('disconnect', () => {
         console.log('plugin engine disconnected.')
@@ -609,6 +610,7 @@ export default {
         this.socket = null
         this.pluing_context.socket = null
         // this.pluing_context.socket = null
+        this.removePythonPlugins()
       });
       this.socket = socket
 
@@ -678,6 +680,7 @@ export default {
 
     },
     reloadPlugin(pconfig) {
+      console.error(pconfig)
       return new Promise((resolve, reject) => {
         if(pconfig.type){
           for (let k in this.plugins) {
@@ -707,7 +710,8 @@ export default {
             delete this.plugins[pconfig.plugin.id]
           }
         }
-        if (pconfig.type)
+
+        if (pconfig.plugin && pconfig.plugin.type)
           Joy.remove(pconfig.plugin.type)
 
         if (pconfig.plugin && pconfig.plugin.terminate) {
@@ -763,7 +767,7 @@ export default {
           force: true
         }).then((result) => {
           console.log('Successfully installed!');
-          this.show(template.name + ' has been sucessfully saved.')
+          this.show(`${template.name } has been sucessfully saved.`)
         }).catch((err) => {
           this.show('failed to save the plugin.')
           console.error(err)
@@ -777,6 +781,33 @@ export default {
       }).catch((err) => {
         addPlugin()
       });
+    },
+    reloadPythonPlugins(){
+      for(let p of this.installed_plugins){
+        if(p.mode == 'pyworker'){
+          this.reloadPlugin(p)
+        }
+      }
+    },
+    removePythonPlugins(){
+      for (let k in this.plugins) {
+        if (this.plugins.hasOwnProperty(k)) {
+          const plugin = this.plugins[k]
+          if(plugin.mode == 'pyworker'){
+            try {
+              delete this.plugins[k]
+              delete this.plugin_names[plugin.config.name]
+              Joy.remove(plugin.config.type)
+              console.log('terminating ',plugin)
+              if (typeof plugin.terminate == 'function') {
+                plugin.terminate()
+              }
+            } catch (e) {
+
+            }
+          }
+        }
+      }
     },
     reloadPlugins() {
       if (this.plugins) {
@@ -828,7 +859,7 @@ export default {
               }
             } catch (e) {
               console.error(e)
-              alert('error occured when loading plugin "' + config.name + '": ' + e.toString())
+              alert(`Error occured when loading plugin "${config.name}": ${e.toString()}` )
             }
           }
         }
