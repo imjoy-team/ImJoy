@@ -2,6 +2,8 @@
 
 Image processing with Joy
 
+<img src="https://github.com/oeway/ImJoy/raw/master/docs/img/imjoy-screenshot.png" width="600px"></img>
+
 # Key Features
  * Serverless solution with offline-first design
  * Easy-to-use workflow composition
@@ -21,12 +23,10 @@ Image processing with Joy
 ## Basic Usage
 Go to the [ImJoy web app](https://imjoy.io/#/:\)), click the + button to install new plugins or open an image.
 
-When images is opened in the workspace, you need to first click the title bar of the window to select an active window, then click on the plugin menu to run the plugin.
+When images are opened in the workspace, you need to first click the title bar of the window to select an active window, then click on the plugin menu to run the plugin.
 
 ## Using Python Plugins
-ImJoy supports Python Plugins which can run much more computationally intensive tasks. In order to run that, it needs to connected to the Python Plugin Engine -- a small python library we developed for ImJoy (source code: https://github.com/oeway/ImJoy-Python ).
-
-In order to setup the Python Plugin Engine, following the instructions below:
+In order to use Python Plugins, please follow the instructions below:
   * Download Annaconda3 (Python3.6 version) from https://www.anaconda.com/download/ and install it.
   * Run `pip install -U git+https://github.com/oeway/ImJoy-Python#egg=imjoy` in a terminal window
   * Run `python -m imjoy` in a terminal and keep the window running.
@@ -35,12 +35,14 @@ Now you can go to the [ImJoy web app](https://imjoy.io/#/:\)), and connect to th
 
 For future usage, you just need to run `python -m imjoy` in a terminal.
 
+### How does it work?
+ImJoy supports Python Plugins which can run much more computationally intensive tasks. In order to run that, it needs to connected to the Python Plugin Engine -- a small python library we developed for ImJoy (source code: https://github.com/oeway/ImJoy-Python).
 
-![imjoy-screenshot](./docs/img/imjoy-screenshot.png | width=600)
+Under the hood, the Python Plugin Engine will be connected with the ImJoy web app through websockets, the interaction is done with remote procedure calls (RPC).
 
 # Developing Plugins for ImJoy
 
-![imjoy-code-screenshot](./docs/img/imjoy-code-screenshot.png | width=600)
+<img src="https://github.com/oeway/ImJoy/raw/master/docs/img/imjoy-code-screenshot.png" width="600px"></img>
 
 Click the + button and select the plugin dropdown option, then create a plugin.
 
