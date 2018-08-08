@@ -33,7 +33,7 @@ When images is opened in the workspace, you need to first click the title bar of
 
 ## Installation
   * Download Annaconda3 (Python3.6 version) from https://www.anaconda.com/download/ and install it.
-  * Run `pip install -U "git+https://github.com/oeway/ImJoy#egg=imjoy&subdirectory=backend"` in a terminal window
+  * Run `pip install -U "git+https://github.com/oeway/ImJoy-Python#egg=imjoy"` in a terminal window
 
 ## Usage
   * Run `python -m imjoy` in a terminal and keep the window running.
