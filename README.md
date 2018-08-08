@@ -11,6 +11,7 @@ Image processing with Joy
    - Built-in code editor, no extra IDEs or tools are needed
    - Support virtual environment and pip packages for Python
    - Support libraries hosted on Github or CDNs for javascript
+   - Github based plugin/library hosting
  * Native support for Deep Learning
    - Use ndarrays or tensors for data exchange
    - Support Tensorflow.js and native Tensorflow
