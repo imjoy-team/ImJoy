@@ -20,7 +20,7 @@
     <md-dialog-title>Getting Started with ImJoy</md-dialog-title>
     <md-dialog-content>
       <p>With the ImJoy web app, you process your images within the browser, instantly, no installation.</p>
-      <md-button class="md-raised md-primary" to=":)">Start</md-button>
+      <md-button class="md-raised md-primary" to="app">Start</md-button>
       <p>You can process your data with the Imjoy app locally and anonymously, by default, no data will be transferred to the internet (also depends on the plugin you installed).</p>
     </md-dialog-content>
     <md-dialog-actions>

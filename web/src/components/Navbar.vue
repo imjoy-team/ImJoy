@@ -15,7 +15,7 @@
               </md-button>
               <md-menu-content>
                 <md-menu-item class="md-primary md-button menu-button" v-show="$route.path != '/'" to="/">Home</md-menu-item>
-                <md-menu-item class="md-primary md-button menu-button" v-show="$route.path != '/:)'" to="/:)">Start ImJoy</md-menu-item>
+                <md-menu-item class="md-primary md-button menu-button" v-show="$route.path != '/app'" to="/app">Start ImJoy</md-menu-item>
                 <md-menu-item class="md-primary md-button menu-button" href="https://github.com/oeway/ImJoy">Source</md-menu-item>
                 <md-menu-item class="md-primary md-button menu-button" href="/static/docs/">Docs</md-menu-item>
                 <!-- <md-menu-item class="md-primary md-button menu-button" @click="shareOnTwitter">Share</md-menu-item> -->
@@ -28,7 +28,7 @@
               <md-tooltip>Home Page</md-tooltip>
             </md-button>
             &nbsp;
-            <md-button v-show="$route.path != '/:)'" class="md-accent" v-if="screenWidth>=600" to="/:)">
+            <md-button v-show="$route.path != '/app'" class="md-accent" v-if="screenWidth>=600" to="/app">
               <md-icon>mood</md-icon> ImJoy
               <md-tooltip>Start ImJoy App</md-tooltip>
             </md-button>

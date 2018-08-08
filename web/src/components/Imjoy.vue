@@ -567,7 +567,7 @@ export default {
         q = null
       }
       this.$router.push({
-        name: ':)',
+        name: 'app',
         query: q
       })
       this.$router.go()

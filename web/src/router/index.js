@@ -20,9 +20,13 @@ export default new Router({
       redirect: '/',
     },
     {
-      path: '/:)',
-      name: ':)',
+      path: '/app',
+      name: 'app',
       component: Imjoy
+    },
+    {
+      path: '/:)',
+      redirect: { name: 'app' }
     },
     {
       path: '/imjoy',

@@ -21,7 +21,7 @@ Image processing with Joy
 # Use Imjoy for image processing
 
 ## Basic Usage
-Go to the [ImJoy web app](https://imjoy.io/#/:\)), click the + button to install new plugins or open an image.
+Go to the [ImJoy web app](https://imjoy.io/#/app), click the + button to install new plugins or open an image.
 
 When images are opened in the workspace, you need to first click the title bar of the window to select an active window, then click on the plugin menu to run the plugin.
 
@@ -30,8 +30,8 @@ In order to use Python Plugins, please follow the instructions below:
   * Download Annaconda3 (Python3.6 version) from https://www.anaconda.com/download/ and install it.
   * Run `pip install -U git+https://github.com/oeway/ImJoy-Python#egg=imjoy` in a terminal window
   * Run `python -m imjoy` in a terminal and keep the window running.
-  
-Now you can go to the [ImJoy web app](https://imjoy.io/#/:\)), and connect to the Plugin Engine with the button located on the upper-right corner.
+
+Now you can go to the [ImJoy web app](https://imjoy.io/#/app), and connect to the Plugin Engine with the button located on the upper-right corner.
 
 For future usage, you just need to run `python -m imjoy` in a terminal.
 
