@@ -260,7 +260,31 @@ Engine<template>
     </md-dialog-actions>
   </md-dialog>
 
-  <md-dialog :md-active.sync="showSettingsDialog">
+  <md-dialog-prompt
+        :md-active.sync="showTokenPrompt"
+        v-model="connection_token"
+        md-title="What is the connection token?"
+        md-input-maxlength="36"
+        :md-click-outside-to-close="false"
+        md-input-placeholder="Please go to the plugin engine terminal to get the token."
+        md-confirm-text="Connect"
+        @md-confirm="connectEngine(engine_url)"/>
+
+  <md-dialog-confirm
+        :md-active.sync="showPluginEngineInfo"
+        md-title="Setup the Python Plugin Engine"
+        :md-click-outside-to-close="false"
+        md-content='If already installed the Plugin Engine, run <strong>python -m imjoy</strong> in a terminal and press <strong>Connect</strong>.<br><br>
+        If this is your first time, you need to do the following:<br>
+        &nbsp;&nbsp;Step 1. Install <a href="https://www.anaconda.com/download/" target="_blank">Anaconda (Python3.6 version)</a> <br>
+        &nbsp;&nbsp;Step 2. Run <strong>pip install -U git+https://github.com/oeway/ImJoy-Python#egg=imjoy</strong> in a terminal. <br>
+        &nbsp;&nbsp;Step 3. Run <strong>python -m imjoy</strong> in a terminal to start the engine.<br><br>
+        Once you are ready, click <strong>Connect</strong><br>'
+        md-confirm-text="Connect"
+        md-cancel-text="Cancel"
+        @md-confirm="connectEngine(engine_url)" />
+
+  <md-dialog :md-active.sync="showSettingsDialog" :md-click-outside-to-close="false">
     <md-dialog-content>
       <md-tabs>
       <md-tab id="tab-settings" md-label="General Settings">
@@ -284,7 +308,7 @@ Engine<template>
       <md-button class="md-primary" @click="showSettingsDialog=false; reloadPlugins()">OK</md-button>
     </md-dialog-actions>
   </md-dialog>
-  <md-dialog :md-active.sync="showAddPluginDialog">
+  <md-dialog :md-active.sync="showAddPluginDialog" :md-click-outside-to-close="false">
     <md-dialog-content>
       <md-subheader>Create a New Plugin</md-subheader>
       <md-button class="md-primary md-raised centered-button" @click="newPlugin(template);showAddPluginDialog=false" v-for="(template, k) in plugin_templates" :key="k">
@@ -352,6 +376,9 @@ export default {
       windows: [],
       active_windows: [],
       selected_workspace: null,
+      connection_token: null,
+      showTokenPrompt: false,
+      showPluginEngineInfo: false,
       workspace_list: [],
       workflow_list: [],
       resumable_plugins: [],
@@ -464,6 +491,7 @@ export default {
       this.client_id = 'imjoy_web_'+randId()
       localStorage.setItem("imjoy_client_id", this.client_id);
     }
+    this.connection_token = localStorage.getItem("imjoy_connection_token")
     this.plugin_api = {
       alert: alert,
       register: this.register,
@@ -585,25 +613,35 @@ export default {
       const socket = io(url);
       const timer = setTimeout(() => {
         if (socket) {
-          this.engine_status = 'Error: connection timeout, please make sure you have started the plugin engine.'
-          if(!auto) this.show('Error: connection timeout, please make sure you have started the plugin engine.', 5000)
           socket.disconnect()
+          this.engine_status = 'Plugin Engine not connected'
+          if(!auto) this.show('Error: connection timeout, please make sure you have started the plugin engine.', 5000)
+          if(!auto) this.showPluginEngineInfo = true
         }
       }, 3000)
       socket.on('connect', (d) => {
-        console.log('plugin engine connected.')
         clearTimeout(timer)
-        this.socket = socket
-        this.pluing_context.socket = socket
-        this.engine_connected = true
-        this.engine_status = 'Plugin Engine connected.'
-        socket.emit('register_client', {id: this.client_id}, (ret)=>{
-          this.resumable_plugins = []//ret.plugins
-          console.log('these python plugins can be resumed: ', ret.plugins)
+        socket.emit('register_client', {id: this.client_id, token: this.connection_token}, (ret)=>{
+          if(ret.success){
+            this.resumable_plugins = []//ret.plugins
+            this.socket = socket
+            this.pluing_context.socket = socket
+            this.engine_connected = true
+            this.engine_status = 'Plugin Engine connected.'
+            localStorage.setItem("imjoy_connection_token", this.connection_token);
+            console.log('these python plugins can be resumed: ', ret.plugins)
+            this.show('Plugin Engine connected.')
+            console.log('plugin engine connected.')
+            this.store.event_bus.$emit('engine_connected', d)
+            this.reloadPythonPlugins()
+          }
+          else{
+            socket.disconnect()
+            this.showTokenPrompt = true
+            console.error('failed to connect.')
+          }
         })
-        this.show('Plugin Engine connected.')
-        this.store.event_bus.$emit('engine_connected', d)
-        this.reloadPythonPlugins()
+
       })
       socket.on('disconnect', () => {
         console.log('plugin engine disconnected.')
@@ -1545,13 +1583,15 @@ export default {
   height: 100%;
 }
 
-.md-dialog {
+/* .md-dialog {
   width: 80%;
-}
+  max-width: 700px;
+} */
 
 @media screen and (max-width: 700px) {
   .md-dialog {
     width: 100%;
+    max-width: 100%;
   }
 }
 
