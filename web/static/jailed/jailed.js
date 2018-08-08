@@ -540,10 +540,12 @@ function randId() {
             if (!this._disconnected) {
                 this._disconnected = true;
             }
-            this.context.socket.emit('kill_plugin',
+            if(this.context && this.context.socket){
+              this.context.socket.emit('kill_plugin',
                  {id: this.id}
-            );
-            console.log('kill plugin '+this.id)
+              );
+              console.log('kill plugin '+this.id)
+            }
         }
 
     }
@@ -798,10 +800,16 @@ function randId() {
             me._fail.emit(error);
             me.disconnect();
         }
-        this._connection = new Connection(this.id, this.mode, this.config);
-        this._connection.whenInit(function(){
-            me._init();
-        });
+        if(this.mode == 'pyworker' && (!this.config.context || !this.config.context.socket)){
+          me._fail.emit('plugin engine is not connected.');
+          this._connection = null
+        }
+        else{
+          this._connection = new Connection(this.id, this.mode, this.config);
+          this._connection.whenInit(function(){
+              me._init();
+          });
+        }
     }
 
 

@@ -1225,9 +1225,11 @@ export default {
           // }
         });
         plugin.whenFailed((e) => {
+          if(e){
+            this.status_text = template.name + '-> Error: ' + e
+            this.show('error occured when loading ' + template.name + ": " + e)
+          }
           console.error('error occured when loading ' + template.name + ": ", e)
-          this.status_text = template.name + '-> Error: ' + e
-          this.show('error occured when loading ' + template.name + ": " + e)
           plugin.terminate()
           // reject(e)
           this.plugins[plugin.id] = plugin
