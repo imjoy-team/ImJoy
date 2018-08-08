@@ -28,7 +28,6 @@ class PythonPlugin():
 
     api.register({
       "name": "op with option",
-      "type": "demo/python_op",
       "tags": ["demo", "op"],
       "inputs": None,
       "outputs": None,
@@ -37,7 +36,7 @@ class PythonPlugin():
     print('initialized from python')
 
   def run(self, my):
-    if my['op']['type'] == 'demo/python_op':
+    if my['op']['name'] == 'op with option':
       print('run python_op: ' + my['config']['op_option'])
     else:
       print('hello world: ' + str(self.count))
