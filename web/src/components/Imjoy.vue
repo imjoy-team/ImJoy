@@ -60,7 +60,7 @@ Engine<template>
               <span>Disconnect</span>
               <md-icon>clear</md-icon>
             </md-menu-item>
-            <md-menu-item @click="showAboutEngineDialog=true">
+            <md-menu-item @click="showPluginEngineInfo=true">
               <span>About Plugin Engine</span>
               <md-icon>info</md-icon>
             </md-menu-item>
@@ -221,19 +221,6 @@ Engine<template>
     </md-app-content>
   </md-app>
   <!-- </md-card-content> -->
-  <md-dialog :md-active.sync="showAboutEngineDialog" :md-click-outside-to-close="false">
-    <md-dialog-content>
-      <h2>About Plugin Engine</h2>
-      <p>Plugin Engine is a Python program running locally(or remotely) on your computer in order to utilize the full computation power of your computer.</p>
-      <p>With the Plugin Engine running in the background, you can send heavy compuation to the python backend.</p>
-      <p>TODO: how to setup the plugin engine?</p>
-      <p>For developers, develop plugin which run in the plugin engine is as easy as javascript plugins.</p>
-      <p>TODO: how it works?</p>
-    </md-dialog-content>
-    <md-dialog-actions>
-      <md-button class="md-primary" @click="showAboutEngineDialog=false">OK</md-button>
-    </md-dialog-actions>
-  </md-dialog>
 
   <md-dialog :md-active.sync="showPluginDialog" :md-click-outside-to-close="false">
     <md-dialog-content>
@@ -272,10 +259,10 @@ Engine<template>
 
   <md-dialog-confirm
         :md-active.sync="showPluginEngineInfo"
-        md-title="Setup the Python Plugin Engine"
+        md-title="Use the Python Plugin Engine"
         :md-click-outside-to-close="false"
-        md-content='If already installed the Plugin Engine, run <strong>python -m imjoy</strong> in a terminal and press <strong>Connect</strong>.<br><br>
-        If this is your first time, you need to do the following:<br>
+        md-content='Python plugins are supported by ImJoy with the Python Plugin Engine. If it was already installed, run <strong>python -m imjoy</strong> in a terminal and press <strong>Connect</strong>.<br><br>
+        If not, you need to do the following:<br>
         &nbsp;&nbsp;Step 1. Install <a href="https://www.anaconda.com/download/" target="_blank">Anaconda (Python3.6 version)</a> <br>
         &nbsp;&nbsp;Step 2. Run <strong>pip install -U git+https://github.com/oeway/ImJoy-Python#egg=imjoy</strong> in a terminal. <br>
         &nbsp;&nbsp;Step 3. Run <strong>python -m imjoy</strong> in a terminal to start the engine.<br><br>
@@ -364,7 +351,6 @@ export default {
       showPluginDialog: false,
       showSettingsDialog: false,
       showAddPluginDialog: false,
-      showAboutEngineDialog: false,
       plugin_dialog_config: null,
       _plugin_dialog_promise: {},
       loading: false,
