@@ -16,15 +16,28 @@ Image processing with Joy
    - Use ndarrays or tensors for data exchange
    - Support Tensorflow.js and native Tensorflow
 
-
-
 # Use Imjoy for image processing
 
 ![imjoy-screenshot](./docs/img/imjoy-screenshot.png)
 
+## Web Installation
+
 Go to the [ImJoy web app](https://imjoy.io/#/:\)), click the + button to install new plugins or open an image.
 
+## Usage
+
 When images is opened in the workspace, you need to first click the title bar of the window to select an active window, then click on the plugin menu to run the plugin.
+
+
+# Use the Python Plugin Engine
+
+## Installation
+  * Download Annaconda3 (Python3.6 version) from https://www.anaconda.com/download/ and install it.
+  * Run `pip install -U "git+https://github.com/oeway/ImJoy#egg=imjoy&subdirectory=backend"` in a terminal window
+
+## Usage
+  * Run `python -m imjoy` in a terminal and keep the window running.
+  * Go to https://imjoy.io, connect to the plugin engine, and you will be able to use plugins written in Python
 
 # Developing Plugins for ImJoy
 
@@ -55,7 +68,7 @@ Plugins can be written in Javascript or Python, a minimal plugin needs to implem
 * `mode` the mode of the plugin, currently supported modes are `webworker`, `iframe` and `pyworker`.
   * `webworker` is used to run computationally intensive javascript plugins. It do not have an interface, it runs in a new thread and won't hang the main thread during running.
   * `iframe` is used for create new web interface with HTML/CSS and Javascript, it runs in the same thread as the main webpage.
-  * `pyworker` is used to run plugins written in Python, the user needs to have the **Python Plugin Engine** installed and started before using the plugin. See the `Use Python Plugin Engine` for more details.
+  * `pyworker` is used to run plugins written in Python, the user needs to have the **Python Plugin Engine** installed and started before using the plugin. See the `Developing Python Plugins` for more details.
 * `tags`
 * `ui` a string used to generate the GUI to the user, you can include the following elements to render an input form:
   * `type: 'choice', options: []`
@@ -156,17 +169,7 @@ run another plugin by the plugin name, example: `api.run("Python Demo Plugin")` 
 
 
 
-# Use Python Plugin Engine
-
-## Installation
-  * Download Annaconda3 (Python3.6 version) from https://www.anaconda.com/download/
-  * Install Annaconda
-  * Run `pip install -U "git+https://github.com/oeway/ImJoy#egg=imjoy&subdirectory=backend"` in a terminal window
-
-## Usage
-  * Run `python -m imjoy` in a terminal and keep the window running.
-  * Go to https://imjoy.io, connect to the plugin engine
-  * Now you can start to use plugins written in Python
+# Developing Python Plugins
 
 For plugin developers, you can now create a python plugin within the browser.
 
