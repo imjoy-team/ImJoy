@@ -276,7 +276,7 @@ Engine<template>
         <plugin-list :plugins="installed_plugins" :workspace="selected_workspace" title="Installed Plugins"></plugin-list>
       </md-tab>
       <md-tab id="tab-plugin-store" md-label="Plugin Store" >
-        <plugin-list config-url="static/plugins/manifest.json" :workspace="selected_workspace"  title="Available Plugins"></plugin-list>
+        <plugin-list config-url="https://raw.githubusercontent.com/oeway/ImJoy-Plugins/master/manifest.json" :workspace="selected_workspace"  title="Available Plugins"></plugin-list>
       </md-tab>
     </md-tabs>
     </md-dialog-content>
@@ -290,7 +290,7 @@ Engine<template>
       <md-button class="md-primary md-raised centered-button" @click="newPlugin(template);showAddPluginDialog=false" v-for="(template, k) in plugin_templates" :key="k">
         <md-icon>add</md-icon>{{k}}
       </md-button>
-      <plugin-list config-url="static/plugins/manifest.json" :workspace="selected_workspace" title="Or, install from the Plugin Store"></plugin-list>
+      <plugin-list config-url="https://raw.githubusercontent.com/oeway/ImJoy-Plugins/master/manifest.json" :workspace="selected_workspace" title="Or, install from the Plugin Store"></plugin-list>
     </md-dialog-content>
     <md-dialog-actions>
       <md-button class="md-primary" @click="showAddPluginDialog=false; reloadPlugins()">OK</md-button>

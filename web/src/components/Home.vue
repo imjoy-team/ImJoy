@@ -28,7 +28,7 @@
     </md-dialog-actions>
   </md-dialog>
   <br>
-  <plugin-list config-url="static/plugins/manifest.json" title="Plugins"></plugin-list>
+  <plugin-list config-url="https://raw.githubusercontent.com/oeway/ImJoy-Plugins/master/manifest.json" title="Plugins"></plugin-list>
   <br>
   <md-divider></md-divider>
   <main-footer/>
