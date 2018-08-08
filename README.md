@@ -18,7 +18,7 @@ Image processing with Joy
 
 # Use Imjoy for image processing
 
-![imjoy-screenshot](./docs/img/imjoy-screenshot.png)
+![imjoy-screenshot](./docs/img/imjoy-screenshot.png =600x)
 
 ## Web Installation
 
@@ -27,7 +27,6 @@ Go to the [ImJoy web app](https://imjoy.io/#/:\)), click the + button to install
 ## Usage
 
 When images is opened in the workspace, you need to first click the title bar of the window to select an active window, then click on the plugin menu to run the plugin.
-
 
 # Use the Python Plugin Engine
 
@@ -41,7 +40,7 @@ When images is opened in the workspace, you need to first click the title bar of
 
 # Developing Plugins for ImJoy
 
-![imjoy-code-screenshot](./docs/img/imjoy-code-screenshot.png)
+![imjoy-code-screenshot](./docs/img/imjoy-code-screenshot.png =600x)
 
 Click the + button and select the plugin dropdown option, then create a plugin.
 
