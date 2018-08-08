@@ -983,12 +983,7 @@ function randId() {
     DynamicPlugin.prototype.terminate =
            Plugin.prototype.terminate = function() {
         this._disconnected = true
-        try {
-          this._site.disconnect();
-        }
-        finally{
-
-        }
+        this._site&&this._site.disconnect();
     }
 
     exports.Plugin = Plugin;
