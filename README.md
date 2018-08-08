@@ -1,6 +1,5 @@
 # ImJoy
-
-Image processing with Joy
+## Image processing with :)
 
 <img src="https://github.com/oeway/ImJoy/raw/master/docs/img/imjoy-screenshot.png" width="600px"></img>
 
