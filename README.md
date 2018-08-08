@@ -7,13 +7,13 @@ Image processing with Joy
 ## Key Features of ImJoy
  * Serverless solution with offline-first design
  * Easy-to-use workflow composition
- * Extendable with plugin interface
+ * Extendable with a plugin interface
    - Support Python and Javascript
    - Plugins are isolated with secured sandboxes
-   - Built-in code editor, no extra IDEs or tools are needed
-   - Support virtual environment and pip packages for Python
+   - Built-in code editor, no extra IDEs are needed for development
+   - Support virtual environments and pip packages for Python
    - Support libraries hosted on Github or CDNs for javascript
-   - Github based plugin/library hosting
+   - Deploying your own plugin with Github
  * Native support for Deep Learning
    - Use ndarrays or tensors for data exchange
    - Support Tensorflow.js and native Tensorflow
