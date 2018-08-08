@@ -17,8 +17,12 @@ logger.setLevel(logging.INFO)
 # import logging
 # logging.basicConfig(level=logging.DEBUG)
 
-sys.path.insert(0, os.path.dirname(os.path.normpath(__file__)))
-sys.path.insert(0, '')
+if '' not in sys.path:
+    sys.path.insert(0, '')
+
+imjoy_path = os.path.dirname(os.path.normpath(__file__))
+if imjoy_path not in sys.path:
+    sys.path.insert(0, imjoy_path)
 
 from socketio_client.manager import Manager
 # from RestrictedPython import compile_restricted
