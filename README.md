@@ -18,30 +18,29 @@ Image processing with Joy
 
 # Use Imjoy for image processing
 
-![imjoy-screenshot](./docs/img/imjoy-screenshot.png =600x)
-
-## Web Installation
-
+## Basic Usage
 Go to the [ImJoy web app](https://imjoy.io/#/:\)), click the + button to install new plugins or open an image.
-
-## Usage
 
 When images is opened in the workspace, you need to first click the title bar of the window to select an active window, then click on the plugin menu to run the plugin.
 
-# Use the Python Plugin Engine
-Python Plugin Engine is a python library which enables the interaction between the ImJoy web interface and Python, the source code can be found here: https://github.com/oeway/ImJoy-Python
+## Using Python Plugins
+ImJoy supports Python Plugins which can run much more computationally intensive tasks. In order to run that, it needs to connected to the Python Plugin Engine -- a small python library we developed for ImJoy (source code: https://github.com/oeway/ImJoy-Python ).
 
-## Installation
+In order to setup the Python Plugin Engine, following the instructions below:
   * Download Annaconda3 (Python3.6 version) from https://www.anaconda.com/download/ and install it.
   * Run `pip install -U git+https://github.com/oeway/ImJoy-Python#egg=imjoy` in a terminal window
-
-## Usage
   * Run `python -m imjoy` in a terminal and keep the window running.
-  * Go to https://imjoy.io, connect to the plugin engine, and you will be able to use plugins written in Python
+  
+Now you can go to the [ImJoy web app](https://imjoy.io/#/:\)), and connect to the Plugin Engine with the button located on the upper-right corner.
+
+For future usage, you just need to run `python -m imjoy` in a terminal.
+
+
+![imjoy-screenshot](./docs/img/imjoy-screenshot.png | width=600)
 
 # Developing Plugins for ImJoy
 
-![imjoy-code-screenshot](./docs/img/imjoy-code-screenshot.png =600x)
+![imjoy-code-screenshot](./docs/img/imjoy-code-screenshot.png | width=600)
 
 Click the + button and select the plugin dropdown option, then create a plugin.
 
