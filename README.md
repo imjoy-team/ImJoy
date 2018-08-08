@@ -4,7 +4,7 @@ Image processing with Joy
 
 <img src="https://github.com/oeway/ImJoy/raw/master/docs/img/imjoy-screenshot.png" width="600px"></img>
 
-# Key Features
+## Key Features of ImJoy
  * Serverless solution with offline-first design
  * Easy-to-use workflow composition
  * Extendable with plugin interface
