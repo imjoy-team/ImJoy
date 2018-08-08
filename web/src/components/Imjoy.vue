@@ -1200,8 +1200,7 @@ export default {
             console.error('error occured when loading plugin.')
             throw 'error occured when loading plugin.'
           }
-          this.plugins[plugin.id] = plugin
-          this.plugin_names[plugin.name] = plugin
+
           if (template.type) {
             this.register(template, {
               id: plugin.id
@@ -1232,9 +1231,10 @@ export default {
           console.error('error occured when loading ' + template.name + ": ", e)
           plugin.terminate()
           // reject(e)
-          this.plugins[plugin.id] = plugin
-          this.plugin_names[plugin.name] = plugin
         });
+
+        this.plugins[plugin.id] = plugin
+        this.plugin_names[plugin.name] = plugin
       })
     },
     async runPlugin(plugin_name, my, _plugin) {
@@ -1265,6 +1265,7 @@ export default {
         config.type = config.type || config.name
         config.mode = config.mode || 'webworker'
         config.show_panel = config.show_panel || false
+        config.ui = config.ui || config.name
         console.log('registering op', config)
         if (!REGISTER_SCHEMA(config)) {
           const error = REGISTER_SCHEMA.errors(config)
