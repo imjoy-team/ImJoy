@@ -102,7 +102,7 @@ export default {
       editorOptions: {},
       showEditor: false,
       containerWidth: 500,
-      root_url: null,
+      uri_root: null,
       plugin_dir: null,
       manifest: null,
       available_plugins: [],
@@ -130,11 +130,12 @@ export default {
       axios.get(this.configUrl).then(response => {
         if (response && response.data && response.data.plugins) {
           this.manifest = response.data
+          console.log('----------------', this.manifest)
           this.available_plugins = this.manifest.plugins
-          this.plugin_dir = this.manifest.root_path
-          this.root_url = location.protocol + '//' + location.host
+          this.plugin_dir = this.manifest.uri_root
+          this.uri_root = location.protocol + '//' + location.host
           if (!this.plugin_dir.startsWith('http')) {
-            this.plugin_dir = this.root_url + this.plugin_dir
+            this.plugin_dir = this.uri_root + this.plugin_dir
             console.log(this.plugin_dir)
           }
           this.updatePluginList()
@@ -154,13 +155,12 @@ export default {
     updatePluginList() {
       for (let i = 0; i < this.available_plugins.length; i++) {
         const plugin = this.available_plugins[i]
-        console.log(plugin)
-        if (plugin.url) {
-          if (!plugin.url.startsWith('http')) {
-            plugin.url = '/' + plugin.url
-          }
-          plugin.url = this.plugin_dir + plugin.url
+        plugin.uri = plugin.uri || plugin.name + '.html'
+        if (!plugin.uri.startsWith('http')) {
+          plugin.uri = '/' + plugin.uri
         }
+        plugin.uri = this.plugin_dir + plugin.uri
+
         plugin._id = plugin._id || plugin.name.replace(/ /g, '_')
         this.db.get(plugin._id).then((doc) => {
           plugin.installed = true
@@ -220,9 +220,9 @@ export default {
       }
     },
     install(plugin) {
-      axios.get(plugin.url).then(response => {
+      axios.get(plugin.uri).then(response => {
         if (!response || !response.data || response.data == '') {
-          alert('failed to get plugin code from ' + plugin.url)
+          alert('failed to get plugin code from ' + plugin.uri)
           return
         }
         plugin.code = response.data

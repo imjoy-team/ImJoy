@@ -889,11 +889,11 @@ export default {
     showProgress(p) {
       if (p < 1) this.progress = p * 100
       else this.progress = p
-      // this.$forceUpdate()
+      this.$forceUpdate()
     },
     showStatus(s) {
       this.status_text = s
-      // this.$forceUpdate()
+      this.$forceUpdate()
     },
     addWindow(w) {
       this.generateGridPosition(w)
@@ -980,6 +980,7 @@ export default {
     runWorkflow(joy) {
       console.log('run workflow.', this.active_windows)
       const w = this.active_windows[this.active_windows.length - 1] || {}
+      this.status_text = ''
       joy.workflow.execute(w.data || {}).then((my) => {
         if (my.target) {
           console.log('result', my)
@@ -991,7 +992,7 @@ export default {
           this.createWindow(my)
         }
         this.progress = 100
-        this.status_text = ''
+
       }).catch((e) => {
         console.error(e)
         this.status_text = e.toString() || "Error."
@@ -1057,7 +1058,6 @@ export default {
           this.createWindow(my)
         }
         this.progress = 100
-        this.status_text = ''
       }).catch((e) => {
         console.error(e)
         this.status_text = op.name + '->' + (e.toString() || "Error.")
