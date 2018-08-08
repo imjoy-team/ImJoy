@@ -29,6 +29,7 @@ Go to the [ImJoy web app](https://imjoy.io/#/:\)), click the + button to install
 When images is opened in the workspace, you need to first click the title bar of the window to select an active window, then click on the plugin menu to run the plugin.
 
 # Use the Python Plugin Engine
+Python Plugin Engine is a python library which enables the interaction between the ImJoy web interface and Python, the source code can be found here: https://github.com/oeway/ImJoy-Python
 
 ## Installation
   * Download Annaconda3 (Python3.6 version) from https://www.anaconda.com/download/ and install it.
@@ -259,3 +260,8 @@ api.export(PythonPlugin())
    ...
  </config>
  ```
+
+# Deploy your plugins to the ImJoy Plugin Repository
+The plugin store shown on the ImJoy.IO is served with Github through the ImJoy-Plugins repository: https://github.com/oeway/ImJoy-Plugins.
+
+In order to deploy your plugin, you can send a pull request to [ImJoy-Plugins](https://github.com/oeway/ImJoy-Plugins).
