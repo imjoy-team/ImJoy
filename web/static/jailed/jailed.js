@@ -392,7 +392,7 @@ function randId() {
          * @param {Object} data to send
          */
         BasicConnection.prototype.send = function(data) {
-            this._frame.contentWindow.postMessage(
+            this._frame.contentWindow&&this._frame.contentWindow.postMessage(
                 {type: 'message', data: data}, '*'
             );
         }
@@ -982,11 +982,12 @@ function randId() {
 
     DynamicPlugin.prototype.terminate =
            Plugin.prototype.terminate = function() {
+        this._disconnected = true
         try {
           this._site.disconnect();
         }
         finally{
-          this._disconnected = true
+
         }
     }
 
