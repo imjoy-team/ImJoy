@@ -17,8 +17,8 @@ logger.setLevel(logging.INFO)
 # import logging
 # logging.basicConfig(level=logging.DEBUG)
 
-sys.path.append(os.path.dirname(os.path.normpath(__file__)))
-sys.path.append(os.getcwd())
+sys.path.insert(0, os.path.dirname(os.path.normpath(__file__)))
+sys.path.insert(0, '')
 
 from socketio_client.manager import Manager
 # from RestrictedPython import compile_restricted
