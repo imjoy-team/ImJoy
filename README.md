@@ -33,7 +33,7 @@ Python Plugin Engine is a python library which enables the interaction between t
 
 ## Installation
   * Download Annaconda3 (Python3.6 version) from https://www.anaconda.com/download/ and install it.
-  * Run `pip install -U "git+https://github.com/oeway/ImJoy-Python#egg=imjoy"` in a terminal window
+  * Run `pip install -U git+https://github.com/oeway/ImJoy-Python#egg=imjoy` in a terminal window
 
 ## Usage
   * Run `python -m imjoy` in a terminal and keep the window running.
