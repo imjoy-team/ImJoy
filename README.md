@@ -61,7 +61,7 @@ Plugins can be written in Javascript or Python, a minimal plugin needs to implem
 
 Here are the variables stored in `my`:
  * `my['op']`
- Give information about which op is executed, the plugin can use `my['op']['type']` to determine the op by its type, or use `my['op']['name']` to determine the op by its name.
+ Give information about which op is executed, the plugin can use `my['op']['name']` to determine the op by its name.
  * `my['config']`
  The config values from the user interface defined with the `ui` string (from the plugin config or `api.register`).
  * `my['data']`
@@ -106,6 +106,19 @@ Within the plugin, there is a variable called `api` which exposes a set of inter
 show alert dialog with message, example: `api.alert('hello world')`
 ## `api.register(...)`
 register a new op.
+
+Example:
+```javascript
+    api.register({
+       "name": "LUT",
+       "tags": ["op"],
+       "inputs": {"image": "image/grayscale"},
+       "outputs": {"image": "image/color"},
+       "ui": "apply LUT {id:'lut', type:'choose', options:['hot', 'rainbow'], placeholder: 'hot'}",
+    })
+```
+(Should be placed inside `setup()`, works for both Javascript and Python)
+
 ## `api.createWindow(...)`
 create a new window and add to the workspace.
 ## `api.showDialog(...)`
