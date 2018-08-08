@@ -185,7 +185,7 @@ Engine<template>
                 <md-icon v-if="plugin.icon">{{plugin.icon}}</md-icon>
                 <md-icon v-else>extension</md-icon>
               </md-button>
-              <md-button class="joy-run-button md-primary" @click="plugin.ops && plugin.ops[0] && runOp(plugin.ops[0])">
+              <md-button class="joy-run-button md-primary" :disabled="plugin._disconnected" @click="plugin.ops && plugin.ops[0] && runOp(plugin.ops[0])">
                 {{plugin.name}}
               </md-button>
               <md-button class="md-icon-button" @click="plugin.panel_expanded=!plugin.panel_expanded; $forceUpdate()">
@@ -197,7 +197,7 @@ Engine<template>
                 <md-button class="md-icon-button" v-show="plugin.panel_expanded && i != 0" :disabled="true">
                   <md-icon>remove</md-icon>
                 </md-button>
-                <md-button class="joy-run-button md-primary" v-show="plugin.panel_expanded && i != 0" @click="runOp(op)">
+                <md-button class="joy-run-button md-primary" :disabled="plugin._disconnected" v-show="plugin.panel_expanded && i != 0" @click="runOp(op)">
                     {{op.name}}
                   </md-button>
 
@@ -680,9 +680,8 @@ export default {
 
     },
     reloadPlugin(pconfig) {
-      console.error(pconfig)
       return new Promise((resolve, reject) => {
-        if(pconfig.type){
+        if(pconfig.type || pconfig.name){
           for (let k in this.plugins) {
             if (this.plugins.hasOwnProperty(k)) {
               const plugin = this.plugins[k]
@@ -795,13 +794,13 @@ export default {
           const plugin = this.plugins[k]
           if(plugin.mode == 'pyworker'){
             try {
-              delete this.plugins[k]
-              delete this.plugin_names[plugin.config.name]
               Joy.remove(plugin.config.type)
               console.log('terminating ',plugin)
               if (typeof plugin.terminate == 'function') {
                 plugin.terminate()
               }
+              // delete this.plugins[k]
+              // delete this.plugin_names[plugin.config.name]
             } catch (e) {
 
             }
@@ -819,11 +818,10 @@ export default {
                 plugin.terminate()
               } catch (e) {
                 console.error(e)
-              } finally {
-                this.plugins[k] = null
-                this.plugin_names[plugin.name] = null
               }
             }
+            this.plugins[k] = null
+            this.plugin_names[plugin.name] = null
           }
         }
       }
@@ -1232,6 +1230,8 @@ export default {
           this.show('error occured when loading ' + template.name + ": " + e)
           plugin.terminate()
           // reject(e)
+          this.plugins[plugin.id] = plugin
+          this.plugin_names[plugin.name] = plugin
         });
       })
     },
