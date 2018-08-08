@@ -179,10 +179,10 @@ Engine<template>
             </div>
           </md-card-header>
           <md-card-content>
-            <div v-for="plugin in this.plugins" :key="plugin.id">
+            <div v-for="plugin in sortedPlugins()" :key="plugin.name">
               <md-divider></md-divider>
               <md-button class="md-icon-button" @click="editPlugin(plugin.id)">
-                <md-icon v-if="plugin.icon">{{plugin.icon}}</md-icon>
+                <md-icon v-if="plugin.config.icon">{{plugin.config.icon}}</md-icon>
                 <md-icon v-else>extension</md-icon>
               </md-button>
               <md-button class="joy-run-button md-primary" :disabled="plugin._disconnected" @click="plugin.ops && plugin.ops[0] && runOp(plugin.ops[0])">
@@ -545,6 +545,9 @@ export default {
     this.disconnectEngine()
   },
   methods: {
+    sortedPlugins: function() {
+        return _.orderBy(this.plugins, 'name');
+    },
     registerExtension(exts, plugin) {
       for (let i = 0; i < exts.length; i++) {
         exts[i] = exts[i].replace('.', '')

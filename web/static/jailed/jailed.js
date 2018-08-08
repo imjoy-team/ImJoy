@@ -755,6 +755,7 @@ function randId() {
         this.mode = config.mode || 'webworker'
         this._path = config.url;
         this._initialInterface = _interface||{};
+        this._disconnected = true
         this._connect();
     };
 
@@ -776,6 +777,7 @@ function randId() {
         this.type = config.type
         this.mode = config.mode || 'webworker'
         this._initialInterface = _interface||{};
+        this._disconnected = true
         this._connect();
     };
 
@@ -913,6 +915,7 @@ function randId() {
         this._site.onRemoteUpdate(function(){
             me.remote = me._site.getRemote();
             me.api = me.remote;
+            me._disconnected = false
             me._connect.emit();
         });
 
@@ -962,6 +965,7 @@ function randId() {
     DynamicPlugin.prototype.whenConnected =
            Plugin.prototype.whenConnected = function(handler) {
         this._connect.whenEmitted(handler);
+
     }
 
 
@@ -978,13 +982,11 @@ function randId() {
 
     DynamicPlugin.prototype.terminate =
            Plugin.prototype.terminate = function() {
-        if(this._disconnected === undefined || !this._disconnected){
-          try {
-            this._site.disconnect();
-          } catch (e) {
-          } finally {
-            this._disconnected = true
-          }
+        try {
+          this._site.disconnect();
+        }
+        finally{
+          this._disconnected = true
         }
     }
 

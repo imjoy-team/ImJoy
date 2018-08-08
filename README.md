@@ -51,6 +51,29 @@ Plugins can be written in Javascript or Python, a minimal plugin needs to implem
   "dependencies": []
 }
 ```
+* `name` the name of the plugin, it must be unique to avoid conflicting with other plugins.
+* `mode` the mode of the plugin, currently supported modes are `webworker`, `iframe` and `pyworker`.
+  * `webworker` is used to run computationally intensive javascript plugins. It do not have an interface, it runs in a new thread and won't hang the main thread during running.
+  * `iframe` is used for create new web interface with HTML/CSS and Javascript, it runs in the same thread as the main webpage.
+  * `pyworker` is used to run plugins written in Python, the user needs to have the **Python Plugin Engine** installed and started before using the plugin. See the `Use Python Plugin Engine` for more details.
+* `tags`
+* `ui` a string used to generate the GUI to the user, you can include the following elements to render an input form:
+  * `type: 'choice', options: []`
+  * `type: 'number', min: 0, max: 10`
+  * ...
+* `version` version of the plugin
+* `api_version` api version of imjoy which the plugin is written for
+* `url` the url used point to current file, used to download the plugin file when a user install it from the plugin store on imjoy.io website.
+* `description` a short description about the plugin, describe the main feature or the context of the plugin
+* `icon` defines the icon used in the plugin menu. You can find a material icon from https://material.io/tools/icons/ and set its name to `icon`.
+* `inputs` defines the inputs data with name and type. E.g.: {"image": "image/grayscale"}, if multiple inputs will be used, just add all of them into the object.
+* `outputs` defines the outputs data with name and type. E.g.: {"image": "image/grayscale"}, if multiple inputs will be used, just add all of them into the object.
+* `env` (**for python plugins only**) the virtual environment or docker image command used for creating an enviroment to run the plugins
+* `requirements` (**for python plugins only**) the pip packages which will be installed before running the plugin, package names or github links are both supported.
+* `cmd` (**for python plugins only**) the command used to run the plugin, by default, it will run `python`, sometimes it can be something like `python3` or `python27` etc.
+* `dependencies` names of other imjoy plugins which the current one depend on. They will be installed automatically during installation.
+## The `<docs>` tag
+Used to contain documentation for the plugin, it need to be written in markdown language.
 
 ## The `<script>` tag
 
