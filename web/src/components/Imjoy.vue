@@ -695,6 +695,8 @@ export default {
         config: {},
         reload: this.reloadPlugin,
         save: this.savePlugin,
+        w: 10,
+        h: 10,
         plugin: {},
         data: {
           name: 'new plugin',
