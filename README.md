@@ -68,7 +68,7 @@ Plugins can be written in Javascript or Python, a minimal plugin needs to implem
 * `mode` the mode of the plugin, currently supported modes are `webworker`, `iframe` and `pyworker`.
   * `webworker` is used to run computationally intensive javascript plugins. It do not have an interface, it runs in a new thread and won't hang the main thread during running.
   * `iframe` is used for create new web interface with HTML/CSS and Javascript, it runs in the same thread as the main webpage.
-  * `pyworker` is used to run plugins written in Python, the user needs to have the **Python Plugin Engine** installed and started before using the plugin. See the `Developing Python Plugins` for more details.
+  * `pyworker` is used to run plugins written in Python, the user needs to have the **Python Plugin Engine** installed and started before using the plugin. See the **Developing Python Plugins** for more details.
 * `tags`
 * `ui` a string used to generate the GUI to the user, you can include the following elements to render an input form:
   * `type: 'choice', options: []`
