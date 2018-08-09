@@ -137,7 +137,7 @@ api.export(PythonPlugin())
 
 # Plugin API
 
-Within the plugin, there is a variable called `api` which exposes a set of internal functions which can be used by the plugin to interact with the GUI, talk with another plugin etc.
+Within the plugin, there is a variable called `api` which exposes a set of internal utility functions. These utility functions can be used in the plugin to interact with the GUI, talk with another plugin etc.
 
 ## `api.alert(...)`
 show alert dialog with message, example: `api.alert('hello world')`
