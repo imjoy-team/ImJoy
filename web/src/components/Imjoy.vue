@@ -199,7 +199,7 @@ Engine<template>
                 </md-button>
                 <md-button class="joy-run-button md-primary" :disabled="plugin._disconnected" v-show="plugin.panel_expanded && i != 0" @click="runOp(op)">
                     {{op.name}}
-                  </md-button>
+                </md-button>
 
                 <md-button class="md-icon-button" v-show="plugin.panel_expanded && i != 0" @click="op.panel_expanded=!op.panel_expanded; $forceUpdate()">
                   <md-icon v-if="!op.panel_expanded">expand_more</md-icon>
@@ -393,7 +393,7 @@ export default {
       },
       plugin_templates: {
         "Webworker(Javascript)": WEBWORKER_PLUGIN_TEMPLATE,
-        "Iframe(Javascript and HTML)": WEBWORKER_PLUGIN_TEMPLATE,
+        "Iframe(Javascript and HTML)": IFRAME_PLUGIN_TEMPLATE,
         "PyWorker(Python)": PYWORKER_PLUGIN_TEMPLATE,
       },
       updating_workflow: false,
@@ -678,6 +678,8 @@ export default {
         plugin: plugin,
         reload: this.reloadPlugin,
         save: this.savePlugin,
+        w: 10,
+        h: 10,
         data: {
           name: pconfig.name,
           id: plugin.id,
@@ -943,8 +945,8 @@ export default {
     },
     generateGridPosition(config) {
       config.i = this.default_window_pos.i.toString()
-      config.w = this.default_window_pos.w
-      config.h = this.default_window_pos.h
+      config.w = config.w || this.default_window_pos.w
+      config.h = config.h || this.default_window_pos.h
       config.x = this.default_window_pos.x
       config.y = this.default_window_pos.y
       this.default_window_pos.x = this.default_window_pos.x + this.default_window_pos.w
@@ -1303,62 +1305,62 @@ export default {
         //   console.log('plugin already registered')
         //   return
         // }
-        if (config.tags.includes('op')) {
-          console.log('creating Op: ', config, plugin)
-          if (!plugin || !plugin.api || !plugin.api.run) {
-            console.log("WARNING: no run function found in the config, this op won't be able to do anything: " + config.name)
-            config.onexecute = () => {
-              console.log("WARNING: no run function defined.")
-            }
-          } else {
-            const onexecute = async (my) => {
-              //conver the api here data-->config   target--> data
-              const result = await plugin.api.run({
-                op: {
-                  name: my.op.name,
-                  type: my.op.type
-                },
-                config: my.data,
-                data: my.target,
-                variables: my.target && my.target._variables
-              })
-              my.data = result && result.config
-              my.target = result && result.data
-              return my
-            }
-            config.onexecute = onexecute
+        console.log('creating Op: ', config, plugin)
+        if (!plugin || !plugin.api || !plugin.api.run) {
+          console.log("WARNING: no run function found in the config, this op won't be able to do anything: " + config.name)
+          config.onexecute = () => {
+            console.log("WARNING: no run function defined.")
           }
-          if (config.onupdate && typeof config.onupdate == 'object') {
-            for (let k in config.onupdate) {
-              if (config.onupdate.hasOwnProperty(k)) {
-                // replace the string to a real function
-                const onupdate = plugin.api[config.onupdate[k]]
-                config.onupdate[k] = onupdate
-              }
-            }
+        } else {
+          const onexecute = async (my) => {
+            //conver the api here data-->config   target--> data
+            const result = await plugin.api.run({
+              op: {
+                name: my.op.name,
+                type: my.op.type
+              },
+              config: my.data,
+              data: my.target,
+              variables: my.target && my.target._variables
+            })
+            my.data = result && result.config
+            my.target = result && result.data
+            return my
           }
-          console.log('adding joy op', config)
-          const joy_template = config
-          joy_template.init = joy_template.ui || joy_template.name
-          // joy_template.ui = null
-          Joy.add(joy_template);
-          //update the joy workflow if new template added, TODO: preserve settings during reload
-          if (this.$refs.workflow) this.$refs.workflow.setupJoy()
-          plugin.type = config.type
-          console.log('register op plugin: ', plugin.config)
-          this.registered.ops[config.type] = plugin.config
-          const op_config = {
-            name: config.name,
-            id: _plugin.id,
-            ui: "{id: '_panel', type: '" + config.type + "'}",
-            onexecute: config.onexecute
-          }
-          plugin.ops = plugin.ops || []
-          plugin.ops.push(op_config)
-
-          console.log('creating panel: ', op_config)
-          this.$forceUpdate()
+          config.onexecute = onexecute
         }
+        if (config.onupdate && typeof config.onupdate == 'object') {
+          for (let k in config.onupdate) {
+            if (config.onupdate.hasOwnProperty(k)) {
+              // replace the string to a real function
+              const onupdate = plugin.api[config.onupdate[k]]
+              config.onupdate[k] = onupdate
+            }
+          }
+        }
+        console.log('adding joy op', config)
+        const joy_template = config
+        joy_template.init = joy_template.ui || joy_template.name
+        // joy_template.ui = null
+        Joy.add(joy_template);
+
+        plugin.type = config.type
+        console.log('register op plugin: ', plugin.config)
+        this.registered.ops[config.type] = plugin.config
+        const op_config = {
+          name: config.name,
+          id: _plugin.id,
+          ui: "{id: '_panel', type: '" + config.type + "'}",
+          onexecute: config.onexecute
+        }
+        plugin.ops = plugin.ops || []
+        plugin.ops.push(op_config)
+        //update the joy workflow if new template added, TODO: preserve settings during reload
+        if (this.$refs.workflow) this.$refs.workflow.setupJoy()
+
+        console.log('creating panel: ', op_config)
+        this.$forceUpdate()
+
         if (config.tags.includes('window')) {
           if (config.mode != 'iframe') {
             throw 'Window plugin must be with type "iframe"'

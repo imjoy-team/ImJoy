@@ -36,6 +36,11 @@ export default {
   mounted() {
     setTimeout(this.setupJoy, 500)
   },
+  watch: {
+    config: (newVal, oldVal) => { // watch it
+      this.setupJoy&&this.setupJoy()
+    }
+  },
   methods: {
     editSource(){
       this.$emit('edit', this.config)
