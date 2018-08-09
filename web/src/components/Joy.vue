@@ -45,7 +45,10 @@ export default {
     editSource(){
       this.$emit('edit', this.config)
     },
-    setupJoy() {
+    setupJoy(reset) {
+      if(!reset && this.joy){
+        this.config.data = this.joy.top.data
+      }
       this.$refs.editor.innerHTML = ''
       const joy_config = {
         // Where the Joy editor goes:
@@ -79,7 +82,12 @@ export default {
         }
       }
       console.log('setting up joy ', this.config)
-      this.joy = new Joy(joy_config)
+      try {
+        this.joy = new Joy(joy_config)
+      } catch (e) {
+        joy_config.data = ''
+        this.joy = new Joy(joy_config)
+      }
       this.config.joy = this.joy
     },
     runJoy() {

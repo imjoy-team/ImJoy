@@ -192,7 +192,7 @@ Engine<template>
                 <md-icon v-if="!plugin.panel_expanded">expand_more</md-icon>
                 <md-icon v-else>expand_less</md-icon>
               </md-button>
-              <div v-for="(op, i) in plugin.ops" :key="op.name + op.type">
+              <div v-for="(op, i) in plugin.ops" :key="op.id + op.name">
 
                 <md-button class="md-icon-button" v-show="plugin.panel_expanded && i != 0" :disabled="true">
                   <md-icon>remove</md-icon>
@@ -768,6 +768,7 @@ export default {
         } else {
           p = this.loadPlugin(template)
         }
+
         p.then((plugin) => {
           console.log('new plugin loaded', plugin)
           pconfig.name = plugin.name
@@ -1001,14 +1002,14 @@ export default {
     },
     clearWorkflow() {
       this.workflow_joy_config.data = ''
-      this.$refs.workflow.setupJoy()
+      this.$refs.workflow.setupJoy(true)
     },
     runWorkflow(joy) {
       console.log('run workflow.', this.active_windows)
       const w = this.active_windows[this.active_windows.length - 1] || {}
       this.status_text = ''
       joy.workflow.execute(w.data || {}).then((my) => {
-        if (my.target) {
+        if (my.target && Object.keys(my.target).length>0) {
           console.log('result', my)
           my.name = 'result'
           my.type = 'imjoy/generic'
@@ -1074,7 +1075,7 @@ export default {
       console.log('run op.', this.active_windows)
       const w = this.active_windows[this.active_windows.length - 1] || {}
       op.joy._panel.execute(w.data || {}).then((my) => {
-        if (my.target) {
+        if (my.target && Object.keys(my.target).length>0) {
           console.log('result', my)
           my.name = 'result'
           my.type = 'imjoy/generic'
