@@ -142,9 +142,7 @@ Within the plugin, there is a variable called `api` which exposes a set of inter
 ## `api.alert(...)`
 show alert dialog with message, example: `api.alert('hello world')`
 ## `api.register(...)`
-register a new op.
-
-Example:
+register a new op, example:
 ```javascript
     api.register({
        "name": "LUT",
@@ -157,9 +155,21 @@ Example:
 (Should be placed inside `setup()`, works for both Javascript and Python)
 
 ## `api.createWindow(...)`
-create a new window and add to the workspace.
+create a new window and add to the workspace, example:
+
+`api.createWindow({name: 'new window', type: 'Image Window', w:7, h:7, data: {image: ...}, config: {}})`
+
 ## `api.showDialog(...)`
-show a dialog with customized GUI.
+show a dialog with customized GUI, example:
+
+```javascript
+   api.showDialog({
+      "name": "This is a dialog",
+      "ui": "Hey, please select a value for sigma: {id:'sigma', type:'choose', options:['1', '3'], placeholder: '1'}.",
+   }).then((result)=>{
+   
+   })
+``` 
 ## `api.showProgress(...)`
 update the progress bar on the Imjoy GUI, example: `api.showProgress(85)`
 ## `api.showStatus(...)`
