@@ -26,7 +26,7 @@ When images are opened in the workspace, you need to first click the title bar o
 
 ## Using Python Plugins
 In order to use Python Plugins, please follow the instructions below:
-  * Download Annaconda3 (Python3.6 version) from https://www.anaconda.com/download/ and install it.
+  * Download Annaconda (Python3.6 version) from https://www.anaconda.com/download/ and install it.
   * Run `pip install -U git+https://github.com/oeway/ImJoy-Python#egg=imjoy` in a terminal window
   * Run `python -m imjoy` in a terminal and keep the window running.
 
@@ -35,7 +35,7 @@ Now you can go to the [ImJoy web app](https://imjoy.io/#/app), and connect to th
 For future usage, you just need to run `python -m imjoy` in a terminal.
 
 ### How does it work?
-ImJoy supports Python Plugins which can run much more computationally intensive tasks. In order to run that, it needs to connected to the Python Plugin Engine -- a small python library we developed for ImJoy (source code: https://github.com/oeway/ImJoy-Python).
+ImJoy supports Python Plugins which can run much more computationally intensive tasks. In order to run that, it needs to connect to the Python Plugin Engine -- a small python library we developed for ImJoy (source code: https://github.com/oeway/ImJoy-Python).
 
 Under the hood, the Python Plugin Engine will be connected with the ImJoy web app through websockets, the interaction is done with remote procedure calls (RPC).
 
@@ -137,7 +137,7 @@ api.export(PythonPlugin())
 
 # Plugin API
 
-Within the plugin, there is a variable called `api` which exposes a set of internal functions which can be used by the plugin to interact with the GUI, talk with another plugin etc.
+Within the plugin, there is a variable called `api` which exposes a set of internal utility functions. These utility functions can be used in the plugin to interact with the GUI, talk with another plugin etc.
 
 ## `api.alert(...)`
 show alert dialog with message, example: `api.alert('hello world')`
@@ -261,7 +261,7 @@ api.export(PythonPlugin())
  </config>
  ```
 
-# Deploy your plugins to the ImJoy Plugin Repository
-The plugin store shown on the ImJoy.IO is served with Github through the ImJoy-Plugins repository: https://github.com/oeway/ImJoy-Plugins.
+# Deploy your own plugin to the ImJoy Plugin Repository
+The plugin store shown on the ImJoy.IO is served with Github through the [ImJoy-Plugins repository](https://github.com/oeway/ImJoy-Plugins).
 
-In order to deploy your plugin, you can send a pull request to [ImJoy-Plugins](https://github.com/oeway/ImJoy-Plugins).
+In order to deploy your plugin, you can fork the repository, add your plugin and then send a pull request to [ImJoy-Plugins](https://github.com/oeway/ImJoy-Plugins). Once the pull request being accepted, the user will be able to install your plugin from the plugin store.
