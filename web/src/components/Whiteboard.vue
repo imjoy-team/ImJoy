@@ -1,7 +1,7 @@
 <template>
 <div class="whiteboard noselect" ref="whiteboard"  @click="unselectWindows()">
   <div class="overlay" @click="show_overlay=false" v-if="show_overlay"></div>
-  <grid-layout :layout="windows" :col-num="20" :is-mirrored="false" :auto-size="true" :row-height="row_height" :col-width="column_width" :is-draggable="true" :is-resizable="true" :vertical-compact="true" :margin="[10, 10]" :use-css-transforms="true">
+  <grid-layout :layout="windows" :col-num="20" :is-mirrored="false" :auto-size="true" :row-height="row_height" :col-width="column_width" :is-draggable="true" :is-resizable="true" :vertical-compact="true" :margin="[3, 3]" :use-css-transforms="true">
     <grid-item v-for="(w, wi) in windows" drag-ignore-from=".ace_editor" :x="w.x" :y="w.y" :w="w.w" :h="w.h" :i="w.i" @resize="focusWindow(w)" @move="focusWindow(w)" @resized="show_overlay=false" @moved="show_overlay=false" :key="w.iframe_container">
       <md-card>
         <md-card-expand>
