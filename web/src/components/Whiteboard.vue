@@ -1,7 +1,7 @@
 <template>
-<div class="whiteboard noselect" ref="whiteboard">
+<div class="whiteboard noselect" ref="whiteboard"  @click="unselectWindows()">
   <div class="overlay" @click="show_overlay=false" v-if="show_overlay"></div>
-  <grid-layout :layout="windows" :col-num="20" :is-mirrored="false" :auto-size="true" :row-height="30" :is-draggable="true" :is-resizable="true" :vertical-compact="true" :margin="[10, 10]" :use-css-transforms="true">
+  <grid-layout :layout="windows" :col-num="20" :is-mirrored="false" :auto-size="true" :row-height="row_height" :col-width="column_width" :is-draggable="true" :is-resizable="true" :vertical-compact="true" :margin="[10, 10]" :use-css-transforms="true">
     <grid-item v-for="(w, wi) in windows" drag-ignore-from=".ace_editor" :x="w.x" :y="w.y" :w="w.w" :h="w.h" :i="w.i" @resize="focusWindow(w)" @move="focusWindow(w)" @resized="show_overlay=false" @moved="show_overlay=false" :key="w.iframe_container">
       <md-card>
         <md-card-expand>
@@ -12,20 +12,24 @@
               </md-button>
             </md-card-expand-trigger>
             <div v-if="!w.panel"></div>
-            <div class="window-title noselect" @click="selectWindow(w, $event)">{{w.name+'(#'+w.i+')'}}</div>
+            <div class="window-title noselect" @click.stop="selectWindow(w, $event)">{{w.name+'(#'+w.i+')'}}</div>
             <div>
               <md-menu md-size="big" md-direction="bottom-end">
                 <md-button class="md-icon-button" md-menu-trigger>
                   <md-icon>more_vert</md-icon>
                 </md-button>
                 <md-menu-content>
+                  <md-menu-item @click.stop="normalSize(w)" v-if="w._h && w._w">
+                    <span>Normal view</span>
+                    <md-icon>fullscreen</md-icon>
+                  </md-menu-item>
+                  <md-menu-item @click.stop="fullScreen(w)" v-else>
+                    <span>Fullscreen</span>
+                    <md-icon>fullscreen</md-icon>
+                  </md-menu-item>
                   <md-menu-item @click.stop="duplicate(w)">
                     <span>Duplicate</span>
                     <md-icon>filter</md-icon>
-                  </md-menu-item>
-                  <md-menu-item @click.stop="fullScreen(w)">
-                    <span>Fullscreen</span>
-                    <md-icon>fullscreen</md-icon>
                   </md-menu-item>
                   <md-menu-item v-if="w.type!='main'" @click="close(wi)">
                     <span>Close</span>
@@ -132,6 +136,8 @@ export default {
   },
   data() {
     return {
+      row_height: 30,
+      column_width: 30,
       active_windows: [],
       show_overlay: false,
       router: this.$root.$data.router,
@@ -154,10 +160,29 @@ export default {
     },
     close(wi) {
       console.log('close', wi)
+      const ai = this.active_windows.indexOf(this.windows[wi])
+      if(ai>=0){
+        this.active_windows[ai].selected = false
+        this.active_windows.splice(ai, 1)
+        this.$emit('select', this.active_windows, null)
+      }
+
       this.windows.splice(wi, 1)
     },
     fullScreen(w) {
-
+      console.log('---------------', this.$refs.whiteboard.clientHeight, this.row_height)
+      const fh = parseInt(this.$refs.whiteboard.clientHeight/this.row_height) -10
+      const fw = parseInt(this.$refs.whiteboard.clientWidth/this.column_width) -1
+      w._h = w.h
+      w._w = w.w
+      w.h = fh
+      w.w = fw
+    },
+    normalSize(w) {
+      w.h = w._h || 5
+      w.w = w._w || 5
+      w._w = null
+      w._h = null
     },
     duplicate(w) {
       const nw = Object.assign({}, w)
@@ -170,6 +195,16 @@ export default {
         nw.renderWindow = w.renderWindow
       }
       this.windows.push(nw)
+    },
+    unselectWindows(){
+      if(this.active_windows && this.active_windows.length>0){
+        for (let i = 0; i < this.active_windows.length; i++) {
+            this.active_windows[i].selected = false
+        }
+        this.active_windows = []
+        this.$emit('select', [], null)
+        this.$forceUpdate()
+      }
     },
     selectWindow(w, evt) {
       w.selected = true
