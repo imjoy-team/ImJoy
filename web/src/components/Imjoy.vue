@@ -1326,8 +1326,14 @@ export default {
               data: my.target,
               variables: my.target && my.target._variables
             })
-            my.data = result && result.config
-            my.target = result && result.data
+            if(result && result.data && result.config){
+              my.data = result.config
+              my.target = result.data
+            }
+            else if(result){
+              my.data = null
+              my.target = result
+            }
             return my
           }
           config.onexecute = onexecute

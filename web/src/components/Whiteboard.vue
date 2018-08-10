@@ -73,12 +73,22 @@
           <div v-else-if="w.type=='imjoy/panel'">
             <joy :config="w.config"></joy>
           </div>
-          <div v-else-if="w.type=='imjoy/generic'">
+          <div v-else-if="w.type=='imjoy/generic'" class="generic-plugin-window">
             <!-- <p>generic data</p> -->
+
             <md-list>
-              <md-list-item v-for="(v, k) in w.data" :key="k">
+              <md-list-item @click="printObject(w.type, w.data)">
+                <span class="md-list-item-text">{{dataSummary(w)}}</span>
+                <md-tooltip>click to print the data in your console.</md-tooltip>
+              </md-list-item>
+              <md-list-item v-for="(v, k) in w.data" @click="printObject(k, v)" v-if="w.data && (!w.data.length) || (w.data.length && w.data.length > 0 && k <= 20)" :key="k">
                 <md-icon>insert_drive_file</md-icon>
                 <span class="md-list-item-text">{{k}}</span>
+              </md-list-item>
+              <md-list-item v-if="w.data && w.data.length && w.data.length > 20"  @click="printObject(w.data)">
+                <md-icon>insert_drive_file</md-icon>
+                <span class="md-list-item-text">...</span>
+                <md-tooltip>click to print the data in your console.</md-tooltip>
               </md-list-item>
             </md-list>
           </div>
@@ -198,6 +208,24 @@ export default {
         this.show_overlay = false
         this.$forceUpdate()
       }, 300)
+    },
+    printObject(name, obj){
+      console.log(name, obj)
+    },
+    dataSummary(w){
+
+      if(typeof w.data == 'array'){
+        return `${w.type}, ${typeof w.data}, length: ${w.data.length}`
+      }
+      else if(w.data.buffer && Object.prototype.toString.call(w.data.buffer) === "[object ArrayBuffer]"){
+        return `${w.type}, typedarray, length: ${w.data.length}`
+      }
+      else if(typeof w.data == 'object'){
+        return `${w.type}, ${typeof w.data}, length: ${Object.keys(w.data).length}`
+      }
+      else{
+        return `${w.type}`
+      }
     }
   }
 }
@@ -248,13 +276,16 @@ export default {
   display: flex;
   width: 100%;
   height: calc(100% - 40px);
-  ;
   flex-direction: column;
   overflow: hidden;
   padding-left: 2px;
   padding-right: 2px;
   padding-top: 2px;
   padding-bottom: 2px;
+}
+
+.generic-plugin-window {
+  overflow: auto;
 }
 
 .iframe-load-button {

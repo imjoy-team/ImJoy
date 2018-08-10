@@ -130,7 +130,6 @@ export default {
       axios.get(this.configUrl).then(response => {
         if (response && response.data && response.data.plugins) {
           this.manifest = response.data
-          console.log('----------------', this.manifest)
           this.available_plugins = this.manifest.plugins
           this.plugin_dir = this.manifest.uri_root
           this.uri_root = location.protocol + '//' + location.host
