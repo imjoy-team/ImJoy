@@ -8,7 +8,7 @@
 (function(){
 
     // localize
-    var site = new JailedSite(connection, '__plugin__');
+    var site = new JailedSite(connection, '__plugin__', 'javascript');
     delete JailedSite;
     delete connection;
 

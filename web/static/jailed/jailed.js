@@ -821,7 +821,7 @@ function randId() {
      */
     DynamicPlugin.prototype._init =
            Plugin.prototype._init = function() {
-        this._site = new JailedSite(this._connection, this.id);
+        this._site = new JailedSite(this._connection, this.id, this.mode == 'pyworker'?'python':'javascript');
 
         var me = this;
         this._site.onDisconnect(function() {
