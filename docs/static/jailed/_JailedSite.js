@@ -387,7 +387,7 @@
               let v_bytes = v_buffer
               if(v_buffer.length > ARRAY_CHUNK){
                 v_bytes = []
-                const rounds = Math.trunc(v_buffer.length/ARRAY_CHUNK)
+                const rounds = Math.ceil(v_buffer.length/ARRAY_CHUNK)
                 for(let i of _.range(rounds)){
                   v_bytes[i] = v_buffer.slice(i*ARRAY_CHUNK, (i+1)*ARRAY_CHUNK)
                 }
