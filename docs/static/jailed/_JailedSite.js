@@ -27,8 +27,14 @@
       Float64Array: 'float64',
       Array: 'array'
     };
+    var ARRAY_CHUNK = 1000000;
     var ArrayBufferView = Object.getPrototypeOf(Object.getPrototypeOf(new Uint8Array)).constructor;
-
+    var _appendBuffer = function(buffer1, buffer2) {
+      var tmp = new Uint8Array(buffer1.byteLength + buffer2.byteLength);
+      tmp.set(new Uint8Array(buffer1), 0);
+      tmp.set(new Uint8Array(buffer2), buffer1.byteLength);
+      return tmp.buffer;
+    };
     /**
      * JailedSite object represents a single site in the
      * communication protocol between the application and the plugin
@@ -37,8 +43,9 @@
      * and receive messages from the opposite site (basically it
      * should only provide send() and onMessage() methods)
      */
-    JailedSite = function(connection, id) {
+    JailedSite = function(connection, id, lang) {
         this.id = id;
+        this.lang = lang;
         this._interface = {};
         this._remote = null;
         this._remoteUpdateHandler = function(){};
@@ -376,7 +383,16 @@
               bObject[k] = {__jailed_type__: 'callback', __value__ : v.constructor.name, num: id}
             }
             else if(typeof tf != 'undefined' && tf.Tensor && v instanceof tf.Tensor){
-              bObject[k] = {__jailed_type__: 'ndarray', __value__ : v.dataSync(), __shape__: v.shape, __dtype__: v.dtype}
+              const v_buffer = v.dataSync()
+              let v_bytes = v_buffer
+              if(v_buffer.length > ARRAY_CHUNK){
+                v_bytes = []
+                const rounds = Math.trunc(v_buffer.length/ARRAY_CHUNK)
+                for(let i of _.range(rounds)){
+                  v_bytes[i] = v_buffer.slice(i*ARRAY_CHUNK, (i+1)*ARRAY_CHUNK)
+                }
+              }
+              bObject[k] = {__jailed_type__: 'ndarray', __value__ : v_bytes, __shape__: v.shape, __dtype__: v.dtype}
             }
             else if(typeof nj != 'undefined' && nj.NdArray && v instanceof nj.NdArray){
               var dtype = _typedarray2dtype[v.selection.data.constructor.name]
@@ -415,9 +431,15 @@
           else if(aObject.__jailed_type__ == 'ndarray'){
             //create build array/tensor if used in the plugin
             if(this.id == '__plugin__' && typeof nj != 'undefined' && nj.array){
+              if(Array.isArray(aObject.__value__)){
+                aObject.__value__ = aObject.__value__.reduce(_appendBuffer)
+              }
               bObject = nj.array(aObject.__value__, aObject.__dtype__).reshape(aObject.__shape__)
             }
             else if(this.id == '__plugin__' && typeof tf != 'undefined' && tf.Tensor){
+              if(Array.isArray(aObject.__value__)){
+                aObject.__value__ = aObject.__value__.reduce(_appendBuffer)
+              }
               bObject = tf.tensor(aObject.__value__, aObject.__shape__, aObject.__dtype__)
             }
             else{
