@@ -81,8 +81,8 @@ Plugins can be written in Javascript or Python, a minimal plugin needs to implem
 * `url` the url used point to current file, used to download the plugin file when a user install it from the plugin store on imjoy.io website.
 * `description` a short description about the plugin, describe the main feature or the context of the plugin
 * `icon` defines the icon used in the plugin menu. You can find a material icon from https://material.io/tools/icons/ and set its name to `icon`.
-* `inputs` defines the inputs data with name and type. E.g.: {"image": "image/grayscale"}, if multiple inputs will be used, just add all of them into the object.
-* `outputs` defines the outputs data with name and type. E.g.: {"image": "image/grayscale"}, if multiple inputs will be used, just add all of them into the object.
+* `inputs` defines the inputs with json-schema syntax (http://json-schema.org/) .
+* `outputs` defines the outputs with json-schema syntax (http://json-schema.org/).
 * `env` (**for python plugins only**) the virtual environment or docker image command used for creating an enviroment to run the plugins
 * `requirements` (**for python plugins only**) the pip packages which will be installed before running the plugin, package names or github links are both supported.
 * `cmd` (**for python plugins only**) the command used to run the plugin, by default, it will run `python`, sometimes it can be something like `python3` or `python27` etc.
