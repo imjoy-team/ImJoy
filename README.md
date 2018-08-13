@@ -94,7 +94,7 @@ Used to contain documentation for the plugin, it need to be written in markdown 
 `setup` function used to get the plugin prepared for running, it will be exectued when the plugin during initialization.
 
 ### `run(my)` function
-`run` function will be called each time a user click on the menu or the container workflow is executed. While executed, an object(for Javascript) or a dictionary(for Python) called `my` will be passed into the function. The plugin can use variables stored in `my`.
+`run` function will be called each time a user click on the menu or run a workflow is executed. While executed, an object(for Javascript) or a dictionary(for Python) called `my` will be passed into the function. The plugin can use variables stored in `my`. 
 
 Here are the variables stored in `my`:
  * `my['op']`
@@ -105,6 +105,21 @@ Here are the variables stored in `my`:
  It stores the data from current active window while running the plugin.
  * `my['variables']`
  When the plugin is executed in a workflow, variables setted in the workflow will be passed as `my['variables']`.
+
+
+
+For the results, you can directly return your result and it will show in a result window. If you want to define the type of your result, or return multiple results, you can construct a new `my` variable(dictionary or object) with two fields `config` and `data`. Here is an example:
+```json
+   my = {
+      "config": {},
+      "data": {
+         "data_1": {"type": "image/grayscale", "image": img},
+         "result_tensor": {"type": "tensor", "tensor": t}
+      }
+   }
+   return my
+```
+In the result, two fields named `data_1` and `result_tensor` will be displayed in a result window or passed to the next op in a workflow.
 
 ### Javascript example
 ```javascript
