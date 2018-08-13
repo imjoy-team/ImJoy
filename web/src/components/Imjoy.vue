@@ -185,27 +185,27 @@ Engine<template>
                 <md-icon v-if="plugin.config.icon">{{plugin.config.icon}}</md-icon>
                 <md-icon v-else>extension</md-icon>
               </md-button>
-              <md-button class="joy-run-button md-primary" :disabled="plugin._disconnected" @click="plugin.ops && plugin.ops[0] && runOp(plugin.ops[0])">
+              <md-button class="joy-run-button md-primary" :disabled="plugin._disconnected" @click="runOp(plugin.ops[plugin.name])">
                 {{plugin.name}}
               </md-button>
               <md-button class="md-icon-button" @click="plugin.panel_expanded=!plugin.panel_expanded; $forceUpdate()">
                 <md-icon v-if="!plugin.panel_expanded">expand_more</md-icon>
                 <md-icon v-else>expand_less</md-icon>
               </md-button>
-              <div v-for="(op, i) in plugin.ops" :key="op.id + op.name">
+              <div v-for="(op, n) in plugin.ops" :key="op.id + op.name">
 
-                <md-button class="md-icon-button" v-show="plugin.panel_expanded && i != 0" :disabled="true">
+                <md-button class="md-icon-button" v-show="plugin.panel_expanded && op.name != plugin.name" :disabled="true">
                   <md-icon>remove</md-icon>
                 </md-button>
-                <md-button class="joy-run-button md-primary" :disabled="plugin._disconnected" v-show="plugin.panel_expanded && i != 0" @click="runOp(op)">
+                <md-button class="joy-run-button md-primary" :disabled="plugin._disconnected" v-show="plugin.panel_expanded && op.name != plugin.name" @click="runOp(op)">
                     {{op.name}}
                 </md-button>
 
-                <md-button class="md-icon-button" v-show="plugin.panel_expanded && i != 0" @click="op.panel_expanded=!op.panel_expanded; $forceUpdate()">
+                <md-button class="md-icon-button" v-show="plugin.panel_expanded &&  op.name != plugin.name" @click="op.panel_expanded=!op.panel_expanded; $forceUpdate()">
                   <md-icon v-if="!op.panel_expanded">expand_more</md-icon>
                   <md-icon v-else>expand_less</md-icon>
                 </md-button>
-                <joy :config="op" :show="(plugin.panel_expanded || false) && (((plugin.panel_expanded || false)  && i == 0) || op.panel_expanded || false )"></joy>
+                <joy :config="op" :show="(plugin.panel_expanded || false) && (((plugin.panel_expanded || false)  && op.name == plugin.name) || op.panel_expanded || false )"></joy>
                 <md-divider></md-divider>
               </div>
             </div>
@@ -338,6 +338,8 @@ import {
   Joy
 } from '../joy'
 
+import schema from 'js-schema'
+
 export default {
   name: 'imjoy',
   props: ['title'],
@@ -384,13 +386,9 @@ export default {
         w: 5,
         h: 5
       },
-      plugins: {},
-      plugin_names: {},
-      registered: {
-        ops: {},
-        windows: {},
-        extensions: {}
-      },
+      plugins: null,
+      plugin_names: null,
+      registered: null,
       plugin_templates: {
         "Webworker(Javascript)": WEBWORKER_PLUGIN_TEMPLATE,
         "Iframe(Javascript and HTML)": IFRAME_PLUGIN_TEMPLATE,
@@ -487,6 +485,7 @@ export default {
       showStatus: this.showStatus,
       run: this.runPlugin,
     }
+    this.resetPlugins()
     this.pluing_context = {}
     this.plugin_loaded = false
     this.loading = true
@@ -840,6 +839,30 @@ export default {
         }
       }
     },
+    resetPlugins(){
+      this.plugins = {}
+      this.plugin_names = {}
+      this.registered = {
+        ops: {},
+        windows: {},
+        extensions: {},
+        inputs: {},
+        outputs: {}
+      }
+      this.registered.internal_inputs = {
+        'Image': { schema: schema({type: ['image/jpeg', 'image/png', 'image/gif'], size: Number}), loader: (file)=>{
+          var fr = new FileReader();
+          fr.onload =  () => {
+            this.createWindow({
+              name: file.name,
+              type: 'imjoy/image',
+              data: {src: fr.result}
+            })
+          }
+          fr.readAsDataURL(file);
+        }},
+      }
+    },
     reloadPlugins() {
       if (this.plugins) {
         for (let k in this.plugins) {
@@ -857,8 +880,7 @@ export default {
           }
         }
       }
-      this.plugins = {}
-      this.plugin_names = {}
+      this.resetPlugins()
       this.db.allDocs({
         include_docs: true,
         attachments: true,
@@ -906,7 +928,7 @@ export default {
 
     },
     closeAll() {
-      this.windows = []
+
       this.default_window_pos = {
         i: 0,
         x: 0,
@@ -914,6 +936,14 @@ export default {
         w: 5,
         h: 5
       }
+      this.status_text = ''
+
+      for (var i = this.windows.length; i--;) {
+        if (this.windows[i].type != 'imjoy/plugin-editor') {
+            this.windows.splice(i, 1);
+        }
+      }
+
     },
     showProgress(p) {
       if (p < 1) this.progress = p * 100
@@ -925,6 +955,8 @@ export default {
       this.$forceUpdate()
     },
     addWindow(w) {
+      w.loaders = this.getDataLoaders(w.data)
+      console.log('-------------------', w.loaders)
       this.generateGridPosition(w)
       this.windows.push(w)
       this.store.event_bus.$emit('add_window', w)
@@ -959,38 +991,94 @@ export default {
       }
       this.default_window_pos.i = this.default_window_pos.i + 1
     },
+    validatePluginConfig(config){
+      if(config.name.indexOf('/')<0){
+        return true
+      }
+      else{
+        throw "Plugin name should not contain '/'."
+      }
+    },
+    getDataLoaders(data){
+      const loaders = {}
+      for (let k in this.registered.internal_inputs) {
+        if (this.registered.internal_inputs.hasOwnProperty(k)) {
+          console.log(k, this.registered.internal_inputs[k])
+          if (this.registered.internal_inputs[k].schema(data)) {
+            loaders[k] = this.registered.internal_inputs[k].loader
+          }
+        }
+      }
+      // find all the plugins registered for this type
+      for (let k in this.registered.inputs) {
+        if (this.registered.inputs.hasOwnProperty(k)) {
+          // const error = this.registered.inputs[k].schema.errors(data)
+          // console.error("schema mismatch: ", data, error)
+          if (this.registered.inputs[k].schema(data)) {
+            const plugin_name = this.registered.inputs[k].plugin_name
+            const op_name = this.registered.inputs[k].op_name
+            const plugin = this.plugin_names[plugin_name]
+
+            if(plugin){
+              console.log('associate data with ', plugin_name, op_name )
+              loaders[op_name] = async (target_data) => {
+                let config = {}
+                if (plugin.config && plugin.config.ui) {
+                  config = await this.showDialog(plugin.config)
+                }
+                plugin.api.run({
+                  op: {name: op_name},
+                  config: config,
+                  data: target_data
+                }).then((my) => {
+                  if (my) {
+                    console.log('result', my)
+                    my.name = my.name || 'result'
+                    my.type = my.type || 'imjoy/generic'
+                    this.addWindow(my)
+                  }
+                })
+              }
+            }
+          }
+        }
+      }
+      return loaders
+    },
     loadFiles() {
       for (let f = 0; f < this.selected_files.length; f++) {
         const file = this.selected_files[f]
         const tmp = file.name.split('.')
         const ext = tmp[tmp.length - 1]
-        if (this.registered.extensions[ext]) {
-          const plugins = this.registered.extensions[ext]
-          file.loaders = {}
-          for (let i = 0; i < plugins.length; i++) {
-            console.log('trying to open the file with ', plugins[i].name, plugins[i])
-            file.loaders[plugins[i].name] = async () => {
-              let config = {}
-              if (plugins[i].config && plugins[i].config.ui) {
-                config = await this.showDialog(plugins[i].config)
-              }
-              plugins[i].api.run({
-                op: {},
-                config: config,
-                data: {
-                  file: file
-                }
-              }).then((my) => {
-                if (my) {
-                  console.log('result', my)
-                  my.name = my.name || 'result'
-                  my.type = my.type || 'imjoy/generic'
-                  this.addWindow(my)
-                }
-              })
-            }
-          }
-        }
+        file.loaders = this.getDataLoaders(file)
+        console.log('loaders', file.loaders)
+        // if (this.registered.extensions[ext]) {
+        //   const plugins = this.registered.extensions[ext]
+        //   file.loaders = {}
+          // for (let i = 0; i < plugins.length; i++) {
+          //   console.log('trying to open the file with ', plugins[i].name, plugins[i])
+          //   file.loaders[plugins[i].name] = async () => {
+          //     let config = {}
+          //     if (plugins[i].config && plugins[i].config.ui) {
+          //       config = await this.showDialog(plugins[i].config)
+          //     }
+          //     plugins[i].api.run({
+          //       op: {},
+          //       config: config,
+          //       data: {
+          //         file: file
+          //       }
+          //     }).then((my) => {
+          //       if (my) {
+          //         console.log('result', my)
+          //         my.name = my.name || 'result'
+          //         my.type = my.type || 'imjoy/generic'
+          //         this.addWindow(my)
+          //       }
+          //     })
+          //   }
+          // }
+        // }
       }
       const w = {
         name: 'Files',
@@ -1167,6 +1255,7 @@ export default {
         inputs: template.inputs,
         outputs: template.outputs
       }
+      this.validatePluginConfig(config)
       //generate a random id for the plugin
       return new Promise((resolve, reject) => {
         if(!rplugin){
@@ -1209,6 +1298,7 @@ export default {
     loadPlugin(template, rplugin) {
       this.status_text = ''
       template = _clone(template)
+      this.validatePluginConfig(template)
       //generate a random id for the plugin
       return new Promise((resolve, reject) => {
         const config = {}
@@ -1321,7 +1411,6 @@ export default {
             const result = await plugin.api.run({
               op: {
                 name: my.op.name,
-                type: my.op.type
               },
               config: my.data,
               data: my.target,
@@ -1354,17 +1443,38 @@ export default {
         // joy_template.ui = null
         Joy.add(joy_template);
 
-        plugin.type = config.type
+        // plugin.type = config.type
+        // plugin.name = config.name
         console.log('register op plugin: ', plugin.config)
-        this.registered.ops[config.type] = plugin.config
+
         const op_config = {
+          plugin_id: _plugin.id,
           name: config.name,
-          id: _plugin.id,
           ui: "{id: '_panel', type: '" + config.type + "'}",
           onexecute: config.onexecute
         }
-        plugin.ops = plugin.ops || []
-        plugin.ops.push(op_config)
+        plugin.ops = plugin.ops || {}
+        plugin.ops[config.name] = op_config
+
+        if (config.inputs){
+          try {
+            const sch = schema.fromJSON(config.inputs)
+            this.registered.inputs[plugin.name+'/'+config.name] =  {op_name: config.name, plugin_name: plugin.name, schema: sch}
+          } catch (e) {
+            console.error(`something went wrong with the input schema for ${config.name}`, config.inputs)
+          }
+        }
+        if (config.outputs){
+          try {
+            const sch = schema.fromJSON(config.outputs)
+            this.registered.outputs[plugin.name+'/'+config.name] =  {op_name: config.name, plugin_name: plugin.name, schema: sch}
+          } catch (e) {
+            console.error(`something went wrong with the output schema for ${config.name}`, config.outputs)
+          }
+        }
+
+        this.registered.ops[plugin.name+'/'+config.name] = op_config
+
         //update the joy workflow if new template added, TODO: preserve settings during reload
         if (this.$refs.workflow) this.$refs.workflow.setupJoy()
 
@@ -1376,7 +1486,7 @@ export default {
             throw 'Window plugin must be with type "iframe"'
           }
           console.log('register window plugin: ', plugin.config)
-          this.registered.windows[config.type] = plugin.config
+          this.registered.windows[config.name] = plugin.config
         }
         if (config.tags.includes('file_importer')) {
           throw "file importer not supported yet"
@@ -1422,60 +1532,56 @@ export default {
       });
     },
     createWindow(wconfig, _plugin) {
-      try {
-        // wconfig.type = wconfig.type || "imjoy/panel"
-        wconfig.config = wconfig.config || {}
-        wconfig.data = wconfig.data || null
-        wconfig.force_show = wconfig.force_show || false
-        wconfig.panel = wconfig.panel || null
-        if (!WINDOW_SCHEMA(wconfig)) {
-          const error = WINDOW_SCHEMA.errors(wconfig)
-          console.error("Error occured during creating window " + wconfig.name, error)
-          throw error
+      // const plugin = this.plugins[_plugin.id]
+      // wconfig.type = wconfig.type || "imjoy/panel"
+      wconfig.config = wconfig.config || {}
+      wconfig.data = wconfig.data || null
+      wconfig.force_show = wconfig.force_show || false
+      wconfig.panel = wconfig.panel || null
+      if (!WINDOW_SCHEMA(wconfig)) {
+        const error = WINDOW_SCHEMA.errors(wconfig)
+        console.error("Error occured during creating window " + wconfig.name, error)
+        throw error
+      }
+      console.log('window config', wconfig)
+      if (wconfig.type.startsWith('imjoy')) {
+        // console.log('creating imjoy window', wconfig)
+        // wconfig.window_id = 'plugin_window_'+plugin._id+randId()
+        this.addWindow(wconfig)
+        return true
+      } else {
+        const window_config = this.registered.windows[wconfig.type]
+        console.log(window_config)
+        if (!window_config) {
+          console.error('no plugin registered for window type: ', wconfig.type)
+          throw 'no plugin registered for window type: ', wconfig.type
         }
-        console.log('window config', wconfig)
-        if (wconfig.type.startsWith('imjoy')) {
-          // console.log('creating imjoy window', wconfig)
-          // wconfig.window_id = 'plugin_window_'+plugin._id+randId()
-          this.addWindow(wconfig)
-          return true
+        // console.log(window_config)
+        const pconfig = wconfig //_clone(window_config)
+        //generate a new window id
+        pconfig.mode = window_config.mode
+        pconfig.id = window_config.name.trim().replace(/ /g, '_') + '_' + randId()
+        console.log('creating window: ', pconfig)
+        if (pconfig.mode != 'iframe') {
+          throw 'Window plugin must be with mode "iframe"'
+        }
+        // this is a unique id for the iframe to attach
+        pconfig.iframe_container = 'plugin_window_' + pconfig.id + randId()
+        console.log('changing id...')
+        pconfig.iframe_window = null
+        pconfig.plugin = window_config
+        pconfig.context = this.pluing_context
+        if (wconfig.force_show) {
+          pconfig.click2load = false
+          pconfig.loadWindow = null
+          this.showPluginWindow(pconfig).then(() => {
+            this.renderWindow(pconfig)
+          })
         } else {
-          const window_config = this.registered.windows[wconfig.type]
-          console.log(window_config)
-          if (!window_config) {
-            console.error('no plugin registered for window type: ', wconfig.type)
-            throw 'no plugin registered for window type: ', wconfig.type
-          }
-          // console.log(window_config)
-          const pconfig = wconfig //_clone(window_config)
-          //generate a new window id
-          pconfig.mode = window_config.mode
-          pconfig.id = window_config.name.trim().replace(/ /g, '_') + '_' + randId()
-          console.log('creating window: ', pconfig)
-          if (pconfig.mode != 'iframe') {
-            throw 'Window plugin must be with mode "iframe"'
-          }
-          // this is a unique id for the iframe to attach
-          pconfig.iframe_container = 'plugin_window_' + pconfig.id + randId()
-          console.log('changing id...')
-          pconfig.iframe_window = null
-          pconfig.plugin = window_config
-          pconfig.context = this.pluing_context
-          if (wconfig.force_show) {
-            pconfig.click2load = false
-            pconfig.loadWindow = null
-            this.showPluginWindow(pconfig).then(() => {
-              this.renderWindow(pconfig)
-            })
-          } else {
-            pconfig.click2load = true
-            pconfig.renderWindow = this.renderWindow
-            this.showPluginWindow(pconfig)
-          }
+          pconfig.click2load = true
+          pconfig.renderWindow = this.renderWindow
+          this.showPluginWindow(pconfig)
         }
-      } catch (e) {
-        console.error(e)
-        throw e
       }
       return true
     },

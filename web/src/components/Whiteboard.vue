@@ -35,6 +35,14 @@
                     <span>Close</span>
                     <md-icon>close</md-icon>
                   </md-menu-item>
+                  <md-menu-item @click="printObject(w.type, w.data)">
+                    <span>Console.log</span>
+                    <md-icon>bug_report</md-icon>
+                  </md-menu-item>
+                  <md-menu-item v-for="(loader, name) in w.loaders" v-if="w.loaders" :key="name" @click="loader(w.data)">
+                    <span>{{name}}</span>
+                    <md-icon>play_arrow</md-icon>
+                  </md-menu-item>
                 </md-menu-content>
               </md-menu>
             </div>
@@ -49,9 +57,9 @@
         <md-card-content class="plugin-iframe-container">
           <md-empty-state v-if="w.type=='empty'" md-icon="hourglass_empty" md-label="IMJOY.IO" md-description="">
           </md-empty-state>
-          <div v-if="w.type=='imjoy/files'">
+          <div v-if="w.type=='imjoy/files'" class="generic-plugin-window">
             <md-list>
-              <md-list-item v-for="f in w.data.files" @click="f.loaders&&Object.keys(f.loaders).length > 0&&f.loaders[Object.keys(f.loaders)[0]]()" :key="f.name">
+              <md-list-item v-for="f in w.data.files" @click="f.loaders&&Object.keys(f.loaders).length > 0&&f.loaders[Object.keys(f.loaders)[0]](f)" :key="f.name">
                 <md-icon>insert_drive_file</md-icon>
                 <span class="md-list-item-text">{{f.name}}</span>
                 <md-menu md-size="big" md-direction="bottom-end" v-if="f.loaders && Object.keys(f.loaders).length > 0">
@@ -59,7 +67,7 @@
                     <md-icon>more_horiz</md-icon>
                   </md-button>
                   <md-menu-content>
-                    <md-menu-item v-for="(loader, name) in f.loaders" :key="name" @click="loader()">
+                    <md-menu-item v-for="(loader, name) in f.loaders" :key="name" @click="loader(f)">
                       <span>{{name}}</span>
                       <md-icon>play_arrow</md-icon>
                     </md-menu-item>
@@ -69,10 +77,12 @@
             </md-list>
           </div>
           <div v-else-if="w.type=='imjoy/image'">
-            <img :src="w.data.image"></img>
+            <img style="width: 100%" :src="w.data.src" v-if="w.data.src"></img>
+            <p v-else> No image available for display.</p>
           </div>
           <div v-else-if="w.type=='imjoy/images'">
-            <img :src="img" v-for="img in w.data.images"></img>
+            <img style="width: 100%" :src="img" v-for="img in w.data.images" v-if="w.data.images"></img>
+            <p v-else> No image available for display.</p>
           </div>
           <div v-else-if="w.type=='imjoy/panel'">
             <joy :config="w.config"></joy>
@@ -170,7 +180,6 @@ export default {
       this.windows.splice(wi, 1)
     },
     fullScreen(w) {
-      console.log('---------------', this.$refs.whiteboard.clientHeight, this.row_height)
       const fh = parseInt(this.$refs.whiteboard.clientHeight/this.row_height) -10
       const fw = parseInt(this.$refs.whiteboard.clientWidth/this.column_width) -1
       w._h = w.h

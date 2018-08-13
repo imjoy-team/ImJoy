@@ -67,6 +67,21 @@ export default {
     });
     this.editor.setValue(this.value)
 
+    this.editor.commands.addCommand({
+      name: 'save',
+      bindKey: {"win": "Ctrl-S", "mac": "Cmd-S"},
+      exec: (editor) => {
+          this.save()
+      }
+    })
+
+    this.editor.commands.addCommand({
+      name: 'reload',
+      bindKey: {"win": "Ctrl-R", "mac": "Cmd-R"},
+      exec: (editor) => {
+          this.reload()
+      }
+    })
     // var editorDiv = document.getElementById(this.editorId);     // its container
     // var doc = this.editor.getSession().getDocument();  // a reference to the doc
     // this.editor.on("change", ()=>{
