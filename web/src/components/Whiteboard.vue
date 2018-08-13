@@ -91,7 +91,7 @@
             <!-- <p>generic data</p> -->
 
             <md-list>
-              <md-list-item @click="printObject(w.type, w.data)">
+              <md-list-item @click="w.loaders&&Object.keys(w.loaders).length > 0&&w.loaders[Object.keys(w.loaders)[0]](w.data)">
                 <span class="md-list-item-text">{{dataSummary(w)}}</span>
                 <md-tooltip>click to print the data in your console.</md-tooltip>
               </md-list-item>

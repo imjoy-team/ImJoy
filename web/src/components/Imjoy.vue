@@ -1014,32 +1014,50 @@ export default {
         if (this.registered.inputs.hasOwnProperty(k)) {
           // const error = this.registered.inputs[k].schema.errors(data)
           // console.error("schema mismatch: ", data, error)
-          if (this.registered.inputs[k].schema(data)) {
-            const plugin_name = this.registered.inputs[k].plugin_name
-            const op_name = this.registered.inputs[k].op_name
-            const plugin = this.plugin_names[plugin_name]
+          try {
+            if (this.registered.inputs[k].schema(data)) {
+              const plugin_name = this.registered.inputs[k].plugin_name
+              const op_name = this.registered.inputs[k].op_name
+              const plugin = this.plugin_names[plugin_name]
 
-            if(plugin){
-              console.log('associate data with ', plugin_name, op_name )
-              loaders[op_name] = async (target_data) => {
-                let config = {}
-                if (plugin.config && plugin.config.ui) {
-                  config = await this.showDialog(plugin.config)
-                }
-                plugin.api.run({
-                  op: {name: op_name},
-                  config: config,
-                  data: target_data
-                }).then((my) => {
-                  if (my) {
-                    console.log('result', my)
-                    my.name = my.name || 'result'
-                    my.type = my.type || 'imjoy/generic'
-                    this.addWindow(my)
+              if(plugin){
+                console.log('associate data with ', plugin_name, op_name )
+                loaders[op_name] = async (target_data) => {
+                  let config = {}
+                  if (plugin.config && plugin.config.ui) {
+                    config = await this.showDialog(plugin.config)
                   }
-                })
+                  const result = await plugin.api.run({
+                    op: {name: op_name},
+                    config: config,
+                    data: target_data
+                  })
+                  if(result){
+                    console.log('result', result)
+                    const my = {}
+                    if(result && result.data && result.config){
+                      my.data = result.config
+                      my.target = result.data
+                    }
+                    else if(result){
+                      my.data = null
+                      my.target = result
+                    }
+                    if (my.target && Object.keys(my.target).length>0) {
+                      const w = {}
+                      w.name = 'result'
+                      w.type = 'imjoy/generic'
+                      w.config = my.data
+                      w.data = my.target
+                      w.variables = my.target && my.target._variables
+                      this.createWindow(w)
+                    }
+                  }
+                }
               }
             }
+          } catch (e) {
+            console.error('error with validation with', this.registered.inputs[k].op_name, e)
           }
         }
       }
@@ -1101,12 +1119,13 @@ export default {
       joy.workflow.execute(w.data || {}).then((my) => {
         if (my.target && Object.keys(my.target).length>0) {
           console.log('result', my)
-          my.name = 'result'
-          my.type = 'imjoy/generic'
-          my.config = my.data
-          my.data = my.target
-          my.variables = my.target && my.target._variables
-          this.createWindow(my)
+          const w = {}
+          w.name = 'result'
+          w.type = 'imjoy/generic'
+          w.config = my.data
+          w.data = my.target
+          w.variables = my.target && my.target._variables
+          this.createWindow(w)
         }
         this.progress = 100
 
@@ -1165,6 +1184,7 @@ export default {
       console.log('run op.', this.active_windows)
       const w = this.active_windows[this.active_windows.length - 1] || {}
       op.joy._panel.execute(w.data || {}).then((my) => {
+        console.log('----------------', my)
         if (my.target && Object.keys(my.target).length>0) {
           console.log('result', my)
           my.name = 'result'
