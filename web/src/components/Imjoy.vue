@@ -1096,6 +1096,7 @@ export default {
       console.log(file_list)
       this.selected_file = file_list[0]
       this.selected_files = file_list
+      this.loadFiles()
     },
     closePanel(panel) {
 
