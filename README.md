@@ -24,6 +24,8 @@ Go to the [ImJoy web app](https://imjoy.io/#/app), click the + button to install
 
 When images are opened in the workspace, you need to first click the title bar of the window to select an active window, then click on the plugin menu to run the plugin.
 
+You can drag and drop your file into the workspace, or load with the + button. Then, a file window will open if files are loaded. File formats are supported with plugins, if a certain file extension is recognized by a plugin, you can just click the file in the file window to open it. For example, if you installed the plugin "Tif file importer", you will be able to click the .tif file in the file window.
+
 ## Using Python Plugins
 In order to use Python Plugins, please follow the instructions below:
   * Download Annaconda (Python3.6 version) from https://www.anaconda.com/download/ and install it.
