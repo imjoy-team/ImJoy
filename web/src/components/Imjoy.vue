@@ -270,7 +270,7 @@ Engine<template>
         &nbsp;&nbsp;Step 1. Install <a href="https://www.anaconda.com/download/" target="_blank">Anaconda</a> or <a href="https://conda.io/miniconda.html/" target="_blank">Miniconda</a> (Python3.6 version is preferred) <br>
         &nbsp;&nbsp;Step 2. Run <strong>pip install -U git+https://github.com/oeway/ImJoy-Python#egg=imjoy</strong> in a terminal. <br>
         &nbsp;&nbsp;Step 3. Run <strong>python -m imjoy</strong> in a terminal to start the engine.<br><br>
-        Once you are ready, click <strong>Connect</strong><br>'
+        Once you are ready, click <strong>CONNECT</strong><br>'
         md-confirm-text="Connect"
         md-cancel-text="Cancel"
         @md-confirm="connectEngine(engine_url)" />
