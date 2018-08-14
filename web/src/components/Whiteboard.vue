@@ -59,11 +59,11 @@
           </md-empty-state>
           <div v-if="w.type=='imjoy/files'" class="generic-plugin-window">
             <md-list>
-              <md-list-item v-for="f in w.data.files" @click="loaders && f.loaders&&Object.keys(f.loaders).length > 0 && loaders[f.loaders[Object.keys(f.loaders)[0]]](f)" :key="f.name">
+              <md-list-item v-for="f in w.data.files" @click="loaders && f.loaders&&Object.keys(f.loaders).length > 0 && loaders[f.loaders[Object.keys(f.loaders)[0]]](f)" :key="f.name+f.relativePath">
                 <md-icon>insert_drive_file</md-icon>
                 <span class="md-list-item-text">{{f.name}}</span>
                 <md-menu md-size="big" md-direction="bottom-end" v-if="f.loaders && Object.keys(f.loaders).length > 0">
-                  <md-button class="md-icon-button" md-menu-trigger>
+                  <md-button class="md-icon-button" md-menu-trigger.stop>
                     <md-icon>more_horiz</md-icon>
                   </md-button>
                   <md-menu-content>
@@ -89,7 +89,6 @@
           </div>
           <div v-else-if="w.type=='imjoy/generic'" class="generic-plugin-window">
             <!-- <p>generic data</p> -->
-
             <md-list>
               <md-list-item @click="loaders && w.loaders&&Object.keys(w.loaders).length > 0&& loaders[w.loaders[Object.keys(w.loaders)[0]]](w.data)">
                 <span class="md-list-item-text">{{dataSummary(w)}}</span>

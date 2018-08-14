@@ -119,7 +119,6 @@ api.export(PythonPlugin())
 export const PLUGIN_SCHEMA= schema({
   _id: [null, String],
   name: String,
-  url: [null, String],
   code: String,
   lang: [null, String],
   script: [null, String],

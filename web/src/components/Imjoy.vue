@@ -83,11 +83,11 @@ Engine<template>
           <md-icon>add</md-icon>
         </md-speed-dial-target>
         <md-speed-dial-content>
-          <md-button @click="$refs.file_select.openPicker()" class="md-icon-button md-primary">
+          <md-button @click="$refs.file_form.reset();$refs.file_select.click()" class="md-icon-button md-primary">
             <md-icon>insert_drive_file</md-icon>
             <md-tooltip>Open a file</md-tooltip>
           </md-button>
-          <md-button @click="$refs.folder_select.openPicker()" class="md-icon-button md-primary">
+          <md-button @click="$refs.folder_form.reset();$refs.folder_select.click()" class="md-icon-button md-primary">
             <md-icon>folder_open</md-icon>
             <md-tooltip>Open a folder</md-tooltip>
           </md-button>
@@ -102,12 +102,18 @@ Engine<template>
           <!-- <md-button v-if="!menuVisible" class="md-fab md-primary" @click="menuVisible=true">
             <md-icon>menu</md-icon>
           </md-button> -->
-          <md-field v-show="false">
+          <!-- <md-field v-show="false">
             <md-file v-show="false" v-model="folder_select" ref="file_select" @md-change="selectFileChanged" />
           </md-field>
           <md-field v-show="false">
             <md-file v-model="file_select" ref="folder_select" @md-change="selectFileChanged" webkitdirectory mozdirectory msdirectory odirectory directory multiple/>
-          </md-field>
+          </md-field> -->
+          <form v-show="false" ref="folder_form">
+            <input class="md-file" type="file" @change="selectFileChanged" ref="folder_select" webkitdirectory mozdirectory msdirectory odirectory directory multiple></input>
+          </form>
+          <form v-show="false" ref="file_form">
+            <input class="md-file" type="file" @change="selectFileChanged" ref="file_select" multiple></input>
+          </form>
           <md-button class="site-button" to="/">
             <div class="site-title">ImJoy.io<span class="superscript">alpha</span></div>
           </md-button>
@@ -305,6 +311,7 @@ Engine<template>
       <md-button class="md-primary md-raised centered-button" @click="newPlugin(template);showAddPluginDialog=false" v-for="(template, k) in plugin_templates" :key="k">
         <md-icon>add</md-icon>{{k}}
       </md-button>
+
       <plugin-list config-url="https://raw.githubusercontent.com/oeway/ImJoy-Plugins/master/manifest.json" :workspace="selected_workspace" title="Or, install from the Plugin Store"></plugin-list>
     </md-dialog-content>
     <md-dialog-actions>
@@ -442,7 +449,43 @@ export default {
       document.querySelector("#dropzone").style.visibility = "hidden";
       document.querySelector("#dropzone").style.opacity = 0;
       document.querySelector("#textnode").style.fontSize = "42px";
-      this.selected_files = e.dataTransfer.files;
+      const filelist = []
+      let folder_supported = false
+      // https://gist.github.com/tiff/3076863
+       const traverseFileTree = (item, path, getDataLoaders) => {
+         path = path || "";
+         if (item.isFile) {
+           // Get file
+           item.file((file)=>{
+             file.relativePath = path + file.name
+             file.loaders = getDataLoaders(file)
+             filelist.push(file);
+           });
+         } else if (item.isDirectory) {
+           // Get folder contents
+           var dirReader = item.createReader();
+           dirReader.readEntries((entries)=>{
+             for (var i = 0; i < entries.length; i++) {
+               traverseFileTree(entries[i], path + item.name + "/", getDataLoaders);
+             }
+           });
+         }
+      };
+      var length = e.dataTransfer.items.length;
+      for (var i = 0; i < length; i++) {
+        if(e.dataTransfer.items[i].webkitGetAsEntry){
+          folder_supported = true
+          var entry = e.dataTransfer.items[i].webkitGetAsEntry();
+          traverseFileTree(entry, null, this.getDataLoaders)
+        }
+      }
+      if(!folder_supported){
+        this.selected_files = e.dataTransfer.files;
+      }
+      else{
+        this.selected_files = filelist
+      }
+      console.log('files loaded: ', this.selected_files)
       this.loadFiles()
     });
     this.importScripts.apply(null, this.preload_main).then(() => {
@@ -921,7 +964,7 @@ export default {
               }
             } catch (e) {
               console.error(e)
-              alert(`Error occured when loading plugin "${config.name}": ${e.toString()}` )
+              this.showStatus(`Error occured when loading plugin "${config.name}": ${e.toString()}` )
             }
           }
         }
@@ -1012,7 +1055,7 @@ export default {
       const loaders = {}
       for (let k in this.registered.internal_inputs) {
         if (this.registered.internal_inputs.hasOwnProperty(k)) {
-          console.log(k, this.registered.internal_inputs[k])
+          // console.log(k, this.registered.internal_inputs[k])
           if (this.registered.internal_inputs[k].schema(data)) {
             loaders[k] = k
           }
@@ -1149,10 +1192,16 @@ export default {
         this.status_text = op.name + '->' + (e.toString() || "Error.")
       })
     },
-    selectFileChanged(file_list) {
-      console.log(file_list)
-      this.selected_file = file_list[0]
-      this.selected_files = file_list
+    selectFileChanged(event) {
+      console.log(event.target.files)
+      this.selected_file = event.target.files[0];
+      this.selected_files = event.target.files;
+      //normalize relative path
+      for(let i=0;i<event.target.files.length; i++){
+        const file = event.target.files[i];
+        file.relativePath = file.webkitRelativePath;
+        file.loaders = this.getDataLoaders(file)
+      }
       this.loadFiles()
     },
     closePanel(panel) {
@@ -1160,8 +1209,8 @@ export default {
     },
     parsePluginCode(code, config) {
       config = config || {}
-      const url = config.url
-      if (url && url.endsWith('.js')) {
+      const uri = config.uri
+      if (uri && uri.endsWith('.js')) {
         config.lang = config.lang || 'javascript'
         config.script = code
         config.style = null
@@ -1204,7 +1253,7 @@ export default {
       }
       config.type = config.type || config.name
       config._id = config._id || null
-      config.url = url
+      config.uri = uri
       config.code = code
       config.id = config.name.trim().replace(/ /g, '_') + '_' + randId()
       if (!PLUGIN_SCHEMA(config)) {
@@ -1428,6 +1477,7 @@ export default {
         if (config.inputs){
           try {
             const sch = schema.fromJSON(config.inputs)
+            console.log('inputs schema:-->', plugin.name, config.name, sch.toJSON())
             const plugin_name = plugin.name
             const op_name = config.name
             this.registered.inputs[plugin_name+'/'+op_name] =  {op_name: op_name, plugin_name: plugin_name, schema: sch}

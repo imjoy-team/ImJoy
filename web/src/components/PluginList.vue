@@ -3,6 +3,11 @@
   <!-- <md-subheader>Options</md-subheader> -->
   <md-subheader v-if="title">{{title}}
     <md-button v-if="available_plugins" @click="updateAll()" class="md-button md-primary"><md-icon>update</md-icon>Update All</md-button>
+      <md-field>
+        <label for="plugin_url">Install from URL</label>
+        <md-input type="text" v-model="plugin_url" name="plugin_url"></md-input>
+      </md-field>
+      <md-button v-if="plugin_url&&plugin_url!=''" @click="install({uri: plugin_url})" class="md-button md-primary"><md-icon>cloud_download</md-icon>Install</md-button>
   </md-subheader>
   <md-card v-if="containerWidth<=500" v-for="(plugin, k) in available_plugins" :key="k">
     <md-card-header>
@@ -69,6 +74,10 @@ import {
   randId
 } from '../utils.js'
 
+import {
+  parseComponent
+} from '../pluginParser.js'
+
 export default {
   name: 'plugin-list',
   props: {
@@ -98,6 +107,7 @@ export default {
   data() {
     return {
       editorCode: '',
+      plugin_url: '',
       editorPlugin: null,
       editorOptions: {},
       showEditor: false,
@@ -132,11 +142,18 @@ export default {
           this.manifest = response.data
           this.available_plugins = this.manifest.plugins
           this.plugin_dir = this.manifest.uri_root
-          this.uri_root = location.protocol + '//' + location.host
-          if (!this.plugin_dir.startsWith('http')) {
-            this.plugin_dir = this.uri_root + this.plugin_dir
-            console.log(this.plugin_dir)
+          if(this.plugin_dir){
+            this.uri_root = location.protocol + '//' + location.host
+            if (!this.plugin_dir.startsWith('http')) {
+              this.plugin_dir = this.uri_root + this.plugin_dir
+              console.log(this.plugin_dir)
+            }
           }
+          else{
+            this.uri_root = ''
+            this.plugin_dir = ''
+          }
+
           this.updatePluginList()
         }
       })
@@ -155,16 +172,13 @@ export default {
       for (let i = 0; i < this.available_plugins.length; i++) {
         const plugin = this.available_plugins[i]
         plugin.uri = plugin.uri || plugin.name + '.html'
-        if (!plugin.uri.startsWith('http')) {
-          plugin.uri = '/' + plugin.uri
+        if(!plugin.uri.startsWith(this.plugin_dir) && !plugin.uri.startsWith('http')){
+          plugin.uri = this.plugin_dir + '/'+ plugin.uri
         }
-        plugin.uri = this.plugin_dir + plugin.uri
-
         plugin._id = plugin._id || plugin.name.replace(/ /g, '_')
         this.db.get(plugin._id).then((doc) => {
           plugin.installed = true
           this.$forceUpdate()
-          console.log(plugin)
         }).catch((err) => {
           console.log(plugin.name, err)
         });
@@ -226,21 +240,41 @@ export default {
         this.api.show('Plugins updated with error.')
       });
     },
-    install(plugin) {
+    install(p) {
       return new Promise((resolve, reject) => {
-        axios.get(plugin.uri).then(response => {
+        const uri = typeof p == 'object'? p.uri: p
+        axios.get(uri).then(response => {
           if (!response || !response.data || response.data == '') {
-            alert('failed to get plugin code from ' + plugin.uri)
+            alert('failed to get plugin code from ' + uri)
             reject('failed to get code.')
             return
           }
-          plugin.code = response.data
-          plugin._id = plugin.name.replace(/ /g, '_')
-          if(plugin.dependencies){
-            for(let i=0;i<plugin.dependencies.length;i++){
-              const ps = this.available_plugins.filter(p => p.name == plugin.dependencies[i]);
+          let config = null
+          const code = response.data
+          const pluginComp = parseComponent(code)
+          console.log('code parsed from', pluginComp)
+          let c = null
+          for (let i = 0; i < pluginComp.customBlocks.length; i++) {
+            if (pluginComp.customBlocks[i].type == 'config') {
+              // find the first config block
+              config = JSON.parse(pluginComp.customBlocks[i].content)
+              console.log('loading config from .html file', config)
+              break
+            }
+          }
+          if(!config){
+            console.error('Failed to parse the plugin code.', code)
+            reject('Failed to parse the plugin code.')
+            return
+          }
+          config.uri = uri
+          config.code = code
+          config._id = config.name&&config.name.replace(/ /g, '_') || randId()
+          if(config.dependencies){
+            for(let i=0;i<config.dependencies.length;i++){
+              const ps = this.available_plugins.filter(p => p.name == config.dependencies[i]);
               if(ps.length<=0){
-                alert(plugin.name +' plugin depends on '+plugin.dependencies[i]+', but it can not be found in the repository.')
+                alert(config.name +' plugin depends on '+config.dependencies[i]+', but it can not be found in the repository.')
               }
               else{
                 console.log('installing dependency ', ps[0])
@@ -250,13 +284,15 @@ export default {
             }
           }
           const addPlugin = () => {
-            this.db.put(plugin, {
+            this.db.put(config, {
               force: true
             }).then((result) => {
               console.log('Successfully installed!');
-              plugin.installed = true
+              if(typeof p == 'object'){
+                p.installed = true
+              }
               this.$forceUpdate()
-              this.api.show(plugin.name + ' has been sucessfully installed.')
+              this.api.show(config.name + ' has been sucessfully installed.')
               resolve()
             }).catch((err) => {
               this.api.show('failed to install the plugin.')
@@ -264,7 +300,7 @@ export default {
             })
           }
           // remove if exists
-          this.db.get(plugin._id).then((doc) => {
+          this.db.get(config._id).then((doc) => {
             return this.db.remove(doc);
           }).then((result) => {
             addPlugin()
