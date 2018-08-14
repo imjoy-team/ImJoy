@@ -111,7 +111,7 @@ Here are the variables stored in `my`:
 
 
 For the results, you can directly return your result and it will show in a result window. If you want to define the type of your result, or return multiple results, you can construct a new `my` variable(dictionary or object) with two fields `config` and `data`. Here is an example:
-```json
+```javascript
    my = {
       "config": {},
       "data": {
