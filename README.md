@@ -251,7 +251,7 @@ api.export(PythonPlugin())
   ```json
   <config>
     ...
-    "env": "conda create -y -n python2 python=2.7 anaconda",
+    "env": "conda create -y -n python2 python=2.7",
     "requirements": ["numpy", "scipy"],
     "cmd": "python",
     ...
@@ -262,7 +262,7 @@ api.export(PythonPlugin())
   ```json
   <config>
     ...
-    "env": "conda create -y -n python3 python=3.6 anaconda",
+    "env": "conda create -y -n python3 python=3.6",
     "requirements": ["numpy", "scipy"],
     "cmd": "python",
     ...
@@ -273,7 +273,7 @@ api.export(PythonPlugin())
   **Note 2**: in the `env` field, you need to use `-n XXXX` to name your environment, otherwise, it will use the plugin name to name the environment.
 
 ## TODO: Use Docker Containers
- **Not supported yet**
+ **Not yet supported**
 
  Python plugin can also be ran with Docker.
  Examples:
