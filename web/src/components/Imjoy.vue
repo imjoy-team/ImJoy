@@ -273,23 +273,40 @@ Engine<template>
 
   <md-dialog :md-active.sync="showSettingsDialog" :md-click-outside-to-close="false">
     <md-dialog-content>
-      <md-tabs>
-      <md-tab id="tab-settings" md-label="General Settings">
-        <md-field>
-          <label for="engine_url">Plugin Engine URL</label>
-          <md-input type="text" v-model="engine_url" name="engine_url"></md-input>
-        </md-field>
-        <md-button class="md-primary" @click="connectEngine(engine_url)">Connect Plugin Engine</md-button>
-        <md-button class="md-primary" @click="disconnectEngine()">Disconnect Plugin Engine</md-button>
-        <p>{{engine_status}}</p>
-      </md-tab>
-      <md-tab id="tab-installed" md-label="Installed Plugins">
-        <plugin-list :plugins="installed_plugins" :workspace="selected_workspace" title="Installed Plugins"></plugin-list>
-      </md-tab>
-      <md-tab id="tab-plugin-store" md-label="Plugin Store" >
-        <plugin-list config-url="https://raw.githubusercontent.com/oeway/ImJoy-Plugins/master/manifest.json" :workspace="selected_workspace"  title="Available Plugins"></plugin-list>
-      </md-tab>
-    </md-tabs>
+      <md-divider></md-divider>
+      <md-card>
+        <md-card-header>
+          <div class="md-title">General Settings</div>
+        </md-card-header>
+        <md-card-content>
+          <md-field>
+            <label for="engine_url">Plugin Engine URL</label>
+            <md-input type="text" v-model="engine_url" name="engine_url"></md-input>
+          </md-field>
+          <md-button class="md-primary" @click="connectEngine(engine_url)">Connect Plugin Engine</md-button>
+          <md-button class="md-primary" @click="disconnectEngine()">Disconnect Plugin Engine</md-button>
+          <p>{{engine_status}}</p>
+        </md-card-content>
+      </md-card>
+
+      <md-divider></md-divider>
+      <md-card>
+        <md-card-header>
+          <div class="md-title">Installed Plugins</div>
+        </md-card-header>
+        <md-card-content>
+          <plugin-list mode="list" :plugins="installed_plugins" :workspace="selected_workspace"></plugin-list>
+        </md-card-content>
+      </md-card>
+      <md-divider></md-divider>
+      <md-card>
+        <md-card-header>
+          <div class="md-title">Plugin Store</div>
+        </md-card-header>
+        <md-card-content>
+        <plugin-list mode="list" config-url="https://raw.githubusercontent.com/oeway/ImJoy-Plugins/master/manifest.json" :workspace="selected_workspace"></plugin-list>
+    </md-card-content>
+    </md-card>
     </md-dialog-content>
     <md-dialog-actions>
       <md-button class="md-primary" @click="showSettingsDialog=false; reloadPlugins()">OK</md-button>
@@ -301,7 +318,7 @@ Engine<template>
       <md-button class="md-primary md-raised centered-button" @click="newPlugin(template);showAddPluginDialog=false" v-for="(template, k) in plugin_templates" :key="k">
         <md-icon>add</md-icon>{{k}}
       </md-button>
-      <plugin-list config-url="https://raw.githubusercontent.com/oeway/ImJoy-Plugins/master/manifest.json" :workspace="selected_workspace" title="Or, install from the Plugin Store"></plugin-list>
+      <plugin-list mode="list" config-url="https://raw.githubusercontent.com/oeway/ImJoy-Plugins/master/manifest.json" :workspace="selected_workspace" title="Or, install from the Plugin Store"></plugin-list>
     </md-dialog-content>
     <md-dialog-actions>
       <md-button class="md-primary" @click="showAddPluginDialog=false; reloadPlugins()">OK</md-button>

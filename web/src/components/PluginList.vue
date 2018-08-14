@@ -1,34 +1,84 @@
 <template>
 <div class="plugin-list" ref="container">
   <!-- <md-subheader>Options</md-subheader> -->
-  <md-subheader v-if="title">{{title}}
-    <md-button v-if="available_plugins" @click="updateAll()" class="md-button md-primary"><md-icon>update</md-icon>Update All</md-button>
+  <md-subheader>{{title}}
+    <md-button v-if="available_plugins" @click="updateAll()" class="md-button md-primary">
+      <md-icon>update</md-icon>Update All</md-button>
   </md-subheader>
-  <md-card v-if="containerWidth<=500" v-for="(plugin, k) in available_plugins" :key="k">
-    <md-card-header>
-      {{plugin.createdAt}}
-      <h2>{{plugin.name}}</h2>
-      <p>{{plugin.description}}</p>
-      <md-chip v-for="tag in plugin.tags" :key="tag">{{tag}}</md-chip>
-    </md-card-header>
-    <md-card-content>
-      <md-button v-if="!plugin.installed" @click="install(plugin)" class="md-button md-primary"><md-icon>cloud_download</md-icon>Install</md-button>
-      <md-button v-if="plugin.installed" @click="install(plugin)" class="md-button md-primary"><md-icon>update</md-icon>Update</md-button>
-      <md-button v-if="plugin.installed" @click="_plugin2_remove=plugin;showRemoveConfirmation=true;" class="md-accent"><md-icon>delete_forever</md-icon>Delete</md-button>
-      <md-button v-if="plugin.installed" @click="edit(plugin)" class="md-button md-primary"><md-icon>edit</md-icon>Edit</md-button>
-    </md-card-content>
-  </md-card>
-  <grid v-if="containerWidth>500"
-   :center="center"
-   :draggable="false"
-   :sortable="true"
-   :items="available_plugins"
-   :cell-width="380"
-   :cell-height="280"
-   :grid-width="containerWidth"
-   class="grid-container"
-   >
-   <template slot="cell" slot-scope="props">
+    <md-list class="md-triple-line md-dense" v-if="mode='list'">
+        <div v-for="(plugin, k) in available_plugins" :key="k">
+        <md-list-item>
+          <md-avatar>
+            <!-- <img src="https://placeimg.com/40/40/people/1" alt="People"> -->
+            <md-icon v-if="plugin.icon">{{plugin.icon}}</md-icon>
+            <md-icon v-else>extension</md-icon>
+          </md-avatar>
+
+          <div class="md-list-item-text">
+            <span>{{plugin.name}}</span>
+            <p>{{plugin.description}}</p>
+            <!-- <div>
+              <md-chip v-for="tag in plugin.tags" :key="tag">{{tag}}</md-chip>
+            </div> -->
+            <p><span v-for="tag in plugin.tags" :key="tag">{{tag}}; </span></p>
+          </div>
+          <md-menu>
+            <md-button class="md-icon-button md-list-action" md-menu-trigger>
+              <md-icon class="md-primary">more_horiz</md-icon>
+            </md-button>
+            <md-menu-content>
+              <md-menu-item v-if="!plugin.installed" @click="install(plugin)">
+                <md-icon>cloud_download</md-icon>Install
+              </md-menu-item>
+              <md-menu-item v-if="plugin.installed" @click="install(plugin)" >
+                <md-icon>update</md-icon>Update
+              </md-menu-item>
+              <md-menu-item v-if="plugin.installed" @click="_plugin2_remove=plugin;showRemoveConfirmation=true;" >
+                <md-icon>delete_forever</md-icon>Delete
+              </md-menu-item>
+              <md-menu-item v-if="plugin.installed" @click="edit(plugin)" >
+                <md-icon>edit</md-icon>Edit
+              </md-menu-item>
+            </md-menu-content>
+          </md-menu>
+
+          <!--<md-button v-if="!plugin.installed" @click="install(plugin)" class="md-icon-button md-list-action">
+            <md-icon>cloud_download</md-icon>Install</md-button>
+           <md-button v-if="plugin.installed" @click="install(plugin)" class="md-icon-button md-list-action">
+            <md-icon>update</md-icon>Update</md-button>
+          <md-button v-if="plugin.installed" @click="_plugin2_remove=plugin;showRemoveConfirmation=true;" class="md-icon-button md-list-action md-accent">
+            <md-icon>delete_forever</md-icon>Delete</md-button>
+          <md-button v-if="plugin.installed" @click="edit(plugin)"class="md-icon-button md-list-action">
+            <md-icon>edit</md-icon>Edit</md-button> -->
+
+
+        </md-list-item>
+        <md-divider class="md-inset"></md-divider>
+      </div>
+
+    </md-list>
+
+  <div v-else>
+    <md-card v-if="containerWidth<=500" v-for="(plugin, k) in available_plugins" :key="k">
+      <md-card-header>
+        {{plugin.createdAt}}
+        <h2>{{plugin.name}}</h2>
+        <p>{{plugin.description}}</p>
+        <md-chip v-for="tag in plugin.tags" :key="tag">{{tag}}</md-chip>
+      </md-card-header>
+      <md-card-content>
+        <md-button v-if="!plugin.installed" @click="install(plugin)" class="md-button md-primary">
+          <md-icon>cloud_download</md-icon>Install</md-button>
+        <md-button v-if="plugin.installed" @click="install(plugin)" class="md-button md-primary">
+          <md-icon>update</md-icon>Update</md-button>
+        <md-button v-if="plugin.installed" @click="_plugin2_remove=plugin;showRemoveConfirmation=true;" class="md-accent">
+          <md-icon>delete_forever</md-icon>Delete</md-button>
+        <md-button v-if="plugin.installed" @click="edit(plugin)" class="md-button md-primary">
+          <md-icon>edit</md-icon>Edit</md-button>
+      </md-card-content>
+    </md-card>
+    <grid v-if="containerWidth>500" :center="center" :draggable="false" :sortable="true" :items="available_plugins" :cell-width="380" :cell-height="280" :grid-width="containerWidth" class="grid-container">
+      <template slot="cell" slot-scope="props">
      <md-card>
        <md-card-header>
          {{props.item.createdAt}}
@@ -44,8 +94,8 @@
        </md-card-content>
      </md-card>
    </template>
- </grid>
-
+    </grid>
+  </div>
   <br>
   <md-dialog-confirm :md-active.sync="showRemoveConfirmation" md-title="Removing Plugin" md-content="Do you really want to <strong>delete</strong> this plugin" md-confirm-text="Yes" md-cancel-text="Cancel" @md-cancel="showRemoveConfirmation=false" @md-confirm="remove(_plugin2_remove);showRemoveConfirmation=false"
   />
@@ -84,13 +134,17 @@ export default {
       type: String,
       default: null
     },
+    mode: {
+      type: String,
+      default: 'list'
+    },
     center: {
       type: Boolean,
       default: true
     },
     plugins: {
       type: Array,
-      default: function(){
+      default: function() {
         return null
       }
     }
@@ -116,17 +170,16 @@ export default {
   },
   mounted() {
     this.containerWidth = this.$refs.container.offsetWidth;
-    this.store.event_bus.$on('resize',this.updateSize)
+    this.store.event_bus.$on('resize', this.updateSize)
 
     this.db = new PouchDB(this.workspace + '_workspace', {
       revs_limit: 2,
       auto_compaction: true
     })
-    if(this.plugins){
+    if (this.plugins) {
       this.available_plugins = this.plugins
       this.updatePluginList()
-    }
-    else if (this.configUrl) {
+    } else if (this.configUrl) {
       axios.get(this.configUrl).then(response => {
         if (response && response.data && response.data.plugins) {
           this.manifest = response.data
@@ -145,10 +198,10 @@ export default {
 
   },
   beforeDestroy() {
-    this.store.event_bus.$off('resize',this.updateSize)
+    this.store.event_bus.$off('resize', this.updateSize)
   },
   methods: {
-    updateSize(){
+    updateSize() {
       this.containerWidth = this.$refs.container.offsetWidth;
     },
     updatePluginList() {
@@ -187,13 +240,13 @@ export default {
     },
     saveCode() {
       this.editorPlugin.code = this.editorCode
-      this.db.get(this.editorPlugin._id).then((doc)=>{
+      this.db.get(this.editorPlugin._id).then((doc) => {
         this.editorPlugin._id = this.editorPlugin.name.replace(/ /g, '_')
         this.editorPlugin._rev = doc._rev
         return this.db.put(this.editorPlugin);
-      }).then((response)=>{
+      }).then((response) => {
         this.api.show('changes has been saved.')
-      }).catch( (err)=>{
+      }).catch((err) => {
         console.error(err);
         this.api.show('something went wrong during saving.')
       });
@@ -211,9 +264,9 @@ export default {
         console.log('error occured when removing ', plugin.name, err)
       });
     },
-    updateAll(){
-      for(let plugin of this.available_plugins){
-        if(plugin.installed){
+    updateAll() {
+      for (let plugin of this.available_plugins) {
+        if (plugin.installed) {
           this.install(plugin)
         }
       }
@@ -226,16 +279,15 @@ export default {
         }
         plugin.code = response.data
         plugin._id = plugin.name.replace(/ /g, '_')
-        if(plugin.dependencies){
-          for(let i=0;i<plugin.dependencies.length;i++){
+        if (plugin.dependencies) {
+          for (let i = 0; i < plugin.dependencies.length; i++) {
             const ps = this.available_plugins.filter(p => p.name == plugin.dependencies[i]);
-            if(ps.length<=0){
-              alert(plugin.name +' plugin depends on '+plugin.dependencies[i]+', but it can not be found in the repository.')
-            }
-            else{
+            if (ps.length <= 0) {
+              alert(plugin.name + ' plugin depends on ' + plugin.dependencies[i] + ', but it can not be found in the repository.')
+            } else {
               console.log('installing dependency ', ps[0])
-              if(!ps[0].installed)
-              this.install(ps[0])
+              if (!ps[0].installed)
+                this.install(ps[0])
             }
           }
         }
@@ -277,16 +329,17 @@ export default {
   margin-top: 20px
 }
 
-.editor-dialog{
+.editor-dialog {
   width: 80%;
   height: 85%;
 }
 
 .code-editor {
-  height: calc(100%)!important;
-  width: calc(100%)!important;
+  height: calc(100%) !important;
+  width: calc(100%) !important;
 }
-.grid-container{
-  width: calc(100%)!important;
+
+.grid-container {
+  width: calc(100%) !important;
 }
 </style>
