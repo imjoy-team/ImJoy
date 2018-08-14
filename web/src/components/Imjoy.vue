@@ -267,7 +267,7 @@ Engine<template>
         :md-click-outside-to-close="false"
         md-content='Python plugins are supported by ImJoy with the Python Plugin Engine. If it was already installed, run <strong>python -m imjoy</strong> in a terminal and press <strong>Connect</strong>.<br><br>
         If not, you need to do the following:<br>
-        &nbsp;&nbsp;Step 1. Install <a href="https://www.anaconda.com/download/" target="_blank">Anaconda</a> or <a href="https://conda.io/miniconda.html/" target="_blank">Miniconda</a> (Python3.6 version is preferred) <br>
+        &nbsp;&nbsp;Step 1. Install <a href="https://www.anaconda.com/download/" target="_blank">Anaconda</a> or <a href="https://conda.io/miniconda.html" target="_blank">Miniconda</a> (Python3.6 version is preferred) <br>
         &nbsp;&nbsp;Step 2. Run <strong>pip install -U git+https://github.com/oeway/ImJoy-Python#egg=imjoy</strong> in a terminal. <br>
         &nbsp;&nbsp;Step 3. Run <strong>python -m imjoy</strong> in a terminal to start the engine.<br><br>
         Once you are ready, click <strong>CONNECT</strong><br>'
