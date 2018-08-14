@@ -43,7 +43,11 @@ Engine<template>
           <md-icon>save</md-icon>
           <md-tooltip>Save all windows</md-tooltip>
         </md-button>
-        <md-menu md-size="big" md-direction="bottom-end">
+        <md-button v-if="!engine_connected" @click="connectEngine(engine_url)" class="md-icon-button md-accent">
+          <md-icon>whatshot</md-icon>
+          <md-tooltip>Connect to the Plugin Engine</md-tooltip>
+        </md-button>
+        <md-menu v-else md-size="big" md-direction="bottom-end">
           <md-button class="md-icon-button" :class="engine_connected?'md-primary':'md-accent'" md-menu-trigger>
             <md-icon>{{engine_connected?'sync':'sync_disabled'}}</md-icon>
             <md-tooltip>Connection to the Plugin Engine</md-tooltip>
@@ -52,10 +56,10 @@ Engine<template>
             <md-menu-item :disabled="true">
               <span>{{engine_status}}</span>
             </md-menu-item>
-            <md-menu-item @click="connectEngine(engine_url)">
+            <!-- <md-menu-item @click="connectEngine(engine_url)">
               <span>Connect</span>
               <md-icon>settings_ethernet</md-icon>
-            </md-menu-item>
+            </md-menu-item> -->
             <md-menu-item @click="disconnectEngine()">
               <span>Disconnect</span>
               <md-icon>clear</md-icon>
@@ -263,7 +267,7 @@ Engine<template>
         :md-click-outside-to-close="false"
         md-content='Python plugins are supported by ImJoy with the Python Plugin Engine. If it was already installed, run <strong>python -m imjoy</strong> in a terminal and press <strong>Connect</strong>.<br><br>
         If not, you need to do the following:<br>
-        &nbsp;&nbsp;Step 1. Install <a href="https://www.anaconda.com/download/" target="_blank">Anaconda (Python3.6 version)</a> <br>
+        &nbsp;&nbsp;Step 1. Install <a href="https://www.anaconda.com/download/" target="_blank">Anaconda</a> or <a href="https://conda.io/miniconda.html/" target="_blank">Miniconda</a> (Python3.6 version is preferred) <br>
         &nbsp;&nbsp;Step 2. Run <strong>pip install -U git+https://github.com/oeway/ImJoy-Python#egg=imjoy</strong> in a terminal. <br>
         &nbsp;&nbsp;Step 3. Run <strong>python -m imjoy</strong> in a terminal to start the engine.<br><br>
         Once you are ready, click <strong>Connect</strong><br>'
@@ -595,15 +599,16 @@ export default {
         this.socket.disconnect()
       }
       this.engine_status = 'Connecting, please wait...'
+      this.show('Trying to connect to the plugin engine...')
       const socket = io(url);
       const timer = setTimeout(() => {
         if (socket) {
           socket.disconnect()
           this.engine_status = 'Plugin Engine not connected'
-          if(!auto) this.show('Error: connection timeout, please make sure you have started the plugin engine.', 5000)
+          if(!auto) this.show('Failed to connect, please make sure you have started the plugin engine.', 5000)
           if(!auto) this.showPluginEngineInfo = true
         }
-      }, 3000)
+      }, 2500)
       socket.on('connect', (d) => {
         clearTimeout(timer)
         socket.emit('register_client', {id: this.client_id, token: this.connection_token}, (ret)=>{
