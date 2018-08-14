@@ -35,7 +35,7 @@ Engine<template>
          <span>{{snackbar_info}}</span>
          <md-button class="md-accent" @click="show_snackbar=false">close</md-button>
         </md-snackbar>
-        <md-button @click="closeAll" class="md-icon-button md-accent">
+        <md-button @click="closeAll" class="md-icon-button">
           <md-icon>cancel</md-icon>
           <md-tooltip>Close all windows</md-tooltip>
         </md-button>
@@ -70,7 +70,7 @@ Engine<template>
             </md-menu-item>
           </md-menu-content>
         </md-menu>
-        <md-button class="md-icon-button">
+        <md-button class="md-icon-button" target="_blank" href="https://github.com/oeway/ImJoy">
           <md-icon>help</md-icon>
           <md-tooltip>Open help information.</md-tooltip>
         </md-button>
@@ -544,7 +544,7 @@ export default {
       this.reloadPlugins()
     });
 
-    
+
     this.api.show = this.show;
 
   },
