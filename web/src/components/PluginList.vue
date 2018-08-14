@@ -1,48 +1,56 @@
 <template>
 <div class="plugin-list" ref="container">
   <!-- <md-subheader>Options</md-subheader> -->
-  <md-subheader>{{title}}
-    <md-button v-if="available_plugins" @click="updateAll()" class="md-button md-primary">
-      <md-icon>update</md-icon>Update All</md-button>
+  <md-subheader v-if="title">{{title}}
   </md-subheader>
-    <md-list class="md-triple-line md-dense" v-if="mode='list'">
-        <div v-for="(plugin, k) in available_plugins" :key="k">
-        <md-list-item>
-          <md-avatar>
-            <!-- <img src="https://placeimg.com/40/40/people/1" alt="People"> -->
-            <md-icon v-if="plugin.icon">{{plugin.icon}}</md-icon>
-            <md-icon v-else>extension</md-icon>
-          </md-avatar>
+  <div  class="md-layout md-gutter">
+    <md-button v-if="available_plugins" @click="updateAll()" class="md-button md-primary md-layout-item md-size-20">
+      <md-icon>update</md-icon>Update All</md-button>
+      <md-field v-if="showUrl" class="md-layout-item md-size-50">
+        <label for="plugin_url">Install from URL</label>
+        <md-input type="text" v-model="plugin_url" name="plugin_url"></md-input>
+      </md-field>
+      <md-button v-if="showUrl && plugin_url&&plugin_url!=''" @click="install({uri: plugin_url})" class="md-button md-primary md-size-20">
+        <md-icon>cloud_download</md-icon>Install</md-button>
+  </div>
+  <md-list class="md-triple-line md-dense" v-if="display=='list'">
+    <div v-for="(plugin, k) in available_plugins" :key="k">
+      <md-list-item>
+        <md-avatar>
+          <!-- <img src="https://placeimg.com/40/40/people/1" alt="People"> -->
+          <md-icon v-if="plugin.icon">{{plugin.icon}}</md-icon>
+          <md-icon v-else>extension</md-icon>
+        </md-avatar>
 
-          <div class="md-list-item-text">
-            <span>{{plugin.name}}</span>
-            <p>{{plugin.description}}</p>
-            <!-- <div>
+        <div class="md-list-item-text">
+          <span>{{plugin.name}}</span>
+          <p>{{plugin.description}}</p>
+          <!-- <div>
               <md-chip v-for="tag in plugin.tags" :key="tag">{{tag}}</md-chip>
             </div> -->
-            <p><span v-for="tag in plugin.tags" :key="tag">{{tag}}; </span></p>
-          </div>
-          <md-menu>
-            <md-button class="md-icon-button md-list-action" md-menu-trigger>
-              <md-icon class="md-primary">more_horiz</md-icon>
-            </md-button>
-            <md-menu-content>
-              <md-menu-item v-if="!plugin.installed" @click="install(plugin)">
-                <md-icon>cloud_download</md-icon>Install
-              </md-menu-item>
-              <md-menu-item v-if="plugin.installed" @click="install(plugin)" >
-                <md-icon>update</md-icon>Update
-              </md-menu-item>
-              <md-menu-item v-if="plugin.installed" @click="_plugin2_remove=plugin;showRemoveConfirmation=true;" >
-                <md-icon>delete_forever</md-icon>Delete
-              </md-menu-item>
-              <md-menu-item v-if="plugin.installed" @click="edit(plugin)" >
-                <md-icon>edit</md-icon>Edit
-              </md-menu-item>
-            </md-menu-content>
-          </md-menu>
+          <p><span v-for="tag in plugin.tags" :key="tag">{{tag}}; </span></p>
+        </div>
+        <md-menu>
+          <md-button class="md-icon-button md-list-action" md-menu-trigger>
+            <md-icon class="md-primary">more_horiz</md-icon>
+          </md-button>
+          <md-menu-content>
+            <md-menu-item v-if="!plugin.installed" @click="install(plugin)">
+              <md-icon>cloud_download</md-icon>Install
+            </md-menu-item>
+            <md-menu-item v-if="plugin.installed" @click="install(plugin)">
+              <md-icon>update</md-icon>Update
+            </md-menu-item>
+            <md-menu-item v-if="plugin.installed" @click="_plugin2_remove=plugin;showRemoveConfirmation=true;">
+              <md-icon>delete_forever</md-icon>Delete
+            </md-menu-item>
+            <md-menu-item v-if="plugin.installed" @click="edit(plugin)">
+              <md-icon>edit</md-icon>Edit
+            </md-menu-item>
+          </md-menu-content>
+        </md-menu>
 
-          <!--<md-button v-if="!plugin.installed" @click="install(plugin)" class="md-icon-button md-list-action">
+        <!--<md-button v-if="!plugin.installed" @click="install(plugin)" class="md-icon-button md-list-action">
             <md-icon>cloud_download</md-icon>Install</md-button>
            <md-button v-if="plugin.installed" @click="install(plugin)" class="md-icon-button md-list-action">
             <md-icon>update</md-icon>Update</md-button>
@@ -52,13 +60,13 @@
             <md-icon>edit</md-icon>Edit</md-button> -->
 
 
-        </md-list-item>
-        <md-divider class="md-inset"></md-divider>
-      </div>
+      </md-list-item>
+      <md-divider class="md-inset"></md-divider>
+    </div>
 
-    </md-list>
+  </md-list>
 
-  <div v-else>
+  <div v-if="display=='card'">
     <md-card v-if="containerWidth<=500" v-for="(plugin, k) in available_plugins" :key="k">
       <md-card-header>
         {{plugin.createdAt}}
@@ -119,6 +127,10 @@ import {
   randId
 } from '../utils.js'
 
+import {
+  parseComponent
+} from '../pluginParser.js'
+
 export default {
   name: 'plugin-list',
   props: {
@@ -134,9 +146,15 @@ export default {
       type: String,
       default: null
     },
-    mode: {
+    display: {
       type: String,
-      default: 'list'
+      default: function() {
+        return 'list'
+      }
+    },
+    showUrl: {
+      type: Boolean,
+      default: false
     },
     center: {
       type: Boolean,
@@ -152,6 +170,7 @@ export default {
   data() {
     return {
       editorCode: '',
+      plugin_url: '',
       editorPlugin: null,
       editorOptions: {},
       showEditor: false,
@@ -171,7 +190,6 @@ export default {
   mounted() {
     this.containerWidth = this.$refs.container.offsetWidth;
     this.store.event_bus.$on('resize', this.updateSize)
-
     this.db = new PouchDB(this.workspace + '_workspace', {
       revs_limit: 2,
       auto_compaction: true
@@ -185,11 +203,17 @@ export default {
           this.manifest = response.data
           this.available_plugins = this.manifest.plugins
           this.plugin_dir = this.manifest.uri_root
-          this.uri_root = location.protocol + '//' + location.host
-          if (!this.plugin_dir.startsWith('http')) {
-            this.plugin_dir = this.uri_root + this.plugin_dir
-            console.log(this.plugin_dir)
+          if (this.plugin_dir) {
+            this.uri_root = location.protocol + '//' + location.host
+            if (!this.plugin_dir.startsWith('http')) {
+              this.plugin_dir = this.uri_root + this.plugin_dir
+              console.log(this.plugin_dir)
+            }
+          } else {
+            this.uri_root = ''
+            this.plugin_dir = ''
           }
+
           this.updatePluginList()
         }
       })
@@ -208,16 +232,13 @@ export default {
       for (let i = 0; i < this.available_plugins.length; i++) {
         const plugin = this.available_plugins[i]
         plugin.uri = plugin.uri || plugin.name + '.html'
-        if (!plugin.uri.startsWith('http')) {
-          plugin.uri = '/' + plugin.uri
+        if (!plugin.uri.startsWith(this.plugin_dir) && !plugin.uri.startsWith('http')) {
+          plugin.uri = this.plugin_dir + '/' + plugin.uri
         }
-        plugin.uri = this.plugin_dir + plugin.uri
-
         plugin._id = plugin._id || plugin.name.replace(/ /g, '_')
         this.db.get(plugin._id).then((doc) => {
           plugin.installed = true
           this.$forceUpdate()
-          console.log(plugin)
         }).catch((err) => {
           console.log(plugin.name, err)
         });
@@ -265,54 +286,88 @@ export default {
       });
     },
     updateAll() {
+      const ps = []
       for (let plugin of this.available_plugins) {
         if (plugin.installed) {
-          this.install(plugin)
+          ps.push(this.install(plugin))
         }
       }
+      Promise.all(ps).then(() => {
+        console.log('All plugins updated successfully.')
+        this.api.show('All plugins updated successfully.')
+      }).catch((e) => {
+        console.error('Plugins updated with error.', e)
+        this.api.show('Plugins updated with error.')
+      });
     },
-    install(plugin) {
-      axios.get(plugin.uri).then(response => {
-        if (!response || !response.data || response.data == '') {
-          alert('failed to get plugin code from ' + plugin.uri)
-          return
-        }
-        plugin.code = response.data
-        plugin._id = plugin.name.replace(/ /g, '_')
-        if (plugin.dependencies) {
-          for (let i = 0; i < plugin.dependencies.length; i++) {
-            const ps = this.available_plugins.filter(p => p.name == plugin.dependencies[i]);
-            if (ps.length <= 0) {
-              alert(plugin.name + ' plugin depends on ' + plugin.dependencies[i] + ', but it can not be found in the repository.')
-            } else {
-              console.log('installing dependency ', ps[0])
-              if (!ps[0].installed)
-                this.install(ps[0])
+    install(p) {
+      return new Promise((resolve, reject) => {
+        const uri = typeof p == 'object' ? p.uri : p
+        axios.get(uri).then(response => {
+          if (!response || !response.data || response.data == '') {
+            alert('failed to get plugin code from ' + uri)
+            reject('failed to get code.')
+            return
+          }
+          let config = null
+          const code = response.data
+          const pluginComp = parseComponent(code)
+          console.log('code parsed from', pluginComp)
+          let c = null
+          for (let i = 0; i < pluginComp.customBlocks.length; i++) {
+            if (pluginComp.customBlocks[i].type == 'config') {
+              // find the first config block
+              config = JSON.parse(pluginComp.customBlocks[i].content)
+              console.log('loading config from .html file', config)
+              break
             }
           }
-        }
-        const addPlugin = () => {
-          this.db.put(plugin, {
-            force: true
+          if (!config) {
+            console.error('Failed to parse the plugin code.', code)
+            reject('Failed to parse the plugin code.')
+            return
+          }
+          config.uri = uri
+          config.code = code
+          config._id = config.name && config.name.replace(/ /g, '_') || randId()
+          if (config.dependencies) {
+            for (let i = 0; i < config.dependencies.length; i++) {
+              const ps = this.available_plugins.filter(p => p.name == config.dependencies[i]);
+              if (ps.length <= 0) {
+                alert(config.name + ' plugin depends on ' + config.dependencies[i] + ', but it can not be found in the repository.')
+              } else {
+                console.log('installing dependency ', ps[0])
+                if (!ps[0].installed)
+                  this.install(ps[0])
+              }
+            }
+          }
+          const addPlugin = () => {
+            this.db.put(config, {
+              force: true
+            }).then((result) => {
+              console.log('Successfully installed!');
+              if (typeof p == 'object') {
+                p.installed = true
+              }
+              this.$forceUpdate()
+              this.api.show(config.name + ' has been sucessfully installed.')
+              resolve()
+            }).catch((err) => {
+              this.api.show('failed to install the plugin.')
+              console.error(err)
+            })
+          }
+          // remove if exists
+          this.db.get(config._id).then((doc) => {
+            return this.db.remove(doc);
           }).then((result) => {
-            console.log('Successfully installed!');
-            plugin.installed = true
-            this.$forceUpdate()
-            this.api.show(plugin.name + ' has been sucessfully installed.')
+            addPlugin()
           }).catch((err) => {
-            this.api.show('failed to install the plugin.')
-            console.error(err)
-          })
-        }
-        // remove if exists
-        this.db.get(plugin._id).then((doc) => {
-          return this.db.remove(doc);
-        }).then((result) => {
-          addPlugin()
-        }).catch((err) => {
-          addPlugin()
-        });
+            addPlugin()
+          });
 
+        })
       })
 
     }

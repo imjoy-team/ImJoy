@@ -35,7 +35,7 @@ Engine<template>
          <span>{{snackbar_info}}</span>
          <md-button class="md-accent" @click="show_snackbar=false">close</md-button>
         </md-snackbar>
-        <md-button @click="closeAll" class="md-icon-button md-accent">
+        <md-button @click="closeAll" class="md-icon-button">
           <md-icon>cancel</md-icon>
           <md-tooltip>Close all windows</md-tooltip>
         </md-button>
@@ -43,7 +43,11 @@ Engine<template>
           <md-icon>save</md-icon>
           <md-tooltip>Save all windows</md-tooltip>
         </md-button>
-        <md-menu md-size="big" md-direction="bottom-end">
+        <md-button v-if="!engine_connected" @click="connectEngine(engine_url)" class="md-icon-button md-accent">
+          <md-icon>whatshot</md-icon>
+          <md-tooltip>Connect to the Plugin Engine</md-tooltip>
+        </md-button>
+        <md-menu v-else md-size="big" md-direction="bottom-end">
           <md-button class="md-icon-button" :class="engine_connected?'md-primary':'md-accent'" md-menu-trigger>
             <md-icon>{{engine_connected?'sync':'sync_disabled'}}</md-icon>
             <md-tooltip>Connection to the Plugin Engine</md-tooltip>
@@ -52,10 +56,10 @@ Engine<template>
             <md-menu-item :disabled="true">
               <span>{{engine_status}}</span>
             </md-menu-item>
-            <md-menu-item @click="connectEngine(engine_url)">
+            <!-- <md-menu-item @click="connectEngine(engine_url)">
               <span>Connect</span>
               <md-icon>settings_ethernet</md-icon>
-            </md-menu-item>
+            </md-menu-item> -->
             <md-menu-item @click="disconnectEngine()">
               <span>Disconnect</span>
               <md-icon>clear</md-icon>
@@ -66,7 +70,7 @@ Engine<template>
             </md-menu-item>
           </md-menu-content>
         </md-menu>
-        <md-button class="md-icon-button">
+        <md-button class="md-icon-button" target="_blank" href="https://github.com/oeway/ImJoy">
           <md-icon>help</md-icon>
           <md-tooltip>Open help information.</md-tooltip>
         </md-button>
@@ -79,11 +83,11 @@ Engine<template>
           <md-icon>add</md-icon>
         </md-speed-dial-target>
         <md-speed-dial-content>
-          <md-button @click="$refs.file_select.openPicker()" class="md-icon-button md-primary">
+          <md-button @click="$refs.file_form.reset();$refs.file_select.click()" class="md-icon-button md-primary">
             <md-icon>insert_drive_file</md-icon>
             <md-tooltip>Open a file</md-tooltip>
           </md-button>
-          <md-button @click="$refs.folder_select.openPicker()" class="md-icon-button md-primary">
+          <md-button @click="$refs.folder_form.reset();$refs.folder_select.click()" class="md-icon-button md-primary">
             <md-icon>folder_open</md-icon>
             <md-tooltip>Open a folder</md-tooltip>
           </md-button>
@@ -98,12 +102,18 @@ Engine<template>
           <!-- <md-button v-if="!menuVisible" class="md-fab md-primary" @click="menuVisible=true">
             <md-icon>menu</md-icon>
           </md-button> -->
-          <md-field v-show="false">
+          <!-- <md-field v-show="false">
             <md-file v-show="false" v-model="folder_select" ref="file_select" @md-change="selectFileChanged" />
           </md-field>
           <md-field v-show="false">
             <md-file v-model="file_select" ref="folder_select" @md-change="selectFileChanged" webkitdirectory mozdirectory msdirectory odirectory directory multiple/>
-          </md-field>
+          </md-field> -->
+          <form v-show="false" ref="folder_form">
+            <input class="md-file" type="file" @change="selectFileChanged" ref="folder_select" webkitdirectory mozdirectory msdirectory odirectory directory multiple></input>
+          </form>
+          <form v-show="false" ref="file_form">
+            <input class="md-file" type="file" @change="selectFileChanged" ref="file_select" multiple></input>
+          </form>
           <md-button class="site-button" to="/">
             <div class="site-title">ImJoy.io<span class="superscript">alpha</span></div>
           </md-button>
@@ -217,7 +227,7 @@ Engine<template>
     </md-app-drawer>
     <md-app-content class="whiteboard-content">
       <md-progress-bar md-mode="determinate" :md-value="progress"></md-progress-bar>
-      <whiteboard :windows="windows" @select="windowSelected"></whiteboard>
+      <whiteboard :windows="windows" :loaders="registered&&registered.loaders" @select="windowSelected"></whiteboard>
     </md-app-content>
   </md-app>
   <!-- </md-card-content> -->
@@ -263,10 +273,10 @@ Engine<template>
         :md-click-outside-to-close="false"
         md-content='Python plugins are supported by ImJoy with the Python Plugin Engine. If it was already installed, run <strong>python -m imjoy</strong> in a terminal and press <strong>Connect</strong>.<br><br>
         If not, you need to do the following:<br>
-        &nbsp;&nbsp;Step 1. Install <a href="https://www.anaconda.com/download/" target="_blank">Anaconda (Python3.6 version)</a> <br>
+        &nbsp;&nbsp;Step 1. Install <a href="https://www.anaconda.com/download/" target="_blank">Anaconda</a> or <a href="https://conda.io/miniconda.html" target="_blank">Miniconda</a> (Python3.6 version is preferred) <br>
         &nbsp;&nbsp;Step 2. Run <strong>pip install -U git+https://github.com/oeway/ImJoy-Python#egg=imjoy</strong> in a terminal. <br>
         &nbsp;&nbsp;Step 3. Run <strong>python -m imjoy</strong> in a terminal to start the engine.<br><br>
-        Once you are ready, click <strong>Connect</strong><br>'
+        Once you are ready, click <strong>CONNECT</strong><br>'
         md-confirm-text="Connect"
         md-cancel-text="Cancel"
         @md-confirm="connectEngine(engine_url)" />
@@ -295,7 +305,7 @@ Engine<template>
           <div class="md-title">Installed Plugins</div>
         </md-card-header>
         <md-card-content>
-          <plugin-list mode="list" :plugins="installed_plugins" :workspace="selected_workspace"></plugin-list>
+          <plugin-list display="list" :plugins="installed_plugins" :workspace="selected_workspace"></plugin-list>
         </md-card-content>
       </md-card>
       <md-divider></md-divider>
@@ -304,7 +314,7 @@ Engine<template>
           <div class="md-title">Plugin Store</div>
         </md-card-header>
         <md-card-content>
-        <plugin-list mode="list" config-url="https://raw.githubusercontent.com/oeway/ImJoy-Plugins/master/manifest.json" :workspace="selected_workspace"></plugin-list>
+        <plugin-list show-url display="list" config-url="https://raw.githubusercontent.com/oeway/ImJoy-Plugins/master/manifest.json" :workspace="selected_workspace"></plugin-list>
     </md-card-content>
     </md-card>
     </md-dialog-content>
@@ -318,7 +328,7 @@ Engine<template>
       <md-button class="md-primary md-raised centered-button" @click="newPlugin(template);showAddPluginDialog=false" v-for="(template, k) in plugin_templates" :key="k">
         <md-icon>add</md-icon>{{k}}
       </md-button>
-      <plugin-list mode="list" config-url="https://raw.githubusercontent.com/oeway/ImJoy-Plugins/master/manifest.json" :workspace="selected_workspace" title="Or, install from the Plugin Store"></plugin-list>
+      <plugin-list show-url display="list" config-url="https://raw.githubusercontent.com/oeway/ImJoy-Plugins/master/manifest.json" :workspace="selected_workspace" title="Or, install from the Plugin Store"></plugin-list>
     </md-dialog-content>
     <md-dialog-actions>
       <md-button class="md-primary" @click="showAddPluginDialog=false; reloadPlugins()">OK</md-button>
@@ -455,7 +465,43 @@ export default {
       document.querySelector("#dropzone").style.visibility = "hidden";
       document.querySelector("#dropzone").style.opacity = 0;
       document.querySelector("#textnode").style.fontSize = "42px";
-      this.selected_files = e.dataTransfer.files;
+      const filelist = []
+      let folder_supported = false
+      // https://gist.github.com/tiff/3076863
+       const traverseFileTree = (item, path, getDataLoaders) => {
+         path = path || "";
+         if (item.isFile) {
+           // Get file
+           item.file((file)=>{
+             file.relativePath = path + file.name
+             file.loaders = getDataLoaders(file)
+             filelist.push(file);
+           });
+         } else if (item.isDirectory) {
+           // Get folder contents
+           var dirReader = item.createReader();
+           dirReader.readEntries((entries)=>{
+             for (var i = 0; i < entries.length; i++) {
+               traverseFileTree(entries[i], path + item.name + "/", getDataLoaders);
+             }
+           });
+         }
+      };
+      var length = e.dataTransfer.items.length;
+      for (var i = 0; i < length; i++) {
+        if(e.dataTransfer.items[i].webkitGetAsEntry){
+          folder_supported = true
+          var entry = e.dataTransfer.items[i].webkitGetAsEntry();
+          traverseFileTree(entry, null, this.getDataLoaders)
+        }
+      }
+      if(!folder_supported){
+        this.selected_files = e.dataTransfer.files;
+      }
+      else{
+        this.selected_files = filelist
+      }
+      console.log('files loaded: ', this.selected_files)
       this.loadFiles()
     });
     this.importScripts.apply(null, this.preload_main).then(() => {
@@ -557,6 +603,9 @@ export default {
       this.reloadPlugins()
     });
 
+
+    this.api.show = this.show;
+
   },
   beforeDestroy() {
     console.log('terminating plugins')
@@ -612,15 +661,16 @@ export default {
         this.socket.disconnect()
       }
       this.engine_status = 'Connecting, please wait...'
+      this.show('Trying to connect to the plugin engine...')
       const socket = io(url);
       const timer = setTimeout(() => {
         if (socket) {
           socket.disconnect()
           this.engine_status = 'Plugin Engine not connected'
-          if(!auto) this.show('Error: connection timeout, please make sure you have started the plugin engine.', 5000)
+          if(!auto) this.show('Failed to connect, please make sure you have started the plugin engine.', 5000)
           if(!auto) this.showPluginEngineInfo = true
         }
-      }, 3000)
+      }, 2500)
       socket.on('connect', (d) => {
         clearTimeout(timer)
         socket.emit('register_client', {id: this.client_id, token: this.connection_token}, (ret)=>{
@@ -864,20 +914,22 @@ export default {
         windows: {},
         extensions: {},
         inputs: {},
-        outputs: {}
+        outputs: {},
+        loaders: {}
       }
       this.registered.internal_inputs = {
-        'Image': { schema: schema({type: ['image/jpeg', 'image/png', 'image/gif'], size: Number}), loader: (file)=>{
-          var fr = new FileReader();
-          fr.onload =  () => {
-            this.createWindow({
-              name: file.name,
-              type: 'imjoy/image',
-              data: {src: fr.result}
-            })
-          }
-          fr.readAsDataURL(file);
-        }},
+        'Image': { schema: schema({type: ['image/jpeg', 'image/png', 'image/gif'], size: Number})},
+      }
+      this.registered.loaders['Image'] = (file)=>{
+        var fr = new FileReader();
+        fr.onload =  () => {
+          this.createWindow({
+            name: file.name,
+            type: 'imjoy/image',
+            data: {src: fr.result}
+          })
+        }
+        fr.readAsDataURL(file);
       }
     },
     reloadPlugins() {
@@ -928,7 +980,7 @@ export default {
               }
             } catch (e) {
               console.error(e)
-              alert(`Error occured when loading plugin "${config.name}": ${e.toString()}` )
+              this.showStatus(`Error occured when loading plugin "${config.name}": ${e.toString()}` )
             }
           }
         }
@@ -973,7 +1025,6 @@ export default {
     },
     addWindow(w) {
       w.loaders = this.getDataLoaders(w.data)
-      console.log('-------------------', w.loaders)
       this.generateGridPosition(w)
       this.windows.push(w)
       this.store.event_bus.$emit('add_window', w)
@@ -1020,9 +1071,9 @@ export default {
       const loaders = {}
       for (let k in this.registered.internal_inputs) {
         if (this.registered.internal_inputs.hasOwnProperty(k)) {
-          console.log(k, this.registered.internal_inputs[k])
+          // console.log(k, this.registered.internal_inputs[k])
           if (this.registered.internal_inputs[k].schema(data)) {
-            loaders[k] = this.registered.internal_inputs[k].loader
+            loaders[k] = k
           }
         }
       }
@@ -1036,41 +1087,9 @@ export default {
               const plugin_name = this.registered.inputs[k].plugin_name
               const op_name = this.registered.inputs[k].op_name
               const plugin = this.plugin_names[plugin_name]
-
-              if(plugin){
+              if(plugin && this.registered.loaders[plugin_name+'/'+op_name]){
                 console.log('associate data with ', plugin_name, op_name )
-                loaders[op_name] = async (target_data) => {
-                  let config = {}
-                  if (plugin.config && plugin.config.ui) {
-                    config = await this.showDialog(plugin.config)
-                  }
-                  const result = await plugin.api.run({
-                    op: {name: op_name},
-                    config: config,
-                    data: target_data
-                  })
-                  if(result){
-                    console.log('result', result)
-                    const my = {}
-                    if(result && result.data && result.config){
-                      my.data = result.config
-                      my.target = result.data
-                    }
-                    else if(result){
-                      my.data = null
-                      my.target = result
-                    }
-                    if (my.target && Object.keys(my.target).length>0) {
-                      const w = {}
-                      w.name = 'result'
-                      w.type = 'imjoy/generic'
-                      w.config = my.data
-                      w.data = my.target
-                      w.variables = my.target && my.target._variables
-                      this.createWindow(w)
-                    }
-                  }
-                }
+                loaders[op_name] = plugin_name+'/'+op_name
               }
             }
           } catch (e) {
@@ -1087,33 +1106,6 @@ export default {
         const ext = tmp[tmp.length - 1]
         file.loaders = this.getDataLoaders(file)
         console.log('loaders', file.loaders)
-        // if (this.registered.extensions[ext]) {
-        //   const plugins = this.registered.extensions[ext]
-        //   file.loaders = {}
-          // for (let i = 0; i < plugins.length; i++) {
-          //   console.log('trying to open the file with ', plugins[i].name, plugins[i])
-          //   file.loaders[plugins[i].name] = async () => {
-          //     let config = {}
-          //     if (plugins[i].config && plugins[i].config.ui) {
-          //       config = await this.showDialog(plugins[i].config)
-          //     }
-          //     plugins[i].api.run({
-          //       op: {},
-          //       config: config,
-          //       data: {
-          //         file: file
-          //       }
-          //     }).then((my) => {
-          //       if (my) {
-          //         console.log('result', my)
-          //         my.name = my.name || 'result'
-          //         my.type = my.type || 'imjoy/generic'
-          //         this.addWindow(my)
-          //       }
-          //     })
-          //   }
-          // }
-        // }
       }
       const w = {
         name: 'Files',
@@ -1201,7 +1193,6 @@ export default {
       console.log('run op.', this.active_windows)
       const w = this.active_windows[this.active_windows.length - 1] || {}
       op.joy._panel.execute(w.data || {}).then((my) => {
-        console.log('----------------', my)
         if (my.target && Object.keys(my.target).length>0) {
           console.log('result', my)
           my.name = 'result'
@@ -1217,10 +1208,16 @@ export default {
         this.status_text = op.name + '->' + (e.toString() || "Error.")
       })
     },
-    selectFileChanged(file_list) {
-      console.log(file_list)
-      this.selected_file = file_list[0]
-      this.selected_files = file_list
+    selectFileChanged(event) {
+      console.log(event.target.files)
+      this.selected_file = event.target.files[0];
+      this.selected_files = event.target.files;
+      //normalize relative path
+      for(let i=0;i<event.target.files.length; i++){
+        const file = event.target.files[i];
+        file.relativePath = file.webkitRelativePath;
+        file.loaders = this.getDataLoaders(file)
+      }
       this.loadFiles()
     },
     closePanel(panel) {
@@ -1228,8 +1225,8 @@ export default {
     },
     parsePluginCode(code, config) {
       config = config || {}
-      const url = config.url
-      if (url && url.endsWith('.js')) {
+      const uri = config.uri
+      if (uri && uri.endsWith('.js')) {
         config.lang = config.lang || 'javascript'
         config.script = code
         config.style = null
@@ -1272,7 +1269,7 @@ export default {
       }
       config.type = config.type || config.name
       config._id = config._id || null
-      config.url = url
+      config.uri = uri
       config.code = code
       config.id = config.name.trim().replace(/ /g, '_') + '_' + randId()
       if (!PLUGIN_SCHEMA(config)) {
@@ -1496,9 +1493,45 @@ export default {
         if (config.inputs){
           try {
             const sch = schema.fromJSON(config.inputs)
-            this.registered.inputs[plugin.name+'/'+config.name] =  {op_name: config.name, plugin_name: plugin.name, schema: sch}
+            console.log('inputs schema:-->', plugin.name, config.name, sch.toJSON())
+            const plugin_name = plugin.name
+            const op_name = config.name
+            this.registered.inputs[plugin_name+'/'+op_name] =  {op_name: op_name, plugin_name: plugin_name, schema: sch}
+            this.registered.loaders[plugin_name+'/'+op_name] = async (target_data) => {
+                let config = {}
+                if (plugin.config && plugin.config.ui) {
+                  config = await this.showDialog(plugin.config)
+                }
+                const result = await plugin.api.run({
+                  op: {name: op_name},
+                  config: config,
+                  data: target_data
+                })
+                if(result){
+                  console.log('result', result)
+                  const my = {}
+                  if(result && result.data && result.config){
+                    my.data = result.config
+                    my.target = result.data
+                  }
+                  else if(result){
+                    my.data = null
+                    my.target = result
+                  }
+                  if (my.target && Object.keys(my.target).length>0) {
+                    const w = {}
+                    w.name = 'result'
+                    w.type = 'imjoy/generic'
+                    w.config = my.data
+                    w.data = my.target
+                    w.variables = my.target && my.target._variables
+                    this.createWindow(w)
+                  }
+                }
+            }
+
           } catch (e) {
-            console.error(`something went wrong with the input schema for ${config.name}`, config.inputs)
+            console.error(`something went wrong with the input schema for ${config.name}`, e)
           }
         }
         if (config.outputs){
