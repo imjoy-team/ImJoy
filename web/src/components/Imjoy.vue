@@ -544,6 +544,9 @@ export default {
       this.reloadPlugins()
     });
 
+    
+    this.api.show = this.show;
+
   },
   beforeDestroy() {
     console.log('terminating plugins')

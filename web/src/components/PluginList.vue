@@ -212,55 +212,67 @@ export default {
       });
     },
     updateAll(){
+      const ps = []
       for(let plugin of this.available_plugins){
         if(plugin.installed){
-          this.install(plugin)
+          ps.push(this.install(plugin))
         }
       }
+      Promise.all(ps).then(()=>{
+        console.log('All plugins updated successfully.')
+        this.api.show('All plugins updated successfully.')
+      }).catch((e)=>{
+        console.error('Plugins updated with error.', e)
+        this.api.show('Plugins updated with error.')
+      });
     },
     install(plugin) {
-      axios.get(plugin.uri).then(response => {
-        if (!response || !response.data || response.data == '') {
-          alert('failed to get plugin code from ' + plugin.uri)
-          return
-        }
-        plugin.code = response.data
-        plugin._id = plugin.name.replace(/ /g, '_')
-        if(plugin.dependencies){
-          for(let i=0;i<plugin.dependencies.length;i++){
-            const ps = this.available_plugins.filter(p => p.name == plugin.dependencies[i]);
-            if(ps.length<=0){
-              alert(plugin.name +' plugin depends on '+plugin.dependencies[i]+', but it can not be found in the repository.')
-            }
-            else{
-              console.log('installing dependency ', ps[0])
-              if(!ps[0].installed)
-              this.install(ps[0])
+      return new Promise((resolve, reject) => {
+        axios.get(plugin.uri).then(response => {
+          if (!response || !response.data || response.data == '') {
+            alert('failed to get plugin code from ' + plugin.uri)
+            reject('failed to get code.')
+            return
+          }
+          plugin.code = response.data
+          plugin._id = plugin.name.replace(/ /g, '_')
+          if(plugin.dependencies){
+            for(let i=0;i<plugin.dependencies.length;i++){
+              const ps = this.available_plugins.filter(p => p.name == plugin.dependencies[i]);
+              if(ps.length<=0){
+                alert(plugin.name +' plugin depends on '+plugin.dependencies[i]+', but it can not be found in the repository.')
+              }
+              else{
+                console.log('installing dependency ', ps[0])
+                if(!ps[0].installed)
+                this.install(ps[0])
+              }
             }
           }
-        }
-        const addPlugin = () => {
-          this.db.put(plugin, {
-            force: true
+          const addPlugin = () => {
+            this.db.put(plugin, {
+              force: true
+            }).then((result) => {
+              console.log('Successfully installed!');
+              plugin.installed = true
+              this.$forceUpdate()
+              this.api.show(plugin.name + ' has been sucessfully installed.')
+              resolve()
+            }).catch((err) => {
+              this.api.show('failed to install the plugin.')
+              console.error(err)
+            })
+          }
+          // remove if exists
+          this.db.get(plugin._id).then((doc) => {
+            return this.db.remove(doc);
           }).then((result) => {
-            console.log('Successfully installed!');
-            plugin.installed = true
-            this.$forceUpdate()
-            this.api.show(plugin.name + ' has been sucessfully installed.')
+            addPlugin()
           }).catch((err) => {
-            this.api.show('failed to install the plugin.')
-            console.error(err)
-          })
-        }
-        // remove if exists
-        this.db.get(plugin._id).then((doc) => {
-          return this.db.remove(doc);
-        }).then((result) => {
-          addPlugin()
-        }).catch((err) => {
-          addPlugin()
-        });
+            addPlugin()
+          });
 
+        })
       })
 
     }
