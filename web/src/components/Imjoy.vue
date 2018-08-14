@@ -217,7 +217,7 @@ Engine<template>
     </md-app-drawer>
     <md-app-content class="whiteboard-content">
       <md-progress-bar md-mode="determinate" :md-value="progress"></md-progress-bar>
-      <whiteboard :windows="windows" @select="windowSelected"></whiteboard>
+      <whiteboard :windows="windows" :loaders="registered&&registered.loaders" @select="windowSelected"></whiteboard>
     </md-app-content>
   </md-app>
   <!-- </md-card-content> -->
@@ -847,20 +847,22 @@ export default {
         windows: {},
         extensions: {},
         inputs: {},
-        outputs: {}
+        outputs: {},
+        loaders: {}
       }
       this.registered.internal_inputs = {
-        'Image': { schema: schema({type: ['image/jpeg', 'image/png', 'image/gif'], size: Number}), loader: (file)=>{
-          var fr = new FileReader();
-          fr.onload =  () => {
-            this.createWindow({
-              name: file.name,
-              type: 'imjoy/image',
-              data: {src: fr.result}
-            })
-          }
-          fr.readAsDataURL(file);
-        }},
+        'Image': { schema: schema({type: ['image/jpeg', 'image/png', 'image/gif'], size: Number})},
+      }
+      this.registered.loaders['Image'] = (file)=>{
+        var fr = new FileReader();
+        fr.onload =  () => {
+          this.createWindow({
+            name: file.name,
+            type: 'imjoy/image',
+            data: {src: fr.result}
+          })
+        }
+        fr.readAsDataURL(file);
       }
     },
     reloadPlugins() {
@@ -956,7 +958,6 @@ export default {
     },
     addWindow(w) {
       w.loaders = this.getDataLoaders(w.data)
-      console.log('-------------------', w.loaders)
       this.generateGridPosition(w)
       this.windows.push(w)
       this.store.event_bus.$emit('add_window', w)
@@ -1005,7 +1006,7 @@ export default {
         if (this.registered.internal_inputs.hasOwnProperty(k)) {
           console.log(k, this.registered.internal_inputs[k])
           if (this.registered.internal_inputs[k].schema(data)) {
-            loaders[k] = this.registered.internal_inputs[k].loader
+            loaders[k] = k
           }
         }
       }
@@ -1019,41 +1020,9 @@ export default {
               const plugin_name = this.registered.inputs[k].plugin_name
               const op_name = this.registered.inputs[k].op_name
               const plugin = this.plugin_names[plugin_name]
-
-              if(plugin){
+              if(plugin && this.registered.loaders[plugin_name+'/'+op_name]){
                 console.log('associate data with ', plugin_name, op_name )
-                loaders[op_name] = async (target_data) => {
-                  let config = {}
-                  if (plugin.config && plugin.config.ui) {
-                    config = await this.showDialog(plugin.config)
-                  }
-                  const result = await plugin.api.run({
-                    op: {name: op_name},
-                    config: config,
-                    data: target_data
-                  })
-                  if(result){
-                    console.log('result', result)
-                    const my = {}
-                    if(result && result.data && result.config){
-                      my.data = result.config
-                      my.target = result.data
-                    }
-                    else if(result){
-                      my.data = null
-                      my.target = result
-                    }
-                    if (my.target && Object.keys(my.target).length>0) {
-                      const w = {}
-                      w.name = 'result'
-                      w.type = 'imjoy/generic'
-                      w.config = my.data
-                      w.data = my.target
-                      w.variables = my.target && my.target._variables
-                      this.createWindow(w)
-                    }
-                  }
-                }
+                loaders[op_name] = plugin_name+'/'+op_name
               }
             }
           } catch (e) {
@@ -1070,33 +1039,6 @@ export default {
         const ext = tmp[tmp.length - 1]
         file.loaders = this.getDataLoaders(file)
         console.log('loaders', file.loaders)
-        // if (this.registered.extensions[ext]) {
-        //   const plugins = this.registered.extensions[ext]
-        //   file.loaders = {}
-          // for (let i = 0; i < plugins.length; i++) {
-          //   console.log('trying to open the file with ', plugins[i].name, plugins[i])
-          //   file.loaders[plugins[i].name] = async () => {
-          //     let config = {}
-          //     if (plugins[i].config && plugins[i].config.ui) {
-          //       config = await this.showDialog(plugins[i].config)
-          //     }
-          //     plugins[i].api.run({
-          //       op: {},
-          //       config: config,
-          //       data: {
-          //         file: file
-          //       }
-          //     }).then((my) => {
-          //       if (my) {
-          //         console.log('result', my)
-          //         my.name = my.name || 'result'
-          //         my.type = my.type || 'imjoy/generic'
-          //         this.addWindow(my)
-          //       }
-          //     })
-          //   }
-          // }
-        // }
       }
       const w = {
         name: 'Files',
@@ -1184,7 +1126,6 @@ export default {
       console.log('run op.', this.active_windows)
       const w = this.active_windows[this.active_windows.length - 1] || {}
       op.joy._panel.execute(w.data || {}).then((my) => {
-        console.log('----------------', my)
         if (my.target && Object.keys(my.target).length>0) {
           console.log('result', my)
           my.name = 'result'
@@ -1479,9 +1420,44 @@ export default {
         if (config.inputs){
           try {
             const sch = schema.fromJSON(config.inputs)
-            this.registered.inputs[plugin.name+'/'+config.name] =  {op_name: config.name, plugin_name: plugin.name, schema: sch}
+            const plugin_name = plugin.name
+            const op_name = config.name
+            this.registered.inputs[plugin_name+'/'+op_name] =  {op_name: op_name, plugin_name: plugin_name, schema: sch}
+            this.registered.loaders[plugin_name+'/'+op_name] = async (target_data) => {
+                let config = {}
+                if (plugin.config && plugin.config.ui) {
+                  config = await this.showDialog(plugin.config)
+                }
+                const result = await plugin.api.run({
+                  op: {name: op_name},
+                  config: config,
+                  data: target_data
+                })
+                if(result){
+                  console.log('result', result)
+                  const my = {}
+                  if(result && result.data && result.config){
+                    my.data = result.config
+                    my.target = result.data
+                  }
+                  else if(result){
+                    my.data = null
+                    my.target = result
+                  }
+                  if (my.target && Object.keys(my.target).length>0) {
+                    const w = {}
+                    w.name = 'result'
+                    w.type = 'imjoy/generic'
+                    w.config = my.data
+                    w.data = my.target
+                    w.variables = my.target && my.target._variables
+                    this.createWindow(w)
+                  }
+                }
+            }
+
           } catch (e) {
-            console.error(`something went wrong with the input schema for ${config.name}`, config.inputs)
+            console.error(`something went wrong with the input schema for ${config.name}`, e)
           }
         }
         if (config.outputs){
