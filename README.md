@@ -115,9 +115,9 @@ Here is an outline of the plugin file:
 ## The `<script>` tag
 
 Plugins can be written in Javascript or Python, a minimal plugin needs to implement two functions: `setup()` and `run(my)`.
-In order to differentiate the two different languages, use the `lang` property of the `<script>` tag:
- * for Javascript plugin, use `<script lang="javascript"> ... </script>`
- * for Python plugin, use `<script lang="python"> ... </script>`
+In order to differentiate the two different languages, use the `type` property of the `<script>` tag:
+ * for Javascript plugin, use `<script type="text/javascript"> ... </script>`
+ * for Python plugin, use `<script type="text/python"> ... </script>`
 
 ### `setup()` function
 `setup` function used to get the plugin prepared for running, it will be exectued when the plugin during initialization.
@@ -151,7 +151,8 @@ For the results, you can directly return your result and it will show in a resul
 In the result, two fields named `data_1` and `result_tensor` will be displayed in a result window or passed to the next op in a workflow.
 
 ### Javascript example
-```javascript
+```html
+<script type="text/javascript">
 class UntitledPlugin {
   async setup() {
     console.log('initialized from Javascript.');
@@ -164,10 +165,12 @@ class UntitledPlugin {
 }
 
 api.export(new UntitledPlugin())
+</script>
 ```
 
 ### Python example
-```python
+```html
+<script type="text/python">
 class PythonPlugin():
   def setup(self):
     print('initialized from python.')
@@ -177,6 +180,7 @@ class PythonPlugin():
     return my
 
 api.export(PythonPlugin())
+</script>
 ```
 
 ## The `<docs>` tag
@@ -257,7 +261,7 @@ Here is a python `hello world` example:
 }
 </config>
 
-<script lang="python">
+<script type="text/python">
 import numpy as np
 
 class PythonPlugin():
