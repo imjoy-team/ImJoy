@@ -19,22 +19,21 @@
 
 # Use Imjoy for image processing
 
-## Basic Usage
+## Basic Usage: the ImJoy web app
 Go to the [ImJoy web app](https://imjoy.io/#/app), click the + button to install new plugins or open an image.
 
 When images are opened in the workspace, you need to first click the title bar of the window to select an active window, then click on the plugin menu to run the plugin.
 
 You can drag and drop your file into the workspace, or load with the + button. Then, a file window will open if files are loaded. File formats are supported with plugins, if a certain file extension is recognized by a plugin, you can just click the file in the file window to open it. For example, if you installed the plugin "Tif file importer", you will be able to click the .tif file in the file window.
 
-## Using Python Plugins
-In order to use Python Plugins, please follow the instructions below:
-  * Download Annaconda (Python3.6 version) from https://www.anaconda.com/download/ and install it.
-  * Run `pip install -U git+https://github.com/oeway/ImJoy-Python#egg=imjoy` in a terminal window
-  * Run `python -m imjoy` in a terminal and keep the window running.
+If you installed plugins written in Python, they will be disabled. In order to light them up, and benifit from the full power of your computer, you need to setup the **Python Plugin Engine** as follows.
 
-Now you can go to the [ImJoy web app](https://imjoy.io/#/app), and connect to the Plugin Engine with the button located on the upper-right corner.
+## Advanced Usage: the Python Plugin Engine
+You can use the **Python Plugin Engine** to unlock the power of your computer or another computer in your local network.
 
-For future usage, you just need to run `python -m imjoy` in a terminal.
+To use it, go to the [ImJoy web app](https://imjoy.io/#/app), and click the 🚀 button located on the upper-right corner, you will find instructions on how to set it up. Basically, you will be asked to install the engine and run `python -m imjoy` to start it.
+
+More detailed instructions can be found here: [ImJoy-Python](https://github.com/oeway/ImJoy-Python).
 
 ### How does it work?
 ImJoy supports Python Plugins which can run much more computationally intensive tasks. In order to run that, it needs to connect to the Python Plugin Engine -- a small python library we developed for ImJoy (source code: https://github.com/oeway/ImJoy-Python).
@@ -47,7 +46,32 @@ Under the hood, the Python Plugin Engine will be connected with the ImJoy web ap
 
 Click the + button and select the plugin dropdown option, then create a plugin.
 
-Plugins can be written in Javascript or Python, a minimal plugin needs to implement two functions: `setup()` and `run(my)`.
+The ImJoy plugin file format is built up on html format with customized tags (inspired by the `.vue` format), it consists of two mandatory tags `<config>` and `<script>`, and other optional tags including `<docs>`, `<window>` and `<style>`.
+
+Here is an outline of the plugin file:
+```html
+<docs>
+   ** An recommanded code block in Markdown format with the documentation of the plugin **
+</docs>
+
+<config>
+   ** A code block in Json format describe the plugin**
+</config>
+
+<script>
+   ** A code block in Javascrit or Python format**
+</script>
+
+<window>
+   ** A code block in HTML format**
+   (for plugins in iframe mode)
+</window>
+
+<style>
+   ** A code block in CSS format**
+   (for plugins in iframe mode)
+</style>
+```
 ## The `<config>` tag
 
 ```json
@@ -91,6 +115,11 @@ Plugins can be written in Javascript or Python, a minimal plugin needs to implem
 Used to contain documentation for the plugin, it need to be written in markdown language.
 
 ## The `<script>` tag
+
+Plugins can be written in Javascript or Python, a minimal plugin needs to implement two functions: `setup()` and `run(my)`.
+In order to differentiate the two different languages, use the `lang` property of the `<script>` tag:
+ * for Javascript plugin, use `<script lang="javascript"> ... </script>`
+ * for Python plugin, use `<script lang="python"> ... </script>`
 
 ### `setup()` function
 `setup` function used to get the plugin prepared for running, it will be exectued when the plugin during initialization.
