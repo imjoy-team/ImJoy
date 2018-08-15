@@ -199,7 +199,7 @@
                method = this._interface[data.name];
              }
              var args = this._unwrap(data.args, true);
-             if(this.id) args.push({id: this.id})
+             args.push({id: this.id})
              if(data.promise){
                var [resolve, reject] = this._unwrap(data.promise, false);
                try {
@@ -224,14 +224,9 @@
 
              break;
          case 'callback':
-              // if(callback_reg.test(data.num)){
-              //   var method = this._store.retrieve(data.id)[data.num];
-              // }
-              // else{
-              var method = this._store.fetch(data.id)[data.num];
-              // }
+             var method = this._store.fetch(data.id)[data.num];
              var args = this._unwrap(data.args, true);
-             if(this.id) args.push({id: this.id})
+             args.push({id: this.id})
              if(data.promise){
                var [resolve, reject] = this._unwrap(data.promise, false);
                try {

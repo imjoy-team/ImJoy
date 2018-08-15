@@ -243,6 +243,10 @@ show a dialog with customized GUI, example:
 update the progress bar on the Imjoy GUI, example: `api.showProgress(85)`
 ## `api.showStatus(...)`
 update the status text on the Imjoy GUI, example: `api.showStatus('processing...')`
+## `api.showPluginProgress(...)`
+update the progress bar of the current plugin (in the plugin menu), example: `api.showPluginProgress(85)`
+## `api.showPluginStatus(...)`
+update the status text of the current plugin (in the plugin menu), example: `api.showPluginStatus('processing...')`
 ## `api.run(...)`
 run another plugin by the plugin name, example: `api.run("Python Demo Plugin")` or `api.run("Python Demo Plugin", my)`
 

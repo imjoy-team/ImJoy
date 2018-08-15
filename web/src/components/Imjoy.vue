@@ -191,19 +191,20 @@ Engine<template>
           <md-card-content>
             <div v-for="plugin in sortedPlugins()" :key="plugin.name">
               <md-divider></md-divider>
-              <md-button class="md-icon-button" :class="plugin.running?'md-accent':'md-primary'" @click="editPlugin(plugin.id)">
+              <md-button class="md-icon-button" :class="plugin.running?'md-accent':''" @click="editPlugin(plugin.id)">
                 <md-icon v-if="plugin.config.icon">{{plugin.config.icon}}</md-icon>
                 <md-icon v-else>extension</md-icon>
               </md-button>
-              <md-button class="joy-run-button md-primary" :disabled="plugin._disconnected" @click="runOp(plugin.ops[plugin.name])">
+              <md-button class="joy-run-button" :class="plugin.running?'md-accent':'md-primary'" :disabled="plugin._disconnected" @click="runOp(plugin.ops[plugin.name])">
                 {{plugin.name}}
               </md-button>
               <md-button class="md-icon-button" @click="plugin.panel_expanded=!plugin.panel_expanded; $forceUpdate()">
                 <md-icon v-if="!plugin.panel_expanded">expand_more</md-icon>
                 <md-icon v-else>expand_less</md-icon>
               </md-button>
+              <md-progress-bar md-mode="determinate" v-if="plugin.running&&plugin.progress" :md-value="plugin.progress"></md-progress-bar>
+              <p v-if="plugin.running&&plugin.status_text">{{plugin.status_text}}</p>
               <div v-for="(op, n) in plugin.ops" :key="op.id + op.name">
-
                 <md-button class="md-icon-button" v-show="plugin.panel_expanded && op.name != plugin.name" :disabled="true">
                   <md-icon>remove</md-icon>
                 </md-button>
@@ -215,6 +216,7 @@ Engine<template>
                   <md-icon v-if="!op.panel_expanded">expand_more</md-icon>
                   <md-icon v-else>expand_less</md-icon>
                 </md-button>
+
                 <joy :config="op" :show="(plugin.panel_expanded || false) && (((plugin.panel_expanded || false)  && op.name == plugin.name) || op.panel_expanded || false )"></joy>
                 <md-divider></md-divider>
               </div>
@@ -536,6 +538,10 @@ export default {
     //     })
     //   }
     // }
+
+    // Make sure the GUI is refreshed
+    setInterval(()=>{this.$forceUpdate()}, 5000)
+
     this.client_id = localStorage.getItem("imjoy_client_id")
     if(!this.client_id){
       this.client_id = 'imjoy_web_'+randId()
@@ -550,6 +556,8 @@ export default {
       showProgress: this.showProgress,
       showStatus: this.showStatus,
       run: this.runPlugin,
+      showPluginProgress: this.showPluginProgress,
+      showPluginStatus: this.showPluginStatus,
       $forceUpdate: this.$forceUpdate,
     }
     this.resetPlugins()
@@ -677,6 +685,7 @@ export default {
       }, 2500)
       socket.on('connect', (d) => {
         clearTimeout(timer)
+        this.connection_token = this.connection_token && this.connection_token.trim()
         socket.emit('register_client', {id: this.client_id, token: this.connection_token}, (ret)=>{
           if(ret.success){
             this.resumable_plugins = []//ret.plugins
@@ -992,8 +1001,9 @@ export default {
           }
         }
         // TODO: setup this promise all, it's now cause unknown problem
-        // Promise.all(promises).then(()=>{
-        // })
+        Promise.all(promises).then(()=>{
+          this.$forceUpdate()
+        })
         this.plugin_loaded = true
         this.loading = false
         this.$forceUpdate()
@@ -1024,11 +1034,30 @@ export default {
     showProgress(p) {
       if (p < 1) this.progress = p * 100
       else this.progress = p
-      this.$forceUpdate()
+      // this.$forceUpdate()
     },
     showStatus(s) {
       this.status_text = s
-      this.$forceUpdate()
+      // this.$forceUpdate()
+    },
+    showPluginProgress(p, _plugin){
+      if(_plugin && _plugin.id){
+        const source_plugin = this.plugins[_plugin.id]
+        if(source_plugin){
+          if (p < 1) source_plugin.progress = p * 100
+          else source_plugin.progress = p
+          this.$forceUpdate()
+        }
+      }
+    },
+    showPluginStatus(s, _plugin){
+      if(_plugin && _plugin.id){
+        const source_plugin = this.plugins[_plugin.id]
+        if(source_plugin){
+          source_plugin.status_text = s
+          this.$forceUpdate()
+        }
+      }
     },
     addWindow(w) {
       w.loaders = this.getDataLoaders(w.data)
@@ -1119,6 +1148,9 @@ export default {
         type: 'imjoy/files',
         config: {},
         data: {
+          _op: '__file_loader__',
+          _source_op: null,
+          _workflow_id: 'files_'+randId(),
           files: this.selected_files
         }
       }
@@ -1132,7 +1164,11 @@ export default {
       console.log('run workflow.', this.active_windows)
       const w = this.active_windows[this.active_windows.length - 1] || {}
       this.status_text = ''
-      joy.workflow.execute(w.data || {}).then((my) => {
+      const target = w.data || {}
+      target._op = 'workflow'
+      target._source_op = null
+      target._workflow_id = target._workflow_id || "workflow_"+randId()
+      joy.workflow.execute(target).then((my) => {
         if (my.target && Object.keys(my.target).length>0) {
           console.log('result', my)
           const w = {}
@@ -1198,7 +1234,11 @@ export default {
     runOp(op) {
       console.log('run op.', this.active_windows)
       const w = this.active_windows[this.active_windows.length - 1] || {}
-      op.joy._panel.execute(w.data || {}).then((my) => {
+      const target = w.data || {}
+      target._op = '_panel'
+      target._source_op = null
+      target._workflow_id = target._workflow_id || "op_"+op.name.trim().replace(/ /g, '_')+randId()
+      op.joy._panel.execute(target).then((my) => {
         if (my.target && Object.keys(my.target).length>0) {
           console.log('result', my)
           my.name = 'result'
@@ -1414,9 +1454,9 @@ export default {
         my.op = {type: source_plugin.type, name:source_plugin.name}
         my.config = my.config || {}
         my.data = my.data || {}
-        my.data._op = source_plugin.name
-        my.data._source_op = null
-        my.data._workflow_id = null
+        my.data._op = plugin_name
+        my.data._source_op = source_plugin.name
+        my.data._workflow_id = my.data._workflow_id || null
         return await target_plugin.api.run(my)
       }
       else{
@@ -1450,8 +1490,8 @@ export default {
           const onexecute = async (my) => {
             //conver the api here data-->config   target--> data
             my.target._op = my.op.name;
-            my.target._source_op = null;
-            my.target._workflow_id = null;
+            // my.target._source_op = null;
+            // my.target._workflow_id = null;
             const result = await plugin.api.run({
               op: {
                 name: my.op.name,
@@ -1513,7 +1553,7 @@ export default {
                 }
                 target_data._op = op_name
                 target_data._source_op = null
-                target_data._workflow_id = null
+                target_data._workflow_id = 'data_loader_'+op_name.trim().replace(/ /g, '_')+randId()
                 const result = await plugin.api.run({
                   op: {name: op_name},
                   config: config,
@@ -1593,9 +1633,10 @@ export default {
         // this.plugins[plugin.id] = plugin
         plugin.api.setup().then((result) => {
           console.log('sucessfully setup the window plugin: ', plugin, pconfig)
+          //asuming the data._op is passed from last op
+          pconfig.data._source_op = pconfig.data._op
           pconfig.data._op = plugin.name
-          pconfig.data._source_op = null
-          pconfig.data._workflow_id = null
+          pconfig.data._workflow_id = pconfig.data._workflow_id
           plugin.api.run({
             data: pconfig.data,
             config: pconfig.config,
@@ -1881,4 +1922,5 @@ div#textnode {
 .md-button {
   margin: 1px;
 }
+
 </style>
