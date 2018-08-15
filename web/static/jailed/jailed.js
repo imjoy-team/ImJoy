@@ -337,7 +337,7 @@ function randId() {
             platformInit.whenEmitted(function() {
                 if (!me._disconnected) {
                     me._frame = sample.cloneNode(false);
-                    me._frame.src = me._frame.src+'?mode='+mode;
+                    me._frame.src = me._frame.src+'?mode='+mode+'&name='+config.name;
                     me._frame.id = 'iframe_'+id;
                     if(mode == 'iframe'){
                       if(typeof iframe_container == 'string'){

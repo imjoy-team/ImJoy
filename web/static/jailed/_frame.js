@@ -54,7 +54,8 @@ var initWebworkerPlugin = function() {
         new Blob([blobCode])
     );
 
-    var worker = new Worker(blobUrl);
+    var name = getParamValue('name');
+    var worker = new Worker(blobUrl, {'name' : name || 'plugin_webworker'});
 
     // telling worker to load _pluginWebWorker.js (see blob code above)
     worker.postMessage({
