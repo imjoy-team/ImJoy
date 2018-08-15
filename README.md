@@ -19,22 +19,21 @@
 
 # Use Imjoy for image processing
 
-## Basic Usage
+## Basic Usage: the ImJoy web app
 Go to the [ImJoy web app](https://imjoy.io/#/app), click the + button to install new plugins or open an image.
 
 When images are opened in the workspace, you need to first click the title bar of the window to select an active window, then click on the plugin menu to run the plugin.
 
 You can drag and drop your file into the workspace, or load with the + button. Then, a file window will open if files are loaded. File formats are supported with plugins, if a certain file extension is recognized by a plugin, you can just click the file in the file window to open it. For example, if you installed the plugin "Tif file importer", you will be able to click the .tif file in the file window.
 
-## Using Python Plugins
-In order to use Python Plugins, please follow the instructions below:
-  * Download Annaconda (Python3.6 version) from https://www.anaconda.com/download/ and install it.
-  * Run `pip install -U git+https://github.com/oeway/ImJoy-Python#egg=imjoy` in a terminal window
-  * Run `python -m imjoy` in a terminal and keep the window running.
+If you installed plugins written in Python, they will be disabled. In order to light them up, and benifit from the full power of your computer, you need to setup the **Python Plugin Engine** as follows.
 
-Now you can go to the [ImJoy web app](https://imjoy.io/#/app), and connect to the Plugin Engine with the button located on the upper-right corner.
+## Advanced Usage: the Python Plugin Engine
+You can use the **Python Plugin Engine** to unlock the power of your computer or another computer in your local network.
 
-For future usage, you just need to run `python -m imjoy` in a terminal.
+To use it, go to the [ImJoy web app](https://imjoy.io/#/app), and click the 🚀 button located on the upper-right corner, you will find instructions on how to set it up. Basically, you will be asked to install the engine and run `python -m imjoy` to start it.
+
+More detailed instructions can be found here: [ImJoy-Python](https://github.com/oeway/ImJoy-Python).
 
 ### How does it work?
 ImJoy supports Python Plugins which can run much more computationally intensive tasks. In order to run that, it needs to connect to the Python Plugin Engine -- a small python library we developed for ImJoy (source code: https://github.com/oeway/ImJoy-Python).
@@ -47,7 +46,32 @@ Under the hood, the Python Plugin Engine will be connected with the ImJoy web ap
 
 Click the + button and select the plugin dropdown option, then create a plugin.
 
-Plugins can be written in Javascript or Python, a minimal plugin needs to implement two functions: `setup()` and `run(my)`.
+The ImJoy plugin file format is built up on html format with customized tags (inspired by the `.vue` format), it consists of two mandatory tags `<config>` and `<script>`, and other optional tags including `<docs>`, `<window>` and `<style>`.
+
+Here is an outline of the plugin file:
+```
+<docs>
+   ** An recommanded code block in Markdown format with the documentation of the plugin **
+</docs>
+
+<config>
+   ** A code block in Json format describe the plugin**
+</config>
+
+<script>
+   ** A code block in Javascrit or Python format**
+</script>
+
+<window>
+   ** A code block in HTML format**
+   (for plugins in iframe mode)
+</window>
+
+<style>
+   ** A code block in CSS format**
+   (for plugins in iframe mode)
+</style>
+```
 ## The `<config>` tag
 
 ```json
@@ -69,7 +93,7 @@ Plugins can be written in Javascript or Python, a minimal plugin needs to implem
 * `name` the name of the plugin, it must be unique to avoid conflicting with other plugins.
 * `mode` the mode of the plugin, currently supported modes are `webworker`, `iframe` and `pyworker`.
   * `webworker` is used to run computationally intensive javascript plugins. It do not have an interface, it runs in a new thread and won't hang the main thread during running.
-  * `iframe` is used for create new web interface with HTML/CSS and Javascript, it runs in the same thread as the main webpage.
+  * `iframe` is used for create new web interface with HTML/CSS and Javascript, it runs in the same thread as the main webpage. If `iframe` mode is selected, then you need to provied HTML code with the `<window>` tag and CSS code with the `style` tag.
   * `pyworker` is used to run plugins written in Python, the user needs to have the **Python Plugin Engine** installed and started before using the plugin. See the **Developing Python Plugins** for more details.
 * `tags`
 * `ui` a string used to generate the GUI to the user, you can include the following elements to render an input form:
@@ -87,10 +111,13 @@ Plugins can be written in Javascript or Python, a minimal plugin needs to implem
 * `requirements` (**for python plugins only**) the pip packages which will be installed before running the plugin, package names or github links are both supported.
 * `cmd` (**for python plugins only**) the command used to run the plugin, by default, it will run `python`, sometimes it can be something like `python3` or `python27` etc.
 * `dependencies` names of other imjoy plugins which the current one depend on. They will be installed automatically during installation.
-## The `<docs>` tag
-Used to contain documentation for the plugin, it need to be written in markdown language.
 
 ## The `<script>` tag
+
+Plugins can be written in Javascript or Python, a minimal plugin needs to implement two functions: `setup()` and `run(my)`.
+In order to differentiate the two different languages, use the `lang` property of the `<script>` tag:
+ * for Javascript plugin, use `<script lang="javascript"> ... </script>`
+ * for Python plugin, use `<script lang="python"> ... </script>`
 
 ### `setup()` function
 `setup` function used to get the plugin prepared for running, it will be exectued when the plugin during initialization.
@@ -124,7 +151,8 @@ For the results, you can directly return your result and it will show in a resul
 In the result, two fields named `data_1` and `result_tensor` will be displayed in a result window or passed to the next op in a workflow.
 
 ### Javascript example
-```javascript
+```html
+<script lang="javascript">
 class UntitledPlugin {
   async setup() {
     console.log('initialized from Javascript.');
@@ -137,10 +165,12 @@ class UntitledPlugin {
 }
 
 api.export(new UntitledPlugin())
+</script>
 ```
 
 ### Python example
-```python
+```html
+<script lang="python">
 class PythonPlugin():
   def setup(self):
     print('initialized from python.')
@@ -150,7 +180,17 @@ class PythonPlugin():
     return my
 
 api.export(PythonPlugin())
+</script>
 ```
+
+## The `<docs>` tag
+Used to contain documentation for the plugin, it need to be written in `Markdown` language. Here is a document about how to write document in `Markdown`: [Mastering Markdown](https://guides.github.com/features/mastering-markdown/).
+
+## The `<window>` tag
+Define the HTML code for displaying in the plugin window.
+
+## The `<style>` tag
+Define the CSS code for displaying in the plugin window.
 
 # Plugin API
 
@@ -288,7 +328,16 @@ api.export(PythonPlugin())
  </config>
  ```
 
-# Deploy your own plugin to the ImJoy Plugin Repository
+# Test and Deploy your own plugin to the ImJoy Plugin Repository
+During the development of a plugin, you can use chrome dev tool to debug your javascript plugin. Python plugins can be tested alone first and then wrap as python modules, you can import them by running the `python -m imjoy` in the directory with your modules.
+
+For depolying your plugin, if they do not depend on library or module written by your self, you could just upload the file to a Github repository. For sharing with others, you can copy the link point to the `raw` file. Other uses can use the url to install from ImJoy. If you want to contribute your plugin to the ImJoy central repository, so users can directly install from the plugin store shown on ImJoy.io, you need to send a pull request to the repository. More details about that: [ImJoy-Plugins repository].
+
+If your plugin depends on non-standard libraries and modules, and you want to provid them with your plugin. You just need to upload those libraries and modules to a github repository, and link them in the plugin code.
+
+ * for javascript plugin with extra dependencies, you need to create a repository on Github named with the plugin name, and upload the plugin file together with other javascript files. In the plugin file, you can use `importScripts(url_to_your_js_file)` function to use this libraries. However, due to a restriction of Github, you can't use the url of github directly, you need to copy the url of your javascript file, and convert it with [RawGit](https://rawgit.com/).
+ * for python plugin with extra dependencies, you need to create a `setup.py` file to wrap the plugin as a pip module, create a repository on Github named with the plugin name, and upload the plugin file together with your python modules. Now add the github link to `requirements` in `<config>` of your plugin. The github link should be formated to something like: `git+https://github.com/oeway/ImJoy-Python#egg=imjoy`, you can test with the `pip install ...` command to see if you can install your module.
+
 The plugin store shown on the ImJoy.IO is served with Github through the [ImJoy-Plugins repository](https://github.com/oeway/ImJoy-Plugins).
 
-In order to deploy your plugin, you can fork the repository, add your plugin and then send a pull request to [ImJoy-Plugins](https://github.com/oeway/ImJoy-Plugins). Once the pull request being accepted, the user will be able to install your plugin from the plugin store.
+In order to deploy your plugin to the plugin store, you can fork the repository, add your plugin and then send a pull request to [ImJoy-Plugins](https://github.com/oeway/ImJoy-Plugins). Once the pull request being accepted, the user will be able to install your plugin from the plugin store.
