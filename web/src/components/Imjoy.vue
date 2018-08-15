@@ -58,7 +58,7 @@ Engine<template>
           </md-button>
           <md-menu-content>
             <md-menu-item :disabled="true">
-              <span>{{engine_status}}</span>
+              <span>🚀{{engine_status}}</span>
             </md-menu-item>
             <!-- <md-menu-item @click="connectEngine(engine_url)">
               <span>Connect</span>
@@ -388,7 +388,7 @@ export default {
       loading: false,
       progress: 0,
       status_text: '',
-      engine_status: 'disconnected',
+      engine_status: 'Disconnected',
       engine_connected: false,
       engine_url: 'http://localhost:8080',
       windows: [],
@@ -660,10 +660,11 @@ export default {
       this.show_snackbar = true
     },
     connectEngine(url, auto) {
-      if (this.socket) {
-        this.socket.disconnect()
+      if (this.socket&&this.engine_connected) {
+        return
+        //this.socket.disconnect()
       }
-      this.engine_status = 'Connecting, please wait...'
+      this.engine_status = 'Connecting...'
       this.show('Trying to connect to the plugin engine...')
       const socket = io(url);
       const timer = setTimeout(() => {
@@ -681,7 +682,7 @@ export default {
             this.socket = socket
             this.pluing_context.socket = socket
             this.engine_connected = true
-            this.engine_status = 'Plugin Engine connected.'
+            this.engine_status = 'Connected.'
             localStorage.setItem("imjoy_connection_token", this.connection_token);
             console.log('these python plugins can be resumed: ', ret.plugins)
             this.show('Plugin Engine connected.')
@@ -701,7 +702,7 @@ export default {
         console.log('plugin engine disconnected.')
         this.engine_connected = false
         this.show('Plugin Engine disconnected.')
-        this.engine_status = 'Plugin Engine disconnected.'
+        this.engine_status = 'Disconnected.'
         this.socket = null
         this.pluing_context.socket = null
         // this.pluing_context.socket = null
