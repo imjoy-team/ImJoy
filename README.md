@@ -104,7 +104,7 @@ Here is an outline of the plugin file:
 * `api_version` api version of imjoy which the plugin is written for
 * `url` the url used point to current file, used to download the plugin file when a user install it from the plugin store on imjoy.io website.
 * `description` a short description about the plugin, describe the main feature or the context of the plugin
-* `icon` defines the icon used in the plugin menu. You can find a material icon from https://material.io/tools/icons/ and set its name to `icon`.
+* `icon` defines the icon used in the plugin menu. You can find a material icon from https://material.io/tools/icons/ and set its name to `icon`. Or, you can directly copy and paste Emoji, for example from [here](https://getemoji.com/).
 * `inputs` defines the inputs with json-schema syntax (http://json-schema.org/) .
 * `outputs` defines the outputs with json-schema syntax (http://json-schema.org/).
 * `env` (**for python plugins only**) the virtual environment or docker image command used for creating an enviroment to run the plugins
