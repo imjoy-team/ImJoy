@@ -5,18 +5,21 @@ export const WEBWORKER_PLUGIN_TEMPLATE= `
 Describe your plugin here.
 </docs>
 
-<config>
+<config lang="json">
 {
   "name": "Untitled Plugin",
   "mode": "webworker",
   "tags": ["op", "image"],
-  "ui": "image processing",
+  "ui": "UI for Untitled Plugin",
   "version": "0.1.0",
   "api_version": "0.1.0",
+  "url": "",
   "description": "A plugin for image processing.",
   "icon": "extension",
   "inputs": null,
   "outputs": null,
+  "env": null,
+  "requirements": null,
   "dependencies": []
 }
 </config>
@@ -39,11 +42,11 @@ api.export(new UntitledPlugin())
 `
 
 export const IFRAME_PLUGIN_TEMPLATE= `
-<docs>
+<docs lang="markdown">
 Describe your plugin here.
 </docs>
 
-<config>
+<config lang="json">
 {
   "name": "Untitled Plugin",
   "mode": "iframe",
@@ -74,14 +77,21 @@ class UntitledPlugin {
 api.export(new UntitledPlugin())
 </script>
 
+<window lang="html">
+
+</window>
+
+<style lang="css">
+
+</style>
 `
 
 export const PYWORKER_PLUGIN_TEMPLATE= `
-<docs>
+<docs lang="markdown">
 Describe your plugin here.
 </docs>
 
-<config>
+<config lang="json">
 {
   "name": "Untitled Plugin",
   "mode": "pyworker",
