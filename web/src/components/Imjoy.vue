@@ -43,8 +43,12 @@ Engine<template>
           <md-icon>save</md-icon>
           <md-tooltip>Save all windows</md-tooltip>
         </md-button>
+        <md-button class="md-icon-button" target="_blank" href="https://github.com/oeway/ImJoy">
+          <md-icon>help</md-icon>
+          <md-tooltip>Open help information.</md-tooltip>
+        </md-button>
         <md-button v-if="!engine_connected" @click="connectEngine(engine_url)" class="md-icon-button md-accent">
-          <md-icon>whatshot</md-icon>
+          <md-icon>🚀</md-icon>
           <md-tooltip>Connect to the Plugin Engine</md-tooltip>
         </md-button>
         <md-menu v-else md-size="big" md-direction="bottom-end">
@@ -70,10 +74,6 @@ Engine<template>
             </md-menu-item>
           </md-menu-content>
         </md-menu>
-        <md-button class="md-icon-button" target="_blank" href="https://github.com/oeway/ImJoy">
-          <md-icon>help</md-icon>
-          <md-tooltip>Open help information.</md-tooltip>
-        </md-button>
       </div>
     </md-app-toolbar>
     <md-app-drawer :md-active.sync="menuVisible" md-persistent="full">
@@ -664,8 +664,7 @@ export default {
       this.show('Trying to connect to the plugin engine...')
       const socket = io(url);
       const timer = setTimeout(() => {
-        if (socket) {
-          socket.disconnect()
+        if (!engine_connected) {
           this.engine_status = 'Plugin Engine not connected'
           if(!auto) this.show('Failed to connect, please make sure you have started the plugin engine.', 5000)
           if(!auto) this.showPluginEngineInfo = true
