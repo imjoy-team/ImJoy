@@ -1558,6 +1558,14 @@ export default {
 
         if (config.inputs){
           try {
+            if(config.inputs.type != 'object' || !config.inputs.properties){
+              if(typeof config.inputs == 'object'){
+                config.inputs = {properties: config.inputs, type: 'object'}
+              }
+              else{
+                throw "inputs schema must be an object."
+              }
+            }
             const sch = schema.fromJSON(config.inputs)
             console.log('inputs schema:-->', plugin.name, config.name, sch.toJSON())
             const plugin_name = plugin.name
@@ -1608,6 +1616,14 @@ export default {
         }
         if (config.outputs){
           try {
+            if(config.outputs.type != 'object' || !config.outputs.properties){
+              if(typeof config.outputs == 'object'){
+                config.outputs = {properties: config.outputs, type: 'object'}
+              }
+              else{
+                throw "inputs schema must be an object."
+              }
+            }
             const sch = schema.fromJSON(config.outputs)
             this.registered.outputs[plugin.name+'/'+config.name] =  {op_name: config.name, plugin_name: plugin.name, schema: sch}
           } catch (e) {
