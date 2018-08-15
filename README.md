@@ -244,7 +244,7 @@ For plugin developers, you can now create a python plugin within the browser.
 
 Here is a python `hello world` example:
 ```html
-<config>
+<config lang="json">
 {
   "name": "Python Hello World Plugin",
   "mode": "pyworker",
