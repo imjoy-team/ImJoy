@@ -17,7 +17,7 @@
    - Use ndarrays or tensors for data exchange
    - Support Tensorflow.js and native Tensorflow
 
-# Use Imjoy for image processing
+# Using Imjoy for image processing
 
 ## Basic Usage: the ImJoy web app
 Go to the [ImJoy web app](https://imjoy.io/#/app), click the + button to install new plugins or open an image.
@@ -55,7 +55,7 @@ Here is an outline of the plugin file:
 </docs>
 
 <config lang="json">
-   ** A code block in Json format describe the plugin**
+   ** A code block in Json format describes the plugin**
 </config>
 
 <script lang="javascript">
@@ -279,7 +279,7 @@ api.export(PythonPlugin())
 
 ```
 
-## Use virtual environments
+## Using virtual environments
   Python plugins for ImJoy can have different conda environments, which provides a way to isolate plugins. You can therefore run python plugins with different versions of Python, or use different pip packages.
 
 
@@ -330,7 +330,7 @@ api.export(PythonPlugin())
  </config>
  ```
 
-# Test and deploy your own plugin to the ImJoy Plugin Repository
+# Testing and deploying your own plugin
 During the development of a plugin, you can use chrome dev tool to debug your javascript plugin. Python plugins can be tested alone first and then wrap as python modules, you can import them by running the `python -m imjoy` in the directory with your modules.
 
 For depolying your plugin, if they do not depend on library or module written by your self, you could just upload the file to a Github repository. For sharing with others, you can copy the link point to the `raw` file. Other uses can use the url to install from ImJoy. If you want to contribute your plugin to the ImJoy central repository, so users can directly install from the plugin store shown on ImJoy.io, you need to send a pull request to the repository. More details about that: [ImJoy-Plugins repository].
