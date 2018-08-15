@@ -29,6 +29,10 @@ export default new Router({
       redirect: { name: 'app' }
     },
     {
+      path: '/%F0%9F%98%82',
+      redirect: { name: 'app' }
+    },
+    {
       path: '/imjoy',
       name: 'Imjoy',
       component: Imjoy
