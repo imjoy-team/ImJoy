@@ -87,6 +87,9 @@ Here is an outline of the plugin file:
   "icon": "extension",
   "inputs": null,
   "outputs": null,
+  "env": null,
+  "cmd": null,
+  "requirements": null,
   "dependencies": []
 }
 ```
@@ -108,8 +111,8 @@ Here is an outline of the plugin file:
 * `inputs` defines the inputs with json-schema syntax (http://json-schema.org/) .
 * `outputs` defines the outputs with json-schema syntax (http://json-schema.org/).
 * `env` (**for python plugins only**) the virtual environment or docker image command used for creating an enviroment to run the plugins
-* `requirements` (**for python plugins only**) the pip packages which will be installed before running the plugin, package names or github links are both supported.
 * `cmd` (**for python plugins only**) the command used to run the plugin, by default, it will run `python`, sometimes it can be something like `python3` or `python27` etc.
+* `requirements` (**for python plugins only**) the pip packages which will be installed before running the plugin, package names or github links are both supported.
 * `dependencies` names of other imjoy plugins which the current one depend on. They will be installed automatically during installation.
 
 ## The `<script>` tag
@@ -328,7 +331,7 @@ api.export(PythonPlugin())
  </config>
  ```
 
-# Test and Deploy your own plugin to the ImJoy Plugin Repository
+# Test and deploy your own plugin to the ImJoy Plugin Repository
 During the development of a plugin, you can use chrome dev tool to debug your javascript plugin. Python plugins can be tested alone first and then wrap as python modules, you can import them by running the `python -m imjoy` in the directory with your modules.
 
 For depolying your plugin, if they do not depend on library or module written by your self, you could just upload the file to a Github repository. For sharing with others, you can copy the link point to the `raw` file. Other uses can use the url to install from ImJoy. If you want to contribute your plugin to the ImJoy central repository, so users can directly install from the plugin store shown on ImJoy.io, you need to send a pull request to the repository. More details about that: [ImJoy-Plugins repository].
