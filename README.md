@@ -328,7 +328,16 @@ api.export(PythonPlugin())
  </config>
  ```
 
-# Deploy your own plugin to the ImJoy Plugin Repository
+# Test and Deploy your own plugin to the ImJoy Plugin Repository
+During the development of a plugin, you can use chrome dev tool to debug your javascript plugin. Python plugins can be tested alone first and then wrap as python modules, you can import them by running the `python -m imjoy` in the directory with your modules.
+
+For depolying your plugin, if they do not depend on library or module written by your self, you could just upload the file to a Github repository. For sharing with others, you can copy the link point to the `raw` file. Other uses can use the url to install from ImJoy. If you want to contribute your plugin to the ImJoy central repository, so users can directly install from the plugin store shown on ImJoy.io, you need to send a pull request to the repository. More details about that: [ImJoy-Plugins repository].
+
+If your plugin depends on non-standard libraries and modules, and you want to provid them with your plugin. You just need to upload those libraries and modules to a github repository, and link them in the plugin code.
+
+ * for javascript plugin with extra dependencies, you need to create a repository on Github named with the plugin name, and upload the plugin file together with other javascript files. In the plugin file, you can use `importScripts(url_to_your_js_file)` function to use this libraries. However, due to a restriction of Github, you can't use the url of github directly, you need to copy the url of your javascript file, and convert it with [RawGit](https://rawgit.com/).
+ * for python plugin with extra dependencies, you need to create a `setup.py` file to wrap the plugin as a pip module, create a repository on Github named with the plugin name, and upload the plugin file together with your python modules. Now add the github link to requirements of your plugin. The github link should be formated to something like: `git+https://github.com/oeway/ImJoy-Python#egg=imjoy`, you can test with the `pip install ...` command to see if you can install your module.
+
 The plugin store shown on the ImJoy.IO is served with Github through the [ImJoy-Plugins repository](https://github.com/oeway/ImJoy-Plugins).
 
-In order to deploy your plugin, you can fork the repository, add your plugin and then send a pull request to [ImJoy-Plugins](https://github.com/oeway/ImJoy-Plugins). Once the pull request being accepted, the user will be able to install your plugin from the plugin store.
+In order to deploy your plugin to the plugin store, you can fork the repository, add your plugin and then send a pull request to [ImJoy-Plugins](https://github.com/oeway/ImJoy-Plugins). Once the pull request being accepted, the user will be able to install your plugin from the plugin store.
