@@ -1136,7 +1136,6 @@ export default {
           w.type = 'imjoy/generic'
           w.config = my.data
           w.data = my.target
-          w.variables = my.target && my.target._variables
           this.createWindow(w)
         }
         this.progress = 100
@@ -1202,7 +1201,6 @@ export default {
           my.type = 'imjoy/generic'
           my.config = my.data
           my.data = my.target
-          my.variables = my.target && my.target._variables
           this.createWindow(my)
         }
         this.progress = 100
@@ -1412,7 +1410,9 @@ export default {
         my.op = {type: source_plugin.type, name:source_plugin.name}
         my.config = my.config || {}
         my.data = my.data || {}
-        my.variables = my.variables || {}
+        my.data._op = source_plugin.name
+        my.data._source_op = null
+        my.data._workflow_id = null
         return await target_plugin.api.run(my)
       }
       else{
@@ -1445,13 +1445,15 @@ export default {
         } else {
           const onexecute = async (my) => {
             //conver the api here data-->config   target--> data
+            my.target._op = my.op.name;
+            my.target._source_op = null;
+            my.target._workflow_id = null;
             const result = await plugin.api.run({
               op: {
                 name: my.op.name,
               },
               config: my.data,
               data: my.target,
-              variables: my.target && my.target._variables
             })
             if(result && result.data && result.config){
               my.data = result.config
@@ -1505,6 +1507,9 @@ export default {
                 if (plugin.config && plugin.config.ui) {
                   config = await this.showDialog(plugin.config)
                 }
+                target_data._op = op_name
+                target_data._source_op = null
+                target_data._workflow_id = null
                 const result = await plugin.api.run({
                   op: {name: op_name},
                   config: config,
@@ -1527,7 +1532,6 @@ export default {
                     w.type = 'imjoy/generic'
                     w.config = my.data
                     w.data = my.target
-                    w.variables = my.target && my.target._variables
                     this.createWindow(w)
                   }
                 }
@@ -1585,6 +1589,9 @@ export default {
         // this.plugins[plugin.id] = plugin
         plugin.api.setup().then((result) => {
           console.log('sucessfully setup the window plugin: ', plugin, pconfig)
+          pconfig.data._op = plugin.name
+          pconfig.data._source_op = null
+          pconfig.data._workflow_id = null
           plugin.api.run({
             data: pconfig.data,
             config: pconfig.config,

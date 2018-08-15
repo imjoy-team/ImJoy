@@ -116,27 +116,37 @@ Here is an outline of the plugin file:
 
 ## The `<script>` tag
 
-Plugins can be written in Javascript or Python, a minimal plugin needs to implement two functions: `setup()` and `run(my)`.
+Plugins can be written in Javascript or Python, a minimal plugin needs to implement two functions: `setup()` and `run()`.
 In order to differentiate the two different languages, use the `lang` property of the `<script>` tag:
  * for Javascript plugin, use `<script lang="javascript"> ... </script>`
  * for Python plugin, use `<script lang="python"> ... </script>`
 
 ### `setup()` function
-`setup` function used to get the plugin prepared for running, it will be exectued when the plugin during initialization.
+`setup` function used to get the plugin prepared for running, it will be executed when the plugin during initialization.
 
-### `run(my)` function
-`run` function will be called each time a user click on the menu or run a workflow is executed. While executed, an object(for Javascript) or a dictionary(for Python) called `my` will be passed into the function. The plugin can use variables stored in `my`. 
+### `run()` function
+`run` function will be called each time a user click on the menu or run a workflow is executed. While executed, an object(for Javascript) or a dictionary(for Python) called `my` will be passed into the function.
 
-Here are the variables stored in `my`:
- * `my['op']`
- Give information about which op is executed, the plugin can use `my['op']['name']` to determine the op by its name.
+All the plugins can use variables such as `config` and `data` stored in `my`:
+
  * `my['config']`
  The config values from the user interface defined with the `ui` string (from the plugin config or `api.register`).
  * `my['data']`
- It stores the data from current active window while running the plugin.
- * `my['variables']`
- When the plugin is executed in a workflow, variables setted in the workflow will be passed as `my['variables']`.
+ It stores the data from current active window and state for running the plugin.
 
+ In `my['data']`, there are internal fields which will be used to store the state of the current workflow.
+   * `_variables`
+     When the plugin is executed in a workflow, variables will be set in the workflow will be passed as `my['data']['_variables']`. It will be set to the actual variable value if the user used ops such as `Set [number]`.
+   * `_op`
+     Give the name of the op which is being executing, the plugin can use `my['data']['_op']` to determine the op by its name.
+   * `_source_op`
+     Give the name of the op which initiated current execution.
+   * `_workflow_id`
+     When the plugin is executed in a workflow, the workflow id will be set in the workflow will be passed as `my['data']['_workflowId']`.
+
+     When the plugin is clicked in the plugin menu, ImJoy will try to reuse the workflow id in the current active window, if no window is active, a new workflow id will be assigned. All the data window with the same `_workflow_id` is virtually connected in a pipeline or computational graph. By combining `_workflow_id` with `_op` and `_source_op`, ImJoy can track, maintain and reconstruct the entire workflow.
+
+  Importantly, `_workflow_id`, `_variables`, `_op` and `_source_op` can be used to implement interactivity between plugins, meaning if the user changed a state in one of the result window, downstream of the workflow will be updated automatically.
 
 
 For the results, you can directly return your result and it will show in a result window. If you want to define the type of your result, or return multiple results, you can construct a new `my` variable(dictionary or object) with two fields `config` and `data`. Here is an example:
@@ -226,9 +236,9 @@ show a dialog with customized GUI, example:
       "name": "This is a dialog",
       "ui": "Hey, please select a value for sigma: {id:'sigma', type:'choose', options:['1', '3'], placeholder: '1'}.",
    }).then((result)=>{
-   
+
    })
-``` 
+```
 ## `api.showProgress(...)`
 update the progress bar on the Imjoy GUI, example: `api.showProgress(85)`
 ## `api.showStatus(...)`
