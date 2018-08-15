@@ -50,27 +50,27 @@ The ImJoy plugin file format is built up on html format with customized tags (in
 
 Here is an outline of the plugin file:
 ```
-<docs>
+<docs lang="markdown">
    ** An recommanded code block in Markdown format with the documentation of the plugin **
 </docs>
 
-<config>
+<config lang="json">
    ** A code block in Json format describe the plugin**
 </config>
 
-<script>
+<script lang="javascript">
    ** A code block in Javascrit or Python format**
 </script>
 
-<window>
+<window lang="html">
    ** A code block in HTML format**
    (for plugins in iframe mode)
 </window>
 
-<style>
+<style lang="css">
    ** A code block in CSS format**
    (for plugins in iframe mode)
-</style>
+</style lang="json">
 ```
 ## The `<config>` tag
 
@@ -88,7 +88,6 @@ Here is an outline of the plugin file:
   "inputs": null,
   "outputs": null,
   "env": null,
-  "cmd": null,
   "requirements": null,
   "dependencies": []
 }
