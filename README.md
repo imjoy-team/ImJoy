@@ -135,13 +135,13 @@ All the plugins can use variables such as `config` and `data` stored in `my`:
  It stores the data from current active window and state for running the plugin.
 
  In `my['data']`, there are internal fields which will be used to store the state of the current workflow.
-   * `_variables`
+  * `_variables`
      When the plugin is executed in a workflow, variables will be set in the workflow will be passed as `my['data']['_variables']`. It will be set to the actual variable value if the user used ops such as `Set [number]`.
-   * `_op`
+  * `_op`
      Give the name of the op which is being executing, the plugin can use `my['data']['_op']` to determine the op by its name.
-   * `_source_op`
+  * `_source_op`
      Give the name of the op which initiated current execution.
-   * `_workflow_id`
+  * `_workflow_id`
      When the plugin is executed in a workflow, the workflow id will be set in the workflow will be passed as `my['data']['_workflowId']`.
 
      When the plugin is clicked in the plugin menu, ImJoy will try to reuse the workflow id in the current active window, if no window is active, a new workflow id will be assigned. All the data window with the same `_workflow_id` is virtually connected in a pipeline or computational graph. By combining `_workflow_id` with `_op` and `_source_op`, ImJoy can track, maintain and reconstruct the entire workflow.
@@ -227,6 +227,8 @@ register a new op, example:
 create a new window and add to the workspace, example:
 
 `api.createWindow({name: 'new window', type: 'Image Window', w:7, h:7, data: {image: ...}, config: {}})`
+
+If you do not want the window to load immediately, you can add `click2load: true` and the window will ask for an extra click to load the content.
 
 ## `api.showDialog(...)`
 show a dialog with customized GUI, example:

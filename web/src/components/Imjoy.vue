@@ -1129,7 +1129,7 @@ export default {
               }
             }
           } catch (e) {
-            console.error('error with validation with', this.registered.inputs[k].op_name, e)
+            console.error('error with validation with', k, e)
           }
         }
       }
@@ -1355,7 +1355,7 @@ export default {
         }
         this.plugins[plugin.id] = plugin
         this.plugin_names[plugin.name] = plugin
-        config.force_show = false
+        config.click2load = false
         plugin.api = {
           run: (my) => {
             const c = {}
@@ -1641,6 +1641,8 @@ export default {
             data: pconfig.data,
             config: pconfig.config,
             op: pconfig.op,
+          }).then(()=>{
+            this.$forceUpdate()
           }).catch((e) => {
             this.status_text = plugin.name + '->' + e
             console.error('error in the run function of plugin ' + plugin.name, e)
@@ -1657,11 +1659,9 @@ export default {
       });
     },
     createWindow(wconfig, _plugin) {
-      // const plugin = this.plugins[_plugin.id]
-      // wconfig.type = wconfig.type || "imjoy/panel"
       wconfig.config = wconfig.config || {}
       wconfig.data = wconfig.data || null
-      wconfig.force_show = wconfig.force_show || false
+      wconfig.click2load = wconfig.click2load || false
       wconfig.panel = wconfig.panel || null
       if (!WINDOW_SCHEMA(wconfig)) {
         const error = WINDOW_SCHEMA.errors(wconfig)
@@ -1696,14 +1696,12 @@ export default {
         pconfig.iframe_window = null
         pconfig.plugin = window_config
         pconfig.context = this.pluing_context
-        if (wconfig.force_show) {
-          pconfig.click2load = false
+        if (!pconfig.click2load) {
           pconfig.loadWindow = null
           this.showPluginWindow(pconfig).then(() => {
             this.renderWindow(pconfig)
           })
         } else {
-          pconfig.click2load = true
           pconfig.renderWindow = this.renderWindow
           this.showPluginWindow(pconfig)
         }
@@ -1751,13 +1749,7 @@ export default {
         console.log('creating plugin window: ', config)
         this.addWindow(config)
         console.log('added the window')
-        // container IS NOT finished rendering to the DOM
-        // this.$nextTick(()=>{
-        //      resolve()
-        // })
-        // setTimeout(() => {
-        //   resolve()
-        // }, 500)
+        resolve()
       })
     },
   }
