@@ -115,9 +115,9 @@ Here is an outline of the plugin file:
 ## The `<script>` tag
 
 Plugins can be written in Javascript or Python, a minimal plugin needs to implement two functions: `setup()` and `run(my)`.
-In order to differentiate the two different languages, use the `type` property of the `<script>` tag:
- * for Javascript plugin, use `<script type="text/javascript"> ... </script>`
- * for Python plugin, use `<script type="text/python"> ... </script>`
+In order to differentiate the two different languages, use the `lang` property of the `<script>` tag:
+ * for Javascript plugin, use `<script lang="javascript"> ... </script>`
+ * for Python plugin, use `<script lang="python"> ... </script>`
 
 ### `setup()` function
 `setup` function used to get the plugin prepared for running, it will be exectued when the plugin during initialization.
@@ -152,7 +152,7 @@ In the result, two fields named `data_1` and `result_tensor` will be displayed i
 
 ### Javascript example
 ```html
-<script type="text/javascript">
+<script lang="javascript">
 class UntitledPlugin {
   async setup() {
     console.log('initialized from Javascript.');
@@ -170,7 +170,7 @@ api.export(new UntitledPlugin())
 
 ### Python example
 ```html
-<script type="text/python">
+<script lang="python">
 class PythonPlugin():
   def setup(self):
     print('initialized from python.')
@@ -261,7 +261,7 @@ Here is a python `hello world` example:
 }
 </config>
 
-<script type="text/python">
+<script lang="python">
 import numpy as np
 
 class PythonPlugin():
