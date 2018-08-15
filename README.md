@@ -49,7 +49,7 @@ Click the + button and select the plugin dropdown option, then create a plugin.
 The ImJoy plugin file format is built up on html format with customized tags (inspired by the `.vue` format), it consists of two mandatory tags `<config>` and `<script>`, and other optional tags including `<docs>`, `<window>` and `<style>`.
 
 Here is an outline of the plugin file:
-```html
+```
 <docs>
    ** An recommanded code block in Markdown format with the documentation of the plugin **
 </docs>
@@ -93,7 +93,7 @@ Here is an outline of the plugin file:
 * `name` the name of the plugin, it must be unique to avoid conflicting with other plugins.
 * `mode` the mode of the plugin, currently supported modes are `webworker`, `iframe` and `pyworker`.
   * `webworker` is used to run computationally intensive javascript plugins. It do not have an interface, it runs in a new thread and won't hang the main thread during running.
-  * `iframe` is used for create new web interface with HTML/CSS and Javascript, it runs in the same thread as the main webpage.
+  * `iframe` is used for create new web interface with HTML/CSS and Javascript, it runs in the same thread as the main webpage. If `iframe` mode is selected, then you need to provied HTML code with the `<window>` tag and CSS code with the `style` tag.
   * `pyworker` is used to run plugins written in Python, the user needs to have the **Python Plugin Engine** installed and started before using the plugin. See the **Developing Python Plugins** for more details.
 * `tags`
 * `ui` a string used to generate the GUI to the user, you can include the following elements to render an input form:
@@ -111,8 +111,6 @@ Here is an outline of the plugin file:
 * `requirements` (**for python plugins only**) the pip packages which will be installed before running the plugin, package names or github links are both supported.
 * `cmd` (**for python plugins only**) the command used to run the plugin, by default, it will run `python`, sometimes it can be something like `python3` or `python27` etc.
 * `dependencies` names of other imjoy plugins which the current one depend on. They will be installed automatically during installation.
-## The `<docs>` tag
-Used to contain documentation for the plugin, it need to be written in markdown language.
 
 ## The `<script>` tag
 
@@ -180,6 +178,15 @@ class PythonPlugin():
 
 api.export(PythonPlugin())
 ```
+
+## The `<docs>` tag
+Used to contain documentation for the plugin, it need to be written in `Markdown` language. Here is a document about how to write document in `Markdown`: [Mastering Markdown](https://guides.github.com/features/mastering-markdown/).
+
+## The `<window>` tag
+Define the HTML code for displaying in the plugin window.
+
+## The `<style>` tag
+Define the CSS code for displaying in the plugin window.
 
 # Plugin API
 
