@@ -1252,6 +1252,10 @@ export default {
           my.type = 'imjoy/generic'
           my.config = my.data
           my.data = my.target
+          my.data._op = target._op || null
+          my.data._source_op = target._source_op || null
+          my.data._workflow_id = target._workflow_id || null
+          if(Object.keys(my.data).length>3)
           this.createWindow(my)
         }
         this.progress = 100
@@ -1584,7 +1588,7 @@ export default {
                     my.target = result
                   }
                   my.target = my.target || {}
-                  my.target._op = target_data._source_op || null
+                  my.target._op = target_data._op || null
                   my.target._source_op = target_data._source_op || null
                   my.target._workflow_id = target_data._workflow_id || null
                   if (Object.keys(my.target).length>3) {
