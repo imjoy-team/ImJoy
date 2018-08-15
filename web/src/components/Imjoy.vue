@@ -191,7 +191,7 @@ Engine<template>
           <md-card-content>
             <div v-for="plugin in sortedPlugins()" :key="plugin.name">
               <md-divider></md-divider>
-              <md-button class="md-icon-button" @click="editPlugin(plugin.id)">
+              <md-button class="md-icon-button md-primary" @click="editPlugin(plugin.id)">
                 <md-icon v-if="plugin.config.icon">{{plugin.config.icon}}</md-icon>
                 <md-icon v-else>extension</md-icon>
               </md-button>
@@ -664,7 +664,7 @@ export default {
       this.show('Trying to connect to the plugin engine...')
       const socket = io(url);
       const timer = setTimeout(() => {
-        if (!engine_connected) {
+        if (!this.engine_connected) {
           this.engine_status = 'Plugin Engine not connected'
           if(!auto) this.show('Failed to connect, please make sure you have started the plugin engine.', 5000)
           if(!auto) this.showPluginEngineInfo = true

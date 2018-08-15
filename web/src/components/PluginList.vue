@@ -397,4 +397,8 @@ export default {
 .grid-container {
   width: calc(100%) !important;
 }
+
+.md-list {
+  max-width: 100%;
+}
 </style>
