@@ -16,7 +16,7 @@ Engine<template>
         </md-button>
         <md-menu>
           <md-button class="md-button" md-menu-trigger>
-            <span class="subheader-title" style="flex: 1">Image Processing with Joy</span>
+            <span class="subheader-title md-small-hide" style="flex: 1">Image Processing with </span><span class="subheader-emoji">😂</span>
             <md-tooltip>Switch workspace</md-tooltip>
           </md-button>
           <md-menu-content>
@@ -28,8 +28,11 @@ Engine<template>
             </md-menu-item>
           </md-menu-content>
         </md-menu>
+        <md-button v-if="status_text&&status_text.length"class="status-text md-small-hide" @click="showAlert(status_text)" :class="status_text.includes('rror')?'error-message':''">
+          {{status_text.slice(0,60)+(status_text.length>60?'...':'')}}
+        </md-button>
       </div>
-      <span class="status-text md-small-hide" :class="status_text.includes('rror')?'error-message':''">{{status_text}}</span>
+
       <div class="md-toolbar-section-end">
         <md-snackbar :md-position="'center'" class="md-accent" :md-active.sync="show_snackbar" :md-duration="snackbar_duration">
          <span>{{snackbar_info}}</span>
@@ -549,7 +552,7 @@ export default {
     }
     this.connection_token = localStorage.getItem("imjoy_connection_token")
     this.plugin_api = {
-      alert: alert,
+      alert: this.showAlert,
       register: this.register,
       createWindow: this.createWindow,
       showDialog: this.showDialog,
@@ -1169,7 +1172,11 @@ export default {
       target._source_op = null
       target._workflow_id = target._workflow_id || "workflow_"+randId()
       joy.workflow.execute(target).then((my) => {
-        if (my.target && Object.keys(my.target).length>0) {
+        my.target = my.target || {}
+        my.target._op = target._op || null
+        my.target._source_op = target._source_op || null
+        my.target._workflow_id = target._workflow_id || null
+        if (Object.keys(my.target).length>3) {
           console.log('result', my)
           const w = {}
           w.name = 'result'
@@ -1489,9 +1496,10 @@ export default {
         } else {
           const onexecute = async (my) => {
             //conver the api here data-->config   target--> data
+            my.target._source_op = my.target._op;
             my.target._op = my.op.name;
-            // my.target._source_op = null;
             // my.target._workflow_id = null;
+            const _workflow_id = my.target._workflow_id;
             const result = await plugin.api.run({
               op: {
                 name: my.op.name,
@@ -1499,15 +1507,20 @@ export default {
               config: my.data,
               data: my.target,
             })
+            const res = {}
             if(result && result.data && result.config){
-              my.data = result.config
-              my.target = result.data
+              res.data = result.config
+              res.target = result.data
             }
             else if(result){
-              my.data = null
-              my.target = result
+              res.data = null
+              res.target = result
             }
-            return my
+            res.target = res.target || {}
+            res.target._workflow_id = _workflow_id
+            res.target._op = my.target
+            res.target._source_op = my._source_op
+            return res
           }
           config.onexecute = onexecute
         }
@@ -1551,9 +1564,9 @@ export default {
                 if (plugin.config && plugin.config.ui) {
                   config = await this.showDialog(plugin.config)
                 }
+                target_data._source_op = target_data._op
                 target_data._op = op_name
-                target_data._source_op = null
-                target_data._workflow_id = 'data_loader_'+op_name.trim().replace(/ /g, '_')+randId()
+                target_data._workflow_id = target_data._workflow_id || 'data_loader_'+op_name.trim().replace(/ /g, '_')+randId()
                 const result = await plugin.api.run({
                   op: {name: op_name},
                   config: config,
@@ -1570,7 +1583,11 @@ export default {
                     my.data = null
                     my.target = result
                   }
-                  if (my.target && Object.keys(my.target).length>0) {
+                  my.target = my.target || {}
+                  my.target._op = target_data._source_op || null
+                  my.target._source_op = target_data._source_op || null
+                  my.target._workflow_id = target_data._workflow_id || null
+                  if (Object.keys(my.target).length>3) {
                     const w = {}
                     w.name = 'result'
                     w.type = 'imjoy/generic'
@@ -1752,6 +1769,10 @@ export default {
         resolve()
       })
     },
+    showAlert(text){
+      console.log('alert: ', text)
+      alert(text)
+    }
   }
 }
 </script>
@@ -1784,6 +1805,11 @@ export default {
   text-transform: none;
 }
 
+.subheader-emoji {
+  font-size: 20px;
+  font-weight: 500;
+  text-transform: none;
+}
 .superscript {
   font-size: 16px;
   text-transform: none;
@@ -1904,6 +1930,11 @@ div#textnode {
   width: 100%;
   height: 100%;
   max-height: 100%;
+}
+
+.status-text{
+  text-align: center;
+  text-transform: none;
 }
 
 .centered-button{
