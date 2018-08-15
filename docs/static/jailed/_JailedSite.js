@@ -53,7 +53,7 @@
         this._interfaceSetAsRemoteHandler = function(){};
         this._disconnectHandler = function(){};
         this._store = new ReferenceStore;
-
+        this._method_refs = new ReferenceStore;
         var me = this;
         this._connection = connection;
         this._connection.onMessage(
@@ -90,7 +90,17 @@
         this._interfaceSetAsRemoteHandler = handler;
     }
 
+    JailedSite.prototype.onRemoteReady = function(handler) {
+        this._method_refs.onReady(handler);
+    }
 
+    JailedSite.prototype.onRemoteBusy = function(handler) {
+        this._method_refs.onBusy(handler);
+    }
+
+    JailedSite.prototype.getRemoteCallStack = function() {
+        return this._method_refs.getStack();
+    }
     /**
      * Set a handler to be called when the remote site requests to
      * (re)send the interface. Used to detect an initialzation
@@ -189,7 +199,7 @@
                method = this._interface[data.name];
              }
              var args = this._unwrap(data.args, true);
-             if(this.id) args.push({id: this.id})
+             args.push({id: this.id})
              if(data.promise){
                var [resolve, reject] = this._unwrap(data.promise, false);
                try {
@@ -214,14 +224,9 @@
 
              break;
          case 'callback':
-              // if(callback_reg.test(data.num)){
-              //   var method = this._store.retrieve(data.id)[data.num];
-              // }
-              // else{
-              var method = this._store.fetch(data.id)[data.num];
-              // }
+             var method = this._store.fetch(data.id)[data.num];
              var args = this._unwrap(data.args, true);
-             if(this.id) args.push({id: this.id})
+             args.push({id: this.id})
              if(data.promise){
                var [resolve, reject] = this._unwrap(data.promise, false);
                try {
@@ -333,12 +338,28 @@
         var me = this;
         var remoteMethod = function() {
           return new Promise((resolve, reject) => {
-            me._connection.send({
-                type: 'method',
-                name: name,
-                args: me._wrap(Array.prototype.slice.call(arguments)),
-                promise: me._wrap([resolve, reject])
-            });
+            let id = null;
+            try {
+              id=me._method_refs.put(name)
+              var wrapped_resolve = function () {
+                if(id!==null) me._method_refs.fetch(id);
+                return resolve.apply(this, arguments);
+              };
+              var wrapped_reject = function () {
+                if(id!==null) me._method_refs.fetch(id);
+                return reject.apply(this, arguments);
+              };
+              me._connection.send({
+                  type: 'method',
+                  name: name,
+                  args: me._wrap(Array.prototype.slice.call(arguments)),
+                  promise: me._wrap([wrapped_resolve, wrapped_reject])
+              });
+            } catch (e) {
+              if(id) me._method_refs.fetch(id);
+              console.error(e)
+            }
+
           });
         };
 
@@ -604,9 +625,22 @@
     var ReferenceStore = function() {
         this._store = {};    // stored object
         this._indices = [0]; // smallest available indices
+        this._readyHandler = function(){};
+        this._busyHandler = function(){};
+        this._readyHandler();
     }
 
+    ReferenceStore.prototype.onReady = function(readyHandler) {
+        this._readyHandler = readyHandler || function(){};
+    }
 
+    ReferenceStore.prototype.onBusy = function(busyHandler) {
+        this._busyHandler = busyHandler || function(){};
+    }
+
+    ReferenceStore.prototype.getStack = function() {
+        return Object.keys(this._store).length
+    }
     /**
      * @function _genId() generates the new reference id
      *
@@ -657,6 +691,9 @@
      * @returns {Number} reference id of the stored object
      */
     ReferenceStore.prototype.put = function(obj) {
+        if(this._busyHandler&&Object.keys(this._store).length==0){
+          this._busyHandler()
+        }
         var id = this._genId();
         this._store[id] = obj;
         return id;
@@ -673,6 +710,9 @@
         this._store[id] = null;
         delete this._store[id];
         this._releaseId(id);
+        if(this._readyHandler&&Object.keys(this._store).length==0){
+          this._readyHandler()
+        }
         return obj;
     }
 
