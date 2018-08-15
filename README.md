@@ -127,7 +127,7 @@ In order to differentiate the two different languages, use the `lang` property o
 ### `run()` function
 `run` function will be called each time a user click on the menu or run a workflow is executed. While executed, an object(for Javascript) or a dictionary(for Python) called `my` will be passed into the function.
 
-All the plugins can use variables such as `config` and `data` stored in `my`:
+All the plugins can access `config` and `data` from `my`:
 
  * `my['config']`
  The config values from the user interface defined with the `ui` string (from the plugin config or `api.register`).
