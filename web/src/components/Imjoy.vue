@@ -191,7 +191,7 @@ Engine<template>
           <md-card-content>
             <div v-for="plugin in sortedPlugins()" :key="plugin.name">
               <md-divider></md-divider>
-              <md-button class="md-icon-button md-primary" @click="editPlugin(plugin.id)">
+              <md-button class="md-icon-button" :class="plugin.running?'md-accent':'md-primary'" @click="editPlugin(plugin.id)">
                 <md-icon v-if="plugin.config.icon">{{plugin.config.icon}}</md-icon>
                 <md-icon v-else>extension</md-icon>
               </md-button>
@@ -550,6 +550,7 @@ export default {
       showProgress: this.showProgress,
       showStatus: this.showStatus,
       run: this.runPlugin,
+      $forceUpdate: this.$forceUpdate,
     }
     this.resetPlugins()
     this.pluing_context = {}
@@ -818,6 +819,7 @@ export default {
             console.log('terminating plugin ', pconfig.plugin)
             if (typeof pconfig.plugin.terminate == 'function'){
               pconfig.plugin.terminate()
+              this.$forceUpdate()
               console.log('terminated.')
             }
           } finally {
@@ -846,14 +848,16 @@ export default {
           pconfig.type = plugin.type
           pconfig.plugin = plugin
           if (this.$refs.workflow) this.$refs.workflow.setupJoy()
+          this.$forceUpdate()
           resolve(plugin)
         }).catch((e) => {
           pconfig.name = null
           pconfig.type = null
           pconfig.plugin = null
+          this.$forceUpdate()
           reject(e)
         })
-        // this.$forceUpdate()
+
       })
     },
     savePlugin(pconfig) {
