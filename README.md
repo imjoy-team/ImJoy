@@ -50,10 +50,6 @@ The ImJoy plugin file format is built up on html format with customized tags (in
 
 Here is an outline of the plugin file:
 ```
-<docs lang="markdown">
-   ** An recommanded code block in Markdown format with the documentation of the plugin **
-</docs>
-
 <config lang="json">
    ** A code block in Json format describes the plugin**
 </config>
@@ -71,6 +67,10 @@ Here is an outline of the plugin file:
    ** A code block in CSS format**
    (for plugins in iframe mode)
 </style lang="json">
+
+<docs lang="markdown">
+   ** An recommanded code block in Markdown format with the documentation of the plugin **
+</docs>
 ```
 ## The `<config>` tag
 
@@ -94,15 +94,15 @@ Here is an outline of the plugin file:
 ```
 * `name` the name of the plugin, it must be unique to avoid conflicting with other plugins.
 * `mode` the mode of the plugin, currently supported modes are `webworker`, `iframe` and `pyworker`.
-  * `webworker` is used to run computationally intensive javascript plugins. It do not have an interface, it runs in a new thread and won't hang the main thread during running.
+  * `webworker` is used to run computationally intensive javascript plugins. It does not have an interface, it runs in a new thread and won't hang the main thread during running.
   * `iframe` is used for create new web interface with HTML/CSS and Javascript, it runs in the same thread as the main webpage. If `iframe` mode is selected, then you need to provied HTML code with the `<window>` tag and CSS code with the `style` tag.
   * `pyworker` is used to run plugins written in Python, the user needs to have the **Python Plugin Engine** installed and started before using the plugin. See the **Developing Python Plugins** for more details.
-* `tags`
-* `ui` a string used to generate the GUI to the user, you can include the following elements to render an input form:
+* `tags` defines the tags for the plugin, if the tag is used for several plugins, they will be grouped in the ops menu shown in workflow.
+* `ui` is a string used to generate the GUI to the user, you can include the following elements to render an input form:
   * `type: 'choice', options: []`
   * `type: 'number', min: 0, max: 10`
   * ...
-* `version` version of the plugin
+* `version` defines the version of the plugin
 * `api_version` api version of imjoy which the plugin is written for
 * `url` the url used point to current file, used to download the plugin file when a user install it from the plugin store on imjoy.io website.
 * `description` a short description about the plugin, describe the main feature or the context of the plugin
@@ -218,8 +218,8 @@ register a new op, example:
     api.register({
        "name": "LUT",
        "tags": ["op"],
-       "inputs": {"image": "image/grayscale"},
-       "outputs": {"image": "image/color"},
+       "inputs": {"type": {"enum": ["image/grayscale"], "required": true}},
+       "outputs": {"type": {"enum": ["image/color"], "required": true}},
        "ui": "apply LUT {id:'lut', type:'choose', options:['hot', 'rainbow'], placeholder: 'hot'}",
     })
 ```
