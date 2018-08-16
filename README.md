@@ -108,7 +108,9 @@ Here is an outline of the plugin file:
 * `description` a short description about the plugin, describe the main feature or the context of the plugin
 * `icon` defines the icon used in the plugin menu. You can find a material icon from https://material.io/tools/icons/ and set its name to `icon`. Or, you can directly copy and paste Emoji, for example from [here](https://getemoji.com/).
 * `inputs` defines the inputs with json-schema syntax (http://json-schema.org/) .
+For example, you can use `"inputs": {"properties": {"type": {"enum": ["image/png"], "required": true}}, "type": "object"}` to describe the plugin takes an png image as input. You can also use the simplified format which assumes the inputs is an object and use json schema to describe the properties: `"inputs": {"type": {"enum": ["image/png"], "required": true}}`.
 * `outputs` defines the outputs with json-schema syntax (http://json-schema.org/).
+The format is exactly the same as `inputs`.
 * `env` (**for python plugins only**) the virtual environment or docker image command used for creating an enviroment to run the plugins
 * `cmd` (**for python plugins only**) the command used to run the plugin, by default, it will run `python`, sometimes it can be something like `python3` or `python27` etc.
 * `requirements` (**for python plugins only**) the pip packages which will be installed before running the plugin, package names or github links are both supported.
