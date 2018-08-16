@@ -301,10 +301,11 @@ Engine<template>
         If not, you need to do the following:<br>
         &nbsp;&nbsp;* Install <a href="https://www.anaconda.com/download/" target="_blank">Anaconda</a> or <a href="https://conda.io/miniconda.html" target="_blank">Miniconda</a> (Python3.6 version is preferred) <br>
         &nbsp;&nbsp;* Open a `Terminal`(mac/linux) or `Anaconda Prompt`(windows), then run the following command:<br>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>conda install -y git pip && pip install -U git+https://github.com/oeway/ImJoy-Python#egg=imjoy</strong><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>conda -V && pip install -U git+https://github.com/oeway/ImJoy-Python#egg=imjoy</strong><br>
         &nbsp;&nbsp;* Run <strong>python -m imjoy</strong> in the terminal to start the engine.<br><br>
         Once the plugin engine is ready, click <strong>CONNECT</strong><br>
-        If you failed to set it up, please consult <a href="https://github.com/oeway/ImJoy-Python" target="_blank">here</a><br>'
+        If you encountered any error related to git or pip, try to run <strong>conda install -y git pip</strong> before the above command.<br>
+        If you still failed to set it up, please consult <a href="https://github.com/oeway/ImJoy-Python" target="_blank">here</a><br>'
         md-confirm-text="Connect"
         md-cancel-text="Cancel"
         @md-confirm="connectEngine(engine_url)" />
