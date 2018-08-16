@@ -97,12 +97,12 @@ Here is an outline of the plugin file:
   * `webworker` is used to run computationally intensive javascript plugins. It does not have an interface, it runs in a new thread and won't hang the main thread during running.
   * `iframe` is used for create new web interface with HTML/CSS and Javascript, it runs in the same thread as the main webpage. If `iframe` mode is selected, then you need to provied HTML code with the `<window>` tag and CSS code with the `style` tag.
   * `pyworker` is used to run plugins written in Python, the user needs to have the **Python Plugin Engine** installed and started before using the plugin. See the **Developing Python Plugins** for more details.
-* `tags`
-* `ui` a string used to generate the GUI to the user, you can include the following elements to render an input form:
+* `tags` defines the tags for the plugin, if the tag is used for several plugins, they will be grouped in the ops menu shown in workflow.
+* `ui` is a string used to generate the GUI to the user, you can include the following elements to render an input form:
   * `type: 'choice', options: []`
   * `type: 'number', min: 0, max: 10`
   * ...
-* `version` version of the plugin
+* `version` defines the version of the plugin
 * `api_version` api version of imjoy which the plugin is written for
 * `url` the url used point to current file, used to download the plugin file when a user install it from the plugin store on imjoy.io website.
 * `description` a short description about the plugin, describe the main feature or the context of the plugin
