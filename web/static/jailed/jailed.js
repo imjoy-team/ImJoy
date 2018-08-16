@@ -756,6 +756,7 @@ function randId() {
         this._path = config.url;
         this._initialInterface = _interface||{};
         this._disconnected = true
+        this.running = false;
         this._connect();
     };
 
@@ -772,12 +773,13 @@ function randId() {
         if(!this.config.script){
           throw "you must specify the script for the plugin to run."
         }
-        this.id = config.id || randId()
-        this.name = config.name
-        this.type = config.type
-        this.mode = config.mode || 'webworker'
+        this.id = config.id || randId();
+        this.name = config.name;
+        this.type = config.type;
+        this.mode = config.mode || 'webworker';
+        this.running = false;
         this._initialInterface = _interface||{};
-        this._disconnected = true
+        this._disconnected = true;
         this._connect();
     };
 
@@ -827,6 +829,18 @@ function randId() {
         this._site.onDisconnect(function() {
             me._disconnect.emit();
         });
+
+        this._site.onRemoteReady(function() {
+            me.running = false;
+            // me._initialInterface.$forceUpdate&&me._initialInterface.$forceUpdate();
+        });
+
+        this._site.onRemoteBusy(function() {
+            me.running = true;
+            // me._initialInterface.$forceUpdate&&me._initialInterface.$forceUpdate();
+        });
+
+        this.getRemoteCallStack = this._site.getRemoteCallStack;
 
         var sCb = function() {
             me._loadCore();
@@ -983,6 +997,8 @@ function randId() {
     DynamicPlugin.prototype.terminate =
            Plugin.prototype.terminate = function() {
         this._disconnected = true
+        this.running = false
+        // this._initialInterface.$forceUpdate&&this._initialInterface.$forceUpdate();
         this._site&&this._site.disconnect();
     }
 

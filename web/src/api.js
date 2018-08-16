@@ -152,7 +152,7 @@ export const WINDOW_SCHEMA= schema({
   config: Object,
   data: [null, Object], //attachments: {}
   panel: [null, Object],
-  force_show: Boolean
+  // click2load: Boolean
 })
 
 export const OP_SCHEMA = {
