@@ -191,10 +191,29 @@ Engine<template>
           <md-card-content>
             <div v-for="plugin in sortedPlugins()" :key="plugin.name">
               <md-divider></md-divider>
-              <md-button class="md-icon-button md-primary" @click="editPlugin(plugin.id)">
-                <md-icon v-if="plugin.config.icon">{{plugin.config.icon}}</md-icon>
-                <md-icon v-else>extension</md-icon>
-              </md-button>
+
+              <md-menu md-size="medium">
+                <md-button class="md-icon-button md-primary" md-menu-trigger>
+                  <md-icon v-if="plugin.config.icon">{{plugin.config.icon}}</md-icon>
+                  <md-icon v-else>extension</md-icon>
+                  <md-tooltip>show more options for the plugin</md-tooltip>
+                </md-button>
+                <md-menu-content>
+                  <md-menu-item @click="editPlugin(plugin.id)">
+                    <md-icon>edit</md-icon>Edit
+                  </md-menu-item>
+                  <md-menu-item @click="reloadPlugin({name: plugin.name, plugin:plugin})">
+                    <md-icon>autorenew</md-icon>Reload
+                  </md-menu-item>
+                  <md-menu-item @click="plugin.terminate()">
+                    <md-icon>delete</md-icon>Terminate
+                  </md-menu-item>
+                  <md-menu-item @click="showRemoveConfirmation=true">
+                    <md-icon>delete_forever</md-icon>Uninstall
+                  </md-menu-item>
+                </md-menu-content>
+              </md-menu>
+
               <md-button class="joy-run-button md-primary" :disabled="plugin._disconnected" @click="runOp(plugin.ops[plugin.name])">
                 {{plugin.name}}
               </md-button>
@@ -202,6 +221,7 @@ Engine<template>
                 <md-icon v-if="!plugin.panel_expanded">expand_more</md-icon>
                 <md-icon v-else>expand_less</md-icon>
               </md-button>
+
               <div v-for="(op, n) in plugin.ops" :key="op.id + op.name">
 
                 <md-button class="md-icon-button" v-show="plugin.panel_expanded && op.name != plugin.name" :disabled="true">
@@ -230,6 +250,8 @@ Engine<template>
       <whiteboard :windows="windows" :loaders="registered&&registered.loaders" @select="windowSelected"></whiteboard>
     </md-app-content>
   </md-app>
+
+  <md-dialog-confirm :md-active.sync="showRemoveConfirmation" md-title="Removing Plugin" md-content="Do you really want to <strong>delete</strong> this plugin" md-confirm-text="Yes" md-cancel-text="Cancel" @md-cancel="showRemoveConfirmation=false" @md-confirm="removePlugin(_plugin2_remove);showRemoveConfirmation=false"/>
   <!-- </md-card-content> -->
 
   <md-dialog :md-active.sync="showPluginDialog" :md-click-outside-to-close="false">
@@ -383,8 +405,10 @@ export default {
       showPluginDialog: false,
       showSettingsDialog: false,
       showAddPluginDialog: false,
+      showRemoveConfirmation: false,
       plugin_dialog_config: null,
       _plugin_dialog_promise: {},
+      _plugin2_remove: null,
       loading: false,
       progress: 0,
       status_text: '',
@@ -627,6 +651,9 @@ export default {
     this.disconnectEngine()
   },
   methods: {
+    removePlugin(p){
+      console.log('remove plugin', p)
+    },
     sortedPlugins: function() {
         return _.orderBy(this.plugins, 'name');
     },
@@ -781,15 +808,15 @@ export default {
     },
     reloadPlugin(pconfig) {
       return new Promise((resolve, reject) => {
-        if(pconfig.type || pconfig.name){
+        if(pconfig.name){
           for (let k in this.plugins) {
             if (this.plugins.hasOwnProperty(k)) {
               const plugin = this.plugins[k]
-              if(plugin.type == pconfig.type || plugin.name == pconfig.name){
+              if(plugin.name == pconfig.name){
                   try {
                     delete this.plugins[k]
                     delete this.plugin_names[pconfig.name]
-                    Joy.remove(pconfig.type)
+                    Joy.remove(pconfig.name)
                     console.log('terminating ',plugin)
                     if (typeof plugin.terminate == 'function') {
                       plugin.terminate()
