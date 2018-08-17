@@ -115,6 +115,16 @@ The format is exactly the same as `inputs`.
 * `requirements` (**for python plugins only**) the pip packages which will be installed before running the plugin, package names or github links are both supported.
 * `dependencies` names of other imjoy plugins which the current one depend on. They will be installed automatically during installation.
 
+
+## The `<docs>` tag
+Used to contain documentation for the plugin, it need to be written in `Markdown` language. Here is a document about how to write document in `Markdown`: [Mastering Markdown](https://guides.github.com/features/mastering-markdown/).
+
+## The `<window>` tag
+Define the HTML code for displaying in the plugin window.
+
+## The `<style>` tag
+Define the CSS code for displaying in the plugin window.
+
 ## The `<script>` tag
 
 Plugins can be written in Javascript or Python, a minimal plugin needs to implement two functions: `setup()` and `run()`.
@@ -196,22 +206,18 @@ api.export(PythonPlugin())
 </script>
 ```
 
-## The `<docs>` tag
-Used to contain documentation for the plugin, it need to be written in `Markdown` language. Here is a document about how to write document in `Markdown`: [Mastering Markdown](https://guides.github.com/features/mastering-markdown/).
+## `Plugin API` and `ImJoy API`
+The plugin system of ImJoy is built upon remote procedure calls we implemented, an encoding and decoding scheme is used by ImJoy to transfer data and functions between plugins. It works by exposing a set of API functions both from the plugin or the main app. In the plugin, predefined object called `api` is to access the ImJoy API, detailed information can be found in the **ImJoy API** section. By using an ImJoy API called `api.export`, a set of functions can be exported as `Plugin APIs`, `setup` and `run` as described before are two mandatory `Plugin API` functions which need to be defined and exported. In addition to that, other functions can be also exported as `Plugin APIs`. 
 
-## The `<window>` tag
-Define the HTML code for displaying in the plugin window.
+## Callback functions
+Besides the `Plugin API` functions, when a plugin is executed, you can return an object which includes functions which will be called by other plugins or ImJoy. However, if the function has never been exported as a `Plugin API` before, it will be treated a `callback` function and can be only called once. Otherwise, if the function has been exported as `Plugin API`, it won't be treated as `callback` function and can be called repeatly.
 
-## The `<style>` tag
-Define the CSS code for displaying in the plugin window.
-
-# Plugin API
-
+## `ImJoy API`
 Within the plugin, there is a variable called `api` which exposes a set of internal utility functions. These utility functions can be used in the plugin to interact with the GUI, talk with another plugin etc.
 
-## `api.alert(...)`
+### `api.alert(...)`
 show alert dialog with message, example: `api.alert('hello world')`
-## `api.register(...)`
+### `api.register(...)`
 register a new op, example:
 ```javascript
     api.register({
@@ -226,16 +232,16 @@ The same api works for both Javascript and Python.
 
 By default, each all the ops created by the same plugin will call the same `run` function defined in the plugin, and you will need to use `my["data"]["_op"]` in the `run` function to differentiate which op is called. 
 
-Alternatively, another function can be passed as the `run` field if the function is already in the plugin api, meaning the function is a memeber of the plugin class. For example, you can add  `"run": this.hello` in a Javascript plugin or `"run": self.hello` in a Python plugin if `hello` is a member function of the plugin class.
+Alternatively, another `Plugin API` function other than `run` can be passed when calling `api.register`. For example, you can add  `"run": this.hello` in a Javascript plugin or `"run": self.hello` in a Python plugin if `hello` is a member function of the plugin class. When the registered op is exectued, `hello` will be called. **Note:** the function must be a member of the plugin class or being exported (with `api.export`) as a `Plugin API` function. This is because a arbitrary function transfered by ImJoy will be treated as `callback` function, thus only allowed to run once. 
 
-## `api.createWindow(...)`
+### `api.createWindow(...)`
 create a new window and add to the workspace, example:
 
 `api.createWindow({name: 'new window', type: 'Image Window', w:7, h:7, data: {image: ...}, config: {}})`
 
 If you do not want the window to load immediately, you can add `click2load: true` and the window will ask for an extra click to load the content.
 
-## `api.showDialog(...)`
+### `api.showDialog(...)`
 show a dialog with customized GUI, example:
 
 ```javascript
@@ -246,15 +252,15 @@ show a dialog with customized GUI, example:
 
    })
 ```
-## `api.showProgress(...)`
+### `api.showProgress(...)`
 update the progress bar on the Imjoy GUI, example: `api.showProgress(85)`
-## `api.showStatus(...)`
+### `api.showStatus(...)`
 update the status text on the Imjoy GUI, example: `api.showStatus('processing...')`
-## `api.showPluginProgress(...)`
+### `api.showPluginProgress(...)`
 update the progress bar of the current plugin (in the plugin menu), example: `api.showPluginProgress(85)`
-## `api.showPluginStatus(...)`
+### `api.showPluginStatus(...)`
 update the status text of the current plugin (in the plugin menu), example: `api.showPluginStatus('processing...')`
-## `api.run(...)`
+### `api.run(...)`
 run another plugin by the plugin name, example: `api.run("Python Demo Plugin")` or `api.run("Python Demo Plugin", my)`
 
 
