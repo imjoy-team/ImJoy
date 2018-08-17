@@ -659,17 +659,32 @@
         this._readyHandler();
     }
 
+    /**
+     * call handler when the store is empty
+     *
+     * @param {FUNCTION} id of a handler
+     */
     ReferenceStore.prototype.onReady = function(readyHandler) {
         this._readyHandler = readyHandler || function(){};
     }
 
+    /**
+     * call handler when the store is not empty
+     *
+     * @param {FUNCTION} id of a handler
+     */
     ReferenceStore.prototype.onBusy = function(busyHandler) {
         this._busyHandler = busyHandler || function(){};
     }
 
+    /**
+     * get the length of the store
+     *
+     */
     ReferenceStore.prototype.getStack = function() {
         return Object.keys(this._store).length
     }
+
     /**
      * @function _genId() generates the new reference id
      *
@@ -685,7 +700,6 @@
 
         return id;
     }
-
 
     /**
      * Releases the given reference id so that it will be available by
@@ -711,7 +725,6 @@
         }
     }
 
-
     /**
      * Stores the given object and returns the refernce id instead
      *
@@ -727,7 +740,6 @@
         this._store[id] = obj;
         return id;
     }
-
 
     /**
      * Retrieves previously stored object and releases its reference
@@ -745,15 +757,14 @@
         return obj;
     }
 
-
     /**
      * Retrieves previously stored object
      *
      * @param {Number} id of an object to retrieve
      */
-    ReferenceStore.prototype.retrieve = function(id) {
-        var obj = this._store[id];
-        return obj;
-    }
+    // ReferenceStore.prototype.retrieve = function(id) {
+    //     var obj = this._store[id];
+    //     return obj;
+    // }
 
 })();
