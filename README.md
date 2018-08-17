@@ -9,10 +9,11 @@
  * Extendable plugin interface
    - Support Python and Javascript
    - Plugins are isolated with secured sandboxes
-   - Built-in code editor, no extra IDEs are needed for development
    - Support virtual environments and pip packages for Python
    - Support libraries hosted on Github or CDNs for javascript
    - Deploying your own plugin with Github
+ * Battery-included plugin prototyping
+   - Built-in code editor, no extra IDE is needed for development
  * Native support for n-dimentional arrays and tensors
    - Support ndarrays from Numpy or Numjs for data exchange
    - Support Tensorflow.js and native Tensorflow for deep learning
