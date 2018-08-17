@@ -399,9 +399,35 @@
           if (isarray || aObject.hasOwnProperty(k)) {
             v = aObject[k];
             if(typeof v == 'function'){
-              var id = (Date.now().toString(36) + Math.random().toString(36).substr(2, 5)).toUpperCase()
-              callbacks[id] = v
-              bObject[k] = {__jailed_type__: 'callback', __value__ : v.constructor.name, num: id}
+              let interfaceFuncName = null
+              for (var name in this._interface) {
+                if (this._interface.hasOwnProperty(name)) {
+                  if(name.startsWith('_')) continue;
+                  if(this._interface[name] === v){
+                    interfaceFuncName = name
+                    break
+                  }
+                }
+              }
+              // search for prototypes
+              var functions = Object.getOwnPropertyNames(Object.getPrototypeOf(this._interface));
+              for(var i=0;i<functions.length;i++){
+                var name = functions[i];
+                if(name.startsWith('_')) continue;
+                if(this._interface[name] === v){
+                  interfaceFuncName = name
+                  break
+                }
+              }
+              if(!interfaceFuncName){
+                var id = (Date.now().toString(36) + Math.random().toString(36).substr(2, 5)).toUpperCase()
+                callbacks[id] = v
+                bObject[k] = {__jailed_type__: 'callback', __value__ : v.constructor.name, num: id}
+              }
+              else{
+                bObject[k] = {__jailed_type__: 'interface', __value__ : interfaceFuncName, num: null}
+              }
+
             }
             else if(typeof tf != 'undefined' && tf.Tensor && v instanceof tf.Tensor){
               const v_buffer = v.dataSync()
@@ -448,6 +474,9 @@
         if(aObject.hasOwnProperty('__jailed_type__') && aObject.hasOwnProperty('__value__')){
           if(aObject.__jailed_type__ == 'callback'){
             bObject = this._genRemoteCallback(callbackId, aObject.num, withPromise)
+          }
+          else if(aObject.__jailed_type__ == 'interface'){
+            bObject = this._remote[aObject.__value__] || this._genRemoteMethod(aObject.__value__)
           }
           else if(aObject.__jailed_type__ == 'ndarray'){
             //create build array/tensor if used in the plugin
