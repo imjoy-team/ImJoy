@@ -1518,7 +1518,14 @@ export default {
         //   return
         // }
         console.log('creating Op: ', config, plugin)
-        if (!plugin || !plugin.api || !plugin.api.run) {
+        let run = null
+        if(config.run && typeof config.run == 'function'){
+          run = config.run
+        }
+        else{
+          run = plugin && plugin.api && plugin.api.run
+        }
+        if (!plugin || !run) {
           console.log("WARNING: no run function found in the config, this op won't be able to do anything: " + config.name)
           config.onexecute = () => {
             console.log("WARNING: no run function defined.")
@@ -1530,7 +1537,9 @@ export default {
             my.target._op = my.op.name;
             // my.target._workflow_id = null;
             const _workflow_id = my.target._workflow_id;
-            const result = await plugin.api.run({
+
+
+            const result = await run({
               op: {
                 name: my.op.name,
               },
