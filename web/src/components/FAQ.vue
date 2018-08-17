@@ -20,10 +20,12 @@ export default {
   data () {
     return {
       source: source,
-      router: this.$root.$data.router,
-      store: this.$root.$data.store,
-      api: this.$root.$data.store.api
     }
+  },
+  created(){
+    this.router = this.$root.$data.router
+    this.store = this.$root.$data.store
+    this.api = this.$root.$data.store.api
   },
   computed: {
     compiledMarkdown: function () {

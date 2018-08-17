@@ -90,11 +90,11 @@
           <div v-else-if="w.type=='imjoy/generic'" class="generic-plugin-window">
             <!-- <p>generic data</p> -->
             <md-list>
-              <md-list-item @click="loaders && w.loaders&&Object.keys(w.loaders).length > 0&& loaders[w.loaders[Object.keys(w.loaders)[0]]](w.data)">
+              <md-list-item :disabled="!w.loaders||Object.keys(w.loaders).length <= 0" @click="loaders && w.loaders&&Object.keys(w.loaders).length > 0&& loaders[w.loaders[Object.keys(w.loaders)[0]]](w.data)">
                 <span class="md-list-item-text">{{dataSummary(w)}}</span>
-                <md-tooltip>click to print the data in your console.</md-tooltip>
+                <md-tooltip>click to load.</md-tooltip>
               </md-list-item>
-              <md-list-item v-for="(v, k) in w.data" @click="printObject(k, v)" v-if="w.data && (!w.data.length) || (w.data.length && w.data.length > 0 && k <= 20)" :key="k">
+              <md-list-item v-for="(v, k) in w.data" @click="printObject(k, v)" v-if="!k.startsWith('_') && w.data && (!w.data.length) || (w.data.length && w.data.length > 0 && k <= 20)" :key="k">
                 <md-icon>insert_drive_file</md-icon>
                 <span class="md-list-item-text">{{k}}</span>
               </md-list-item>
@@ -136,12 +136,6 @@ export default {
         return null
       }
     },
-    pluginWindows: {
-      type: Array,
-      default: function() {
-        return null
-      }
-    },
     loaders: {
       type: Object,
       default: function() {
@@ -155,12 +149,12 @@ export default {
       column_width: 30,
       active_windows: [],
       show_overlay: false,
-      router: this.$root.$data.router,
-      store: this.$root.$data.store,
-      api: this.$root.$data.store.api
     }
   },
-  created() {
+  created(){
+    this.router = this.$root.$data.router
+    this.store = this.$root.$data.store
+    this.api = this.$root.$data.store.api
     this.store.event_bus.$on('add_window', this.onWindowAdd)
   },
   mounted() {
@@ -181,7 +175,7 @@ export default {
         this.active_windows.splice(ai, 1)
         this.$emit('select', this.active_windows, null)
       }
-
+      this.$emit('close', this.windows[wi])
       this.windows.splice(wi, 1)
     },
     fullScreen(w) {
@@ -208,7 +202,9 @@ export default {
       if (w.renderWindow) {
         nw.renderWindow = w.renderWindow
       }
+      nw.id = nw.name + randId()
       this.windows.push(nw)
+      this.$emit('add', nw)
     },
     unselectWindows(){
       if(this.active_windows && this.active_windows.length>0){

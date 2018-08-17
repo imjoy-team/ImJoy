@@ -72,10 +72,12 @@ export default {
       snackbar_duration: 1000,
       showSnackbar: false,
       screenWidth: window.innerWidth,
-      router: this.$root.$data.router,
-      store: this.$root.$data.store,
-      api: this.$root.$data.store.api
     }
+  },
+  created(){
+    this.router = this.$root.$data.router
+    this.store = this.$root.$data.store
+    this.api = this.$root.$data.store.api
   },
   mounted(){
     // this.api.connect(["anonymous"]).then((session, connection)=>{

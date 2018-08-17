@@ -250,7 +250,7 @@ Engine<template>
     </md-app-drawer>
     <md-app-content class="whiteboard-content">
       <md-progress-bar md-mode="determinate" :md-value="progress"></md-progress-bar>
-      <whiteboard :windows="windows" :loaders="registered&&registered.loaders" @select="windowSelected"></whiteboard>
+      <whiteboard :windows="windows" :loaders="registered&&registered.loaders" @add="windowAdded" @close="windowClosed" @select="windowSelected"></whiteboard>
     </md-app-content>
   </md-app>
 
@@ -401,7 +401,6 @@ export default {
   props: ['title'],
   data() {
     return {
-      client_id: null,
       file_select: null,
       folder_select: null,
       selected_file: null,
@@ -429,29 +428,8 @@ export default {
       workflow_list: [],
       resumable_plugins: [],
       showNewWorkspaceDialog: false,
-      new_workspace_name: 'default',
-      preload_main: ['/static/tfjs/tfjs.js', 'https://rawgit.com/nicolaspanel/numjs/893016ec40e62eaaa126e1024dbe250aafb3014b/dist/numjs.min.js'],
-      workflow_joy_config: {
-        expanded: true,
-        name: "Workflow",
-        ui: "{id:'workflow', type:'ops'}",
-        // onupdate: this.workflowOnchange
-      },
-      default_window_pos: {
-        i: 0,
-        x: 0,
-        y: 0,
-        w: 5,
-        h: 5
-      },
       plugins: null,
-      plugin_names: null,
       registered: null,
-      plugin_templates: {
-        "Webworker(Javascript)": WEBWORKER_PLUGIN_TEMPLATE,
-        "Iframe(Javascript and HTML)": IFRAME_PLUGIN_TEMPLATE,
-        "PyWorker(Python)": PYWORKER_PLUGIN_TEMPLATE,
-      },
       updating_workflow: false,
       installed_plugins: [],
       plugin_api: null,
@@ -461,9 +439,6 @@ export default {
       snackbar_info: '',
       snackbar_duration: 3000,
       show_snackbar: false,
-      db: null,
-      store: this.$root.$data.store,
-      api: this.$root.$data.store.api,
     }
   },
   watch: {
@@ -472,6 +447,35 @@ export default {
     }
   },
   created() {
+    this.router = this.$root.$data.router
+    this.store = this.$root.$data.store
+    this.api = this.$root.$data.store.api
+    this.window_ids = {}
+    this.plugin_names = null
+    this.api = this.$root.$data.store.api
+    this.db = null
+    this.client_id = null
+    this.plugin_templates = {
+      "Webworker(Javascript)": WEBWORKER_PLUGIN_TEMPLATE,
+      "Iframe(Javascript and HTML)": IFRAME_PLUGIN_TEMPLATE,
+      "PyWorker(Python)": PYWORKER_PLUGIN_TEMPLATE,
+    }
+    this.default_window_pos = {
+      i: 0,
+      x: 0,
+      y: 0,
+      w: 5,
+      h: 5
+    }
+    this.new_workspace_name = 'default',
+    this.preload_main = ['/static/tfjs/tfjs.js', 'https://rawgit.com/nicolaspanel/numjs/893016ec40e62eaaa126e1024dbe250aafb3014b/dist/numjs.min.js'],
+    this.workflow_joy_config = {
+      expanded: true,
+      name: "Workflow",
+      ui: "{id:'workflow', type:'ops'}",
+      // onupdate: this.workflowOnchange
+    },
+
     window.onbeforeunload = s => modified ? "" : null;
     window.addEventListener("dragover", (e) => {
       e.preventDefault();
@@ -564,10 +568,8 @@ export default {
     //     })
     //   }
     // }
-
     // Make sure the GUI is refreshed
     setInterval(()=>{this.$forceUpdate()}, 5000)
-
     this.client_id = localStorage.getItem("imjoy_client_id")
     if(!this.client_id){
       this.client_id = 'imjoy_web_'+randId()
@@ -578,12 +580,14 @@ export default {
       alert: this.showAlert,
       register: this.register,
       createWindow: this.createWindow,
+      updateWindow: this.updateWindow,
       showDialog: this.showDialog,
       showProgress: this.showProgress,
       showStatus: this.showStatus,
       run: this.runPlugin,
       showPluginProgress: this.showPluginProgress,
       showPluginStatus: this.showPluginStatus,
+      showSnackbar: this.show,
       $forceUpdate: this.$forceUpdate,
     }
     this.resetPlugins()
@@ -640,10 +644,6 @@ export default {
     }).then(() => {
       this.reloadPlugins()
     });
-
-
-    this.api.show = this.show;
-
   },
   beforeDestroy() {
     console.log('terminating plugins')
@@ -703,13 +703,14 @@ export default {
         //this.socket.disconnect()
       }
       this.engine_status = 'Connecting...'
-      this.show('Trying to connect to the plugin engine...')
+      if(!auto) this.show('Trying to connect to the plugin engine...')
       const socket = io(url);
       const timer = setTimeout(() => {
         if (!this.engine_connected) {
           this.engine_status = 'Plugin Engine not connected'
           if(!auto) this.show('Failed to connect, please make sure you have started the plugin engine.', 5000)
           if(!auto) this.showPluginEngineInfo = true
+          if(auto) socket.disconnect()
         }
       }, 2500)
       socket.on('connect', (d) => {
@@ -813,10 +814,6 @@ export default {
         }
       }
       this.addWindow(w)
-    },
-    resumePlugin(pconfig) {
-
-
     },
     reloadPlugin(pconfig) {
       return new Promise((resolve, reject) => {
@@ -1055,6 +1052,7 @@ export default {
 
       for (var i = this.windows.length; i--;) {
         if (this.windows[i].type != 'imjoy/plugin-editor') {
+            delete this.window_ids[this.windows[i].id]
             this.windows.splice(i, 1);
         }
       }
@@ -1089,10 +1087,13 @@ export default {
       }
     },
     addWindow(w) {
+      w.id = w.id || w.name + randId()
       w.loaders = this.getDataLoaders(w.data)
       this.generateGridPosition(w)
       this.windows.push(w)
+      this.window_ids[w.id] = w
       this.store.event_bus.$emit('add_window', w)
+      return w.id
     },
     closePluginDialog(ok) {
       this.showPluginDialog = false
@@ -1110,6 +1111,12 @@ export default {
     windowSelected(ws) {
       console.log('activate window: ', ws)
       this.active_windows = ws
+    },
+    windowClosed(ws) {
+      delete this.window_ids[ws.id]
+    },
+    windowAdded(ws) {
+      this.window_ids[ws.id] = ws
     },
     generateGridPosition(config) {
       config.i = this.default_window_pos.i.toString()
@@ -1287,7 +1294,7 @@ export default {
         this.progress = 100
       }).catch((e) => {
         console.error(e)
-        this.status_text = op.name + '->' + (e.toString() || "Error.")
+        this.status_text = '<' +op.name + '>' + (e.toString() || "Error.")
       })
     },
     selectFileChanged(event) {
@@ -1695,42 +1702,75 @@ export default {
 
     },
     renderWindow(pconfig) {
-      console.log('rendering window', pconfig)
-      const tconfig = _.assign({}, pconfig.plugin, pconfig)
-      const plugin = new jailed.DynamicPlugin(tconfig, this.plugin_api)
-      plugin.whenConnected(() => {
-        if (!plugin.api) {
-          console.error('the window plugin seems not ready.')
-        }
-        // this.plugins[plugin.id] = plugin
-        plugin.api.setup().then((result) => {
-          console.log('sucessfully setup the window plugin: ', plugin, pconfig)
-          //asuming the data._op is passed from last op
-          pconfig.data._source_op = pconfig.data._op
-          pconfig.data._op = plugin.name
-          pconfig.data._workflow_id = pconfig.data._workflow_id
-          plugin.api.run({
-            data: pconfig.data,
-            config: pconfig.config,
-            op: pconfig.op,
-          }).then(()=>{
-            this.$forceUpdate()
+      return new Promise((resolve, reject) => {
+        console.log('rendering window', pconfig)
+        const tconfig = _.assign({}, pconfig.plugin, pconfig)
+        const plugin = new jailed.DynamicPlugin(tconfig, this.plugin_api)
+        plugin.whenConnected(() => {
+          if (!plugin.api) {
+            console.error('the window plugin seems not ready.')
+            reject(e)
+            return
+          }
+          // this.plugins[plugin.id] = plugin
+          plugin.api.setup().then((result) => {
+            console.log('sucessfully setup the window plugin: ', plugin, pconfig)
+            //asuming the data._op is passed from last op
+            pconfig.data = pconfig.data || {}
+            pconfig.data._source_op = pconfig.data && pconfig.data._op
+            pconfig.data._op = plugin.name
+            pconfig.data._workflow_id = pconfig.data && pconfig.data._workflow_id
+            pconfig.plugin = plugin
+            pconfig.update = plugin.api.run
+            plugin.api.run({
+              data: pconfig.data,
+              config: pconfig.config,
+              op: pconfig.op,
+            }).then((result)=>{
+              if(result){
+                for(let k in result){
+                  pconfig[k] = result[k]
+                }
+              }
+              resolve()
+              this.$forceUpdate()
+            }).catch((e) => {
+              this.status_text = plugin.name + '->' + e
+              console.error('error in the run function of plugin ' + plugin.name, e)
+              reject(e)
+            })
           }).catch((e) => {
-            this.status_text = plugin.name + '->' + e
-            console.error('error in the run function of plugin ' + plugin.name, e)
+            console.error('error occured when loading the window plugin ' + pconfig.name + ": ", e)
+            this.status_text = 'error occured when loading the window plugin ' + pconfig.name + ": " + e
+            plugin.terminate()
+            reject(e)
           })
-        }).catch((e) => {
-          console.error('error occured when loading the window plugin ' + pconfig.name + ": ", e)
+        });
+        plugin.whenFailed((e) => {
+          console.error('error occured when loading ' + pconfig.name + ":", e)
+          this.status_text = 'error occured when loading ' + pconfig.name + ": " + e
           plugin.terminate()
-        })
-      });
-      plugin.whenFailed((e) => {
-        console.error('error occured when loading ' + pconfig.name + ":", e)
-        alert('error occured when loading ' + pconfig.name)
-        plugin.terminate()
-      });
+          reject(e)
+        });
+      })
     },
-    createWindow(wconfig, _plugin) {
+    async updateWindow(wid, wconfig, _plugin){
+      const w = this.window_ids[wid]
+      if(w && w.update){
+        const ret = await w.update(wconfig)
+        if(ret){
+          for(let k in ret){
+            w[k] = ret[k]
+          }
+        }
+      }
+      else{
+        for(let k in wconfig){
+          w[k] = wconfig[k]
+        }
+      }
+    },
+    async createWindow(wconfig, _plugin) {
       wconfig.config = wconfig.config || {}
       wconfig.data = wconfig.data || null
       wconfig.click2load = wconfig.click2load || false
@@ -1743,9 +1783,8 @@ export default {
       console.log('window config', wconfig)
       if (wconfig.type.startsWith('imjoy')) {
         // console.log('creating imjoy window', wconfig)
-        // wconfig.window_id = 'plugin_window_'+plugin._id+randId()
-        this.addWindow(wconfig)
-        return true
+        wconfig.id = 'imjoy_'+randId()
+        return this.addWindow(wconfig)
       } else {
         const window_config = this.registered.windows[wconfig.type]
         console.log(window_config)
@@ -1769,16 +1808,14 @@ export default {
         pconfig.plugin = window_config
         pconfig.context = this.pluing_context
         if (!pconfig.click2load) {
-          pconfig.loadWindow = null
-          this.showPluginWindow(pconfig).then(() => {
-            this.renderWindow(pconfig)
-          })
+          this.showPluginWindow(pconfig)
+          await this.renderWindow(pconfig)
         } else {
           pconfig.renderWindow = this.renderWindow
           this.showPluginWindow(pconfig)
         }
+        return pconfig.id
       }
-      return true
     },
     showDialog(config, _plugin) {
       return new Promise((resolve, reject) => {
@@ -1807,22 +1844,17 @@ export default {
       })
     },
     showPluginWindow(config) {
-      return new Promise((resolve, reject) => {
-        config.type = config.type || "joy_panel"
-        config.data = config.data || null
-        config.config = config.config || {}
-        config.panel = config.panel || null
-        if (!WINDOW_SCHEMA(config)) {
-          const error = WINDOW_SCHEMA.errors(config)
-          console.error("Error occured during creating window " + config.name, error)
-          throw error
-        }
-        //TODO: verify fields with WINDOW_TEMPLATE
-        console.log('creating plugin window: ', config)
-        this.addWindow(config)
-        console.log('added the window')
-        resolve()
-      })
+      config.type = config.type
+      config.data = config.data || null
+      config.config = config.config || {}
+      config.panel = config.panel || null
+      if (!WINDOW_SCHEMA(config)) {
+        const error = WINDOW_SCHEMA.errors(config)
+        console.error("Error occured during creating window " + config.name, error)
+        throw error
+      }
+      console.log('creating plugin window: ', config)
+      return this.addWindow(config)
     },
     showAlert(text){
       console.log('alert: ', text)

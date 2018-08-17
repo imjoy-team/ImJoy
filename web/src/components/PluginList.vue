@@ -182,10 +182,12 @@ export default {
       showRemoveConfirmation: false,
       _plugin2_remove: null,
       db: null,
-      router: this.$root.$data.router,
-      store: this.$root.$data.store,
-      api: this.$root.$data.store.api
     }
+  },
+  created(){
+    this.router = this.$root.$data.router
+    this.store = this.$root.$data.store
+    this.api = this.$root.$data.store.api
   },
   mounted() {
     this.containerWidth = this.$refs.container.offsetWidth;
