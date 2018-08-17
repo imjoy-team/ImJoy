@@ -139,7 +139,7 @@ All the plugins can access `config` and `data` from `my`:
   * `_variables`
      When the plugin is executed in a workflow, variables will be set in the workflow will be passed as `my['data']['_variables']`. It will be set to the actual variable value if the user used ops such as `Set [number]`.
   * `_op`
-     Give the name of the op which is being executing, the plugin can use `my['data']['_op']` to determine the op by its name.
+     Give the name of the op which is being executing. When a plugin registered for multiple ops and no callback function was specified for the op, the `run` function will be called, and you can use `my['data']['_op']` to determine which op is being executing.
   * `_source_op`
      Give the name of the op which initiated current execution.
   * `_workflow_id`
@@ -222,7 +222,11 @@ register a new op, example:
        "ui": "apply LUT {id:'lut', type:'choose', options:['hot', 'rainbow'], placeholder: 'hot'}",
     })
 ```
-(Should be placed inside `setup()`, works for both Javascript and Python)
+The same api works for both Javascript and Python.
+
+By default, each all the ops created by the same plugin will call the same `run` function defined in the plugin, and you will need to use `my["data"]["_op"]` in the `run` function to differentiate which op is called. 
+
+Alternatively, another function can be passed as the `run` field if the function is already in the plugin api, meaning the function is a memeber of the plugin class. For example, you can add  `"run": this.hello` in a Javascript plugin or `"run": self.hello` in a Python plugin if `hello` is a member function of the plugin class.
 
 ## `api.createWindow(...)`
 create a new window and add to the workspace, example:
