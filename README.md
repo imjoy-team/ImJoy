@@ -241,6 +241,15 @@ create a new window and add to the workspace, example:
 
 If you do not want the window to load immediately, you can add `click2load: true` and the window will ask for an extra click to load the content.
 
+Once an window is created, it will return a window ID, which can be used for updating the window with `api.updateWindow`.
+
+### `api.updateWindow(...)`
+update an existing window, an window ID should be passed in order to perform the update, example:
+
+`api.updateWindow(window_id, {data: {image: ...}})`
+
+The second parameter is an object contains fields which the plugin wants to update.
+
 ### `api.showDialog(...)`
 show a dialog with customized GUI, example:
 
@@ -256,6 +265,8 @@ show a dialog with customized GUI, example:
 update the progress bar on the Imjoy GUI, example: `api.showProgress(85)`
 ### `api.showStatus(...)`
 update the status text on the Imjoy GUI, example: `api.showStatus('processing...')`
+### `api.showSnackbar(...)`
+show a quick message with a snackbar and disappear in a few seconds, example: `api.showSnackbar('processing...', 5)`
 ### `api.showPluginProgress(...)`
 update the progress bar of the current plugin (in the plugin menu), example: `api.showPluginProgress(85)`
 ### `api.showPluginStatus(...)`
