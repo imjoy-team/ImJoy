@@ -229,7 +229,7 @@ Engine<template>
                 <md-button class="md-icon-button" v-show="plugin.panel_expanded && op.name != plugin.name" :disabled="true">
                   <md-icon>remove</md-icon>
                 </md-button>
-                <md-button class="joy-run-button md-primary" :disabled="plugin._disconnected" v-show="plugin.panel_expanded && op.name != plugin.name" @click="runOp(op)">
+                <md-button class="joy-run-button md-primary" :class="plugin.running?'md-accent':'md-primary'" :disabled="plugin._disconnected" v-show="plugin.panel_expanded && op.name != plugin.name" @click="runOp(op)">
                     {{op.name}}
                 </md-button>
 
