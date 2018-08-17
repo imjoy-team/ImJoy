@@ -6,27 +6,26 @@
 ## Key Features of ImJoy
  * Serverless solution with offline-first design
  * Easy-to-use workflow composition
- * Extendable with a plugin interface
+ * Extendable plugin interface
    - Support Python and Javascript
    - Plugins are isolated with secured sandboxes
-   - Built-in code editor, no extra IDEs are needed for development
    - Support virtual environments and pip packages for Python
    - Support libraries hosted on Github or CDNs for javascript
    - Deploying your own plugin with Github
- * Native support for Deep Learning
-   - Use ndarrays or tensors for data exchange
-   - Support Tensorflow.js and native Tensorflow
+ * Battery-included plugin prototyping
+   - Built-in code editor, no extra IDE is needed for development
+ * Native support for n-dimentional arrays and tensors
+   - Support ndarrays from Numpy or Numjs for data exchange
+   - Support Tensorflow.js and native Tensorflow for deep learning
 
 # Using Imjoy for image processing
 
 ## Basic Usage: the ImJoy web app
-Go to the [ImJoy web app](https://imjoy.io/#/app), click the + button to install new plugins or open an image.
-
-When images are opened in the workspace, you need to first click the title bar of the window to select an active window, then click on the plugin menu to run the plugin.
-
-You can drag and drop your file into the workspace, or load with the + button. Then, a file window will open if files are loaded. File formats are supported with plugins, if a certain file extension is recognized by a plugin, you can just click the file in the file window to open it. For example, if you installed the plugin "Tif file importer", you will be able to click the .tif file in the file window.
-
-If you installed plugins written in Python, they will be disabled. In order to light them up, and benifit from the full power of your computer, you need to setup the **Python Plugin Engine** as follows.
+ * Go to the [ImJoy web app](https://imjoy.io/#/app), click the **+** button to install new plugins from the [Plugin Repository](https://github.com/oeway/ImJoy-Plugins).
+ * You can then open files or folders with the **+** button, or drag and drop them to the web app.
+ * When files are loaded into the workspace, you can click the file to open it if the file is recognized by ImJoy or any plugin. For example, if you installed the plugin "Tif file importer", you will be able to click the .tif file in the file window. 
+ * Similar to [ImageJ](https://imagej.nih.gov/ij), when clicking on the plugin menu, ImJoy will try to pass the current active window to the plugin, it is them let the plugin decide how to process the data contained in the window.
+ * If you installed plugins written in Python, they will be disabled by default. In order to light them up, and benifit from the full power of your computer, you need to setup the **Python Plugin Engine** as follows.
 
 ## Advanced Usage: the Python Plugin Engine
 You can use the **Python Plugin Engine** to unlock the power of your computer or another computer in your local network.
