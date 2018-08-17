@@ -274,9 +274,19 @@ update the status text of the current plugin (in the plugin menu), example: `api
 ### `api.run(...)`
 run another plugin by the plugin name, example: `api.run("Python Demo Plugin")` or `api.run("Python Demo Plugin", my)`
 
+## Developing Window Plugin
+Window plugin is a speical type of plugins running in `iframe` mode, and it will show up as a window. `<window>` and `<style>` can be used to define the actual content of the window.
+
+I order to make a `window` plugin, you need to add `window` to `tags` and set `mode` as `iframe` in the `<config>` tag.
+
+Different from other plugins which will be loaded and intialized when ImJoy is started, a `window` plugin will not be loaded until the actuall plugin is created with `api.createWindow` or clicked by a user in the menu. During execution of `api.createWindow`, `setup` and `run` will be called for the first time, and return with an window ID. After that, if needed, another plugin can call `api.updateWindow` with the window ID, ImJoy will try to execute the `run` function with the new data again.
+
+If the `run` returned with an object, then it will be used to update the window status managed by ImJoy. This means, for example, if the user changed the name of the plugin, it can be achieved by returning the same `my` object in the `run` function.
 
 
-# Developing Python Plugins
+## Developing Webworker Plugin
+
+## Developing Python Plugins
 
 For plugin developers, you can now create a python plugin within the browser.
 
@@ -317,7 +327,7 @@ api.export(PythonPlugin())
 
 ```
 
-## Using virtual environments
+### Using virtual environments
   Python plugins for ImJoy can have different conda environments, which provides a way to isolate plugins. You can therefore run python plugins with different versions of Python, or use different pip packages.
 
 
@@ -352,7 +362,7 @@ api.export(PythonPlugin())
 
   **Note 2**: in the `env` field, you need to use `-n XXXX` to name your environment, otherwise, it will use the plugin name to name the environment.
 
-## TODO: Use Docker Containers
+### TODO: Use Docker Containers
  **Not yet supported**
 
  Python plugin can also be ran with Docker.
