@@ -90,13 +90,17 @@
           <div v-else-if="w.type=='imjoy/generic'" class="generic-plugin-window">
             <!-- <p>generic data</p> -->
             <md-list>
-              <md-list-item :disabled="!w.loaders||Object.keys(w.loaders).length <= 0" @click="loaders && w.loaders&&Object.keys(w.loaders).length > 0&& loaders[w.loaders[Object.keys(w.loaders)[0]]](w.data)">
+              <md-list-item class="md-primary" v-if="loaders&&w.loaders&&Object.keys(w.loaders).length > 0" @click="loaders[w.loaders[Object.keys(w.loaders)[0]]](w.data)">
+                <span class="md-list-item-text md-primary">Open with "{{Object.keys(w.loaders)[0]}}"</span>
+                <md-tooltip>click to open with "{{Object.keys(w.loaders)[0]}}".</md-tooltip>
+              </md-list-item>
+              <md-list-item v-else>
                 <span class="md-list-item-text">{{dataSummary(w)}}</span>
                 <md-tooltip>click to load.</md-tooltip>
               </md-list-item>
-              <md-list-item v-for="(v, k) in w.data" @click="printObject(k, v)" v-if="(!k.startsWith || !k.startsWith('_')) && w.data && (!w.data.length) || (w.data.length && w.data.length > 0 && k <= 20)" :key="k">
+              <md-list-item v-for="(v, k) in w.data" v-if="(!k.startsWith || !k.startsWith('_')) && w.data && (!w.data.length) || (w.data.length && w.data.length > 0 && k <= 20)" :key="k">
                 <md-icon>insert_drive_file</md-icon>
-                <span class="md-list-item-text">{{k}}</span>
+                <span class="md-list-item-text" @click="printObject(k, v)">{{k}}</span>
               </md-list-item>
               <md-list-item v-if="w.data && w.data.length && w.data.length > 20"  @click="printObject(w.data)">
                 <md-icon>insert_drive_file</md-icon>
