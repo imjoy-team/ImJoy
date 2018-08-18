@@ -59,11 +59,11 @@
           </md-empty-state>
           <div v-if="w.type=='imjoy/files'" class="generic-plugin-window">
             <md-list>
-              <md-list-item v-for="f in w.data.files" @click="loaders && f.loaders&&Object.keys(f.loaders).length > 0 && loaders[f.loaders[Object.keys(f.loaders)[0]]](f)" :key="f.name+f.relativePath">
+              <md-list-item v-for="f in w.data.files" :key="f.name+f.relativePath">
                 <md-icon>insert_drive_file</md-icon>
-                <span class="md-list-item-text">{{f.name}}</span>
+                <span class="md-list-item-text" style="cursor: pointer;" @click="loaders && f.loaders&&Object.keys(f.loaders).length > 0 && loaders[f.loaders[Object.keys(f.loaders)[0]]](f)">{{f.name}}</span>
                 <md-menu md-size="big" md-direction="bottom-end" v-if="f.loaders && Object.keys(f.loaders).length > 0">
-                  <md-button class="md-icon-button" md-menu-trigger.stop>
+                  <md-button class="md-icon-button" md-menu-trigger>
                     <md-icon>more_horiz</md-icon>
                   </md-button>
                   <md-menu-content>
