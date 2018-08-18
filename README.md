@@ -17,6 +17,7 @@
  * Native support for n-dimentional arrays and tensors
    - Support ndarrays from Numpy or Numjs for data exchange
    - Support Tensorflow.js and native Tensorflow for deep learning
+ * Rendering muti-dimentional data in 3D with webGL, Three.js etc.
 
 # Using Imjoy for image processing
 
