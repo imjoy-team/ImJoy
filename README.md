@@ -194,7 +194,7 @@ api.export(new UntitledPlugin())
 ### Python example
 ```html
 <script lang="python">
-class PythonPlugin():
+class UntitledPythonPlugin():
   def setup(self):
     print('initialized from python.')
 
@@ -202,12 +202,22 @@ class PythonPlugin():
     print('hello world.')
     return my
 
-api.export(PythonPlugin())
+api.export(UntitledPythonPlugin())
 </script>
 ```
 
-## `Plugin API` and `ImJoy API`
-The plugin system of ImJoy is built upon remote procedure calls we implemented, an encoding and decoding scheme is used by ImJoy to transfer data and functions between plugins. It works by exposing a set of API functions both from the plugin or the main app. In the plugin, predefined object called `api` is to access the ImJoy API, detailed information can be found in the **ImJoy API** section. By using an ImJoy API called `api.export`, a set of functions can be exported as `Plugin APIs`, `setup` and `run` as described before are two mandatory `Plugin API` functions which need to be defined and exported. In addition to that, other functions can be also exported as `Plugin APIs`. 
+## `Plugin API`
+The plugin system of ImJoy is built upon remote procedure calls we implemented, an encoding and decoding scheme is used by ImJoy to transfer data and functions between plugins. It works by exposing a set of API functions both from the plugin or the main app. In the plugin, predefined object called `api` is to access the ImJoy API, detailed information can be found in the **ImJoy API** section. By using an ImJoy API called `api.export`, a set of functions can be exported as `Plugin APIs`, `setup` and `run` as described before are two mandatory `Plugin API` functions which need to be defined and exported. In addition to that, other functions can be also exported as `Plugin APIs`.
+
+As you may see in the above examples, they both contain an `api.export` statement as the last line of the `<script>` code block.
+
+```
+//Javascript
+api.export(new UntitledJSPlugin())
+
+# Python
+api.export(UntitledPythonPlugin())
+```
 
 ## Callback functions
 Besides the `Plugin API` functions, when a plugin is executed, you can return an object which includes functions which will be called by other plugins or ImJoy. However, if the function has never been exported as a `Plugin API` before, it will be treated a `callback` function and can be only called once. Otherwise, if the function has been exported as `Plugin API`, it won't be treated as `callback` function and can be called repeatly.
