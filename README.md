@@ -211,13 +211,15 @@ The plugin system of ImJoy is built upon remote procedure calls we implemented, 
 
 As you may see in the above examples, they both contain an `api.export` statement as the last line of the `<script>` code block.
 
-```
+```javascript
 //Javascript
 api.export(new UntitledJSPlugin())
 
 # Python
 api.export(UntitledPythonPlugin())
 ```
+
+**Notice** that in Javascript, the `new` keyword is necessary to create an instance of a class, while in Python there is no `new` keyword.
 
 ## Callback functions
 Besides the `Plugin API` functions, when a plugin is executed, you can return an object which includes functions which will be called by other plugins or ImJoy. However, if the function has never been exported as a `Plugin API` before, it will be treated a `callback` function and can be only called once. Otherwise, if the function has been exported as `Plugin API`, it won't be treated as `callback` function and can be called repeatly.
