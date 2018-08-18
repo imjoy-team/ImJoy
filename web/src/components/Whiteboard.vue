@@ -315,6 +315,7 @@ export default {
 
 .window-title {
   font-size: 1.2em;
+  white-space: nowrap;
 }
 
 .plugin-iframe-container {
