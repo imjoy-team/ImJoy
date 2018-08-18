@@ -94,7 +94,7 @@
                 <span class="md-list-item-text">{{dataSummary(w)}}</span>
                 <md-tooltip>click to load.</md-tooltip>
               </md-list-item>
-              <md-list-item v-for="(v, k) in w.data" @click="printObject(k, v)" v-if="!k.startsWith('_') && w.data && (!w.data.length) || (w.data.length && w.data.length > 0 && k <= 20)" :key="k">
+              <md-list-item v-for="(v, k) in w.data" @click="printObject(k, v)" v-if="(!k.startsWith || !k.startsWith('_')) && w.data && (!w.data.length) || (w.data.length && w.data.length > 0 && k <= 20)" :key="k">
                 <md-icon>insert_drive_file</md-icon>
                 <span class="md-list-item-text">{{k}}</span>
               </md-list-item>
