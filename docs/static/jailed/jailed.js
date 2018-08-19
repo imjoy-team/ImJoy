@@ -510,7 +510,7 @@ function randId() {
             this.context.socket.emit('message_to_plugin_'+this.id,
                 {type: 'message', data: data}
             );
-            console.log('message_to_plugin_'+this.id, {type: 'message', data: data})
+            // console.log('message_to_plugin_'+this.id, {type: 'message', data: data})
         }
 
 
@@ -544,7 +544,7 @@ function randId() {
               this.context.socket.emit('kill_plugin',
                  {id: this.id}
               );
-              console.log('kill plugin '+this.id)
+              // console.log('kill plugin '+this.id)
             }
         }
 
