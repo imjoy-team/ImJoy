@@ -1539,6 +1539,7 @@ export default {
     },
     filter4plugin(my){
       return my && {
+        _variables: my._variables || null,
         _op: my._op,
         _source_op: my._source_op,
         _workflow_id: my._workflow_id,
@@ -1549,6 +1550,7 @@ export default {
     joy2plugin(my){
       //conver data-->config target--> data
       return my && {
+        _variables: my.target && my.target._variables || null,
         _op: my.op && my.op.name,
         _source_op: my.target && my.target._op,
         _workflow_id: my.target && my.target._workflow_id,
