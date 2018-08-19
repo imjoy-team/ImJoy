@@ -59,8 +59,8 @@
           </md-empty-state>
           <div v-if="w.type=='imjoy/files'" class="generic-plugin-window">
             <md-list>
-              <md-list-item v-for="f in w.data.files" :key="f.name+f.relativePath">
-                <md-icon>insert_drive_file</md-icon>
+              <md-list-item v-for="(f, i) in w.data" :key="f.name+f.relativePath">
+                <md-radio v-model="w.select" :value="i" />
                 <span class="md-list-item-text" style="cursor: pointer;" @click="loaders && f.loaders&&Object.keys(f.loaders).length > 0 && loaders[f.loaders[Object.keys(f.loaders)[0]]](f)">{{f.name}}</span>
                 <md-menu md-size="big" md-direction="bottom-end" v-if="f.loaders && Object.keys(f.loaders).length > 0">
                   <md-button class="md-icon-button" md-menu-trigger>
@@ -74,6 +74,7 @@
                   </md-menu-content>
                 </md-menu>
               </md-list-item>
+
             </md-list>
           </div>
           <div v-else-if="w.type=='imjoy/image'">

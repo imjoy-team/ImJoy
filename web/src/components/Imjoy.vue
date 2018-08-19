@@ -1174,7 +1174,7 @@ export default {
               }
             }
           } catch (e) {
-            console.error('error with validation with', k, e)
+            // console.error('error with validation with', k, e)
           }
         }
       }
@@ -1185,19 +1185,18 @@ export default {
         const file = this.selected_files[f]
         const tmp = file.name.split('.')
         const ext = tmp[tmp.length - 1]
-        file.loaders = this.getDataLoaders(file)
+        file.loaders = file.loaders || this.getDataLoaders(file)
         // console.log('loaders', file.loaders)
       }
       const w = {
         name: 'Files',
         type: 'imjoy/files',
         config: {},
-        data: {
-          _op: '__file_loader__',
-          _source_op: null,
-          _workflow_id: 'files_'+randId(),
-          files: this.selected_files
-        }
+        select: 0,
+        _op: '__file_loader__',
+        _source_op: null,
+        _workflow_id: 'files_'+randId(),
+        data: this.selected_files
       }
       this.addWindow(w)
     },
@@ -1219,7 +1218,6 @@ export default {
         const w = this.joy2plugin(my)
         if (w) {
           // console.log('result', w)
-          const w = w
           w.name = 'result'
           w.type = 'imjoy/generic'
           this.createWindow(w)
@@ -1525,10 +1523,16 @@ export default {
         res.target = my
       }
       res.target = res.target || {}
+      if(Array.isArray(res.target) && res.target.length>0){
+        if(my.select !== undefined && res.target[my.select]){
+          res.target = res.target[my.select]
+        }
+      }
       res.target._variables = my._variables || {}
       res.target._workflow_id = my._workflow_id || null
       res.target._op = my._op || null
       res.target._source_op = my._source_op || null
+
       if(Object.keys(res.target).length>4){
         // console.log('returning', res)
         return res
@@ -1549,14 +1553,22 @@ export default {
     },
     joy2plugin(my){
       //conver data-->config target--> data
-      return my && {
+      if(!my) return null;
+      const ret = {
         _variables: my.target && my.target._variables || null,
-        _op: my.op && my.op.name,
-        _source_op: my.target && my.target._op,
+        _op: my.target && my.target._op,
+        _source_op: my.target && my.target._source_op,
         _workflow_id: my.target && my.target._workflow_id,
         config: my.data,
         data: my.target,
       }
+      if(my.target){
+        delete my.target._op
+        delete my.target._workflow_id
+        delete my.target._variables
+        delete my.target._source_op
+      }
+      return ret
     },
     register(config, _plugin) {
       try {
