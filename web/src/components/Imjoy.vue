@@ -663,18 +663,22 @@ export default {
   },
   methods: {
     removePlugin(plugin){
-      console.log('remove plugin', plugin.name)
-      // remove if exists
-      this.db.get(plugin.config._id).then((doc) => {
-        return this.db.remove(doc);
-      }).then((result) => {
-        this.unloadPlugin(plugin.name)
-        console.log('plugin has been removed')
-        this.show('the plugin has been removed.')
-        this.$forceUpdate()
-      }).catch((err) => {
-        this.show('Error:'+err)
-        console.log('error occured when removing ', plugin, err)
+      return new Promise((resolve, reject) => {
+        console.log('remove plugin', plugin.name)
+        // remove if exists
+        this.db.get(plugin.config._id).then((doc) => {
+          return this.db.remove(doc);
+        }).then((result) => {
+          this.unloadPlugin(plugin.name)
+          console.log('plugin has been removed')
+          this.show('the plugin has been removed.')
+          this.$forceUpdate()
+          resolve()
+        }).catch((err) => {
+          this.show('Error:'+err)
+          console.log('error occured when removing ', plugin, err)
+          reject()
+        });
       });
     },
     sortedPlugins: function() {
@@ -799,6 +803,7 @@ export default {
         plugin: plugin,
         reload: this.reloadPlugin,
         save: this.savePlugin,
+        remove: this.removePlugin,
         w: 10,
         h: 10,
         data: {

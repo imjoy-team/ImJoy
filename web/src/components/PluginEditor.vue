@@ -3,15 +3,19 @@
     <md-toolbar class="md-dense editor-toolbar" md-elevation="1">
       <md-button @click="reload()" class="md-icon-button">
         <md-icon>autorenew</md-icon>
-        <md-tooltip>Update the plugin</md-tooltip>
+        <md-tooltip>Update this plugin</md-tooltip>
       </md-button>
       <md-button @click="save()" class="md-icon-button">
         <md-icon>save</md-icon>
-        <md-tooltip>Save the plugin</md-tooltip>
+        <md-tooltip>Save this plugin</md-tooltip>
       </md-button>
       <md-button @click="saveAs()" class="md-icon-button">
         <md-icon>cloud_download</md-icon>
-        <md-tooltip>Export the plugin</md-tooltip>
+        <md-tooltip>Export this plugin</md-tooltip>
+      </md-button>
+      <md-button @click="remove()" v-if="window.plugin&&window.plugin.config&&window.plugin.config._id" class="md-icon-button">
+        <md-icon>delete</md-icon>
+        <md-tooltip>Remove this plugin</md-tooltip>
       </md-button>
     </md-toolbar>
     <md-content class="editor">
@@ -58,7 +62,7 @@ export default {
     this.editor.setOptions({
         wrap: false,
         maxLines: Infinity,
-        // autoScrollEditorIntoView : false,
+        autoScrollEditorIntoView : true,
         // enableBasicAutocompletion: true,
         // enableLiveAutocompletion: true
     });
@@ -97,20 +101,33 @@ export default {
   },
   methods: {
     save(){
-      this.reload()
-      this.window.save({pluginId: this.pluginId, code: this.editor.getValue()}).then((p_id)=>{
-        if(this.window.plugin && this.window.plugin.config)
-        this.window.plugin.config._id = p_id
+      const save_plugin = ()=>{this.window.save({pluginId: this.pluginId, code: this.editor.getValue()}).then((p_id)=>{
+        this.window.data._id = p_id
+        this.window.plugin.config._id= p_id
+        this.$forceUpdate()
+      })}
+      this.reload().then(save_plugin).catch(save_plugin)
+      //this.$emit('save', {pluginId: this.pluginId, code: this.editor.getValue()})
+    },
+    remove(){
+      this.window.data._id = null
+      this.window.remove(this.window.plugin).then(()=>{
+        this.window.plugin = {}
       })
       //this.$emit('save', {pluginId: this.pluginId, code: this.editor.getValue()})
     },
     reload(){
-      this.editor.resize()
-      this.window.reload({pluginId: this.pluginId, type:this.window.plugin.type, name:this.window.plugin.name, code: this.editor.getValue(), plugin: this.window.plugin}).then((plugin)=>{
-        this.window.plugin = plugin
-        this.window.name = plugin.name
+      return new Promise((resolve, reject) => {
+        this.editor.resize()
+        this.window.reload({pluginId: this.pluginId, type:this.window.plugin.type, name:this.window.plugin.name, code: this.editor.getValue(), plugin: this.window.plugin}).then((plugin)=>{
+          this.window.plugin = plugin
+          this.window.name = plugin.name
+          resolve()
+        }).catch(()=>{
+          reject()
+        })
+        //this.$emit('reload', {pluginId: this.pluginId, code: this.editor.getValue()})
       })
-      //this.$emit('reload', {pluginId: this.pluginId, code: this.editor.getValue()})
     },
     saveAs(){
       const filename = this.window.plugin&&this.window.plugin.name?this.window.plugin.name+"_"+randId()+'.imjoy.html':'plugin_'+randId()+'.imjoy.html'
