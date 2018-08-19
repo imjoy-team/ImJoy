@@ -36,7 +36,7 @@ To use it, go to the [ImJoy web app](https://imjoy.io/#/app), and click the 🚀
 More detailed instructions can be found here: [ImJoy-Python](https://github.com/oeway/ImJoy-Python).
 
 ## Advanced Usage: Going offline
-If you have already installed the **Python Plugin Engine**, then you can run ImJoy in offline mode. What you do is to run the engine with `python -m imjoy --offline`. Then you will have your personal ImJoy locally, and you access by [http://localhost:8080](http://localhost:8080).
+If you have already installed the **Python Plugin Engine**, then you can run ImJoy in offline mode. What you do is to run the engine with `python -m imjoy --offline` . And it will download all the files for offline access, after that, if you run `python -m imjoy` in the **same directory**, you will have your personal ImJoy web app which can be access by [http://localhost:8080](http://localhost:8080).
 
 Also notice that, even though ImJoy can run without internet, depends on the implementation of the plugin, some plugins maybe unusable when you go offline.
 
