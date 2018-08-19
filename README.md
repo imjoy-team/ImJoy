@@ -49,7 +49,7 @@ Under the hood, the Python Plugin Engine will be connected with the ImJoy web ap
 
 <img src="https://github.com/oeway/ImJoy/raw/master/docs/img/imjoy-code-screenshot.png" width="600px"></img>
 
-Click the + button and select the plugin dropdown option, then create a plugin.
+Click the **+** button and select the plugin dropdown option, then create a plugin.
 
 The ImJoy plugin file format is built up on html format with customized tags (inspired by the `.vue` format), it consists of two mandatory tags `<config>` and `<script>`, and other optional tags including `<docs>`, `<window>` and `<style>`.
 
