@@ -3,16 +3,18 @@
   <!-- <md-subheader>Options</md-subheader> -->
   <md-subheader v-if="title">{{title}}
   </md-subheader>
+
   <div  class="md-layout md-gutter">
-    <md-button v-if="available_plugins" @click="updateAll()" class="md-button md-primary md-layout-item md-size-20">
-      <md-icon>update</md-icon>Update All</md-button>
+    <md-button v-if="available_plugins" @click="updateAll()" class="md-button md-primary  md-size-20 md-layout-item">
+      <md-icon>update</md-icon><span class="md-medium-hide">Update All</span></md-button>
       <md-field v-if="showUrl" class="md-layout-item md-size-50">
         <label for="plugin_url">Install from URL</label>
         <md-input type="text" v-model="plugin_url" name="plugin_url"></md-input>
       </md-field>
-      <md-button v-if="showUrl && plugin_url&&plugin_url!=''" @click="install({uri: plugin_url})" class="md-button md-primary md-size-20">
-        <md-icon>cloud_download</md-icon>Install</md-button>
+      <md-button v-if="showUrl && plugin_url&&plugin_url!=''" @click="install({uri: plugin_url})" class="md-button md-primary md-size-60  md-layout-item">
+          <md-icon>cloud_download</md-icon>Install</md-button>
   </div>
+
   <md-list class="md-triple-line md-dense" v-if="display=='list'">
     <div v-for="(plugin, k) in available_plugins" :key="k">
       <md-list-item>
@@ -28,8 +30,24 @@
           <!-- <div>
               <md-chip v-for="tag in plugin.tags" :key="tag">{{tag}}</md-chip>
             </div> -->
+
           <p><span v-for="tag in plugin.tags" :key="tag">{{tag}}; </span></p>
+
         </div>
+        <p>
+        <md-button class="md-icon-button md-list-action md-primary" v-if="!plugin.installed" @click="install(plugin)">
+          <md-icon>cloud_download</md-icon>
+          <md-tooltip>Install {{plugin.name}}</md-tooltip>
+        </md-button>
+        <md-button  class="md-icon-button md-list-action md-primary" v-if="plugin.installed" @click="install(plugin)">
+          <md-icon>update</md-icon>
+          <md-tooltip>Update {{plugin.name}}</md-tooltip>
+        </md-button>
+        <md-button  class="md-icon-button md-list-action md-accent" v-if="plugin.installed" @click="_plugin2_remove=plugin;showRemoveConfirmation=true;">
+          <md-icon>delete_forever</md-icon>
+          <md-tooltip>Delete {{plugin.name}}</md-tooltip>
+        </md-button>
+        </p>
         <md-menu>
           <md-button class="md-icon-button md-list-action" md-menu-trigger>
             <md-icon class="md-primary">more_horiz</md-icon>
@@ -391,6 +409,14 @@ export default {
   height: 85%;
 }
 
+
+@media screen and (max-width: 600px) {
+  .editor-dialog {
+    width: 100%;
+    height: 100%;
+  }
+}
+
 .code-editor {
   height: calc(100%) !important;
   width: calc(100%) !important;
@@ -403,4 +429,6 @@ export default {
 .md-list {
   max-width: 100%;
 }
+
+
 </style>

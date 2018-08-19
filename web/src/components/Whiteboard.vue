@@ -59,11 +59,11 @@
           </md-empty-state>
           <div v-if="w.type=='imjoy/files'" class="generic-plugin-window">
             <md-list>
-              <md-list-item v-for="f in w.data.files" @click="loaders && f.loaders&&Object.keys(f.loaders).length > 0 && loaders[f.loaders[Object.keys(f.loaders)[0]]](f)" :key="f.name+f.relativePath">
+              <md-list-item v-for="f in w.data.files" :key="f.name+f.relativePath">
                 <md-icon>insert_drive_file</md-icon>
-                <span class="md-list-item-text">{{f.name}}</span>
+                <span class="md-list-item-text" style="cursor: pointer;" @click="loaders && f.loaders&&Object.keys(f.loaders).length > 0 && loaders[f.loaders[Object.keys(f.loaders)[0]]](f)">{{f.name}}</span>
                 <md-menu md-size="big" md-direction="bottom-end" v-if="f.loaders && Object.keys(f.loaders).length > 0">
-                  <md-button class="md-icon-button" md-menu-trigger.stop>
+                  <md-button class="md-icon-button" md-menu-trigger>
                     <md-icon>more_horiz</md-icon>
                   </md-button>
                   <md-menu-content>
@@ -90,13 +90,17 @@
           <div v-else-if="w.type=='imjoy/generic'" class="generic-plugin-window">
             <!-- <p>generic data</p> -->
             <md-list>
-              <md-list-item :disabled="!w.loaders||Object.keys(w.loaders).length <= 0" @click="loaders && w.loaders&&Object.keys(w.loaders).length > 0&& loaders[w.loaders[Object.keys(w.loaders)[0]]](w.data)">
+              <md-list-item class="md-primary" v-if="loaders&&w.loaders&&Object.keys(w.loaders).length > 0" @click="loaders[w.loaders[Object.keys(w.loaders)[0]]](w.data)">
+                <span class="md-list-item-text md-primary">Open with "{{Object.keys(w.loaders)[0]}}"</span>
+                <md-tooltip>click to open with "{{Object.keys(w.loaders)[0]}}".</md-tooltip>
+              </md-list-item>
+              <md-list-item v-else>
                 <span class="md-list-item-text">{{dataSummary(w)}}</span>
                 <md-tooltip>click to load.</md-tooltip>
               </md-list-item>
-              <md-list-item v-for="(v, k) in w.data" @click="printObject(k, v)" v-if="!k.startsWith('_') && w.data && (!w.data.length) || (w.data.length && w.data.length > 0 && k <= 20)" :key="k">
+              <md-list-item v-for="(v, k) in w.data" v-if="(!k.startsWith || !k.startsWith('_')) && w.data && (!w.data.length) || (w.data.length && w.data.length > 0 && k <= 20)" :key="k">
                 <md-icon>insert_drive_file</md-icon>
-                <span class="md-list-item-text">{{k}}</span>
+                <span class="md-list-item-text" @click="printObject(k, v)">{{k}}</span>
               </md-list-item>
               <md-list-item v-if="w.data && w.data.length && w.data.length > 20"  @click="printObject(w.data)">
                 <md-icon>insert_drive_file</md-icon>
@@ -315,6 +319,7 @@ export default {
 
 .window-title {
   font-size: 1.2em;
+  white-space: nowrap;
 }
 
 .plugin-iframe-container {

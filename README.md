@@ -17,6 +17,7 @@
  * Native support for n-dimentional arrays and tensors
    - Support ndarrays from Numpy or Numjs for data exchange
    - Support Tensorflow.js and native Tensorflow for deep learning
+ * Rendering muti-dimentional data in 3D with webGL, Three.js etc.
 
 # Using Imjoy for image processing
 
@@ -140,20 +141,20 @@ In order to differentiate the two different languages, use the `lang` property o
 
 All the plugins can access `config` and `data` from `my`:
 
- * `my['config']`
+ * `my.config`
  The config values from the user interface defined with the `ui` string (from the plugin config or `api.register`).
- * `my['data']`
+ * `my.data`
  It stores the data from current active window and state for running the plugin.
 
- In `my['data']`, there are internal fields which will be used to store the state of the current workflow.
+ In `my.data`, there are internal fields which will be used to store the state of the current workflow.
   * `_variables`
-     When the plugin is executed in a workflow, variables will be set in the workflow will be passed as `my['data']['_variables']`. It will be set to the actual variable value if the user used ops such as `Set [number]`.
+     When the plugin is executed in a workflow, variables will be set in the workflow will be passed as `my.data._variables`. It will be set to the actual variable value if the user used ops such as `Set [number]`.
   * `_op`
-     Give the name of the op which is being executing. When a plugin registered for multiple ops and no callback function was specified for the op, the `run` function will be called, and you can use `my['data']['_op']` to determine which op is being executing.
+     Give the name of the op which is being executing. When a plugin registered for multiple ops and no callback function was specified for the op, the `run` function will be called, and you can use `my.data._op` to determine which op is being executing.
   * `_source_op`
      Give the name of the op which initiated current execution.
   * `_workflow_id`
-     When the plugin is executed in a workflow, the workflow id will be set in the workflow will be passed as `my['data']['_workflowId']`.
+     When the plugin is executed in a workflow, the workflow id will be set in the workflow will be passed as `my.data._workflowId`.
 
      When the plugin is clicked in the plugin menu, ImJoy will try to reuse the workflow id in the current active window, if no window is active, a new workflow id will be assigned. All the data window with the same `_workflow_id` is virtually connected in a pipeline or computational graph. By combining `_workflow_id` with `_op` and `_source_op`, ImJoy can track, maintain and reconstruct the entire workflow.
 
@@ -194,7 +195,7 @@ api.export(new UntitledPlugin())
 ### Python example
 ```html
 <script lang="python">
-class PythonPlugin():
+class UntitledPythonPlugin():
   def setup(self):
     print('initialized from python.')
 
@@ -202,12 +203,24 @@ class PythonPlugin():
     print('hello world.')
     return my
 
-api.export(PythonPlugin())
+api.export(UntitledPythonPlugin())
 </script>
 ```
 
-## `Plugin API` and `ImJoy API`
-The plugin system of ImJoy is built upon remote procedure calls we implemented, an encoding and decoding scheme is used by ImJoy to transfer data and functions between plugins. It works by exposing a set of API functions both from the plugin or the main app. In the plugin, predefined object called `api` is to access the ImJoy API, detailed information can be found in the **ImJoy API** section. By using an ImJoy API called `api.export`, a set of functions can be exported as `Plugin APIs`, `setup` and `run` as described before are two mandatory `Plugin API` functions which need to be defined and exported. In addition to that, other functions can be also exported as `Plugin APIs`. 
+## `Plugin API`
+The plugin system of ImJoy is built upon remote procedure calls we implemented, an encoding and decoding scheme is used by ImJoy to transfer data and functions between plugins. It works by exposing a set of API functions both from the plugin or the main app. In the plugin, predefined object called `api` is to access the ImJoy API, detailed information can be found in the **ImJoy API** section. By using an ImJoy API called `api.export`, a set of functions can be exported as `Plugin APIs`, `setup` and `run` as described before are two mandatory `Plugin API` functions which need to be defined and exported. In addition to that, other functions can be also exported as `Plugin APIs`.
+
+As you may see in the above examples, they both contain an `api.export` statement as the last line of the `<script>` code block.
+
+```javascript
+//Javascript
+api.export(new UntitledJSPlugin())
+
+# Python
+api.export(UntitledPythonPlugin())
+```
+
+**Notice** that in Javascript, the `new` keyword is necessary to create an instance of a class, while in Python there is no `new` keyword.
 
 ## Callback functions
 Besides the `Plugin API` functions, when a plugin is executed, you can return an object which includes functions which will be called by other plugins or ImJoy. However, if the function has never been exported as a `Plugin API` before, it will be treated a `callback` function and can be only called once. Otherwise, if the function has been exported as `Plugin API`, it won't be treated as `callback` function and can be called repeatly.
@@ -230,14 +243,19 @@ register a new op, example:
 ```
 The same api works for both Javascript and Python.
 
-By default, each all the ops created by the same plugin will call the same `run` function defined in the plugin, and you will need to use `my["data"]["_op"]` in the `run` function to differentiate which op is called. 
+By default, each all the ops created by the same plugin will call the same `run` function defined in the plugin, and you will need to use `my.data._op` in the `run` function to differentiate which op is called. 
 
 Alternatively, another `Plugin API` function other than `run` can be passed when calling `api.register`. For example, you can add  `"run": this.hello` in a Javascript plugin or `"run": self.hello` in a Python plugin if `hello` is a member function of the plugin class. When the registered op is exectued, `hello` will be called. **Note:** the function must be a member of the plugin class or being exported (with `api.export`) as a `Plugin API` function. This is because a arbitrary function transfered by ImJoy will be treated as `callback` function, thus only allowed to run once. 
 
 ### `api.createWindow(...)`
 create a new window and add to the workspace, example:
+```javascript
+//Javascript
+const windowId = await api.createWindow({name: 'new window', type: 'Image Window', w:7, h:7, data: {image: ...}, config: {}})
 
-`api.createWindow({name: 'new window', type: 'Image Window', w:7, h:7, data: {image: ...}, config: {}})`
+# Python
+windowId = await api.createWindow({name: 'new window', type: 'Image Window', w:7, h:7, data: {image: ...}, config: {}})
+```
 
 If you do not want the window to load immediately, you can add `click2load: true` and the window will ask for an extra click to load the content.
 
@@ -246,7 +264,7 @@ Once an window is created, it will return a window ID, which can be used for upd
 ### `api.updateWindow(...)`
 update an existing window, an window ID should be passed in order to perform the update, example:
 
-`api.updateWindow(window_id, {data: {image: ...}})`
+`await api.updateWindow(windowId, {data: {image: ...}})`
 
 The second parameter is an object contains fields which the plugin wants to update.
 
