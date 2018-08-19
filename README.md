@@ -24,7 +24,7 @@
 ## Basic Usage: the ImJoy web app
  * Go to the [ImJoy web app](https://imjoy.io/#/app), click the **+** button to install new plugins from the [Plugin Repository](https://github.com/oeway/ImJoy-Plugins).
  * You can then open files or folders with the **+** button, or drag and drop them to the web app.
- * When files are loaded into the workspace, you can click the file to open it if the file is recognized by ImJoy or any plugin. For example, if you installed the plugin "Tif file importer", you will be able to click the .tif file in the file window. 
+ * When files are loaded into the workspace, you can click the file to open it if the file is recognized by ImJoy or any plugin. For example, if you installed the plugin "Tif file importer", you will be able to click the .tif file in the file window.
  * Similar to [ImageJ](https://imagej.nih.gov/ij), when clicking on the plugin menu, ImJoy will try to pass the current active window to the plugin, it is them let the plugin decide how to process the data contained in the window.
  * If you installed plugins written in Python, they will be disabled by default. In order to light them up, and benifit from the full power of your computer, you need to setup the **Python Plugin Engine** as follows.
 
@@ -34,6 +34,11 @@ You can use the **Python Plugin Engine** to unlock the power of your computer or
 To use it, go to the [ImJoy web app](https://imjoy.io/#/app), and click the 🚀 button located on the upper-right corner, you will find instructions on how to set it up. Basically, you will be asked to install the engine and run `python -m imjoy` to start it.
 
 More detailed instructions can be found here: [ImJoy-Python](https://github.com/oeway/ImJoy-Python).
+
+## Advanced Usage: Going offline
+If you have already installed the **Python Plugin Engine**, then you can run ImJoy in offline mode. What you do is to run the engine with `python -m imjoy --offline`. Then you will have your personal ImJoy locally, and you access by [http://localhost:8080](http://localhost:8080).
+
+Also notice that, even though ImJoy can run without internet, depends on the implementation of the plugin, some plugins maybe unusable when you go offline.
 
 ### How does it work?
 ImJoy supports Python Plugins which can run much more computationally intensive tasks. In order to run that, it needs to connect to the Python Plugin Engine -- a small python library we developed for ImJoy (source code: https://github.com/oeway/ImJoy-Python).
@@ -243,9 +248,9 @@ register a new op, example:
 ```
 The same api works for both Javascript and Python.
 
-By default, each all the ops created by the same plugin will call the same `run` function defined in the plugin, and you will need to use `my.data._op` in the `run` function to differentiate which op is called. 
+By default, each all the ops created by the same plugin will call the same `run` function defined in the plugin, and you will need to use `my.data._op` in the `run` function to differentiate which op is called.
 
-Alternatively, another `Plugin API` function other than `run` can be passed when calling `api.register`. For example, you can add  `"run": this.hello` in a Javascript plugin or `"run": self.hello` in a Python plugin if `hello` is a member function of the plugin class. When the registered op is exectued, `hello` will be called. **Note:** the function must be a member of the plugin class or being exported (with `api.export`) as a `Plugin API` function. This is because a arbitrary function transfered by ImJoy will be treated as `callback` function, thus only allowed to run once. 
+Alternatively, another `Plugin API` function other than `run` can be passed when calling `api.register`. For example, you can add  `"run": this.hello` in a Javascript plugin or `"run": self.hello` in a Python plugin if `hello` is a member function of the plugin class. When the registered op is exectued, `hello` will be called. **Note:** the function must be a member of the plugin class or being exported (with `api.export`) as a `Plugin API` function. This is because a arbitrary function transfered by ImJoy will be treated as `callback` function, thus only allowed to run once.
 
 ### `api.createWindow(...)`
 create a new window and add to the workspace, example:
