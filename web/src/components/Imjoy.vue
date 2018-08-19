@@ -1210,12 +1210,13 @@ export default {
       const w = this.active_windows[this.active_windows.length - 1] || {}
       this.status_text = ''
       this.progress = 0
-      const mw = plugin2joy(w)
+      const mw = this.plugin2joy(w) || {}
+      mw.target = mw.target || {}
       mw.target._op = 'workflow'
       mw.target._source_op = null
       mw.target._workflow_id = mw.target._workflow_id || "workflow_"+randId()
       joy.workflow.execute(mw.target).then((my) => {
-        const w = joy2plugin(my)
+        const w = this.joy2plugin(my)
         if (w) {
           console.log('result', w)
           const w = w
@@ -1280,13 +1281,13 @@ export default {
       this.status_text = ''
       this.progress = 0
       const w = this.active_windows[this.active_windows.length - 1] || {}
-      const mw = plugin2joy(w)
-      const target = w.data || {}
+      const mw = this.plugin2joy(w) || {}
+      mw.target = mw.target || {}
       mw.target._op = '__op__'
       mw.target._source_op = null
       mw.target._workflow_id = mw.target._workflow_id || "op_"+op.name.trim().replace(/ /g, '_')+randId()
       op.joy.__op__.execute(mw.target).then((my) => {
-        const w = joy2plugin(my)
+        const w = this.joy2plugin(my)
         if (w) {
           console.log('result', w)
           w.name = 'result'
@@ -1505,7 +1506,7 @@ export default {
         my.data._op = plugin_name
         my.data._source_op = source_plugin.name
         my.data._workflow_id = my.data._workflow_id || null
-        return await target_plugin.api.run(my)
+        return await target_plugin.api.run(this.filter4plugin(my))
       }
       else{
         throw 'plugin with type '+plugin_name+ ' not found.'
@@ -1536,9 +1537,18 @@ export default {
         return null
       }
     },
+    filter4plugin(my){
+      return my && {
+        _op: my._op,
+        _source_op: my._source_op,
+        _workflow_id: my._workflow_id,
+        config: my.config,
+        data: my.data,
+      }
+    },
     joy2plugin(my){
       //conver data-->config target--> data
-      return {
+      return my && {
         _op: my.op && my.op.name,
         _source_op: my.target && my.target._op,
         _workflow_id: my.target && my.target._workflow_id,
@@ -1579,6 +1589,7 @@ export default {
         } else {
           const onexecute = async (my) => {
             // my.target._workflow_id = null;
+            console.log('---------------------------', my)
             const result = await run(this.joy2plugin(my))
             return this.plugin2joy(result)
           }
@@ -1635,11 +1646,8 @@ export default {
                 target._source_op = target._op
                 target._op = op_name
                 target._workflow_id = target._workflow_id || 'data_loader_'+op_name.trim().replace(/ /g, '_')+randId()
-                const result = await plugin.api.run({
-                  op: {name: op_name},
-                  config: config,
-                  data: target
-                })
+                const my = {op:{name: op_name}, target: target, data: config}
+                const result = await plugin.api.run(this.joy2plugin(my))
                 if(result){
                   console.log('result', result)
                   const res = this.plugin2joy(result)
@@ -1724,7 +1732,7 @@ export default {
             pconfig.data._workflow_id = pconfig.data && pconfig.data._workflow_id
             pconfig.plugin = plugin
             pconfig.update = plugin.api.run
-            plugin.api.run(pconfig).then((result)=>{
+            plugin.api.run(this.filter4plugin(pconfig)).then((result)=>{
               if(result){
                 for(let k in result){
                   pconfig[k] = result[k]
