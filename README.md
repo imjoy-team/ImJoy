@@ -151,15 +151,14 @@ All the plugins can access `config` and `data` from `my`:
  * `my.data`
  It stores the data from current active window and state for running the plugin.
 
- In `my.data`, there are internal fields which will be used to store the state of the current workflow.
-  * `_variables`
-     When the plugin is executed in a workflow, variables will be set in the workflow will be passed as `my.data._variables`. It will be set to the actual variable value if the user used ops such as `Set [number]`.
-  * `_op`
-     Give the name of the op which is being executing. When a plugin registered for multiple ops and no callback function was specified for the op, the `run` function will be called, and you can use `my.data._op` to determine which op is being executing.
-  * `_source_op`
+ * `my._variables`
+     When the plugin is executed in a workflow, variables will be set in the workflow will be passed as `my._variables`. It will be set to the actual variable value if the user used ops such as `Set [number]`.
+ * `my._op`
+     Give the name of the op which is being executing. When a plugin registered for multiple ops and no callback function was specified for the op, the `run` function will be called, and you can use `my._op` to determine which op is being executing.
+ * `my._source_op`
      Give the name of the op which initiated current execution.
-  * `_workflow_id`
-     When the plugin is executed in a workflow, the workflow id will be set in the workflow will be passed as `my.data._workflowId`.
+ * `my._workflow_id`
+     When the plugin is executed in a workflow, the workflow id will be set in the workflow will be passed as `my._workflowId`.
 
      When the plugin is clicked in the plugin menu, ImJoy will try to reuse the workflow id in the current active window, if no window is active, a new workflow id will be assigned. All the data window with the same `_workflow_id` is virtually connected in a pipeline or computational graph. By combining `_workflow_id` with `_op` and `_source_op`, ImJoy can track, maintain and reconstruct the entire workflow.
 
@@ -178,6 +177,8 @@ For the results, you can directly return your result and it will show in a resul
    return my
 ```
 In the result, two fields named `data_1` and `result_tensor` will be displayed in a result window or passed to the next op in a workflow.
+
+(**Note**: in Python, the data type of `my` is a dictionary, ImJoy added the interface for allowing dot notation, just like in Javascript. If you prefer, you can also use `[]` in both languages to access dictionary or object.)
 
 ### Javascript example
 ```html
@@ -248,7 +249,7 @@ register a new op, example:
 ```
 The same api works for both Javascript and Python.
 
-By default, each all the ops created by the same plugin will call the same `run` function defined in the plugin, and you will need to use `my.data._op` in the `run` function to differentiate which op is called.
+By default, each all the ops created by the same plugin will call the same `run` function defined in the plugin, and you will need to use `my._op` in the `run` function to differentiate which op is called.
 
 Alternatively, another `Plugin API` function other than `run` can be passed when calling `api.register`. For example, you can add  `"run": this.hello` in a Javascript plugin or `"run": self.hello` in a Python plugin if `hello` is a member function of the plugin class. When the registered op is exectued, `hello` will be called. **Note:** the function must be a member of the plugin class or being exported (with `api.export`) as a `Plugin API` function. This is because a arbitrary function transfered by ImJoy will be treated as `callback` function, thus only allowed to run once.
 
