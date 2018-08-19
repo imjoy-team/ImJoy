@@ -178,6 +178,8 @@ For the results, you can directly return your result and it will show in a resul
 ```
 In the result, two fields named `data_1` and `result_tensor` will be displayed in a result window or passed to the next op in a workflow.
 
+(**Note**: in Python, the data type of `my` is a dictionary, ImJoy added the interface for allowing dot notation, just like in Javascript. If you prefer, you can also use `[]` in both languages to access dictionary or object.)
+
 ### Javascript example
 ```html
 <script lang="javascript">
