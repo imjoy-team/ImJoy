@@ -97,7 +97,11 @@ export default {
   },
   methods: {
     save(){
-      this.window.save({pluginId: this.pluginId, code: this.editor.getValue()})
+      this.reload()
+      this.window.save({pluginId: this.pluginId, code: this.editor.getValue()}).then((p_id)=>{
+        if(this.window.plugin && this.window.plugin.config)
+        this.window.plugin.config._id = p_id
+      })
       //this.$emit('save', {pluginId: this.pluginId, code: this.editor.getValue()})
     },
     reload(){

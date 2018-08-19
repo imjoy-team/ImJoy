@@ -204,13 +204,13 @@ Engine<template>
                   <md-menu-item @click="editPlugin(plugin.id)">
                     <md-icon>edit</md-icon>Edit
                   </md-menu-item>
-                  <md-menu-item @click="reloadPlugin({name: plugin.name, plugin:plugin})">
+                  <md-menu-item @click="reloadPlugin(plugin.config)">
                     <md-icon>autorenew</md-icon>Reload
                   </md-menu-item>
-                  <md-menu-item @click="plugin.terminate()">
+                  <md-menu-item @click="unloadPlugin(plugin.name)">
                     <md-icon>clear</md-icon>Terminate
                   </md-menu-item>
-                  <md-menu-item @click="showRemoveConfirmation=true">
+                  <md-menu-item @click="_plugin2_remove=plugin;showRemoveConfirmation=true">
                     <md-icon>delete_forever</md-icon>Remove
                   </md-menu-item>
                 </md-menu-content>
@@ -225,7 +225,7 @@ Engine<template>
               </md-button>
               <md-progress-bar md-mode="determinate" v-if="plugin.running&&plugin.progress" :md-value="plugin.progress"></md-progress-bar>
               <p v-if="plugin.running&&plugin.status_text">{{plugin.status_text}}</p>
-              <div v-for="(op, n) in plugin.ops" :key="op.id + op.name">
+              <div v-for="(op, n) in plugin.ops" :key="op.plugin_id + op.name">
                 <md-button class="md-icon-button" v-show="plugin.panel_expanded && op.name != plugin.name" :disabled="true">
                   <md-icon>remove</md-icon>
                 </md-button>
@@ -254,7 +254,7 @@ Engine<template>
     </md-app-content>
   </md-app>
 
-  <md-dialog-confirm :md-active.sync="showRemoveConfirmation" md-title="Removing Plugin" md-content="Do you really want to <strong>delete</strong> this plugin" md-confirm-text="Yes" md-cancel-text="Cancel" @md-cancel="showRemoveConfirmation=false" @md-confirm="removePlugin(_plugin2_remove);showRemoveConfirmation=false"/>
+  <md-dialog-confirm :md-active.sync="showRemoveConfirmation" md-title="Removing Plugin" md-content="Do you really want to <strong>delete</strong> this plugin" md-confirm-text="Yes" md-cancel-text="Cancel" @md-cancel="showRemoveConfirmation=false" @md-confirm="removePlugin(_plugin2_remove);_plugin2_remove=null;showRemoveConfirmation=false"/>
   <!-- </md-card-content> -->
 
   <md-dialog :md-active.sync="showPluginDialog" :md-click-outside-to-close="false">
@@ -662,8 +662,20 @@ export default {
     this.disconnectEngine()
   },
   methods: {
-    removePlugin(p){
-      console.log('remove plugin', p)
+    removePlugin(plugin){
+      console.log('remove plugin', plugin.name)
+      // remove if exists
+      this.db.get(plugin.config._id).then((doc) => {
+        return this.db.remove(doc);
+      }).then((result) => {
+        this.unloadPlugin(plugin.name)
+        console.log('plugin has been removed')
+        this.show('the plugin has been removed.')
+        this.$forceUpdate()
+      }).catch((err) => {
+        this.show('Error:'+err)
+        console.log('error occured when removing ', plugin, err)
+      });
     },
     sortedPlugins: function() {
         return _.orderBy(this.plugins, 'name');
@@ -815,61 +827,34 @@ export default {
       }
       this.addWindow(w)
     },
+    unloadPlugin(name){
+      for (let k in this.plugins) {
+        if (this.plugins.hasOwnProperty(k)) {
+          const plugin = this.plugins[k]
+          if(plugin.name == name){
+              try {
+                delete this.plugins[k]
+                delete this.plugin_names[name]
+                Joy.remove(name)
+                console.log('terminating ',plugin)
+                if (typeof plugin.terminate == 'function') {
+                  plugin.terminate()
+                }
+              } catch (e) {
+                console.error(e)
+              }
+          }
+        }
+      }
+      this.$forceUpdate()
+
+    },
     reloadPlugin(pconfig) {
       return new Promise((resolve, reject) => {
-        if(pconfig.name){
-          for (let k in this.plugins) {
-            if (this.plugins.hasOwnProperty(k)) {
-              const plugin = this.plugins[k]
-              if(plugin.name == pconfig.name){
-                  try {
-                    delete this.plugins[k]
-                    delete this.plugin_names[pconfig.name]
-                    Joy.remove(pconfig.name)
-                    console.log('terminating ',plugin)
-                    if (typeof plugin.terminate == 'function') {
-                      plugin.terminate()
-                    }
-                  } catch (e) {
-
-                  }
-
-              }
-            }
-          }
-        }
-
-        if (pconfig.plugin && pconfig.plugin.id){
-          if(this.plugins[pconfig.plugin.id]){
-            delete this.plugin_names[this.plugins[pconfig.plugin.id].name]
-            delete this.plugins[pconfig.plugin.id]
-          }
-        }
-
-        if (pconfig.plugin && pconfig.plugin.type)
-          Joy.remove(pconfig.plugin.type)
-
-        if (pconfig.plugin && pconfig.plugin.terminate) {
-          try {
-            console.log('terminating plugin ', pconfig.plugin)
-            if (typeof pconfig.plugin.terminate == 'function'){
-              pconfig.plugin.terminate()
-              this.$forceUpdate()
-              console.log('terminated.')
-            }
-          } finally {
-            delete pconfig.plugin
-          }
-        }
-        pconfig.plugin = null
+        this.unloadPlugin(pconfig.name)
         console.log('reloading plugin ', pconfig)
         const template = this.parsePluginCode(pconfig.code, pconfig)
-        // const rplugins = this.resumable_plugins.filter(p => p.name==template.name && p.type==template.type)
-        // let rplugin = null
-        // if(rplugins.length>0){
-        //   rplugin = rplugins[0]
-        // }
-
+        this.unloadPlugin(template.name)
         let p
         if (template.mode == 'iframe' && template.tags.includes('window')) {
           p = this.preLoadPlugin(template)
@@ -896,30 +881,34 @@ export default {
       })
     },
     savePlugin(pconfig) {
-      //console.log('saving plugin ', pconfig)
-      const code = pconfig.code
-      const template = this.parsePluginCode(code, {})
-      template.code = code
-      template._id = template.name.replace(/ /g, '_')
-      const addPlugin = () => {
-        this.db.put(template, {
-          force: true
+      return new Promise((resolve, reject) => {
+        //console.log('saving plugin ', pconfig)
+        const code = pconfig.code
+        const template = this.parsePluginCode(code, {})
+        template.code = code
+        template._id = template.name.replace(/ /g, '_')
+        const addPlugin = () => {
+          this.db.put(template, {
+            force: true
+          }).then((result) => {
+            resolve(template._id)
+            console.log('Successfully saved!');
+            this.show(`${template.name } has been sucessfully saved.`)
+          }).catch((err) => {
+            this.show('failed to save the plugin.')
+            console.error(err)
+            reject('failed to save')
+          })
+        }
+        // remove if exists
+        this.db.get(template._id).then((doc) => {
+          return this.db.remove(doc);
         }).then((result) => {
-          console.log('Successfully installed!');
-          this.show(`${template.name } has been sucessfully saved.`)
+          addPlugin()
         }).catch((err) => {
-          this.show('failed to save the plugin.')
-          console.error(err)
-        })
-      }
-      // remove if exists
-      this.db.get(template._id).then((doc) => {
-        return this.db.remove(doc);
-      }).then((result) => {
-        addPlugin()
-      }).catch((err) => {
-        addPlugin()
-      });
+          addPlugin()
+        });
+      })
     },
     reloadPythonPlugins(){
       for(let p of this.installed_plugins){
@@ -1008,6 +997,7 @@ export default {
             this.installed_plugins.push(config)
             try {
               const template = this.parsePluginCode(config.code, config)
+              template._id = config._id
               const rplugins = this.resumable_plugins.filter(p => p.name==template.name && p.type==template.type)
 
               let rplugin = null
@@ -1376,7 +1366,8 @@ export default {
         tags: template.tags,
         ui: template.ui,
         inputs: template.inputs,
-        outputs: template.outputs
+        outputs: template.outputs,
+        _id: template._id
       }
       this.validatePluginConfig(config)
       //generate a random id for the plugin
@@ -1433,6 +1424,7 @@ export default {
           config.id = rplugin.id
           config.initialized = true
         }
+        config._id = template._id
         config.context = this.pluing_context
         if (template.mode == 'pyworker') {
           if (!this.socket) {
