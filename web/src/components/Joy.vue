@@ -83,7 +83,7 @@ export default {
           }
         }
       }
-      console.log('setting up joy ', this.config)
+      // console.log('setting up joy ', this.config)
       try {
         this.joy = new Joy(joy_config)
       } catch (e) {

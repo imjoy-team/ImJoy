@@ -550,11 +550,11 @@ export default {
       else{
         this.selected_files = filelist
       }
-      console.log('files loaded: ', this.selected_files)
+      // console.log('files loaded: ', this.selected_files)
       this.loadFiles()
     });
     this.importScripts.apply(null, this.preload_main).then(() => {
-      console.log('preload done.')
+      // console.log('preload done.')
     })
   },
   beforeRouteLeave(to, from, next) {
@@ -613,7 +613,7 @@ export default {
       auto_compaction: true
     })
     let default_ws = null
-    console.log('loading workspace: ', this.$route.query.w)
+    // console.log('loading workspace: ', this.$route.query.w)
     this.config_db.get('workspace_list').then((doc) => {
       this.workspace_list = doc.list
       default_ws = doc.default
@@ -660,7 +660,7 @@ export default {
     });
   },
   beforeDestroy() {
-    console.log('terminating plugins')
+    // console.log('terminating plugins')
     for (let k in this.plugins) {
       if (this.plugins.hasOwnProperty(k)) {
         const plugin = this.plugins[k]
@@ -678,19 +678,19 @@ export default {
   methods: {
     removePlugin(plugin){
       return new Promise((resolve, reject) => {
-        console.log('remove plugin', plugin.name)
+        // console.log('remove plugin', plugin.name)
         // remove if exists
         this.db.get(plugin.config._id).then((doc) => {
           return this.db.remove(doc);
         }).then((result) => {
           this.unloadPlugin(plugin.name)
-          console.log('plugin has been removed')
+          // console.log('plugin has been removed')
           this.show('the plugin has been removed.')
           this.$forceUpdate()
           resolve()
         }).catch((err) => {
           this.show('Error:'+err)
-          console.log('error occured when removing ', plugin, err)
+          console.error('error occured when removing ', plugin, err)
           reject()
         });
       });
@@ -709,7 +709,7 @@ export default {
       }
     },
     switchWorkspace(w) {
-      console.log('switch to ', w)
+      // console.log('switch to ', w)
       let q = {
         w: w
       }
@@ -754,9 +754,9 @@ export default {
             this.engine_connected = true
             this.engine_status = 'Connected.'
             localStorage.setItem("imjoy_connection_token", this.connection_token);
-            console.log('these python plugins can be resumed: ', ret.plugins)
+            // console.log('these python plugins can be resumed: ', ret.plugins)
             this.show('Plugin Engine connected.')
-            console.log('plugin engine connected.')
+            // console.log('plugin engine connected.')
             this.store.event_bus.$emit('engine_connected', d)
             this.reloadPythonPlugins()
           }
@@ -769,7 +769,7 @@ export default {
 
       })
       socket.on('disconnect', () => {
-        console.log('plugin engine disconnected.')
+        // console.log('plugin engine disconnected.')
         this.engine_connected = false
         this.show('Plugin Engine disconnected.')
         this.engine_status = 'Disconnected.'
@@ -855,7 +855,7 @@ export default {
                 delete this.plugins[k]
                 delete this.plugin_names[name]
                 Joy.remove(name)
-                console.log('terminating ',plugin)
+                // console.log('terminating ',plugin)
                 if (typeof plugin.terminate == 'function') {
                   plugin.terminate()
                 }
@@ -871,7 +871,7 @@ export default {
     reloadPlugin(pconfig) {
       return new Promise((resolve, reject) => {
         this.unloadPlugin(pconfig.name)
-        console.log('reloading plugin ', pconfig)
+        // console.log('reloading plugin ', pconfig)
         const template = this.parsePluginCode(pconfig.code, pconfig)
         this.unloadPlugin(template.name)
         let p
@@ -882,7 +882,7 @@ export default {
         }
 
         p.then((plugin) => {
-          console.log('new plugin loaded', plugin)
+          // console.log('new plugin loaded', plugin)
           pconfig.name = plugin.name
           pconfig.type = plugin.type
           pconfig.plugin = plugin
@@ -911,7 +911,7 @@ export default {
             force: true
           }).then((result) => {
             resolve(template._id)
-            console.log('Successfully saved!');
+            // console.log('Successfully saved!');
             this.show(`${template.name } has been sucessfully saved.`)
           }).catch((err) => {
             this.show('failed to save the plugin.')
@@ -943,7 +943,7 @@ export default {
           if(plugin.mode == 'pyworker'){
             try {
               Joy.remove(plugin.config.type)
-              console.log('terminating ',plugin)
+              // console.log('terminating ',plugin)
               if (typeof plugin.terminate == 'function') {
                 plugin.terminate()
               }
@@ -1169,7 +1169,7 @@ export default {
               const op_name = this.registered.inputs[k].op_name
               const plugin = this.plugin_names[plugin_name]
               if(plugin && this.registered.loaders[plugin_name+'/'+op_name]){
-                console.log('associate data with ', plugin_name, op_name )
+                // console.log('associate data with ', plugin_name, op_name )
                 loaders[op_name] = plugin_name+'/'+op_name
               }
             }
@@ -1186,7 +1186,7 @@ export default {
         const tmp = file.name.split('.')
         const ext = tmp[tmp.length - 1]
         file.loaders = this.getDataLoaders(file)
-        console.log('loaders', file.loaders)
+        // console.log('loaders', file.loaders)
       }
       const w = {
         name: 'Files',
@@ -1206,7 +1206,7 @@ export default {
       this.$refs.workflow.setupJoy(true)
     },
     runWorkflow(joy) {
-      console.log('run workflow.', this.active_windows)
+      // console.log('run workflow.', this.active_windows)
       const w = this.active_windows[this.active_windows.length - 1] || {}
       this.status_text = ''
       this.progress = 0
@@ -1218,7 +1218,7 @@ export default {
       joy.workflow.execute(mw.target).then((my) => {
         const w = this.joy2plugin(my)
         if (w) {
-          console.log('result', w)
+          // console.log('result', w)
           const w = w
           w.name = 'result'
           w.type = 'imjoy/generic'
@@ -1241,11 +1241,11 @@ export default {
       data._id = name + '_workflow'
       // delete data._references
       data.workflow = JSON.stringify(joy.top.data)
-      console.log('saving workflow: ', data)
+      // console.log('saving workflow: ', data)
       this.db.put(data, {
         force: true
       }).then((result) => {
-        console.log('Successfully saved!');
+        // console.log('Successfully saved!');
         this.workflow_list.push(data)
         this.show(name + ' has been sucessfully saved.')
       }).catch((err) => {
@@ -1257,10 +1257,10 @@ export default {
     loadWorkflow(w) {
       this.workflow_joy_config.data = JSON.parse(w.workflow)
       this.$refs.workflow.setupJoy()
-      console.log(w)
+      // console.log(w)
     },
     removeWorkflow(w) {
-      console.log('removing: ', w)
+      // console.log('removing: ', w)
       this.db.get(w._id).then((doc) => {
         return this.db.remove(doc);
       }).then((result) => {
@@ -1268,7 +1268,7 @@ export default {
         if (index > -1) {
           this.workflow_list.splice(index, 1);
         }
-        console.log('Successfully removed!');
+        // console.log('Successfully removed!');
         this.show(name + ' has been sucessfully removed.')
       }).catch((err) => {
         this.show('failed to remove the workflow.')
@@ -1277,7 +1277,7 @@ export default {
       })
     },
     runOp(op) {
-      console.log('run op.', this.active_windows)
+      // console.log('run op.', this.active_windows)
       this.status_text = ''
       this.progress = 0
       const w = this.active_windows[this.active_windows.length - 1] || {}
@@ -1301,7 +1301,7 @@ export default {
       })
     },
     selectFileChanged(event) {
-      console.log(event.target.files)
+      // console.log(event.target.files)
       this.selected_file = event.target.files[0];
       this.selected_files = event.target.files;
       //normalize relative path
@@ -1324,15 +1324,15 @@ export default {
         config.style = null
         config.window = null
       } else {
-        console.log('parsing the plugin file')
+        // console.log('parsing the plugin file')
         const pluginComp = parseComponent(code)
-        console.log('code parsed from', pluginComp)
+        // console.log('code parsed from', pluginComp)
         let c = null
         for (let i = 0; i < pluginComp.customBlocks.length; i++) {
           if (pluginComp.customBlocks[i].type == 'config') {
             // find the first config block
             config = JSON.parse(pluginComp.customBlocks[i].content)
-            console.log('loading config from .html file', config)
+            // console.log('loading config from .html file', config)
             break
           }
         }
@@ -1418,7 +1418,7 @@ export default {
         this.register(config, {
           id: config.id
         })
-        console.log('sucessfully preloaded plugin: ', plugin)
+        // console.log('sucessfully preloaded plugin: ', plugin)
         resolve(plugin)
       })
     },
@@ -1462,7 +1462,7 @@ export default {
           }
           // if(!config.initialized){
             plugin.api.setup().then((result) => {
-              console.log('sucessfully setup plugin: ', plugin)
+              // console.log('sucessfully setup plugin: ', plugin)
               resolve(plugin)
             }).catch((e) => {
               console.error('error occured when loading plugin ' + template.name + ": ", e)
@@ -1530,7 +1530,7 @@ export default {
       res.target._op = my._op || null
       res.target._source_op = my._source_op || null
       if(Object.keys(res.target).length>4){
-        console.log('returning', res)
+        // console.log('returning', res)
         return res
       }
       else{
@@ -1563,7 +1563,7 @@ export default {
         config.mode = config.mode || 'webworker'
         config.show_panel = config.show_panel || false
         config.ui = config.ui || config.name
-        console.log('registering op', config)
+        // console.log('registering op', config)
         if (!REGISTER_SCHEMA(config)) {
           const error = REGISTER_SCHEMA.errors(config)
           console.error("Error occured during registering " + config.name, error)
@@ -1573,7 +1573,7 @@ export default {
         //   console.log('plugin already registered')
         //   return
         // }
-        console.log('creating Op: ', config, plugin)
+        // console.log('creating Op: ', config, plugin)
         let run = null
         if(config.run && typeof config.run == 'function'){
           run = config.run
@@ -1589,7 +1589,6 @@ export default {
         } else {
           const onexecute = async (my) => {
             // my.target._workflow_id = null;
-            console.log('---------------------------', my)
             const result = await run(this.joy2plugin(my))
             return this.plugin2joy(result)
           }
@@ -1604,7 +1603,7 @@ export default {
             }
           }
         }
-        console.log('adding joy op', config)
+        // console.log('adding joy op', config)
         const joy_template = config
         joy_template.init = joy_template.ui || joy_template.name
         // joy_template.ui = null
@@ -1612,8 +1611,7 @@ export default {
 
         // plugin.type = config.type
         // plugin.name = config.name
-        console.log('register op plugin: ', plugin.config)
-
+        // console.log('register op plugin: ', plugin.config)
         const op_config = {
           plugin_id: _plugin.id,
           name: config.name,
@@ -1634,7 +1632,7 @@ export default {
               }
             }
             const sch = schema.fromJSON(config.inputs)
-            console.log('inputs schema:-->', plugin.name, config.name, sch.toJSON())
+            // console.log('inputs schema:-->', plugin.name, config.name, sch.toJSON())
             const plugin_name = plugin.name
             const op_name = config.name
             this.registered.inputs[plugin_name+'/'+op_name] =  {op_name: op_name, plugin_name: plugin_name, schema: sch}
@@ -1649,7 +1647,7 @@ export default {
                 const my = {op:{name: op_name}, target: target, data: config}
                 const result = await plugin.api.run(this.joy2plugin(my))
                 if(result){
-                  console.log('result', result)
+                  // console.log('result', result)
                   const res = this.plugin2joy(result)
                   if (res) {
                     const w = {}
@@ -1688,14 +1686,14 @@ export default {
         //update the joy workflow if new template added, TODO: preserve settings during reload
         if (this.$refs.workflow) this.$refs.workflow.setupJoy()
 
-        console.log('creating panel: ', op_config)
+        // console.log('creating panel: ', op_config)
         this.$forceUpdate()
 
         if (config.tags.includes('window')) {
           if (config.mode != 'iframe') {
             throw 'Window plugin must be with type "iframe"'
           }
-          console.log('register window plugin: ', plugin.config)
+          // console.log('register window plugin: ', plugin.config)
           this.registered.windows[config.name] = plugin.config
         }
         if (config.tags.includes('file_importer')) {
@@ -1713,7 +1711,7 @@ export default {
     },
     renderWindow(pconfig) {
       return new Promise((resolve, reject) => {
-        console.log('rendering window', pconfig)
+        // console.log('rendering window', pconfig)
         const tconfig = _.assign({}, pconfig.plugin, pconfig)
         const plugin = new jailed.DynamicPlugin(tconfig, this.plugin_api)
         plugin.whenConnected(() => {
@@ -1724,7 +1722,7 @@ export default {
           }
           // this.plugins[plugin.id] = plugin
           plugin.api.setup().then((result) => {
-            console.log('sucessfully setup the window plugin: ', plugin, pconfig)
+            // console.log('sucessfully setup the window plugin: ', plugin, pconfig)
             //asuming the data._op is passed from last op
             pconfig.data = pconfig.data || {}
             pconfig.data._source_op = pconfig.data && pconfig.data._op
@@ -1786,14 +1784,14 @@ export default {
         console.error("Error occured during creating window " + wconfig.name, error)
         throw error
       }
-      console.log('window config', wconfig)
+      // console.log('window config', wconfig)
       if (wconfig.type && wconfig.type.startsWith('imjoy')) {
         // console.log('creating imjoy window', wconfig)
         wconfig.id = 'imjoy_'+randId()
         return this.addWindow(wconfig)
       } else {
         const window_config = this.registered.windows[wconfig.type]
-        console.log(window_config)
+        // console.log(window_config)
         if (!window_config) {
           console.error('no plugin registered for window type: ', wconfig.type)
           throw 'no plugin registered for window type: ', wconfig.type
@@ -1803,13 +1801,13 @@ export default {
         //generate a new window id
         pconfig.mode = window_config.mode
         pconfig.id = window_config.name.trim().replace(/ /g, '_') + '_' + randId()
-        console.log('creating window: ', pconfig)
+        // console.log('creating window: ', pconfig)
         if (pconfig.mode != 'iframe') {
           throw 'Window plugin must be with mode "iframe"'
         }
         // this is a unique id for the iframe to attach
         pconfig.iframe_container = 'plugin_window_' + pconfig.id + randId()
-        console.log('changing id...')
+        // console.log('changing id...')
         pconfig.iframe_window = null
         pconfig.plugin = window_config
         pconfig.context = this.pluing_context
@@ -1840,7 +1838,7 @@ export default {
         console.error("Error occured during creating window " + config.name, error)
         throw error
       }
-      console.log('creating plugin window: ', config)
+      // console.log('creating plugin window: ', config)
       return this.addWindow(config)
     },
     showAlert(text){
