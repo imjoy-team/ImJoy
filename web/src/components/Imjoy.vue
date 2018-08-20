@@ -242,7 +242,13 @@ Engine<template>
                 <md-divider></md-divider>
               </div>
             </div>
-
+            <md-divider></md-divider>
+          <div class="md-layout md-gutter md-alignment-center-center">
+            <br>
+            <md-button class="md-raised md-primary" @click="showAddPluginDialog=true">
+              <md-icon>add</md-icon>Add New Plugins
+            </md-button>
+          </div>
           </md-card-content>
         </md-card>
       </div>
