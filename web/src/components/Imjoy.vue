@@ -94,10 +94,6 @@ Engine<template>
             <md-icon>folder_open</md-icon>
             <md-tooltip>Open a folder</md-tooltip>
           </md-button>
-          <md-button @click="showAddPluginDialog=true" class="md-icon-button md-accent">
-            <md-icon>extension</md-icon>
-            <md-tooltip>Install or create a new plugin</md-tooltip>
-          </md-button>
         </md-speed-dial-content>
       </md-speed-dial>
       <div class="md-toolbar-row">
@@ -244,9 +240,9 @@ Engine<template>
             </div>
             <md-divider></md-divider>
           <div class="md-layout md-gutter md-alignment-center-center">
-            <br>
             <md-button :class="installed_plugins&&installed_plugins.length>0?'':'md-raised md-primary'" @click="showAddPluginDialog=true">
               <md-icon>add</md-icon>Add New Plugins
+              <md-tooltip>Install or create a new plugin</md-tooltip>
             </md-button>
           </div>
           </md-card-content>
