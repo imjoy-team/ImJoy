@@ -16,7 +16,6 @@ api = null;
  * @param {Object} msg stack provided by error.stack or a message
  */
 var printError = function(msg) {
-    console.error();
     console.error(msg);
 }
 
@@ -255,8 +254,8 @@ var loadRemote = function(url, sCb, fCb) {
  */
 var conn = {
     disconnect: function(){ process.exit(); },
-    send: function(data) {
-        process.send({type: 'message', data: data});
+    send: function(data, transferables) {
+        process.send({type: 'message', data: data}, transferables);
     },
     onMessage: function(h){ conn._messageHandler = h; },
     _messageHandler: function(){},

@@ -247,9 +247,9 @@ function randId() {
          *
          * @param {Object} data to send
          */
-        BasicConnection.prototype.send = function(data) {
+        BasicConnection.prototype.send = function(data, transferables) {
             if (!this._disconnected) {
-                this._process.send(data);
+                this._process.send(data, transferables);
             }
         }
 
@@ -265,7 +265,6 @@ function randId() {
                 try {
                     handler(data);
                 } catch (e) {
-                    console.error();
                     console.error(e.stack);
                 }
             }
@@ -391,9 +390,9 @@ function randId() {
          *
          * @param {Object} data to send
          */
-        BasicConnection.prototype.send = function(data) {
+        BasicConnection.prototype.send = function(data, transferables) {
             this._frame.contentWindow&&this._frame.contentWindow.postMessage(
-                {type: 'message', data: data}, '*'
+                {type: 'message', data: data}, '*', transferables
             );
         }
 
@@ -506,7 +505,7 @@ function randId() {
          *
          * @param {Object} data to send
          */
-        SocketioConnection.prototype.send = function(data) {
+        SocketioConnection.prototype.send = function(data, transferables) {
             this.context.socket.emit('message_to_plugin_'+this.id,
                 {type: 'message', data: data}
             );
@@ -697,11 +696,11 @@ function randId() {
      *
      * @param {Object} data of the message to send
      */
-    Connection.prototype.send = function(data) {
+    Connection.prototype.send = function(data, transferables) {
         this._platformConnection.send({
             type: 'message',
             data: data
-        });
+        }, transferables);
     }
 
 
