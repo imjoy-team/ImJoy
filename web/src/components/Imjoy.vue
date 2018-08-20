@@ -1216,7 +1216,7 @@ export default {
       mw.target = mw.target || {}
       mw.target._op = 'workflow'
       mw.target._source_op = null
-      mw.target._transfer = true
+      // mw.target._transfer = true
       mw.target._workflow_id = mw.target._workflow_id || "workflow_"+randId()
       joy.workflow.execute(mw.target).then((my) => {
         const w = this.joy2plugin(my)
@@ -1287,7 +1287,7 @@ export default {
       mw.target = mw.target || {}
       mw.target._op = '__op__'
       mw.target._source_op = null
-      mw.target._transfer = true
+      // mw.target._transfer = true
       mw.target._workflow_id = mw.target._workflow_id || "op_"+op.name.trim().replace(/ /g, '_')+randId()
       op.joy.__op__.execute(mw.target).then((my) => {
         const w = this.joy2plugin(my)
