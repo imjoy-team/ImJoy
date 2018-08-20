@@ -73,17 +73,32 @@ var initWebworkerPlugin = function() {
 
     // forwarding messages between the worker and parent window
     worker.addEventListener('message', function(m) {
+
+        var transferables = undefined;
         if (m.data.type == 'initialized') {
             clearTimeout(fallbackTimeout);
         }
         else if(m.data.type == 'disconnect'){
           worker.terminate();
         }
-        parent.postMessage(m.data, '*');
+        else if(m.data.type == 'message'){
+          if(m.data.data.__transferables__){
+            transferables = m.data.data.__transferables__;
+            delete m.data.data.__transferables__;
+          }
+        }
+        parent.postMessage(m.data, '*', transferables);
     });
 
     window.addEventListener('message', function(m) {
-        worker.postMessage(m.data);
+       var transferables = undefined;
+       if(m.data.type == 'message'){
+        if(m.data.data.__transferables__){
+          transferables = m.data.data.__transferables__;
+          delete m.data.data.__transferables__;
+        }
+      }
+      worker.postMessage(m.data, transferables);
     });
 }
 

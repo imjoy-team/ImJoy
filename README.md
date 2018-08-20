@@ -178,6 +178,8 @@ For the results, you can directly return your result and it will show in a resul
 ```
 In the result, two fields named `data_1` and `result_tensor` will be displayed in a result window or passed to the next op in a workflow.
 
+Since ImJoy use postMessage to exchange data between plugins, for Javascript plugins, objects are cloned during the transfer. When there is a large object exchange, it will be more effective if the object created by a plugin can be directly transferred. To enable that, you can add `_transfer=true` to your object when you return it. For example, in the above example, you can set `my._transfer = true` when you return `my`. However, it will only speed up the transferring of `ArrayBuffers` or `ArrayBufferViews` (and also ndarrays produced by Python), and after transferring, you won't be able to access it.
+
 (**Note**: in Python, the data type of `my` is a dictionary, ImJoy added the interface for allowing dot notation, just like in Javascript. If you prefer, you can also use `[]` in both languages to access dictionary or object.)
 
 ### Javascript example

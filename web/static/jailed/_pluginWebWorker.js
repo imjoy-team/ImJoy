@@ -97,8 +97,9 @@ self.connection = {};
      */
     var conn = {
         disconnect: function(){ self.close(); },
-        send: function(data) {
-            self.postMessage({type: 'message', data: data});
+        send: function(data, transferables) {
+            data.__transferables__ = transferables;
+            self.postMessage({type: 'message', data: data}, transferables);
         },
         onMessage: function(h){ conn._messageHandler = h; },
         _messageHandler: function(){},
