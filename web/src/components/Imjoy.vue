@@ -245,7 +245,7 @@ Engine<template>
             <md-divider></md-divider>
           <div class="md-layout md-gutter md-alignment-center-center">
             <br>
-            <md-button class="md-raised md-primary" @click="showAddPluginDialog=true">
+            <md-button :class="installed_plugins&&installed_plugins.length>0?'':'md-raised md-primary'" @click="showAddPluginDialog=true">
               <md-icon>add</md-icon>Add New Plugins
             </md-button>
           </div>
