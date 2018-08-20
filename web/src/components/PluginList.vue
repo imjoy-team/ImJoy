@@ -298,7 +298,7 @@ export default {
         return this.db.remove(doc);
       }).then((result) => {
         console.log('plugin has been removed')
-        this.api.show('the plugin has been removed.')
+        this.api.show('The plugin has been removed.')
         plugin.installed = false
         this.$forceUpdate()
       }).catch((err) => {
