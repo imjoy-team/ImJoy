@@ -16,7 +16,6 @@
        <img id="ip-img" src="static/img/Institut_Pasteur_logo.svg" alt="Institut Pasteur">
        </a></p>
         <br>
-      <md-button @click="api.contact" class="md-raised">Contact us</md-button>
       </md-card-content>
     </md-card>
 
