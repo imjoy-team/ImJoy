@@ -349,12 +349,15 @@
                 if(id!==null) me._method_refs.fetch(id);
                 return reject.apply(this, arguments);
               };
+              var args = me._wrap(Array.prototype.slice.call(arguments))
+              var transferables = args.args.__transferables__
+              if(transferables) delete args.args.__transferables__
               me._connection.send({
                   type: 'method',
                   name: name,
-                  args: me._wrap(Array.prototype.slice.call(arguments)),
+                  args: args,
                   promise: me._wrap([wrapped_resolve, wrapped_reject])
-              });
+              }, transferables);
             } catch (e) {
               if(id) me._method_refs.fetch(id);
               console.error(e)
@@ -385,9 +388,11 @@
      * @returns {Array} wrapped arguments
      */
      JailedSite.prototype._encode = function(aObject, callbacks) {
+        var transferables = []
         if (!aObject) {
           return aObject;
         }
+        var _transfer = aObject._transfer;
         var bObject, v, k;
         var isarray = Array.isArray(aObject)
         bObject = isarray ? [] : {};
@@ -437,12 +442,29 @@
                 const rounds = Math.ceil(v_buffer.length/ARRAY_CHUNK)
                 for(let i of _.range(rounds)){
                   v_bytes[i] = v_buffer.slice(i*ARRAY_CHUNK, (i+1)*ARRAY_CHUNK)
+                  if(v._transfer || _transfer){
+                    transferables.push(v_bytes[i])
+                  }
+                }
+                delete v_buffer
+                if(v._transfer){
+                  delete v._transfer
+                }
+              }
+              else{
+                if(v._transfer || _transfer){
+                  transferables.push(v_bytes.buffer)
+                  delete v._transfer
                 }
               }
               bObject[k] = {__jailed_type__: 'ndarray', __value__ : v_bytes, __shape__: v.shape, __dtype__: v.dtype}
             }
             else if(typeof nj != 'undefined' && nj.NdArray && v instanceof nj.NdArray){
               var dtype = _typedarray2dtype[v.selection.data.constructor.name]
+              if(v._transfer || _transfer){
+                transferables.push(v.selection.data.buffer)
+                delete v._transfer
+              }
               bObject[k] = {__jailed_type__: 'ndarray', __value__ : v.selection.data, __shape__: v.shape, __dtype__: dtype}
             }
             else if( v instanceof Error){
@@ -450,17 +472,41 @@
             }
             // send objects supported by structure clone algorithm
             // https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Structured_clone_algorithm
-            else if(v !== Object(v) || v instanceof Boolean || v instanceof String || v instanceof Date || v instanceof RegExp || v instanceof Blob || v instanceof File || v instanceof FileList || v instanceof ArrayBuffer || v instanceof ArrayBufferView || v instanceof ImageData){
+            else if(v !== Object(v) || v instanceof Boolean || v instanceof String || v instanceof Date || v instanceof RegExp || v instanceof Blob || v instanceof File || v instanceof FileList || v instanceof ImageData){
+              bObject[k] =  {__jailed_type__: 'argument', __value__ : v}
+            }
+            else if(v instanceof ArrayBuffer){
+              if(v._transfer || _transfer){
+                transferables.push(v)
+                delete v._transfer
+              }
+              bObject[k] =  {__jailed_type__: 'argument', __value__ : v}
+            }
+            else if(v instanceof ArrayBufferView){
+              if(v._transfer || _transfer){
+                transferables.push(v.buffer)
+                delete v._transfer
+              }
               bObject[k] =  {__jailed_type__: 'argument', __value__ : v}
             }
             //TODO: support also Map and Set
             else if(typeof v == "object" || typeof v == "array"){
               bObject[k] = this._encode(v, callbacks)
+              // move transferables to the top level object
+              if(bObject[k].__transferables__){
+                for(var t=0; t<bObject[k].__transferables__.length; t++){
+                  transferables.push(bObject[k].__transferables__[t])
+                }
+                delete bObject[k].__transferables__
+              }
             }
             else{
               throw "Unsupported data type for transferring between the plugin and the main app: "+ k+','+v
             }
           }
+        }
+        if(transferables.length>0){
+          bObject.__transferables__ = transferables;
         }
         return bObject;
      };
@@ -581,25 +627,31 @@
       if(withPromise){
         var remoteCallback = function() {
           return new Promise((resolve, reject) => {
+            var args = me._wrap(Array.prototype.slice.call(arguments));
+            var transferables = args.args.__transferables__
+            if(transferables) delete args.args.__transferables__
             me._connection.send({
                 type : 'callback',
                 id   : id,
                 num  : argNum,
-                args : me._wrap(Array.prototype.slice.call(arguments)),
+                args : args,
                 promise : me._wrap([resolve, reject])
-            });
+            }, transferables);
           });
         };
         return remoteCallback;
       }
       else{
         var remoteCallback = function() {
+            var args = me._wrap(Array.prototype.slice.call(arguments));
+            var transferables = args.args.__transferables__
+            if(transferables) delete args.args.__transferables__
             return me._connection.send({
                 type : 'callback',
                 id   : id,
                 num  : argNum,
-                args : me._wrap(Array.prototype.slice.call(arguments))
-            });
+                args : args
+            }, transferables);
         };
         return remoteCallback;
       }

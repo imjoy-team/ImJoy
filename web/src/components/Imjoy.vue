@@ -1198,6 +1198,7 @@ export default {
         _op: '__file_loader__',
         _source_op: null,
         _workflow_id: 'files_'+randId(),
+        _transfer: false,
         data: this.selected_files
       }
       this.addWindow(w)
@@ -1215,6 +1216,7 @@ export default {
       mw.target = mw.target || {}
       mw.target._op = 'workflow'
       mw.target._source_op = null
+      // mw.target._transfer = true
       mw.target._workflow_id = mw.target._workflow_id || "workflow_"+randId()
       joy.workflow.execute(mw.target).then((my) => {
         const w = this.joy2plugin(my)
@@ -1285,6 +1287,7 @@ export default {
       mw.target = mw.target || {}
       mw.target._op = '__op__'
       mw.target._source_op = null
+      // mw.target._transfer = true
       mw.target._workflow_id = mw.target._workflow_id || "op_"+op.name.trim().replace(/ /g, '_')+randId()
       op.joy.__op__.execute(mw.target).then((my) => {
         const w = this.joy2plugin(my)
@@ -1506,6 +1509,7 @@ export default {
         my.data._op = plugin_name
         my.data._source_op = source_plugin.name
         my.data._workflow_id = my.data._workflow_id || null
+        my.data._transfer = false
         return await target_plugin.api.run(this.filter4plugin(my))
       }
       else{
@@ -1534,6 +1538,7 @@ export default {
       res.target._workflow_id = my._workflow_id || null
       res.target._op = my._op || null
       res.target._source_op = my._source_op || null
+      res.target._transfer = my._transfer || false
 
       if(Object.keys(res.target).length>4){
         // console.log('returning', res)
@@ -1548,6 +1553,7 @@ export default {
         _variables: my._variables || null,
         _op: my._op,
         _source_op: my._source_op,
+        _transfer: my._transfer,
         _workflow_id: my._workflow_id,
         config: my.config,
         data: my.data,
@@ -1560,6 +1566,7 @@ export default {
         _variables: my.target && my.target._variables || null,
         _op: my.target && my.target._op,
         _source_op: my.target && my.target._source_op,
+        _transfer: my.target && my.target._transfer,
         _workflow_id: my.target && my.target._workflow_id,
         config: my.data,
         data: my.target,
@@ -1569,6 +1576,7 @@ export default {
         delete my.target._workflow_id
         delete my.target._variables
         delete my.target._source_op
+        delete my.target._transfer
       }
       return ret
     },
@@ -1639,7 +1647,7 @@ export default {
 
         if (config.inputs){
           try {
-            if(config.inputs.type != 'object' || !config.inputs.properties){
+            if((config.inputs.type != 'object' || !config.inputs.properties) && (config.inputs.type != 'array' || !config.inputs.items)){
               if(typeof config.inputs == 'object'){
                 config.inputs = {properties: config.inputs, type: 'object'}
               }
@@ -1657,6 +1665,7 @@ export default {
                 if (plugin.config && plugin.config.ui) {
                   config = await this.showDialog(plugin.config)
                 }
+                target.transfer = target.transfer || false
                 target._source_op = target._op
                 target._op = op_name
                 target._workflow_id = target._workflow_id || 'data_loader_'+op_name.trim().replace(/ /g, '_')+randId()

@@ -122,8 +122,8 @@ var execute = function(code) {
 // connection object for the JailedSite constructor
 var conn = {
     disconnect : function() {},
-    send: function(data) {
-        parent.postMessage({type: 'message', data: data}, '*');
+    send: function(data, transferables) {
+        parent.postMessage({type: 'message', data: data}, '*', transferables);
     },
     onMessage: function(h){ conn._messageHandler = h },
     _messageHandler: function(){},

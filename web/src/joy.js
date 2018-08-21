@@ -2660,25 +2660,25 @@ Joy.add({
 			// Do those ops, baby!!!
 			for(var i=0; i<my.data.ops.length; i++){
 
-			// Stop?
-			var opData = my.data.ops[i];
-			if(opData.STOP) return "STOP";
+				// Stop?
+				var opData = my.data.ops[i];
+				if(opData.STOP) return "STOP";
 
-			// Run
-			var op = my.op.entries[i].op; // TODO: THIS IS A HACK AND SHOULD NOT RELY ON THAT
-			var result = await op.execute(my.target, opData); // use ol' op, but GIVEN data.
-			if(result && result.target){
-				my.target = result.target;
-			}
-			else if(result && result.error){
-				console.error('ops stopped with error: ', result);
-				return result;
-			}
-			else if(result && result.stop){
-				console.log('ops interrupted at step ', i, result);
-				return result;
-			}
-			else if(result=="STOP") return result;
+				// Run
+				var op = my.op.entries[i].op; // TODO: THIS IS A HACK AND SHOULD NOT RELY ON THAT
+				var result = await op.execute(my.target, opData); // use ol' op, but GIVEN data.
+				if(result && result.target){
+					my.target = result.target;
+				}
+				else if(result && result.error){
+					console.error('ops stopped with error: ', result);
+					return result;
+				}
+				else if(result && result.stop){
+					console.log('ops interrupted at step ', i, result);
+					return result;
+				}
+				else if(result=="STOP") return result;
 		}
 		return my;
 	},

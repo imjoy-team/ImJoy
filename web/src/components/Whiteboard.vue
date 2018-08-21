@@ -97,13 +97,12 @@
               </md-list-item>
               <md-list-item v-else>
                 <span class="md-list-item-text">{{dataSummary(w)}}</span>
-                <md-tooltip>click to load.</md-tooltip>
               </md-list-item>
-              <md-list-item v-for="(v, k) in w.data" v-if="(!k.startsWith || !k.startsWith('_')) && w.data && (!w.data.length) || (w.data.length && w.data.length > 0 && k <= 20)" :key="k">
+              <md-list-item v-for="(v, k) in w.data" v-if=" !isTypedArray(w.data) && (!k.startsWith || !k.startsWith('_')) && w.data && (!w.data.length) || ((w.data.length||w.data.byteLength) && (w.data.length||w.data.byteLength) > 0 && k <= 20)" :key="k">
                 <md-icon>insert_drive_file</md-icon>
                 <span class="md-list-item-text" @click="printObject(k, v)">{{k}}</span>
               </md-list-item>
-              <md-list-item v-if="w.data && w.data.length && w.data.length > 20"  @click="printObject(w.data)">
+              <md-list-item v-if="w.data && (w.data.length||w.data.byteLength) && (w.data.length||w.data.byteLength) > 20"  @click="printObject(w.data)">
                 <md-icon>insert_drive_file</md-icon>
                 <span class="md-list-item-text">...</span>
                 <md-tooltip>click to print the data in your console.</md-tooltip>
@@ -182,6 +181,10 @@ export default {
       }
       this.$emit('close', this.windows[wi])
       this.windows.splice(wi, 1)
+    },
+    isTypedArray(obj)
+    {
+      return !!obj && obj.byteLength !== undefined;
     },
     fullScreen(w) {
       const fh = parseInt(this.$refs.whiteboard.clientHeight/this.row_height) -10
