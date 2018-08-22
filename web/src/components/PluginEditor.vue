@@ -1,11 +1,11 @@
 <template>
 <div class="plugin-editor">
     <md-toolbar class="md-dense editor-toolbar" md-elevation="1">
-      <md-button @click="reload()" class="md-icon-button">
+      <md-button @click="reload()"  v-if="window" class="md-icon-button">
         <md-icon>autorenew</md-icon>
         <md-tooltip>Update this plugin</md-tooltip>
       </md-button>
-      <md-button @click="save()" class="md-icon-button">
+      <md-button @click="save()"  v-if="window" class="md-icon-button">
         <md-icon>save</md-icon>
         <md-tooltip>Save this plugin</md-tooltip>
       </md-button>
@@ -13,7 +13,7 @@
         <md-icon>cloud_download</md-icon>
         <md-tooltip>Export this plugin</md-tooltip>
       </md-button>
-      <md-button @click="remove()" v-if="window.plugin&&window.plugin.config&&window.plugin.config._id" class="md-icon-button">
+      <md-button @click="remove()" v-if="window && window.plugin&&window.plugin.config&&window.plugin.config._id" class="md-icon-button">
         <md-icon>delete</md-icon>
         <md-tooltip>Remove this plugin</md-tooltip>
       </md-button>
@@ -130,7 +130,7 @@ export default {
       })
     },
     saveAs(){
-      const filename = this.window.plugin&&this.window.plugin.name?this.window.plugin.name+"_"+randId()+'.imjoy.html':'plugin_'+randId()+'.imjoy.html'
+      const filename = this.window&&this.window.plugin&&this.window.plugin.name?this.window.plugin.name+"_"+randId()+'.imjoy.html':'plugin_'+randId()+'.imjoy.html'
       const file = new Blob([this.editor.getValue()], {type: "text/plain;charset=utf-8"})
       saveAs(file, filename);
     }

@@ -62,8 +62,8 @@
             <md-menu-item v-if="plugin.installed" @click="_plugin2_remove=plugin;showRemoveConfirmation=true;">
               <md-icon>delete_forever</md-icon>Delete
             </md-menu-item>
-            <md-menu-item v-if="plugin.installed" @click="edit(plugin)">
-              <md-icon>edit</md-icon>Edit
+            <md-menu-item @click="edit(plugin)">
+              <md-icon>code</md-icon>Code
             </md-menu-item>
           </md-menu-content>
         </md-menu>
@@ -99,8 +99,9 @@
           <md-icon>update</md-icon>Update</md-button>
         <md-button v-if="plugin.installed" @click="_plugin2_remove=plugin;showRemoveConfirmation=true;" class="md-accent">
           <md-icon>delete_forever</md-icon>Delete</md-button>
-        <md-button v-if="plugin.installed" @click="edit(plugin)" class="md-button md-primary">
-          <md-icon>edit</md-icon>Edit</md-button>
+        <md-button @click="edit(plugin)" class="md-button md-primary">
+          <md-icon>code</md-icon>Code
+        </md-button>
       </md-card-content>
     </md-card>
     <grid v-if="containerWidth>500" :center="center" :draggable="false" :sortable="true" :items="available_plugins" :cell-width="380" :cell-height="280" :grid-width="containerWidth" class="grid-container">
@@ -116,7 +117,7 @@
          <md-button v-if="!props.item.installed" @click="install(props.item)" class="md-button md-primary"><md-icon>cloud_download</md-icon>Install</md-button>
          <md-button v-if="props.item.installed" @click="install(props.item)" class="md-button md-primary"><md-icon>update</md-icon>Update</md-button>
          <md-button v-if="props.item.installed" @click="_plugin2_remove=props.item;showRemoveConfirmation=true;" class="md-accent"><md-icon>delete_forever</md-icon>Delete</md-button>
-         <md-button v-if="props.item.installed" @click="edit(props.item)" class="md-button md-primary"><md-icon>edit</md-icon>Edit</md-button>
+         <md-button  @click="edit(props.item)" class="md-button md-primary"><md-icon>code</md-icon>Code</md-button>
        </md-card-content>
      </md-card>
    </template>
@@ -131,8 +132,8 @@
       <plugin-editor class="code-editor" v-model="editorCode" title="Plugin Editor" :options="editorOptions"></plugin-editor>
     </md-dialog-content>
     <md-dialog-actions>
-      <md-button class="md-primary" @click="saveCode(); showEditor=false">Save</md-button>
-      <md-button class="md-primary" @click="showEditor=false">Cancel</md-button>
+      <!-- <md-button class="md-primary" @click="saveCode(); showEditor=false">Save</md-button> -->
+      <md-button class="md-primary" @click="showEditor=false">OK</md-button>
     </md-dialog-actions>
   </md-dialog>
 </div>
@@ -265,19 +266,37 @@ export default {
       }
     },
     edit(plugin) {
-      this.db.get(plugin._id).then((doc) => {
-        this.editorCode = doc.code
-        this.editorOptions = {
-          mode: "ace/mode/html",
-          selectionStyle: "text"
-        }
-        this.editorPlugin = plugin
-        this.showEditor = true
-        this.$forceUpdate()
-      }).catch((err) => {
-        console.log('error occured when editing ', plugin.name, err)
-      });
-
+      if(plugin.installed){
+        this.db.get(plugin._id).then((doc) => {
+          this.editorCode = doc.code
+          this.editorOptions = {
+            mode: "ace/mode/html",
+            selectionStyle: "text"
+          }
+          this.editorPlugin = plugin
+          this.showEditor = true
+          this.$forceUpdate()
+        }).catch((err) => {
+          console.log('error occured when editing ', plugin.name, err)
+        });
+      }
+      else{
+        const uri = plugin.uri
+        axios.get(uri).then(response => {
+          if (!response || !response.data || response.data == '') {
+            alert('failed to get plugin code from ' + uri)
+            return
+          }
+          this.editorCode = response.data
+          this.editorOptions = {
+            mode: "ace/mode/html",
+            selectionStyle: "text"
+          }
+          this.editorPlugin = plugin
+          this.showEditor = true
+          this.$forceUpdate()
+        })
+      }
     },
     saveCode() {
       this.editorPlugin.code = this.editorCode
