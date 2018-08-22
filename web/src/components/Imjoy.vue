@@ -16,7 +16,7 @@ Engine<template>
         </md-button>
         <md-menu>
           <md-button class="md-button" md-menu-trigger>
-            <span class="subheader-title md-small-hide" style="flex: 1">Image Processing with </span><span class="subheader-emoji">😂</span>
+            <span class="subheader-title md-small-hide" style="flex: 1">Image Processing with </span><span class="subheader-emoji">😁</span>
             <md-tooltip>Switch workspace</md-tooltip>
           </md-button>
           <md-menu-content>

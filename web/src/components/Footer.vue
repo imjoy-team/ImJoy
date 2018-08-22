@@ -1,7 +1,6 @@
 <template>
   <div class="footer" v-if="$route.path != '/app' && $route.path != '/app'">
     <div class="md-layout md-alignment-center-center">
-      <md-button class="md-accent footer-button" target="_blank" @click="contact()">Ask a question</md-button>
       <md-button class="md-accent footer-button" target="_blank" href="https://github.com/oeway/ImJoy/issues">Create an issue on Github</md-button>
     </div>
 
@@ -19,35 +18,6 @@
       <img id="ip-img" src="static/img/Institut_Pasteur_logo.svg" alt="Institut Pasteur">
       </a>
     </div>
-
-
-    <md-dialog :md-active.sync="showDialog">
-      <md-dialog-content>
-        <about v-if="mode=='about'" :footer="false" :faq="false"/>
-        <tos v-if="mode=='tos'"/>
-      </md-dialog-content>
-    <md-dialog-actions>
-      <md-button class="md-primary" @click="showDialog=false">OK</md-button>
-    </md-dialog-actions>
-    </md-dialog>
-    <md-dialog :md-active.sync="showQuestion" id="question-dialog">
-      <md-toolbar class="md-primary">
-        <div class="md-toolbar-row" flex>
-          <md-subheader>
-            Contact us
-          </md-subheader>
-          <div class="md-toolbar-section-end" >
-            <md-button class="md-icon-button" @click="showQuestion=false"> <md-icon>close</md-icon></md-button>
-          </div>
-        </div>
-      </md-toolbar>
-      <md-dialog-content>
-        <div class="holds-the-iframe"><iframe id="typeform-full" width="100%" height="100%" frameborder="0" src="https://oeway.typeform.com/to/qyJOIy"></iframe></div>
-      </md-dialog-content>
-      <md-dialog-actions>
-        <md-button class="md-primary" @click="showQuestion=false">Close</md-button>
-      </md-dialog-actions>
-    </md-dialog>
   </div>
 </template>
 
@@ -67,12 +37,8 @@ export default {
     this.api = this.$root.$data.store.api
   },
   mounted(){
-    this.api.contact = this.contact
   },
   methods: {
-    contact(){
-      this.showQuestion = true
-    }
   }
 }
 </script>
