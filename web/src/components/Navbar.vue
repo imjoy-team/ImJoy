@@ -17,7 +17,8 @@
                 <md-menu-item class="md-primary md-button menu-button" v-show="$route.path != '/'" to="/">Home</md-menu-item>
                 <md-menu-item class="md-primary md-button menu-button" v-show="$route.path != '/app'" to="/app">Start ImJoy</md-menu-item>
                 <md-menu-item class="md-primary md-button menu-button" href="https://github.com/oeway/ImJoy">Source</md-menu-item>
-                <md-menu-item class="md-primary md-button menu-button" href="/static/docs/">Docs</md-menu-item>
+                <md-menu-item class="md-primary md-button menu-button" href="https://github.com/oeway/ImJoy/blob/master/README.md">Docs</md-menu-item>
+                <!-- <md-menu-item class="md-primary md-button menu-button" href="/static/docs/">Docs</md-menu-item> -->
                 <!-- <md-menu-item class="md-primary md-button menu-button" @click="shareOnTwitter">Share</md-menu-item> -->
                 <md-menu-item class="md-primary md-button menu-button" v-show="$route.path != '/about'" to="/about">About</md-menu-item>
               </md-menu-content>
@@ -38,10 +39,15 @@
               <md-tooltip>Source code on Github</md-tooltip>
             </md-button>
             &nbsp;
-            <md-button href="/static/docs/" class="md-accent" v-if="screenWidth>=600">
+            <md-button href="https://github.com/oeway/ImJoy/blob/master/README.md" class="md-accent" v-if="screenWidth>=600">
               <md-icon>library_books</md-icon>docs
               <md-tooltip>Documentation</md-tooltip>
             </md-button>
+            <!-- &nbsp; -->
+            <!-- <md-button href="/static/docs/" class="md-accent" v-if="screenWidth>=600">
+              <md-icon>library_books</md-icon>docs
+              <md-tooltip>Documentation</md-tooltip>
+            </md-button> -->
             <!-- &nbsp;
             <md-button @click="shareOnTwitter" class="md-accent" v-if="screenWidth>=600">
               <md-icon md-src="static/img/twitter.svg" class="md-size-1x svg-icon"></md-icon>share

@@ -9,8 +9,8 @@
   <div class="md-toolbar-row md-layout md-alignment-center-center">
     <div class="banner-container">
       <img src="static/img/perspective-hr.jpg" alt="banner"></img>
-      <div class="subtitle">Image processing with joy.<br>
-        <md-button class="md-raised md-accent" @click="showDialog=true">Getting Started</md-button>
+      <div class="subtitle">Image processing with joy!<br>
+        <md-button class="md-raised " to="app">Start ImJoy 😁</md-button>
       </div>
     </div>
   </div>
