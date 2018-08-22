@@ -22,7 +22,7 @@
 # Using Imjoy for image processing
 
 ## Basic Usage: the ImJoy web app
- * Go to the [ImJoy web app](https://imjoy.io/#/app), click the **+ADD NEW PLUGINS** button to install new plugins from the [Plugin Repository](https://github.com/oeway/ImJoy-Plugins).
+ * Go to the [ImJoy web app](https://imjoy.io/#/app), click the **+ADD NEW PLUGINS** button in `Plugins` to install new plugins from the [Plugin Repository](https://github.com/oeway/ImJoy-Plugins).
  * You can then open files or folders with the **+** button, or drag and drop them to the web app.
  * When files are loaded into the workspace, you can click the file to open it if the file is recognized by ImJoy or any plugin. For example, if you installed the plugin "Tif file importer", you will be able to click the .tif file in the file window.
  * Similar to [ImageJ](https://imagej.nih.gov/ij), when clicking on the plugin menu, ImJoy will try to pass the current active window to the plugin, it is them let the plugin decide how to process the data contained in the window.
@@ -49,7 +49,7 @@ Under the hood, the Python Plugin Engine will be connected with the ImJoy web ap
 
 <img src="https://github.com/oeway/ImJoy/raw/master/docs/img/imjoy-code-screenshot.png" width="600px"></img>
 
-Click the **+** button and select the plugin dropdown option, then create a plugin.
+Click the **+ADD NEW PLUGINS** button in `Plugins`, then select `Create a New Plugin` with one of the plugin template. A code editor will show up in the workspace, you can write the code, save it, or install the plugin to the plugin menu. You can then test by click your new plugin in the plugin menu.
 
 The ImJoy plugin file format is built up on html format with customized tags (inspired by the `.vue` format), it consists of two mandatory tags `<config>` and `<script>`, and other optional tags including `<docs>`, `<window>` and `<style>`.
 
