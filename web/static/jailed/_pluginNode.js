@@ -135,8 +135,8 @@ var execute = function(code) {
         process.send({type: 'executeSuccess'});
     }
 
-    var fCb = function() {
-        process.send({type: 'executeFailure'});
+    var fCb = function(e) {
+        process.send({type: 'executeFailure', error: e.toString()});
     }
 
     executeJailed(code, 'DYNAMIC PLUGIN', sCb, fCb);
@@ -194,7 +194,7 @@ var executeJailed = function(code, url, sCb, fCb) {
         sCb();
     } catch (e) {
         printError(e.stack);
-        fCb();
+        fCb(e);
     }
 }
 

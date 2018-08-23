@@ -100,7 +100,7 @@ var execute = function(code) {
           eval(code.content);
       } catch (e) {
           console.error(e.message, e.stack)
-          parent.postMessage({type : 'executeFailure'}, '*');
+          parent.postMessage({type : 'executeFailure', error: e.toString()}, '*');
           throw e;
       }
     }

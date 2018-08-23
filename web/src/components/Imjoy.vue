@@ -873,16 +873,22 @@ export default {
     reloadPlugin(pconfig) {
       return new Promise((resolve, reject) => {
         this.unloadPlugin(pconfig.name)
-        // console.log('reloading plugin ', pconfig)
-        const template = this.parsePluginCode(pconfig.code, pconfig)
-        this.unloadPlugin(template.name)
-        let p
-        if (template.mode == 'iframe' && template.tags.includes('window')) {
-          p = this.preLoadPlugin(template)
-        } else {
-          p = this.loadPlugin(template)
-        }
+        try {
+          // console.log('reloading plugin ', pconfig)
+          const template = this.parsePluginCode(pconfig.code, pconfig)
+          this.unloadPlugin(template.name)
 
+          if (template.mode == 'iframe' && template.tags.includes('window')) {
+            this.preLoadPlugin(template)
+          } else {
+            this.loadPlugin(template)
+          }
+        } catch (e) {
+          this.status_text = 'Error: ' + e
+          this.show('Error: ' + e)
+          reject(e)
+          return
+        }
         p.then((plugin) => {
           // console.log('new plugin loaded', plugin)
           pconfig.name = plugin.name
@@ -905,30 +911,36 @@ export default {
       return new Promise((resolve, reject) => {
         //console.log('saving plugin ', pconfig)
         const code = pconfig.code
-        const template = this.parsePluginCode(code, {})
-        template.code = code
-        template._id = template.name.replace(/ /g, '_')
-        const addPlugin = () => {
-          this.db.put(template, {
-            force: true
+        try {
+          const template = this.parsePluginCode(code, {})
+          template.code = code
+          template._id = template.name.replace(/ /g, '_')
+          const addPlugin = () => {
+            this.db.put(template, {
+              force: true
+            }).then((result) => {
+              resolve(template._id)
+              // console.log('Successfully saved!');
+              this.show(`${template.name } has been sucessfully saved.`)
+            }).catch((err) => {
+              this.show('failed to save the plugin.')
+              console.error(err)
+              reject('failed to save')
+            })
+          }
+          // remove if exists
+          this.db.get(template._id).then((doc) => {
+            return this.db.remove(doc);
           }).then((result) => {
-            resolve(template._id)
-            // console.log('Successfully saved!');
-            this.show(`${template.name } has been sucessfully saved.`)
+            addPlugin()
           }).catch((err) => {
-            this.show('failed to save the plugin.')
-            console.error(err)
-            reject('failed to save')
-          })
+            addPlugin()
+          });
+        } catch (e) {
+          this.status_text = 'Error: ' + e
+          this.show('Error: ' + e)
+          reject(e)
         }
-        // remove if exists
-        this.db.get(template._id).then((doc) => {
-          return this.db.remove(doc);
-        }).then((result) => {
-          addPlugin()
-        }).catch((err) => {
-          addPlugin()
-        });
       })
     },
     reloadPythonPlugins(){
@@ -1230,6 +1242,7 @@ export default {
       }).catch((e) => {
         console.error(e)
         this.status_text = e.toString() || "Error."
+        this.show('Error: ' + e)
       })
     },
     saveWorkflow(joy) {
@@ -1301,6 +1314,7 @@ export default {
       }).catch((e) => {
         console.error(e)
         this.status_text = '<' +op.name + '>' + (e.toString() || "Error.")
+        this.show('Error: ' + e)
       })
     },
     selectFileChanged(event) {
@@ -1480,7 +1494,11 @@ export default {
         plugin.whenFailed((e) => {
           if(e){
             this.status_text = template.name + '-> Error: ' + e
-            this.show('error occured when loading ' + template.name + ": " + e)
+            this.show('Error occured when loading ' + template.name + ": " + e)
+          }
+          else{
+            this.status_text = 'Error occured when loading ' +template.name
+            this.show('Error occured when loading ' + template.name )
           }
           console.error('error occured when loading ' + template.name + ": ", e)
           plugin.terminate()
@@ -1765,19 +1783,22 @@ export default {
               this.$forceUpdate()
             }).catch((e) => {
               this.status_text = plugin.name + '->' + e
-              console.error('error in the run function of plugin ' + plugin.name, e)
+              console.error('Error in the run function of plugin ' + plugin.name, e)
+              this.show('Error: '+ e)
               reject(e)
             })
           }).catch((e) => {
-            console.error('error occured when loading the window plugin ' + pconfig.name + ": ", e)
-            this.status_text = 'error occured when loading the window plugin ' + pconfig.name + ": " + e
+            console.error('Error occured when loading the window plugin ' + pconfig.name + ": ", e)
+            this.status_text = 'Error occured when loading the window plugin ' + pconfig.name + ": " + e
             plugin.terminate()
+            this.show('Error occured when loading the window plugin ' + pconfig.name + ": " + e)
             reject(e)
           })
         });
         plugin.whenFailed((e) => {
           console.error('error occured when loading ' + pconfig.name + ":", e)
           this.status_text = 'error occured when loading ' + pconfig.name + ": " + e
+          this.show('error occured when loading ' + pconfig.name + ": " + e)
           plugin.terminate()
           reject(e)
         });
