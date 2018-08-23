@@ -76,7 +76,7 @@ self.connection = {};
             eval(code.content);
         } catch (e) {
             console.error(e.message, e.stack)
-            self.postMessage({type: 'executeFailure'});
+            self.postMessage({type: 'executeFailure', error: e.toString()});
             throw e;
         }
         self.postMessage({type: 'executeSuccess'});
