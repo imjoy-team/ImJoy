@@ -35,15 +35,15 @@ To use it, go to the [ImJoy web app](https://imjoy.io/#/app), and click the 🚀
 
 More detailed instructions can be found here: [ImJoy-Python](https://github.com/oeway/ImJoy-Python).
 
-## Advanced Usage: Going offline
-If you have already installed the **Python Plugin Engine**, then you can run ImJoy in offline mode. What you do is to run the engine with `python -m imjoy --offline` . And it will download all the files for offline access, after that, if you run `python -m imjoy` in the **same directory**, you will have your personal ImJoy web app which can be access by [http://localhost:8080](http://localhost:8080).
-
-Also notice that, even though ImJoy can run without internet, depends on the implementation of the plugin, some plugins maybe unusable when you go offline.
-
 ### How does it work?
 ImJoy supports Python Plugins which can run much more computationally intensive tasks. In order to run that, it needs to connect to the Python Plugin Engine -- a small python library we developed for ImJoy (source code: https://github.com/oeway/ImJoy-Python).
 
 Under the hood, the Python Plugin Engine will be connected with the ImJoy web app through websockets, the interaction is done with remote procedure calls (RPC). When a window in the ImJoy workspace is selected, the contained data (e.g. an image) will be transferred to the Python plugin so it can process the data with the `run` function, results will be send back to the ImJoy workspace and displayed as a new window. Natively, ImJoy supports the conversion and transmission of Numpy arrays and Tensorflow tensors, so plugin developers could just use those data types and exchange them between plugins, no matter they are in Python or Javascript.
+
+## Advanced Usage: Going offline
+If you have already installed the **Python Plugin Engine**, then you can run ImJoy in offline mode. What you do is to run the engine with `python -m imjoy --offline` . And it will download all the files for offline access, after that, if you run `python -m imjoy` in the **same directory**, you will have your personal ImJoy web app which can be access by [http://localhost:8080](http://localhost:8080).
+
+Also notice that, even though ImJoy can run without internet, depends on the implementation of the plugin, some plugins maybe unusable when you go offline.
 
 # Developing Plugins for ImJoy
 
