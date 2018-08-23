@@ -262,7 +262,8 @@ create a new window and add to the workspace, example:
 const windowId = await api.createWindow({name: 'new window', type: 'Image Window', w:7, h:7, data: {image: ...}, config: {}})
 
 # Python
-windowId = await api.createWindow({name: 'new window', type: 'Image Window', w:7, h:7, data: {image: ...}, config: {}})
+windowId = api.createWindow({name: 'new window', type: 'Image Window', w:7, h:7, data: {image: ...}, config: {}})
+
 ```
 
 If you do not want the window to load immediately, you can add `click2load: true` and the window will ask for an extra click to load the content.
@@ -272,7 +273,14 @@ Once an window is created, it will return a window ID, which can be used for upd
 ### `api.updateWindow(...)`
 update an existing window, an window ID should be passed in order to perform the update, example:
 
-`await api.updateWindow(windowId, {data: {image: ...}})`
+```javascript
+
+# Javascript
+await api.updateWindow(windowId, {data: {image: ...}})
+
+# Python
+api.updateWindow(windowId, {data: {image: ...}})
+```
 
 The second parameter is an object contains fields which the plugin wants to update.
 
