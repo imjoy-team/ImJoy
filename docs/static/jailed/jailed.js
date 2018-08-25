@@ -76,7 +76,7 @@ function randId() {
     Whenable.prototype.emit = function(e){
         if (!this._emitted) {
             this._emitted = true;
-
+            this._e = e;
             var handler;
             while(handler = this._handlers.pop()) {
                 setTimeout(handler.bind(null, e),0);
@@ -96,7 +96,7 @@ function randId() {
     Whenable.prototype.whenEmitted = function(handler){
         handler = this._checkHandler(handler);
         if (this._emitted) {
-            setTimeout(handler, 0);
+            setTimeout(handler.bind(null, this._e),0);
         } else {
             this._handlers.push(handler);
         }
