@@ -177,7 +177,10 @@ Engine<template>
           <md-card-header>
             <div class="md-layout md-gutter md-alignment-center-space-between">
               <div class="md-layout-item md-size-70">
-                <span class="md-subheading">Plugins</span>
+                <!-- <span class="md-subheading">Plugins</span> -->
+                <md-button class="md-raised" :class="installed_plugins.length>0?'':'md-primary'" @click="showAddPluginDialog=true">
+                  <md-icon>add</md-icon>Plugins
+                </md-button>
               </div>
               <div class="md-layout-item">
                 <md-button @click="reloadPlugins()" class="md-icon-button">
@@ -239,12 +242,12 @@ Engine<template>
               </div>
             </div>
             <md-divider></md-divider>
-          <div class="md-layout md-gutter md-alignment-center-center">
-            <md-button :class="installed_plugins&&installed_plugins.length>0?'':'md-raised md-primary'" @click="showAddPluginDialog=true">
+          <!-- <div class="md-layout md-gutter md-alignment-center-center">
+            <md-button class="md-raised md-primary" v-if="!installed_plugins || installed_plugins.length<=0" @click="showAddPluginDialog=true">
               <md-icon>add</md-icon>Add New Plugins
               <md-tooltip>Install or create a new plugin</md-tooltip>
             </md-button>
-          </div>
+          </div> -->
           </md-card-content>
         </md-card>
       </div>
@@ -301,7 +304,7 @@ Engine<template>
         md-content='Python plugins are supported by ImJoy with the Python Plugin Engine. <br><br>
         If it was already installed, run <strong>python -m imjoy</strong> in a terminal.<br><br>
         If not, you need to do the following:<br>
-        &nbsp;&nbsp;* Install <a href="https://www.anaconda.com/download/" target="_blank">Anaconda</a> or <a href="https://conda.io/miniconda.html" target="_blank">Miniconda</a> (Python3.6 version is preferred) <br>
+        &nbsp;&nbsp;* Install <a href="https://conda.io/miniconda.html" target="_blank">Miniconda</a> or <a href="https://www.anaconda.com/download/" target="_blank">Anaconda</a> (Python3.6 version is recommanded) <br>
         &nbsp;&nbsp;* Open a `Terminal`(mac/linux) or `Anaconda Prompt`(windows), then run the following command:<br>
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>conda -V && pip install -U git+https://github.com/oeway/ImJoy-Python#egg=imjoy</strong><br>
         &nbsp;&nbsp;* Run <strong>python -m imjoy</strong> in the terminal to start the engine.<br><br>
@@ -1045,7 +1048,7 @@ export default {
               }
             } catch (e) {
               console.error(e)
-              this.showStatus(`Error occured when loading plugin "${config.name}": ${e.toString()}` )
+              this.showStatus(`<${config.name}>: ${e.toString()}` )
             }
           }
         }
@@ -1466,6 +1469,7 @@ export default {
         plugin.whenConnected(() => {
           if (!plugin.api) {
             console.error('error occured when loading plugin.')
+            this.show('error occured when loading plugin.')
             throw 'error occured when loading plugin.'
           }
 
@@ -1483,6 +1487,7 @@ export default {
               resolve(plugin)
             }).catch((e) => {
               console.error('error occured when loading plugin ' + template.name + ": ", e)
+              this.show('error occured when loading plugin ' + template.name + ": " + e)
               reject(e)
               plugin.terminate()
             })
