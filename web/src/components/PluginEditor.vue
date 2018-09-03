@@ -91,51 +91,6 @@ export default {
       }
     })
 
-    var editorDiv = document.getElementById('editor_'+this.pluginId);
-    var editorDiv2 = document.getElementById('editor');
-    var heightUpdateFunction = ()=> {
-
-        // http://stackoverflow.com/questions/11584061/
-        var newHeight =
-                  this.editor.getSession().getScreenLength()
-                  * this.editor.renderer.lineHeight
-                  + this.editor.renderer.scrollBar.getHeight();
-
-        editorDiv.style.height = newHeight.toString() + "px";
-        editorDiv2.style.height = newHeight.toString() + "px";
-
-        // This call is required for the editor to fix all of
-        // its inner structure for adapting to a change in size
-        this.editor.resize();
-    };
-
-    // Set initial size to match initial content
-    heightUpdateFunction();
-
-    // Whenever a change happens inside the ACE editor, update
-    // the size again
-    this.editor.getSession().on('change', heightUpdateFunction);
-
-    // var editorDiv = document.getElementById(this.editorId);     // its container
-    // var doc = this.editor.getSession().getDocument();  // a reference to the doc
-    // this.editor.on("change", ()=>{
-    //     var lineHeight = this.editor.renderer.lineHeight;
-    //     editorDiv.style.height = lineHeight * doc.getLength() + "px";
-    //     this.editor.resize();
-    // });
-    if(this.window){
-      this.window.resize = ()=>{
-        heightUpdateFunction()
-        // console.log('------------', this.editor.session.getLength())
-        // this.editor.setOptions({
-        //      maxLines: this.editor.session.getLength()
-        // });
-      }
-      // console.log('-------2-----', this.editor.session.getLength())
-      // this.editor.setOptions({
-      //      maxLines: this.editor.session.getLength()
-      // });
-    }
   },
   watch: {
 
@@ -198,8 +153,7 @@ export default {
   flex-direction: column;
   overflow: auto;
 }
-/* .ace_editor {
-  height: 100%!important;
-  overflow: auto;
-} */
+.editor::-webkit-scrollbar {
+ display: none;
+}
 </style>
