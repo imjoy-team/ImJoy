@@ -18,9 +18,9 @@
         <md-tooltip>Remove this plugin</md-tooltip>
       </md-button>
     </md-toolbar>
-    <md-content class="editor">
+    <div class="editor">
       <div :id="'editor_'+pluginId"></div>
-    </md-content>
+    </div>
 </div>
 </template>
 
