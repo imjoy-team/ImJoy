@@ -19,8 +19,8 @@
       </md-button>
     </md-toolbar>
     <md-content class="editor">
-    <div :id="'editor_'+pluginId"></div>
-  </md-content>
+      <div :id="'editor_'+pluginId"></div>
+    </md-content>
 </div>
 </template>
 
@@ -61,16 +61,17 @@ export default {
     ace.config.set('basePath', '/static/ace')
     this.editor.setOptions({
         wrap: false,
-        maxLines: Infinity,
+        maxLines: 70,
         autoScrollEditorIntoView : true,
         // enableBasicAutocompletion: true,
         // enableLiveAutocompletion: true
     });
+    // this.editor.setAutoScrollEditorIntoView(true);
     this.editor.setTheme("ace/theme/chrome");
     this.editor.session.setMode("ace/mode/html");
-    this.editor.session.on('change', (delta)=>{
-        this.$emit('input', this.editor.getValue())
-    });
+    // this.editor.session.on('change', (delta)=>{
+    //     this.$emit('input', this.editor.getValue())
+    // });
     this.editor.setValue(this.value)
 
     this.editor.commands.addCommand({
@@ -78,6 +79,7 @@ export default {
       bindKey: {"win": "Ctrl-S", "mac": "Cmd-S"},
       exec: (editor) => {
           this.save()
+          // this.editor.resize();
       }
     })
 
@@ -88,6 +90,32 @@ export default {
           this.reload()
       }
     })
+
+    var editorDiv = document.getElementById('editor_'+this.pluginId);
+    var editorDiv2 = document.getElementById('editor');
+    var heightUpdateFunction = ()=> {
+
+        // http://stackoverflow.com/questions/11584061/
+        var newHeight =
+                  this.editor.getSession().getScreenLength()
+                  * this.editor.renderer.lineHeight
+                  + this.editor.renderer.scrollBar.getHeight();
+
+        editorDiv.style.height = newHeight.toString() + "px";
+        editorDiv2.style.height = newHeight.toString() + "px";
+
+        // This call is required for the editor to fix all of
+        // its inner structure for adapting to a change in size
+        this.editor.resize();
+    };
+
+    // Set initial size to match initial content
+    heightUpdateFunction();
+
+    // Whenever a change happens inside the ACE editor, update
+    // the size again
+    this.editor.getSession().on('change', heightUpdateFunction);
+
     // var editorDiv = document.getElementById(this.editorId);     // its container
     // var doc = this.editor.getSession().getDocument();  // a reference to the doc
     // this.editor.on("change", ()=>{
@@ -95,6 +123,19 @@ export default {
     //     editorDiv.style.height = lineHeight * doc.getLength() + "px";
     //     this.editor.resize();
     // });
+    if(this.window){
+      this.window.resize = ()=>{
+        heightUpdateFunction()
+        // console.log('------------', this.editor.session.getLength())
+        // this.editor.setOptions({
+        //      maxLines: this.editor.session.getLength()
+        // });
+      }
+      // console.log('-------2-----', this.editor.session.getLength())
+      // this.editor.setOptions({
+      //      maxLines: this.editor.session.getLength()
+      // });
+    }
   },
   watch: {
 
@@ -144,6 +185,7 @@ export default {
 
 .editor{
   overflow: auto;
+  /* height: 100%; */
 }
 .editor-toolbar{
   min-height: 40px!important;
@@ -156,4 +198,8 @@ export default {
   flex-direction: column;
   overflow: auto;
 }
+/* .ace_editor {
+  height: 100%!important;
+  overflow: auto;
+} */
 </style>
