@@ -92,9 +92,6 @@ export default {
     })
 
   },
-  watch: {
-
-  },
   methods: {
     save(){
       const save_plugin = ()=>{this.window.save({pluginId: this.pluginId, code: this.editor.getValue()}).then((p_id)=>{
