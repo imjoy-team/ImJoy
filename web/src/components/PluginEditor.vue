@@ -19,7 +19,7 @@
       </md-button>
     </md-toolbar>
     <div class="editor">
-      <div :id="'editor_'+pluginId"></div>
+      <div :id="'editor_'+pluginId" style='width="auto";height="auto"'></div>
     </div>
 </div>
 </template>
@@ -62,7 +62,7 @@ export default {
     this.editor.setOptions({
         wrap: false,
         maxLines: 70,
-        autoScrollEditorIntoView : true,
+        // autoScrollEditorIntoView : true,
         // enableBasicAutocompletion: true,
         // enableLiveAutocompletion: true
     });
