@@ -607,7 +607,7 @@ export default {
       showPluginProgress: this.showPluginProgress,
       showPluginStatus: this.showPluginStatus,
       showSnackbar: this.show,
-      $forceUpdate: this.$forceUpdate,
+      utils: {$forceUpdate: this.$forceUpdate}
     }
     this.resetPlugins()
     this.pluing_context = {}
