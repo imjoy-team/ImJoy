@@ -310,7 +310,11 @@ update the status text of the current plugin (in the plugin menu), example: `api
 ### `api.run(...)`
 run another plugin by the plugin name, example: `api.run("Python Demo Plugin")` or `api.run("Python Demo Plugin", my)`
 
-### `api.utils` (for Python plugins only)
+### `api.utils`
+For Javascript plugins, currently supported functions are:
+`api.utils.$forceUpdate` for force refreshing the GUI.
+
+For Python Plugins, currently supported functions are:
 `api.utils.kill` for kill a `subprocess` in python.
 
 ## Developing Window Plugin
