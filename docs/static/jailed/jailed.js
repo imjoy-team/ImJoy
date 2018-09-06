@@ -994,10 +994,20 @@ function randId() {
 
     DynamicPlugin.prototype.terminate =
            Plugin.prototype.terminate = function() {
-        this._disconnected = true
-        this.running = false
-        // this._initialInterface.$forceUpdate&&this._initialInterface.$forceUpdate();
-        this._site&&this._site.disconnect();
+        try {
+          this.api.exit().finally(()=>{
+            this._disconnected = true
+            this.running = false
+            // this._initialInterface.$forceUpdate&&this._initialInterface.$forceUpdate();
+            this._site&&this._site.disconnect();
+          })
+        } catch (e) {
+          // console.error('error occured when terminating the plugin',e)
+          this._disconnected = true
+          this.running = false
+          // this._initialInterface.$forceUpdate&&this._initialInterface.$forceUpdate();
+          this._site&&this._site.disconnect();
+        }
     }
 
     exports.Plugin = Plugin;
