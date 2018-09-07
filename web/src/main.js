@@ -16,6 +16,7 @@ import Joy from '@/components/Joy'
 import FAQ from '@/components/FAQ'
 import PluginList from '@/components/PluginList'
 import PluginEditor from '@/components/PluginEditor'
+import FileItem from '@/components/FileItem'
 import store from './store.js'
 import App from './App'
 import VueGridLayout from 'vue-grid-layout'
@@ -38,6 +39,7 @@ Vue.component('whiteboard', Whiteboard)
 Vue.component('joy', Joy)
 Vue.component('plugin-list', PluginList)
 Vue.component('plugin-editor', PluginEditor)
+Vue.component('file-item', FileItem)
 Vue.component('grid-layout', VueGridLayout.GridLayout)
 Vue.component('grid-item', VueGridLayout.GridItem)
 

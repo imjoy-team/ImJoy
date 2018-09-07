@@ -1,4 +1,4 @@
-Engine<template>
+<template>
 <div class="imjoy noselect">
   <div style="visibility:hidden; opacity:0" id="dropzone">
     <div id="textnode">Drop files to add data.</div>
@@ -129,13 +129,23 @@ Engine<template>
         </div>
       </div>
       <br>
+      <md-card v-if="file_tree">
+        <md-card-content>
+          <md-button @click="file_selector_expand=!file_selector_expand" :class="file_selector_expand?'': 'md-primary'"><span class="md-subheading">Files</span></md-button>
+          <ul v-show="file_selector_expand">
+            <file-item :model="file_tree" :selected="file_tree_selection" @select="fileTreeSelected">
+            </file-item>
+          </ul>
+        </md-card-content>
+      </md-card>
+
       <md-card>
         <md-card-header>
           <div class="md-layout md-gutter md-alignment-center-space-between">
             <div class="md-layout-item md-size-70">
-              <span class="md-subheading">Workflow</span>
+              <md-button @click="workflow_expand=!workflow_expand" :class="workflow_expand?'': 'md-primary'"><span class="md-subheading">Workflow</span></md-button>
             </div>
-            <div class="md-layout-item">
+            <div v-show="workflow_expand" class="md-layout-item">
               <md-button @click="clearWorkflow()" class="md-icon-button">
                 <md-icon>clear</md-icon>
                 <md-tooltip>Clear workflow</md-tooltip>
@@ -143,7 +153,7 @@ Engine<template>
             </div>
           </div>
         </md-card-header>
-        <md-card-content>
+        <md-card-content v-show="workflow_expand">
           <joy :config="workflow_joy_config" ref="workflow" v-if="plugin_loaded && !updating_workflow"></joy>
           <md-button class="md-button md-primary" v-if="plugin_loaded" @click="runWorkflow(workflow_joy_config.joy)">
             <md-icon>play_arrow</md-icon>Run
@@ -168,10 +178,8 @@ Engine<template>
               </md-menu-item>
             </md-menu-content>
           </md-menu>
-
         </md-card-content>
       </md-card>
-
       <div v-if="plugin_loaded">
         <md-card>
           <md-card-header>
@@ -420,6 +428,10 @@ export default {
   props: ['title'],
   data() {
     return {
+      workflow_expand: false,
+      file_selector_expand: false,
+      file_tree_selection: null,
+      file_tree: null,
       file_select: null,
       folder_select: null,
       selected_file: null,
@@ -681,6 +693,11 @@ export default {
     this.disconnectEngine()
   },
   methods: {
+    fileTreeSelected(s){
+      console.log('selected---->', s)
+      this.file_tree_selection = s
+      this.$forceUpdate()
+    },
     removePlugin(plugin){
       return new Promise((resolve, reject) => {
         // console.log('remove plugin', plugin.name)
