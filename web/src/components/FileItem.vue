@@ -1,7 +1,7 @@
 <template>
   <li>
     <div>
-      <span @click="select(model)" :class="{bold: isFolder, selected: model==selected || (selected && selected.length && selected.indexOf(model)>=0)}">{{ model.name }}</span>
+      <span @click="select({target: model, path: root+'/'+model.name})" :class="{bold: isFolder, selected: (root+'/'+model.name)==selected || (selected && Array.isArray(selected) && selected.indexOf(root+'/'+model.name)>=0)}">{{ model.name }}</span>
       <span v-if="isFolder" @click="toggle">[{{ open ? '-' : '+' }}]</span>
     </div>
     <ul v-show="open" v-if="isFolder">
@@ -9,6 +9,7 @@
         class="item"
         v-for="(model, index) in model.children.slice(0, 300)"
         :key="index"
+        :root="root+'/'+model.name"
         :model="model" :selected="selected" @select="select($event)">
       </file-item>
     </ul>
@@ -21,7 +22,8 @@ export default {
   name: 'file-item',
   props: {
      model: Object,
-     selected: Object,
+     selected: String,
+     root: {type: String, default: '.'},
    },
    data: function () {
      return {
@@ -40,7 +42,7 @@ export default {
    methods: {
      select: function(m){
        // this.model.selected = !this.model.selected
-       this.$emit('select', m||this.model)
+       this.$emit('select', m || {target: this.model, path: this.root+'/'+this.model.name })
      },
      toggle: function () {
        if (this.isFolder) {

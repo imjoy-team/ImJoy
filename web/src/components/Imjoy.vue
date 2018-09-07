@@ -431,7 +431,34 @@ export default {
       workflow_expand: false,
       file_selector_expand: false,
       file_tree_selection: null,
-      file_tree: null,
+      file_tree: {
+  name: 'My Tree',
+  children: [
+    { name: 'hello' },
+    { name: 'wat' },
+    {
+      name: 'child folder',
+      children: [
+        {
+          name: 'child folder',
+          children: [
+            { name: 'hello' },
+            { name: 'wat' }
+          ]
+        },
+        { name: 'hello' },
+        { name: 'wat' },
+        {
+          name: 'child folder',
+          children: [
+            { name: 'hello' },
+            { name: 'wat' }
+          ]
+        }
+      ]
+    }
+  ]
+},
       file_select: null,
       folder_select: null,
       selected_file: null,
@@ -619,7 +646,7 @@ export default {
       showPluginProgress: this.showPluginProgress,
       showPluginStatus: this.showPluginStatus,
       showSnackbar: this.show,
-      utils: {$forceUpdate: this.$forceUpdate}
+      $forceUpdate: this.$forceUpdate,
     }
     this.resetPlugins()
     this.pluing_context = {}
@@ -694,8 +721,8 @@ export default {
   },
   methods: {
     fileTreeSelected(s){
-      console.log('selected---->', s)
-      this.file_tree_selection = s
+      console.log('selected---->', s.path)
+      this.file_tree_selection = s.path
       this.$forceUpdate()
     },
     removePlugin(plugin){
@@ -897,35 +924,33 @@ export default {
           // console.log('reloading plugin ', pconfig)
           const template = this.parsePluginCode(pconfig.code, pconfig)
           this.unloadPlugin(template.name)
-          let p = null
-          if (template.mode == 'iframe' && template.tags.includes('window')) {
-            p = this.preLoadPlugin(template)
-          } else {
-            p = this.loadPlugin(template)
-          }
-          p && p.then((plugin) => {
-            // console.log('new plugin loaded', plugin)
-            pconfig.name = plugin.name
-            pconfig.type = plugin.type
-            pconfig.plugin = plugin
-            if (this.$refs.workflow) this.$refs.workflow.setupJoy()
-            this.$forceUpdate()
-            resolve(plugin)
-          }).catch((e) => {
-            pconfig.name = null
-            pconfig.type = null
-            pconfig.plugin = null
-            this.$forceUpdate()
-            reject(e)
-          })
 
+          if (template.mode == 'iframe' && template.tags.includes('window')) {
+            this.preLoadPlugin(template)
+          } else {
+            this.loadPlugin(template)
+          }
         } catch (e) {
           this.status_text = 'Error: ' + e
           this.show('Error: ' + e)
           reject(e)
           return
         }
-
+        p.then((plugin) => {
+          // console.log('new plugin loaded', plugin)
+          pconfig.name = plugin.name
+          pconfig.type = plugin.type
+          pconfig.plugin = plugin
+          if (this.$refs.workflow) this.$refs.workflow.setupJoy()
+          this.$forceUpdate()
+          resolve(plugin)
+        }).catch((e) => {
+          pconfig.name = null
+          pconfig.type = null
+          pconfig.plugin = null
+          this.$forceUpdate()
+          reject(e)
+        })
 
       })
     },
