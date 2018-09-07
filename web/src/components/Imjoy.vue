@@ -619,7 +619,7 @@ export default {
       showPluginProgress: this.showPluginProgress,
       showPluginStatus: this.showPluginStatus,
       showSnackbar: this.show,
-      $forceUpdate: this.$forceUpdate,
+      utils: {$forceUpdate: this.$forceUpdate}
     }
     this.resetPlugins()
     this.pluing_context = {}
@@ -897,33 +897,35 @@ export default {
           // console.log('reloading plugin ', pconfig)
           const template = this.parsePluginCode(pconfig.code, pconfig)
           this.unloadPlugin(template.name)
-
+          let p = null
           if (template.mode == 'iframe' && template.tags.includes('window')) {
-            this.preLoadPlugin(template)
+            p = this.preLoadPlugin(template)
           } else {
-            this.loadPlugin(template)
+            p = this.loadPlugin(template)
           }
+          p && p.then((plugin) => {
+            // console.log('new plugin loaded', plugin)
+            pconfig.name = plugin.name
+            pconfig.type = plugin.type
+            pconfig.plugin = plugin
+            if (this.$refs.workflow) this.$refs.workflow.setupJoy()
+            this.$forceUpdate()
+            resolve(plugin)
+          }).catch((e) => {
+            pconfig.name = null
+            pconfig.type = null
+            pconfig.plugin = null
+            this.$forceUpdate()
+            reject(e)
+          })
+
         } catch (e) {
           this.status_text = 'Error: ' + e
           this.show('Error: ' + e)
           reject(e)
           return
         }
-        p.then((plugin) => {
-          // console.log('new plugin loaded', plugin)
-          pconfig.name = plugin.name
-          pconfig.type = plugin.type
-          pconfig.plugin = plugin
-          if (this.$refs.workflow) this.$refs.workflow.setupJoy()
-          this.$forceUpdate()
-          resolve(plugin)
-        }).catch((e) => {
-          pconfig.name = null
-          pconfig.type = null
-          pconfig.plugin = null
-          this.$forceUpdate()
-          reject(e)
-        })
+
 
       })
     },

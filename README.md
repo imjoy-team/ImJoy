@@ -137,6 +137,8 @@ Plugins can be written in Javascript or Python, a minimal plugin needs to implem
 In order to differentiate the two different languages, use the `lang` property of the `<script>` tag:
  * for Javascript plugin, use `<script lang="javascript"> ... </script>`
  * for Python plugin, use `<script lang="python"> ... </script>`
+ 
+Optionally, if you provided a function called `exit`, it will be called when the plugin is being killed.
 
 ### `setup()` function
 `setup` function used to get the plugin prepared for running, it will be executed when the plugin during initialization.
@@ -307,6 +309,13 @@ update the progress bar of the current plugin (in the plugin menu), example: `ap
 update the status text of the current plugin (in the plugin menu), example: `api.showPluginStatus('processing...')`
 ### `api.run(...)`
 run another plugin by the plugin name, example: `api.run("Python Demo Plugin")` or `api.run("Python Demo Plugin", my)`
+
+### `api.utils`
+For Javascript plugins, currently supported functions are:
+`api.utils.$forceUpdate` for force refreshing the GUI.
+
+For Python Plugins, currently supported functions are:
+`api.utils.kill` for kill a `subprocess` in python.
 
 ## Developing Window Plugin
 Window plugin is a speical type of plugins running in `iframe` mode, and it will show up as a window. `<window>` and `<style>` can be used to define the actual content of the window.
