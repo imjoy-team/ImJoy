@@ -135,6 +135,7 @@
           <ul v-show="file_selector_expand">
             <file-item :model="file_tree" :selected="file_tree_selection" @select="fileTreeSelected">
             </file-item>
+            <md-tooltip v-if="file_tree&&file_tree.path">file_tree.path</md-tooltip>
           </ul>
         </md-card-content>
       </md-card>
@@ -431,34 +432,7 @@ export default {
       workflow_expand: false,
       file_selector_expand: false,
       file_tree_selection: null,
-      file_tree: {
-  name: 'My Tree',
-  children: [
-    { name: 'hello' },
-    { name: 'wat' },
-    {
-      name: 'child folder',
-      children: [
-        {
-          name: 'child folder',
-          children: [
-            { name: 'hello' },
-            { name: 'wat' }
-          ]
-        },
-        { name: 'hello' },
-        { name: 'wat' },
-        {
-          name: 'child folder',
-          children: [
-            { name: 'hello' },
-            { name: 'wat' }
-          ]
-        }
-      ]
-    }
-  ]
-},
+      file_tree: null,
       file_select: null,
       folder_select: null,
       selected_file: null,
@@ -808,6 +782,7 @@ export default {
             // console.log('plugin engine connected.')
             this.store.event_bus.$emit('engine_connected', d)
             this.reloadPythonPlugins()
+            this.listEngineDir()
           }
           else{
             socket.disconnect()
@@ -834,6 +809,19 @@ export default {
       if (this.socket) {
         this.socket.disconnect()
       }
+    },
+    listEngineDir(path){
+      this.socket.emit('list_dir', {path: path || '.'}, (ret)=>{
+        console.log(ret)
+        if(ret.success){
+          this.file_tree = ret
+          console.log('list dir ',ret)
+          this.$forceUpdate()
+        }
+        else{
+          this.show('Failed to list dir: '+path)
+        }
+      })
     },
     importScript(url) {
       //url is URL of external file, implementationCode is the code

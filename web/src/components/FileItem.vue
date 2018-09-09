@@ -1,7 +1,7 @@
 <template>
   <li>
     <div>
-      <span @click="select({target: model, path: root+'/'+model.name})" :class="{bold: isFolder, selected: (root+'/'+model.name)==selected || (selected && Array.isArray(selected) && selected.indexOf(root+'/'+model.name)>=0)}">{{ model.name }}</span>
+      <span @click="select({target: model, path: root})" :class="{bold: isFolder, selected: (root+'/'+model.name)==selected || (selected && Array.isArray(selected) && selected.indexOf(root+'/'+model.name)>=0)}">{{ model.name }}</span>
       <span v-if="isFolder" @click="toggle">[{{ open ? '-' : '+' }}]</span>
     </div>
     <ul v-show="open" v-if="isFolder">
@@ -31,7 +31,6 @@ export default {
      }
    },
    mounted(){
-
    },
    computed: {
      isFolder: function () {
