@@ -135,7 +135,7 @@
           <ul v-show="file_selector_expand">
             <file-item :model="file_tree" :selected="file_tree_selection" @select="fileTreeSelected">
             </file-item>
-            <md-tooltip v-if="file_tree&&file_tree.path">file_tree.path</md-tooltip>
+            <!-- <md-tooltip v-if="file_tree&&file_tree.path">file_tree.path</md-tooltip> -->
           </ul>
         </md-card-content>
       </md-card>
@@ -270,7 +270,7 @@
 
   <md-dialog-confirm :md-active.sync="showRemoveConfirmation" md-title="Removing Plugin" md-content="Do you really want to <strong>delete</strong> this plugin" md-confirm-text="Yes" md-cancel-text="Cancel" @md-cancel="showRemoveConfirmation=false" @md-confirm="removePlugin(_plugin2_remove);_plugin2_remove=null;showRemoveConfirmation=false"/>
   <!-- </md-card-content> -->
-
+  <file-dialog ref="file-dialog" :list-files="listEngineDir"></file-dialog>
   <md-dialog :md-active.sync="showPluginDialog" :md-click-outside-to-close="false">
     <md-dialog-content>
       <div v-if="plugin_dialog_config">
@@ -460,6 +460,7 @@ export default {
       workflow_list: [],
       resumable_plugins: [],
       showNewWorkspaceDialog: false,
+      show_file_dialog: false,
       plugins: null,
       registered: null,
       updating_workflow: false,
@@ -619,6 +620,7 @@ export default {
       run: this.runPlugin,
       showPluginProgress: this.showPluginProgress,
       showPluginStatus: this.showPluginStatus,
+      showFileDialog: this.$refs['file-dialog'].showDialog,
       showSnackbar: this.show,
       $forceUpdate: this.$forceUpdate,
     }
@@ -811,16 +813,20 @@ export default {
       }
     },
     listEngineDir(path){
-      this.socket.emit('list_dir', {path: path || '.'}, (ret)=>{
-        console.log(ret)
-        if(ret.success){
-          this.file_tree = ret
-          console.log('list dir ',ret)
-          this.$forceUpdate()
-        }
-        else{
-          this.show('Failed to list dir: '+path)
-        }
+      return new Promise((resolve, reject) => {
+        console.log('listing dir...')
+        this.socket.emit('list_dir', {path: path || '.'}, (ret)=>{
+          console.log('list dir: ', ret)
+          if(ret.success){
+            this.file_tree = ret
+            resolve(ret)
+            this.$forceUpdate()
+          }
+          else{
+            this.show('Failed to list dir: '+path)
+            reject()
+          }
+        })
       })
     },
     importScript(url) {
@@ -912,34 +918,33 @@ export default {
           // console.log('reloading plugin ', pconfig)
           const template = this.parsePluginCode(pconfig.code, pconfig)
           this.unloadPlugin(template.name)
-
+          let p
           if (template.mode == 'iframe' && template.tags.includes('window')) {
-            this.preLoadPlugin(template)
+            p = this.preLoadPlugin(template)
           } else {
-            this.loadPlugin(template)
+            p = this.loadPlugin(template)
           }
+          p.then((plugin) => {
+            // console.log('new plugin loaded', plugin)
+            pconfig.name = plugin.name
+            pconfig.type = plugin.type
+            pconfig.plugin = plugin
+            if (this.$refs.workflow) this.$refs.workflow.setupJoy()
+            this.$forceUpdate()
+            resolve(plugin)
+          }).catch((e) => {
+            pconfig.name = null
+            pconfig.type = null
+            pconfig.plugin = null
+            this.$forceUpdate()
+            reject(e)
+          })
         } catch (e) {
           this.status_text = 'Error: ' + e
           this.show('Error: ' + e)
           reject(e)
           return
         }
-        p.then((plugin) => {
-          // console.log('new plugin loaded', plugin)
-          pconfig.name = plugin.name
-          pconfig.type = plugin.type
-          pconfig.plugin = plugin
-          if (this.$refs.workflow) this.$refs.workflow.setupJoy()
-          this.$forceUpdate()
-          resolve(plugin)
-        }).catch((e) => {
-          pconfig.name = null
-          pconfig.type = null
-          pconfig.plugin = null
-          this.$forceUpdate()
-          reject(e)
-        })
-
       })
     },
     savePlugin(pconfig) {
