@@ -250,6 +250,7 @@
               </div>
             </div>
             <md-divider></md-divider>
+            <p v-if="installed_plugins.length<=0">&nbsp;No plugin installed.</p>
           <!-- <div class="md-layout md-gutter md-alignment-center-center">
             <md-button class="md-raised md-primary" v-if="!installed_plugins || installed_plugins.length<=0" @click="showAddPluginDialog=true">
               <md-icon>add</md-icon>Add New Plugins
