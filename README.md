@@ -269,6 +269,14 @@ def error_callback(error):
 api.XXXXX().then(callback).catch(error_callback)
 ```
 
+When calling the API functions, most functions take an object or dictionary as its first argument. For Javascript plugins, an object should be used. For Python plugins, you use a dictionary, or use named arguments. For example, the following function call will work in both JavaScript and Python:
+```javascript
+//# works for JavaScript and Python
+api.XXXXX({"option1": 3, "option2": 'hi'})
+
+# only for Python
+api.XXXXX(option1=3, option2='hi')
+```
 
 ### `api.alert(...)`
 show alert dialog with message, example: `api.alert('hello world')`
@@ -316,10 +324,10 @@ update an existing window, an window ID should be passed in order to perform the
 ```javascript
 
 # Javascript
-api.updateWindow(windowId, {data: {image: ...}})
+api.updateWindow({id: windowId, data: {image: ...}})
 
 # Python
-api.updateWindow(windowId, {data: {image: ...}})
+api.updateWindow({'id': windowId, 'data': {'image': ...}})
 ```
 
 The second parameter is an object contains fields which the plugin wants to update.
