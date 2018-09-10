@@ -1670,7 +1670,6 @@ export default {
     },
     register(config, _plugin) {
       try {
-        console.log('xxxx',_plugin)
         const plugin = this.plugins[_plugin.id]
         if(!plugin) throw "Plugin not found."
         config.type = config.type || config.name
