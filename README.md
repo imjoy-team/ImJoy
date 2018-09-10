@@ -353,6 +353,7 @@ show a quick message with a snackbar and disappear in a few seconds, example: `a
 update the progress bar of the current plugin (in the plugin menu), example: `api.showPluginProgress(85)`
 ### `api.showPluginStatus(...)`
 update the status text of the current plugin (in the plugin menu), example: `api.showPluginStatus('processing...')`
+
 ### `api.showFileDialog(...)`
 show a file dialog for selecting files or directories. It accept the following options:
  * `type` the mode of file dialog, it accept `file` for selecting one or multiple files; `directory` for selecting one or multiple directories; By default, it will use `type='file'`. For Python plugin, if you don't specify the type, both file or directory can be selected.
