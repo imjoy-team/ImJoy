@@ -1670,7 +1670,9 @@ export default {
     },
     register(config, _plugin) {
       try {
+        console.log('xxxx',_plugin)
         const plugin = this.plugins[_plugin.id]
+        if(!plugin) throw "Plugin not found."
         config.type = config.type || config.name
         config.mode = config.mode || 'webworker'
         config.show_panel = config.show_panel || false
@@ -1916,7 +1918,7 @@ export default {
         const pconfig = wconfig //_clone(window_config)
         //generate a new window id
         pconfig.mode = window_config.mode
-        pconfig.id = window_config.name.trim().replace(/ /g, '_') + '_' + randId()
+        pconfig.id = window_config.id//window_config.name.trim().replace(/ /g, '_') + '_' + randId()
         // console.log('creating window: ', pconfig)
         if (pconfig.mode != 'iframe') {
           throw 'Window plugin must be with mode "iframe"'
