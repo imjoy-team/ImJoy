@@ -3,20 +3,24 @@
   <!-- <md-subheader>Options</md-subheader> -->
   <md-subheader v-if="title">{{title}}
   </md-subheader>
-
-  <div  class="md-layout md-gutter">
-    <md-button v-if="available_plugins" @click="updateAll()" class="md-button md-primary  md-size-20 md-layout-item">
-      <md-icon>update</md-icon><span class="md-medium-hide">Update All</span></md-button>
-      <md-field v-if="showUrl" class="md-layout-item md-size-50">
-        <label for="plugin_url">Install from URL</label>
-        <md-input type="text" v-model="plugin_url" name="plugin_url"></md-input>
-      </md-field>
-      <md-button v-if="showUrl && plugin_url&&plugin_url!=''" @click="install({uri: plugin_url})" class="md-button md-primary md-size-60  md-layout-item">
-          <md-icon>cloud_download</md-icon>Install</md-button>
-  </div>
-
+  <md-toolbar md-elevation="0">
+    <md-field md-clearable v-show="!plugin_url" class="md-toolbar-section-start">
+      <md-icon>search</md-icon>
+      <md-input placeholder="Search by name..." v-model="search" @input="searchPlugin" />
+    </md-field>
+    <md-field v-show="showUrl && !search" md-clearable class="md-toolbar-section-start">
+      <md-icon>cloud_download</md-icon>
+      <md-input placeholder="Install plugin from url" type="text" v-model="plugin_url" name="plugin_url"></md-input>
+    </md-field>
+    <md-button v-show="showUrl && plugin_url&&plugin_url!=''" @click="install({uri: plugin_url})" class="md-button md-primary">
+      <md-icon>cloud_download</md-icon>Install
+    </md-button>
+    <md-button v-show="!search&&!plugin_url" @click="updateAll()" class="md-button md-primary">
+      <md-icon>update</md-icon><span class="md-small-hide">Update All</span>
+    </md-button>
+  </md-toolbar>
   <md-list class="md-triple-line md-dense" v-if="display=='list'">
-    <div v-for="(plugin, k) in available_plugins" :key="k">
+    <div v-for="(plugin, k) in searched_plugins" :key="k">
       <md-list-item>
         <md-avatar>
           <!-- <img src="https://placeimg.com/40/40/people/1" alt="People"> -->
@@ -85,7 +89,7 @@
   </md-list>
 
   <div v-if="display=='card'">
-    <md-card v-if="containerWidth<=500" v-for="(plugin, k) in available_plugins" :key="k">
+    <md-card v-if="containerWidth<=500" v-for="(plugin, k) in searched_plugins" :key="k">
       <md-card-header>
         {{plugin.createdAt}}
         <h2>{{plugin.name}}</h2>
@@ -104,7 +108,7 @@
         </md-button>
       </md-card-content>
     </md-card>
-    <grid v-if="containerWidth>500" :center="center" :draggable="false" :sortable="true" :items="available_plugins" :cell-width="380" :cell-height="280" :grid-width="containerWidth" class="grid-container">
+    <grid v-if="containerWidth>500" :center="center" :draggable="false" :sortable="true" :items="searched_plugins" :cell-width="380" :cell-height="280" :grid-width="containerWidth" class="grid-container">
       <template slot="cell" slot-scope="props">
      <md-card>
        <md-card-header>
@@ -188,6 +192,7 @@ export default {
   },
   data() {
     return {
+      search: '',
       editorCode: '',
       plugin_url: '',
       editorPlugin: null,
@@ -198,6 +203,7 @@ export default {
       plugin_dir: null,
       manifest: null,
       available_plugins: [],
+      searched_plugins: [],
       showRemoveConfirmation: false,
       _plugin2_remove: null,
       db: null,
@@ -217,12 +223,14 @@ export default {
     })
     if (this.plugins) {
       this.available_plugins = this.plugins
+      this.searched_plugins = this.plugins
       this.updatePluginList()
     } else if (this.configUrl) {
       axios.get(this.configUrl).then(response => {
         if (response && response.data && response.data.plugins) {
           this.manifest = response.data
           this.available_plugins = this.manifest.plugins
+          this.searched_plugins = this.manifest.plugins
           this.plugin_dir = this.manifest.uri_root
           if (this.plugin_dir) {
             this.uri_root = location.protocol + '//' + location.host
@@ -246,6 +254,18 @@ export default {
     this.store.event_bus.$off('resize', this.updateSize)
   },
   methods: {
+    toLower(text){
+      return text.toString().toLowerCase()
+    },
+    searchByName(items, term){
+      if (term) {
+        return items.filter(item => this.toLower(item.name+' '+item.description).includes(this.toLower(term)))
+      }
+      return items
+    },
+    searchPlugin(){
+      this.searched_plugins = this.searchByName(this.available_plugins, this.search)
+    },
     updateSize() {
       this.containerWidth = this.$refs.container.offsetWidth;
     },
