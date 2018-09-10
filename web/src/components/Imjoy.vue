@@ -620,7 +620,7 @@ export default {
       run: this.runPlugin,
       showPluginProgress: this.showPluginProgress,
       showPluginStatus: this.showPluginStatus,
-      showFileDialog: this.$refs['file-dialog'].showDialog,
+      showFileDialog: this.showFileDialog,
       showSnackbar: this.show,
       $forceUpdate: this.$forceUpdate,
     }
@@ -696,6 +696,39 @@ export default {
     this.disconnectEngine()
   },
   methods: {
+    showFileDialog(options, _plugin){
+      if(!_plugin){
+        _plugin = options
+        options = {}
+      }
+      if(_plugin && _plugin.id){
+        const source_plugin = this.plugins[_plugin.id]
+        if(source_plugin){
+          console.log(source_plugin)
+          if(source_plugin && source_plugin.mode != 'pyworker'){
+            if(options.mode == 'file'){
+
+            }
+            else if(options.mode == 'files'){
+
+            }
+            else if(options.mode == 'directory'){
+
+            }
+            else if(options.mode == 'directories'){
+
+            }
+            else{
+              throw "unsupported mode: "+options.mode
+            }
+          }
+          else{
+            return this.$refs['file-dialog'].showDialog(options)
+          }
+        }
+      }
+      throw "Plugin not found."
+    },
     fileTreeSelected(s){
       console.log('selected---->', s.path)
       this.file_tree_selection = s.path

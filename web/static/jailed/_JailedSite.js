@@ -199,7 +199,7 @@
                method = this._interface[data.name];
              }
              var args = this._unwrap(data.args, true);
-             args.push({id: this.id})
+             if(this.id != '__plugin__') args.push({id: data.pid})
              if(data.promise){
                var [resolve, reject] = this._unwrap(data.promise, false);
                try {
@@ -226,7 +226,7 @@
          case 'callback':
              var method = this._store.fetch(data.id)[data.num];
              var args = this._unwrap(data.args, true);
-             args.push({id: this.id})
+             if(this.id != '__plugin__') args.push({id: data.pid})
              if(data.promise){
                var [resolve, reject] = this._unwrap(data.promise, false);
                try {
@@ -356,6 +356,7 @@
                   type: 'method',
                   name: name,
                   args: args,
+                  pid :  me.id,
                   promise: me._wrap([wrapped_resolve, wrapped_reject])
               }, transferables);
             } catch (e) {
@@ -635,6 +636,7 @@
                 id   : id,
                 num  : argNum,
                 args : args,
+                pid :  me.id,
                 promise : me._wrap([resolve, reject])
             }, transferables);
           });
@@ -650,7 +652,8 @@
                 type : 'callback',
                 id   : id,
                 num  : argNum,
-                args : args
+                args : args,
+                pid :  me.id
             }, transferables);
         };
         return remoteCallback;

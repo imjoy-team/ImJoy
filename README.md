@@ -137,7 +137,7 @@ Plugins can be written in Javascript or Python, a minimal plugin needs to implem
 In order to differentiate the two different languages, use the `lang` property of the `<script>` tag:
  * for Javascript plugin, use `<script lang="javascript"> ... </script>`
  * for Python plugin, use `<script lang="python"> ... </script>`
- 
+
 Optionally, if you provided a function called `exit`, it will be called when the plugin is being killed.
 
 ### `setup()` function
@@ -238,6 +238,38 @@ Besides the `Plugin API` functions, when a plugin is executed, you can return an
 ## `ImJoy API`
 Within the plugin, there is a variable called `api` which exposes a set of internal utility functions. These utility functions can be used in the plugin to interact with the GUI, talk with another plugin etc.
 
+When a `ImJoy API` function is executed, they will return a object called `promise` ([more about Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)).
+For Javascrit plugins, native Javascrit `Promise` will be returned. For Python plugins, it will return a simplified Python implement of promise.
+
+Here is how you can use it (suppose the api name is `XXXXX`):
+```
+// JavaScript
+const callback(result){
+  console.log(result)
+}
+api.XXXXX().then(callback)
+
+// optionally, you can catch error
+const error_callback(error){
+  console.error(error)
+}
+api.XXXXX().then(callback).catch(error_callback)
+
+
+# Python
+def callback(result):
+  print(result)
+
+api.XXXXX().then(callback)
+
+# optionally, you can catch error
+def error_callback(error):
+  print(error)
+
+api.XXXXX().then(callback).catch(error_callback)
+```
+
+
 ### `api.alert(...)`
 show alert dialog with message, example: `api.alert('hello world')`
 ### `api.register(...)`
@@ -261,11 +293,17 @@ Alternatively, another `Plugin API` function other than `run` can be passed when
 create a new window and add to the workspace, example:
 ```javascript
 //Javascript
-const windowId = await api.createWindow({name: 'new window', type: 'Image Window', w:7, h:7, data: {image: ...}, config: {}})
+const window_callback = (windowId)=>{
+  //use `windowId` here to access the window
+  console.log(windowId)
+}
+api.createWindow({name: 'new window', type: 'Image Window', w:7, h:7, data: {image: ...}, config: {}}).then(window_callback)
 
 # Python
-windowId = api.createWindow({name: 'new window', type: 'Image Window', w:7, h:7, data: {image: ...}, config: {}})
-
+def window_callback(windowId):
+  # use `windowId` here to access the window
+  print(windowId)
+api.createWindow({name: 'new window', type: 'Image Window', w:7, h:7, data: {image: ...}, config: {}}).then(window_callback)
 ```
 
 If you do not want the window to load immediately, you can add `click2load: true` and the window will ask for an extra click to load the content.
@@ -278,7 +316,7 @@ update an existing window, an window ID should be passed in order to perform the
 ```javascript
 
 # Javascript
-await api.updateWindow(windowId, {data: {image: ...}})
+api.updateWindow(windowId, {data: {image: ...}})
 
 # Python
 api.updateWindow(windowId, {data: {image: ...}})
@@ -307,6 +345,28 @@ show a quick message with a snackbar and disappear in a few seconds, example: `a
 update the progress bar of the current plugin (in the plugin menu), example: `api.showPluginProgress(85)`
 ### `api.showPluginStatus(...)`
 update the status text of the current plugin (in the plugin menu), example: `api.showPluginStatus('processing...')`
+### `api.showFileDialog(...)`
+show a file dialog for selecting files or directories. It accept the following options:
+ * `type` the mode of file dialog, it accept `file` for selecting one or multiple files; `directory` for selecting one or multiple directories; By default, it will use `type='file'`.
+ * `title` the title of the dialog.
+
+Since the file handling is different in the browser environment and Python, this api have different behavior when called from different types of plugin. In Javascrpt, a system file selection dialog will be used, and it will return a promise which you can get the selected file object with or a list of files. In Python, an Imjoy file dialog will be displayed, it will only return a promise which you can get the file path string with.  
+
+Example:
+```javascript
+//javascript example
+api.showFileDialog().then((file)=>{
+  console.log(file)
+})
+```
+
+```python
+# python example
+def print_path(path):
+  print(path)
+api.showFileDialog().then(print_path)
+```
+
 ### `api.run(...)`
 run another plugin by the plugin name, example: `api.run("Python Demo Plugin")` or `api.run("Python Demo Plugin", my)`
 
