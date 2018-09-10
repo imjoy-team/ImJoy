@@ -1,9 +1,11 @@
 <template>
-  <div>
+  <div class="file-dialog">
   <md-dialog :md-active.sync="show_" :md-click-outside-to-close="false">
+    <md-dialog-title>{{this.options.title || 'ImJoy File Dialog'}}</md-dialog-title>
     <md-dialog-content>
       <ul v-if="file_tree">
-        <file-item :model="file_tree" :selected="file_tree_selection" @select="fileTreeSelected">
+        <file-item :model="file_tree" :root="root" :selected="file_tree_selection" @load="loadFile" @select="fileTreeSelected">
+          <md-icon-button>up</md-icon-button>
         </file-item>
       </ul>
     </md-dialog-content>
@@ -25,6 +27,8 @@ export default {
    },
    data: function () {
      return {
+       root: null,
+       options: {},
        show_: false,
        file_tree_selection: null,
        file_tree: null,
@@ -40,20 +44,44 @@ export default {
    },
    methods: {
      fileTreeSelected(f){
+       if(this.options.type == 'file' && f.target.type == 'dir')
+       return
        this.file_tree_selection = f.path
        this.$forceUpdate()
      },
-     showDialog(){
-       this.show_ = true
-       return new Promise((resolve, reject) => {
-         this.resolve = resolve
-         this.reject = reject
-         this.listFiles().then((tree)=>{
+     loadFile(f){
+
+       if(f.target.type == 'dir'){
+         if(f.path == this.root){
+           f.path = f.path+'/../'
+         }
+         this.listFiles(f.path, this.options.type, this.options.recursive).then((tree)=>{
+           this.root = tree.path
            this.file_tree = tree
            this.$forceUpdate()
            console.log(this.file_tree)
          })
-
+       }
+       else{
+         this.show_=false
+         this.resolve(this.file_tree_selection)
+       }
+     },
+     showDialog(options){
+       this.show_ = true
+       this.options = options
+       this.options.title = this.options.title || 'ImJoy File Dialog'
+       this.options.root = this.options.root|| '.'
+       return new Promise((resolve, reject) => {
+         this.resolve = resolve
+         this.reject = reject
+         this.root = this.options.root
+         this.listFiles(options.root, options.type, options.recursive).then((tree)=>{
+           this.root = tree.path
+           this.file_tree = tree
+           this.$forceUpdate()
+           console.log(this.file_tree)
+         })
        })
      }
    }
@@ -62,5 +90,9 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+.md-dialog {
+  max-width: 1024px;
+  min-width: 50%;
+}
 
 </style>

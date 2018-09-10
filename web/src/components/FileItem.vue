@@ -1,16 +1,20 @@
 <template>
   <li>
     <div>
-      <span @click="select({target: model, path: root})" :class="{bold: isFolder, selected: (root)==selected || (selected && Array.isArray(selected) && selected.indexOf(root)>=0)}">{{ model.name }}</span>
       <span v-if="isFolder" @click="toggle">[{{ open ? '-' : '+' }}]</span>
+      <md-icon v-if="model.type=='dir'">folder_open</md-icon> <md-icon v-else>insert_drive_file</md-icon>
+      <span class="noselect" @click="select({target: model, path: root})" @dblclick="load()" :class="{bold: isFolder, selected: (root)==selected || (selected && Array.isArray(selected) && selected.indexOf(root)>=0)}">{{ model.name }}</span>
     </div>
-    <ul v-show="open" v-if="isFolder">
+    <ul v-if="open&&isFolder">
       <file-item
         class="item"
         v-for="(model, index) in model.children.slice(0, 300)"
         :key="index"
         :root="root+'/'+model.name"
-        :model="model" :selected="selected" @select="select($event)">
+        :model="model"
+        :selected="selected"
+        @load="load($event)"
+        @select="select($event)">
       </file-item>
     </ul>
   </li>
@@ -27,7 +31,7 @@ export default {
    },
    data: function () {
      return {
-       open: false
+       open: true
      }
    },
    mounted(){
@@ -39,11 +43,14 @@ export default {
      }
    },
    methods: {
-     select: function(m){
+     load(m){
+       this.$emit('load', m || {target: this.model, path: this.root})
+     },
+     select(m){
        // this.model.selected = !this.model.selected
        this.$emit('select', m || {target: this.model, path: this.root+'/'+this.model.name })
      },
-     toggle: function () {
+     toggle() {
        if (this.isFolder) {
          this.open = !this.open
        }
@@ -68,5 +75,14 @@ ul {
   padding-left: 1em;
   line-height: 1.5em;
   list-style-type: dot;
+}
+.noselect {
+  -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+     -khtml-user-select: none; /* Konqueror HTML */
+       -moz-user-select: none; /* Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome and Opera */
 }
 </style>

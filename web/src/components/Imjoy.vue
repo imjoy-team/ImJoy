@@ -129,16 +129,15 @@
         </div>
       </div>
       <br>
-      <md-card v-if="file_tree">
+      <!-- <md-card v-if="file_tree">
         <md-card-content>
           <md-button @click="file_selector_expand=!file_selector_expand" :class="file_selector_expand?'': 'md-primary'"><span class="md-subheading">Files</span></md-button>
           <ul v-show="file_selector_expand">
             <file-item :model="file_tree" :selected="file_tree_selection" @select="fileTreeSelected">
             </file-item>
-            <!-- <md-tooltip v-if="file_tree&&file_tree.path">file_tree.path</md-tooltip> -->
           </ul>
         </md-card-content>
-      </md-card>
+      </md-card> -->
 
       <md-card>
         <md-card-header>
@@ -325,6 +324,7 @@
         @md-confirm="connectEngine(engine_url)" />
 
   <md-dialog :md-active.sync="showSettingsDialog" :md-click-outside-to-close="false">
+    <md-dialog-title>Settings</md-dialog-title>
     <md-dialog-content>
       <md-divider></md-divider>
       <md-card>
@@ -357,6 +357,7 @@
     </md-dialog-actions>
   </md-dialog>
   <md-dialog :md-active.sync="showAddPluginDialog" :md-click-outside-to-close="true">
+    <md-dialog-title>Plugins Management</md-dialog-title>
     <md-dialog-content>
       <md-card>
         <md-card-header>
@@ -430,9 +431,9 @@ export default {
   data() {
     return {
       workflow_expand: false,
-      file_selector_expand: false,
-      file_tree_selection: null,
-      file_tree: null,
+      // file_selector_expand: false,
+      // file_tree_selection: null,
+      // file_tree: null,
       file_select: null,
       folder_select: null,
       selected_file: null,
@@ -706,20 +707,14 @@ export default {
         if(source_plugin){
           console.log(source_plugin)
           if(source_plugin && source_plugin.mode != 'pyworker'){
-            if(options.mode == 'file'){
-
+            if(options.type == 'file'){
+              $refs.file_form.reset();$refs.file_select.click()
             }
-            else if(options.mode == 'files'){
-
-            }
-            else if(options.mode == 'directory'){
-
-            }
-            else if(options.mode == 'directories'){
-
+            else if(options.type == 'directory'){
+              $refs.file_form.reset();$refs.folder_select.click()
             }
             else{
-              throw "unsupported mode: "+options.mode
+              throw "unsupported type: "+options.type
             }
           }
           else{
@@ -729,11 +724,11 @@ export default {
       }
       throw "Plugin not found."
     },
-    fileTreeSelected(s){
-      console.log('selected---->', s.path)
-      this.file_tree_selection = s.path
-      this.$forceUpdate()
-    },
+    // fileTreeSelected(s){
+    //   console.log('selected---->', s.path)
+    //   this.file_tree_selection = s.path
+    //   this.$forceUpdate()
+    // },
     removePlugin(plugin){
       return new Promise((resolve, reject) => {
         // console.log('remove plugin', plugin.name)
@@ -817,7 +812,7 @@ export default {
             // console.log('plugin engine connected.')
             this.store.event_bus.$emit('engine_connected', d)
             this.reloadPythonPlugins()
-            this.listEngineDir()
+            // this.listEngineDir()
           }
           else{
             socket.disconnect()
@@ -845,13 +840,13 @@ export default {
         this.socket.disconnect()
       }
     },
-    listEngineDir(path){
+    listEngineDir(path, type, recursive){
       return new Promise((resolve, reject) => {
         console.log('listing dir...')
-        this.socket.emit('list_dir', {path: path || '.'}, (ret)=>{
+        this.socket.emit('list_dir', {path: path || '.', type: type || 'file', recursive: recursive || false}, (ret)=>{
           console.log('list dir: ', ret)
           if(ret.success){
-            this.file_tree = ret
+            // this.file_tree = ret
             resolve(ret)
             this.$forceUpdate()
           }

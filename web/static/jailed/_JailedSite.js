@@ -199,7 +199,7 @@
                method = this._interface[data.name];
              }
              var args = this._unwrap(data.args, true);
-             if(this.id != '__plugin__') args.push({id: data.pid})
+             args.push({id: data.pid})
              if(data.promise){
                var [resolve, reject] = this._unwrap(data.promise, false);
                try {
@@ -226,7 +226,7 @@
          case 'callback':
              var method = this._store.fetch(data.id)[data.num];
              var args = this._unwrap(data.args, true);
-             if(this.id != '__plugin__') args.push({id: data.pid})
+             args.push({id: data.pid})
              if(data.promise){
                var [resolve, reject] = this._unwrap(data.promise, false);
                try {
