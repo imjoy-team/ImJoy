@@ -104,9 +104,17 @@ Here is an outline of the plugin file:
   * `pyworker` is used to run plugins written in Python, the user needs to have the **Python Plugin Engine** installed and started before using the plugin. See the **Developing Python Plugins** for more details.
 * `tags` defines the tags for the plugin, if the tag is used for several plugins, they will be grouped in the ops menu shown in workflow.
 * `ui` is a string used to generate the GUI to the user, you can include the following elements to render an input form:
-  * `type: 'choice', options: []`
-  * `type: 'number', min: 0, max: 10`
+  * `type: 'choice', options: ['cat', 'dog'], placeholder: 'cat'`
+  * `type: 'number', min: 0, max: 10, placeholder:2`
+  * `type: 'color'`
+  * `type: 'string'`
+  * `type: 'save'`
+  * `type: 'instructions/comment'`
+  * `type: 'variableName'`
   * ...
+  
+  You need to define a unique id for each element, for example `"ui": "select an option: {id: 'option1', type: 'choice', options: ['cat', 'dog'], placeholder: 'cat'}"`
+
 * `version` defines the version of the plugin
 * `api_version` api version of imjoy which the plugin is written for
 * `url` the url used point to current file, used to download the plugin file when a user install it from the plugin store on imjoy.io website.
