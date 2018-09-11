@@ -41,7 +41,7 @@ ImJoy supports Python Plugins which can run much more computationally intensive 
 Under the hood, the Python Plugin Engine will be connected with the ImJoy web app through websockets, the interaction is done with remote procedure calls (RPC). When a window in the ImJoy workspace is selected, the contained data (e.g. an image) will be transferred to the Python plugin so it can process the data with the `run` function, results will be send back to the ImJoy workspace and displayed as a new window. Natively, ImJoy supports the conversion and transmission of Numpy arrays and Tensorflow tensors, so plugin developers could just use those data types and exchange them between plugins, no matter they are in Python or Javascript.
 
 ## Advanced Usage: Going offline
-If you have already installed the **Python Plugin Engine**, then you can run ImJoy in offline mode. What you do is to run the engine with `python -m imjoy --offline` . And it will download all the files for offline access, after that, if you run `python -m imjoy` in the **same directory**, you will have your personal ImJoy web app which can be access by [http://localhost:8080](http://localhost:8080).
+If you have already installed the **Python Plugin Engine**, then you can run ImJoy in offline mode. What you do is to run the engine with `python -m imjoy --serve` . And it will download all the files for offline access, after that, if you run `python -m imjoy` in the **same directory**, you will have your personal ImJoy web app which can be access by [http://localhost:8080](http://localhost:8080).
 
 Also notice that, even though ImJoy can run without internet, depends on the implementation of the plugin, some plugins maybe unusable when you go offline.
 
@@ -269,6 +269,14 @@ def error_callback(error):
 api.XXXXX().then(callback).catch(error_callback)
 ```
 
+When calling the API functions, most functions take an object or dictionary as its first argument. For Javascript plugins, an object should be used. For Python plugins, you use a dictionary, or use named arguments. For example, the following function call will work in both JavaScript and Python:
+```javascript
+//# works for JavaScript and Python
+api.XXXXX({"option1": 3, "option2": 'hi'})
+
+# only for Python
+api.XXXXX(option1=3, option2='hi')
+```
 
 ### `api.alert(...)`
 show alert dialog with message, example: `api.alert('hello world')`
@@ -316,10 +324,10 @@ update an existing window, an window ID should be passed in order to perform the
 ```javascript
 
 # Javascript
-api.updateWindow(windowId, {data: {image: ...}})
+api.updateWindow({id: windowId, data: {image: ...}})
 
 # Python
-api.updateWindow(windowId, {data: {image: ...}})
+api.updateWindow({'id': windowId, 'data': {'image': ...}})
 ```
 
 The second parameter is an object contains fields which the plugin wants to update.
@@ -345,6 +353,7 @@ show a quick message with a snackbar and disappear in a few seconds, example: `a
 update the progress bar of the current plugin (in the plugin menu), example: `api.showPluginProgress(85)`
 ### `api.showPluginStatus(...)`
 update the status text of the current plugin (in the plugin menu), example: `api.showPluginStatus('processing...')`
+
 ### `api.showFileDialog(...)`
 show a file dialog for selecting files or directories. It accept the following options:
  * `type` the mode of file dialog, it accept `file` for selecting one or multiple files; `directory` for selecting one or multiple directories; By default, it will use `type='file'`. For Python plugin, if you don't specify the type, both file or directory can be selected.

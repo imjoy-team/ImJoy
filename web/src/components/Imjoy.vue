@@ -250,6 +250,7 @@
               </div>
             </div>
             <md-divider></md-divider>
+            <p v-if="installed_plugins.length<=0">&nbsp;No plugin installed.</p>
           <!-- <div class="md-layout md-gutter md-alignment-center-center">
             <md-button class="md-raised md-primary" v-if="!installed_plugins || installed_plugins.length<=0" @click="showAddPluginDialog=true">
               <md-icon>add</md-icon>Add New Plugins
@@ -1671,6 +1672,7 @@ export default {
     register(config, _plugin) {
       try {
         const plugin = this.plugins[_plugin.id]
+        if(!plugin) throw "Plugin not found."
         config.type = config.type || config.name
         config.mode = config.mode || 'webworker'
         config.show_panel = config.show_panel || false
@@ -1874,7 +1876,9 @@ export default {
         });
       })
     },
-    async updateWindow(wid, wconfig, _plugin){
+    async updateWindow(wconfig, _plugin){
+      const wid = wconfig.id
+      if(!wid) throw "You must provide the window id for updating."
       const w = this.window_ids[wid]
       if(w && w.update){
         const ret = await w.update(wconfig)
@@ -1916,7 +1920,7 @@ export default {
         const pconfig = wconfig //_clone(window_config)
         //generate a new window id
         pconfig.mode = window_config.mode
-        pconfig.id = window_config.name.trim().replace(/ /g, '_') + '_' + randId()
+        pconfig.id = window_config.id//window_config.name.trim().replace(/ /g, '_') + '_' + randId()
         // console.log('creating window: ', pconfig)
         if (pconfig.mode != 'iframe') {
           throw 'Window plugin must be with mode "iframe"'
