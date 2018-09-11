@@ -20,11 +20,11 @@
             <md-tooltip>Switch workspace</md-tooltip>
           </md-button>
           <md-menu-content>
-            <md-menu-item @click="switchWorkspace(w)" v-for="w in workspace_list" :key="w.name">
+            <md-menu-item @click="switchWorkspace(w)" v-for="w in workspace_list" :key="w">
               <span>{{w}}</span><md-icon>forward</md-icon>
             </md-menu-item>
-            <md-menu-item @click="showNewWorkspaceDialog=true">
-              <md-icon>add</md-icon>New Workspace
+            <md-menu-item @click="showWorkspaceDialog=true">
+              <md-icon>settings</md-icon>Workspaces
             </md-menu-item>
           </md-menu-content>
         </md-menu>
@@ -283,16 +283,47 @@
     </md-dialog-actions>
   </md-dialog>
 
-  <md-dialog :md-active.sync="showNewWorkspaceDialog" :md-click-outside-to-close="false">
+  <md-dialog :md-active.sync="showWorkspaceDialog" :md-click-outside-to-close="false">
+    <md-dialog-title>Workspace Management</md-dialog-title>
     <md-dialog-content>
-      <md-field>
-        <label for="workspace_name">Name</label>
-        <md-input type="text" v-model="new_workspace_name" name="workspace_name"></md-input>
-      </md-field>
+      <md-toolbar class="md-dense" md-elevation="0">
+        <div class="md-toolbar-section-start">
+        <md-field>
+          <label for="workspace_name">Name</label>
+          <md-input type="text" v-model="new_workspace_name" placeholder="Create a new workspace" name="workspace_name"></md-input>
+        </md-field>
+        </div>
+        <div class="md-toolbar-section-end" v-show="new_workspace_name">
+          <md-button class="md-primary" @click="showWorkspaceDialog=false;switchWorkspace(new_workspace_name)"><md-icon>add</md-icon>New Workspace</md-button>
+        </div>
+      </md-toolbar>
+      <md-list class="md-double-line md-dense">
+        <md-list-item v-for="w in workspace_list" :key="w">
+            <span>{{w}}</span>
+            <md-menu>
+              <md-button class="md-icon-button md-list-action" md-menu-trigger>
+                <md-icon class="md-primary">more_horiz</md-icon>
+              </md-button>
+              <md-menu-content>
+                <md-menu-item @click="showWorkspaceDialog=false;switchWorkspace(w)">
+                    <md-icon>forward</md-icon> Switch
+                </md-menu-item>
+                <md-menu-item class="md-accent" @click="removeWorkspace(w)">
+                    <md-icon>delete</md-icon> Delete
+                </md-menu-item>
+              </md-menu-content>
+            </md-menu>
+
+
+        </md-list-item>
+      </md-list>
+      <!-- <div @click="switchWorkspace(w)" >
+        <span>{{w}}</span><md-icon>forward</md-icon>
+      </div> -->
+
     </md-dialog-content>
     <md-dialog-actions>
-      <md-button class="md-primary" @click="showNewWorkspaceDialog=false;switchWorkspace(new_workspace_name)">OK</md-button>
-      <md-button class="md-primary" @click="showNewWorkspaceDialog=false">Cancel</md-button>
+      <md-button class="md-primary" @click="showWorkspaceDialog=false;">OK</md-button>
     </md-dialog-actions>
   </md-dialog>
 
@@ -461,7 +492,7 @@ export default {
       workspace_list: [],
       workflow_list: [],
       resumable_plugins: [],
-      showNewWorkspaceDialog: false,
+      showWorkspaceDialog: false,
       show_file_dialog: false,
       plugins: null,
       registered: null,
@@ -502,7 +533,7 @@ export default {
       w: 5,
       h: 5
     }
-    this.new_workspace_name = 'default',
+    this.new_workspace_name = '',
     this.preload_main = ['/static/tfjs/tfjs.js', 'https://rawgit.com/nicolaspanel/numjs/893016ec40e62eaaa126e1024dbe250aafb3014b/dist/numjs.min.js'],
     this.workflow_joy_config = {
       expanded: true,
@@ -775,6 +806,33 @@ export default {
         query: q
       })
       this.$router.go()
+    },
+    removeWorkspace(w) {
+      if (this.workspace_list.includes(w)) {
+        const index = this.workspace_list.indexOf(w)
+        this.workspace_list.splice(index, 1)
+        this.config_db.get('workspace_list').then((doc) => {
+          this.config_db.put({
+            _id: doc._id,
+            _rev: doc._rev,
+            list: this.workspace_list,
+            default: 'default'
+          }).then(()=>{
+            this.show('Workspace ' + w + ' has been deleted.')
+          }).catch(()=>{
+            this.show('Error occured when removing workspace ' + w + '.')
+          })
+        })
+
+      }
+      // if current workspace is deleted, go to default
+      if (this.selected_workspace == w.name) {
+        this.$router.replace({
+          query: {
+            w: 'default'
+          }
+        })
+      }
     },
     show(info, duration) {
       this.snackbar_info = info
