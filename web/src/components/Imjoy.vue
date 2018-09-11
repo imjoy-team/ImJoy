@@ -1876,7 +1876,9 @@ export default {
         });
       })
     },
-    async updateWindow(wid, wconfig, _plugin){
+    async updateWindow(wconfig, _plugin){
+      const wid = wconfig.id
+      if(!wid) throw "You must provide the window id for updating."
       const w = this.window_ids[wid]
       if(w && w.update){
         const ret = await w.update(wconfig)
