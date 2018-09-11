@@ -313,14 +313,8 @@
                 </md-menu-item>
               </md-menu-content>
             </md-menu>
-
-
         </md-list-item>
       </md-list>
-      <!-- <div @click="switchWorkspace(w)" >
-        <span>{{w}}</span><md-icon>forward</md-icon>
-      </div> -->
-
     </md-dialog-content>
     <md-dialog-actions>
       <md-button class="md-primary" @click="showWorkspaceDialog=false;">OK</md-button>
