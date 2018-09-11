@@ -941,8 +941,8 @@ export default {
     },
     reloadPlugin(pconfig) {
       return new Promise((resolve, reject) => {
-        this.unloadPlugin(pconfig.name)
         try {
+          this.unloadPlugin(pconfig.name)
           // console.log('reloading plugin ', pconfig)
           const template = this.parsePluginCode(pconfig.code, pconfig)
           this.unloadPlugin(template.name)
@@ -977,7 +977,7 @@ export default {
     },
     savePlugin(pconfig) {
       return new Promise((resolve, reject) => {
-        //console.log('saving plugin ', pconfig)
+        console.log('saving plugin ', pconfig)
         const code = pconfig.code
         try {
           const template = this.parsePluginCode(code, {})
