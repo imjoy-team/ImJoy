@@ -99,12 +99,10 @@ export default {
         this.window.plugin.config._id= p_id
         this.$forceUpdate()
       })}
+      save_plugin()
       const p = this.reload()
       if(p){
         p.finally(save_plugin)
-      }
-      else{
-        save_plugin()
       }
       //this.$emit('save', {pluginId: this.pluginId, code: this.editor.getValue()})
     },
