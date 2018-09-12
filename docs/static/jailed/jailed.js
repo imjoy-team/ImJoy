@@ -908,9 +908,22 @@ function randId() {
       var sCb = function() {
           me._requestRemote();
       }
-      this._connection.execute({type: 'script', content: this.config.script, lang: this.config.lang}, sCb, this._fCb);
-      if(this.config.style && this.config.style.trim()) this._connection.execute({type: 'style', content: this.config.style}, sCb, this._fCb);
-      if(this.config.window && this.config.window.trim()) this._connection.execute({type: 'html', content: this.config.window}, sCb, this._fCb);
+
+      for (let i = 0; i < this.config.scripts.length; i++) {
+        this._connection.execute({type: 'script', content: this.config.scripts[i].content, src: this.config.scripts[i].attrs.src}, sCb, this._fCb);
+      }
+      if(this.config.mode == 'iframe'){
+        for (let i = 0; i < this.config.styles.length; i++) {
+          this._connection.execute({type: 'style', content: this.config.styles[i].content, src: this.config.styles[i].attrs.src}, sCb, this._fCb);
+        }
+        for (let i = 0; i < this.config.links.length; i++) {
+          this._connection.execute({type: 'link', rel: this.config.links[i].attrs.rel, type_: this.config.links[i].attrs.type, href: this.config.links[i].attrs.href }, sCb, this._fCb);
+        }
+        for (let i = 0; i < this.config.windows.length; i++) {
+          this._connection.execute({type: 'html', content: this.config.windows[i].content}, sCb, this._fCb);
+        }
+      }
+      this._connection.execute({type: 'script', content: this.config.script, lang: this.config.lang, main: true}, sCb, this._fCb);
     }
 
 
