@@ -112,7 +112,7 @@ Here is an outline of the plugin file:
   * `type: 'instructions/comment'`
   * `type: 'variableName'`
   * ...
-  
+
   You need to define a unique id for each element, for example `"ui": "select an option: {id: 'option1', type: 'choice', options: ['cat', 'dog'], placeholder: 'cat'}"`
 
 * `version` defines the version of the plugin
@@ -393,6 +393,26 @@ For Javascript plugins, currently supported functions are:
 
 For Python Plugins, currently supported functions are:
 `api.utils.kill` for kill a `subprocess` in python.
+
+### `api.setConfig(...)`
+Each plugin can store its configurations with `api.setConfig`. For example store a simple number `api.setConfig('sigma', 928)`,
+you can also store an object `api.setConfig('sigma', {"a": 99, "b": "1234x3"})`.
+
+**Note** this is designed for storing small amount of data, do not store large object.
+Current implementation uses `localStorage` to store settings. Depends on different browsers, most of them can only allow 5M data storage shared by all the plugins and ImJoy app itself.
+
+### `api.getConfig(...)`
+This is used for retrieve configurations set by `api.setConfig(...)`.
+For example in Javascrit you can use `const sigma = await api.getConfig('sigma')` to access get a previously stored settings.
+Notice that `await` is needed because all the api are async functions. Alternatively, you can use `Promise` to access it: ` api.getConfig('sigma').then((sigma)=>{ console.log(sigma) })`.
+
+Similarly, for Python, you will need to use callback function to access the result:
+```python
+def print_sigma(result):
+    print(result)
+
+api.getConfig('sigma').then(print_sigma)
+```
 
 ## Developing Window Plugin
 Window plugin is a speical type of plugins running in `iframe` mode, and it will show up as a window. `<window>` and `<style>` can be used to define the actual content of the window.

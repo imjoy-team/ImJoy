@@ -649,6 +649,8 @@ export default {
       showPluginStatus: this.showPluginStatus,
       showFileDialog: this.showFileDialog,
       showSnackbar: this.show,
+      setConfig: this.setPluginConfig,
+      getConfig: this.getPluginConfig,
       $forceUpdate: this.$forceUpdate,
     }
     this.resetPlugins()
@@ -723,6 +725,16 @@ export default {
     this.disconnectEngine()
   },
   methods: {
+    setPluginConfig(name, value, _plugin){
+      const plugin = this.plugins[_plugin.id]
+      if(!plugin) throw "setConfig Error: Plugin not found."
+      return localStorage.setItem("config_"+plugin.name+'_'+name, value)
+    },
+    getPluginConfig(name, _plugin){
+      const plugin = this.plugins[_plugin.id]
+      if(!plugin) throw "getConfig Error: Plugin not found."
+      return localStorage.getItem("config_"+plugin.name+'_'+name)
+    },
     showFileDialog(options, _plugin){
       if(!_plugin){
         _plugin = options
@@ -1726,7 +1738,6 @@ export default {
         const plugin = this.plugins[_plugin.id]
         if(!plugin) throw "Plugin not found."
         config.type = config.type || config.name
-        config.mode = config.mode
         config.show_panel = config.show_panel || false
         config.ui = config.ui || config.name
         config.tags = config.tags || ["op"]

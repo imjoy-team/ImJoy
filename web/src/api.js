@@ -51,7 +51,7 @@ Describe your plugin here.
   "name": "Untitled Plugin",
   "mode": "iframe",
   "tags": ["op", "window"],
-  "ui": "image display with iframe",
+  "ui": "UI for Untitled Plugin",
   "version": "0.1.0",
   "api_version": "0.1.0",
   "description": "A plugin for image display.",
@@ -97,16 +97,14 @@ Describe your plugin here.
   "mode": "pyworker",
   "version": "0.1.0",
   "api_version": "0.1.1",
-  "createdAt": "Mon Jun 26 2018 15:45:30",
   "description": "A plugin for demonstrate python plugin.",
   "tags": ["demo", "op"],
-  "ui": "image processing with python",
+  "ui": null,
   "inputs": null,
   "outputs": null,
   "icon": null,
   "env": null,
   "requirements": [],
-  "cmd": "python",
   "dependencies": []
 }
 </config>
@@ -139,7 +137,6 @@ export const PLUGIN_SCHEMA= schema({
 export const REGISTER_SCHEMA= schema({
   name: String,
   type: String,
-  mode: String,
   tags: Array,
   ui: [null, String],
   inputs: [null, Object],
