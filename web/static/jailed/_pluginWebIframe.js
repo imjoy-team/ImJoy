@@ -96,18 +96,46 @@ var importScript = function(url) {
 // evaluates the provided string
 var execute = function(code) {
     if(code.type == 'script'){
-      try {
-          eval(code.content);
-      } catch (e) {
-          console.error(e.message, e.stack)
-          parent.postMessage({type : 'executeFailure', error: e.toString()}, '*');
-          throw e;
+      if(code.src){
+        var script_node = document.createElement('script');
+        script_node.setAttribute('src', code.src);
+        document.head.appendChild(script_node);
+      }
+      else{
+        if(code.content){
+          // document.addEventListener("DOMContentLoaded", function(){
+          try {
+              eval(code.content);
+              if(code.main)  parent.postMessage({type : 'executeSuccess'}, '*');
+          } catch (e) {
+              console.error(e.message, e.stack)
+              parent.postMessage({type : 'executeFailure', error: e.toString()}, '*');
+              throw e;
+          }
+          // });
+        }
       }
     }
     else if (code.type == 'style'){
         var style_node = document.createElement('style');
+        if(code.src){
+          style_node.src = code.src
+        }
         style_node.innerHTML = code.content;
         document.head.appendChild(style_node)
+    }
+    else if (code.type == 'link'){
+        var link_node = document.createElement('link');
+        if(code.rel){
+          link_node.rel = code.rel
+        }
+        if(code.href){
+          link_node.href = code.href
+        }
+        if(code.type_){
+          link_node.type = code.type_
+        }
+        document.head.appendChild(link_node)
     }
     else if (code.type == 'html'){
          document.body.appendChild(_htmlToElement(code.content));
@@ -115,7 +143,7 @@ var execute = function(code) {
     else{
       throw "unsupported code type."
     }
-    parent.postMessage({type : 'executeSuccess'}, '*');
+
 }
 
 

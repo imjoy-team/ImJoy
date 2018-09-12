@@ -651,6 +651,7 @@ export default {
       showSnackbar: this.show,
       setConfig: this.setPluginConfig,
       getConfig: this.getPluginConfig,
+      getAttachment: this.getAttachment,
       $forceUpdate: this.$forceUpdate,
     }
     this.resetPlugins()
@@ -734,6 +735,19 @@ export default {
       const plugin = this.plugins[_plugin.id]
       if(!plugin) throw "getConfig Error: Plugin not found."
       return localStorage.getItem("config_"+plugin.name+'_'+name)
+    },
+    getAttachment(name, _plugin){
+      const plugin = this.plugins[_plugin.id]
+      if(plugin.attachments){
+        for (let i = 0; i < plugin.attachments.length; i++) {
+          if (plugin.attachments[i].attrs.name == name) {
+            return plugin.attachments[i].content
+          }
+        }
+      }
+      else{
+        return null
+      }
     },
     showFileDialog(options, _plugin){
       if(!_plugin){
@@ -1478,36 +1492,26 @@ export default {
         const pluginComp = parseComponent(code)
         // console.log('code parsed from', pluginComp)
         let c = null
-        for (let i = 0; i < pluginComp.customBlocks.length; i++) {
-          if (pluginComp.customBlocks[i].type == 'config') {
-            // find the first config block
-            config = JSON.parse(pluginComp.customBlocks[i].content)
-            // console.log('loading config from .html file', config)
-            break
+        config = JSON.parse(pluginComp.config[0].content)
+        config.scripts = []
+        for (let i = 0; i < pluginComp.script.length; i++) {
+          if (pluginComp.script[i].attrs.lang) {
+            config.script = pluginComp.script[i].content
+            config.lang = pluginComp.script[i].attrs.lang || 'javascript'
+          }
+          else{
+            config.scripts.push(pluginComp.script[i])
           }
         }
-
-        config.script = pluginComp.script.content
-        config.lang = pluginComp.script.attrs.lang || 'javascript'
-        for (let i = 0; i < pluginComp.customBlocks.length; i++) {
-          if (pluginComp.customBlocks[i].type == 'window') {
-            // find the first html block
-            config.window = pluginComp.customBlocks[i].content
-            break
-            //show the iframe if there is html defined
-            // config.iframe_container = 'plugin_window_' + config.id + randId()
-            // config.iframe_window = null
-            // config.type = 'main'
-            // this.showPluginWindow(config)
-          }
+        if(!config.script){
+          config.script = pluginComp.script[0].content
+          config.lang = pluginComp.script[0].attrs.lang || 'javascript'
         }
-        config.window = config.window || null
-        if (pluginComp.styles.length > 0) {
-          // here we only take the first stylesheet we found
-          config.style = pluginComp.styles[0].content
-        } else {
-          config.style = null
-        }
+        config.links = pluginComp.link || null
+        config.windows = pluginComp.window || null
+        config.styles = pluginComp.style || null
+        config.docs = pluginComp.docs || null
+        config.attachments = pluginComp.attachment || null
       }
       config.type = config.type || config.name
       config._id = config._id || null
@@ -1549,7 +1553,9 @@ export default {
           name: config.name,
           type: config.type,
           config: tconfig,
-          mode: template.mode
+          mode: template.mode,
+          docs: template.docs,
+          attachments: template.attachments,
         }
         this.plugins[plugin.id] = plugin
         this.plugin_names[plugin.name] = plugin
@@ -1639,7 +1645,8 @@ export default {
           plugin.terminate()
           // reject(e)
         });
-
+        plugin.docs = template.docs
+        plugin.attachments = template.attachments
         this.plugins[plugin.id] = plugin
         this.plugin_names[plugin.name] = plugin
       })

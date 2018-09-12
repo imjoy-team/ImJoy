@@ -100,10 +100,7 @@ export default {
         this.$forceUpdate()
       })}
       save_plugin()
-      const p = this.reload()
-      if(p){
-        p.finally(save_plugin)
-      }
+      this.reload()
       //this.$emit('save', {pluginId: this.pluginId, code: this.editor.getValue()})
     },
     remove(){

@@ -51,7 +51,9 @@ Also notice that, even though ImJoy can run without internet, depends on the imp
 
 Click the **+ PLUGINS** button in `Plugins`, then select `Create a New Plugin` with one of the plugin template. A code editor will show up in the workspace, you can write the code, save it, or install the plugin to the plugin menu. You can then test by click your new plugin in the plugin menu.
 
-The ImJoy plugin file format is built up on html format with customized tags (inspired by the `.vue` format), it consists of two mandatory tags `<config>` and `<script>`, and other optional tags including `<docs>`, `<window>` and `<style>`.
+The ImJoy plugin file format is built up on html format with customized tags (inspired by the `.vue` format), it consists of two mandatory tags `<config>` and `<script>`, and other optional tags including `<docs>`, `<window>` and `<style>`.  For `<style>`, you can also use `src` property and have multiple of it.
+
+Other optional tags includes `<docs>`, `<attachment>` and `<link>`.
 
 Here is an outline of the plugin file:
 ```
@@ -74,8 +76,12 @@ Here is an outline of the plugin file:
 </style lang="json">
 
 <docs lang="markdown">
-   ** An recommanded code block in Markdown format with the documentation of the plugin **
+   ** A recommanded code block in Markdown format with the documentation of the plugin **
 </docs>
+
+<attachment name="XXXXX">
+   ** An optional for storing text data, you can use multiple of them **
+</attachment>
 ```
 ## The `<config>` tag
 
@@ -413,6 +419,29 @@ def print_sigma(result):
 
 api.getConfig('sigma').then(print_sigma)
 ```
+
+### `api.getAttachment(...)`
+You can store any text data such as base64 encoded images, code and json in `<attachment>` tag, for example if you have the following tag in the plugin file:
+```
+<attachment name="att_name">
+
+</attachment>
+```
+
+To get the content in JavaScript or Python, you can use `api.getAttachment("att_name")`.
+```
+// JavaScript
+api.getAttachment("att_name").then((content)=>{
+  console.log(content)
+})
+
+# Python
+def callback(content):
+    print(content)
+
+api.getAttachment("att_name").then(callback)
+```
+
 
 ## Developing Window Plugin
 Window plugin is a speical type of plugins running in `iframe` mode, and it will show up as a window. `<window>` and `<style>` can be used to define the actual content of the window.

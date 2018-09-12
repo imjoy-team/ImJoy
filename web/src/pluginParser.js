@@ -633,10 +633,14 @@ export function parseComponent (
   if ( options === void 0 ) options = {};
 
   var sfc = {
-    template: null,
-    script: null,
-    styles: [],
-    customBlocks: []
+    script: [],
+    style: [],
+    config: [],
+    window: [],
+    docs: [],
+    attachment: [],
+    link: [],
+    others: []
   };
   var depth = 0;
   var currentBlock = null;
@@ -661,15 +665,11 @@ export function parseComponent (
           return cumulated
         }, {})
       };
-      if (isSpecialTag(tag)) {
+      if (sfc[tag]) {
         checkAttrs(currentBlock, attrs);
-        if (tag === 'style') {
-          sfc.styles.push(currentBlock);
-        } else {
-          sfc[tag] = currentBlock;
-        }
+        sfc[tag].push(currentBlock);
       } else { // custom blocks
-        sfc.customBlocks.push(currentBlock);
+        sfc.others.push(currentBlock);
       }
     }
     if (!unary) {
