@@ -1726,9 +1726,12 @@ export default {
         const plugin = this.plugins[_plugin.id]
         if(!plugin) throw "Plugin not found."
         config.type = config.type || config.name
-        config.mode = config.mode || 'webworker'
+        config.mode = config.mode
         config.show_panel = config.show_panel || false
         config.ui = config.ui || config.name
+        config.tags = config.tags || ["op"]
+        config.inputs = config.inputs || null
+        config.outputs = config.outputs || null
         // console.log('registering op', config)
         if (!REGISTER_SCHEMA(config)) {
           const error = REGISTER_SCHEMA.errors(config)
