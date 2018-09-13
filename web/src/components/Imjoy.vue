@@ -331,23 +331,40 @@
         md-confirm-text="Connect"
         @md-confirm="connectEngine(engine_url)"/>
 
-  <md-dialog-confirm
-        :md-active.sync="showPluginEngineInfo"
-        md-title="Using the Python Plugin Engine"
-        :md-click-outside-to-close="false"
-        md-content='Python plugins are supported by ImJoy with the Python Plugin Engine. <br><br>
-        If it was already installed, run <strong>python -m imjoy</strong> in a terminal.<br><br>
-        If not, you need to do the following:<br>
-        &nbsp;&nbsp;* Install <a href="https://conda.io/miniconda.html" target="_blank">Miniconda</a> or <a href="https://www.anaconda.com/download/" target="_blank">Anaconda</a> (Python3.6 version is recommanded) <br>
-        &nbsp;&nbsp;* Open a `Terminal`(mac/linux) or `Anaconda Prompt`(windows), then run the following command:<br>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>conda -V && pip install -U git+https://github.com/oeway/ImJoy-Python#egg=imjoy</strong><br>
-        &nbsp;&nbsp;* Run <strong>python -m imjoy</strong> in the terminal to start the engine.<br><br>
-        Once the plugin engine is ready, click <strong>CONNECT</strong><br>
-        If you encountered any error related to git or pip, try to run <strong>conda install -y git pip</strong> before the above command.<br>
-        If you still failed to set it up, please consult <a href="https://github.com/oeway/ImJoy-Python" target="_blank">here</a><br>'
-        md-confirm-text="Connect"
-        md-cancel-text="Cancel"
-        @md-confirm="connectEngine(engine_url)" />
+  <md-dialog :md-active.sync="showPluginEngineInfo" :md-click-outside-to-close="false">
+    <md-dialog-title>Using the Python Plugin Engine</md-dialog-title>
+    <md-dialog-content>
+        <p>
+          Python plugins are supported by ImJoy with the Python Plugin Engine. <br><br>
+          If you have it already, run <strong>python -m imjoy</strong> in a `Terminal`(mac/linux) or `Anaconda Prompt`(windows).
+        </p>
+        <md-field>
+          <label for="engine_url">Plugin Engine URL</label>
+          <md-input type="text" v-model="engine_url" name="engine_url"></md-input>
+        </md-field>
+        <md-field>
+          <label for="connection_token">Connection Token</label>
+          <md-input type="text" v-model="connection_token" name="connection_token"></md-input>
+        </md-field>
+        <p>&nbsp;{{engine_status}}</p>
+        <md-button class="md-primary" @click="connectEngine(engine_url)">Connect</md-button>
+
+        <p>
+          If you don't have it, you need to do the following:<br>
+          &nbsp;&nbsp;* Install <a href="https://conda.io/miniconda.html" target="_blank">Miniconda</a> or <a href="https://www.anaconda.com/download/" target="_blank">Anaconda</a> (Python3.6+ version is recommanded) <br>
+          &nbsp;&nbsp;* Open a `Terminal`(mac/linux) or `Anaconda Prompt`(windows), then run the following command:<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>conda -V && pip install -U git+https://github.com/oeway/ImJoy-Python#egg=imjoy</strong><br>
+          &nbsp;&nbsp;* Run <strong>python -m imjoy</strong> in the terminal to start the engine.<br><br>
+          Once the plugin engine is ready, click the `CONNECT` button below.<br>
+          If you encountered any error related to git or pip, try to run <strong>conda install -y git pip</strong> before the above command.<br>
+          If you still failed to set it up, please consult <a href="https://github.com/oeway/ImJoy-Python" target="_blank">here</a><br>
+        </p>
+    </md-dialog-content>
+    <md-dialog-actions>
+      <md-button class="md-primary" @click="showPluginEngineInfo=false;">Cancel</md-button>
+      <md-button class="md-primary" @click="showPluginEngineInfo=false; connectEngine(engine_url)">OK</md-button>
+    </md-dialog-actions>
+  </md-dialog>
 
   <md-dialog :md-active.sync="showSettingsDialog" :md-click-outside-to-close="false">
     <md-dialog-title>Settings</md-dialog-title>
@@ -362,7 +379,11 @@
             <label for="engine_url">Plugin Engine URL</label>
             <md-input type="text" v-model="engine_url" name="engine_url"></md-input>
           </md-field>
-          <md-button class="md-primary" @click="connectEngine(engine_url)">Connect Plugin Engine</md-button>
+          <md-field>
+            <label for="connection_token">Connection Token</label>
+            <md-input type="text" v-model="connection_token" name="connection_token"></md-input>
+          </md-field>
+          <md-button class="md-primary" @click="connectEngine(engine_url); showSettingsDialog=false;">Connect Plugin Engine</md-button>
           <md-button class="md-primary" @click="disconnectEngine()">Disconnect Plugin Engine</md-button>
           <p>{{engine_status}}</p>
         </md-card-content>
@@ -382,6 +403,7 @@
       <md-button class="md-primary" @click="showSettingsDialog=false; reloadPlugins()">OK</md-button>
     </md-dialog-actions>
   </md-dialog>
+
   <md-dialog :md-active.sync="showAddPluginDialog" :md-click-outside-to-close="true">
     <md-dialog-title>Plugins Management</md-dialog-title>
     <md-dialog-content>
@@ -636,6 +658,13 @@ export default {
       localStorage.setItem("imjoy_client_id", this.client_id);
     }
     this.connection_token = localStorage.getItem("imjoy_connection_token")
+
+    this.engine_url = localStorage.getItem("imjoy_engine_url")
+    if(!this.engine_url){
+      this.engine_url = location.protocol+'//'+location.hostname+(location.port ? ':'+location.port: '')
+      localStorage.setItem("imjoy_engine_url", this.engine_url)
+    }
+
     this.plugin_api = {
       alert: this.showAlert,
       register: this.register,
@@ -876,7 +905,7 @@ export default {
       const socket = io(url);
       const timer = setTimeout(() => {
         if (!this.engine_connected) {
-          this.engine_status = 'Plugin Engine not connected'
+          this.engine_status = 'Plugin Engine is not connected.'
           if(!auto) this.show('Failed to connect, please make sure you have started the plugin engine.', 5000)
           if(!auto) this.showPluginEngineInfo = true
           if(auto) socket.disconnect()
@@ -891,10 +920,11 @@ export default {
             this.socket = socket
             this.pluing_context.socket = socket
             this.engine_connected = true
+            this.showPluginEngineInfo = false
             this.engine_status = 'Connected.'
             localStorage.setItem("imjoy_connection_token", this.connection_token);
             // console.log('these python plugins can be resumed: ', ret.plugins)
-            this.show('Plugin Engine connected.')
+            this.show('Plugin Engine is connected.')
             // console.log('plugin engine connected.')
             this.store.event_bus.$emit('engine_connected', d)
             this.reloadPythonPlugins()
