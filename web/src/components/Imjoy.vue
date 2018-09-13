@@ -78,6 +78,12 @@
           </md-menu-content>
         </md-menu>
       </div>
+      <form v-show="false" ref="folder_form">
+        <input class="md-file" type="file" @change="selectFileChanged" ref="folder_select" webkitdirectory mozdirectory msdirectory odirectory directory multiple></input>
+      </form>
+      <form v-show="false" ref="file_form">
+        <input class="md-file" type="file" @change="selectFileChanged" ref="file_select" multiple></input>
+      </form>
     </md-app-toolbar>
     <md-app-drawer :md-active.sync="menuVisible" md-persistent="full">
       <!-- <md-app-toolbar class="md-primary md-dense"> -->
@@ -107,12 +113,6 @@
           <md-field v-show="false">
             <md-file v-model="file_select" ref="folder_select" @md-change="selectFileChanged" webkitdirectory mozdirectory msdirectory odirectory directory multiple/>
           </md-field> -->
-          <form v-show="false" ref="folder_form">
-            <input class="md-file" type="file" @change="selectFileChanged" ref="folder_select" webkitdirectory mozdirectory msdirectory odirectory directory multiple></input>
-          </form>
-          <form v-show="false" ref="file_form">
-            <input class="md-file" type="file" @change="selectFileChanged" ref="file_select" multiple></input>
-          </form>
           <md-button class="site-button" to="/">
             <div class="site-title">ImJoy.io<span class="superscript">alpha</span></div>
           </md-button>
@@ -510,9 +510,9 @@ export default {
     this.router = this.$root.$data.router
     this.store = this.$root.$data.store
     this.api = this.$root.$data.store.api
+    this.api.show = this.show
     this.window_ids = {}
     this.plugin_names = null
-    this.api = this.$root.$data.store.api
     this.db = null
     this.client_id = null
     this.plugin_templates = {
@@ -757,24 +757,31 @@ export default {
       if(_plugin && _plugin.id){
         const source_plugin = this.plugins[_plugin.id]
         if(source_plugin){
-          console.log(source_plugin)
+          this.$refs.file_form.reset()
+          this.$refs.file_select.click()
           if(source_plugin && source_plugin.mode != 'pyworker'){
-            if(options.type == 'file'){
-              $refs.file_form.reset();$refs.file_select.click()
-            }
-            else if(options.type == 'directory'){
-              $refs.file_form.reset();$refs.folder_select.click()
-            }
-            else{
-              throw "unsupported type: "+options.type
-            }
+            return this.$refs['file-dialog'].showDialog(options)
+            // if(options.type == 'file'){
+            //   this.$refs.file_form.reset()
+            //   this.$refs.file_select.click()
+            // }
+            // else if(options.type == 'directory'){
+            //   this.$refs.file_form.reset();
+            //   this.$refs.folder_select.click()
+            // }
+            // else{
+            //   throw "unsupported type: "+options.type
+            // }
           }
           else{
             return this.$refs['file-dialog'].showDialog(options)
           }
         }
       }
-      throw "Plugin not found."
+      else{
+        throw "Plugin not found."
+      }
+
     },
     // fileTreeSelected(s){
     //   console.log('selected---->', s.path)
@@ -921,9 +928,7 @@ export default {
     },
     listEngineDir(path, type, recursive){
       return new Promise((resolve, reject) => {
-        console.log('listing dir...')
         this.socket.emit('list_dir', {path: path || '.', type: type || 'file', recursive: recursive || false}, (ret)=>{
-          console.log('list dir: ', ret)
           if(ret.success){
             // this.file_tree = ret
             resolve(ret)

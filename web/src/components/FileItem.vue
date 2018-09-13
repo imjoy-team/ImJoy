@@ -3,11 +3,12 @@
     <div>
       <span v-if="isFolder" @click="toggle">[{{ open ? '-' : '+' }}]</span>
       <span @click="select({target: model, path: root})" @dblclick="load()">
-        <md-icon v-if="model.type=='dir'">folder_open</md-icon> <md-icon v-else>insert_drive_file</md-icon>
+        <md-icon v-if="model.type=='file'">insert_drive_file</md-icon> <md-icon v-else>folder_open</md-icon>
         <span class="noselect" :class="{bold: isFolder, selected: (root)==selected || (selected && Array.isArray(selected) && selected.indexOf(root)>=0)}">{{ model.name }}</span>
       </span>
       <md-icon-button v-if="isFolder" @click="load()"><md-icon>arrow_upward</md-icon></md-icon-button>
     </div>
+
     <ul v-if="open&&isFolder">
       <file-item
         class="item"

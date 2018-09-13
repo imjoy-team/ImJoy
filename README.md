@@ -373,7 +373,7 @@ show a file dialog for selecting files or directories. It accept the following o
  * `type` the mode of file dialog, it accept `file` for selecting one or multiple files; `directory` for selecting one or multiple directories; By default, it will use `type='file'`. For Python plugin, if you don't specify the type, both file or directory can be selected.
  * `title` the title of the dialog.
 
-Since the file handling is different in the browser environment and Python, this api have different behavior when called from different types of plugin. In Javascrpt, a system file selection dialog will be used, and it will return a promise which you can get the selected file object with or a list of files. In Python, an Imjoy file dialog will be displayed, it will only return a promise which you can get the file path string with.  
+Since the file handling is different in the browser environment and Python, this api have different behavior when called from different types of plugin. In Javascrpt and Python, an Imjoy file dialog will be displayed, it will only return a promise which you can get the file path string with.
 
 Example:
 ```javascript

@@ -5,7 +5,6 @@
     <md-dialog-content>
       <ul v-if="file_tree">
         <file-item :model="file_tree" :root="root" :selected="file_tree_selection" @load="loadFile" @select="fileTreeSelected">
-          <md-icon-button>up</md-icon-button>
         </file-item>
       </ul>
     </md-dialog-content>
@@ -50,8 +49,7 @@ export default {
        this.$forceUpdate()
      },
      loadFile(f){
-
-       if(f.target.type == 'dir'){
+       if(f.target.type != 'file'){
          if(f.path == this.root){
            f.path = f.path+'/../'
          }
@@ -59,7 +57,6 @@ export default {
            this.root = tree.path
            this.file_tree = tree
            this.$forceUpdate()
-           console.log(this.file_tree)
          })
        }
        else{
@@ -80,7 +77,6 @@ export default {
            this.root = tree.path
            this.file_tree = tree
            this.$forceUpdate()
-           console.log(this.file_tree)
          })
        })
      }

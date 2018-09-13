@@ -373,13 +373,11 @@ export default {
           const pluginComp = parseComponent(code)
           console.log('code parsed from', pluginComp)
           let c = null
-          for (let i = 0; i < pluginComp.customBlocks.length; i++) {
-            if (pluginComp.customBlocks[i].type == 'config') {
-              // find the first config block
-              config = JSON.parse(pluginComp.customBlocks[i].content)
-              console.log('loading config from .html file', config)
-              break
-            }
+          try {
+            config = JSON.parse(pluginComp.config[0].content)
+            console.log('loading config from .html file', config)
+          } catch (e) {
+            console.error(e)
           }
           if (!config) {
             console.error('Failed to parse the plugin code.', code)
@@ -426,6 +424,9 @@ export default {
             addPlugin()
           });
 
+        }).catch((e)=>{
+          console.error(e)
+          this.api.show('Failed to download, if you download from github, please use the url to the raw file', 6000)
         })
       })
 

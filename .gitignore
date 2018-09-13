@@ -3,3 +3,4 @@ __pycache__
 *.pyc
 mode_modules
 /docs
+__websocket_relay__.js
