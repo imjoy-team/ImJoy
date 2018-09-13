@@ -659,11 +659,8 @@ export default {
     }
     this.connection_token = localStorage.getItem("imjoy_connection_token")
 
-    this.engine_url = localStorage.getItem("imjoy_engine_url")
-    if(!this.engine_url){
-      this.engine_url = location.protocol+'//'+location.hostname+(location.port ? ':'+location.port: '')
-      localStorage.setItem("imjoy_engine_url", this.engine_url)
-    }
+    this.engine_url = localStorage.getItem("imjoy_engine_url") || 'http://localhost:8080'
+    //location.protocol+'//'+location.hostname+(location.port ? ':'+location.port: '')
 
     this.plugin_api = {
       alert: this.showAlert,
@@ -923,11 +920,13 @@ export default {
             this.showPluginEngineInfo = false
             this.engine_status = 'Connected.'
             localStorage.setItem("imjoy_connection_token", this.connection_token);
+            localStorage.setItem("imjoy_engine_url", url)
             // console.log('these python plugins can be resumed: ', ret.plugins)
             this.show('Plugin Engine is connected.')
             // console.log('plugin engine connected.')
             this.store.event_bus.$emit('engine_connected', d)
             this.reloadPythonPlugins()
+
             // this.listEngineDir()
           }
           else{
