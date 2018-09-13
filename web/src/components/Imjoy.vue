@@ -347,7 +347,7 @@
           <md-input type="text" v-model="connection_token" name="connection_token"></md-input>
         </md-field>
         <p>&nbsp;{{engine_status}}</p>
-        <md-button class="md-primary" @click="connectEngine(engine_url)">Connect</md-button>
+        <md-button class="md-primary" v-if="!engine_connected" @click="connectEngine(engine_url)">Connect</md-button>
 
         <p>
           If you don't have it, you need to do the following:<br>
