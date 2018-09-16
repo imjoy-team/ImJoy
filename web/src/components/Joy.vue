@@ -66,22 +66,9 @@ export default {
         // Other ops to include, beyond turtle ops:
         modules: this.config.modules || ["instructions", "math"],
 
-        onexecute: this.config.onexecute
+        onexecute: this.config.onexecute,
         // What to do when the user makes a change:
-        // onupdate: (my) => {
-        //   // turtle.start();
-        //   // my.turtleInstructions.act(turtle);
-        //   // turtle.draw();
-        //   console.log('joy updated: ', my)
-        //   this.$emit('update', my)
-        // }
-      }
-      for (let c in this.config) {
-        if (this.config.hasOwnProperty(c)) {
-          if (c.endsWith('onupdate') && typeof this.config[c] == 'function') {
-            joy_config[c] = this.config[c]
-          }
-        }
+        onupdate: this.config.onupdate
       }
       // console.log('setting up joy ', this.config)
       try {

@@ -1802,6 +1802,7 @@ export default {
         else{
           run = plugin && plugin.api && plugin.api.run
         }
+
         if (!plugin || !run) {
           console.log("WARNING: no run function found in the config, this op won't be able to do anything: " + config.name)
           config.onexecute = () => {
@@ -1815,14 +1816,22 @@ export default {
           }
           config.onexecute = onexecute
         }
-        if (config.onupdate && typeof config.onupdate == 'object') {
-          for (let k in config.onupdate) {
-            if (config.onupdate.hasOwnProperty(k)) {
-              // replace the string to a real function
-              const onupdate = plugin.api[config.onupdate[k]]
-              config.onupdate[k] = onupdate
-            }
+
+        if(config.update && typeof config.update == 'function'){
+          const onupdate = async (my) => {
+            // my.target._workflow_id = null;
+            const result = await config.update(this.joy2plugin(my))
+            return this.plugin2joy(result)
           }
+          config.onupdate = onupdate
+        }
+        else if(plugin && plugin.api && plugin.api.update){
+          const onupdate = async (my) => {
+            // my.target._workflow_id = null;
+            const result = await plugin.api.update(this.joy2plugin(my))
+            return this.plugin2joy(result)
+          }
+          config.onupdate = onupdate
         }
         // console.log('adding joy op', config)
         const joy_template = config

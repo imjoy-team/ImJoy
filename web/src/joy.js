@@ -49,53 +49,6 @@ function Joy(options){
 	Joy.ui.init(self);
 	Joy.modal.init(self);
 
-	// Update!
-	// self.onupdate = self.onupdate || function(my){};
-	self.update = function(){
-
-		// Create a fake "my"
-		var my = {
-			op: self,
-			data: {}
-		};
-
-		// Try to pre-evaluate all data beforehand!
-		self.children.forEach(function(childOp){
-			var dataID = childOp.dataID;
-			if(dataID){
-				var value = childOp.get();
-				my.data[dataID] = value;
-			}
-		});
-
-		// Aliases to all children too, though
-		self.children.forEach(function(child){
-			if(child.id) my[child.id] = child;
-		});
-
-		// On Update!
-		if(self.onupdate && typeof self.onupdate == 'function'){
-			var ret = self.onupdate({data: my.data});
-			if(ret instanceof Promise){
-				ret.then((res)=>{
-					if(res && res.init){
-						self.init = res.init;
-						self.children = [];
-						Joy.initializeWithString(self, self.init);
-						self.createWidget();
-						if(self.container){
-							self.container.innerHTML = '';
-							self.container.appendChild(self.dom);
-						}
-					}
-				}).catch(()=>{
-					console.error('failed to run onupdate function in ' + self.id)
-				}); //my
-			}
-		}
-	};
-	self.update();
-
 	// Return to sender
 	return self;
 
@@ -133,7 +86,7 @@ Joy.Op = function(options, parent, data){
 	}
 	_configure(self, self.options);
 
-	if(parent && typeof parent.onupdate == 'object'){
+	if(parent && typeof parent.onupdate == 'object' && parent.onupdate[self.id]){
 		self.onupdate = parent.onupdate[self.id]
 	}
 
@@ -141,7 +94,7 @@ Joy.Op = function(options, parent, data){
 	self.children = [];
 	self.addChild = function(child, data){
 		//get onupdate for the child
-		if(typeof self.onupdate == 'object'){
+		if(typeof self.onupdate == 'object' && self.onupdate[child.id]){
 			child.onupdate = self.onupdate[child.id]
 		}
 		// If child's not an Op, it's options to create a new Op.
@@ -158,42 +111,6 @@ Joy.Op = function(options, parent, data){
 	self.removeChild = function(child){
 		_removeFromArray(self.children, child);
 		child.kill();
-	};
-	// Update
-	self.update = function(){
-		// if(self.onchange && typeof self.onchange == 'function') self.onchange({});
-		if(self.onupdate && typeof self.onupdate == 'function'){
-			var ret = self.onupdate({data: self.data})// TODO: make consistent with .execute()
-			if(ret instanceof Promise){
-				ret.then((res)=>{
-					try {
-						if(res && res.init){
-							// TODO: update the widget
-							// self.children = [];
-							// replace the entire dom
-							// Joy.initializeWithString(self, res.init);
-							// self.createWidget();
-							// if(self.top && self.top.container){
-							// 	self.top.container.innerHTML=""
-							// 	self.top.container.appendChild(self.dom);
-							// }
-							var old_dom = self.dom
-							self.children = [];
-							Joy.initializeWithString(self, res.init);
-							self.createWidget();
-							if(self.parent && self.parent.dom){
-								self.parent.dom.replaceChild(self.dom, old_dom);
-							}
-						}
-					} catch (e) {
-						console.error(e)
-					}
-				}).catch(()=>{
-					console.error('failed to run onupdate function in ' + self.id)
-				}); //my
-			}
-		}
-		if(self.parent) self.parent.update();
 	};
 
 	// Kill!
@@ -337,6 +254,60 @@ Joy.Op = function(options, parent, data){
 			target: target,
 			data: data
 		});
+
+	};
+
+	// Update
+	self.update = function(){
+		// if(self.onchange && typeof self.onchange == 'function') self.onchange({});
+		if(self.parent) self.parent.update();
+		if(self.onupdate && typeof self.onupdate == 'function'){
+			// Real or Preview data?
+			var data;
+			if(self.previewData){
+				data = _clone(self.previewData);
+			}else{
+				data = _clone(self.data);
+			}
+
+			// Try to pre-evaluate all data beforehand!
+			self.children.forEach(function(childOp){
+				var dataID = childOp.dataID;
+				if(dataID){
+					var value = childOp.get({});
+					data[dataID] = value;
+				}
+			});
+			var ret = self.onupdate({data: data})// TODO: make consistent with .execute()
+			// if(ret instanceof Promise){
+			// 	ret.then((res)=>{
+			// 		try {
+			// 			if(res && res.init){
+			// 				// TODO: update the widget
+			// 				// self.children = [];
+			// 				// replace the entire dom
+			// 				// Joy.initializeWithString(self, res.init);
+			// 				// self.createWidget();
+			// 				// if(self.top && self.top.container){
+			// 				// 	self.top.container.innerHTML=""
+			// 				// 	self.top.container.appendChild(self.dom);
+			// 				// }
+			// 				var old_dom = self.dom
+			// 				self.children = [];
+			// 				Joy.initializeWithString(self, res.init);
+			// 				self.createWidget();
+			// 				if(self.parent && self.parent.dom){
+			// 					self.parent.dom.replaceChild(self.dom, old_dom);
+			// 				}
+			// 			}
+			// 		} catch (e) {
+			// 			console.error(e)
+			// 		}
+			// 	}).catch(()=>{
+			// 		console.error('failed to run onupdate function in ' + self.id)
+			// 	}); //my
+			// }
+		}
 
 	};
 

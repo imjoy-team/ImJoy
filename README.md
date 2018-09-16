@@ -160,6 +160,9 @@ Optionally, if you provided a function called `exit`, it will be called when the
 ### `run()` function
 `run` function will be called each time a user click on the menu or run a workflow is executed. While executed, an object(for Javascript) or a dictionary(for Python) called `my` will be passed into the function.
 
+### optional: `update()` function
+Optionally, you can define an update function which will be called when any setting of the op is changed.
+
 All the plugins can access `config` and `data` from `my`:
 
  * `my.config`
@@ -295,21 +298,43 @@ api.XXXXX(option1=3, option2='hi')
 ### `api.alert(...)`
 show alert dialog with message, example: `api.alert('hello world')`
 ### `api.register(...)`
-register a new op, example:
+register a new op, example code for JavaScript:
 ```javascript
-    api.register({
-       "name": "LUT",
-       "tags": ["op"],
-       "inputs": {"type": {"enum": ["image/grayscale"], "required": true}},
-       "outputs": {"type": {"enum": ["image/color"], "required": true}},
-       "ui": "apply LUT {id:'lut', type:'choose', options:['hot', 'rainbow'], placeholder: 'hot'}",
-    })
+    api.register({name: "LUT", ui: "apply LUT {id:'lut', type:'choose', options:['hot', 'rainbow'], placeholder: 'hot'}"})
 ```
-The same api works for both Javascript and Python.
+
+Example code for Python:
+```python
+    api.register(name="LUT", ui="apply LUT {id:'lut', type:'choose', options:['hot', 'rainbow'], placeholder: 'hot'}")
+```
+
+Or, you can use the following version which works for both Javascript and Python:
+```javascript
+api.register({"name":"LUT", "ui":"apply LUT {id:'lut', type:'choose', options:['hot', 'rainbow'], placeholder: 'hot'}"})
+```
 
 By default, each all the ops created by the same plugin will call the same `run` function defined in the plugin, and you will need to use `my._op` in the `run` function to differentiate which op is called.
 
 Alternatively, another `Plugin API` function other than `run` can be passed when calling `api.register`. For example, you can add  `"run": this.hello` in a Javascript plugin or `"run": self.hello` in a Python plugin if `hello` is a member function of the plugin class. When the registered op is exectued, `hello` will be called. **Note:** the function must be a member of the plugin class or being exported (with `api.export`) as a `Plugin API` function. This is because a arbitrary function transfered by ImJoy will be treated as `callback` function, thus only allowed to run once.
+
+If you want to run a function whenever any option is changed, you can pass a `update` function. Similar to `run`, you need to pass a function from the member of the plugin class.
+
+Here is an example which defines `run` and `update` in Python:
+
+```python
+class PythonPlugin():
+  def apply_lut(self, my):
+    ...
+  def lut_updated(self, my):
+    ...
+  def setup(self):
+    ...
+    api.register(name="LUT",
+                 ui="apply LUT {id:'lut', type:'choose', options:['hot', 'rainbow'], placeholder: 'hot'}",
+                 run=self.apply_lut,
+                 update=self.lut_updated)
+    ...
+```
 
 ### `api.createWindow(...)`
 create a new window and add to the workspace, example:
