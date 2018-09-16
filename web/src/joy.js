@@ -28,8 +28,8 @@ function Joy(options){
 	Joy.initReferences(self);
 
 	// Allow previewing of... ops, numbers, variables?
-	if(self.previewOps==undefined) self.previewOps = true;
-	if(self.previewNumbers==undefined) self.previewNumbers = true;
+	if(self.previewOps==undefined) self.previewOps = false;
+	if(self.previewNumbers==undefined) self.previewNumbers = false;
 	//if(self.previewVariables==undefined) self.previewVariables = false;
 	self.activePreview = null;
 	self.canPreview = function(type){
@@ -2028,7 +2028,7 @@ Joy.add({
 		var _stopPreview = function(){
 			if(_ticker) clearInterval(_ticker);
 			self.previewData = null;
-			self.update();
+			// self.update();
 		};
 		self.dom.onmouseleave = _stopPreview;
 

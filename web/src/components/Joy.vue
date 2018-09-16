@@ -68,7 +68,8 @@ export default {
 
         onexecute: this.config.onexecute,
         // What to do when the user makes a change:
-        onupdate: this.config.onupdate
+        onupdate: this.config.onupdate,
+
       }
       // console.log('setting up joy ', this.config)
       try {
