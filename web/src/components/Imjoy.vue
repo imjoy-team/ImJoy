@@ -457,7 +457,8 @@ import {
 
 import {
   _clone,
-  randId
+  randId,
+  debounce
 } from '../utils.js'
 import {
   parseComponent
@@ -1823,7 +1824,7 @@ export default {
             const result = await config.update(this.joy2plugin(my))
             return this.plugin2joy(result)
           }
-          config.onupdate = onupdate
+          config.onupdate = debounce(onupdate, 300)
         }
         else if(plugin && plugin.api && plugin.api.update){
           const onupdate = async (my) => {
@@ -1831,7 +1832,7 @@ export default {
             const result = await plugin.api.update(this.joy2plugin(my))
             return this.plugin2joy(result)
           }
-          config.onupdate = onupdate
+          config.onupdate = debounce(onupdate, 300)
         }
         // console.log('adding joy op', config)
         const joy_template = config
