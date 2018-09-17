@@ -8,7 +8,7 @@
       <div class="md-toolbar-section-start">
         <md-button v-if="!menuVisible" class="md-primary md-icon-button" @click="menuVisible=true">
           <md-icon>menu</md-icon>
-          <md-tooltip>show sidebar</md-tooltip>
+          <!-- <md-tooltip>show sidebar</md-tooltip> -->
         </md-button>
         <md-button to="/" v-if="!menuVisible" class="md-medium-hide">
           <div class="site-title">ImJoy.io<span class="superscript md-small-hide">alpha</span></div>
@@ -48,7 +48,7 @@
         </md-button>
         <md-button class="md-icon-button" target="_blank" href="https://github.com/oeway/ImJoy">
           <md-icon>help</md-icon>
-          <md-tooltip>Open help information.</md-tooltip>
+          <!-- <md-tooltip>Open help information.</md-tooltip> -->
         </md-button>
         <md-button v-if="!engine_connected" @click="connectEngine(engine_url)" class="md-icon-button md-accent">
           <md-icon>🚀</md-icon>
@@ -120,11 +120,11 @@
         <div class="md-toolbar-section-end">
           <md-button class="md-icon-button md-primary" @click="showSettingsDialog=true">
             <md-icon>settings</md-icon>
-            <md-tooltip>Show settings and installed plugins</md-tooltip>
+            <!-- <md-tooltip>Show settings and installed plugins</md-tooltip> -->
           </md-button>
           <md-button class="md-icon-button md-dense md-raised" @click="menuVisible = !menuVisible">
             <md-icon>keyboard_arrow_left</md-icon>
-            <md-tooltip>Hide sidebar</md-tooltip>
+            <!-- <md-tooltip>Hide sidebar</md-tooltip> -->
           </md-button>
         </div>
       </div>
