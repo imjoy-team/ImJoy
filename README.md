@@ -25,8 +25,8 @@
  * Go to the [ImJoy web app](https://imjoy.io/#/app), click the **+ PLUGINS** button in `Plugins` to install new plugins from the [Plugin Repository](https://github.com/oeway/ImJoy-Plugins).
  * You can then open files or folders with the **+** button, or drag and drop them to the web app.
  * When files are loaded into the workspace, you can click the file to open it if the file is recognized by ImJoy or any plugin. For example, if you installed the plugin "Tif file importer", you will be able to click the .tif file in the file window.
- * Similar to [ImageJ](https://imagej.nih.gov/ij), when clicking on the plugin menu, ImJoy will try to pass the current active window to the plugin, it is them let the plugin decide how to process the data contained in the window.
- * If you installed plugins written in Python, they will be disabled by default. In order to light them up, and benifit from the full power of your computer, you need to setup the **Python Plugin Engine** as follows.
+ * Similar to [ImageJ](https://imagej.nih.gov/ij), when clicking on the plugin menu, ImJoy will try to pass the current active window to the plugin, it then will let the plugin decide how to process the data contained in the window.
+ * If you installed plugins written in Python, they will be disabled by default. In order to light them up and benifit from the full power of your computer, you need to setup the **Python Plugin Engine** as follows.
 
 ## Advanced Usage: the Python Plugin Engine
 You can use the **Python Plugin Engine** to unlock the power of your computer or another computer in your local network.
