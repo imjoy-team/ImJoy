@@ -136,11 +136,11 @@ export default {
 <style scoped>
 
 .editor{
-  overflow: auto;
+  overflow: hidden;
   /* height: 100%; */
   /* width: 600px; */
   /* width: 100%; */
-  height: 800px;
+  height: calc( 100vh - 16px );
 }
 /*
 .editor-toolbar{
