@@ -1,6 +1,6 @@
 {
   "name": "ImJoy.io",
-  "version": "0.8.22",
+  "version": "0.8.24",
   "description": "Image processing with joy.",
   "author": "Wei OUYANG <wei.ouyang@cri-paris.org>",
   "private": true,
@@ -21,6 +21,8 @@
     "js-schema": "^1.0.1",
     "lodash": "^4.17.10",
     "marked": "^0.4.0",
+    "monaco-editor": "^0.14.3",
+    "monaco-editor-webpack-plugin": "1.5.0",
     "pica": "^4.0.1",
     "uglify-es": "github:mishoo/UglifyJS2#harmony",
     "uglify-js": "^2.8.29",
@@ -31,6 +33,7 @@
     "vue-grid-layout": "^2.1.13",
     "vue-js-grid": "github:euvl/vue-js-grid",
     "vue-material": "^1.0.0-beta-10.2",
+    "vue-monaco": "^0.2.0",
     "vue-router": "^3.0.1",
     "vue-slider-component": "^2.6.2"
   },

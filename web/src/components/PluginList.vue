@@ -133,7 +133,7 @@
 
   <md-dialog class="editor-dialog" :md-active.sync="showEditor">
     <md-dialog-content>
-      <plugin-editor class="code-editor" v-model="editorCode" title="Plugin Editor" :options="editorOptions"></plugin-editor>
+      <plugin-editor class="code-editor" v-model="editorCode" title="Plugin Editor"></plugin-editor>
     </md-dialog-content>
     <md-dialog-actions>
       <!-- <md-button class="md-primary" @click="saveCode(); showEditor=false">Save</md-button> -->
@@ -196,7 +196,6 @@ export default {
       editorCode: '',
       plugin_url: '',
       editorPlugin: null,
-      editorOptions: {},
       showEditor: false,
       containerWidth: 500,
       uri_root: null,
@@ -289,10 +288,6 @@ export default {
       if(plugin.installed){
         this.db.get(plugin._id).then((doc) => {
           this.editorCode = doc.code
-          this.editorOptions = {
-            mode: "ace/mode/html",
-            selectionStyle: "text"
-          }
           this.editorPlugin = plugin
           this.showEditor = true
           this.$forceUpdate()
@@ -308,10 +303,6 @@ export default {
             return
           }
           this.editorCode = response.data
-          this.editorOptions = {
-            mode: "ace/mode/html",
-            selectionStyle: "text"
-          }
           this.editorPlugin = plugin
           this.showEditor = true
           this.$forceUpdate()

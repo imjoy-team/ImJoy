@@ -2,7 +2,7 @@
 <div class="whiteboard noselect" ref="whiteboard"  @click="unselectWindows()">
   <div class="overlay" @click="show_overlay=false" v-if="show_overlay"></div>
   <grid-layout :layout="windows" :col-num="20" :is-mirrored="false" :auto-size="true" :row-height="row_height" :col-width="column_width" :is-draggable="true" :is-resizable="true" :vertical-compact="true" :margin="[3, 3]" :use-css-transforms="true">
-    <grid-item v-for="(w, wi) in windows" drag-ignore-from=".ace_editor" :x="w.x" :y="w.y" :w="w.w" :h="w.h" :i="w.i" @resize="focusWindow(w)" @move="focusWindow(w)" @resized="show_overlay=false;w.resize&&w.resize()" @moved="show_overlay=false;w.move&&w.move()" :key="w.iframe_container">
+    <grid-item v-for="(w, wi) in windows" drag-ignore-from=".code_editor" :x="w.x" :y="w.y" :w="w.w" :h="w.h" :i="w.i" @resize="focusWindow(w)" @move="focusWindow(w)" @resized="show_overlay=false;w.resize&&w.resize()" @moved="show_overlay=false;w.move&&w.move()" :key="w.iframe_container">
       <md-card>
         <md-card-expand>
           <md-card-actions md-alignment="space-between" :class="w.selected?'window-selected':'window-header'">
@@ -193,12 +193,14 @@ export default {
       w._w = w.w
       w.h = fh
       w.w = fw
+      setTimeout(()=>{w.resize&&w.resize()}, 1000);
     },
     normalSize(w) {
       w.h = w._h || 5
       w.w = w._w || 5
       w._w = null
       w._h = null
+      setTimeout(()=>{w.resize&&w.resize()}, 1000);
     },
     duplicate(w) {
       const nw = Object.assign({}, w)
