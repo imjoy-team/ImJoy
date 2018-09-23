@@ -12,7 +12,7 @@
               </md-button>
             </md-card-expand-trigger>
             <div v-if="!w.panel"></div>
-            <div class="window-title noselect" @click.stop="selectWindow(w, $event)">{{w.name+'(#'+w.i+')'}}</div>
+            <div class="window-title noselect" @dblclick="w._h && w._w?normalSize(w):fullScreen(w)" @click.stop="selectWindow(w, $event)">{{w.name+'(#'+w.i+')'}}</div>
             <div>
               <md-menu md-size="big" md-direction="bottom-end">
                 <md-button class="md-icon-button" md-menu-trigger>
