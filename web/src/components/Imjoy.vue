@@ -203,7 +203,8 @@
               <md-divider></md-divider>
               <md-menu md-size="medium">
                 <md-button class="md-icon-button" :class="plugin.running?'md-accent':''" md-menu-trigger>
-                  <md-icon v-if="plugin.config.icon">{{plugin.config.icon}}</md-icon>
+                  <md-progress-spinner v-if="plugin.initializing" class="md-accent" :md-diameter="20" md-mode="indeterminate"></md-progress-spinner>
+                  <md-icon v-else-if="plugin.config.icon">{{plugin.config.icon}}</md-icon>
                   <md-icon v-else>extension</md-icon>
                   <md-tooltip>show more options for the plugin</md-tooltip>
                 </md-button>
