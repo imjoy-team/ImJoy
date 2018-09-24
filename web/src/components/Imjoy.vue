@@ -659,7 +659,16 @@ export default {
       this.client_id = 'imjoy_web_'+randId()
       localStorage.setItem("imjoy_client_id", this.client_id);
     }
-    this.connection_token = localStorage.getItem("imjoy_connection_token")
+    console.log('--------------', this.$route.query)
+    if(this.$route.query.token){
+      const query = Object.assign({}, this.$route.query);
+      delete query.token;
+      this.$router.replace({ query });
+      this.connection_token = this.$route.query.token
+    }
+    else{
+      this.connection_token = localStorage.getItem("imjoy_connection_token")
+    }
 
     this.engine_url = localStorage.getItem("imjoy_engine_url") || 'http://localhost:8080'
     //location.protocol+'//'+location.hostname+(location.port ? ':'+location.port: '')
@@ -913,10 +922,13 @@ export default {
         if (!this.engine_connected) {
           this.engine_status = 'Plugin Engine is not connected.'
           if(!auto) this.show('Failed to connect, please make sure you have started the plugin engine.', 5000)
-          if(!auto) this.showPluginEngineInfo = true
+
           if(auto) socket.disconnect()
         }
       }, 2500)
+
+      if(!auto) this.showPluginEngineInfo = true
+
       socket.on('connect', (d) => {
         clearTimeout(timer)
         this.connection_token = this.connection_token && this.connection_token.trim()
