@@ -659,7 +659,6 @@ export default {
       this.client_id = 'imjoy_web_'+randId()
       localStorage.setItem("imjoy_client_id", this.client_id);
     }
-    console.log('--------------', this.$route.query)
     if(this.$route.query.token){
       const query = Object.assign({}, this.$route.query);
       delete query.token;
