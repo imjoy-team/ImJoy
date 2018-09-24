@@ -18,9 +18,15 @@
         <md-tooltip>Remove this plugin</md-tooltip>
       </md-button>
     </md-toolbar>
-    <div class="editor">
+    <monaco-editor
+      class="editor code_editor"
+      v-model="codeValue"
+      language="html"
+      ref="monaco_editor">
+    </monaco-editor>
+    <!-- <div class="editor">
       <div :id="'editor_'+pluginId" style='width="auto";height="auto"'></div>
-    </div>
+    </div> -->
 </div>
 </template>
 
@@ -29,11 +35,34 @@ import { saveAs } from 'file-saver';
 import {
   randId
 } from '../utils.js'
+
+import MonacoEditor from 'vue-monaco'
+
+window.MonacoEnvironment = {
+  getWorkerUrl: function(workerId, label) {
+    var fullPath = location.protocol+'//'+location.hostname+(location.port ? ':'+location.port: '');
+    return `data:text/javascript;charset=utf-8,${encodeURIComponent(`
+      self.MonacoEnvironment = {
+        baseUrl: '${fullPath}/static'
+      };
+      try {
+        importScripts('${fullPath}/static/vs/base/worker/workerMain.js');
+      } catch (e) {
+        console.error(e)
+      } finally {
+
+      }
+      `
+    )}`;
+  }
+};
+
 export default {
   name: 'joy',
-  props: ['value', 'options', 'title', 'pluginId', 'window'],
+  props: ['value', 'title', 'pluginId', 'window'],
   data() {
     return {
+      codeValue: '',
     }
   },
   created(){
@@ -42,93 +71,63 @@ export default {
     this.api = this.$root.$data.store.api
   },
   watch: {
-    options: ()=>{
-      this.editor.setOptions(this.options)
-    }
+
   },
   mounted() {
-    const editorId = 'editor_'+this.pluginId
-    ace.require('ace/tooltip').Tooltip.prototype.setPosition = function (x, y) {
-        var rect = document.getElementById(editorId).getBoundingClientRect()
-        y -= (rect.top-64);
-        x -= rect.left;
-        this.getElement().style.left = x + "px";
-        this.getElement().style.top = y + "px";
-     };
-    // ace.require("ace/ext/language_tools");
+    this.codeValue = this.value
+    this.editor = this.$refs.monaco_editor.getMonaco()
+    if(this.window){
+        this.window.resize = ()=>{
+        this.editor.layout();
+      }
+    }
+    setTimeout(()=>{
+      this.editor.layout();
+    }, 1000)
 
-    this.editor = ace.edit(editorId);
-    ace.config.set('basePath', '/static/ace')
-    this.editor.setOptions({
-        wrap: false,
-        maxLines: 70,
-        // autoScrollEditorIntoView : true,
-        // enableBasicAutocompletion: true,
-        // enableLiveAutocompletion: true
+    this.editor.addCommand( window.monaco.KeyMod.CtrlCmd |  window.monaco.KeyCode.KEY_S, ()=>{
+      this.save()
     });
-    // this.editor.setAutoScrollEditorIntoView(true);
-    this.editor.setTheme("ace/theme/chrome");
-    this.editor.session.setMode("ace/mode/html");
-    // this.editor.session.on('change', (delta)=>{
-    //     this.$emit('input', this.editor.getValue())
-    // });
-    this.editor.setValue(this.value)
-
-    this.editor.commands.addCommand({
-      name: 'save',
-      bindKey: {"win": "Ctrl-S", "mac": "Cmd-S"},
-      exec: (editor) => {
-          this.save()
-          // this.editor.resize();
-      }
-    })
-
-    this.editor.commands.addCommand({
-      name: 'reload',
-      bindKey: {"win": "Ctrl-R", "mac": "Cmd-R"},
-      exec: (editor) => {
-          this.reload()
-      }
-    })
-
+    this.editor.addCommand( window.monaco.KeyMod.CtrlCmd |  window.monaco.KeyCode.KEY_R, ()=>{
+      this.reload()
+    });
   },
   methods: {
     save(){
-      const save_plugin = ()=>{this.window.save({pluginId: this.pluginId, code: this.editor.getValue()}).then((p_id)=>{
+      this.$emit('input', this.codeValue)
+      const save_plugin = ()=>{this.window.save({pluginId: this.pluginId, code: this.codeValue}).then((p_id)=>{
         this.window.data._id = p_id
         this.window.plugin.config._id= p_id
         this.$forceUpdate()
       })}
       save_plugin()
       this.reload()
-      //this.$emit('save', {pluginId: this.pluginId, code: this.editor.getValue()})
     },
     remove(){
+      this.$emit('input', this.codeValue)
       this.window.data._id = null
       this.window.remove(this.window.plugin).then(()=>{
         this.window.plugin = {}
       })
-      //this.$emit('save', {pluginId: this.pluginId, code: this.editor.getValue()})
     },
     reload(){
       return new Promise((resolve, reject) => {
-        this.editor.resize()
-        this.window.reload({pluginId: this.pluginId, type:this.window.plugin.type, name:this.window.plugin.name, code: this.editor.getValue(), plugin: this.window.plugin}).then((plugin)=>{
+        this.$emit('input', this.codeValue)
+        this.window.reload({pluginId: this.pluginId, type:this.window.plugin.type, name:this.window.plugin.name, code: this.codeValue, plugin: this.window.plugin}).then((plugin)=>{
           this.window.plugin = plugin
           this.window.name = plugin.name
           resolve()
         }).catch(()=>{
           reject()
         })
-        //this.$emit('reload', {pluginId: this.pluginId, code: this.editor.getValue()})
       })
     },
     saveAs(){
+      $emit('input', this.codeValue)
       const filename = this.window&&this.window.plugin&&this.window.plugin.name?this.window.plugin.name+"_"+randId()+'.imjoy.html':'plugin_'+randId()+'.imjoy.html'
-      const file = new Blob([this.editor.getValue()], {type: "text/plain;charset=utf-8"})
+      const file = new Blob([this.codeValue], {type: "text/plain;charset=utf-8"})
       saveAs(file, filename);
     }
-
   }
 }
 </script>
@@ -137,9 +136,13 @@ export default {
 <style scoped>
 
 .editor{
-  overflow: auto;
+  overflow: hidden;
   /* height: 100%; */
+  /* width: 600px; */
+  /* width: 100%; */
+  height: calc( 100vh - 16px );
 }
+/*
 .editor-toolbar{
   min-height: 40px!important;
   height: 40px!important;
@@ -153,5 +156,5 @@ export default {
 }
 .editor::-webkit-scrollbar {
  display: none;
-}
+} */
 </style>

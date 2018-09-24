@@ -676,7 +676,7 @@ export default {
       showPluginProgress: this.showPluginProgress,
       showPluginStatus: this.showPluginStatus,
       showFileDialog: this.showFileDialog,
-      showSnackbar: this.show,
+      showSnackbar: this.showSnackbar,
       setConfig: this.setPluginConfig,
       getConfig: this.getPluginConfig,
       getAttachment: this.getAttachment,
@@ -776,6 +776,13 @@ export default {
       else{
         return null
       }
+    },
+    showSnackbar(msg, duration, _plugin){
+      if(!_plugin){
+        _plugin = duration
+        duration = null
+      }
+      this.show(msg, duration)
     },
     showFileDialog(options, _plugin){
       if(!_plugin){

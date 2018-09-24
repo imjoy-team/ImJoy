@@ -755,6 +755,7 @@ function randId() {
         this._path = config.url;
         this._initialInterface = _interface||{};
         this._disconnected = true
+        this.initializing = false;
         this.running = false;
         this._connect();
     };
@@ -776,6 +777,7 @@ function randId() {
         this.name = config.name;
         this.type = config.type;
         this.mode = config.mode || 'webworker';
+        this.initializing = false;
         this.running = false;
         this._initialInterface = _interface||{};
         this._disconnected = true;
@@ -809,6 +811,7 @@ function randId() {
         }
         else{
           this._connection = new Connection(this.id, this.mode, this.config);
+          this.initializing = true;
           this._connection.whenInit(function(){
               me._init();
           });
@@ -823,6 +826,7 @@ function randId() {
     DynamicPlugin.prototype._init =
            Plugin.prototype._init = function() {
         this._site = new JailedSite(this._connection, this.id, this.mode == 'pyworker'?'python':'javascript');
+        this.initializing = false;
 
         var me = this;
         this._site.onDisconnect(function() {

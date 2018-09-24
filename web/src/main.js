@@ -22,7 +22,7 @@ import store from './store.js'
 import App from './App'
 import VueGridLayout from 'vue-grid-layout'
 import Grid from "vue-js-grid"
-
+import MonacoEditor from 'vue-monaco'
 
 Vue.config.productionTip = false
 
@@ -44,6 +44,7 @@ Vue.component('file-item', FileItem)
 Vue.component('file-dialog', FileDialog)
 Vue.component('grid-layout', VueGridLayout.GridLayout)
 Vue.component('grid-item', VueGridLayout.GridItem)
+Vue.component('monaco-editor', MonacoEditor)
 
 const truncate = function(text, length, clamp) {
   clamp = clamp || '...';
