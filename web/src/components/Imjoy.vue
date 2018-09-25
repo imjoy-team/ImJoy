@@ -323,7 +323,7 @@
   </md-dialog>
 
   <md-dialog-prompt
-        :md-active.sync="showTokenPrompt"
+        :md-active.sync="showTokenPrompt && !showPluginEngineInfo"
         v-model="connection_token"
         md-title="What is the connection token?"
         md-input-maxlength="36"
@@ -938,6 +938,7 @@ export default {
             this.pluing_context.socket = socket
             this.engine_connected = true
             this.showPluginEngineInfo = false
+            this.showTokenPrompt = false
             this.engine_status = 'Connected.'
             localStorage.setItem("imjoy_connection_token", this.connection_token);
             localStorage.setItem("imjoy_engine_url", url)
