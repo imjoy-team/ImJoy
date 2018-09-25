@@ -660,10 +660,10 @@ export default {
       localStorage.setItem("imjoy_client_id", this.client_id);
     }
     if(this.$route.query.token){
+      this.connection_token = this.$route.query.token
       const query = Object.assign({}, this.$route.query);
       delete query.token;
       this.$router.replace({ query });
-      this.connection_token = this.$route.query.token
     }
     else{
       this.connection_token = localStorage.getItem("imjoy_connection_token")
