@@ -19,6 +19,10 @@
    - Support Tensorflow.js and native Tensorflow for deep learning
  * Rendering muti-dimentional data in 3D with webGL, Three.js etc.
 
+Currently, ImJoy consists of three repositories:
+ * [the ImJoy web application](https://github.com/oeway/ImJoy/) (this repository)
+ * [the ImJoy plugin engine](https://github.com/oeway/ImJoy-Python)
+ * [the ImJoy plugin repository](https://github.com/oeway/ImJoy-Plugins)
 # Using Imjoy for image processing
 
 ## Basic Usage: the ImJoy web app
@@ -255,7 +259,8 @@ Besides the `Plugin API` functions, when a plugin is executed, you can return an
 ## `ImJoy API`
 Within the plugin, there is a variable called `api` which exposes a set of internal utility functions. These utility functions can be used in the plugin to interact with the GUI, talk with another plugin etc.
 
-When a `ImJoy API` function is executed, they will return a object called `promise` ([more about Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)).
+All the API functions provided by ImJoy are asynchronous functions, meaning that when a `ImJoy API` function is executed, you won't get the result immediately. Instead, it will immediately return a object called `promise` ([more about Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)). For example, if you want to popup a dialog for taking the user input, a synchronous program will block the execution until the user close the dialog. However in ImJoy, it will return immediately even if the user haven't close the dialog, with the `promise` object, you can set a callback function which will be called when the user close the dialog.
+
 For Javascrit plugins, native Javascrit `Promise` will be returned. For Python plugins, it will return a simplified Python implement of promise.
 
 Here is how you can use it (suppose the api name is `XXXXX`):
