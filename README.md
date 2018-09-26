@@ -3,6 +3,11 @@
 
 <img src="https://github.com/oeway/ImJoy/raw/master/docs/img/imjoy-screenshot.png" width="600px"></img>
 
+Currently, ImJoy consists of three repositories:
+ * [the ImJoy web application](https://github.com/oeway/ImJoy/) (this repository)
+ * [the ImJoy plugin engine](https://github.com/oeway/ImJoy-Python)
+ * [the ImJoy plugin repository](https://github.com/oeway/ImJoy-Plugins)
+ 
 ## Key Features of ImJoy
  * Serverless solution with offline-first design
  * Easy-to-use workflow composition
@@ -19,10 +24,6 @@
    - Support Tensorflow.js and native Tensorflow for deep learning
  * Rendering muti-dimentional data in 3D with webGL, Three.js etc.
 
-Currently, ImJoy consists of three repositories:
- * [the ImJoy web application](https://github.com/oeway/ImJoy/) (this repository)
- * [the ImJoy plugin engine](https://github.com/oeway/ImJoy-Python)
- * [the ImJoy plugin repository](https://github.com/oeway/ImJoy-Plugins)
 # Using Imjoy for image processing
 
 ## Basic Usage: the ImJoy web app
