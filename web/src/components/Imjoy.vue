@@ -1644,6 +1644,7 @@ export default {
           }
         }
         const tconfig = _.assign({}, template, config)
+        tconfig.workspace = this.selected_workspace
         const plugin = new jailed.DynamicPlugin(tconfig, this.plugin_api)
         plugin.whenConnected(() => {
           if (!plugin.api) {
@@ -1953,6 +1954,7 @@ export default {
       return new Promise((resolve, reject) => {
         // console.log('rendering window', pconfig)
         const tconfig = _.assign({}, pconfig.plugin, pconfig)
+        tconfig.workspace = this.selected_workspace
         const plugin = new jailed.DynamicPlugin(tconfig, this.plugin_api)
         plugin.whenConnected(() => {
           if (!plugin.api) {
