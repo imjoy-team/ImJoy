@@ -323,7 +323,7 @@
   </md-dialog>
 
   <md-dialog-prompt
-        :md-active.sync="showTokenPrompt && !showPluginEngineInfo"
+        :md-active.sync="showTokenPrompt"
         v-model="connection_token"
         md-title="What is the connection token?"
         md-input-maxlength="36"
@@ -952,7 +952,7 @@ export default {
           }
           else{
             socket.disconnect()
-            this.showTokenPrompt = true
+            if(!this.showPluginEngineInfo) this.showTokenPrompt = true
             console.error('failed to connect.')
           }
         })
