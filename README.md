@@ -164,7 +164,7 @@ In order to differentiate the two different languages, use the `lang` property o
 
 If `tags` are defined, you can define configurable script tag by adding a `tag` property to the `<script>` tag. Notice also that you will still need the `lang` property.
 
-For example, if you have `"tags": ["gpu", "cpu"]`, then you can have two script blocks: `<script lang="python" tag="gpu">` and `<script lang="python" tag="cpu">`.
+For example, if you have `"tags": ["stable", "dev"]`, then you can have two script blocks: `<script lang="python" tag="stable">` and `<script lang="python" tag="dev">`.
 
 ### `setup()` function
 `setup` function used to get the plugin prepared for running, it will be executed when the plugin during initialization.
