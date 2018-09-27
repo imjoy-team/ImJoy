@@ -88,6 +88,10 @@
           <div v-else-if="w.type=='imjoy/panel'">
             <joy :config="w.config"></joy>
           </div>
+          <div v-else-if="w.type=='imjoy/markdown'">
+            <div v-if="w.data.source && w.data.source.trim() !='' " v-html="marked(w.data.source, { sanitize: true })"></div>
+            <p v-else>This plugin developer is too busy or lazy to write the plugin documentation!</p>
+          </div>
           <div v-else-if="w.type=='imjoy/generic'" class="generic-plugin-window">
             <!-- <p>generic data</p> -->
             <md-list>
@@ -130,7 +134,7 @@
 import {
   randId
 } from '../utils.js'
-
+import marked from 'marked';
 export default {
   name: 'whiteboard',
   props: {
@@ -160,6 +164,7 @@ export default {
     this.store = this.$root.$data.store
     this.api = this.$root.$data.store.api
     this.store.event_bus.$on('add_window', this.onWindowAdd)
+    this.marked = marked
   },
   mounted() {
 

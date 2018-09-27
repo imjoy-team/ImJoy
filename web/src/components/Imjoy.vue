@@ -209,6 +209,9 @@
                   <md-tooltip>show more options for the plugin</md-tooltip>
                 </md-button>
                 <md-menu-content>
+                  <md-menu-item @click="showDoc(plugin.id)">
+                    <md-icon>description</md-icon>Documentation
+                  </md-menu-item>
                   <md-menu-item @click="editPlugin(plugin.id)">
                     <md-icon>edit</md-icon>Edit
                   </md-menu-item>
@@ -1014,6 +1017,22 @@ export default {
       for (; i < len; i++) {
         await this.importScript(args[i])
       }
+    },
+    showDoc(pid) {
+      const plugin = this.plugins[pid]
+      const pconfig = plugin.config
+      const w = {
+        name: "About " + pconfig.name,
+        type: 'imjoy/markdown',
+        w: 7,
+        h: 10,
+        data: {
+          name: pconfig.name,
+          id: plugin.id,
+          source: pconfig && pconfig.docs[0] && pconfig.docs[0].content
+        }
+      }
+      this.addWindow(w)
     },
     editPlugin(pid) {
       const plugin = this.plugins[pid]
