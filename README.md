@@ -7,7 +7,7 @@ Currently, ImJoy consists of three repositories:
  * [the ImJoy web application](https://github.com/oeway/ImJoy/) (this repository)
  * [the ImJoy plugin engine](https://github.com/oeway/ImJoy-Python)
  * [the ImJoy plugin repository](https://github.com/oeway/ImJoy-Plugins)
- 
+
 ## Key Features of ImJoy
  * Serverless solution with offline-first design
  * Easy-to-use workflow composition
@@ -94,7 +94,7 @@ Here is an outline of the plugin file:
 {
   "name": "Untitled Plugin",
   "mode": "webworker",
-  "tags": ["op", "image"],
+  "tags": [],
   "ui": "image processing",
   "version": "0.1.0",
   "api_version": "0.1.0",
@@ -113,7 +113,7 @@ Here is an outline of the plugin file:
   * `webworker` is used to run computationally intensive javascript plugins. It does not have an interface, it runs in a new thread and won't hang the main thread during running.
   * `iframe` is used for create new web interface with HTML/CSS and Javascript, it runs in the same thread as the main webpage. If `iframe` mode is selected, then you need to provied HTML code with the `<window>` tag and CSS code with the `style` tag.
   * `pyworker` is used to run plugins written in Python, the user needs to have the **Python Plugin Engine** installed and started before using the plugin. See the **Developing Python Plugins** for more details.
-* `tags` defines the tags for the plugin, if the tag is used for several plugins, they will be grouped in the ops menu shown in workflow.
+* `tags` defines a list of tags which is supported by the plugin. It will serve as a configureable modes for the plugin, for example, a python plugin may have two tags `["GPU", "CPU"]`. The user will be asked to choose one of the tag for the installation. The plugin then can be configured to work in different modes controlled by the corresponding tag.
 * `ui` is a string used to generate the GUI to the user, you can include the following elements to render an input form:
   * `type: 'choice', options: ['cat', 'dog'], placeholder: 'cat'`
   * `type: 'number', min: 0, max: 10, placeholder:2`
@@ -137,8 +137,12 @@ For example, you can use `"inputs": {"properties": {"type": {"enum": ["image/png
 The format is exactly the same as `inputs`.
 * `env` (**for python plugins only**) the virtual environment or docker image command used for creating an enviroment to run the plugins
 * `cmd` (**for python plugins only**) the command used to run the plugin, by default, it will run `python`, sometimes it can be something like `python3` or `python27` etc.
-* `requirements` (**for python plugins only**) the pip packages which will be installed before running the plugin, package names or github links are both supported.
+* `requirements` (**for python plugins only**) the pip packages which will be installed before running the plugin, package names or github links are both supported. It can be a list of pip packages or a command string. For example, `["numpy", "scipy==1.0"]` or `"pip install numpy scipy==1.0"`. If you want to use conda, you can set it to `"conda install numpy scipy==1.0"`.
 * `dependencies` names of other imjoy plugins which the current one depend on. They will be installed automatically during installation.
+
+To configure the plugin with `tags`, the following `<config>` fields can be made configurable: `"env", "requirements", "dependencies", "icon", "ui", "mode"`.
+
+For example, you can set different `requirements` according to different tag which selected by the user during installation. In order to support that, the `requirements` can be set to `{"gpu": "pip install tensorflow-gpu keras", "cpu": "pip install tensorflow keras"}` or `{"gpu": ["tensorflow-gpu", "keras"], "cpu": ["tensorflow", "keras"]}`.
 
 
 ## The `<docs>` tag
@@ -152,12 +156,15 @@ Define the CSS code for displaying in the plugin window.
 
 ## The `<script>` tag
 
-Plugins can be written in Javascript or Python, a minimal plugin needs to implement two functions: `setup()` and `run()`.
+Plugins can be written in Javascript or Python, a minimal plugin needs to implement two functions: `setup()` and `run()`. Optionally, if you provided a function called `exit`, it will be called when the plugin is being killed.
+
 In order to differentiate the two different languages, use the `lang` property of the `<script>` tag:
  * for Javascript plugin, use `<script lang="javascript"> ... </script>`
  * for Python plugin, use `<script lang="python"> ... </script>`
 
-Optionally, if you provided a function called `exit`, it will be called when the plugin is being killed.
+If `tags` are defined, you can define configurable script tag by adding a `tag` property to the `<script>` tag. Notice also that you will still need the `lang` property.
+
+For example, if you have `"tags": ["gpu", "cpu"]`, then you can have two script blocks: `<script lang="python" tag="gpu">` and `<script lang="python" tag="cpu">`.
 
 ### `setup()` function
 `setup` function used to get the plugin prepared for running, it will be executed when the plugin during initialization.
@@ -477,7 +484,7 @@ api.getAttachment("att_name").then(callback)
 ## Developing Window Plugin
 Window plugin is a speical type of plugins running in `iframe` mode, and it will show up as a window. `<window>` and `<style>` can be used to define the actual content of the window.
 
-I order to make a `window` plugin, you need to add `window` to `tags` and set `mode` as `iframe` in the `<config>` tag.
+I order to make a `window` plugin, you need to set `mode` as `window` in the `<config>` tag.
 
 Different from other plugins which will be loaded and intialized when ImJoy is started, a `window` plugin will not be loaded until the actuall plugin is created with `api.createWindow` or clicked by a user in the menu. During execution of `api.createWindow`, `setup` and `run` will be called for the first time, and return with an window ID. After that, if needed, another plugin can call `api.updateWindow` with the window ID, ImJoy will try to execute the `run` function with the new data again.
 
@@ -499,7 +506,7 @@ Here is a python `hello world` example:
   "version": "0.1.0",
   "api_version": "0.1.1",
   "description": "A python plugin demo.",
-  "tags": ["demo", "op"],
+  "tags": [],
   "ui": "print hello world from python",
   "inputs": null,
   "outputs": null,

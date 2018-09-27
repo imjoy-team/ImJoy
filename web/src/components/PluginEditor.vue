@@ -1,6 +1,6 @@
 <template>
 <div class="plugin-editor">
-    <md-toolbar class="md-dense editor-toolbar" md-elevation="1">
+    <md-toolbar class="md-dense editor-toolbar md-layout md-gutter" md-elevation="1">
       <md-button @click="reload()"  v-if="window" class="md-icon-button">
         <md-icon>autorenew</md-icon>
         <md-tooltip>Update this plugin</md-tooltip>
@@ -17,6 +17,12 @@
         <md-icon>delete</md-icon>
         <md-tooltip>Remove this plugin</md-tooltip>
       </md-button>
+      <md-field class="md-layout-item md-size-20" v-if="window && window.plugin&&window.plugin.tags&&window.plugin.tags.length>1">
+        <!-- <label for="tag">Tag</label> -->
+        <md-select id="tag" @md-selected="reload()" v-model="window.plugin.tag" name="tag">
+          <md-option :value="tag" v-for="tag in window.plugin.tags" :key="tag">{{tag}}</md-option>
+        </md-select>
+      </md-field>
     </md-toolbar>
     <monaco-editor
       class="editor code_editor"
@@ -113,7 +119,7 @@ export default {
     reload(){
       return new Promise((resolve, reject) => {
         this.$emit('input', this.codeValue)
-        this.window.reload({pluginId: this.pluginId, type:this.window.plugin.type, name:this.window.plugin.name, code: this.codeValue, plugin: this.window.plugin}).then((plugin)=>{
+        this.window.reload({pluginId: this.pluginId, tag: this.window.plugin.tag, type:this.window.plugin.type, name:this.window.plugin.name, code: this.codeValue, plugin: this.window.plugin}).then((plugin)=>{
           this.window.plugin = plugin
           this.window.name = plugin.name
           resolve()

@@ -39,7 +39,18 @@
 
         </div>
         <p>
-        <md-button class="md-icon-button md-list-action md-primary" v-if="!plugin.installed" @click="install(plugin)">
+        <md-menu v-if="!plugin.installed && plugin.tags && plugin.tags.length>0">
+          <md-button class="md-icon-button md-list-action md-primary" md-menu-trigger>
+            <md-icon>cloud_download</md-icon>
+            <md-tooltip>Install {{plugin.name}}</md-tooltip>
+          </md-button>
+          <md-menu-content>
+            <md-menu-item v-for="tag in plugin.tags" :key="tag" @click="install(plugin, tag)">
+              <md-icon>cloud_download</md-icon>{{tag}}
+            </md-menu-item>
+          </md-menu-content>
+        </md-menu>
+        <md-button class="md-icon-button md-list-action md-primary" v-else-if="!plugin.installed" @click="install(plugin)">
           <md-icon>cloud_download</md-icon>
           <md-tooltip>Install {{plugin.name}}</md-tooltip>
         </md-button>
@@ -97,8 +108,18 @@
         <md-chip v-for="tag in plugin.tags" :key="tag">{{tag}}</md-chip>
       </md-card-header>
       <md-card-content>
-        <md-button v-if="!plugin.installed" @click="install(plugin)" class="md-button md-primary">
-          <md-icon>cloud_download</md-icon>Install</md-button>
+        <md-menu v-if="!plugin.installed && plugin.tags && plugin.tags.length>0">
+          <md-button class="md-button md-primary" md-menu-trigger>
+            <md-icon>cloud_download</md-icon>Install
+          </md-button>
+          <md-menu-content>
+            <md-menu-item v-for="tag in plugin.tags" :key="tag" @click="install(plugin, tag)">
+              <md-icon>cloud_download</md-icon>{{tag}}
+            </md-menu-item>
+          </md-menu-content>
+        </md-menu>
+        <md-button v-else-if="!plugin.installed" @click="install(plugin)" class="md-button md-primary">
+            <md-icon>cloud_download</md-icon>Install</md-button>
         <md-button v-if="plugin.installed" @click="install(plugin)" class="md-button md-primary">
           <md-icon>update</md-icon>Update</md-button>
         <md-button v-if="plugin.installed" @click="_plugin2_remove=plugin;showRemoveConfirmation=true;" class="md-accent">
@@ -118,7 +139,17 @@
          <md-chip v-for="tag in props.item.tags" :key="tag">{{tag}}</md-chip>
        </md-card-header>
        <md-card-content>
-         <md-button v-if="!props.item.installed" @click="install(props.item)" class="md-button md-primary"><md-icon>cloud_download</md-icon>Install</md-button>
+         <md-menu v-if="!props.item.installed && props.item.tags && props.item.tags.length>0">
+           <md-button class="md-button md-primary" md-menu-trigger>
+             <md-icon>cloud_download</md-icon>Install
+           </md-button>
+           <md-menu-content>
+             <md-menu-item v-for="tag in props.item.tags" :key="tag" @click="install(props.item, tag)">
+               <md-icon>cloud_download</md-icon>{{tag}}
+             </md-menu-item>
+           </md-menu-content>
+         </md-menu>
+         <md-button v-else-if="!props.item.installed" @click="install(props.item)" class="md-button md-primary"><md-icon>cloud_download</md-icon>Install</md-button>
          <md-button v-if="props.item.installed" @click="install(props.item)" class="md-button md-primary"><md-icon>update</md-icon>Update</md-button>
          <md-button v-if="props.item.installed" @click="_plugin2_remove=props.item;showRemoveConfirmation=true;" class="md-accent"><md-icon>delete_forever</md-icon>Delete</md-button>
          <md-button  @click="edit(props.item)" class="md-button md-primary"><md-icon>code</md-icon>Code</md-button>
@@ -350,7 +381,7 @@ export default {
         this.api.show('Plugins updated with error.')
       });
     },
-    install(p) {
+    install(p, tag) {
       return new Promise((resolve, reject) => {
         const uri = typeof p == 'object' ? p.uri : p
         axios.get(uri).then(response => {
@@ -377,6 +408,7 @@ export default {
           }
           config.uri = uri
           config.code = code
+          config.tag = tag
           config._id = config.name && config.name.replace(/ /g, '_') || randId()
           if (config.dependencies) {
             for (let i = 0; i < config.dependencies.length; i++) {
@@ -385,8 +417,15 @@ export default {
                 alert(config.name + ' plugin depends on ' + config.dependencies[i] + ', but it can not be found in the repository.')
               } else {
                 console.log('installing dependency ', ps[0])
-                if (!ps[0].installed)
-                  this.install(ps[0])
+                if (!ps[0].installed){
+                  const dep = ps[0].split(":");
+                  if(dep.length>1){
+                    this.install(dep[0].trim(), dep[1].trim())
+                  }
+                  else{
+                    this.install(dep[0].trim())
+                  }
+                }
               }
             }
           }

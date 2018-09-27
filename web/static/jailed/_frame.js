@@ -168,7 +168,7 @@ if(plugin_mode =='webworker'){
       initIframePlugin();
   }
 }
-else if(plugin_mode=='iframe'){
+else if(plugin_mode=='iframe' || plugin_mode=='window'){
   initIframePlugin();
 }
 else{

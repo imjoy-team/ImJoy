@@ -453,7 +453,9 @@ import {
   PLUGIN_SCHEMA,
   PYWORKER_PLUGIN_TEMPLATE,
   WEBWORKER_PLUGIN_TEMPLATE,
-  IFRAME_PLUGIN_TEMPLATE
+  IFRAME_PLUGIN_TEMPLATE,
+  WINDOW_PLUGIN_TEMPLATE,
+  CONFIGURABLE_FIELDS
 } from '../api.js'
 
 import {
@@ -541,7 +543,8 @@ export default {
     this.client_id = null
     this.plugin_templates = {
       "Webworker(Javascript)": WEBWORKER_PLUGIN_TEMPLATE,
-      "Iframe(Javascript and HTML)": IFRAME_PLUGIN_TEMPLATE,
+      "Iframe(Javascript)": IFRAME_PLUGIN_TEMPLATE,
+      "Window(Javascript and HTML)": WINDOW_PLUGIN_TEMPLATE,
       "PyWorker(Python)": PYWORKER_PLUGIN_TEMPLATE,
     }
     this.default_window_pos = {
@@ -1081,7 +1084,7 @@ export default {
           const template = this.parsePluginCode(pconfig.code, pconfig)
           this.unloadPlugin(template.name)
           let p
-          if (template.mode == 'iframe' && template.tags.includes('window')) {
+          if (template.mode == 'window') {
             p = this.preLoadPlugin(template)
           } else {
             p = this.loadPlugin(template)
@@ -1114,7 +1117,7 @@ export default {
         console.log('saving plugin ', pconfig)
         const code = pconfig.code
         try {
-          const template = this.parsePluginCode(code, {})
+          const template = this.parsePluginCode(code, {tag: pconfig.tag})
           template.code = code
           template._id = template.name.replace(/ /g, '_')
           const addPlugin = () => {
@@ -1240,7 +1243,7 @@ export default {
                 rplugin = rplugins[0]
               }
 
-              if (template.mode == 'iframe' && template.tags.includes('window')) {
+              if (template.mode == 'window') {
                 promises.push(this.preLoadPlugin(template, rplugin))
               } else {
                 promises.push(this.loadPlugin(template, rplugin))
@@ -1537,11 +1540,13 @@ export default {
     parsePluginCode(code, config) {
       config = config || {}
       const uri = config.uri
+      const tag = config.tag
       if (uri && uri.endsWith('.js')) {
         config.lang = config.lang || 'javascript'
         config.script = code
         config.style = null
         config.window = null
+        config.tag = tag || null
       } else {
         // console.log('parsing the plugin file')
         const pluginComp = parseComponent(code)
@@ -1562,6 +1567,15 @@ export default {
           config.script = pluginComp.script[0].content
           config.lang = pluginComp.script[0].attrs.lang || 'javascript'
         }
+        config.tag = tag || config.tags && config.tags[0]
+        // try to match the script with current tag
+        for (let i = 0; i < pluginComp.script.length; i++) {
+          if (pluginComp.script[i].attrs.tag == config.tag) {
+            config.script = pluginComp.script[i].content
+            config.lang = pluginComp.script[i].attrs.lang || 'javascript'
+            break
+          }
+        }
         config.links = pluginComp.link || null
         config.windows = pluginComp.window || null
         config.styles = pluginComp.style || null
@@ -1573,6 +1587,21 @@ export default {
       config.uri = uri
       config.code = code
       config.id = config.name.trim().replace(/ /g, '_') + '_' + randId()
+
+      for (let i = 0; i < CONFIGURABLE_FIELDS.length; i++) {
+          const obj = config[CONFIGURABLE_FIELDS[i]]
+          if(obj && typeof obj === 'object' && !(obj instanceof Array)){
+            if(config.tag){
+              config[CONFIGURABLE_FIELDS[i]] = obj[config.tag]
+              if(!obj.hasOwnProperty(config.tag)){
+                console.log("WARNING: " + CONFIGURABLE_FIELDS[i] + " do not contain a tag named: " + config.tag)
+              }
+            }
+            else{
+              throw "You must use 'tags' with configurable fields."
+            }
+          }
+      }
       if (!PLUGIN_SCHEMA(config)) {
         const error = PLUGIN_SCHEMA.errors(config)
         console.error("Invalid plugin config: " + config.name, error)
@@ -1585,8 +1614,8 @@ export default {
         name: template.name,
         mode: template.mode,
         type: template.type,
-        tags: template.tags,
         ui: template.ui,
+        tag: template.tag,
         inputs: template.inputs,
         outputs: template.outputs,
         _id: template._id
@@ -1610,6 +1639,7 @@ export default {
           config: tconfig,
           mode: template.mode,
           docs: template.docs,
+          tag: template.tag,
           attachments: template.attachments,
         }
         this.plugins[plugin.id] = plugin
@@ -1620,6 +1650,7 @@ export default {
             const c = {}
             c.type = template.type
             c.name = template.name
+            c.tag = template.tag
             // c.op = my.op
             c.data = my.data
             c.config = my.config
@@ -1657,7 +1688,7 @@ export default {
         }
         const tconfig = _.assign({}, template, config)
         tconfig.workspace = this.selected_workspace
-        const plugin = new jailed.DynamicPlugin(tconfig, this.plugin_api)
+        const plugin = new jailed.DynamicPlugin(tconfig, _.assign({TAG: tconfig.tag, WORKSPACE: this.selected_workspace}, this.plugin_api))
         plugin.whenConnected(() => {
           if (!plugin.api) {
             console.error('error occured when loading plugin.')
@@ -1800,12 +1831,25 @@ export default {
       try {
         const plugin = this.plugins[_plugin.id]
         if(!plugin) throw "Plugin not found."
+        config = _clone(config)
         config.type = config.type || config.name
         config.show_panel = config.show_panel || false
         config.ui = config.ui || config.name
-        config.tags = config.tags || ["op"]
+        config.tags = ["op", "plugin"]
         config.inputs = config.inputs || null
         config.outputs = config.outputs || null
+        if(config.mode == 'window'){
+          config.tags.push('window')
+        }
+        else if(config.mode == 'pyworker'){
+          config.tags.push('python')
+        }
+        else if(config.mode == 'webworker'){
+          config.tags.push('webworker')
+        }
+        else if(config.mode == 'iframe'){
+          config.tags.push('iframe')
+        }
         // console.log('registering op', config)
         if (!REGISTER_SCHEMA(config)) {
           const error = REGISTER_SCHEMA.errors(config)
@@ -1942,19 +1986,13 @@ export default {
         // console.log('creating panel: ', op_config)
         this.$forceUpdate()
 
-        if (config.tags.includes('window')) {
-          if (config.mode != 'iframe') {
-            throw 'Window plugin must be with type "iframe"'
-          }
-          // console.log('register window plugin: ', plugin.config)
-          this.registered.windows[config.name] = plugin.config
-        }
-        if (config.tags.includes('file_importer')) {
-          throw "file importer not supported yet"
-        }
-        if (config.tags.includes('file_exporter')) {
-          throw "file importer not supported yet"
-        }
+        // if (config.mode != 'window') {
+        //   throw 'Window plugin must be with type "window"'
+        // }
+
+        // console.log('register window plugin: ', plugin.config)
+        this.registered.windows[config.name] = plugin.config
+
         return true
       } catch (e) {
         console.error(e)
@@ -1967,7 +2005,7 @@ export default {
         // console.log('rendering window', pconfig)
         const tconfig = _.assign({}, pconfig.plugin, pconfig)
         tconfig.workspace = this.selected_workspace
-        const plugin = new jailed.DynamicPlugin(tconfig, this.plugin_api)
+        const plugin = new jailed.DynamicPlugin(tconfig, _.assign({TAG: pconfig.tag, WORKSPACE: this.selected_workspace}, this.plugin_api))
         plugin.whenConnected(() => {
           if (!plugin.api) {
             console.error('the window plugin seems not ready.')
@@ -2061,8 +2099,8 @@ export default {
         pconfig.mode = window_config.mode
         pconfig.id = window_config.id//window_config.name.trim().replace(/ /g, '_') + '_' + randId()
         // console.log('creating window: ', pconfig)
-        if (pconfig.mode != 'iframe') {
-          throw 'Window plugin must be with mode "iframe"'
+        if (pconfig.mode != 'window') {
+          throw 'Window plugin must be with mode "window"'
         }
         // this is a unique id for the iframe to attach
         pconfig.iframe_container = 'plugin_window_' + pconfig.id + randId()

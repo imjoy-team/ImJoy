@@ -1,5 +1,7 @@
 import schema from 'js-schema'
 
+export const CONFIGURABLE_FIELDS = ["env", "requirements", "dependencies", "icon", "ui", "mode"]
+
 export const WEBWORKER_PLUGIN_TEMPLATE= `
 <docs>
 Describe your plugin here.
@@ -14,7 +16,7 @@ Describe your plugin here.
   "version": "0.1.0",
   "api_version": "0.1.0",
   "url": "",
-  "description": "A plugin for image processing.",
+  "description": "describe your plugin here.",
   "icon": "extension",
   "inputs": null,
   "outputs": null,
@@ -50,11 +52,48 @@ Describe your plugin here.
 {
   "name": "Untitled Plugin",
   "mode": "iframe",
+  "tags": ["op"],
+  "ui": "UI for Untitled Plugin",
+  "version": "0.1.0",
+  "api_version": "0.1.0",
+  "description": "describe your plugin here",
+  "icon": "extension",
+  "inputs": null,
+  "outputs": null,
+  "dependencies": []
+}
+</config>
+
+<script lang="javascript">
+class UntitledPlugin {
+  async setup() {
+    //await importScripts("http://xxxx/xxx.js")
+  }
+
+  run(my) {
+    console.log('running in the plugin ', my)
+
+  }
+}
+
+api.export(new UntitledPlugin())
+</script>
+`
+
+export const WINDOW_PLUGIN_TEMPLATE= `
+<docs lang="markdown">
+Describe your plugin here.
+</docs>
+
+<config lang="json">
+{
+  "name": "Untitled Plugin",
+  "mode": "iframe",
   "tags": ["op", "window"],
   "ui": "UI for Untitled Plugin",
   "version": "0.1.0",
   "api_version": "0.1.0",
-  "description": "A plugin for image display.",
+  "description": "describe your plugin here.",
   "icon": "extension",
   "inputs": null,
   "outputs": null,
@@ -78,7 +117,11 @@ api.export(new UntitledPlugin())
 </script>
 
 <window lang="html">
-
+  <div>
+    <p>
+    Hello World
+    </p>
+  </div>
 </window>
 
 <style lang="css">
