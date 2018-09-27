@@ -456,19 +456,16 @@ export default {
           config._id = config.name && config.name.replace(/ /g, '_') || randId()
           if (config.dependencies) {
             for (let i = 0; i < config.dependencies.length; i++) {
-              const ps = this.available_plugins.filter(p => p.name == config.dependencies[i]);
+              const dep = config.dependencies[i].split(":");
+              const ps = this.available_plugins.filter((p) => {
+                return dep[0] && p.name == dep[0].trim()
+              });
               if (ps.length <= 0) {
                 alert(config.name + ' plugin depends on ' + config.dependencies[i] + ', but it can not be found in the repository.')
               } else {
-                console.log('installing dependency ', ps[0])
+                console.log('installing dependency ', dep)
                 if (!ps[0].installed){
-                  const dep = ps[0].split(":");
-                  if(dep.length>1){
-                    this.install(dep[0].trim(), dep[1].trim())
-                  }
-                  else{
-                    this.install(dep[0].trim())
-                  }
+                    this.install(ps[0], dep[1])
                 }
               }
             }
