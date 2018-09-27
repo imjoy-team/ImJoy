@@ -338,7 +338,7 @@ function randId() {
                     me._frame = sample.cloneNode(false);
                     me._frame.src = me._frame.src+'?mode='+mode+'&name='+config.name;
                     me._frame.id = 'iframe_'+id;
-                    if(mode == 'iframe'){
+                    if(mode == 'iframe' || mode == 'window'){
                       if(typeof iframe_container == 'string'){
                         iframe_container = document.getElementById(iframe_container)
                       }
@@ -464,7 +464,7 @@ function randId() {
                         this._messageHandler(data);
                     }
                 })
-                const config_ = {api_version: config.api_version, env: config.env, requirements: config.requirements, cmd: config.cmd, name: config.name, type: config.type, inputs: config.inputs, outputs: config.outputs}
+                const config_ = {api_version: config.api_version, tag: config.tag, env: config.env, requirements: config.requirements, cmd: config.cmd, name: config.name, type: config.type, inputs: config.inputs, outputs: config.outputs}
                 // create a plugin here
                 this.context.socket.emit('init_plugin', {id: id, mode: mode, config: config_}, (result) => {
                   // console.log('init_plugin: ', result)
@@ -750,7 +750,10 @@ function randId() {
     var Plugin = function( config, _interface) {
         this.config = config
         this.id = config.id || randId()
-        this.name = config.name
+        this.name = config.name;
+        this.type = config.type;
+        this.tag = config.tag;
+        this.tags = config.tags;
         this.mode = config.mode || 'webworker'
         this._path = config.url;
         this._initialInterface = _interface||{};
@@ -776,6 +779,8 @@ function randId() {
         this.id = config.id || randId();
         this.name = config.name;
         this.type = config.type;
+        this.tag = config.tag;
+        this.tags = config.tags;
         this.mode = config.mode || 'webworker';
         this.initializing = false;
         this.running = false;
@@ -916,7 +921,7 @@ function randId() {
       for (let i = 0; i < this.config.scripts.length; i++) {
         this._connection.execute({type: 'script', content: this.config.scripts[i].content, src: this.config.scripts[i].attrs.src}, sCb, this._fCb);
       }
-      if(this.config.mode == 'iframe'){
+      if(this.config.mode == 'iframe' || this.config.mode == 'window'){
         for (let i = 0; i < this.config.styles.length; i++) {
           this._connection.execute({type: 'style', content: this.config.styles[i].content, src: this.config.styles[i].attrs.src}, sCb, this._fCb);
         }
