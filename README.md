@@ -166,6 +166,8 @@ If `tags` are defined, you can define configurable script tag by adding a `tag` 
 
 For example, if you have `"tags": ["stable", "dev"]`, then you can have two script blocks: `<script lang="python" tag="stable">` and `<script lang="python" tag="dev">`.
 
+Beside seperating the code into different `<script>` tags, the plugin script can also access `api.TAG` variable to determine current plugin tag and change its behavior correspondingly.
+
 ### `setup()` function
 `setup` function used to get the plugin prepared for running, it will be executed when the plugin during initialization.
 
@@ -479,7 +481,11 @@ def callback(content):
 
 api.getAttachment("att_name").then(callback)
 ```
+### `api.TAG` constant
+The current plugin tag chose by the user during installation.
 
+### `api.WORKSPACE` constant
+Name of the current workspace.
 
 ## Developing Window Plugin
 Window plugin is a speical type of plugins running in `iframe` mode, and it will show up as a window. `<window>` and `<style>` can be used to define the actual content of the window.
