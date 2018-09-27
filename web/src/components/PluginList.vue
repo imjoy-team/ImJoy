@@ -34,7 +34,6 @@
           <!-- <div>
               <md-chip v-for="tag in plugin.tags" :key="tag">{{tag}}</md-chip>
             </div> -->
-
           <p><span v-for="tag in plugin.tags" :key="tag">{{tag}}; </span></p>
 
         </div>
@@ -68,6 +67,9 @@
             <md-icon class="md-primary">more_horiz</md-icon>
           </md-button>
           <md-menu-content>
+            <md-menu-item @click="showDocs(plugin)">
+              <md-icon>description</md-icon>Documentation
+            </md-menu-item>
             <md-menu-item v-if="!plugin.installed" @click="install(plugin)">
               <md-icon>cloud_download</md-icon>Install
             </md-menu-item>
@@ -105,6 +107,7 @@
         {{plugin.createdAt}}
         <h2>{{plugin.name}}</h2>
         <p>{{plugin.description}}</p>
+        <md-button  @click="showDocs(plugin)" class="md-icon-button md-primary"><md-icon>more_horiz</md-icon></md-button>
         <md-chip v-for="tag in plugin.tags" :key="tag">{{tag}}</md-chip>
       </md-card-header>
       <md-card-content>
@@ -136,6 +139,7 @@
          {{props.item.createdAt}}
          <h2>{{props.item.name}}</h2>
          <p>{{props.item.description}}</p>
+         <md-button  @click="showDocs(props.item)" class="md-icon-button md-primary"><md-icon>more_horiz</md-icon></md-button>
          <md-chip v-for="tag in props.item.tags" :key="tag">{{tag}}</md-chip>
        </md-card-header>
        <md-card-content>
@@ -171,11 +175,23 @@
       <md-button class="md-primary" @click="showEditor=false">OK</md-button>
     </md-dialog-actions>
   </md-dialog>
+
+  <md-dialog :md-active.sync="showDocsDialog">
+    <md-dialog-content>
+      <div style="padding-left: 10px; padding-right: 5px;" v-if="docs && docs.trim() !='' " v-html="marked(docs, { sanitize: true })"></div>
+      <h3 v-else> Oops, this plugin has no documentation!</h3>
+    </md-dialog-content>
+    <md-dialog-actions>
+      <!-- <md-button class="md-primary" @click="saveCode(); showEditor=false">Save</md-button> -->
+      <md-button class="md-primary" @click="showDocsDialog=false">OK</md-button>
+    </md-dialog-actions>
+  </md-dialog>
 </div>
 </template>
 
 <script>
 import axios from 'axios';
+import marked from 'marked';
 import {
   _clone,
   randId
@@ -236,6 +252,8 @@ export default {
       searched_plugins: [],
       showRemoveConfirmation: false,
       _plugin2_remove: null,
+      showDocsDialog: false,
+      docs: null,
       db: null,
     }
   },
@@ -243,6 +261,7 @@ export default {
     this.router = this.$root.$data.router
     this.store = this.$root.$data.store
     this.api = this.$root.$data.store.api
+    this.marked = marked
   },
   mounted() {
     this.containerWidth = this.$refs.container.offsetWidth;
@@ -313,6 +332,31 @@ export default {
         }).catch((err) => {
           console.log(plugin.name, err)
         });
+      }
+    },
+    showDocs(plugin){
+      if(plugin.installed){
+        this.db.get(plugin._id).then((doc) => {
+          const pluginComp = parseComponent(doc.code)
+          this.docs = pluginComp.docs && pluginComp.docs[0] && pluginComp.docs[0].content
+          this.showDocsDialog = true
+          this.$forceUpdate()
+        }).catch((err) => {
+          console.log('error occured when editing ', plugin.name, err)
+        });
+      }
+      else{
+        const uri = plugin.uri
+        axios.get(uri).then(response => {
+          if (!response || !response.data || response.data == '') {
+            alert('failed to get plugin code from ' + uri)
+            return
+          }
+          const pluginComp = parseComponent(response.data)
+          this.docs = pluginComp.docs && pluginComp.docs[0] && pluginComp.docs[0].content
+          this.showDocsDialog = true
+          this.$forceUpdate()
+        })
       }
     },
     edit(plugin) {
