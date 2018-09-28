@@ -86,6 +86,7 @@ export default {
        this.options.title = this.options.title || 'ImJoy File Dialog'
        this.options.root = this.options.root|| '.'
        this.options.mode = this.options.mode|| 'single|multiple'
+       this.file_tree_selection = null
        return new Promise((resolve, reject) => {
          this.resolve = resolve
          this.reject = reject
