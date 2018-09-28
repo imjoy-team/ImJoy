@@ -362,6 +362,8 @@
           Once the plugin engine is ready, click the `CONNECT` button below.<br>
           If you encountered any error related to git or pip, try to run <strong>conda install -y git pip</strong> before the above command.<br>
           If you still failed to set it up, please consult <a href="https://github.com/oeway/ImJoy-Python" target="_blank">here</a><br>
+          <br>
+          <p><strong>Update: we are experimenting an easier way to install and use the plugin engine, please try it out <a href="https://github.com/oeway/ImJoy-Python/releases" target="_blank">here</a>.</strong></p>
         </p>
     </md-dialog-content>
     <md-dialog-actions>
