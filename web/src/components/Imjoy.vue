@@ -1028,6 +1028,7 @@ export default {
         type: 'imjoy/markdown',
         w: 7,
         h: 10,
+        scroll: true,
         data: {
           name: pconfig.name,
           id: plugin.id,

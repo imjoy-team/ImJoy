@@ -54,7 +54,7 @@
           </md-card-expand-content>
         </md-card-expand>
 
-        <md-card-content class="plugin-iframe-container">
+        <md-card-content :class="w.scroll?'plugin-iframe-container allow-scroll':'plugin-iframe-container'">
           <md-empty-state v-if="w.type=='empty'" md-icon="hourglass_empty" md-label="IMJOY.IO" md-description="">
           </md-empty-state>
           <div v-if="w.type=='imjoy/files'" class="generic-plugin-window">
@@ -343,6 +343,10 @@ export default {
   padding-right: 2px;
   padding-top: 2px;
   padding-bottom: 2px;
+}
+
+.allow-scroll {
+  overflow: auto !important;
 }
 
 .generic-plugin-window {
