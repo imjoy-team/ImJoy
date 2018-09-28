@@ -89,7 +89,7 @@
             <joy :config="w.config"></joy>
           </div>
           <div v-else-if="w.type=='imjoy/markdown'">
-            <div style="padding-left: 10px; padding-right: 5px;" v-if="w.data.source && w.data.source.trim() !='' " v-html="marked(w.data.source, { sanitize: true })"></div>
+            <div style="padding-left: 10px; padding-right: 5px; overflow: auto" v-if="w.data.source && w.data.source.trim() !='' " v-html="marked(w.data.source, { sanitize: true })"></div>
             <h3 v-else> Oops, this plugin has no documentation!</h3>
           </div>
           <div v-else-if="w.type=='imjoy/generic'" class="generic-plugin-window">
