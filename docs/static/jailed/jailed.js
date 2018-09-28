@@ -464,7 +464,7 @@ function randId() {
                         this._messageHandler(data);
                     }
                 })
-                const config_ = {api_version: config.api_version, tag: config.tag, env: config.env, requirements: config.requirements, cmd: config.cmd, name: config.name, type: config.type, inputs: config.inputs, outputs: config.outputs}
+                const config_ = {api_version: config.api_version, tag: config.tag, workspace: config.workspace, env: config.env, requirements: config.requirements, cmd: config.cmd, name: config.name, type: config.type, inputs: config.inputs, outputs: config.outputs}
                 // create a plugin here
                 this.context.socket.emit('init_plugin', {id: id, mode: mode, config: config_}, (result) => {
                   // console.log('init_plugin: ', result)
@@ -749,7 +749,8 @@ function randId() {
      */
     var Plugin = function( config, _interface) {
         this.config = config
-        this.id = config.id || randId()
+        this.id = config.id || randId();
+        this._id = config._id;
         this.name = config.name;
         this.type = config.type;
         this.tag = config.tag;
@@ -777,6 +778,7 @@ function randId() {
           throw "you must specify the script for the plugin to run."
         }
         this.id = config.id || randId();
+        this._id = config._id;
         this.name = config.name;
         this.type = config.type;
         this.tag = config.tag;
