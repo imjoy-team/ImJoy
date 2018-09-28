@@ -140,7 +140,7 @@ Describe your plugin here.
   "mode": "pyworker",
   "version": "0.1.0",
   "api_version": "0.1.1",
-  "description": "A plugin for demonstrate python plugin.",
+  "description": "describe your plugin here.",
   "tags": ["demo", "op"],
   "ui": null,
   "inputs": null,
@@ -155,16 +155,15 @@ Describe your plugin here.
 <script lang="python">
 import numpy as np
 class PythonPlugin():
-  def setup(self):
-    print('setup in python')
+    def setup(self):
+        print('setup in python')
 
-  def run(self, my):
-    print('hello world.')
-    return my
+    def run(self, my):
+        print('hello world.')
+        return my
 
 api.export(PythonPlugin())
 </script>
-
 `
 
 export const PLUGIN_SCHEMA= schema({
