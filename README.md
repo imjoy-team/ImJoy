@@ -50,6 +50,7 @@ If you have already installed the **Python Plugin Engine**, then you can run ImJ
 
 Also notice that, even though ImJoy can run without internet, depends on the implementation of the plugin, some plugins maybe unusable when you go offline.
 
+
 # Developing Plugins for ImJoy
 
 <img src="https://github.com/oeway/ImJoy/raw/master/docs/img/imjoy-code-screenshot.png" width="600px"></img>
