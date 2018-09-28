@@ -194,7 +194,8 @@ import axios from 'axios';
 import marked from 'marked';
 import {
   _clone,
-  randId
+  randId,
+  url_regex
 } from '../utils.js'
 
 import {
@@ -206,6 +207,10 @@ export default {
   props: {
     configUrl: {
       type: String,
+      default: null
+    },
+    database: {
+      type: PouchDB,
       default: null
     },
     workspace: {
@@ -225,6 +230,14 @@ export default {
     showUrl: {
       type: Boolean,
       default: false
+    },
+    initUrl: {
+      type: String,
+      default: null
+    },
+    initSearch: {
+      type: String,
+      default: null
     },
     center: {
       type: Boolean,
@@ -264,12 +277,15 @@ export default {
     this.marked = marked
   },
   mounted() {
+    this.plugin_url = this.initUrl || '';
+    this.search = this.initSearch || '';
     this.containerWidth = this.$refs.container.offsetWidth;
     this.store.event_bus.$on('resize', this.updateSize)
-    this.db = new PouchDB(this.workspace + '_workspace', {
+    this.db = this.database || new PouchDB(this.workspace + '_workspace', {
       revs_limit: 2,
       auto_compaction: true
     })
+
     if (this.plugins) {
       this.available_plugins = this.plugins
       this.searched_plugins = this.plugins
@@ -291,8 +307,10 @@ export default {
             this.uri_root = ''
             this.plugin_dir = ''
           }
-
           this.updatePluginList()
+          if(this.search){
+            this.searchPlugin()
+          }
         }
       })
     }
@@ -391,10 +409,10 @@ export default {
         this.editorPlugin._rev = doc._rev
         return this.db.put(this.editorPlugin);
       }).then((response) => {
-        this.api.show('changes has been saved.')
+        this.$emit('message', 'Changes has been saved.')
       }).catch((err) => {
         console.error(err);
-        this.api.show('something went wrong during saving.')
+        this.$emit('message', 'Something went wrong during saving.')
       });
     },
     remove(plugin) {
@@ -403,9 +421,10 @@ export default {
         return this.db.remove(doc);
       }).then((result) => {
         console.log('plugin has been removed')
-        this.api.show('The plugin has been removed.')
+        this.$emit('message', 'Plugin "' + plugin.name + '" has been removed.')
         plugin.installed = false
         this.$forceUpdate()
+        this.$emit('remove', plugin)
       }).catch((err) => {
         console.log('error occured when removing ', plugin.name, err)
       });
@@ -419,10 +438,10 @@ export default {
       }
       Promise.all(ps).then(() => {
         console.log('All plugins updated successfully.')
-        this.api.show('All plugins updated successfully.')
+        this.$emit('message', 'All plugins updated successfully.')
       }).catch((e) => {
         console.error('Plugins updated with error.', e)
-        this.api.show('Plugins updated with error.')
+        this.$emit('message', 'Plugins updated with error.')
       });
     },
     install(p, tag) {
@@ -479,10 +498,11 @@ export default {
                 p.installed = true
               }
               this.$forceUpdate()
-              this.api.show(config.name + ' has been sucessfully installed.')
+              this.$emit('message', config.name + ' has been sucessfully installed.')
+              this.$emit('install', config)
               resolve()
             }).catch((err) => {
-              this.api.show('failed to install the plugin.')
+              this.$emit('message', 'Failed to install the plugin.')
               console.error(err)
             })
           }
@@ -497,7 +517,7 @@ export default {
 
         }).catch((e)=>{
           console.error(e)
-          this.api.show('Failed to download, if you download from github, please use the url to the raw file', 6000)
+          this.$emit('message', 'Failed to download, if you download from github, please use the url to the raw file', 6000)
         })
       })
 

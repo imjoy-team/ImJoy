@@ -186,7 +186,7 @@
             <div class="md-layout md-gutter md-alignment-center-space-between">
               <div class="md-layout-item md-size-70">
                 <!-- <span class="md-subheading">Plugins</span> -->
-                <md-button class="md-raised" :class="installed_plugins.length>0?'':'md-primary'" @click="showAddPluginDialog=true">
+                <md-button class="md-raised" :class="installed_plugins.length>0?'':'md-primary'" @click="show_plugin_templates=true; showAddPluginDialog=true">
                   <md-icon>add</md-icon>Plugins
                 </md-button>
               </div>
@@ -218,7 +218,7 @@
                   <md-menu-item @click="reloadPlugin(plugin.config)">
                     <md-icon>autorenew</md-icon>Reload
                   </md-menu-item>
-                  <md-menu-item @click="unloadPlugin(plugin.name)">
+                  <md-menu-item @click="unloadPlugin(plugin)">
                     <md-icon>clear</md-icon>Terminate
                   </md-menu-item>
                   <md-menu-item @click="_plugin2_remove=plugin;showRemoveConfirmation=true">
@@ -401,7 +401,7 @@
           <div class="md-title">Installed Plugins</div>
         </md-card-header>
         <md-card-content>
-          <plugin-list display="list" :plugins="installed_plugins" :workspace="selected_workspace"></plugin-list>
+          <plugin-list display="list" :database="db" @message="show"  @install="pluginInstalled" @remove="pluginRemoved" :plugins="installed_plugins" :workspace="selected_workspace"></plugin-list>
         </md-card-content>
       </md-card>
     </md-dialog-content>
@@ -413,7 +413,7 @@
   <md-dialog :md-active.sync="showAddPluginDialog" :md-click-outside-to-close="true">
     <md-dialog-title>Plugins Management</md-dialog-title>
     <md-dialog-content>
-      <md-card>
+      <md-card v-if="show_plugin_templates">
         <md-card-header>
           <div class="md-title">Create a New Plugin</div>
         </md-card-header>
@@ -429,7 +429,7 @@
           <div class="md-title">Or, install from the Plugin Store</div>
         </md-card-header>
         <md-card-content>
-          <plugin-list show-url display="list" config-url="https://raw.githubusercontent.com/oeway/ImJoy-Plugins/master/manifest.json" :workspace="selected_workspace"></plugin-list>
+          <plugin-list show-url @message="show" :database="db" @install="pluginInstalled" @remove="pluginRemoved"  :init-url="init_plugin_url" :init-search="init_plugin_search" display="list" config-url="https://raw.githubusercontent.com/oeway/ImJoy-Plugins/master/manifest.json" :workspace="selected_workspace"></plugin-list>
         </md-card-content>
       </md-card>
       <md-divider></md-divider>
@@ -438,12 +438,12 @@
           <div class="md-title">Installed Plugins</div>
         </md-card-header>
         <md-card-content>
-          <plugin-list display="list" :plugins="installed_plugins" :workspace="selected_workspace"></plugin-list>
+          <plugin-list display="list" :database="db" @install="pluginInstalled" @remove="pluginRemoved" @message="show" :plugins="installed_plugins" :workspace="selected_workspace"></plugin-list>
         </md-card-content>
       </md-card>
     </md-dialog-content>
     <md-dialog-actions>
-      <md-button class="md-primary" @click="showAddPluginDialog=false; reloadPlugins()">OK</md-button>
+      <md-button class="md-primary" @click="showAddPluginDialog=false;">OK</md-button>
     </md-dialog-actions>
   </md-dialog>
 </div>
@@ -466,7 +466,8 @@ import {
 import {
   _clone,
   randId,
-  debounce
+  debounce,
+  url_regex
 } from '../utils.js'
 import {
   parseComponent
@@ -502,6 +503,9 @@ export default {
       plugin_dialog_config: null,
       _plugin_dialog_promise: {},
       _plugin2_remove: null,
+      init_plugin_url: null,
+      init_plugin_search: null,
+      show_plugin_templates: true,
       loading: false,
       progress: 0,
       status_text: '',
@@ -677,7 +681,26 @@ export default {
       this.connection_token = localStorage.getItem("imjoy_connection_token")
     }
 
-    this.engine_url = localStorage.getItem("imjoy_engine_url") || 'http://localhost:8080'
+    if(this.$route.query.engine){
+      this.engine_url = this.$route.query.engine.trim()
+    }
+    else{
+      this.engine_url = localStorage.getItem("imjoy_engine_url") || 'http://localhost:8080'
+    }
+
+    if(this.$route.query.plugin && this.$route.query.plugin.trim() != ''){
+      const p = this.$route.query.plugin.trim()
+      if (p.match(url_regex)) {
+        this.init_plugin_url = p
+        this.init_plugin_search = null
+      } else {
+        this.init_plugin_url = null
+        this.init_plugin_search = p
+      }
+      this.show_plugin_templates = false
+      this.showAddPluginDialog = true
+    }
+
     //location.protocol+'//'+location.hostname+(location.port ? ':'+location.port: '')
 
     this.plugin_api = {
@@ -770,6 +793,12 @@ export default {
     this.disconnectEngine()
   },
   methods: {
+    pluginInstalled(p){
+      this.reloadPlugin(p)
+    },
+    pluginRemoved(p){
+      this.unloadPlugin(p)
+    },
     setPluginConfig(name, value, _plugin){
       const plugin = this.plugins[_plugin.id]
       if(!plugin) throw "setConfig Error: Plugin not found."
@@ -843,10 +872,10 @@ export default {
       return new Promise((resolve, reject) => {
         // console.log('remove plugin', plugin.name)
         // remove if exists
-        this.db.get(plugin.config._id).then((doc) => {
+        this.db.get(plugin._id).then((doc) => {
           return this.db.remove(doc);
         }).then((result) => {
-          this.unloadPlugin(plugin.name)
+          this.unloadPlugin(plugin)
           // console.log('plugin has been removed')
           this.show('the plugin has been removed.')
           this.$forceUpdate()
@@ -1076,7 +1105,8 @@ export default {
       }
       this.addWindow(w)
     },
-    unloadPlugin(name){
+    unloadPlugin(plugin){
+      const name = plugin.name
       for (let k in this.plugins) {
         if (this.plugins.hasOwnProperty(k)) {
           const plugin = this.plugins[k]
@@ -1101,10 +1131,11 @@ export default {
     reloadPlugin(pconfig) {
       return new Promise((resolve, reject) => {
         try {
-          this.unloadPlugin(pconfig.name)
+          this.unloadPlugin(pconfig)
           // console.log('reloading plugin ', pconfig)
           const template = this.parsePluginCode(pconfig.code, pconfig)
-          this.unloadPlugin(template.name)
+          template._id = pconfig._id
+          this.unloadPlugin(template)
           let p
           if (template.mode == 'window') {
             p = this.preLoadPlugin(template)
@@ -1223,6 +1254,35 @@ export default {
         fr.readAsDataURL(file);
       }
     },
+    reloadDB(){
+      return new Promise((resolve, reject) => {
+        if(this.db){
+          try {
+              this.db.close().finally(()=>{
+                this.db = new PouchDB(this.selected_workspace + '_workspace', {
+                  revs_limit: 2,
+                  auto_compaction: true
+                })
+                resolve()
+              })
+          } catch (e) {
+            console.error('failed to reload database: ', e)
+            this.db = new PouchDB(this.selected_workspace + '_workspace', {
+              revs_limit: 2,
+              auto_compaction: true
+            })
+            resolve()
+          }
+        }
+        else{
+          this.db = new PouchDB(this.selected_workspace + '_workspace', {
+            revs_limit: 2,
+            auto_compaction: true
+          })
+          resolve()
+        }
+      })
+    },
     reloadPlugins() {
       if (this.plugins) {
         for (let k in this.plugins) {
@@ -1241,53 +1301,54 @@ export default {
         }
       }
       this.resetPlugins()
-      this.db.allDocs({
-        include_docs: true,
-        attachments: true,
-        sort: 'name'
-      }).then((result) => {
-        const promises = []
-        this.workflow_list = []
-        this.installed_plugins = []
-        for (let i = 0; i < result.total_rows; i++) {
-          const config = result.rows[i].doc
-          if (config.workflow) {
-            this.workflow_list.push(config)
-          } else {
-            this.installed_plugins.push(config)
-            try {
-              const template = this.parsePluginCode(config.code, config)
-              template._id = config._id
-              const rplugins = this.resumable_plugins.filter(p => p.name==template.name && p.type==template.type)
+      this.reloadDB().then(()=>{
+        this.db.allDocs({
+          include_docs: true,
+          attachments: true,
+          sort: 'name'
+        }).then((result) => {
+          const promises = []
+          this.workflow_list = []
+          this.installed_plugins = []
+          for (let i = 0; i < result.total_rows; i++) {
+            const config = result.rows[i].doc
+            if (config.workflow) {
+              this.workflow_list.push(config)
+            } else {
+              this.installed_plugins.push(config)
+              try {
+                const template = this.parsePluginCode(config.code, config)
+                template._id = config._id
+                const rplugins = this.resumable_plugins.filter(p => p.name==template.name && p.type==template.type)
 
-              let rplugin = null
-              if(rplugins.length>0){
-                rplugin = rplugins[0]
-              }
+                let rplugin = null
+                if(rplugins.length>0){
+                  rplugin = rplugins[0]
+                }
 
-              if (template.mode == 'window') {
-                promises.push(this.preLoadPlugin(template, rplugin))
-              } else {
-                promises.push(this.loadPlugin(template, rplugin))
+                if (template.mode == 'window') {
+                  promises.push(this.preLoadPlugin(template, rplugin))
+                } else {
+                  promises.push(this.loadPlugin(template, rplugin))
+                }
+              } catch (e) {
+                console.error(e)
+                this.showStatus(`<${config.name}>: ${e.toString()}` )
               }
-            } catch (e) {
-              console.error(e)
-              this.showStatus(`<${config.name}>: ${e.toString()}` )
             }
           }
-        }
-        // TODO: setup this promise all, it's now cause unknown problem
-        Promise.all(promises).then(()=>{
+          // TODO: setup this promise all, it's now cause unknown problem
+          Promise.all(promises).then(()=>{
+            this.$forceUpdate()
+          })
+          this.plugin_loaded = true
+          this.loading = false
           this.$forceUpdate()
-        })
-        this.plugin_loaded = true
-        this.loading = false
-        this.$forceUpdate()
-      }).catch((err) => {
-        console.error(err)
-        this.loading = false
-      });
-
+        }).catch((err) => {
+          console.error(err)
+          this.loading = false
+        });
+      })
     },
     closeAll() {
 

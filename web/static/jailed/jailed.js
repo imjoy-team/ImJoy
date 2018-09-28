@@ -749,7 +749,8 @@ function randId() {
      */
     var Plugin = function( config, _interface) {
         this.config = config
-        this.id = config.id || randId()
+        this.id = config.id || randId();
+        this._id = config._id;
         this.name = config.name;
         this.type = config.type;
         this.tag = config.tag;
@@ -777,6 +778,7 @@ function randId() {
           throw "you must specify the script for the plugin to run."
         }
         this.id = config.id || randId();
+        this._id = config._id;
         this.name = config.name;
         this.type = config.type;
         this.tag = config.tag;
