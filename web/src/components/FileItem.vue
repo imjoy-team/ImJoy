@@ -2,7 +2,7 @@
   <li>
     <div>
       <span v-if="isFolder" @click="toggle">[{{ open ? '-' : '+' }}]</span>
-      <span @click="select({target: model, path: root})" @dblclick="load()">
+      <span @click="select({target: model, path: root}, $event.shiftKey)" @dblclick="load()">
         <md-icon v-if="model.type=='file'">insert_drive_file</md-icon> <md-icon v-else>folder_open</md-icon>
         <span class="noselect" :class="{bold: isFolder, selected: (root)==selected || (selected && Array.isArray(selected) && selected.indexOf(root)>=0)}">{{ model.name }}</span>
       </span>
@@ -18,7 +18,8 @@
         :model="model"
         :selected="selected"
         @load="load($event)"
-        @select="select($event)">
+        @select="select($event)"
+        @select_append="select($event, true)">
       </file-item>
     </ul>
   </li>
@@ -30,7 +31,7 @@ export default {
   name: 'file-item',
   props: {
      model: Object,
-     selected: String,
+     selected: [String,Array],
      root: {type: String, default: '.'},
    },
    data: function () {
@@ -50,9 +51,14 @@ export default {
      load(m){
        this.$emit('load', m || {target: this.model, path: this.root})
      },
-     select(m){
+     select(m, append){
        // this.model.selected = !this.model.selected
-       this.$emit('select', m || {target: this.model, path: this.root+'/'+this.model.name })
+       if(append){
+          this.$emit('select_append', m || {target: this.model, path: this.root+'/'+this.model.name })
+       }
+       else{
+         this.$emit('select', m || {target: this.model, path: this.root+'/'+this.model.name })
+       }
      },
      toggle() {
        if (this.isFolder) {

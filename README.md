@@ -414,6 +414,7 @@ show a file dialog for selecting files or directories. It accept the following o
  * `type` the mode of file dialog, it accept `file` for selecting one or multiple files; `directory` for selecting one or multiple directories; By default, it will use `type='file'`. For Python plugin, if you don't specify the type, both file or directory can be selected.
  * `title` the title of the dialog.
  * `root` the initial path for the dialog to show.
+ * `mode` two modes are supported, by default, the user can select a single or multiple file (with `shift` key pressed), if you want to force the dialog to return multiple files or directories in an array or list, set `mode` to `"multiple"`, or you can force it to return only a single file or directory by setting `mode` to `"single"`, if you want to support both, you can explicitly set `mode` to `"single|multiple"` or keep the default setting.
 
 Since the file handling is different in the browser environment and Python, this api have different behavior when called from different types of plugin. In Javascrpt and Python, an Imjoy file dialog will be displayed, it will only return a promise which you can get the file path string with.
 
