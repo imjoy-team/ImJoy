@@ -131,7 +131,7 @@ export default {
       })
     },
     saveAs(){
-      $emit('input', this.codeValue)
+      this.$emit('input', this.codeValue)
       const filename = this.window&&this.window.plugin&&this.window.plugin.name?this.window.plugin.name+"_"+randId()+'.imjoy.html':'plugin_'+randId()+'.imjoy.html'
       const file = new Blob([this.codeValue], {type: "text/plain;charset=utf-8"})
       saveAs(file, filename);
