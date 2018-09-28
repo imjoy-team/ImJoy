@@ -413,6 +413,7 @@ update the status text of the current plugin (in the plugin menu), example: `api
 show a file dialog for selecting files or directories. It accept the following options:
  * `type` the mode of file dialog, it accept `file` for selecting one or multiple files; `directory` for selecting one or multiple directories; By default, it will use `type='file'`. For Python plugin, if you don't specify the type, both file or directory can be selected.
  * `title` the title of the dialog.
+ * `root` the initial path for the dialog to show.
 
 Since the file handling is different in the browser environment and Python, this api have different behavior when called from different types of plugin. In Javascrpt and Python, an Imjoy file dialog will be displayed, it will only return a promise which you can get the file path string with.
 
