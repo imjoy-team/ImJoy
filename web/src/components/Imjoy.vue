@@ -893,7 +893,7 @@ export default {
         if(plugin.mode == 'pyworker' && !this.engine_connected){
           this.connectEngine(this.engine_url)
         }
-        else if(plugin.mode != 'pyworker'){
+        else{
           this.reloadPlugin(plugin.config)
         }
       }
