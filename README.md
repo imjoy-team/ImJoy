@@ -40,6 +40,20 @@ To use it, go to the [ImJoy web app](https://imjoy.io/#/app), and click the 🚀
 
 More detailed instructions can be found here: [ImJoy-Python](https://github.com/oeway/ImJoy-Python).
 
+### Install from url
+You can install a plugin from an url which point to a ImJoy plugin file (extension: `*.imjoy.html`).In order to do that, you can construct an url by setting `plugin` to the **raw** file url of your image plugin file from Github, for example: `http://imjoy.io/#/app?plugin=https://raw.githubusercontent.com/oeway/ImJoy-Plugins/master/repository/imageWindow.imjoy.html`. You may need to encode all the strings into url, the easiest way to make it right is to write directly in the address bar of your browser and then use the url copied from the address bar. For example the previous url will become: `http://imjoy.io/#/app?plugin=https%3A%2F%2Fraw.githubusercontent.com%2Foeway%2FImJoy-Plugins%2Fmaster%2Frepository%2FimageWindow.imjoy.html`.
+
+For installing a plugin with predefined tag, you can use `#` to append the tag, for example, you can add `#dev` to tell ImJoy to install with the `dev` tag from the plugin.
+
+When open such an url, a plugin management dialog will be shown which allow the user to click `Install`.
+
+### supported url parameters
+ * `w` workspace name, an url contains `w` as a query string (e.g. https://imjoy.io/#/?w=test) can be used to create or switch to a new workspace.
+ * `plugin` show the specified plugin in the plugin management dialog, you can use plugin name or an url for the plugin, for example: `https://imjoy.io/#/app?plugin=Image%20Window` will show up a plugin dialog with `Image Window` in the search. You can also set `plugin` to an url for sharing plugin hosted on github, please refer to `Install from url` for more details.
+ * `engine` define the engine url, for example: `http://imjoy.io/#/app?engine=http://localhost:8080`, notice that if you want to connect to a remote machine through http (not https) connection, you can only do it by using `http://imjoy.io` rather than `https://imjoy.io`. This restriction also exist if you use localhost with some browsers (e.g. safari).
+ * `token` define the connection token, for example: `http://imjoy.io/#/app?token=2760239c-c0a7-4a53-a01e-d6da48b949bc`
+
+ These parameters are independent from each other, meaning you can combine different parameters with `&` and construct a long url. For example combining engine url and connection token:  `http://imjoy.io/#/app?engine=http://localhost:8080&token=2760239c-c0a7-4a53-a01e-d6da48b949bc`.
 ### How does it work?
 ImJoy supports Python Plugins which can run much more computationally intensive tasks. In order to run that, it needs to connect to the Python Plugin Engine -- a small python library we developed for ImJoy (source code: https://github.com/oeway/ImJoy-Python).
 
@@ -139,7 +153,7 @@ The format is exactly the same as `inputs`.
 * `env` (**for python plugins only**) the virtual environment or docker image command used for creating an enviroment to run the plugins
 * `cmd` (**for python plugins only**) the command used to run the plugin, by default, it will run `python`, sometimes it can be something like `python3` or `python27` etc.
 * `requirements` (**for python plugins only**) the pip packages which will be installed before running the plugin, package names or github links are both supported. It can be a list of pip packages or a command string. For example, `["numpy", "scipy==1.0"]` or `"pip install numpy scipy==1.0"`. If you want to use conda, you can set it to `"conda install numpy scipy==1.0"`.
-* `dependencies` names of other imjoy plugins which the current one depend on. They will be installed automatically during installation.
+* `dependencies` names of other imjoy plugins which the current one depend on. They will be installed automatically during installation. An url can also be used as a dependency for sharing a plugin.
 
 To configure the plugin with `tags`, the following `<config>` fields can be made configurable: `"env", "requirements", "dependencies", "icon", "ui", "mode"`.
 

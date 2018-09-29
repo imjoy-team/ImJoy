@@ -12,10 +12,10 @@
       <md-icon>cloud_download</md-icon>
       <md-input placeholder="Install plugin from url" type="text" v-model="plugin_url" name="plugin_url"></md-input>
     </md-field>
-    <md-button v-show="showUrl && plugin_url&&plugin_url!=''" @click="install({uri: plugin_url})" class="md-button md-primary">
+    <md-button v-show="installPlugin && showUrl && plugin_url&&plugin_url!=''" @click="install(plugin_url)" class="md-button md-primary">
       <md-icon>cloud_download</md-icon>Install
     </md-button>
-    <md-button v-show="!search&&!plugin_url" @click="updateAll()" class="md-button md-primary">
+    <md-button v-show="!search&&!plugin_url && installPlugin" @click="updateAll()" class="md-button md-primary">
       <md-icon>update</md-icon><span class="md-small-hide">Update All</span>
     </md-button>
   </md-toolbar>
@@ -38,7 +38,7 @@
 
         </div>
         <p>
-        <md-menu v-if="!plugin.installed && plugin.tags && plugin.tags.length>0">
+        <md-menu v-if="installPlugin && !plugin.installed && plugin.tags && plugin.tags.length>0">
           <md-button class="md-icon-button md-list-action md-primary" md-menu-trigger>
             <md-icon>cloud_download</md-icon>
             <md-tooltip>Install {{plugin.name}}</md-tooltip>
@@ -49,15 +49,15 @@
             </md-menu-item>
           </md-menu-content>
         </md-menu>
-        <md-button class="md-icon-button md-list-action md-primary" v-else-if="!plugin.installed" @click="install(plugin)">
+        <md-button class="md-icon-button md-list-action md-primary" v-else-if="!plugin.installed && installPlugin" @click="install(plugin)">
           <md-icon>cloud_download</md-icon>
           <md-tooltip>Install {{plugin.name}}</md-tooltip>
         </md-button>
-        <md-button  class="md-icon-button md-list-action md-primary" v-if="plugin.installed" @click="install(plugin)">
+        <md-button  class="md-icon-button md-list-action md-primary" v-if="plugin.installed && installPlugin" @click="install(plugin)">
           <md-icon>update</md-icon>
           <md-tooltip>Update {{plugin.name}}</md-tooltip>
         </md-button>
-        <md-button  class="md-icon-button md-list-action md-accent" v-if="plugin.installed" @click="_plugin2_remove=plugin;showRemoveConfirmation=true;">
+        <md-button  class="md-icon-button md-list-action md-accent" v-if="removePlugin && plugin.installed" @click="_plugin2_remove=plugin;showRemoveConfirmation=true;">
           <md-icon>delete_forever</md-icon>
           <md-tooltip>Delete {{plugin.name}}</md-tooltip>
         </md-button>
@@ -70,16 +70,16 @@
             <md-menu-item @click="showDocs(plugin)">
               <md-icon>description</md-icon>Documentation
             </md-menu-item>
-            <md-menu-item v-if="!plugin.installed" @click="install(plugin)">
+            <md-menu-item v-if="!plugin.installed && installPlugin" @click="install(plugin)">
               <md-icon>cloud_download</md-icon>Install
             </md-menu-item>
-            <md-menu-item v-if="plugin.installed" @click="install(plugin)">
+            <md-menu-item v-if="plugin.installed && installPlugin" @click="install(plugin)">
               <md-icon>update</md-icon>Update
             </md-menu-item>
-            <md-menu-item v-if="plugin.installed" @click="_plugin2_remove=plugin;showRemoveConfirmation=true;">
+            <md-menu-item v-if="plugin.installed && removePlugin" @click="_plugin2_remove=plugin;showRemoveConfirmation=true;">
               <md-icon>delete_forever</md-icon>Delete
             </md-menu-item>
-            <md-menu-item @click="edit(plugin)">
+            <md-menu-item @click="showCode(plugin)">
               <md-icon>code</md-icon>Code
             </md-menu-item>
           </md-menu-content>
@@ -91,7 +91,7 @@
             <md-icon>update</md-icon>Update</md-button>
           <md-button v-if="plugin.installed" @click="_plugin2_remove=plugin;showRemoveConfirmation=true;" class="md-icon-button md-list-action md-accent">
             <md-icon>delete_forever</md-icon>Delete</md-button>
-          <md-button v-if="plugin.installed" @click="edit(plugin)"class="md-icon-button md-list-action">
+          <md-button v-if="plugin.installed" @click="showCode(plugin)"class="md-icon-button md-list-action">
             <md-icon>edit</md-icon>Edit</md-button> -->
 
 
@@ -107,11 +107,10 @@
         {{plugin.createdAt}}
         <h2>{{plugin.name}}</h2>
         <p>{{plugin.description}}</p>
-        <md-button  @click="showDocs(plugin)" class="md-icon-button md-primary"><md-icon>more_horiz</md-icon></md-button>
         <md-chip v-for="tag in plugin.tags" :key="tag">{{tag}}</md-chip>
       </md-card-header>
       <md-card-content>
-        <md-menu v-if="!plugin.installed && plugin.tags && plugin.tags.length>0">
+        <md-menu v-if="installPlugin && !plugin.installed && plugin.tags && plugin.tags.length>0">
           <md-button class="md-button md-primary" md-menu-trigger>
             <md-icon>cloud_download</md-icon>Install
           </md-button>
@@ -121,13 +120,16 @@
             </md-menu-item>
           </md-menu-content>
         </md-menu>
-        <md-button v-else-if="!plugin.installed" @click="install(plugin)" class="md-button md-primary">
+        <md-button v-else-if="installPlugin && !plugin.installed" @click="install(plugin)" class="md-button md-primary">
             <md-icon>cloud_download</md-icon>Install</md-button>
-        <md-button v-if="plugin.installed" @click="install(plugin)" class="md-button md-primary">
+        <md-button v-if="installPlugin&& plugin.installed" @click="install(plugin, plugin.tag)" class="md-button md-primary">
           <md-icon>update</md-icon>Update</md-button>
-        <md-button v-if="plugin.installed" @click="_plugin2_remove=plugin;showRemoveConfirmation=true;" class="md-accent">
+        <md-button v-if="removePlugin && plugin.installed" @click="_plugin2_remove=plugin;showRemoveConfirmation=true;" class="md-accent">
           <md-icon>delete_forever</md-icon>Delete</md-button>
-        <md-button @click="edit(plugin)" class="md-button md-primary">
+        <md-button  @click="showDocs(plugin)" class="md-button md-primary">
+          <md-icon>note</md-icon>Docs
+        </md-button>
+        <md-button @click="showCode(plugin)" class="md-button md-primary">
           <md-icon>code</md-icon>Code
         </md-button>
       </md-card-content>
@@ -136,14 +138,13 @@
       <template slot="cell" slot-scope="props">
      <md-card>
        <md-card-header>
-         {{props.item.createdAt}}
-         <h2>{{props.item.name}}</h2>
+         <h2>{{props.item.name}} <md-icon v-if="props.item.icon">{{props.item.icon}}</md-icon>
+               <md-icon v-else>extension</md-icon></h2>
          <p>{{props.item.description}}</p>
-         <md-button  @click="showDocs(props.item)" class="md-icon-button md-primary"><md-icon>more_horiz</md-icon></md-button>
          <md-chip v-for="tag in props.item.tags" :key="tag">{{tag}}</md-chip>
        </md-card-header>
        <md-card-content>
-         <md-menu v-if="!props.item.installed && props.item.tags && props.item.tags.length>0">
+         <md-menu v-if="installPlugin && !props.item.installed && props.item.tags && props.item.tags.length>0">
            <md-button class="md-button md-primary" md-menu-trigger>
              <md-icon>cloud_download</md-icon>Install
            </md-button>
@@ -153,10 +154,13 @@
              </md-menu-item>
            </md-menu-content>
          </md-menu>
-         <md-button v-else-if="!props.item.installed" @click="install(props.item)" class="md-button md-primary"><md-icon>cloud_download</md-icon>Install</md-button>
-         <md-button v-if="props.item.installed" @click="install(props.item)" class="md-button md-primary"><md-icon>update</md-icon>Update</md-button>
-         <md-button v-if="props.item.installed" @click="_plugin2_remove=props.item;showRemoveConfirmation=true;" class="md-accent"><md-icon>delete_forever</md-icon>Delete</md-button>
-         <md-button  @click="edit(props.item)" class="md-button md-primary"><md-icon>code</md-icon>Code</md-button>
+         <md-button v-else-if="!props.item.installed && installPlugin" @click="install(props.item)" class="md-button md-primary"><md-icon>cloud_download</md-icon>Install</md-button>
+         <md-button v-if="props.item.installed && installPlugin" @click="install(props.item, props.item.tag)" class="md-button md-primary"><md-icon>update</md-icon>Update</md-button>
+         <md-button v-if="props.item.installed && removePlugin" @click="_plugin2_remove=props.item;showRemoveConfirmation=true;" class="md-accent"><md-icon>delete_forever</md-icon>Delete</md-button>
+         <md-button  @click="showDocs(props.item)" class="md-button md-primary">
+           <md-icon>note</md-icon>Docs
+         </md-button>
+         <md-button  @click="showCode(props.item)" class="md-button md-primary"><md-icon>code</md-icon>Code</md-button>
        </md-card-content>
      </md-card>
    </template>
@@ -248,7 +252,15 @@ export default {
       default: function() {
         return null
       }
-    }
+    },
+    installPlugin: {
+      type: Function,
+      default: null
+    },
+    removePlugin: {
+      type: Function,
+      default: null
+    },
   },
   data() {
     return {
@@ -289,13 +301,24 @@ export default {
     if (this.plugins) {
       this.available_plugins = this.plugins
       this.searched_plugins = this.plugins
-      this.updatePluginList()
+      if(this.search){
+        this.searchPlugin()
+      }
     } else if (this.configUrl) {
       axios.get(this.configUrl).then(response => {
         if (response && response.data && response.data.plugins) {
           this.manifest = response.data
           this.available_plugins = this.manifest.plugins
           this.searched_plugins = this.manifest.plugins
+          const uri_root = this.manifest.uri_root
+          for (let i = 0; i < this.available_plugins.length; i++) {
+              const p = this.available_plugins[i]
+              p.uri = p.uri || p.name + '.html'
+              if (!p.uri.startsWith(uri_root) && !p.uri.startsWith('http')) {
+                p.uri = uri_root + '/' + p.uri
+              }
+              p._id = p._id || p.name.replace(/ /g, '_')
+          }
           this.plugin_dir = this.manifest.uri_root
           if (this.plugin_dir) {
             this.uri_root = location.protocol + '//' + location.host
@@ -307,15 +330,12 @@ export default {
             this.uri_root = ''
             this.plugin_dir = ''
           }
-          this.updatePluginList()
           if(this.search){
             this.searchPlugin()
           }
         }
       })
     }
-
-
   },
   beforeDestroy() {
     this.store.event_bus.$off('resize', this.updateSize)
@@ -335,22 +355,6 @@ export default {
     },
     updateSize() {
       this.containerWidth = this.$refs.container.offsetWidth;
-    },
-    updatePluginList() {
-      for (let i = 0; i < this.available_plugins.length; i++) {
-        const plugin = this.available_plugins[i]
-        plugin.uri = plugin.uri || plugin.name + '.html'
-        if (!plugin.uri.startsWith(this.plugin_dir) && !plugin.uri.startsWith('http')) {
-          plugin.uri = this.plugin_dir + '/' + plugin.uri
-        }
-        plugin._id = plugin._id || plugin.name.replace(/ /g, '_')
-        this.db.get(plugin._id).then((doc) => {
-          plugin.installed = true
-          this.$forceUpdate()
-        }).catch((err) => {
-          console.log(plugin.name, err)
-        });
-      }
     },
     showDocs(plugin){
       if(plugin.installed){
@@ -377,7 +381,7 @@ export default {
         })
       }
     },
-    edit(plugin) {
+    showCode(plugin) {
       if(plugin.installed){
         this.db.get(plugin._id).then((doc) => {
           this.editorCode = doc.code
@@ -402,38 +406,11 @@ export default {
         })
       }
     },
-    saveCode() {
-      this.editorPlugin.code = this.editorCode
-      this.db.get(this.editorPlugin._id).then((doc) => {
-        this.editorPlugin._id = this.editorPlugin.name.replace(/ /g, '_')
-        this.editorPlugin._rev = doc._rev
-        return this.db.put(this.editorPlugin);
-      }).then((response) => {
-        this.$emit('message', 'Changes has been saved.')
-      }).catch((err) => {
-        console.error(err);
-        this.$emit('message', 'Something went wrong during saving.')
-      });
-    },
-    remove(plugin) {
-      // remove if exists
-      this.db.get(plugin._id).then((doc) => {
-        return this.db.remove(doc);
-      }).then((result) => {
-        console.log('plugin has been removed')
-        this.$emit('message', 'Plugin "' + plugin.name + '" has been removed.')
-        plugin.installed = false
-        this.$forceUpdate()
-        this.$emit('remove', plugin)
-      }).catch((err) => {
-        console.log('error occured when removing ', plugin.name, err)
-      });
-    },
     updateAll() {
       const ps = []
       for (let plugin of this.available_plugins) {
         if (plugin.installed) {
-          ps.push(this.install(plugin))
+          ps.push(this.install(plugin, plugin.tag))
         }
       }
       Promise.all(ps).then(() => {
@@ -444,83 +421,26 @@ export default {
         this.$emit('message', 'Plugins updated with error.')
       });
     },
-    install(p, tag) {
-      return new Promise((resolve, reject) => {
-        const uri = typeof p == 'object' ? p.uri : p
-        axios.get(uri).then(response => {
-          if (!response || !response.data || response.data == '') {
-            alert('failed to get plugin code from ' + uri)
-            reject('failed to get code.')
-            return
-          }
-          let config = null
-          const code = response.data
-          const pluginComp = parseComponent(code)
-          console.log('code parsed from', pluginComp)
-          let c = null
-          try {
-            config = JSON.parse(pluginComp.config[0].content)
-            console.log('loading config from .html file', config)
-          } catch (e) {
-            console.error(e)
-          }
-          if (!config) {
-            console.error('Failed to parse the plugin code.', code)
-            reject('Failed to parse the plugin code.')
-            return
-          }
-          config.uri = uri
-          config.code = code
-          config.tag = tag
-          config._id = config.name && config.name.replace(/ /g, '_') || randId()
-          if (config.dependencies) {
-            for (let i = 0; i < config.dependencies.length; i++) {
-              const dep = config.dependencies[i].split(":");
-              const ps = this.available_plugins.filter((p) => {
-                return dep[0] && p.name == dep[0].trim()
-              });
-              if (ps.length <= 0) {
-                alert(config.name + ' plugin depends on ' + config.dependencies[i] + ', but it can not be found in the repository.')
-              } else {
-                console.log('installing dependency ', dep)
-                if (!ps[0].installed){
-                    this.install(ps[0], dep[1])
-                }
-              }
-            }
-          }
-          const addPlugin = () => {
-            this.db.put(config, {
-              force: true
-            }).then((result) => {
-              console.log('Successfully installed!');
-              if (typeof p == 'object') {
-                p.installed = true
-              }
-              this.$forceUpdate()
-              this.$emit('message', config.name + ' has been sucessfully installed.')
-              this.$emit('install', config)
-              resolve()
-            }).catch((err) => {
-              this.$emit('message', 'Failed to install the plugin.')
-              console.error(err)
-            })
-          }
-          // remove if exists
-          this.db.get(config._id).then((doc) => {
-            return this.db.remove(doc);
-          }).then((result) => {
-            addPlugin()
-          }).catch((err) => {
-            addPlugin()
-          });
+    install(pconfig, t){
+      if(this.installPlugin){
+        const p = this.installPlugin(pconfig, t)
+        if(p){
+          p.then(()=>{
+            this.$forceUpdate()
+          })
+        }
+      }
 
-        }).catch((e)=>{
-          console.error(e)
-          this.$emit('message', 'Failed to download, if you download from github, please use the url to the raw file', 6000)
-        })
-      })
-
+    },
+    remove(pconfig){
+      if(this.removePlugin){
+        const p = this.removePlugin(pconfig)
+        if(p){
+          p.then(()=>{
+            this.$forceUpdate()
+          })
+        }
+      }
     }
   }
 }
