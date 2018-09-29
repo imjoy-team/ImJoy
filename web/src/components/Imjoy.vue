@@ -277,7 +277,7 @@
 
   <md-dialog-confirm :md-active.sync="showRemoveConfirmation" md-title="Removing Plugin" md-content="Do you really want to <strong>delete</strong> this plugin" md-confirm-text="Yes" md-cancel-text="Cancel" @md-cancel="showRemoveConfirmation=false" @md-confirm="removePlugin(_plugin2_remove);_plugin2_remove=null;showRemoveConfirmation=false"/>
   <!-- </md-card-content> -->
-  <file-dialog ref="file-dialog" :list-files="listEngineDir"></file-dialog>
+  <file-dialog ref="file-dialog" :list-files="listEngineDir" :get-file-url="getFileUrl"></file-dialog>
   <md-dialog :md-active.sync="showPluginDialog" :md-click-outside-to-close="true">
     <md-dialog-content>
       <div v-if="plugin_dialog_config">
@@ -856,6 +856,10 @@ export default {
       this.show(msg, duration)
     },
     showFileDialog(options, _plugin){
+      if(!this.engine_connected){
+        this.show('File Dialog requires the plugin engine, please connect to the plugin engine.')
+        throw "Plugin engine is not connected."
+      }
       if(!_plugin){
         _plugin = options
         options = {}
@@ -866,25 +870,17 @@ export default {
           this.$refs.file_form.reset()
           this.$refs.file_select.click()
           if(source_plugin && source_plugin.mode != 'pyworker'){
+            options.uri_type = options.uri_type || 'url'
             return this.$refs['file-dialog'].showDialog(options)
-            // if(options.type == 'file'){
-            //   this.$refs.file_form.reset()
-            //   this.$refs.file_select.click()
-            // }
-            // else if(options.type == 'directory'){
-            //   this.$refs.file_form.reset();
-            //   this.$refs.folder_select.click()
-            // }
-            // else{
-            //   throw "unsupported type: "+options.type
-            // }
           }
           else{
+            options.uri_type = options.uri_type || 'path'
             return this.$refs['file-dialog'].showDialog(options)
           }
         }
       }
       else{
+        this.show('Plugin not found.')
         throw "Plugin not found."
       }
 
@@ -987,7 +983,7 @@ export default {
               this.installed_plugins.push(config)
               this.reloadPlugin(config)
               this.$forceUpdate()
-              this.show(config.name + ' has been sucessfully installed.')
+              this.show(config.name + ' has been successfully installed.')
               resolve()
             }).catch((err) => {
               this.show('Failed to install the plugin.')
@@ -1170,13 +1166,28 @@ export default {
       return new Promise((resolve, reject) => {
         this.socket.emit('list_dir', {path: path || '~', type: type || 'file', recursive: recursive || false}, (ret)=>{
           if(ret.success){
-            // this.file_tree = ret
             resolve(ret)
             this.$forceUpdate()
           }
           else{
-            this.show('Failed to list dir: '+path)
-            reject()
+            this.show(`Failed to list dir: ${path} ${ret.error}`)
+            reject(ret.error)
+            this.$forceUpdate()
+          }
+        })
+      })
+    },
+    getFileUrl(path){
+      return new Promise((resolve, reject) => {
+        this.socket.emit('get_file_url', {path: path}, (ret)=>{
+          if(ret.success){
+            resolve(ret)
+            this.$forceUpdate()
+          }
+          else{
+            this.show(`Failed to list dir: ${path} ${ret.error}`)
+            reject(ret.error)
+            this.$forceUpdate()
           }
         })
       })
@@ -1337,7 +1348,7 @@ export default {
             }).then((result) => {
               resolve(template._id)
               // console.log('Successfully saved!');
-              this.show(`${template.name } has been sucessfully saved.`)
+              this.show(`${template.name } has been successfully saved.`)
             }).catch((err) => {
               this.show('failed to save the plugin.')
               console.error(err)
@@ -1482,11 +1493,6 @@ export default {
                 })
               }
             }
-            // TODO: setup this promise all, it's now cause unknown problem
-            // Promise.all(promises).then(()=>{
-            //
-            //   this.$forceUpdate()
-            // })
             this.plugin_loaded = true
             this.loading = false
             resolve()
@@ -1500,7 +1506,6 @@ export default {
       })
     },
     closeAll() {
-
       this.default_window_pos = {
         i: 0,
         x: 0,
@@ -1699,7 +1704,7 @@ export default {
       }).then((result) => {
         // console.log('Successfully saved!');
         this.workflow_list.push(data)
-        this.show(name + ' has been sucessfully saved.')
+        this.show(name + ' has been successfully saved.')
       }).catch((err) => {
         this.show('failed to save the workflow.')
         console.error(err)
@@ -1721,7 +1726,7 @@ export default {
           this.workflow_list.splice(index, 1);
         }
         // console.log('Successfully removed!');
-        this.show(name + ' has been sucessfully removed.')
+        this.show(name + ' has been successfully removed.')
       }).catch((err) => {
         this.show('failed to remove the workflow.')
         console.error(err)
@@ -1894,7 +1899,7 @@ export default {
         this.register(config, {
           id: config.id
         })
-        // console.log('sucessfully preloaded plugin: ', plugin)
+        // console.log('successfully preloaded plugin: ', plugin)
         resolve(plugin)
       })
     },
@@ -1940,7 +1945,7 @@ export default {
           }
           // if(!config.initialized){
             plugin.api.setup().then((result) => {
-              // console.log('sucessfully setup plugin: ', plugin)
+              // console.log('successfully setup plugin: ', plugin)
               resolve(plugin)
             }).catch((e) => {
               console.error('error occured when loading plugin ' + template.name + ": ", e)
@@ -2248,7 +2253,7 @@ export default {
           }
           // this.plugins[plugin.id] = plugin
           plugin.api.setup().then((result) => {
-            // console.log('sucessfully setup the window plugin: ', plugin, pconfig)
+            // console.log('successfully setup the window plugin: ', plugin, pconfig)
             //asuming the data._op is passed from last op
             pconfig.data = pconfig.data || {}
             pconfig.data._source_op = pconfig.data && pconfig.data._op

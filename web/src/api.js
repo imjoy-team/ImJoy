@@ -13,7 +13,7 @@ Describe your plugin here.
 {
   "name": "Untitled Plugin",
   "mode": "webworker",
-  "tags": ["op", "image"],
+  "tags": [],
   "ui": "UI for Untitled Plugin",
   "version": "0.1.0",
   "api_version": "0.1.0",
@@ -54,7 +54,7 @@ Describe your plugin here.
 {
   "name": "Untitled Plugin",
   "mode": "iframe",
-  "tags": ["op"],
+  "tags": [],
   "ui": "UI for Untitled Plugin",
   "version": "0.1.0",
   "api_version": "0.1.0",
@@ -91,7 +91,7 @@ Describe your plugin here.
 {
   "name": "Untitled Plugin",
   "mode": "iframe",
-  "tags": ["op", "window"],
+  "tags": [],
   "ui": "UI for Untitled Plugin",
   "version": "0.1.0",
   "api_version": "0.1.0",
@@ -143,7 +143,7 @@ Describe your plugin here.
   "version": "0.1.0",
   "api_version": "0.1.1",
   "description": "describe your plugin here.",
-  "tags": ["demo", "op"],
+  "tags": [],
   "ui": null,
   "inputs": null,
   "outputs": null,
