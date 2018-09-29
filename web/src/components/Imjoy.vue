@@ -230,10 +230,10 @@
                 </md-menu-content>
               </md-menu>
 
-              <md-button class="joy-run-button" :class="plugin.running?'md-accent':(plugin._disconnected? 'disconnected-plugin': 'md-primary')" :disabled="plugin._disconnected && plugin.mode != 'pyworker'" @click="plugin._disconnected?connectPlugin(plugin):runOp(plugin.ops[plugin.name])">
+              <md-button class="joy-run-button" :class="plugin.running?'md-accent':(plugin._disconnected && plugin.mode == 'pyworker'? 'disconnected-plugin': 'md-primary')" :disabled="plugin._disconnected && plugin.mode != 'pyworker'" @click="plugin._disconnected?connectPlugin(plugin):runOp(plugin.ops[plugin.name])">
                 {{plugin.mode == 'pyworker'? '🚀' + plugin.name: plugin.name}}
               </md-button>
-              <md-button :disabled="plugin._disconnected" class="md-icon-button" @click="plugin.panel_expanded=!plugin.panel_expanded; $forceUpdate()">
+              <md-button v-if="!plugin._disconnected" class="md-icon-button" @click="plugin.panel_expanded=!plugin.panel_expanded; $forceUpdate()">
                 <md-icon v-if="!plugin.panel_expanded">expand_more</md-icon>
                 <md-icon v-else>expand_less</md-icon>
               </md-button>
