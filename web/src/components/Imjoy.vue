@@ -79,6 +79,10 @@
           <md-icon>add</md-icon>
         </md-speed-dial-target>
         <md-speed-dial-content>
+          <md-button :disabled="!engine_connected" @click="showEngineFileDialog()" class="md-icon-button md-primary">
+            <md-icon>add_to_queue</md-icon>
+            <md-tooltip>Show Plugin Engine file dialog</md-tooltip>
+          </md-button>
           <md-button @click="$refs.file_form.reset();$refs.file_select.click()" class="md-icon-button md-primary">
             <md-icon>insert_drive_file</md-icon>
             <md-tooltip>Open a file</md-tooltip>
@@ -657,18 +661,6 @@ export default {
     }
   },
   mounted() {
-    // for(let u in this.builtin_scripts_url){
-    //   if(this.builtin_scripts_url.hasOwnProperty(u)){
-    //     axios.get(this.builtin_scripts_url[u]).then(response => {
-    //       if (!response || !response.data || response.data == '') {
-    //         alert('failed to get plugin code from ' + plugin.url)
-    //         return
-    //       }
-    //       this.builtin_scripts[u] = response.data
-    //       console.log('downloaded script: ', u)
-    //     })
-    //   }
-    // }
     // Make sure the GUI is refreshed
     setInterval(()=>{this.$forceUpdate()}, 5000)
     this.client_id = localStorage.getItem("imjoy_client_id")
@@ -710,6 +702,8 @@ export default {
       setConfig: this.setPluginConfig,
       getConfig: this.getPluginConfig,
       getAttachment: this.getAttachment,
+      getFileUrl: this.getFileUrl,
+      getFilePath: this.getFilePath,
       $forceUpdate: this.$forceUpdate,
     }
     this.resetPlugins()
@@ -871,17 +865,17 @@ export default {
           this.$refs.file_select.click()
           if(source_plugin && source_plugin.mode != 'pyworker'){
             options.uri_type = options.uri_type || 'url'
-            return this.$refs['file-dialog'].showDialog(options)
+            return this.$refs['file-dialog'].showDialog(options, _plugin)
           }
           else{
             options.uri_type = options.uri_type || 'path'
-            return this.$refs['file-dialog'].showDialog(options)
+            return this.$refs['file-dialog'].showDialog(options, _plugin)
           }
         }
       }
       else{
-        this.show('Plugin not found.')
-        throw "Plugin not found."
+        options.uri_type = options.uri_type || 'url'
+        return this.$refs['file-dialog'].showDialog(options, _plugin)
       }
 
     },
@@ -937,11 +931,9 @@ export default {
           config.tag = tag
           config._id = config.name && config.name.replace(/ /g, '_') || randId()
           if (config.dependencies) {
-            console.log('--------------', config.dependencies)
             for (let i = 0; i < config.dependencies.length; i++) {
               let dep
               if (config.dependencies[i].match(url_regex)) {
-                console.log('---------url-----', config.dependencies[i])
                 // this url can contain a hash tag which will be used as tag
                 this.installPlugin(config.dependencies[i])
               }
@@ -950,7 +942,6 @@ export default {
                 const ps = this.available_plugins.filter((p) => {
                   return dep[0] && p.name == dep[0].trim()
                 });
-                console.log('-------22-------', dep, ps)
                 if (ps.length <= 0) {
                   alert(config.name + ' plugin depends on ' + config.dependencies[i] + ', but it can not be found in the repository.')
                 } else {
@@ -1177,15 +1168,44 @@ export default {
         })
       })
     },
-    getFileUrl(path){
+    showEngineFileDialog(){
+      this.showFileDialog({uri_type: 'url'}).then((selection)=>{
+        if(typeof selection === 'string'){
+          selection = [selection]
+        }
+        const w = {
+          name: "Files",
+          type: 'imjoy/url_list',
+          scroll: true,
+          data: selection
+        }
+        this.addWindow(w)
+      })
+    },
+    getFileUrl(path, _plugin){
       return new Promise((resolve, reject) => {
         this.socket.emit('get_file_url', {path: path}, (ret)=>{
           if(ret.success){
-            resolve(ret)
+            resolve(ret.url)
             this.$forceUpdate()
           }
           else{
-            this.show(`Failed to list dir: ${path} ${ret.error}`)
+            this.show(`Failed to get file url for ${path} ${ret.error}`)
+            reject(ret.error)
+            this.$forceUpdate()
+          }
+        })
+      })
+    },
+    getFilePath(url, _plugin){
+      return new Promise((resolve, reject) => {
+        this.socket.emit('get_file_path', {url: url}, (ret)=>{
+          if(ret.success){
+            resolve(ret.path)
+            this.$forceUpdate()
+          }
+          else{
+            this.show(`Failed to get file path for ${url} ${ret.error}`)
             reject(ret.error)
             this.$forceUpdate()
           }
@@ -2524,7 +2544,7 @@ div#textnode {
 
 .md-speed-dial-content {
   left: 40px !important;
-  top: -10px !important;
+  top: -17px !important;
   display: flex;
   flex-direction: row;
 }

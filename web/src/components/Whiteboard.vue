@@ -77,6 +77,14 @@
 
             </md-list>
           </div>
+          <div v-else-if="w.type=='imjoy/url_list'">
+            <ul v-if="w.data.length && w.data.length>0">
+              <li v-for="u in w.data">
+                <a :href="u" target="_blank">{{u}}</a>
+              </li>
+            </ul>
+            <p v-else> No url.</p>
+          </div>
           <div v-else-if="w.type=='imjoy/image'">
             <img style="width: 100%" :src="w.data.src" v-if="w.data.src"></img>
             <p v-else> No image available for display.</p>

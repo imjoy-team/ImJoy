@@ -81,7 +81,7 @@ export default {
          }
        }
      },
-     showDialog(options){
+     showDialog(options, _plugin){
        this.show_ = true
        this.options = options
        this.options.title = this.options.title || 'ImJoy File Dialog'
@@ -98,33 +98,14 @@ export default {
            this.reject = reject
            this.resolve = (paths)=>{
               if(typeof paths == 'string'){
-                this.getFileUrl(paths).then((ret)=>{
-                  if(ret.success){
-                    resolve(ret.url)
-                  }
-                  else{
-                    reject(ret.error)
-                  }
-                }).catch(reject)
+                this.getFileUrl(paths, _plugin).then(resolve).catch(reject)
               }
               else{
                   const ps = []
                   for(let path of paths){
-                    ps.push(this.getFileUrl(path))
+                    ps.push(this.getFileUrl(path, _plugin))
                   }
-                  Promise.all(ps).then((results)=>{
-                    const urls = []
-                    for(let res of results){
-                      if(!res.success){
-                        reject(res.error)
-                        return
-                      }
-                      else{
-                        urls.push(res.url)
-                      }
-                    }
-                    resolve(urls)
-                  }).catch(reject)
+                  Promise.all(ps).then(resolve).catch(reject)
               }
            }
          }
