@@ -92,12 +92,15 @@ export default {
     //   })
     // });
     this.screenWidth = window.innerWidth
-    const updateSize = (e)=>{
-      this.screenWidth = e.width
-    }
-    this.store.event_bus.$on('resize',updateSize)
+    this.store.event_bus.$on('resize',this.updateSize)
+  },
+  beforeDestroy() {
+    this.store.event_bus.$off('resize', this.updateSize)
   },
   methods: {
+    updateSize(e){
+      this.screenWidth = e.width
+    },
     shareOnTwitter() {
       const url = "https://imjoy.io";
       const text = " #ImJoy ";

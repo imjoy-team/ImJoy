@@ -1013,7 +1013,7 @@ export default {
           }
           this.unloadPlugin(plugin, true)
           // console.log('plugin has been removed')
-          this.show('The plugin has been removed.')
+          this.show(`"${plugin.name}" has been removed.`)
           this.$forceUpdate()
           resolve()
         }).catch((err) => {
@@ -1061,9 +1061,9 @@ export default {
             list: this.workspace_list,
             default: 'default'
           }).then(()=>{
-            this.show('Workspace ' + w + ' has been deleted.')
+            this.show(`Workspace ${w} has been deleted.`)
           }).catch(()=>{
-            this.show('Error occured when removing workspace ' + w + '.')
+            this.show(`Error occured when removing workspace ${w}.`)
           })
         })
 
@@ -1204,6 +1204,7 @@ export default {
     },
     editPlugin(pid) {
       const plugin = this.plugins[pid]
+      console.log('editing plugin:', plugin)
       const pconfig = plugin.config
       const w = {
         name: pconfig.name,
@@ -1844,6 +1845,7 @@ export default {
         }
         const tconfig = _.assign({}, template, config)
         const plugin = {
+          _id: config._id,
           id: config.id,
           name: config.name,
           type: config.type,

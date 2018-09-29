@@ -69,6 +69,9 @@ html, body
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
     -webkit-transform: translate3d(0,0,0);
+    /* Disables pull-to-refresh but allows overscroll glow effects. */
+    overscroll-behavior-y: contain;
+    overscroll-behavior-x: none;
 }
 
 .md-app {
