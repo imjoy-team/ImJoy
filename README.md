@@ -153,7 +153,7 @@ The format is exactly the same as `inputs`.
 * `env` (**for python plugins only**) the virtual environment or docker image command used for creating an enviroment to run the plugins
 * `cmd` (**for python plugins only**) the command used to run the plugin, by default, it will run `python`, sometimes it can be something like `python3` or `python27` etc.
 * `requirements` (**for python plugins only**) the pip packages which will be installed before running the plugin, package names or github links are both supported. It can be a list of pip packages or a command string. For example, `["numpy", "scipy==1.0"]` or `"pip install numpy scipy==1.0"`. If you want to use conda, you can set it to `"conda install numpy scipy==1.0"`.
-* `dependencies` names of other imjoy plugins which the current one depend on. They will be installed automatically during installation. An url can also be used as a dependency for sharing a plugin.
+* `dependencies` names of other imjoy plugins which the current one depend on. They will be installed automatically during installation. An url can also be used as a dependency for sharing a plugin. For both cases, a hash tag can be used to specify the tag for the plugin. For example: `dependencies: ["Image Denoising#stable"]`, it means this plugin depends on the `stable` version of the `Image Denoising` plugin (of course, the plugin needs to define these tags).
 
 To configure the plugin with `tags`, the following `<config>` fields can be made configurable: `"env", "requirements", "dependencies", "icon", "ui", "mode"`.
 
