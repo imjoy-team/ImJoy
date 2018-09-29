@@ -119,7 +119,9 @@ export default {
       return new Promise((resolve, reject) => {
         if(this.codeValue){
           this.$emit('input', this.codeValue)
-          this.window.plugin.config.code = this.codeValue
+          if(this.window.plugin && this.window.plugin.config){
+            this.window.plugin.config.code = this.codeValue
+          }
           this.window.reload({pluginId: this.pluginId, tag: this.window.plugin.tag, type:this.window.plugin.type, name:this.window.plugin.name, code: this.codeValue, plugin: this.window.plugin}).then((plugin)=>{
             this.window.plugin = plugin
             this.window.name = plugin.name

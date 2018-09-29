@@ -463,7 +463,8 @@ import {
   WEBWORKER_PLUGIN_TEMPLATE,
   IFRAME_PLUGIN_TEMPLATE,
   WINDOW_PLUGIN_TEMPLATE,
-  CONFIGURABLE_FIELDS
+  CONFIGURABLE_FIELDS,
+  SUPPORTED_PLUGIN_MODES
 } from '../api.js'
 
 import {
@@ -902,6 +903,10 @@ export default {
       return new Promise((resolve, reject) => {
         const uri = typeof pconfig == 'string' ? pconfig : pconfig.uri
         //use the has tag in the uri if no hash tag is defined.
+        if(!uri){
+          reject('No url found for plugin ' + pconfig.name)
+          return
+        }
         tag = tag || uri.split("#")[1]
         axios.get(uri).then(response => {
           if (!response || !response.data || response.data == '') {
@@ -919,10 +924,16 @@ export default {
             console.log('loading config from .html file', config)
           } catch (e) {
             console.error(e)
+            reject(e)
+            return
           }
           if (!config) {
             console.error('Failed to parse the plugin code.', code)
             reject('Failed to parse the plugin code.')
+            return
+          }
+          if (!SUPPORTED_PLUGIN_MODES.includes(config.mode)){
+            reject('Unsupported plugin mode: '+config.mode)
             return
           }
           config.uri = uri
@@ -930,9 +941,11 @@ export default {
           config.tag = tag
           config._id = config.name && config.name.replace(/ /g, '_') || randId()
           if (config.dependencies) {
+            console.log('--------------', config.dependencies)
             for (let i = 0; i < config.dependencies.length; i++) {
               let dep
               if (config.dependencies[i].match(url_regex)) {
+                console.log('---------url-----', config.dependencies[i])
                 // this url can contain a hash tag which will be used as tag
                 this.installPlugin(config.dependencies[i])
               }
@@ -941,6 +954,7 @@ export default {
                 const ps = this.available_plugins.filter((p) => {
                   return dep[0] && p.name == dep[0].trim()
                 });
+                console.log('-------22-------', dep, ps)
                 if (ps.length <= 0) {
                   alert(config.name + ' plugin depends on ' + config.dependencies[i] + ', but it can not be found in the repository.')
                 } else {
@@ -958,12 +972,15 @@ export default {
               force: true
             }).then((result) => {
               console.log('Successfully installed!');
-              for (let k in this.available_plugins ) {
-                if (this.available_plugins.hasOwnProperty(k)) {
-                  if(this.available_plugins[k].name == config.name && !this.available_plugins[k].installed){
-                    this.available_plugins[k].installed = true
-                    this.available_plugins[k].tag = tag
-                  }
+              for (let p of this.available_plugins) {
+                if(p.name == config.name && !p.installed){
+                  p.installed = true
+                  p.tag = tag
+                }
+              }
+              for (let i = 0; i < this.installed_plugins.length; i++) {
+                if(this.installed_plugins[i].name == config.name){
+                  this.installed_plugins.splice(i, 1)
                 }
               }
               config.installed = true
@@ -1273,6 +1290,9 @@ export default {
           // console.log('reloading plugin ', pconfig)
           const template = this.parsePluginCode(pconfig.code, pconfig)
           template._id = pconfig._id
+          if(template.mode == 'collection'){
+            return
+          }
           this.unloadPlugin(template, true)
           let p
           if (template.mode == 'window') {

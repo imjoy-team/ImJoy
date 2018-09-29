@@ -2,6 +2,8 @@ import schema from 'js-schema'
 
 export const CONFIGURABLE_FIELDS = ["env", "requirements", "dependencies", "icon", "ui", "mode"]
 
+export const SUPPORTED_PLUGIN_MODES = ['webworker', 'pyworker', 'iframe', 'window', 'collection']
+
 export const WEBWORKER_PLUGIN_TEMPLATE= `
 <docs>
 Describe your plugin here.

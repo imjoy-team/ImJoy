@@ -110,7 +110,7 @@
         <md-chip v-for="tag in plugin.tags" :key="tag">{{tag}}</md-chip>
       </md-card-header>
       <md-card-content>
-        <md-menu v-if="installPlugin && !plugin.installed && plugin.tags && plugin.tags.length>0">
+        <md-menu v-if="installPlugin && !plugin.installed && plugin.tags && plugin.tags.length>0 && plugin.uri">
           <md-button class="md-button md-primary" md-menu-trigger>
             <md-icon>cloud_download</md-icon>Install
           </md-button>
@@ -120,9 +120,9 @@
             </md-menu-item>
           </md-menu-content>
         </md-menu>
-        <md-button v-else-if="installPlugin && !plugin.installed" @click="install(plugin)" class="md-button md-primary">
+        <md-button v-else-if="installPlugin && !plugin.installed && plugin.uri" @click="install(plugin)" class="md-button md-primary">
             <md-icon>cloud_download</md-icon>Install</md-button>
-        <md-button v-if="installPlugin&& plugin.installed" @click="install(plugin, plugin.tag)" class="md-button md-primary">
+        <md-button v-if="installPlugin && plugin.installed && plugin.uri" @click="install(plugin, plugin.tag)" class="md-button md-primary">
           <md-icon>update</md-icon>Update</md-button>
         <md-button v-if="removePlugin && plugin.installed" @click="_plugin2_remove=plugin;showRemoveConfirmation=true;" class="md-accent">
           <md-icon>delete_forever</md-icon>Delete</md-button>
@@ -144,7 +144,7 @@
          <md-chip v-for="tag in props.item.tags" :key="tag">{{tag}}</md-chip>
        </md-card-header>
        <md-card-content>
-         <md-menu v-if="installPlugin && !props.item.installed && props.item.tags && props.item.tags.length>0">
+         <md-menu v-if="installPlugin && !props.item.installed && props.item.tags && props.item.tags.length>0 && props.item.uri">
            <md-button class="md-button md-primary" md-menu-trigger>
              <md-icon>cloud_download</md-icon>Install
            </md-button>
@@ -154,8 +154,8 @@
              </md-menu-item>
            </md-menu-content>
          </md-menu>
-         <md-button v-else-if="!props.item.installed && installPlugin" @click="install(props.item)" class="md-button md-primary"><md-icon>cloud_download</md-icon>Install</md-button>
-         <md-button v-if="props.item.installed && installPlugin" @click="install(props.item, props.item.tag)" class="md-button md-primary"><md-icon>update</md-icon>Update</md-button>
+         <md-button v-else-if="!props.item.installed && installPlugin && props.item.uri" @click="install(props.item)" class="md-button md-primary"><md-icon>cloud_download</md-icon>Install</md-button>
+         <md-button v-if="props.item.installed && installPlugin && props.item.uri" @click="install(props.item, props.item.tag)" class="md-button md-primary"><md-icon>update</md-icon>Update</md-button>
          <md-button v-if="props.item.installed && removePlugin" @click="_plugin2_remove=props.item;showRemoveConfirmation=true;" class="md-accent"><md-icon>delete_forever</md-icon>Delete</md-button>
          <md-button  @click="showDocs(props.item)" class="md-button md-primary">
            <md-icon>note</md-icon>Docs
@@ -427,6 +427,8 @@ export default {
         if(p){
           p.then(()=>{
             this.$forceUpdate()
+          }).catch((e)=>{
+            this.$emit('message', e)
           })
         }
       }
@@ -438,6 +440,8 @@ export default {
         if(p){
           p.then(()=>{
             this.$forceUpdate()
+          }).catch((e)=>{
+            this.$emit('message', e)
           })
         }
       }
