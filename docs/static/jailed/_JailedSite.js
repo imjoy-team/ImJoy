@@ -373,7 +373,7 @@
 
     /**
      * Sends a responce reporting that interface just provided by the
-     * remote site was sucessfully set by this site as remote
+     * remote site was successfully set by this site as remote
      */
     JailedSite.prototype._reportRemoteSet = function() {
         this._connection.send({type:'interfaceSetAsRemote'});
