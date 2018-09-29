@@ -856,7 +856,7 @@ export default {
       }
       if(!_plugin){
         _plugin = options
-        options = {}
+        options = {root: '~', uri_type: 'url'}
       }
       if(_plugin && _plugin.id){
         const source_plugin = this.plugins[_plugin.id]
@@ -874,7 +874,6 @@ export default {
         }
       }
       else{
-        options.uri_type = options.uri_type || 'url'
         return this.$refs['file-dialog'].showDialog(options, _plugin)
       }
 
@@ -1169,7 +1168,7 @@ export default {
       })
     },
     showEngineFileDialog(){
-      this.showFileDialog({root: '~', uri_type: 'url'}).then((selection)=>{
+      this.showFileDialog().then((selection)=>{
         if(typeof selection === 'string'){
           selection = [selection]
         }
