@@ -1169,7 +1169,7 @@ export default {
       })
     },
     showEngineFileDialog(){
-      this.showFileDialog({uri_type: 'url'}).then((selection)=>{
+      this.showFileDialog({root: '~', uri_type: 'url'}).then((selection)=>{
         if(typeof selection === 'string'){
           selection = [selection]
         }
