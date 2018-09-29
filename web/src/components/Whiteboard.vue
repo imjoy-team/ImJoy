@@ -2,10 +2,10 @@
 <div class="whiteboard noselect" ref="whiteboard"  @click="unselectWindows()">
   <div class="overlay" @click="show_overlay=false" v-if="show_overlay"></div>
   <grid-layout :layout="windows" :col-num="col_num" :is-mirrored="false" :auto-size="true" :row-height="row_height" :col-width="column_width" :is-draggable="true" :is-resizable="true" :vertical-compact="true" :margin="[3, 3]" :use-css-transforms="true">
-    <grid-item v-for="(w, wi) in windows" drag-ignore-from=".code_editor" :x="w.x" :y="w.y" :w="w.w" :h="w.h" :i="w.i" @resize="focusWindow(w)" @move="focusWindow(w)" @resized="show_overlay=false;w.resize&&w.resize()" @moved="show_overlay=false;w.move&&w.move()" :key="w.iframe_container">
+    <grid-item v-for="(w, wi) in windows" drag-allow-from=".drag-handle" drag-ignore-from=".no-drag" :x="w.x" :y="w.y" :w="w.w" :h="w.h" :i="w.i" @resize="focusWindow(w)" @move="focusWindow(w)" @resized="show_overlay=false;w.resize&&w.resize()" @moved="show_overlay=false;w.move&&w.move()" :key="w.iframe_container">
       <md-card>
         <md-card-expand>
-          <md-card-actions md-alignment="space-between" :class="w.selected?'window-selected':'window-header'">
+          <md-card-actions md-alignment="space-between" :class="w.selected?'window-selected drag-handle':'window-header drag-handle'">
             <md-card-expand-trigger v-if="w.panel">
               <md-button class="md-icon-button">
                 <md-icon>keyboard_arrow_down</md-icon>
@@ -113,7 +113,7 @@
               </md-list-item>
             </md-list>
           </div>
-          <plugin-editor v-else-if="w.type=='imjoy/plugin-editor'" :pluginId="w.data.id" :window="w" v-model="w.data.code" :editorId="'editor_'+w.data.id"></plugin-editor>
+          <plugin-editor v-else-if="w.type=='imjoy/plugin-editor'" class="no-drag" :pluginId="w.data.id" :window="w" v-model="w.data.code" :editorId="'editor_'+w.data.id"></plugin-editor>
           <div v-else class="plugin-iframe">
             <md-button class="iframe-load-button" @click="w.click2load=false;w.renderWindow(w)" v-if="w.click2load">Click to load the window</md-button>
             <div :id="w.iframe_container" class="plugin-iframe">

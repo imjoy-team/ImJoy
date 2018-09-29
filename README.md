@@ -456,6 +456,10 @@ For Javascript plugins, currently supported functions are:
 For Python Plugins, currently supported functions are:
 `api.utils.kill` for kill a `subprocess` in python.
 
+`api.utils.ndarray` for wrapping ndarray according to ImJoy ndarray format.
+
+`api.utils.generateFileUrl` for generating an url for accesing a local file. For example: `api.utils.generateFileUrl('~/data/output.png')`, it will return something like `http://localhost:8080/file/1ba89354-ae98-457c-a53b-39a4bdd14941`.
+
 ### `api.setConfig(...)`
 Each plugin can store its configurations with `api.setConfig`. For example store a simple number `api.setConfig('sigma', 928)`,
 you can also store an object `api.setConfig('sigma', {"a": 99, "b": "1234x3"})`.
