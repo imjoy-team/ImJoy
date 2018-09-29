@@ -347,11 +347,11 @@
         </p>
         <md-field>
           <label for="engine_url">Plugin Engine URL</label>
-          <md-input type="text" v-model="engine_url" name="engine_url"></md-input>
+          <md-input type="text" v-model="engine_url" @keyup.enter="connectEngine(engine_url)" name="engine_url"></md-input>
         </md-field>
         <md-field>
           <label for="connection_token">Connection Token</label>
-          <md-input type="text" v-model="connection_token" name="connection_token"></md-input>
+          <md-input type="text" v-model="connection_token" @keyup.enter="connectEngine(engine_url)" name="connection_token"></md-input>
         </md-field>
         <p>&nbsp;{{engine_status}}</p>
         <md-button class="md-primary" v-if="!engine_connected" @click="connectEngine(engine_url)">Connect</md-button>
