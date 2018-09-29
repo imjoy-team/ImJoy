@@ -68,7 +68,7 @@
           </md-button>
           <md-menu-content>
             <md-menu-item @click="showDocs(plugin)">
-              <md-icon>description</md-icon>Documentation
+              <md-icon>description</md-icon>Docs
             </md-menu-item>
             <md-menu-item v-if="!plugin.installed && installPlugin" @click="install(plugin)">
               <md-icon>cloud_download</md-icon>Install

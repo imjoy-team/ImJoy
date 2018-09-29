@@ -3,7 +3,6 @@ import Router from 'vue-router'
 import Home from '@/components/Home'
 import Imjoy from '@/components/Imjoy'
 import About from '@/components/About'
-import FAQ from '@/components/FAQ'
 
 Vue.use(Router)
 
@@ -42,11 +41,6 @@ export default new Router({
       path: '/about',
       name: 'About',
       component: About
-    },
-    {
-      path: '/faq',
-      name: 'FAQ',
-      component: FAQ
     },
     {
       path: '*',

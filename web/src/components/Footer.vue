@@ -7,7 +7,7 @@
     <div class="md-layout md-alignment-center-center">
       <md-button class="footer-button" href="https://creativecommons.org/licenses/by/4.0/" target="_blank">
         <md-tooltip>Except where otherwise noted, content on this site is licensed under a Creative Commons Attribution 4.0 International license.</md-tooltip>
-         <img id="cc-by-img" src="static/img/by.svg" alt="CC BY 4.0"> Site content licensed under CC BY 4.0
+         <img id="cc-by-img" src="static/img/by.svg" alt="CC BY 4.0">
       </md-button>
       <md-button class="footer-button" @click="mode='about';showDialog=true">About ImJoy.io</md-button>
     </div>
