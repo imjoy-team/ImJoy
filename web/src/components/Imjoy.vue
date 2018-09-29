@@ -1168,7 +1168,7 @@ export default {
     },
     listEngineDir(path, type, recursive){
       return new Promise((resolve, reject) => {
-        this.socket.emit('list_dir', {path: path || '.', type: type || 'file', recursive: recursive || false}, (ret)=>{
+        this.socket.emit('list_dir', {path: path || '~', type: type || 'file', recursive: recursive || false}, (ret)=>{
           if(ret.success){
             // this.file_tree = ret
             resolve(ret)
