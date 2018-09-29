@@ -278,7 +278,7 @@
   <md-dialog-confirm :md-active.sync="showRemoveConfirmation" md-title="Removing Plugin" md-content="Do you really want to <strong>delete</strong> this plugin" md-confirm-text="Yes" md-cancel-text="Cancel" @md-cancel="showRemoveConfirmation=false" @md-confirm="removePlugin(_plugin2_remove);_plugin2_remove=null;showRemoveConfirmation=false"/>
   <!-- </md-card-content> -->
   <file-dialog ref="file-dialog" :list-files="listEngineDir"></file-dialog>
-  <md-dialog :md-active.sync="showPluginDialog" :md-click-outside-to-close="false">
+  <md-dialog :md-active.sync="showPluginDialog" :md-click-outside-to-close="true">
     <md-dialog-content>
       <div v-if="plugin_dialog_config">
         <joy :config="plugin_dialog_config" :showHeader="false" :controlButtons="false" ref="plugin_dialog_joy"></joy>
@@ -290,7 +290,7 @@
     </md-dialog-actions>
   </md-dialog>
 
-  <md-dialog :md-active.sync="showWorkspaceDialog" :md-click-outside-to-close="false">
+  <md-dialog :md-active.sync="showWorkspaceDialog" :md-click-outside-to-close="true">
     <md-dialog-title>Workspace Management</md-dialog-title>
     <md-dialog-content>
       <md-toolbar class="md-dense" md-elevation="0">
