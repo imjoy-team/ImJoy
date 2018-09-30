@@ -929,42 +929,23 @@ export default {
 
             }
           }
-          const addPlugin = () => {
-            this.db.put(config, {
-              force: true
-            }).then((result) => {
-              console.log('Successfully installed!');
-              for (let p of this.available_plugins) {
-                if(p.name == config.name && !p.installed){
-                  p.installed = true
-                  p.tag = tag
-                }
+          this.savePlugin(config).then(()=>{
+            for (let p of this.available_plugins) {
+              if(p.name == config.name && !p.installed){
+                p.installed = true
+                p.tag = tag
               }
-              for (let i = 0; i < this.installed_plugins.length; i++) {
-                if(this.installed_plugins[i].name == config.name){
-                  this.installed_plugins.splice(i, 1)
-                }
-              }
-              config.installed = true
-              this.installed_plugins.push(config)
-              this.reloadPlugin(config)
+            }
+            this.reloadPlugin(config).then(()=>{
+              this.show(`Plugin "${config.name}" has been successfully installed.`)
               this.$forceUpdate()
-              this.show(config.name + ' has been successfully installed.')
               resolve()
-            }).catch((err) => {
-              this.show('Failed to install the plugin.')
-              console.error(err)
+            }).catch(()=>{
+              reject(`Plugin ${config.name} saved but failed to load.`)
             })
-          }
-          // remove if exists
-          this.db.get(config._id).then((doc) => {
-            return this.db.remove(doc);
-          }).then((result) => {
-            addPlugin()
-          }).catch((err) => {
-            addPlugin()
-          });
-
+          }).catch(()=>{
+            reject(`Failed to save the plugin ${config.name}`)
+          })
         }).catch((e)=>{
           console.error(e)
           this.show('Failed to download, if you download from github, please use the url to the raw file', 6000)
@@ -1393,7 +1374,14 @@ export default {
             this.db.put(template, {
               force: true
             }).then((result) => {
-              resolve(template._id)
+              for (let i = 0; i < this.installed_plugins.length; i++) {
+                if(this.installed_plugins[i].name == template.name){
+                  this.installed_plugins.splice(i, 1)
+                }
+              }
+              template.installed = true
+              this.installed_plugins.push(template)
+              resolve(template)
               // console.log('Successfully saved!');
               this.show(`${template.name } has been successfully saved.`)
             }).catch((err) => {
