@@ -463,7 +463,7 @@ For Python Plugins, currently supported functions are:
 ### api.getFileUrl
 Used for generating an url for accesing a local file or directory path. For example: `api.getFileUrl('~/data/output.png')`, it will return something like `http://localhost:8080/file/1ba89354-ae98-457c-a53b-39a4bdd14941?name=output.png`.
 
-When this api is called in a JavaScript plugin, a confirmation dialog will popup for getting the user's permission. This means a JavaScript plugin cannot access the user's file system without notifying the user.
+When this function is called, a confirmation dialog will popup for getting the user's permission. This means a JavaScript plugin cannot access the user's file system without notifying the user. TODO: skip this dialog if the path is for the current workspace.
 
 There are two optional parameters `password` and `headers`:
  * `password`: You can specify a password for accessing the file or folder, For example: `api.getFileUrl('~/data/output.png', password='SECRET_PASSWORD')`. 
