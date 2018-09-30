@@ -463,10 +463,10 @@ For Python Plugins, currently supported functions are:
 ### api.getFileUrl
 Used for generating an url for accesing a local file or directory path. For example: `api.getFileUrl('~/data/output.png')`, it will return something like `http://localhost:8080/file/1ba89354-ae98-457c-a53b-39a4bdd14941?name=output.png`.
 
-When this function is called, a confirmation dialog will popup for getting the user's permission. This means a JavaScript plugin cannot access the user's file system without notifying the user. TODO: skip this dialog if the path is for the current workspace.
+When this function is called, a confirmation dialog will popup for getting the user's permission. This means a JavaScript plugin cannot access the user's file system without notifying the user.
 
 There are two optional parameters `password` and `headers`:
- * `password`: You can specify a password for accessing the file or folder, For example: `api.getFileUrl('~/data/output.png', password='SECRET_PASSWORD')`. 
+ * `password`: You can specify a password for accessing the file or folder, For example: `api.getFileUrl('~/data/output.png', password='SECRET_PASSWORD')`.
 
  * `headers`: With the generated url, By default, the generated url will be served with the default header `Content-disposition: inline; filename="XXXXXXXXX.XXX"` which aims for rendering in the browser. If you want to generate a direct download link, you can pass customized `headers`, for example: `headers={'Content-disposition': 'attachment; filename="XXXXXXXXX.XXX"'}` will give you a direct download link. In order to correctly render the file, you may need to pass a `Content-Type` like this:  `headers={'Content-disposition': 'inline; filename="XXXXXXXXX.XXX"', 'Content-Type': 'image/png'}`. If no header is specified, it will use the standard Python library [mimetypes](https://docs.python.org/3/library/mimetypes.html) to guess a MIME type from the file name, if `mimetypes` failed to guess one, the fallback mime type will be `application/octet-stream`.
 
