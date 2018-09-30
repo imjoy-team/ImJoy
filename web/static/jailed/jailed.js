@@ -470,6 +470,7 @@ function randId() {
                   // console.log('init_plugin: ', result)
                   if(result.success){
                     this.secret = result.secret
+                    config.work_dir = result.work_dir
                   }
                   else{
                     console.error('failed to initialize plugin on the plugin engine')

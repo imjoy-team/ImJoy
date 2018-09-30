@@ -1180,16 +1180,20 @@ export default {
           reject("Plugin not found.")
           return
         }
-        const plugin_name = this.plugins[_plugin.id].name
+        const source_plugin = this.plugins[_plugin.id]
+        const plugin_name = source_plugin && source_plugin.name
         if(!plugin_name){
           reject("Plugin name not found.")
           return
         }
+        const work_dir = source_plugin && source_plugin.config && source_plugin.config.work_dir
+        const mode = source_plugin && source_plugin.mode
         if(!this.showPermissionConfirmation){
           let config = path
           if(typeof path === 'string'){
             config = {path: path}
           }
+
           const resolve_permission = ()=>{
             this.socket.emit('get_file_url', config, (ret)=>{
               if(ret.success){
@@ -1197,16 +1201,21 @@ export default {
                 this.$forceUpdate()
               }
               else{
-                this.show(`Failed to get file url for ${path} ${ret.error}`)
+                this.show(`Failed to get file url for ${config.path} ${ret.error}`)
                 reject(ret.error)
                 this.$forceUpdate()
               }
             })
           }
-          this.permission_message = `Plugin "${plugin_name}" would like to access your local file at "${path}"<br>This means files and folders under "${path}" will be exposed as an url which can be accessed with the url.<br><strong>Please make sure this file path do not contain any confidential or sensitive data.</strong><br>Do you trust this plugin and allow this operation?`
-          this.resolve_permission = resolve_permission
-          this.reject_permission = reject
-          this.showPermissionConfirmation = true
+          if(config.path == work_dir && mode == 'pyworker'){
+            resolve_permission()
+          }
+          else{
+            this.permission_message = `Plugin <strong>"${plugin_name}"</strong> would like to access your local file at <strong>"${config.path}"</strong><br>This means files and folders under "${config.path}" will be exposed as an url which can be accessed with the url.<br><strong>Please make sure this file path do not contain any confidential or sensitive data.</strong><br>Do you trust this plugin and allow this operation?`
+            this.resolve_permission = resolve_permission
+            this.reject_permission = reject
+            this.showPermissionConfirmation = true
+          }
         }
         else{
           reject("There is a pending permission request, please try again later.")
@@ -1230,7 +1239,7 @@ export default {
             this.$forceUpdate()
           }
           else{
-            this.show(`Failed to get file path for ${url} ${ret.error}`)
+            this.show(`Failed to get file path for ${config.url} ${ret.error}`)
             reject(ret.error)
             this.$forceUpdate()
           }
