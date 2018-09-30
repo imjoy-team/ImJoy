@@ -1186,8 +1186,12 @@ export default {
           return
         }
         if(!this.showPermissionConfirmation){
+          let config = path
+          if(typeof path === 'string'){
+            config = {path: path}
+          }
           const resolve_permission = ()=>{
-            this.socket.emit('get_file_url', {path: path}, (ret)=>{
+            this.socket.emit('get_file_url', config, (ret)=>{
               if(ret.success){
                 resolve(ret.url)
                 this.$forceUpdate()
@@ -1216,7 +1220,11 @@ export default {
           this.show("Error: Plugin Engine is not connected.")
           return
         }
-        this.socket.emit('get_file_path', {url: url}, (ret)=>{
+        let config = url
+        if(typeof url === 'string'){
+          config = {url: url}
+        }
+        this.socket.emit('get_file_path', config, (ret)=>{
           if(ret.success){
             resolve(ret.path)
             this.$forceUpdate()
