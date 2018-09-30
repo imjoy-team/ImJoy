@@ -535,6 +535,9 @@ export default {
     this.plugin_names = null
     this.db = null
     this.client_id = null
+    this.IMJOY_PLUGIN = {
+      _id: 'IMJOY_APP'
+    }
     this.plugin_templates = {
       "Webworker(Javascript)": WEBWORKER_PLUGIN_TEMPLATE,
       "Iframe(Javascript)": IFRAME_PLUGIN_TEMPLATE,
@@ -549,7 +552,7 @@ export default {
       h: 5
     }
     this.new_workspace_name = '',
-    this.preload_main = ['/static/tfjs/tfjs.js', 'https://rawgit.com/nicolaspanel/numjs/893016ec40e62eaaa126e1024dbe250aafb3014b/dist/numjs.min.js'],
+    // this.preload_main = ['/static/tfjs/tfjs.js', 'https://rawgit.com/nicolaspanel/numjs/893016ec40e62eaaa126e1024dbe250aafb3014b/dist/numjs.min.js'],
     this.workflow_joy_config = {
       expanded: true,
       name: "Workflow",
@@ -620,9 +623,9 @@ export default {
       // console.log('files loaded: ', this.selected_files)
       this.loadFiles()
     });
-    this.importScripts.apply(null, this.preload_main).then(() => {
-      // console.log('preload done.')
-    })
+    // this.importScripts.apply(null, this.preload_main).then(() => {
+    // console.log('preload done.')
+    // })
   },
   beforeRouteLeave(to, from, next) {
     if (this.windows && this.windows.length > 0) {
@@ -836,17 +839,16 @@ export default {
       }
       if(_plugin && _plugin.id){
         const source_plugin = this.plugins[_plugin.id]
-        if(source_plugin){
+        if(source_plugin || _plugin === this.IMJOY_PLUGIN){
           this.$refs.file_form.reset()
           this.$refs.file_select.click()
           if(source_plugin && source_plugin.mode != 'pyworker'){
             options.uri_type = options.uri_type || 'url'
-            return this.$refs['file-dialog'].showDialog(options, _plugin)
           }
           else{
             options.uri_type = options.uri_type || 'path'
-            return this.$refs['file-dialog'].showDialog(options, _plugin)
           }
+          return this.$refs['file-dialog'].showDialog(options, _plugin)
         }
       }
       else{
@@ -1124,15 +1126,19 @@ export default {
       })
     },
     showEngineFileDialog(){
-      this.showFileDialog().then((selection)=>{
+      this.showFileDialog({uri_type: 'url'}, this.IMJOY_PLUGIN).then((selection)=>{
         if(typeof selection === 'string'){
           selection = [selection]
+        }
+        const urls = []
+        for(let u of selection){
+          urls.push({href: u, text: u.split('name=')[1]})
         }
         const w = {
           name: "Files",
           type: 'imjoy/url_list',
           scroll: true,
-          data: selection
+          data: urls
         }
         this.addWindow(w)
       })
@@ -1157,13 +1163,13 @@ export default {
           this.show("Error: Plugin Engine is not connected.")
           return
         }
-        if(!_plugin || !_plugin.id){
+        if(_plugin !== this.IMJOY_PLUGIN && (!_plugin || !_plugin.id)){
           reject("Plugin not found.")
           return
         }
         const source_plugin = this.plugins[_plugin.id]
         const plugin_name = source_plugin && source_plugin.name
-        if(!plugin_name){
+        if(_plugin !== this.IMJOY_PLUGIN && !plugin_name){
           reject("Plugin name not found.")
           return
         }
@@ -1186,10 +1192,15 @@ export default {
               }
             })
           }
-          this.permission_message = `Plugin <strong>"${plugin_name}"</strong> would like to access your local file at <strong>"${config.path}"</strong><br>This means files and folders under "${config.path}" will be exposed as an url which can be accessed with the url.<br><strong>Please make sure this file path do not contain any confidential or sensitive data.</strong><br>Do you trust this plugin and allow this operation?`
-          this.resolve_permission = resolve_permission
-          this.reject_permission = reject
-          this.showPermissionConfirmation = true
+          if(_plugin === this.IMJOY_PLUGIN){
+            resolve_permission()
+          }
+          else{
+            this.permission_message = `Plugin <strong>"${plugin_name}"</strong> would like to access your local file at <strong>"${config.path}"</strong><br>This means files and folders under "${config.path}" will be exposed as an url which can be accessed with the url.<br><strong>Please make sure this file path do not contain any confidential or sensitive data.</strong><br>Do you trust this plugin and allow this operation?`
+            this.resolve_permission = resolve_permission
+            this.reject_permission = reject
+            this.showPermissionConfirmation = true
+          }
         }
         else{
           reject("There is a pending permission request, please try again later.")
