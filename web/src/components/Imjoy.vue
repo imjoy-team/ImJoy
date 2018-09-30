@@ -95,15 +95,6 @@
       </md-speed-dial>
       <div class="md-toolbar-row">
         <div class="md-toolbar-section-start">
-          <!-- <md-button v-if="!menuVisible" class="md-fab md-primary" @click="menuVisible=true">
-            <md-icon>menu</md-icon>
-          </md-button> -->
-          <!-- <md-field v-show="false">
-            <md-file v-show="false" v-model="folder_select" ref="file_select" @md-change="selectFileChanged" />
-          </md-field>
-          <md-field v-show="false">
-            <md-file v-model="file_select" ref="folder_select" @md-change="selectFileChanged" webkitdirectory mozdirectory msdirectory odirectory directory multiple/>
-          </md-field> -->
           <md-button class="site-button" to="/">
             <div class="site-title">ImJoy.io<span class="superscript">alpha</span></div>
           </md-button>
@@ -136,16 +127,6 @@
         </div>
       </div>
       <br>
-      <!-- <md-card v-if="file_tree">
-        <md-card-content>
-          <md-button @click="file_selector_expand=!file_selector_expand" :class="file_selector_expand?'': 'md-primary'"><span class="md-subheading">Files</span></md-button>
-          <ul v-show="file_selector_expand">
-            <file-item :model="file_tree" :selected="file_tree_selection" @select="fileTreeSelected">
-            </file-item>
-          </ul>
-        </md-card-content>
-      </md-card> -->
-
       <md-card>
         <md-card-header>
           <div class="md-layout md-gutter md-alignment-center-space-between">
@@ -262,12 +243,6 @@
             </div>
             <md-divider></md-divider>
             <p v-if="installed_plugins.length<=0">&nbsp;No plugin installed.</p>
-          <!-- <div class="md-layout md-gutter md-alignment-center-center">
-            <md-button class="md-raised md-primary" v-if="!installed_plugins || installed_plugins.length<=0" @click="showAddPluginDialog=true">
-              <md-icon>add</md-icon>Add New Plugins
-              <md-tooltip>Install or create a new plugin</md-tooltip>
-            </md-button>
-          </div> -->
           </md-card-content>
         </md-card>
       </div>

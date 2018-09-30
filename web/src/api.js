@@ -90,7 +90,7 @@ Describe your plugin here.
 <config lang="json">
 {
   "name": "Untitled Plugin",
-  "mode": "iframe",
+  "mode": "window",
   "tags": [],
   "ui": "UI for Untitled Plugin",
   "version": "0.1.0",
