@@ -81,7 +81,7 @@
         <md-speed-dial-content>
           <md-button :disabled="!engine_connected" @click="showEngineFileDialog()" class="md-icon-button md-primary">
             <md-icon>add_to_queue</md-icon>
-            <md-tooltip>Show Plugin Engine file dialog</md-tooltip>
+            <md-tooltip>Load files through the Python Plugin Engine</md-tooltip>
           </md-button>
           <md-button @click="$refs.file_form.reset();$refs.file_select.click()" class="md-icon-button md-primary">
             <md-icon>insert_drive_file</md-icon>
@@ -331,16 +331,14 @@
       <md-button class="md-primary" @click="showWorkspaceDialog=false;">OK</md-button>
     </md-dialog-actions>
   </md-dialog>
-
-  <md-dialog-prompt
-        :md-active.sync="showTokenPrompt"
-        v-model="connection_token"
-        md-title="What is the connection token?"
-        md-input-maxlength="36"
-        :md-click-outside-to-close="false"
-        md-input-placeholder="Please go to the plugin engine terminal to get the token."
-        md-confirm-text="Connect"
-        @md-confirm="connectEngine(engine_url)"/>
+  <md-dialog-confirm
+      :md-active.sync="showPermissionConfirmation"
+      md-title="Request for Permission"
+      :md-content="permission_message"
+      md-confirm-text="Deny"
+      md-cancel-text="Allow"
+      @md-cancel="showPermissionConfirmation=false;processPermission(true)"
+      @md-confirm="showPermissionConfirmation=false;processPermission(false)" />
 
   <md-dialog :md-active.sync="showPluginEngineInfo" :md-click-outside-to-close="false">
     <md-dialog-title>Using the Python Plugin Engine</md-dialog-title>
@@ -508,6 +506,10 @@ export default {
       showSettingsDialog: false,
       showAddPluginDialog: false,
       showRemoveConfirmation: false,
+      showPermissionConfirmation: false,
+      permission_message: 'No permission message.',
+      resolve_permission: null,
+      reject_permission: null,
       plugin_dialog_config: null,
       _plugin_dialog_promise: {},
       _plugin2_remove: null,
@@ -524,7 +526,6 @@ export default {
       active_windows: [],
       selected_workspace: null,
       connection_token: null,
-      showTokenPrompt: false,
       showPluginEngineInfo: false,
       workspace_list: [],
       workflow_list: [],
@@ -1114,7 +1115,6 @@ export default {
             this.pluing_context.socket = socket
             this.engine_connected = true
             this.showPluginEngineInfo = false
-            this.showTokenPrompt = false
             this.engine_status = 'Connected.'
             localStorage.setItem("imjoy_connection_token", this.connection_token);
             localStorage.setItem("imjoy_engine_url", url)
@@ -1128,7 +1128,7 @@ export default {
           }
           else{
             socket.disconnect()
-            if(!this.showPluginEngineInfo) this.showTokenPrompt = true
+            this.showPluginEngineInfo = true
             console.error('failed to connect.')
           }
         })
@@ -1181,23 +1181,66 @@ export default {
         this.addWindow(w)
       })
     },
+    processPermission(allow){
+      if(allow && this.resolve_permission){
+        this.resolve_permission();
+        this.resolve_permission = null;
+      }
+      else if(this.reject_permission){
+        this.reject_permission("Permission Denied!");
+        this.reject_permission = null;
+      }
+      else{
+        console.error('permission handler not found.')
+      }
+    },
     getFileUrl(path, _plugin){
       return new Promise((resolve, reject) => {
-        this.socket.emit('get_file_url', {path: path}, (ret)=>{
-          if(ret.success){
-            resolve(ret.url)
-            this.$forceUpdate()
+        if(!this.engine_connected){
+          reject("Plugin Engine is not connected.")
+          this.show("Error: Plugin Engine is not connected.")
+          return
+        }
+        if(!_plugin || !_plugin.id){
+          reject("Plugin not found.")
+          return
+        }
+        const plugin_name = this.plugins[_plugin.id].name
+        if(!plugin_name){
+          reject("Plugin name not found.")
+          return
+        }
+        if(!this.showPermissionConfirmation){
+          const resolve_permission = ()=>{
+            this.socket.emit('get_file_url', {path: path}, (ret)=>{
+              if(ret.success){
+                resolve(ret.url)
+                this.$forceUpdate()
+              }
+              else{
+                this.show(`Failed to get file url for ${path} ${ret.error}`)
+                reject(ret.error)
+                this.$forceUpdate()
+              }
+            })
           }
-          else{
-            this.show(`Failed to get file url for ${path} ${ret.error}`)
-            reject(ret.error)
-            this.$forceUpdate()
-          }
-        })
+          this.permission_message = `Plugin "${plugin_name}" would like to access your local file at "${path}"<br>This means files and folders under "${path}" will be exposed as an url which can be accessed with the url.<br><strong>Please make sure this file path do not contain any confidential or sensitive data.</strong><br>Do you trust this plugin and allow this operation?`
+          this.resolve_permission = resolve_permission
+          this.reject_permission = reject
+          this.showPermissionConfirmation = true
+        }
+        else{
+          reject("There is a pending permission request, please try again later.")
+        }
       })
     },
     getFilePath(url, _plugin){
       return new Promise((resolve, reject) => {
+        if(!this.engine_connected){
+          reject("Plugin Engine is not connected.")
+          this.show("Error: Plugin Engine is not connected.")
+          return
+        }
         this.socket.emit('get_file_path', {url: url}, (ret)=>{
           if(ret.success){
             resolve(ret.path)
@@ -1979,7 +2022,7 @@ export default {
         });
         plugin.whenFailed((e) => {
           if(e){
-            this.status_text = template.name + '-> Error: ' + e
+            // this.status_text = template.name + '-> Error: ' + e
             this.show('Error occured when loading ' + template.name + ": " + e)
           }
           else{
