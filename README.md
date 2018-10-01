@@ -40,6 +40,20 @@ To use it, go to the [ImJoy web app](https://imjoy.io/#/app), and click the 🚀
 
 More detailed instructions can be found here: [ImJoy-Python](https://github.com/oeway/ImJoy-Python).
 
+### Install from url
+You can install a plugin from an url which point to a ImJoy plugin file (extension: `*.imjoy.html`).In order to do that, you can construct an url by setting `plugin` to the **raw** file url of your image plugin file from Github, for example: `http://imjoy.io/#/app?plugin=https://raw.githubusercontent.com/oeway/ImJoy-Plugins/master/repository/imageWindow.imjoy.html`. You may need to encode all the strings into url, the easiest way to make it right is to write directly in the address bar of your browser and then use the url copied from the address bar. For example the previous url will become: `http://imjoy.io/#/app?plugin=https%3A%2F%2Fraw.githubusercontent.com%2Foeway%2FImJoy-Plugins%2Fmaster%2Frepository%2FimageWindow.imjoy.html`.
+
+For installing a plugin with predefined tag, you can use `#` to append the tag, for example, you can add `#dev` to tell ImJoy to install with the `dev` tag from the plugin.
+
+When open such an url, a plugin management dialog will be shown which allow the user to click `Install`.
+
+### supported url parameters
+ * `w` workspace name, an url contains `w` as a query string (e.g. https://imjoy.io/#/?w=test) can be used to create or switch to a new workspace.
+ * `plugin` show the specified plugin in the plugin management dialog, you can use plugin name or an url for the plugin, for example: `https://imjoy.io/#/app?plugin=Image%20Window` will show up a plugin dialog with `Image Window` in the search. You can also set `plugin` to an url for sharing plugin hosted on github, please refer to `Install from url` for more details.
+ * `engine` define the engine url, for example: `http://imjoy.io/#/app?engine=http://localhost:8080`, notice that if you want to connect to a remote machine through http (not https) connection, you can only do it by using `http://imjoy.io` rather than `https://imjoy.io`. This restriction also exist if you use localhost with some browsers (e.g. safari).
+ * `token` define the connection token, for example: `http://imjoy.io/#/app?token=2760239c-c0a7-4a53-a01e-d6da48b949bc`
+
+ These parameters are independent from each other, meaning you can combine different parameters with `&` and construct a long url. For example combining engine url and connection token:  `http://imjoy.io/#/app?engine=http://localhost:8080&token=2760239c-c0a7-4a53-a01e-d6da48b949bc`.
 ### How does it work?
 ImJoy supports Python Plugins which can run much more computationally intensive tasks. In order to run that, it needs to connect to the Python Plugin Engine -- a small python library we developed for ImJoy (source code: https://github.com/oeway/ImJoy-Python).
 
@@ -125,7 +139,34 @@ Here is an outline of the plugin file:
   * `type: 'variableName'`
   * ...
 
-  You need to define a unique id for each element, for example `"ui": "select an option: {id: 'option1', type: 'choice', options: ['cat', 'dog'], placeholder: 'cat'}"`
+  You need to define a unique id for each element, for example `"ui": "select an option: {id: 'option1', type: 'choice', options: ['cat', 'dog'], placeholder: 'cat'}"`.
+
+  In this example, during running, you can read `option1` with the `my.config.option1`.
+
+  Besides one plain string as shown above which may get very long and `json` do not support breaking long string into several lines. Therefore, we support other different ways of defining the `ui` string. Here are different ways:
+
+  * an array with strings: for example:
+```
+"ui": [
+       "option1: {id: 'option1', type: 'choice', options: ['cat', 'dog'], placeholder: 'cat'}",
+       "option2: {id: 'option2', type: 'number', placeholder: 3}"
+      ],
+```
+  * an object with keys and values: for example:
+```
+"ui": {
+       "option1": "{id: 'option1', type: 'choice', options: ['cat', 'dog'], placeholder: 'cat'}",
+       "option2": "{id: 'option2', type: 'number', placeholder: 3}"
+      },
+```
+In the above example, the values are actually strings, if you want an actual dictionary, you can do:
+```
+"ui": {
+       "option1": {"id": "option1", "type": "choice", "options": ["cat", "dog"], "placeholder": "cat"},
+       "option2": {"id": "option2", "type": "number", "placeholder": 3}
+      },
+```
+Notice that, we added `" "` around keys such as `id` and `type` and we replaced `'` into `"`, this is because JSON format only support keys quoted with `"` and all the strings must use `"` instead of `'`.
 
 * `version` defines the version of the plugin
 * `api_version` api version of imjoy which the plugin is written for
@@ -139,12 +180,11 @@ The format is exactly the same as `inputs`.
 * `env` (**for python plugins only**) the virtual environment or docker image command used for creating an enviroment to run the plugins
 * `cmd` (**for python plugins only**) the command used to run the plugin, by default, it will run `python`, sometimes it can be something like `python3` or `python27` etc.
 * `requirements` (**for python plugins only**) the pip packages which will be installed before running the plugin, package names or github links are both supported. It can be a list of pip packages or a command string. For example, `["numpy", "scipy==1.0"]` or `"pip install numpy scipy==1.0"`. If you want to use conda, you can set it to `"conda install numpy scipy==1.0"`.
-* `dependencies` names of other imjoy plugins which the current one depend on. They will be installed automatically during installation.
+* `dependencies` names of other imjoy plugins which the current one depend on. They will be installed automatically during installation. An url can also be used as a dependency for sharing a plugin. For both cases, a hash tag can be used to specify the tag for the plugin. For example: `dependencies: ["Image Denoising#stable"]`, it means this plugin depends on the `stable` version of the `Image Denoising` plugin (of course, the plugin needs to define these tags).
 
 To configure the plugin with `tags`, the following `<config>` fields can be made configurable: `"env", "requirements", "dependencies", "icon", "ui", "mode"`.
 
 For example, you can set different `requirements` according to different tag which selected by the user during installation. In order to support that, the `requirements` can be set to `{"gpu": "pip install tensorflow-gpu keras", "cpu": "pip install tensorflow keras"}` or `{"gpu": ["tensorflow-gpu", "keras"], "cpu": ["tensorflow", "keras"]}`.
-
 
 ## The `<docs>` tag
 Used to contain documentation for the plugin, it need to be written in `Markdown` language. Here is a document about how to write document in `Markdown`: [Mastering Markdown](https://guides.github.com/features/mastering-markdown/).
@@ -181,7 +221,7 @@ Optionally, you can define an update function which will be called when any sett
 All the plugins can access `config` and `data` from `my`:
 
  * `my.config`
- The config values from the user interface defined with the `ui` string (from the plugin config or `api.register`).
+ The config values from the user interface defined with the `ui` string (from the plugin config or `api.register`). For example, if you defined an ui string(e.g. `"ui": "option {id: 'opt1', type: 'number'}"`) in the plugin `<config>` or in `api.register({"ui": "option {id: 'opt1', , type: 'number'}"})`, you can access it through `my.config.opt1`.
  * `my.data`
  It stores the data from current active window and state for running the plugin.
 
@@ -415,6 +455,7 @@ show a file dialog for selecting files or directories. It accept the following o
  * `title` the title of the dialog.
  * `root` the initial path for the dialog to show.
  * `mode` two modes are supported, by default, the user can select a single or multiple file (with `shift` key pressed), if you want to force the dialog to return multiple files or directories in an array or list, set `mode` to `"multiple"`, or you can force it to return only a single file or directory by setting `mode` to `"single"`, if you want to support both, you can explicitly set `mode` to `"single|multiple"` or keep the default setting.
+ * `uri_type` choose the type for return between `"url"` or `"path"`. The default value for JavaScript plugins is `"url"` and for Python plugins is `"path"`.
 
 Since the file handling is different in the browser environment and Python, this api have different behavior when called from different types of plugin. In Javascrpt and Python, an Imjoy file dialog will be displayed, it will only return a promise which you can get the file path string with.
 
@@ -442,6 +483,22 @@ For Javascript plugins, currently supported functions are:
 
 For Python Plugins, currently supported functions are:
 `api.utils.kill` for kill a `subprocess` in python.
+
+`api.utils.ndarray` for wrapping ndarray according to ImJoy ndarray format.
+
+
+### api.getFileUrl
+Used for generating an url for accesing a local file or directory path. For example: `api.getFileUrl('~/data/output.png')`, it will return something like `http://localhost:8080/file/1ba89354-ae98-457c-a53b-39a4bdd14941?name=output.png`.
+
+When this function is called, a confirmation dialog will popup for getting the user's permission. This means a JavaScript plugin cannot access the user's file system without notifying the user.
+
+There are two optional parameters `password` and `headers`:
+ * `password`: You can specify a password for accessing the file or folder, For example: `api.getFileUrl('~/data/output.png', password='SECRET_PASSWORD')`.
+
+ * `headers`: With the generated url, By default, the generated url will be served with the default header `Content-disposition: inline; filename="XXXXXXXXX.XXX"` which aims for rendering in the browser. If you want to generate a direct download link, you can pass customized `headers`, for example: `headers={'Content-disposition': 'attachment; filename="XXXXXXXXX.XXX"'}` will give you a direct download link. In order to correctly render the file, you may need to pass a `Content-Type` like this:  `headers={'Content-disposition': 'inline; filename="XXXXXXXXX.XXX"', 'Content-Type': 'image/png'}`. If no header is specified, it will use the standard Python library [mimetypes](https://docs.python.org/3/library/mimetypes.html) to guess a MIME type from the file name, if `mimetypes` failed to guess one, the fallback mime type will be `application/octet-stream`.
+
+### api.getFilePath
+This api function convert an url generated by `api.getFileUrl` into an absolute file path on the file system, which can be further accessed by a Python Plugin.
 
 ### `api.setConfig(...)`
 Each plugin can store its configurations with `api.setConfig`. For example store a simple number `api.setConfig('sigma', 928)`,
@@ -543,12 +600,39 @@ api.export(PythonPlugin())
 
 ```
 
+### Sending data/files from Python to the web App.
+
+#### sending small amount of data or small files
+
+You can directly pass the data as parameters of api functions which will be send to the frontend directly.
+
+Small numpy arrays, strings, bytes (less 10MB for example) can be directly send through the builtin websocket between the Plugin Engine and the web App.
+
+For example, for quick display of an small image, you can save it as png format and encode it as base64 strings which can then be directly displayed with a standard HTML `<img>` tag.
+
+```python
+with open("output.png", "rb") as f:
+    data = f.read()
+    result = base64.b64encode(data).decode('ascii')
+    imgurl = 'data:image/png;base64,' + result
+    api.createWindow(name='unet prediction', type = 'imjoy/image', w=7, h=7, data= {"src": imgurl})
+```
+
+#### sending large amount of data or huge files
+
+Potentially, you can send large files chunk by chunk using api calls, however, it's not optimal and may block normal communication between the engine and the App.
+
+The recommended way to do that is to store the data on the disk (in the workspace directory for example), then use `api.getFileUrl` to generate an url for accessing the file.
+
+The generated url can then be send to the web App and accessed with a downlad link or using js libraries such as `axios`. Many libraries such as Three.js, Vega etc. can load files through url directly.
+
 ### Using virtual environments
   Python plugins for ImJoy can have different conda environments, which provides a way to isolate plugins. You can therefore run python plugins with different versions of Python, or use different pip packages.
 
 
-
   By default, python plugins from ImJoy will be executed in the default conda environment(Python 3.6). If you want to run a plugin in a different conda environment, you can specify it by setting the `env` field in the `<config>` section of the plugin.
+
+  `env` can be a string or an array. When connecting multiple command in a line please use `&&` or `||` which supported on different operating systems. If you have several command which are indipendent from each other, please use array to store the commands. For example: `"env": ["git clone https://github.com/oeway/XXXXXX.git", "conda create -n XXXXX python=3.7"]`, this setting will first clone the source code on github, then create an environment with conda. Notice that the git clone command will fail if the folder already exist, in that case, the second command will also been executed.
 
   It is also important to specify the pip packages required by the plugin, this can be done with the `requirements` field in `<config>`.
 

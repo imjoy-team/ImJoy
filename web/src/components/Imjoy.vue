@@ -14,23 +14,10 @@
           <div class="site-title">ImJoy.io<span class="superscript md-small-hide">alpha</span></div>
           <md-tooltip>ImJoy home</md-tooltip>
         </md-button>
-        <md-menu>
-          <md-button class="md-button" md-menu-trigger>
-            <span class="subheader-title md-small-hide" style="flex: 1">Image Processing with </span><span class="subheader-emoji">😁</span>
-            <md-tooltip>Switch workspace</md-tooltip>
-          </md-button>
-          <md-menu-content>
-            <md-menu-item @click="switchWorkspace(w)" v-for="w in workspace_list" :key="w">
-              <span>{{w}}</span><md-icon>forward</md-icon>
-            </md-menu-item>
-            <md-menu-item @click="showWorkspaceDialog=true">
-              <md-icon>settings</md-icon>Workspaces
-            </md-menu-item>
-          </md-menu-content>
-        </md-menu>
         <md-button v-if="status_text&&status_text.length"class="status-text md-small-hide" @click="showAlert(status_text)" :class="status_text.includes('rror')?'error-message':''">
           {{status_text.slice(0,80)+(status_text.length>80?'...':'')}}
         </md-button>
+        <span class="subheader-title md-small-hide" style="flex: 1" v-else>Image Processing with <span class="subheader-emoji">😁</span></span>
       </div>
 
       <div class="md-toolbar-section-end">
@@ -92,6 +79,10 @@
           <md-icon>add</md-icon>
         </md-speed-dial-target>
         <md-speed-dial-content>
+          <md-button :disabled="!engine_connected" @click="showEngineFileDialog()" class="md-icon-button md-primary">
+            <md-icon>add_to_queue</md-icon>
+            <md-tooltip>Load files through the Python Plugin Engine</md-tooltip>
+          </md-button>
           <md-button @click="$refs.file_form.reset();$refs.file_select.click()" class="md-icon-button md-primary">
             <md-icon>insert_drive_file</md-icon>
             <md-tooltip>Open a file</md-tooltip>
@@ -104,24 +95,31 @@
       </md-speed-dial>
       <div class="md-toolbar-row">
         <div class="md-toolbar-section-start">
-          <!-- <md-button v-if="!menuVisible" class="md-fab md-primary" @click="menuVisible=true">
-            <md-icon>menu</md-icon>
-          </md-button> -->
-          <!-- <md-field v-show="false">
-            <md-file v-show="false" v-model="folder_select" ref="file_select" @md-change="selectFileChanged" />
-          </md-field>
-          <md-field v-show="false">
-            <md-file v-model="file_select" ref="folder_select" @md-change="selectFileChanged" webkitdirectory mozdirectory msdirectory odirectory directory multiple/>
-          </md-field> -->
           <md-button class="site-button" to="/">
             <div class="site-title">ImJoy.io<span class="superscript">alpha</span></div>
           </md-button>
         </div>
         <div class="md-toolbar-section-end">
-          <md-button class="md-icon-button md-primary" @click="showSettingsDialog=true">
-            <md-icon>settings</md-icon>
-            <!-- <md-tooltip>Show settings and installed plugins</md-tooltip> -->
-          </md-button>
+          <md-menu>
+            <md-button class="md-icon-button md-primary" md-menu-trigger>
+              <md-icon>settings</md-icon>
+              <!-- <md-tooltip>Show settings and installed plugins</md-tooltip> -->
+            </md-button>
+            <md-menu-content>
+              <md-menu-item @click="switchWorkspace(w)" v-for="w in workspace_list" :key="w">
+                <span>{{w}}</span><md-icon>forward</md-icon>
+                <md-tooltip>Switch to workspace: {{w}} </md-tooltip>
+              </md-menu-item>
+              <md-divider></md-divider>
+              <md-menu-item @click="showWorkspaceDialog=true">
+                <md-icon>settings</md-icon>Workspaces
+              </md-menu-item>
+              <md-menu-item @click="showSettingsDialog=true">
+                <md-icon>settings</md-icon>General Settings
+              </md-menu-item>
+            </md-menu-content>
+          </md-menu>
+
           <md-button class="md-icon-button md-dense md-raised" @click="menuVisible = !menuVisible">
             <md-icon>keyboard_arrow_left</md-icon>
             <!-- <md-tooltip>Hide sidebar</md-tooltip> -->
@@ -129,16 +127,6 @@
         </div>
       </div>
       <br>
-      <!-- <md-card v-if="file_tree">
-        <md-card-content>
-          <md-button @click="file_selector_expand=!file_selector_expand" :class="file_selector_expand?'': 'md-primary'"><span class="md-subheading">Files</span></md-button>
-          <ul v-show="file_selector_expand">
-            <file-item :model="file_tree" :selected="file_tree_selection" @select="fileTreeSelected">
-            </file-item>
-          </ul>
-        </md-card-content>
-      </md-card> -->
-
       <md-card>
         <md-card-header>
           <div class="md-layout md-gutter md-alignment-center-space-between">
@@ -210,7 +198,7 @@
                 </md-button>
                 <md-menu-content>
                   <md-menu-item @click="showDoc(plugin.id)">
-                    <md-icon>description</md-icon>Documentation
+                    <md-icon>description</md-icon>Docs
                   </md-menu-item>
                   <md-menu-item @click="editPlugin(plugin.id)">
                     <md-icon>edit</md-icon>Edit
@@ -227,10 +215,10 @@
                 </md-menu-content>
               </md-menu>
 
-              <md-button class="joy-run-button" :class="plugin.running?'md-accent':'md-primary'" :disabled="plugin._disconnected" @click="runOp(plugin.ops[plugin.name])">
-                {{plugin.name}}
+              <md-button class="joy-run-button" :class="plugin.running?'md-accent':(plugin._disconnected && plugin.mode == 'pyworker'? 'disconnected-plugin': 'md-primary')" :disabled="plugin._disconnected && plugin.mode != 'pyworker'" @click="plugin._disconnected?connectPlugin(plugin):runOp(plugin.ops[plugin.name])">
+                {{plugin.mode == 'pyworker'? plugin.name + '🚀': plugin.name}}
               </md-button>
-              <md-button class="md-icon-button" @click="plugin.panel_expanded=!plugin.panel_expanded; $forceUpdate()">
+              <md-button v-if="!plugin._disconnected" class="md-icon-button" @click="plugin.panel_expanded=!plugin.panel_expanded; $forceUpdate()">
                 <md-icon v-if="!plugin.panel_expanded">expand_more</md-icon>
                 <md-icon v-else>expand_less</md-icon>
               </md-button>
@@ -255,12 +243,6 @@
             </div>
             <md-divider></md-divider>
             <p v-if="installed_plugins.length<=0">&nbsp;No plugin installed.</p>
-          <!-- <div class="md-layout md-gutter md-alignment-center-center">
-            <md-button class="md-raised md-primary" v-if="!installed_plugins || installed_plugins.length<=0" @click="showAddPluginDialog=true">
-              <md-icon>add</md-icon>Add New Plugins
-              <md-tooltip>Install or create a new plugin</md-tooltip>
-            </md-button>
-          </div> -->
           </md-card-content>
         </md-card>
       </div>
@@ -274,8 +256,8 @@
 
   <md-dialog-confirm :md-active.sync="showRemoveConfirmation" md-title="Removing Plugin" md-content="Do you really want to <strong>delete</strong> this plugin" md-confirm-text="Yes" md-cancel-text="Cancel" @md-cancel="showRemoveConfirmation=false" @md-confirm="removePlugin(_plugin2_remove);_plugin2_remove=null;showRemoveConfirmation=false"/>
   <!-- </md-card-content> -->
-  <file-dialog ref="file-dialog" :list-files="listEngineDir"></file-dialog>
-  <md-dialog :md-active.sync="showPluginDialog" :md-click-outside-to-close="false">
+  <file-dialog ref="file-dialog" :list-files="listEngineDir" :get-file-url="getFileUrl"></file-dialog>
+  <md-dialog :md-active.sync="showPluginDialog" :md-click-outside-to-close="true">
     <md-dialog-content>
       <div v-if="plugin_dialog_config">
         <joy :config="plugin_dialog_config" :showHeader="false" :controlButtons="false" ref="plugin_dialog_joy"></joy>
@@ -287,18 +269,18 @@
     </md-dialog-actions>
   </md-dialog>
 
-  <md-dialog :md-active.sync="showWorkspaceDialog" :md-click-outside-to-close="false">
+  <md-dialog :md-active.sync="showWorkspaceDialog" :md-click-outside-to-close="true">
     <md-dialog-title>Workspace Management</md-dialog-title>
     <md-dialog-content>
       <md-toolbar class="md-dense" md-elevation="0">
         <div class="md-toolbar-section-start">
         <md-field>
-          <label for="workspace_name">Name</label>
+          <label for="workspace_name">Workspace Name</label>
           <md-input type="text" v-model="new_workspace_name" placeholder="Create a new workspace" name="workspace_name"></md-input>
         </md-field>
         </div>
-        <div class="md-toolbar-section-end" v-show="new_workspace_name">
-          <md-button class="md-primary" @click="showWorkspaceDialog=false;switchWorkspace(new_workspace_name)"><md-icon>add</md-icon>New Workspace</md-button>
+        <div class="md-toolbar-section-end">
+          <md-button class="md-primary" @click="switchWorkspace(new_workspace_name);showWorkspaceDialog=false;"><md-icon>add</md-icon>New</md-button>
         </div>
       </md-toolbar>
       <md-list class="md-double-line md-dense">
@@ -324,16 +306,14 @@
       <md-button class="md-primary" @click="showWorkspaceDialog=false;">OK</md-button>
     </md-dialog-actions>
   </md-dialog>
-
-  <md-dialog-prompt
-        :md-active.sync="showTokenPrompt"
-        v-model="connection_token"
-        md-title="What is the connection token?"
-        md-input-maxlength="36"
-        :md-click-outside-to-close="false"
-        md-input-placeholder="Please go to the plugin engine terminal to get the token."
-        md-confirm-text="Connect"
-        @md-confirm="connectEngine(engine_url)"/>
+  <md-dialog-confirm
+      :md-active.sync="showPermissionConfirmation"
+      md-title="Request for Permission"
+      :md-content="permission_message"
+      md-confirm-text="Deny"
+      md-cancel-text="Allow"
+      @md-cancel="showPermissionConfirmation=false;processPermission(true)"
+      @md-confirm="showPermissionConfirmation=false;processPermission(false)" />
 
   <md-dialog :md-active.sync="showPluginEngineInfo" :md-click-outside-to-close="false">
     <md-dialog-title>Using the Python Plugin Engine</md-dialog-title>
@@ -344,11 +324,11 @@
         </p>
         <md-field>
           <label for="engine_url">Plugin Engine URL</label>
-          <md-input type="text" v-model="engine_url" name="engine_url"></md-input>
+          <md-input type="text" v-model="engine_url" @keyup.enter="connectEngine(engine_url)" name="engine_url"></md-input>
         </md-field>
         <md-field>
           <label for="connection_token">Connection Token</label>
-          <md-input type="text" v-model="connection_token" name="connection_token"></md-input>
+          <md-input type="text" v-model="connection_token" @keyup.enter="connectEngine(engine_url)" name="connection_token"></md-input>
         </md-field>
         <p>&nbsp;{{engine_status}}</p>
         <md-button class="md-primary" v-if="!engine_connected" @click="connectEngine(engine_url)">Connect</md-button>
@@ -401,12 +381,12 @@
           <div class="md-title">Installed Plugins</div>
         </md-card-header>
         <md-card-content>
-          <plugin-list display="list" :database="db" @message="show"  @install="pluginInstalled" @remove="pluginRemoved" :plugins="installed_plugins" :workspace="selected_workspace"></plugin-list>
+          <plugin-list display="list" :database="db" @message="show"  :install-plugin="installPlugin" :remove-plugin="removePlugin" :plugins="installed_plugins" :workspace="selected_workspace"></plugin-list>
         </md-card-content>
       </md-card>
     </md-dialog-content>
     <md-dialog-actions>
-      <md-button class="md-primary" @click="showSettingsDialog=false; reloadPlugins()">OK</md-button>
+      <md-button class="md-primary" @click="showSettingsDialog=false;">OK</md-button>
     </md-dialog-actions>
   </md-dialog>
 
@@ -429,7 +409,7 @@
           <div class="md-title">Or, install from the Plugin Store</div>
         </md-card-header>
         <md-card-content>
-          <plugin-list show-url @message="show" :database="db" @install="pluginInstalled" @remove="pluginRemoved"  :init-url="init_plugin_url" :init-search="init_plugin_search" display="list" config-url="https://raw.githubusercontent.com/oeway/ImJoy-Plugins/master/manifest.json" :workspace="selected_workspace"></plugin-list>
+          <plugin-list show-url @message="show" :database="db" :install-plugin="installPlugin" :remove-plugin="removePlugin" :init-url="init_plugin_url" :init-search="init_plugin_search" display="list" :plugins="available_plugins" :workspace="selected_workspace"></plugin-list>
         </md-card-content>
       </md-card>
       <md-divider></md-divider>
@@ -438,7 +418,7 @@
           <div class="md-title">Installed Plugins</div>
         </md-card-header>
         <md-card-content>
-          <plugin-list display="list" :database="db" @install="pluginInstalled" @remove="pluginRemoved" @message="show" :plugins="installed_plugins" :workspace="selected_workspace"></plugin-list>
+          <plugin-list display="list" :database="db" :install-plugin="installPlugin" :remove-plugin="removePlugin" @message="show" :plugins="installed_plugins" :workspace="selected_workspace"></plugin-list>
         </md-card-content>
       </md-card>
     </md-dialog-content>
@@ -460,7 +440,8 @@ import {
   WEBWORKER_PLUGIN_TEMPLATE,
   IFRAME_PLUGIN_TEMPLATE,
   WINDOW_PLUGIN_TEMPLATE,
-  CONFIGURABLE_FIELDS
+  CONFIGURABLE_FIELDS,
+  SUPPORTED_PLUGIN_MODES
 } from '../api.js'
 
 import {
@@ -500,6 +481,10 @@ export default {
       showSettingsDialog: false,
       showAddPluginDialog: false,
       showRemoveConfirmation: false,
+      showPermissionConfirmation: false,
+      permission_message: 'No permission message.',
+      resolve_permission: null,
+      reject_permission: null,
       plugin_dialog_config: null,
       _plugin_dialog_promise: {},
       _plugin2_remove: null,
@@ -516,7 +501,6 @@ export default {
       active_windows: [],
       selected_workspace: null,
       connection_token: null,
-      showTokenPrompt: false,
       showPluginEngineInfo: false,
       workspace_list: [],
       workflow_list: [],
@@ -527,6 +511,7 @@ export default {
       registered: null,
       updating_workflow: false,
       installed_plugins: [],
+      available_plugins: [],
       plugin_api: null,
       plugin_context: null,
       plugin_loaded: false,
@@ -550,6 +535,9 @@ export default {
     this.plugin_names = null
     this.db = null
     this.client_id = null
+    this.IMJOY_PLUGIN = {
+      _id: 'IMJOY_APP'
+    }
     this.plugin_templates = {
       "Webworker(Javascript)": WEBWORKER_PLUGIN_TEMPLATE,
       "Iframe(Javascript)": IFRAME_PLUGIN_TEMPLATE,
@@ -564,7 +552,7 @@ export default {
       h: 5
     }
     this.new_workspace_name = '',
-    this.preload_main = ['/static/tfjs/tfjs.js', 'https://rawgit.com/nicolaspanel/numjs/893016ec40e62eaaa126e1024dbe250aafb3014b/dist/numjs.min.js'],
+    // this.preload_main = ['/static/tfjs/tfjs.js', 'https://rawgit.com/nicolaspanel/numjs/893016ec40e62eaaa126e1024dbe250aafb3014b/dist/numjs.min.js'],
     this.workflow_joy_config = {
       expanded: true,
       name: "Workflow",
@@ -635,9 +623,9 @@ export default {
       // console.log('files loaded: ', this.selected_files)
       this.loadFiles()
     });
-    this.importScripts.apply(null, this.preload_main).then(() => {
-      // console.log('preload done.')
-    })
+    // this.importScripts.apply(null, this.preload_main).then(() => {
+    // console.log('preload done.')
+    // })
   },
   beforeRouteLeave(to, from, next) {
     if (this.windows && this.windows.length > 0) {
@@ -652,18 +640,6 @@ export default {
     }
   },
   mounted() {
-    // for(let u in this.builtin_scripts_url){
-    //   if(this.builtin_scripts_url.hasOwnProperty(u)){
-    //     axios.get(this.builtin_scripts_url[u]).then(response => {
-    //       if (!response || !response.data || response.data == '') {
-    //         alert('failed to get plugin code from ' + plugin.url)
-    //         return
-    //       }
-    //       this.builtin_scripts[u] = response.data
-    //       console.log('downloaded script: ', u)
-    //     })
-    //   }
-    // }
     // Make sure the GUI is refreshed
     setInterval(()=>{this.$forceUpdate()}, 5000)
     this.client_id = localStorage.getItem("imjoy_client_id")
@@ -687,20 +663,6 @@ export default {
     else{
       this.engine_url = localStorage.getItem("imjoy_engine_url") || 'http://localhost:8080'
     }
-
-    if(this.$route.query.plugin && this.$route.query.plugin.trim() != ''){
-      const p = this.$route.query.plugin.trim()
-      if (p.match(url_regex)) {
-        this.init_plugin_url = p
-        this.init_plugin_search = null
-      } else {
-        this.init_plugin_url = null
-        this.init_plugin_search = p
-      }
-      this.show_plugin_templates = false
-      this.showAddPluginDialog = true
-    }
-
     //location.protocol+'//'+location.hostname+(location.port ? ':'+location.port: '')
 
     this.plugin_api = {
@@ -719,6 +681,8 @@ export default {
       setConfig: this.setPluginConfig,
       getConfig: this.getPluginConfig,
       getAttachment: this.getAttachment,
+      getFileUrl: this.getFileUrl,
+      getFilePath: this.getFilePath,
       $forceUpdate: this.$forceUpdate,
     }
     this.resetPlugins()
@@ -758,13 +722,11 @@ export default {
           })
         })
       }
-      if (this.selected_workspace != 'default') {
-        this.$router.replace({
-          query: {
-            w: this.selected_workspace
-          }
-        })
-      }
+      // if (this.selected_workspace != 'default') {
+      //   const query = Object.assign({}, this.$route.query);
+      //   query.w = this.selected_workspace
+      //   this.$router.replace({ query });
+      // }
       this.db = new PouchDB(this.selected_workspace + '_workspace', {
         revs_limit: 2,
         auto_compaction: true
@@ -773,8 +735,49 @@ export default {
       this.connectEngine(this.engine_url, true)
 
     }).then(() => {
-      this.reloadPlugins()
-    });
+      this.reloadPlugins().then(()=>{
+        axios.get("https://raw.githubusercontent.com/oeway/ImJoy-Plugins/master/manifest.json").then(response => {
+          if (response && response.data && response.data.plugins) {
+            this.manifest = response.data
+            this.available_plugins = this.manifest.plugins
+            const uri_root = this.manifest.uri_root
+            for (let i = 0; i < this.available_plugins.length; i++) {
+                const p = this.available_plugins[i]
+                p.uri = p.uri || p.name + '.html'
+                if (!p.uri.startsWith(uri_root) && !p.uri.startsWith('http')) {
+                  p.uri = uri_root + '/' + p.uri
+                }
+                p._id = p._id || p.name.replace(/ /g, '_')
+
+            }
+            for (let i = 0; i < this.available_plugins.length; i++) {
+              const ap = this.available_plugins[i]
+              const ps = this.installed_plugins.filter((p) => {
+                return ap.name == p.name
+              })
+              // mark as installed
+              if(ps.length>0){
+                ap.installed = true
+                ap.tag = ps[0].tag
+              }
+            }
+
+            if(this.$route.query.plugin){
+              const p = this.$route.query.plugin.trim()
+              if (p.match(url_regex)) {
+                this.init_plugin_url = p
+                this.init_plugin_search = null
+              } else {
+                this.init_plugin_url = null
+                this.init_plugin_search = p
+              }
+              this.show_plugin_templates = false
+              this.showAddPluginDialog = true
+            }
+          }
+        })
+      })
+    })
   },
   beforeDestroy() {
     // console.log('terminating plugins')
@@ -793,12 +796,6 @@ export default {
     this.disconnectEngine()
   },
   methods: {
-    pluginInstalled(p){
-      this.reloadPlugin(p)
-    },
-    pluginRemoved(p){
-      this.unloadPlugin(p)
-    },
     setPluginConfig(name, value, _plugin){
       const plugin = this.plugins[_plugin.id]
       if(!plugin) throw "setConfig Error: Plugin not found."
@@ -830,44 +827,131 @@ export default {
       this.show(msg, duration)
     },
     showFileDialog(options, _plugin){
+      if(!this.engine_connected){
+        this.show('File Dialog requires the plugin engine, please connect to the plugin engine.')
+        throw "Plugin engine is not connected."
+      }
       if(!_plugin){
         _plugin = options
-        options = {}
+        options = {root: '~', uri_type: 'url'}
       }
       if(_plugin && _plugin.id){
         const source_plugin = this.plugins[_plugin.id]
-        if(source_plugin){
+        if(source_plugin || _plugin === this.IMJOY_PLUGIN){
           this.$refs.file_form.reset()
           this.$refs.file_select.click()
           if(source_plugin && source_plugin.mode != 'pyworker'){
-            return this.$refs['file-dialog'].showDialog(options)
-            // if(options.type == 'file'){
-            //   this.$refs.file_form.reset()
-            //   this.$refs.file_select.click()
-            // }
-            // else if(options.type == 'directory'){
-            //   this.$refs.file_form.reset();
-            //   this.$refs.folder_select.click()
-            // }
-            // else{
-            //   throw "unsupported type: "+options.type
-            // }
+            options.uri_type = options.uri_type || 'url'
           }
           else{
-            return this.$refs['file-dialog'].showDialog(options)
+            options.uri_type = options.uri_type || 'path'
           }
+          return this.$refs['file-dialog'].showDialog(options, _plugin)
         }
       }
       else{
-        throw "Plugin not found."
+        return this.$refs['file-dialog'].showDialog(options, _plugin)
       }
 
     },
-    // fileTreeSelected(s){
-    //   console.log('selected---->', s.path)
-    //   this.file_tree_selection = s.path
-    //   this.$forceUpdate()
-    // },
+    connectPlugin(plugin){
+      if(plugin._disconnected){
+        if(plugin.mode == 'pyworker' && !this.engine_connected){
+          this.connectEngine(this.engine_url)
+        }
+        else{
+          this.reloadPlugin(plugin.config)
+        }
+      }
+    },
+    installPlugin(pconfig, tag){
+      return new Promise((resolve, reject) => {
+        const uri = typeof pconfig == 'string' ? pconfig : pconfig.uri
+        //use the has tag in the uri if no hash tag is defined.
+        if(!uri){
+          reject('No url found for plugin ' + pconfig.name)
+          return
+        }
+        tag = tag || uri.split("#")[1]
+        axios.get(uri).then(response => {
+          if (!response || !response.data || response.data == '') {
+            alert('failed to get plugin code from ' + uri)
+            reject('failed to get code.')
+            return
+          }
+          let config = null
+          const code = response.data
+          const pluginComp = parseComponent(code)
+          console.log('code parsed from', pluginComp)
+          let c = null
+          try {
+            config = JSON.parse(pluginComp.config[0].content)
+            console.log('loading config from .html file', config)
+          } catch (e) {
+            console.error(e)
+            reject(e)
+            return
+          }
+          if (!config) {
+            console.error('Failed to parse the plugin code.', code)
+            reject('Failed to parse the plugin code.')
+            return
+          }
+          if (!SUPPORTED_PLUGIN_MODES.includes(config.mode)){
+            reject('Unsupported plugin mode: '+config.mode)
+            return
+          }
+          config.uri = uri
+          config.code = code
+          config.tag = tag
+          config._id = config.name && config.name.replace(/ /g, '_') || randId()
+          if (config.dependencies) {
+            for (let i = 0; i < config.dependencies.length; i++) {
+              let dep
+              if (config.dependencies[i].match(url_regex)) {
+                // this url can contain a hash tag which will be used as tag
+                this.installPlugin(config.dependencies[i])
+              }
+              else{
+                dep = config.dependencies[i].split("#")
+                const ps = this.available_plugins.filter((p) => {
+                  return dep[0] && p.name == dep[0].trim()
+                });
+                if (ps.length <= 0) {
+                  alert(config.name + ' plugin depends on ' + config.dependencies[i] + ', but it can not be found in the repository.')
+                } else {
+                  console.log('installing dependency ', dep)
+                  if (!ps[0].installed){
+                      this.installPlugin(ps[0], dep[1])
+                  }
+                }
+              }
+
+            }
+          }
+          this.savePlugin(config).then(()=>{
+            for (let p of this.available_plugins) {
+              if(p.name == config.name && !p.installed){
+                p.installed = true
+                p.tag = tag
+              }
+            }
+            this.reloadPlugin(config).then(()=>{
+              this.show(`Plugin "${config.name}" has been successfully installed.`)
+              this.$forceUpdate()
+              resolve()
+            }).catch(()=>{
+              reject(`Plugin ${config.name} saved but failed to load.`)
+            })
+          }).catch(()=>{
+            reject(`Failed to save the plugin ${config.name}`)
+          })
+        }).catch((e)=>{
+          console.error(e)
+          this.show('Failed to download, if you download from github, please use the url to the raw file', 6000)
+        })
+      })
+    },
     removePlugin(plugin){
       return new Promise((resolve, reject) => {
         // console.log('remove plugin', plugin.name)
@@ -875,15 +959,27 @@ export default {
         this.db.get(plugin._id).then((doc) => {
           return this.db.remove(doc);
         }).then((result) => {
-          this.unloadPlugin(plugin)
+
+          for (let i = 0; i < this.installed_plugins.length; i++) {
+            if(this.installed_plugins[i].name == plugin.name){
+              this.installed_plugins.splice(i, 1)
+            }
+          }
+          for (let p of this.available_plugins) {
+              if(p.name == plugin.name){
+                p.installed = false
+                p.tag = null
+              }
+          }
+          this.unloadPlugin(plugin, true)
           // console.log('plugin has been removed')
-          this.show('the plugin has been removed.')
+          this.show(`"${plugin.name}" has been removed.`)
           this.$forceUpdate()
           resolve()
         }).catch((err) => {
           this.show('Error:'+err)
           console.error('error occured when removing ', plugin, err)
-          reject()
+          reject(err)
         });
       });
     },
@@ -902,6 +998,10 @@ export default {
     },
     switchWorkspace(w) {
       // console.log('switch to ', w)
+      if(!w || w.trim() == ''){
+        this.show("Workspace name should not be empty.")
+        throw "Workspace name should not be empty."
+      }
       let q = {
         w: w
       }
@@ -925,9 +1025,9 @@ export default {
             list: this.workspace_list,
             default: 'default'
           }).then(()=>{
-            this.show('Workspace ' + w + ' has been deleted.')
+            this.show(`Workspace ${w} has been deleted.`)
           }).catch(()=>{
-            this.show('Error occured when removing workspace ' + w + '.')
+            this.show(`Error occured when removing workspace ${w}.`)
           })
         })
 
@@ -975,7 +1075,6 @@ export default {
             this.pluing_context.socket = socket
             this.engine_connected = true
             this.showPluginEngineInfo = false
-            this.showTokenPrompt = false
             this.engine_status = 'Connected.'
             localStorage.setItem("imjoy_connection_token", this.connection_token);
             localStorage.setItem("imjoy_engine_url", url)
@@ -989,7 +1088,7 @@ export default {
           }
           else{
             socket.disconnect()
-            if(!this.showPluginEngineInfo) this.showTokenPrompt = true
+            this.showPluginEngineInfo = true
             console.error('failed to connect.')
           }
         })
@@ -1015,15 +1114,121 @@ export default {
     },
     listEngineDir(path, type, recursive){
       return new Promise((resolve, reject) => {
-        this.socket.emit('list_dir', {path: path || '.', type: type || 'file', recursive: recursive || false}, (ret)=>{
+        this.socket.emit('list_dir', {path: path || '~', type: type || 'file', recursive: recursive || false}, (ret)=>{
           if(ret.success){
-            // this.file_tree = ret
             resolve(ret)
             this.$forceUpdate()
           }
           else{
-            this.show('Failed to list dir: '+path)
-            reject()
+            this.show(`Failed to list dir: ${path} ${ret.error}`)
+            reject(ret.error)
+            this.$forceUpdate()
+          }
+        })
+      })
+    },
+    showEngineFileDialog(){
+      this.showFileDialog({uri_type: 'url'}, this.IMJOY_PLUGIN).then((selection)=>{
+        if(typeof selection === 'string'){
+          selection = [selection]
+        }
+        const urls = []
+        for(let u of selection){
+          urls.push({href: u, text: u.split('name=')[1]})
+        }
+        const w = {
+          name: "Files",
+          type: 'imjoy/url_list',
+          scroll: true,
+          data: urls
+        }
+        this.addWindow(w)
+      })
+    },
+    processPermission(allow){
+      if(allow && this.resolve_permission){
+        this.resolve_permission();
+        this.resolve_permission = null;
+      }
+      else if(this.reject_permission){
+        this.reject_permission("Permission Denied!");
+        this.reject_permission = null;
+      }
+      else{
+        console.error('permission handler not found.')
+      }
+    },
+    getFileUrl(path, _plugin){
+      return new Promise((resolve, reject) => {
+        if(!this.engine_connected){
+          reject("Plugin Engine is not connected.")
+          this.show("Error: Plugin Engine is not connected.")
+          return
+        }
+        if(_plugin !== this.IMJOY_PLUGIN && (!_plugin || !_plugin.id)){
+          reject("Plugin not found.")
+          return
+        }
+        const source_plugin = this.plugins[_plugin.id]
+        const plugin_name = source_plugin && source_plugin.name
+        if(_plugin !== this.IMJOY_PLUGIN && !plugin_name){
+          reject("Plugin name not found.")
+          return
+        }
+        if(!this.showPermissionConfirmation){
+          let config = path
+          if(typeof path === 'string'){
+            config = {path: path}
+          }
+
+          const resolve_permission = ()=>{
+            this.socket.emit('get_file_url', config, (ret)=>{
+              if(ret.success){
+                resolve(ret.url)
+                this.$forceUpdate()
+              }
+              else{
+                this.show(`Failed to get file url for ${config.path} ${ret.error}`)
+                reject(ret.error)
+                this.$forceUpdate()
+              }
+            })
+          }
+          if(_plugin === this.IMJOY_PLUGIN){
+            resolve_permission()
+          }
+          else{
+            this.permission_message = `Plugin <strong>"${plugin_name}"</strong> would like to access your local file at <strong>"${config.path}"</strong><br>This means files and folders under "${config.path}" will be exposed as an url which can be accessed with the url.<br><strong>Please make sure this file path do not contain any confidential or sensitive data.</strong><br>Do you trust this plugin and allow this operation?`
+            this.resolve_permission = resolve_permission
+            this.reject_permission = reject
+            this.showPermissionConfirmation = true
+          }
+        }
+        else{
+          reject("There is a pending permission request, please try again later.")
+        }
+      })
+    },
+    getFilePath(url, _plugin){
+      return new Promise((resolve, reject) => {
+        if(!this.engine_connected){
+          reject("Plugin Engine is not connected.")
+          this.show("Error: Plugin Engine is not connected.")
+          return
+        }
+        let config = url
+        if(typeof url === 'string'){
+          config = {url: url}
+        }
+        this.socket.emit('get_file_path', config, (ret)=>{
+          if(ret.success){
+            resolve(ret.path)
+            this.$forceUpdate()
+          }
+          else{
+            this.show(`Failed to get file path for ${config.url} ${ret.error}`)
+            reject(ret.error)
+            this.$forceUpdate()
           }
         })
       })
@@ -1068,6 +1273,7 @@ export default {
     },
     editPlugin(pid) {
       const plugin = this.plugins[pid]
+      console.log('editing plugin:', plugin)
       const pconfig = plugin.config
       const w = {
         name: pconfig.name,
@@ -1105,15 +1311,17 @@ export default {
       }
       this.addWindow(w)
     },
-    unloadPlugin(plugin){
+    unloadPlugin(plugin, temp_remove){
       const name = plugin.name
       for (let k in this.plugins) {
         if (this.plugins.hasOwnProperty(k)) {
           const plugin = this.plugins[k]
           if(plugin.name == name){
               try {
-                delete this.plugins[k]
-                delete this.plugin_names[name]
+                if(temp_remove){
+                  delete this.plugins[k]
+                  delete this.plugin_names[name]
+                }
                 Joy.remove(name)
                 // console.log('terminating ',plugin)
                 if (typeof plugin.terminate == 'function') {
@@ -1126,16 +1334,18 @@ export default {
         }
       }
       this.$forceUpdate()
-
     },
     reloadPlugin(pconfig) {
       return new Promise((resolve, reject) => {
         try {
-          this.unloadPlugin(pconfig)
+          this.unloadPlugin(pconfig, true)
           // console.log('reloading plugin ', pconfig)
           const template = this.parsePluginCode(pconfig.code, pconfig)
           template._id = pconfig._id
-          this.unloadPlugin(template)
+          if(template.mode == 'collection'){
+            return
+          }
+          this.unloadPlugin(template, true)
           let p
           if (template.mode == 'window') {
             p = this.preLoadPlugin(template)
@@ -1177,9 +1387,16 @@ export default {
             this.db.put(template, {
               force: true
             }).then((result) => {
-              resolve(template._id)
+              for (let i = 0; i < this.installed_plugins.length; i++) {
+                if(this.installed_plugins[i].name == template.name){
+                  this.installed_plugins.splice(i, 1)
+                }
+              }
+              template.installed = true
+              this.installed_plugins.push(template)
+              resolve(template)
               // console.log('Successfully saved!');
-              this.show(`${template.name } has been sucessfully saved.`)
+              this.show(`${template.name } has been successfully saved.`)
             }).catch((err) => {
               this.show('failed to save the plugin.')
               console.error(err)
@@ -1284,74 +1501,59 @@ export default {
       })
     },
     reloadPlugins() {
-      if (this.plugins) {
-        for (let k in this.plugins) {
-          if (this.plugins.hasOwnProperty(k)) {
-            const plugin = this.plugins[k]
-            if (typeof plugin.terminate == 'function') {
-              try {
-                plugin.terminate()
-              } catch (e) {
-                console.error(e)
+      return new Promise((resolve, reject) => {
+        if (this.plugins) {
+          for (let k in this.plugins) {
+            if (this.plugins.hasOwnProperty(k)) {
+              const plugin = this.plugins[k]
+              if (typeof plugin.terminate == 'function') {
+                try {
+                  plugin.terminate()
+                } catch (e) {
+                  console.error(e)
+                }
               }
+              this.plugins[k] = null
+              this.plugin_names[plugin.name] = null
             }
-            this.plugins[k] = null
-            this.plugin_names[plugin.name] = null
           }
         }
-      }
-      this.resetPlugins()
-      this.reloadDB().then(()=>{
-        this.db.allDocs({
-          include_docs: true,
-          attachments: true,
-          sort: 'name'
-        }).then((result) => {
-          const promises = []
-          this.workflow_list = []
-          this.installed_plugins = []
-          for (let i = 0; i < result.total_rows; i++) {
-            const config = result.rows[i].doc
-            if (config.workflow) {
-              this.workflow_list.push(config)
-            } else {
-              this.installed_plugins.push(config)
-              try {
-                const template = this.parsePluginCode(config.code, config)
-                template._id = config._id
-                const rplugins = this.resumable_plugins.filter(p => p.name==template.name && p.type==template.type)
-
-                let rplugin = null
-                if(rplugins.length>0){
-                  rplugin = rplugins[0]
-                }
-
-                if (template.mode == 'window') {
-                  promises.push(this.preLoadPlugin(template, rplugin))
-                } else {
-                  promises.push(this.loadPlugin(template, rplugin))
-                }
-              } catch (e) {
-                console.error(e)
-                this.showStatus(`<${config.name}>: ${e.toString()}` )
+        this.resetPlugins()
+        this.reloadDB().then(()=>{
+          this.db.allDocs({
+            include_docs: true,
+            attachments: true,
+            sort: 'name'
+          }).then((result) => {
+            const promises = []
+            this.workflow_list = []
+            this.installed_plugins = []
+            for (let i = 0; i < result.total_rows; i++) {
+              const config = result.rows[i].doc
+              if (config.workflow) {
+                this.workflow_list.push(config)
+              } else {
+                config.installed = true
+                this.installed_plugins.push(config)
+                this.reloadPlugin(config).catch((e)=>{
+                  console.error(e)
+                  this.showStatus(`<${config.name}>: ${e.toString()}` )
+                })
               }
             }
-          }
-          // TODO: setup this promise all, it's now cause unknown problem
-          Promise.all(promises).then(()=>{
+            this.plugin_loaded = true
+            this.loading = false
+            resolve()
             this.$forceUpdate()
-          })
-          this.plugin_loaded = true
-          this.loading = false
-          this.$forceUpdate()
-        }).catch((err) => {
-          console.error(err)
-          this.loading = false
-        });
+          }).catch((err) => {
+            console.error(err)
+            this.loading = false
+            reject()
+          });
+        })
       })
     },
     closeAll() {
-
       this.default_window_pos = {
         i: 0,
         x: 0,
@@ -1550,7 +1752,7 @@ export default {
       }).then((result) => {
         // console.log('Successfully saved!');
         this.workflow_list.push(data)
-        this.show(name + ' has been sucessfully saved.')
+        this.show(name + ' has been successfully saved.')
       }).catch((err) => {
         this.show('failed to save the workflow.')
         console.error(err)
@@ -1572,7 +1774,7 @@ export default {
           this.workflow_list.splice(index, 1);
         }
         // console.log('Successfully removed!');
-        this.show(name + ' has been sucessfully removed.')
+        this.show(name + ' has been successfully removed.')
       }).catch((err) => {
         this.show('failed to remove the workflow.')
         console.error(err)
@@ -1716,6 +1918,7 @@ export default {
         }
         const tconfig = _.assign({}, template, config)
         const plugin = {
+          _id: config._id,
           id: config.id,
           name: config.name,
           type: config.type,
@@ -1724,6 +1927,7 @@ export default {
           docs: template.docs,
           tag: template.tag,
           attachments: template.attachments,
+          terminate: function(){ this._disconnected = true }
         }
         this.plugins[plugin.id] = plugin
         this.plugin_names[plugin.name] = plugin
@@ -1743,7 +1947,7 @@ export default {
         this.register(config, {
           id: config.id
         })
-        // console.log('sucessfully preloaded plugin: ', plugin)
+        // console.log('successfully preloaded plugin: ', plugin)
         resolve(plugin)
       })
     },
@@ -1789,7 +1993,7 @@ export default {
           }
           // if(!config.initialized){
             plugin.api.setup().then((result) => {
-              // console.log('sucessfully setup plugin: ', plugin)
+              // console.log('successfully setup plugin: ', plugin)
               resolve(plugin)
             }).catch((e) => {
               console.error('error occured when loading plugin ' + template.name + ": ", e)
@@ -1804,7 +2008,7 @@ export default {
         });
         plugin.whenFailed((e) => {
           if(e){
-            this.status_text = template.name + '-> Error: ' + e
+            // this.status_text = template.name + '-> Error: ' + e
             this.show('Error occured when loading ' + template.name + ": " + e)
           }
           else{
@@ -2097,7 +2301,7 @@ export default {
           }
           // this.plugins[plugin.id] = plugin
           plugin.api.setup().then((result) => {
-            // console.log('sucessfully setup the window plugin: ', plugin, pconfig)
+            // console.log('successfully setup the window plugin: ', plugin, pconfig)
             //asuming the data._op is passed from last op
             pconfig.data = pconfig.data || {}
             pconfig.data._source_op = pconfig.data && pconfig.data._op
@@ -2368,7 +2572,7 @@ div#textnode {
 
 .md-speed-dial-content {
   left: 40px !important;
-  top: -10px !important;
+  top: -17px !important;
   display: flex;
   flex-direction: row;
 }
@@ -2396,6 +2600,10 @@ div#textnode {
 
 .md-button {
   margin: 1px;
+}
+
+.disconnected-plugin{
+  color: orange!important;
 }
 
 </style>

@@ -1,10 +1,10 @@
 <template>
 <div class="plugin-editor">
     <md-toolbar class="md-dense editor-toolbar md-layout md-gutter" md-elevation="1">
-      <md-button @click="reload()"  v-if="window" class="md-icon-button">
+      <!-- <md-button @click="reload()"  v-if="window" class="md-icon-button">
         <md-icon>autorenew</md-icon>
         <md-tooltip>Update this plugin</md-tooltip>
-      </md-button>
+      </md-button> -->
       <md-button @click="save()"  v-if="window" class="md-icon-button">
         <md-icon>save</md-icon>
         <md-tooltip>Save this plugin</md-tooltip>
@@ -101,12 +101,11 @@ export default {
   methods: {
     save(){
       this.$emit('input', this.codeValue)
-      const save_plugin = ()=>{this.window.save({pluginId: this.pluginId, code: this.codeValue}).then((p_id)=>{
+      this.window.save({pluginId: this.pluginId, code: this.codeValue}).then((p_id)=>{
         this.window.data._id = p_id
         this.window.plugin.config._id= p_id
         this.$forceUpdate()
-      })}
-      save_plugin()
+      })
       this.reload()
     },
     remove(){
@@ -120,6 +119,9 @@ export default {
       return new Promise((resolve, reject) => {
         if(this.codeValue){
           this.$emit('input', this.codeValue)
+          if(this.window.plugin && this.window.plugin.config){
+            this.window.plugin.config.code = this.codeValue
+          }
           this.window.reload({pluginId: this.pluginId, tag: this.window.plugin.tag, type:this.window.plugin.type, name:this.window.plugin.name, code: this.codeValue, plugin: this.window.plugin}).then((plugin)=>{
             this.window.plugin = plugin
             this.window.name = plugin.name

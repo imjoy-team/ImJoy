@@ -52,6 +52,26 @@ export default {
         this.config.data = this.joy.top.data
       }
       this.$refs.editor.innerHTML = ''
+      if(Array.isArray(this.config.ui)){
+        let uistr = ''
+        for(let it of this.config.ui){
+          if(typeof it === 'string')
+            uistr =  uistr + it + '<br>'
+          else
+            uistr =  uistr + JSON.stringify(it) + '<br>'
+        }
+        this.config.ui = uistr
+      }
+      else if(typeof this.config.ui === 'object'){
+        let uistr = ''
+        for(let k in this.config.ui){
+          if(typeof it === 'string')
+            uistr =  uistr + k + ': ' + this.config.ui[k] + '<br>'
+          else
+            uistr =  uistr + k + ': ' + JSON.stringify(this.config.ui[k])+ '<br>'
+        }
+        this.config.ui = uistr
+      }
       const joy_config = {
         // Where the Joy editor goes:
         container: this.$refs.editor,

@@ -22,6 +22,7 @@
 export default {
   name: 'file-dialog',
   props: {
+     getFileUrl: Function,
      listFiles: Function,
      mode: String,
    },
@@ -80,16 +81,37 @@ export default {
          }
        }
      },
-     showDialog(options){
+     showDialog(options, _plugin){
        this.show_ = true
        this.options = options
        this.options.title = this.options.title || 'ImJoy File Dialog'
-       this.options.root = this.options.root|| '.'
-       this.options.mode = this.options.mode|| 'single|multiple'
+       this.options.root = this.options.root || '.'
+       this.options.mode = this.options.mode || 'single|multiple'
+       this.options.uri_type = this.options.uri_type|| 'path'
        this.file_tree_selection = null
        return new Promise((resolve, reject) => {
-         this.resolve = resolve
-         this.reject = reject
+         if(this.options.uri_type == 'path'){
+           this.resolve = resolve
+           this.reject = reject
+         }
+         else if(this.options.uri_type == 'url'){
+           this.reject = reject
+           this.resolve = (paths)=>{
+              if(typeof paths == 'string'){
+                this.getFileUrl(paths, _plugin).then(resolve).catch(reject)
+              }
+              else{
+                  const ps = []
+                  for(let path of paths){
+                    ps.push(this.getFileUrl(path, _plugin))
+                  }
+                  Promise.all(ps).then(resolve).catch(reject)
+              }
+           }
+         }
+         else{
+           reject("unsupported uri_type: " + this.options.uri_type)
+         }
          this.root = this.options.root
          this.listFiles(options.root, options.type, options.recursive).then((tree)=>{
            this.root = tree.path

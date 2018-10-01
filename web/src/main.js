@@ -13,7 +13,6 @@ import Footer from '@/components/Footer'
 import About from '@/components/About'
 import Whiteboard from '@/components/Whiteboard'
 import Joy from '@/components/Joy'
-import FAQ from '@/components/FAQ'
 import PluginList from '@/components/PluginList'
 import PluginEditor from '@/components/PluginEditor'
 import FileItem from '@/components/FileItem'
@@ -32,7 +31,6 @@ Vue.use(Grid)
 // register
 Vue.component('vue-slider', vueSlider)
 Vue.component('navbar', Navbar)
-Vue.component('faq', FAQ)
 Vue.component('imjoy', Imjoy)
 Vue.component('main-footer', Footer)
 Vue.component('about', About)
