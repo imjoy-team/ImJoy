@@ -2115,6 +2115,9 @@ export default {
       return ret
     },
     normalizeUI(ui){
+      if(!ui){
+        return ''
+      }
       let normui = ''
       if(Array.isArray(ui)){
         for(let it of ui){
@@ -2135,8 +2138,12 @@ export default {
       else if(typeof ui === 'object'){
         throw "ui can not be an object, you can only use a string or an array."
       }
-      else{
+      else if(typeof ui === 'string'){
         normui = ui.trim()
+      }
+      else{
+        normui = ''
+        console.log('Warining: removing ui string.')
       }
       return normui
     },
