@@ -2222,7 +2222,7 @@ export default {
         // console.log('adding joy op', config)
         const joy_template = config
 
-        joy_template.init = joy_template.ui || joy_template.name
+        joy_template.init = joy_template.ui || ''
         // joy_template.ui = null
         Joy.add(joy_template);
 
