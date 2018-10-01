@@ -211,7 +211,7 @@ Joy.Op = function(options, parent, data){
 	// Init & Create Widget (if none, just put a "todo")
 	self.initWidget = self.initWidget || function(){
 		self.dom = document.createElement("span");
-		self.dom.innerHTML = "[todo: '"+self.type+"' widget]";
+		self.dom.innerHTML = "[todo: define ui for '"+self.type+"']";
 	};
 	self.createWidget = function(){
 		self.initWidget(self); // bind

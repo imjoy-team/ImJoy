@@ -144,7 +144,7 @@ Describe your plugin here.
   "api_version": "0.1.1",
   "description": "describe your plugin here.",
   "tags": [],
-  "ui": null,
+  "ui": "UI for this plugin",
   "inputs": null,
   "outputs": null,
   "icon": null,
