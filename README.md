@@ -146,27 +146,25 @@ Here is an outline of the plugin file:
   Besides one plain string as shown above which may get very long and `json` do not support breaking long string into several lines. Therefore, we support other different ways of defining the `ui` string. Here are different ways:
 
   * an array with strings: for example:
-```
+```json
 "ui": [
        "option1: {id: 'option1', type: 'choice', options: ['cat', 'dog'], placeholder: 'cat'}",
        "option2: {id: 'option2', type: 'number', placeholder: 3}"
       ],
 ```
-  * an object with keys and values: for example:
+  * an array with keys and values: for example:
+```json
+"ui": [
+       {"option1": "{id: 'option1', type: 'choice', options: ['cat', 'dog'], placeholder: 'cat'}"},
+       {"option2": {"id": "option2",
+                    "type": "number",
+                    "placeholder": 3}
+       }
+      ],
 ```
-"ui": {
-       "option1": "{id: 'option1', type: 'choice', options: ['cat', 'dog'], placeholder: 'cat'}",
-       "option2": "{id: 'option2', type: 'number', placeholder: 3}"
-      },
-```
-In the above example, the values are actually strings, if you want an actual dictionary, you can do:
-```
-"ui": {
-       "option1": {"id": "option1", "type": "choice", "options": ["cat", "dog"], "placeholder": "cat"},
-       "option2": {"id": "option2", "type": "number", "placeholder": 3}
-      },
-```
-Notice that, we added `" "` around keys such as `id` and `type` and we replaced `'` into `"`, this is because JSON format only support keys quoted with `"` and all the strings must use `"` instead of `'`.
+
+Notice that for `option2` in the above example, the value is not an string, so we used `" "` for the keys and strings.
+
 
 * `version` defines the version of the plugin
 * `api_version` api version of imjoy which the plugin is written for
@@ -391,6 +389,9 @@ class PythonPlugin():
                  update=self.lut_updated)
     ...
 ```
+
+If you want to change your interface dynamically, you can run `api.register` multiple times to overwrite the previous version.
+`api.register` can also be used to overwrite the default ui string set in the `<config>`, just set the op name as the same as the plugin name, it will update the UI.
 
 ### `api.createWindow(...)`
 create a new window and add to the workspace, example:

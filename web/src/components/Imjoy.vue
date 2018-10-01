@@ -216,7 +216,7 @@
               </md-menu>
 
               <md-button class="joy-run-button" :class="plugin.running?'md-accent':(plugin._disconnected && plugin.mode == 'pyworker'? 'disconnected-plugin': 'md-primary')" :disabled="plugin._disconnected && plugin.mode != 'pyworker'" @click="plugin._disconnected?connectPlugin(plugin):runOp(plugin.ops[plugin.name])">
-                {{plugin.mode == 'pyworker'? plugin.name + '🚀': plugin.name}}
+                {{plugin.mode == 'pyworker'? plugin.name + ' 🚀': plugin.name}}
               </md-button>
               <md-button v-if="!plugin._disconnected" class="md-icon-button" @click="plugin.panel_expanded=!plugin.panel_expanded; $forceUpdate()">
                 <md-icon v-if="!plugin.panel_expanded">expand_more</md-icon>
@@ -2114,6 +2114,32 @@ export default {
       }
       return ret
     },
+    normalizeUI(ui){
+      let normui = ''
+      if(Array.isArray(ui)){
+        for(let it of ui){
+          if(typeof it === 'string')
+            normui =  normui + it + '<br>'
+          else if(typeof it === 'object'){
+            for(let k in it){
+              if(typeof it[k] === 'string')
+                normui =  normui + k + ': ' + it[k] + '<br>'
+              else
+                normui =  normui + k + ': ' + JSON.stringify(it[k])+ '<br>'
+            }
+          }
+          else
+            normui =  normui + JSON.stringify(it) + '<br>'
+        }
+      }
+      else if(typeof ui === 'object'){
+        throw "ui can not be an object, you can only use a string or an array."
+      }
+      else{
+        normui = ui.trim()
+      }
+      return normui
+    },
     register(config, _plugin) {
       try {
         const plugin = this.plugins[_plugin.id]
@@ -2121,7 +2147,7 @@ export default {
         config = _clone(config)
         config.type = config.type || config.name
         config.show_panel = config.show_panel || false
-        config.ui = config.ui || config.name
+        config.ui = this.normalizeUI(config.ui) || ''
         config.tags = ["op", "plugin"]
         config.inputs = config.inputs || null
         config.outputs = config.outputs || null
@@ -2188,6 +2214,7 @@ export default {
         }
         // console.log('adding joy op', config)
         const joy_template = config
+
         joy_template.init = joy_template.ui || joy_template.name
         // joy_template.ui = null
         Joy.add(joy_template);

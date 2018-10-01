@@ -180,7 +180,7 @@ export const REGISTER_SCHEMA= schema({
   name: String,
   type: String,
   tags: Array,
-  ui: [null, String],
+  ui: [null, String, Array, Object],
   inputs: [null, Object],
   outputs: [null, Object]
 })
@@ -197,7 +197,7 @@ export const WINDOW_SCHEMA= schema({
 export const OP_SCHEMA = {
   name: String,
   type: String,
-  ui: [null, String],
+  ui: [null, String, Array, Object],
   tags: Array,
   run: [null, String],
   inputs: [null, Object],
