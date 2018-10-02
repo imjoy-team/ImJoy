@@ -415,7 +415,7 @@
       <md-divider></md-divider>
       <md-card>
         <md-card-header>
-          <div class="md-title">Or, install from the Plugin Store</div>
+          <div class="md-title">Install from the Plugin Store</div>
         </md-card-header>
         <md-card-content>
           <plugin-list show-url @message="show" :database="db" :install-plugin="installPlugin" :remove-plugin="removePlugin" :init-url="init_plugin_url" :init-search="init_plugin_search" display="list" :plugins="available_plugins" :workspace="selected_workspace"></plugin-list>

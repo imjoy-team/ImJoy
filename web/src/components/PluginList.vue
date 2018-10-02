@@ -34,7 +34,7 @@
           <!-- <div>
               <md-chip v-for="tag in plugin.tags" :key="tag">{{tag}}</md-chip>
             </div> -->
-          <p><span v-for="tag in plugin.tags" :key="tag">{{tag}}; </span></p>
+          <p><span v-for="tag in plugin.tags" :key="tag">{{tag}}, </span></p>
 
         </div>
         <p>
@@ -70,9 +70,9 @@
             <md-menu-item @click="showDocs(plugin)">
               <md-icon>description</md-icon>Docs
             </md-menu-item>
-            <md-menu-item v-if="!plugin.installed && installPlugin" @click="install(plugin)">
+            <!-- <md-menu-item v-if="!plugin.installed && installPlugin" @click="install(plugin)">
               <md-icon>cloud_download</md-icon>Install
-            </md-menu-item>
+            </md-menu-item> -->
             <md-menu-item v-if="plugin.installed && installPlugin" @click="install(plugin)">
               <md-icon>update</md-icon>Update
             </md-menu-item>
