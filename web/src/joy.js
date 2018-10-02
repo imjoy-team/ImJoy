@@ -656,17 +656,32 @@ No need for a server!
 Just compresses JSON with LZ-String and puts it in the URL
 
 ******************************/
+Joy.encodeWorkflow = function(data){
+	var json = JSON.stringify(data); // Stringify
+	var compressed = LZString.compressToEncodedURIComponent(json); // Compress
+	return compressed;
+};
+
+Joy.decodeWorkflow = function(hash){
+	var decompressed = LZString.decompressFromEncodedURIComponent(hash);
+	if(decompressed){
+		var data = JSON.parse(decompressed);
+		return data;
+	}else{
+		return null;
+	}
+};
 
 Joy.saveToURL = function(data){
 	var json = JSON.stringify(data); // Stringify
 	var compressed = LZString.compressToEncodedURIComponent(json); // Compress
-	var url = window.location.origin+window.location.pathname+"?data="+compressed; // append to current URL
+	var url = window.location.origin+window.location.pathname+"#/app?workflow="+compressed; // append to current URL
 	// TODO: keep # and OTHER query stuff the same, just change ?data
 	return url;
 };
 
 Joy.loadFromURL = function(){
-	var hash = _getParameterByName("data");
+	var hash = _getParameterByName("workflow");
 	var decompressed = LZString.decompressFromEncodedURIComponent(hash);
 	if(decompressed){
 		var data = JSON.parse(decompressed);

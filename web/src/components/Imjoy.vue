@@ -131,7 +131,7 @@
         <md-card-header>
           <div class="md-layout md-gutter md-alignment-center-space-between">
             <div class="md-layout-item md-size-70">
-              <md-button @click="workflow_expand=!workflow_expand" :class="workflow_expand?'': 'md-primary'"><span class="md-subheading">Workflow</span></md-button>
+              <md-button @click="workflow_expand=!workflow_expand" :class="workflow_expand?'': 'md-primary'"><span class="md-subheading"><md-icon>format_list_bulleted</md-icon>Workflow</span></md-button>
             </div>
             <div v-show="workflow_expand" class="md-layout-item">
               <md-button @click="clearWorkflow()" class="md-icon-button">
@@ -160,7 +160,11 @@
             </md-button>
             <md-menu-content>
               <md-menu-item @click="loadWorkflow(w)" v-for="w in workflow_list" :key="w.name">
-                <span>{{w.name}}</span> <md-button @click.stop="removeWorkflow(w)" class="md-icon-button md-accent">
+                <span>{{w.name}}</span>
+                <md-button @click.stop="shareWorkflow(w)" class="md-icon-button">
+                  <md-icon>share</md-icon>
+                </md-button>
+                <md-button @click.stop="removeWorkflow(w)" class="md-icon-button md-accent">
                   <md-icon>clear</md-icon>
                 </md-button>
               </md-menu-item>
@@ -314,6 +318,11 @@
       md-cancel-text="Allow"
       @md-cancel="showPermissionConfirmation=false;processPermission(true)"
       @md-confirm="showPermissionConfirmation=false;processPermission(false)" />
+
+  <md-dialog-alert
+      :md-active.sync="showShareUrl"
+      :md-content="share_url_message"
+      md-confirm-text="Close" />
 
   <md-dialog :md-active.sync="showPluginEngineInfo" :md-click-outside-to-close="false">
     <md-dialog-title>Using the Python Plugin Engine</md-dialog-title>
@@ -483,6 +492,8 @@ export default {
       showRemoveConfirmation: false,
       showPermissionConfirmation: false,
       permission_message: 'No permission message.',
+      share_url_message: 'No url',
+      showShareUrl: false,
       resolve_permission: null,
       reject_permission: null,
       plugin_dialog_config: null,
@@ -653,18 +664,12 @@ export default {
       delete query.token;
       this.$router.replace({ query });
     }
-    else{
-      this.connection_token = localStorage.getItem("imjoy_connection_token")
-    }
-
     if(this.$route.query.engine){
       this.engine_url = this.$route.query.engine.trim()
     }
     else{
       this.engine_url = localStorage.getItem("imjoy_engine_url") || 'http://localhost:8080'
     }
-    //location.protocol+'//'+location.hostname+(location.port ? ':'+location.port: '')
-
     this.plugin_api = {
       alert: this.showAlert,
       register: this.register,
@@ -774,6 +779,20 @@ export default {
               this.show_plugin_templates = false
               this.showAddPluginDialog = true
             }
+
+            if(this.$route.query.workflow){
+              const data = Joy.decodeWorkflow(this.$route.query.workflow)
+              // const query = Object.assign({}, this.$route.query);
+              // delete query.workflow;
+              // this.$router.replace({ query });
+              if(data){
+                this.workflow_joy_config.data = data
+              }
+              else{
+                console.log('failed to workflow')
+              }
+            }
+
           }
         })
       })
@@ -1710,7 +1729,7 @@ export default {
       this.addWindow(w)
     },
     clearWorkflow() {
-      this.workflow_joy_config.data = ''
+      this.workflow_joy_config.data = null
       this.$refs.workflow.setupJoy(true)
     },
     runWorkflow(joy) {
@@ -1765,8 +1784,12 @@ export default {
     },
     loadWorkflow(w) {
       this.workflow_joy_config.data = JSON.parse(w.workflow)
-      this.$refs.workflow.setupJoy()
-      // console.log(w)
+      this.$refs.workflow.setupJoy(true)
+    },
+    shareWorkflow(w) {
+      const url = Joy.encodeWorkflow(w.workflow)
+      this.share_url_message = `${location.protocol}//${location.hostname}${location.port ? ':'+location.port: ''}/#/app/?workflow=${url}`
+      this.showShareUrl = true
     },
     removeWorkflow(w) {
       // console.log('removing: ', w)
