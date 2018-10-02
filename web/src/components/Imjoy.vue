@@ -787,6 +787,7 @@ export default {
               // this.$router.replace({ query });
               if(data){
                 this.workflow_joy_config.data = data
+                this.workflow_expand = true
               }
               else{
                 console.log('failed to workflow')

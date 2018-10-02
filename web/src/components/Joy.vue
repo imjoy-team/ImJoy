@@ -51,6 +51,7 @@ export default {
       if(!reset && this.joy){
         this.config.data = this.joy.top.data
       }
+
       this.$refs.editor.innerHTML = ''
       const joy_config = {
         // Where the Joy editor goes:
@@ -61,7 +62,7 @@ export default {
         //"<hr> {type:'save'}", // a save button!
 
         // Load data from URL, otherwise blank:
-        data: this.config.data || Joy.loadFromURL(),
+        data: this.config.data, // || Joy.loadFromURL(),
 
         // Other ops to include, beyond turtle ops:
         modules: this.config.modules || ["instructions", "math"],
