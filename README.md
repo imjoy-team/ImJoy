@@ -454,7 +454,7 @@ update the status text of the current plugin (in the plugin menu), example: `api
 show a file dialog for selecting files or directories. It accept the following options:
  * `type` the mode of file dialog, it accept `file` for selecting one or multiple files; `directory` for selecting one or multiple directories; By default, it will use `type='file'`. For Python plugin, if you don't specify the type, both file or directory can be selected.
  * `title` the title of the dialog.
- * `root` the initial path for the dialog to show.
+ * `root` the initial path for the dialog to show. (Note: for python plugins on windows, you may want to define the path string as raw string using `r"xxxxxx"` syntax, we have seen unrecognized path issue with normal string).
  * `mode` two modes are supported, by default, the user can select a single or multiple file (with `shift` key pressed), if you want to force the dialog to return multiple files or directories in an array or list, set `mode` to `"multiple"`, or you can force it to return only a single file or directory by setting `mode` to `"single"`, if you want to support both, you can explicitly set `mode` to `"single|multiple"` or keep the default setting.
  * `uri_type` choose the type for return between `"url"` or `"path"`. The default value for JavaScript plugins is `"url"` and for Python plugins is `"path"`.
 
