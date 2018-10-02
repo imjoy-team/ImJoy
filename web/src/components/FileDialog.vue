@@ -84,7 +84,7 @@ export default {
        this.show_ = true
        this.options = options
        this.options.title = this.options.title || 'ImJoy File Dialog'
-       this.options.root = this.options.root || '.'
+       this.options.root = this.options.root || '~'
        this.options.mode = this.options.mode || 'single|multiple'
        this.options.uri_type = this.options.uri_type|| 'path'
        this.file_tree_selection = null

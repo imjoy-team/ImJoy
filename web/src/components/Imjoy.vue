@@ -33,6 +33,9 @@
           <md-icon>save</md-icon>
           <md-tooltip>Save all windows</md-tooltip>
         </md-button>
+        <md-button @click="showSettingsDialog=true" class="md-icon-button">
+          <md-icon>settings</md-icon>
+        </md-button>
         <md-button class="md-icon-button" target="_blank" href="https://github.com/oeway/ImJoy">
           <md-icon>help</md-icon>
           <!-- <md-tooltip>Open help information.</md-tooltip> -->
@@ -102,8 +105,8 @@
         <div class="md-toolbar-section-end">
           <md-menu>
             <md-button class="md-icon-button md-primary" md-menu-trigger>
-              <md-icon>settings</md-icon>
-              <!-- <md-tooltip>Show settings and installed plugins</md-tooltip> -->
+              <md-icon>widgets</md-icon>
+              <md-tooltip>Switch Workspace</md-tooltip>
             </md-button>
             <md-menu-content>
               <md-menu-item @click="switchWorkspace(w)" v-for="w in workspace_list" :key="w">
@@ -112,10 +115,7 @@
               </md-menu-item>
               <md-divider></md-divider>
               <md-menu-item @click="showWorkspaceDialog=true">
-                <md-icon>settings</md-icon>Workspaces
-              </md-menu-item>
-              <md-menu-item @click="showSettingsDialog=true">
-                <md-icon>settings</md-icon>General Settings
+                <md-icon>view_list</md-icon>Workspaces
               </md-menu-item>
             </md-menu-content>
           </md-menu>
@@ -833,13 +833,14 @@ export default {
       }
       if(!_plugin){
         _plugin = options
-        options = {root: '~', uri_type: 'url'}
+        options = {}
       }
       if(_plugin && _plugin.id){
         const source_plugin = this.plugins[_plugin.id]
         if(source_plugin || _plugin === this.IMJOY_PLUGIN){
-          this.$refs.file_form.reset()
-          this.$refs.file_select.click()
+          if(source_plugin){
+            options.root = options.root || (source_plugin.config && source_plugin.config.work_dir)
+          }
           if(source_plugin && source_plugin.mode != 'pyworker'){
             options.uri_type = options.uri_type || 'url'
           }
@@ -852,7 +853,6 @@ export default {
       else{
         return this.$refs['file-dialog'].showDialog(options, _plugin)
       }
-
     },
     connectPlugin(plugin){
       if(plugin._disconnected){
@@ -1371,7 +1371,6 @@ export default {
           this.status_text = 'Error: ' + e
           this.show('Error: ' + e)
           reject(e)
-          return
         }
       })
     },
@@ -1536,8 +1535,13 @@ export default {
                 config.installed = true
                 this.installed_plugins.push(config)
                 this.reloadPlugin(config).catch((e)=>{
-                  console.error(e)
-                  this.showStatus(`<${config.name}>: ${e.toString()}` )
+                  console.error(config, e)
+                  if(config.name){
+                    this.showSnackbar(`<${config.name}>: ${e.toString()}` )
+                  }
+                  else{
+                    this.showSnackbar(`Failed to load plugin.` )
+                  }
                 })
               }
             }
@@ -2008,7 +2012,7 @@ export default {
         });
         plugin.whenFailed((e) => {
           if(e){
-            // this.status_text = template.name + '-> Error: ' + e
+            this.status_text = `<${template.name}> ${e.toString()}`
             this.show('Error occured when loading ' + template.name + ": " + e)
           }
           else{
@@ -2017,7 +2021,7 @@ export default {
           }
           console.error('error occured when loading ' + template.name + ": ", e)
           plugin.terminate()
-          // reject(e)
+          reject(e)
         });
         plugin.docs = template.docs
         plugin.attachments = template.attachments
