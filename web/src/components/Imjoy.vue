@@ -658,12 +658,17 @@ export default {
       this.client_id = 'imjoy_web_'+randId()
       localStorage.setItem("imjoy_client_id", this.client_id);
     }
+    
     if(this.$route.query.token){
       this.connection_token = this.$route.query.token
       const query = Object.assign({}, this.$route.query);
       delete query.token;
       this.$router.replace({ query });
     }
+    else{
+      this.connection_token = localStorage.getItem("imjoy_connection_token")
+    }
+
     if(this.$route.query.engine){
       this.engine_url = this.$route.query.engine.trim()
     }
@@ -1738,7 +1743,7 @@ export default {
       const w = this.active_windows[this.active_windows.length - 1] || {}
       this.status_text = ''
       this.progress = 0
-      const mw = this.plugin2joy(w) || {}
+      const mw = this.plugin2joy(w.data) || {}
       mw.target = mw.target || {}
       mw.target._op = 'workflow'
       mw.target._source_op = null
@@ -2096,18 +2101,22 @@ export default {
           res.target = res.target[my.select]
         }
       }
-      res.target._variables = my._variables || {}
-      res.target._workflow_id = my._workflow_id || null
-      res.target._op = my._op || null
-      res.target._source_op = my._source_op || null
-      res.target._transfer = my._transfer || false
-
-      if(Object.keys(res.target).length>4){
-        // console.log('returning', res)
-        return res
+      if(typeof res.target === 'object'){
+        res.target._variables = my._variables || {}
+        res.target._workflow_id = my._workflow_id || null
+        res.target._op = my._op || null
+        res.target._source_op = my._source_op || null
+        res.target._transfer = my._transfer || false
+        if(Object.keys(res.target).length>4){
+          // console.log('returning', res)
+          return res
+        }
+        else{
+          return null
+        }
       }
-      else{
-        return null
+      else {
+        return res
       }
     },
     filter4plugin(my){
