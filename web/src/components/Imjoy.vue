@@ -507,7 +507,7 @@ export default {
       status_text: '',
       engine_status: 'Disconnected',
       engine_connected: false,
-      engine_url: 'http://localhost:8080',
+      engine_url: 'http://127.0.0.1:8080',
       windows: [],
       active_windows: [],
       selected_workspace: null,
@@ -658,7 +658,7 @@ export default {
       this.client_id = 'imjoy_web_'+randId()
       localStorage.setItem("imjoy_client_id", this.client_id);
     }
-    
+
     if(this.$route.query.token){
       this.connection_token = this.$route.query.token
       const query = Object.assign({}, this.$route.query);
@@ -673,7 +673,7 @@ export default {
       this.engine_url = this.$route.query.engine.trim()
     }
     else{
-      this.engine_url = localStorage.getItem("imjoy_engine_url") || 'http://localhost:8080'
+      this.engine_url = localStorage.getItem("imjoy_engine_url") || 'http://127.0.0.1:8080'
     }
     this.plugin_api = {
       alert: this.showAlert,

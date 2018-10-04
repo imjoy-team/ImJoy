@@ -52,17 +52,17 @@ When open such an url, a plugin management dialog will be shown which allow the 
 ### Supported url parameters
  * `w` workspace name, an url contains `w` as a query string (e.g. https://imjoy.io/#/app?w=test) can be used to create or switch to a new workspace.
  * `plugin` show the specified plugin in the plugin management dialog, you can use plugin name or an url for the plugin, for example: `https://imjoy.io/#/app?plugin=Image%20Window` will show up a plugin dialog with `Image Window` in the search. You can also set `plugin` to an url for sharing plugin hosted on github, please refer to `Install from url` for more details.
- * `engine` define the engine url, for example: `http://imjoy.io/#/app?engine=http://localhost:8080`, notice that if you want to connect to a remote machine through http (not https) connection, you can only do it by using `http://imjoy.io` rather than `https://imjoy.io`. This restriction also exist if you use localhost with some browsers (e.g. safari).
+ * `engine` define the engine url, for example: `http://imjoy.io/#/app?engine=http://127.0.0.1:8080`, notice that if you want to connect to a remote machine through http (not https) connection, you can only do it by using `http://imjoy.io` rather than `https://imjoy.io`. This restriction also exist if you use localhost with some browsers (e.g. safari), to avoid it, you need to use `http://127.0.0.1:8080` rather than `http://localhost:8080`, because most browser will consider `127.0.0.1` is a secured connection, but not `localhost`.
  * `token` define the connection token, for example: `http://imjoy.io/#/app?token=2760239c-c0a7-4a53-a01e-d6da48b949bc`
 
- These parameters are independent from each other, meaning you can combine different parameters with `&` and construct a long url. For example combining engine url and connection token:  `http://imjoy.io/#/app?engine=http://localhost:8080&token=2760239c-c0a7-4a53-a01e-d6da48b949bc`.
+ These parameters are independent from each other, meaning you can combine different parameters with `&` and construct a long url. For example combining engine url and connection token:  `http://imjoy.io/#/app?engine=http://127.0.0.1:8080&token=2760239c-c0a7-4a53-a01e-d6da48b949bc`.
 ### How does it work?
 ImJoy supports Python Plugins which can run much more computationally intensive tasks. In order to run that, it needs to connect to the Python Plugin Engine -- a small python library we developed for ImJoy (source code: https://github.com/oeway/ImJoy-Python).
 
 Under the hood, the Python Plugin Engine will be connected with the ImJoy web app through websockets, the interaction is done with remote procedure calls (RPC). When a window in the ImJoy workspace is selected, the contained data (e.g. an image) will be transferred to the Python plugin so it can process the data with the `run` function, results will be send back to the ImJoy workspace and displayed as a new window. Natively, ImJoy supports the conversion and transmission of Numpy arrays and Tensorflow tensors, so plugin developers could just use those data types and exchange them between plugins, no matter they are in Python or Javascript.
 
 ## Advanced Usage: Going offline
-If you have already installed the **Python Plugin Engine**, then you can run ImJoy in offline mode. What you do is to run the engine with `python -m imjoy --serve` . And it will download all the files for offline access, after that, if you run `python -m imjoy` in the **same directory**, you will have your personal ImJoy web app which can be access by [http://localhost:8080](http://localhost:8080).
+If you have already installed the **Python Plugin Engine**, then you can run ImJoy in offline mode. What you do is to run the engine with `python -m imjoy --serve` . And it will download all the files for offline access, after that, if you run `python -m imjoy` in the **same directory**, you will have your personal ImJoy web app which can be access by [http://127.0.0.1:8080](http://127.0.0.1:8080).
 
 Also notice that, even though ImJoy can run without internet, depends on the implementation of the plugin, some plugins maybe unusable when you go offline.
 
@@ -339,7 +339,7 @@ class JSPlugin(){
 class PyPlugin():
     def setup(self):
         pass
- 
+
     def run(self, my):
         api.XXXXX().then(self.callback)
 
@@ -347,7 +347,7 @@ class PyPlugin():
         def error_callback(error):
             print(error)
         api.XXXXX().then(callback).catch(error_callback)
- 
+
      def callback(result):
         print(result)
 ```
@@ -532,7 +532,7 @@ For Python Plugins, currently supported functions are:
 
 
 ### api.getFileUrl
-Used for generating an url for accesing a local file or directory path. For example: `api.getFileUrl('~/data/output.png')`, it will return something like `http://localhost:8080/file/1ba89354-ae98-457c-a53b-39a4bdd14941?name=output.png`.
+Used for generating an url for accesing a local file or directory path. For example: `api.getFileUrl('~/data/output.png')`, it will return something like `http://127.0.0.1:8080/file/1ba89354-ae98-457c-a53b-39a4bdd14941?name=output.png`.
 
 When this function is called, a confirmation dialog will popup for getting the user's permission. This means a JavaScript plugin cannot access the user's file system without notifying the user.
 
