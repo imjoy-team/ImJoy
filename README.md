@@ -310,14 +310,14 @@ Within the plugin, there is a variable called `api` which exposes a set of inter
 
 All the API functions provided by ImJoy are asynchronous functions, meaning that when a `ImJoy API` function is executed, you won't get the result immediately. Instead, it will immediately return a object called `promise` ([more about Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)).
 
-There are two supported coding patterns for accessing asynchronous functions in ImJoy both for Python and JavaScript:
+There are two supported programming style for accessing asynchronous functions in ImJoy both for Python and JavaScript:
 
- 1) use `api.XXXXXX().then(callback)` pattern. For example, if you want to popup a dialog for taking the user input, a synchronous program will block the execution until the user close the dialog. However in ImJoy, it will return immediately even if the user haven't close the dialog, with the `promise` object, you can set a callback function which will be called when the user close the dialog.
+ 1) `callback` style: Call the function and set its callback function with `.then(callback_func)`. For example, if you want to popup a dialog for taking the user input, a synchronous program will block the execution until the user close the dialog. However in ImJoy, it will return immediately even if the user haven't close the dialog, with the `promise` object, you can set a callback function which will be called when the user close the dialog.
 
 For Javascrit plugins, native Javascrit `Promise` will be returned. For Python plugins, it will return a simplified Python implement of promise.
 
 Here is how you can use it (suppose the api name is `XXXXX`):
-```
+```javascript
 // JavaScript
 class JSPlugin(){
   run(my){
@@ -337,10 +337,7 @@ class JSPlugin(){
 class PyPlugin():
     def setup(self):
         pass
-
-    def callback(result):
-        print(result)
-
+ 
     def run(self, my):
         api.XXXXX().then(self.callback)
 
@@ -348,9 +345,12 @@ class PyPlugin():
         def error_callback(error):
             print(error)
         api.XXXXX().then(callback).catch(error_callback)
+ 
+     def callback(result):
+        print(result)
 ```
- 2) use `async/await` pattern, this allows synchronous style programming without setting callbacks. For example:
- ```
+ 2) `async/await` style: declear your function use `async`, append `await` to the async function for waiting the result. This essentially allows synchronous style programming without setting callbacks. For example:
+ ```javascript
  // JavaScript
  class JSPlugin(){
    async run(my){
@@ -379,7 +379,7 @@ class PyPlugin():
             print(e)
  ```
 
- Notice that, for Javascript and Python 3+, both syntax are available, however, for Python 2, `asyncio` is not supported, you can only use the first `.then().catch()` style.
+ Notice that, for Javascript and Python 3+, both syntax are available, however, for Python 2, `asyncio` is not supported, you can only use the first `.then().catch()` style. Don't forget to `import asyncio` if you use `async/await` with Python 3.
 
 When calling the API functions, most functions take an object or dictionary as its first argument. For Javascript plugins, an object should be used. For Python plugins, you use a dictionary, or use named arguments. For example, the following function call will work in both JavaScript and Python:
 ```javascript
