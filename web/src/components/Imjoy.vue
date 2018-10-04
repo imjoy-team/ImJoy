@@ -1772,7 +1772,6 @@ export default {
       }).catch((err) => {
         this.showMessage('failed to save the workflow.')
         console.error(err)
-        alert('error occured: ' + err.toString())
       })
     },
     loadWorkflow(w) {
@@ -1798,7 +1797,6 @@ export default {
       }).catch((err) => {
         this.showMessage('failed to remove the workflow.')
         console.error(err)
-        alert('error occured: ' + err.toString())
       })
     },
     runOp(op) {
@@ -1825,6 +1823,7 @@ export default {
         console.error(e)
         this.status_text = '<' +op.name + '>' + (e.toString() || "Error.")
         this.showMessage('Error: ' + e)
+        this.showPluginStatus('<' +op.name + '>' + (e.toString() || "Error."), {id: op.plugin_id})
       })
     },
     selectFileChanged(event) {
