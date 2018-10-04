@@ -308,37 +308,78 @@ Besides the `Plugin API` functions, when a plugin is executed, you can return an
 ## `ImJoy API`
 Within the plugin, there is a variable called `api` which exposes a set of internal utility functions. These utility functions can be used in the plugin to interact with the GUI, talk with another plugin etc.
 
-All the API functions provided by ImJoy are asynchronous functions, meaning that when a `ImJoy API` function is executed, you won't get the result immediately. Instead, it will immediately return a object called `promise` ([more about Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)). For example, if you want to popup a dialog for taking the user input, a synchronous program will block the execution until the user close the dialog. However in ImJoy, it will return immediately even if the user haven't close the dialog, with the `promise` object, you can set a callback function which will be called when the user close the dialog.
+All the API functions provided by ImJoy are asynchronous functions, meaning that when a `ImJoy API` function is executed, you won't get the result immediately. Instead, it will immediately return a object called `promise` ([more about Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)).
+
+There are two supported coding patterns for accessing asynchronous functions in ImJoy both for Python and JavaScript:
+
+ 1) use `api.XXXXXX().then(callback)` pattern. For example, if you want to popup a dialog for taking the user input, a synchronous program will block the execution until the user close the dialog. However in ImJoy, it will return immediately even if the user haven't close the dialog, with the `promise` object, you can set a callback function which will be called when the user close the dialog.
 
 For Javascrit plugins, native Javascrit `Promise` will be returned. For Python plugins, it will return a simplified Python implement of promise.
 
 Here is how you can use it (suppose the api name is `XXXXX`):
 ```
 // JavaScript
-const callback(result){
-  console.log(result)
+class JSPlugin(){
+  run(my){
+      const callback(result){
+        console.log(result)
+      }
+      api.XXXXX().then(callback)
+
+      // optionally, you can catch error
+      const error_callback(error){
+        console.error(error)
+      }
+      api.XXXXX().then(callback).catch(error_callback)
+  }
 }
-api.XXXXX().then(callback)
 
-// optionally, you can catch error
-const error_callback(error){
-  console.error(error)
-}
-api.XXXXX().then(callback).catch(error_callback)
+class PyPlugin():
+    def setup(self):
+        pass
 
+    def callback(result):
+        print(result)
 
-# Python
-def callback(result):
-  print(result)
+    def run(self, my):
+        api.XXXXX().then(self.callback)
 
-api.XXXXX().then(callback)
-
-# optionally, you can catch error
-def error_callback(error):
-  print(error)
-
-api.XXXXX().then(callback).catch(error_callback)
+        # optionally, you can catch error
+        def error_callback(error):
+            print(error)
+        api.XXXXX().then(callback).catch(error_callback)
 ```
+ 2) use `async/await` pattern, this allows synchronous style programming without setting callbacks. For example:
+ ```
+ // JavaScript
+ class JSPlugin(){
+   async run(my){
+     try{
+       result = await api.XXXXX()
+       console.log(result)
+     }
+     catch(e){
+       console.error(e)
+     }
+   }
+ }
+
+ # Python
+import asyncio
+
+class PyPlugin():
+    async def setup(self):
+        pass
+
+    async def run(self, my):
+        try:
+            result = await api.XXXXX()
+            print(result)
+        except Exception as e:
+            print(e)
+ ```
+
+ Notice that, for Javascript and Python 3+, both syntax are available, however, for Python 2, `asyncio` is not supported, you can only use the first `.then().catch()` style.
 
 When calling the API functions, most functions take an object or dictionary as its first argument. For Javascript plugins, an object should be used. For Python plugins, you use a dictionary, or use named arguments. For example, the following function call will work in both JavaScript and Python:
 ```javascript
