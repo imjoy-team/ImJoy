@@ -81,16 +81,9 @@ export default {
     }
   },
   created(){
-    this.router = this.$root.$data.router
     this.store = this.$root.$data.store
-    this.api = this.$root.$data.store.api
   },
   mounted(){
-    // this.api.connect(["anonymous"]).then((session, connection)=>{
-    //   session.subscribe('org.imod.public.message', this.api.handle_notification).then(()=>{
-    //     console.log('subscribed to org.imod.public.message')
-    //   })
-    // });
     this.screenWidth = window.innerWidth
     this.store.event_bus.$on('resize',this.updateSize)
   },

@@ -44,9 +44,7 @@ export default {
     }
   },
   created(){
-    this.router = this.$root.$data.router
     this.store = this.$root.$data.store
-    this.api = this.$root.$data.store.api
   },
   mounted() {
     this.$nextTick(() => {})

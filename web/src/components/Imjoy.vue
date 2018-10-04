@@ -340,8 +340,8 @@
           <md-input type="text" v-model="connection_token" @keyup.enter="connectEngine(engine_url)" name="connection_token"></md-input>
         </md-field>
         <p>&nbsp;{{engine_status}}</p>
-        <md-button class="md-primary" v-if="!engine_connected" @click="connectEngine(engine_url)">Connect</md-button>
-
+        <p v-if="is_https_mode">Please notice that, in browsers such as Safari do not allow the connection form a `https` website to the Plugin Engine, in that case please <a href="http://imjoy.io/#/app" target="_blank">Switch to HTTP version</a> of ImJoy. </p>
+        <p v-if="is_https_mode">Also notice that data and settings of ImJoy in the HTTP version and HTTPS version are not shared.</p>
         <p>
           If you don't have it, you need to do the following:<br>
           &nbsp;&nbsp;* Install <a href="https://conda.io/miniconda.html" target="_blank">Miniconda</a> or <a href="https://www.anaconda.com/download/" target="_blank">Anaconda</a> (Python3.6+ version is recommanded) <br>
@@ -357,7 +357,7 @@
     </md-dialog-content>
     <md-dialog-actions>
       <md-button class="md-primary" @click="showPluginEngineInfo=false;">Cancel</md-button>
-      <md-button class="md-primary" @click="showPluginEngineInfo=false; connectEngine(engine_url)">OK</md-button>
+      <md-button class="md-primary" @click="showPluginEngineInfo=false; connectEngine(engine_url)">Connect</md-button>
     </md-dialog-actions>
   </md-dialog>
 
@@ -381,16 +381,6 @@
           <md-button class="md-primary" @click="connectEngine(engine_url); showSettingsDialog=false;">Connect Plugin Engine</md-button>
           <md-button class="md-primary" @click="disconnectEngine()">Disconnect Plugin Engine</md-button>
           <p>{{engine_status}}</p>
-        </md-card-content>
-      </md-card>
-
-      <md-divider></md-divider>
-      <md-card>
-        <md-card-header>
-          <div class="md-title">Installed Plugins</div>
-        </md-card-header>
-        <md-card-content>
-          <plugin-list display="list" :database="db" @message="show"  :install-plugin="installPlugin" :remove-plugin="removePlugin" :plugins="installed_plugins" :workspace="selected_workspace"></plugin-list>
         </md-card-content>
       </md-card>
     </md-dialog-content>
@@ -499,6 +489,7 @@ export default {
       plugin_dialog_config: null,
       _plugin_dialog_promise: {},
       _plugin2_remove: null,
+      is_https_mode: true,
       init_plugin_url: null,
       init_plugin_search: null,
       show_plugin_templates: true,
@@ -538,10 +529,7 @@ export default {
     }
   },
   created() {
-    this.router = this.$root.$data.router
     this.store = this.$root.$data.store
-    this.api = this.$root.$data.store.api
-    this.api.show = this.show
     this.window_ids = {}
     this.plugin_names = null
     this.db = null
@@ -651,6 +639,7 @@ export default {
     }
   },
   mounted() {
+    this.is_https_mode = ('https:' == location.protocol)
     // Make sure the GUI is refreshed
     setInterval(()=>{this.$forceUpdate()}, 5000)
     this.client_id = localStorage.getItem("imjoy_client_id")
@@ -849,11 +838,11 @@ export default {
         _plugin = duration
         duration = null
       }
-      this.show(msg, duration)
+      this.showMessage(msg, duration)
     },
     showFileDialog(options, _plugin){
       if(!this.engine_connected){
-        this.show('File Dialog requires the plugin engine, please connect to the plugin engine.')
+        this.showMessage('File Dialog requires the plugin engine, please connect to the plugin engine.')
         throw "Plugin engine is not connected."
       }
       if(!_plugin){
@@ -962,7 +951,7 @@ export default {
               }
             }
             this.reloadPlugin(config).then(()=>{
-              this.show(`Plugin "${config.name}" has been successfully installed.`)
+              this.showMessage(`Plugin "${config.name}" has been successfully installed.`)
               this.$forceUpdate()
               resolve()
             }).catch(()=>{
@@ -973,7 +962,7 @@ export default {
           })
         }).catch((e)=>{
           console.error(e)
-          this.show('Failed to download, if you download from github, please use the url to the raw file', 6000)
+          this.showMessage('Failed to download, if you download from github, please use the url to the raw file', 6000)
         })
       })
     },
@@ -998,11 +987,11 @@ export default {
           }
           this.unloadPlugin(plugin, true)
           // console.log('plugin has been removed')
-          this.show(`"${plugin.name}" has been removed.`)
+          this.showMessage(`"${plugin.name}" has been removed.`)
           this.$forceUpdate()
           resolve()
         }).catch((err) => {
-          this.show('Error:'+err)
+          this.showMessage('Error:'+err)
           console.error('error occured when removing ', plugin, err)
           reject(err)
         });
@@ -1024,7 +1013,7 @@ export default {
     switchWorkspace(w) {
       // console.log('switch to ', w)
       if(!w || w.trim() == ''){
-        this.show("Workspace name should not be empty.")
+        this.showMessage("Workspace name should not be empty.")
         throw "Workspace name should not be empty."
       }
       let q = {
@@ -1050,9 +1039,9 @@ export default {
             list: this.workspace_list,
             default: 'default'
           }).then(()=>{
-            this.show(`Workspace ${w} has been deleted.`)
+            this.showMessage(`Workspace ${w} has been deleted.`)
           }).catch(()=>{
-            this.show(`Error occured when removing workspace ${w}.`)
+            this.showMessage(`Error occured when removing workspace ${w}.`)
           })
         })
 
@@ -1066,7 +1055,7 @@ export default {
         })
       }
     },
-    show(info, duration) {
+    showMessage(info, duration) {
       this.snackbar_info = info
       this.snackbar_duration = duration || 3000
       this.show_snackbar = true
@@ -1079,12 +1068,12 @@ export default {
       //enforcing 127.0.0.1 for avoid security restrictions
       url = url.replace('localhost', '127.0.0.1')
       this.engine_status = 'Connecting...'
-      if(!auto) this.show('Trying to connect to the plugin engine...')
+      if(!auto) this.showMessage('Trying to connect to the plugin engine...')
       const socket = io(url);
       const timer = setTimeout(() => {
         if (!this.engine_connected) {
           this.engine_status = 'Plugin Engine is not connected.'
-          if(!auto) this.show('Failed to connect, please make sure you have started the plugin engine.', 5000)
+          if(!auto) this.showMessage('Failed to connect, please make sure you have started the plugin engine.', 5000)
 
           if(auto) socket.disconnect()
         }
@@ -1106,7 +1095,7 @@ export default {
             localStorage.setItem("imjoy_connection_token", this.connection_token);
             localStorage.setItem("imjoy_engine_url", url)
             // console.log('these python plugins can be resumed: ', ret.plugins)
-            this.show('Plugin Engine is connected.')
+            this.showMessage('Plugin Engine is connected.')
             // console.log('plugin engine connected.')
             this.store.event_bus.$emit('engine_connected', d)
             this.reloadPythonPlugins()
@@ -1124,7 +1113,7 @@ export default {
       socket.on('disconnect', () => {
         // console.log('plugin engine disconnected.')
         this.engine_connected = false
-        this.show('Plugin Engine disconnected.')
+        this.showMessage('Plugin Engine disconnected.')
         this.engine_status = 'Disconnected.'
         this.socket = null
         this.pluing_context.socket = null
@@ -1147,7 +1136,7 @@ export default {
             this.$forceUpdate()
           }
           else{
-            this.show(`Failed to list dir: ${path} ${ret.error}`)
+            this.showMessage(`Failed to list dir: ${path} ${ret.error}`)
             reject(ret.error)
             this.$forceUpdate()
           }
@@ -1189,7 +1178,7 @@ export default {
       return new Promise((resolve, reject) => {
         if(!this.engine_connected){
           reject("Plugin Engine is not connected.")
-          this.show("Error: Plugin Engine is not connected.")
+          this.showMessage("Error: Plugin Engine is not connected.")
           return
         }
         if(_plugin !== this.IMJOY_PLUGIN && (!_plugin || !_plugin.id)){
@@ -1215,7 +1204,7 @@ export default {
                 this.$forceUpdate()
               }
               else{
-                this.show(`Failed to get file url for ${config.path} ${ret.error}`)
+                this.showMessage(`Failed to get file url for ${config.path} ${ret.error}`)
                 reject(ret.error)
                 this.$forceUpdate()
               }
@@ -1240,7 +1229,7 @@ export default {
       return new Promise((resolve, reject) => {
         if(!this.engine_connected){
           reject("Plugin Engine is not connected.")
-          this.show("Error: Plugin Engine is not connected.")
+          this.showMessage("Error: Plugin Engine is not connected.")
           return
         }
         let config = url
@@ -1253,7 +1242,7 @@ export default {
             this.$forceUpdate()
           }
           else{
-            this.show(`Failed to get file path for ${config.url} ${ret.error}`)
+            this.showMessage(`Failed to get file path for ${config.url} ${ret.error}`)
             reject(ret.error)
             this.$forceUpdate()
           }
@@ -1388,15 +1377,13 @@ export default {
             this.$forceUpdate()
             resolve(plugin)
           }).catch((e) => {
-            pconfig.name = null
-            pconfig.type = null
             pconfig.plugin = null
             this.$forceUpdate()
             reject(e)
           })
         } catch (e) {
           this.status_text = 'Error: ' + e
-          this.show('Error: ' + e)
+          this.showMessage('Error: ' + e)
           reject(e)
         }
       })
@@ -1422,9 +1409,9 @@ export default {
               this.installed_plugins.push(template)
               resolve(template)
               // console.log('Successfully saved!');
-              this.show(`${template.name } has been successfully saved.`)
+              this.showMessage(`${template.name } has been successfully saved.`)
             }).catch((err) => {
-              this.show('failed to save the plugin.')
+              this.showMessage('failed to save the plugin.')
               console.error(err)
               reject('failed to save')
             })
@@ -1439,7 +1426,7 @@ export default {
           });
         } catch (e) {
           this.status_text = 'Error: ' + e
-          this.show('Error: ' + e)
+          this.showMessage('Error: ' + e)
           reject(e)
         }
       })
@@ -1563,11 +1550,9 @@ export default {
                 this.installed_plugins.push(config)
                 this.reloadPlugin(config).catch((e)=>{
                   console.error(config, e)
-                  if(config.name){
-                    this.showSnackbar(`<${config.name}>: ${e.toString()}` )
-                  }
-                  else{
-                    this.showSnackbar(`Failed to load plugin.` )
+                  this.showSnackbar(`<${config.name}>: ${e.toString()}` )
+                  if(!e.toString().includes('plugin engine is not connected')){
+                      this.showMessage(`<${config.name}>: ${e.toString()}`)
                   }
                 })
               }
@@ -1763,7 +1748,7 @@ export default {
       }).catch((e) => {
         console.error(e)
         this.status_text = e.toString() || "Error."
-        this.show('Error: ' + e)
+        this.showMessage('Error: ' + e)
       })
     },
     saveWorkflow(joy) {
@@ -1783,9 +1768,9 @@ export default {
       }).then((result) => {
         // console.log('Successfully saved!');
         this.workflow_list.push(data)
-        this.show(name + ' has been successfully saved.')
+        this.showMessage(name + ' has been successfully saved.')
       }).catch((err) => {
-        this.show('failed to save the workflow.')
+        this.showMessage('failed to save the workflow.')
         console.error(err)
         alert('error occured: ' + err.toString())
       })
@@ -1809,9 +1794,9 @@ export default {
           this.workflow_list.splice(index, 1);
         }
         // console.log('Successfully removed!');
-        this.show(name + ' has been successfully removed.')
+        this.showMessage(name + ' has been successfully removed.')
       }).catch((err) => {
-        this.show('failed to remove the workflow.')
+        this.showMessage('failed to remove the workflow.')
         console.error(err)
         alert('error occured: ' + err.toString())
       })
@@ -1839,7 +1824,7 @@ export default {
       }).catch((e) => {
         console.error(e)
         this.status_text = '<' +op.name + '>' + (e.toString() || "Error.")
-        this.show('Error: ' + e)
+        this.showMessage('Error: ' + e)
       })
     },
     selectFileChanged(event) {
@@ -2014,7 +1999,7 @@ export default {
         plugin.whenConnected(() => {
           if (!plugin.api) {
             console.error('error occured when loading plugin.')
-            this.show('error occured when loading plugin.')
+            this.showMessage('error occured when loading plugin.')
             throw 'error occured when loading plugin.'
           }
 
@@ -2032,7 +2017,7 @@ export default {
               resolve(plugin)
             }).catch((e) => {
               console.error('error occured when loading plugin ' + template.name + ": ", e)
-              this.show('error occured when loading plugin ' + template.name + ": " + e)
+              this.showMessage('error occured when loading plugin ' + template.name + ": " + e)
               reject(e)
               plugin.terminate()
             })
@@ -2044,11 +2029,11 @@ export default {
         plugin.whenFailed((e) => {
           if(e){
             this.status_text = `<${template.name}> ${e.toString()}`
-            this.show('Error occured when loading ' + template.name + ": " + e)
+            this.showMessage('Error occured when loading ' + template.name + ": " + e)
           }
           else{
             this.status_text = 'Error occured when loading ' +template.name
-            this.show('Error occured when loading ' + template.name )
+            this.showMessage('Error occured when loading ' + template.name )
           }
           console.error('error occured when loading ' + template.name + ": ", e)
           plugin.terminate()
@@ -2393,21 +2378,21 @@ export default {
             }).catch((e) => {
               this.status_text = plugin.name + '->' + e
               console.error('Error in the run function of plugin ' + plugin.name, e)
-              this.show('Error: '+ e)
+              this.showMessage('Error: '+ e)
               reject(e)
             })
           }).catch((e) => {
             console.error('Error occured when loading the window plugin ' + pconfig.name + ": ", e)
             this.status_text = 'Error occured when loading the window plugin ' + pconfig.name + ": " + e
             plugin.terminate()
-            this.show('Error occured when loading the window plugin ' + pconfig.name + ": " + e)
+            this.showMessage('Error occured when loading the window plugin ' + pconfig.name + ": " + e)
             reject(e)
           })
         });
         plugin.whenFailed((e) => {
           console.error('error occured when loading ' + pconfig.name + ":", e)
           this.status_text = 'error occured when loading ' + pconfig.name + ": " + e
-          this.show('error occured when loading ' + pconfig.name + ": " + e)
+          this.showMessage('error occured when loading ' + pconfig.name + ": " + e)
           plugin.terminate()
           reject(e)
         });
