@@ -13,7 +13,9 @@ Currently, ImJoy consists of three repositories:
  * Easy-to-use workflow composition
  * Extendable plugin interface
    - Support Python and Javascript
-   - Plugins are isolated with secured sandboxes
+   - Javascript plugins are isolated with secured sandboxes
+   - Python plugins run in their own process
+   - Support `async/await` syntax for Python3 and Javascript
    - Support virtual environments and pip packages for Python
    - Support libraries hosted on Github or CDNs for javascript
    - Deploying your own plugin with Github
