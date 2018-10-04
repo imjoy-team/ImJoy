@@ -106,10 +106,10 @@
           <md-menu>
             <md-button class="md-icon-button md-primary" md-menu-trigger>
               <md-icon>widgets</md-icon>
-              <md-tooltip>Switch Workspace</md-tooltip>
+              <md-tooltip>Current workspace: {{selected_workspace}}</md-tooltip>
             </md-button>
             <md-menu-content>
-              <md-menu-item @click="switchWorkspace(w)" v-for="w in workspace_list" :key="w">
+              <md-menu-item @click="switchWorkspace(w)" :disabled="w==selected_workspace" v-for="w in workspace_list" :key="w">
                 <span>{{w}}</span><md-icon>forward</md-icon>
                 <md-tooltip>Switch to workspace: {{w}} </md-tooltip>
               </md-menu-item>
@@ -198,7 +198,7 @@
                   <md-progress-spinner v-if="plugin.initializing" class="md-accent" :md-diameter="20" md-mode="indeterminate"></md-progress-spinner>
                   <md-icon v-else-if="plugin.config.icon">{{plugin.config.icon}}</md-icon>
                   <md-icon v-else>extension</md-icon>
-                  <md-tooltip>show more options for the plugin</md-tooltip>
+                  <md-tooltip>{{plugin.config.description}}</md-tooltip>
                 </md-button>
                 <md-menu-content>
                   <md-menu-item @click="showDoc(plugin.id)">
@@ -213,7 +213,7 @@
                   <md-menu-item @click="unloadPlugin(plugin)">
                     <md-icon>clear</md-icon>Terminate
                   </md-menu-item>
-                  <md-menu-item @click="_plugin2_remove=plugin;showRemoveConfirmation=true">
+                  <md-menu-item class="md-accent" @click="_plugin2_remove=plugin;showRemoveConfirmation=true">
                     <md-icon>delete_forever</md-icon>Remove
                   </md-menu-item>
                 </md-menu-content>
