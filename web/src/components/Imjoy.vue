@@ -408,7 +408,7 @@
           <div class="md-title">Install from the Plugin Store</div>
         </md-card-header>
         <md-card-content>
-          <plugin-list show-url @message="show" :database="db" :install-plugin="installPlugin" :remove-plugin="removePlugin" :init-url="init_plugin_url" :init-search="init_plugin_search" display="list" :plugins="available_plugins" :workspace="selected_workspace"></plugin-list>
+          <plugin-list show-url @message="showMessage" :database="db" :install-plugin="installPlugin" :remove-plugin="removePlugin" :init-url="init_plugin_url" :init-search="init_plugin_search" display="list" :plugins="available_plugins" :workspace="selected_workspace"></plugin-list>
         </md-card-content>
       </md-card>
       <md-divider></md-divider>
@@ -417,7 +417,7 @@
           <div class="md-title">Installed Plugins</div>
         </md-card-header>
         <md-card-content>
-          <plugin-list display="list" :database="db" :install-plugin="installPlugin" :remove-plugin="removePlugin" @message="show" :plugins="installed_plugins" :workspace="selected_workspace"></plugin-list>
+          <plugin-list display="list" :database="db" :install-plugin="installPlugin" :remove-plugin="removePlugin" @message="showMessage" :plugins="installed_plugins" :workspace="selected_workspace"></plugin-list>
         </md-card-content>
       </md-card>
     </md-dialog-content>
@@ -1823,7 +1823,6 @@ export default {
         console.error(e)
         this.status_text = '<' +op.name + '>' + (e.toString() || "Error.")
         this.showMessage('Error: ' + e)
-        this.showPluginStatus('<' +op.name + '>' + (e.toString() || "Error."), {id: op.plugin_id})
       })
     },
     selectFileChanged(event) {
