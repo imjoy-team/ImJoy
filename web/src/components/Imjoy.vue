@@ -1076,6 +1076,8 @@ export default {
         return
         //this.socket.disconnect()
       }
+      //enforcing 127.0.0.1 for avoid security restrictions
+      url = url.replace('localhost', '127.0.0.1')
       this.engine_status = 'Connecting...'
       if(!auto) this.show('Trying to connect to the plugin engine...')
       const socket = io(url);
