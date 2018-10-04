@@ -47,8 +47,8 @@ For installing a plugin with predefined tag, you can use `#` to append the tag, 
 
 When open such an url, a plugin management dialog will be shown which allow the user to click `Install`.
 
-### supported url parameters
- * `w` workspace name, an url contains `w` as a query string (e.g. https://imjoy.io/#/?w=test) can be used to create or switch to a new workspace.
+### Supported url parameters
+ * `w` workspace name, an url contains `w` as a query string (e.g. https://imjoy.io/#/app?w=test) can be used to create or switch to a new workspace.
  * `plugin` show the specified plugin in the plugin management dialog, you can use plugin name or an url for the plugin, for example: `https://imjoy.io/#/app?plugin=Image%20Window` will show up a plugin dialog with `Image Window` in the search. You can also set `plugin` to an url for sharing plugin hosted on github, please refer to `Install from url` for more details.
  * `engine` define the engine url, for example: `http://imjoy.io/#/app?engine=http://localhost:8080`, notice that if you want to connect to a remote machine through http (not https) connection, you can only do it by using `http://imjoy.io` rather than `https://imjoy.io`. This restriction also exist if you use localhost with some browsers (e.g. safari).
  * `token` define the connection token, for example: `http://imjoy.io/#/app?token=2760239c-c0a7-4a53-a01e-d6da48b949bc`
