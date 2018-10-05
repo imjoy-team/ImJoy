@@ -172,9 +172,7 @@ export default {
     }
   },
   created(){
-    this.router = this.$root.$data.router
     this.store = this.$root.$data.store
-    this.api = this.$root.$data.store.api
     this.store.event_bus.$on('add_window', this.onWindowAdd)
     this.store.event_bus.$on('resize', this.updateSize)
     this.marked = marked

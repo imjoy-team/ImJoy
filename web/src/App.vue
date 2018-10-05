@@ -12,7 +12,6 @@ export default {
     return {
       show_navbar: true,
       store: this.$root.$data.store,
-      api: this.$root.$data.store.api
     }
   },
   mounted(){
@@ -21,7 +20,6 @@ export default {
     }
 
     this.$nextTick(()=>{
-      this.store.api.show = this.show
       const updateSize = (e)=>{
         this.store.windowHeight = window.innerHeight
         this.store.windowWidth = window.innerWidth

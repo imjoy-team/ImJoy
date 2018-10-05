@@ -52,7 +52,7 @@ When open such an url, a plugin management dialog will be shown which allow the 
 ### Supported url parameters
  * `w` workspace name, an url contains `w` as a query string (e.g. https://imjoy.io/#/app?w=test) can be used to create or switch to a new workspace.
  * `plugin` show the specified plugin in the plugin management dialog, you can use plugin name or an url for the plugin, for example: `https://imjoy.io/#/app?plugin=Image%20Window` will show up a plugin dialog with `Image Window` in the search. You can also set `plugin` to an url for sharing plugin hosted on github, please refer to `Install from url` for more details.
- * `engine` define the engine url, for example: `http://imjoy.io/#/app?engine=http://127.0.0.1:8080`, notice that if you want to connect to a remote machine through http (not https) connection, you can only do it by using `http://imjoy.io` rather than `https://imjoy.io`. This restriction also exist if you use localhost with some browsers (e.g. safari), to avoid it, you need to use `http://127.0.0.1:8080` rather than `http://localhost:8080`, because most browser will consider `127.0.0.1` is a secured connection, but not `localhost`.
+ * `engine` define the engine url, for example: `http://imjoy.io/#/app?engine=http://127.0.0.1:8080`, notice that if you want to connect to a remote machine through http (not https) connection, you can only do it by using `http://imjoy.io` rather than `https://imjoy.io`. This restriction also exist if you use localhost with some browsers (e.g. firefox), to avoid it, you need to use `http://127.0.0.1:8080` rather than `http://localhost:8080`, because most browser will consider `127.0.0.1` is a secured connection, but not `localhost`. However, there is an exception, on Safari, using `127.0.0.1` does not work due to [this](https://bugs.webkit.org/show_bug.cgi?id=171934), if you still want to use Safari, you have to switch to `http://imjoy.io`.
  * `token` define the connection token, for example: `http://imjoy.io/#/app?token=2760239c-c0a7-4a53-a01e-d6da48b949bc`
 
  These parameters are independent from each other, meaning you can combine different parameters with `&` and construct a long url. For example combining engine url and connection token:  `http://imjoy.io/#/app?engine=http://127.0.0.1:8080&token=2760239c-c0a7-4a53-a01e-d6da48b949bc`.
@@ -322,17 +322,20 @@ Here is how you can use it (suppose the api name is `XXXXX`):
 ```javascript
 // JavaScript
 class JSPlugin(){
+  setup(){
+  }
   run(my){
-      const callback(result){
-        console.log(result)
-      }
-      api.XXXXX().then(callback)
+      api.XXXXX().then(this.callback)
 
       // optionally, you can catch error
       const error_callback(error){
         console.error(error)
       }
-      api.XXXXX().then(callback).catch(error_callback)
+      api.XXXXX().then(this.callback).catch(error_callback)
+  }
+
+  callback(result){
+     console.log(result)
   }
 }
 
@@ -346,7 +349,7 @@ class PyPlugin():
         # optionally, you can catch error
         def error_callback(error):
             print(error)
-        api.XXXXX().then(callback).catch(error_callback)
+        api.XXXXX().then(self.callback).catch(error_callback)
 
      def callback(result):
         print(result)
@@ -355,6 +358,8 @@ class PyPlugin():
  ```javascript
  // JavaScript
  class JSPlugin(){
+   async setup(){
+   }
    async run(my){
      try{
        result = await api.XXXXX()
