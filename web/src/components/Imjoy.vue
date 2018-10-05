@@ -82,7 +82,7 @@
           <md-icon>add</md-icon>
         </md-speed-dial-target>
         <md-speed-dial-content>
-          <md-button :disabled="!engine_connected" @click="showEngineFileDialog()" class="md-icon-button md-primary">
+          <md-button v-if="engine_connected" @click="showEngineFileDialog()" class="md-icon-button md-primary">
             <md-icon>add_to_queue</md-icon>
             <md-tooltip>Load files through the Python Plugin Engine</md-tooltip>
           </md-button>
@@ -390,7 +390,7 @@
           <div class="md-title">Installed Plugins</div>
         </md-card-header>
         <md-card-content>
-          <plugin-list display="list" :database="db" @message="show"  :install-plugin="installPlugin" :remove-plugin="removePlugin" :plugins="installed_plugins" :workspace="selected_workspace"></plugin-list>
+          <plugin-list display="list" name="repository_name" description="repository_description" :database="db" @message="show"  :install-plugin="installPlugin" :remove-plugin="removePlugin" :plugins="installed_plugins" :workspace="selected_workspace"></plugin-list>
         </md-card-content>
       </md-card>
     </md-dialog-content>
@@ -418,7 +418,7 @@
           <div class="md-title">Install from the Plugin Store</div>
         </md-card-header>
         <md-card-content>
-          <plugin-list show-url @message="show" :database="db" :install-plugin="installPlugin" :remove-plugin="removePlugin" :init-url="init_plugin_url" :init-search="init_plugin_search" display="list" :plugins="available_plugins" :workspace="selected_workspace"></plugin-list>
+          <plugin-list show-url name="repository_name" description="repository_description" @message="show" :database="db" :install-plugin="installPlugin" :remove-plugin="removePlugin" :init-url="init_plugin_url" :init-search="init_plugin_search" display="list" :plugins="available_plugins" :workspace="selected_workspace"></plugin-list>
         </md-card-content>
       </md-card>
       <md-divider></md-divider>
@@ -427,7 +427,7 @@
           <div class="md-title">Installed Plugins</div>
         </md-card-header>
         <md-card-content>
-          <plugin-list display="list" :database="db" :install-plugin="installPlugin" :remove-plugin="removePlugin" @message="show" :plugins="installed_plugins" :workspace="selected_workspace"></plugin-list>
+          <plugin-list display="list" name="repository_name" description="repository_description" :database="db" :install-plugin="installPlugin" :remove-plugin="removePlugin" @message="show" :plugins="installed_plugins" :workspace="selected_workspace"></plugin-list>
         </md-card-content>
       </md-card>
     </md-dialog-content>
@@ -508,6 +508,8 @@ export default {
       engine_status: 'Disconnected',
       engine_connected: false,
       engine_url: 'http://127.0.0.1:8080',
+      repository_name: 'ImJoy Repository',
+      repository_description: '',
       windows: [],
       active_windows: [],
       selected_workspace: null,
@@ -675,6 +677,15 @@ export default {
     else{
       this.engine_url = localStorage.getItem("imjoy_engine_url") || 'http://127.0.0.1:8080'
     }
+
+    this.default_repository_url = "https://raw.githubusercontent.com/oeway/ImJoy-Plugins/master/manifest.imjoy.json"
+    if(this.$route.query.repo){
+      this.repository_url = this.$route.query.repo
+    }
+    else{
+      this.repository_url = this.default_repository_url
+    }
+
     this.plugin_api = {
       alert: this.showAlert,
       register: this.register,
@@ -746,10 +757,18 @@ export default {
 
     }).then(() => {
       this.reloadPlugins().then(()=>{
-        axios.get("https://raw.githubusercontent.com/oeway/ImJoy-Plugins/master/manifest.json").then(response => {
+        axios.get(this.repository_url).then(response => {
           if (response && response.data && response.data.plugins) {
             this.manifest = response.data
+            this.repository_name = this.manifest.name || 'ImJoy Repository'
+            this.repository_description = this.manifest.description
+            if (this.repository_url != this.default_repository_url){
+              this.repository_description = "( This repository is not provided by ImJoy, please use it at your own risk. )" + this.manifest.description
+            }
             this.available_plugins = this.manifest.plugins
+            this.available_plugins = this.available_plugins.filter((p) => {
+              return !p.disabled
+            })
             const uri_root = this.manifest.uri_root
             for (let i = 0; i < this.available_plugins.length; i++) {
                 const p = this.available_plugins[i]
@@ -771,35 +790,45 @@ export default {
                 ap.tag = ps[0].tag
               }
             }
-
-            if(this.$route.query.plugin){
-              const p = this.$route.query.plugin.trim()
-              if (p.match(url_regex)) {
-                this.init_plugin_url = p
-                this.init_plugin_search = null
-              } else {
-                this.init_plugin_url = null
-                this.init_plugin_search = p
-              }
-              this.show_plugin_templates = false
-              this.showAddPluginDialog = true
-            }
-
-            if(this.$route.query.workflow){
-              const data = Joy.decodeWorkflow(this.$route.query.workflow)
-              // const query = Object.assign({}, this.$route.query);
-              // delete query.workflow;
-              // this.$router.replace({ query });
-              if(data){
-                this.workflow_joy_config.data = data
-                this.workflow_expand = true
-              }
-              else{
-                console.log('failed to workflow')
-              }
-            }
-
           }
+        }).finally(()=>{
+          if(this.$route.query.plugin){
+            const p = this.$route.query.plugin.trim()
+            if (p.match(url_regex)) {
+              this.init_plugin_url = p
+              this.init_plugin_search = null
+            } else {
+              this.init_plugin_url = null
+              this.init_plugin_search = p
+            }
+            this.show_plugin_templates = false
+            this.showAddPluginDialog = true
+          }
+
+          if(this.$route.query.workflow){
+            const data = Joy.decodeWorkflow(this.$route.query.workflow)
+            // const query = Object.assign({}, this.$route.query);
+            // delete query.workflow;
+            // this.$router.replace({ query });
+            if(data){
+              this.workflow_joy_config.data = data
+              this.workflow_expand = true
+            }
+            else{
+              console.log('failed to workflow')
+            }
+          }
+
+          if(this.$route.query.load){
+            const w = {
+              name: "Loaded Url",
+              type: 'imjoy/url_list',
+              scroll: true,
+              data: [this.$route.query.load]
+            }
+            this.addWindow(w)
+          }
+
         })
       })
     })

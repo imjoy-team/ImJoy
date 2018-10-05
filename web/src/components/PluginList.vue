@@ -1,8 +1,9 @@
 <template>
 <div class="plugin-list" ref="container">
   <!-- <md-subheader>Options</md-subheader> -->
-  <md-subheader v-if="title">{{title}}
+  <md-subheader v-if="title">{{title}} <span v-if="name">{{name}}</span>
   </md-subheader>
+  <p v-if="description">{{description}}</p>
   <md-toolbar md-elevation="0">
     <md-field md-clearable v-show="!plugin_url" class="md-toolbar-section-start">
       <md-icon>search</md-icon>
@@ -209,6 +210,14 @@ import {
 export default {
   name: 'plugin-list',
   props: {
+    name: {
+      type: String,
+      default: null
+    },
+    description: {
+      type: String,
+      default: null
+    },
     configUrl: {
       type: String,
       default: null
