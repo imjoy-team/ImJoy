@@ -383,19 +383,6 @@
           <p>{{engine_status}}</p>
         </md-card-content>
       </md-card>
-<<<<<<< HEAD
-
-      <md-divider></md-divider>
-      <md-card>
-        <md-card-header>
-          <div class="md-title">Installed Plugins</div>
-        </md-card-header>
-        <md-card-content>
-          <plugin-list display="list" name="repository_name" description="repository_description" :database="db" @message="show"  :install-plugin="installPlugin" :remove-plugin="removePlugin" :plugins="installed_plugins" :workspace="selected_workspace"></plugin-list>
-        </md-card-content>
-      </md-card>
-=======
->>>>>>> 03f8aa367a60bd1ddae2c5766c0a73e34e572f1a
     </md-dialog-content>
     <md-dialog-actions>
       <md-button class="md-primary" @click="showSettingsDialog=false;">OK</md-button>
@@ -421,11 +408,7 @@
           <div class="md-title">Install from the Plugin Store</div>
         </md-card-header>
         <md-card-content>
-<<<<<<< HEAD
-          <plugin-list show-url name="repository_name" description="repository_description" @message="show" :database="db" :install-plugin="installPlugin" :remove-plugin="removePlugin" :init-url="init_plugin_url" :init-search="init_plugin_search" display="list" :plugins="available_plugins" :workspace="selected_workspace"></plugin-list>
-=======
-          <plugin-list show-url @message="showMessage" :database="db" :install-plugin="installPlugin" :remove-plugin="removePlugin" :init-url="init_plugin_url" :init-search="init_plugin_search" display="list" :plugins="available_plugins" :workspace="selected_workspace"></plugin-list>
->>>>>>> 03f8aa367a60bd1ddae2c5766c0a73e34e572f1a
+          <plugin-list show-url :name="repository_name" :description="repository_description" @message="showMessage" :database="db" :install-plugin="installPlugin" :remove-plugin="removePlugin" :init-url="init_plugin_url" :init-search="init_plugin_search" display="list" :plugins="available_plugins" :workspace="selected_workspace"></plugin-list>
         </md-card-content>
       </md-card>
       <md-divider></md-divider>
@@ -434,11 +417,7 @@
           <div class="md-title">Installed Plugins</div>
         </md-card-header>
         <md-card-content>
-<<<<<<< HEAD
-          <plugin-list display="list" name="repository_name" description="repository_description" :database="db" :install-plugin="installPlugin" :remove-plugin="removePlugin" @message="show" :plugins="installed_plugins" :workspace="selected_workspace"></plugin-list>
-=======
-          <plugin-list display="list" :database="db" :install-plugin="installPlugin" :remove-plugin="removePlugin" @message="showMessage" :plugins="installed_plugins" :workspace="selected_workspace"></plugin-list>
->>>>>>> 03f8aa367a60bd1ddae2c5766c0a73e34e572f1a
+          <plugin-list display="list" :name="repository_name" :description="repository_description" :database="db" :install-plugin="installPlugin" :remove-plugin="removePlugin" @message="showMessage" :plugins="installed_plugins" :workspace="selected_workspace"></plugin-list>
         </md-card-content>
       </md-card>
     </md-dialog-content>
