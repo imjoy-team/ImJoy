@@ -1,11 +1,11 @@
 docute.init({
   title: 'ImJoy Documentation', // Default to `<title>` value
-  sidebar: [
-  ],
-  // landing: 'GettingStarted.md',
+  landing: [],
   nav: [
     // homepage
-    {title: 'Getting Started', path: '/getting-started', source: 'GettingStarted.md'},
+    {title: 'Overview', path: '/overview', source: 'Overview.md'},
+    {title: 'Architecture', path: '/architecture', source: 'Architecture.md'},
+    {title: 'Plugin development', path: '/developlugins', source: 'DevelopingPlugins.md'},
     {title: 'Tutorial', path: '/tutorial', source: 'Tutorial.md'},
     {title: 'API', path: '/api', source: 'API.md'},
     // {
