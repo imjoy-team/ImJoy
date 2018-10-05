@@ -1,0 +1,49 @@
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+  <title>docs</title>
+  <link rel="stylesheet" href="asserts/docute.css">
+  <style>
+    body {
+        display: block;
+        margin: 8px;
+    }
+    .page {
+        height: 100%;
+        max-width: 1280px;
+        margin: 0 auto;
+        display: flex;
+    }
+    @media screen and (min-width: 1280px){
+      .page:not(.no-sidebar) {
+          border: 1px solid rgba(0,0,0,.07);
+          border-top: none;
+          border-bottom: none;
+      }
+    }
+    .sidebar {
+        margin: 0;
+        width: 280px;
+        border-right: 1px solid rgba(0,0,0,.07);
+        overflow-y: auto;
+        padding: 0 0 70px;
+    }
+
+    figure {
+        display: block;
+        margin-block-start: 1em;
+        margin-block-end: 1em;
+        margin-inline-start: 40px;
+        margin-inline-end: 40px;
+    }
+  </style>
+</head>
+<body>
+  <div id="app"></div>
+  <script src="asserts/docute.js"></script>
+  <script src="config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs/components/prism-python.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs/components/prism-nginx.js"></script>
+</body>
+</html>

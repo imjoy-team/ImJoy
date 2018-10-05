@@ -69,6 +69,14 @@ const devWebpackConfig = merge(baseWebpackConfig, {
         to: config.dev.assetsSubDirectory,
         ignore: ['.*']
       }
+    ]),
+    // copy docs assets
+    new CopyWebpackPlugin([
+      {
+        from: path.resolve(__dirname, '../../docs/docs'),
+        to: 'docs',
+        ignore: ['.*']
+      }
     ])
   ]
 })

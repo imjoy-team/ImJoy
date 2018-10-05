@@ -39,7 +39,7 @@
               <md-tooltip>Source code on Github</md-tooltip>
             </md-button>
             &nbsp;
-            <md-button href="https://github.com/oeway/ImJoy/blob/master/README.md" class="md-accent" v-if="screenWidth>=600">
+            <md-button href="/docs/index.html#/overview" target="_blank" class="md-accent" v-if="screenWidth>=600">
               <md-icon>library_books</md-icon>docs
               <md-tooltip>Documentation</md-tooltip>
             </md-button>

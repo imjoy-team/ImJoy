@@ -3,7 +3,7 @@
 ImJoy is a flexible image processing framework allowing the deployment of complex
 computational tasks in a robust, secure and easy-to-use environment. The entire functionality is provided by **plugins**. Within a modern graphical user-interface, these plugins can be assembled into **workflows**. This design makes ImJoy intuitive to work with for end users.
 
-<img src="https://github.com/oeway/ImJoy/raw/master/docs/img/imjoy-screenshot.png" width="600px"></img>
+<img src="./asserts/imjoy-screenshot.png" width="600px"></img>
 
 Here we describe the basic concepts of ImJoy and how to get started. More detailed
 information about ImJoy architecture, existing plugins, can be found
