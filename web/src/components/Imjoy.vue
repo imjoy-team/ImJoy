@@ -754,8 +754,7 @@ export default {
             if (this.repository_url != this.default_repository_url){
               this.repository_description = "( This repository is not provided by ImJoy, please use it at your own risk. )" + this.manifest.description
             }
-            this.available_plugins = this.manifest.plugins
-            this.available_plugins = this.available_plugins.filter((p) => {
+            this.available_plugins = this.manifest.plugins.filter((p) => {
               return !p.disabled
             })
             const uri_root = this.manifest.uri_root
