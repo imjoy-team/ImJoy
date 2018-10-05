@@ -8,15 +8,10 @@ Imjoy consists of **two main components**
 access to the entire Python ecosystem. Complex computional tasks can be implemented
 in plugins, which run in the **Python Plugin Engine** - a small python library we developed for ImJoy. The Python Plugin Engine is connected with the ImJoy web interface through websockets and communicate with a customized remote procedure calls (RPC) based on `socket.io`.
 
-<img src="./asserts/imjoy-overview.png" width="800px"></img>
+<img src="./asserts/imjoy-architecture.png" width="800px"></img>
 
 **Importantly**, ImJoy can run without the Python backend and thus without the need of any
 installation. Plugins can then only implemented in JavaScript (such as [TensoFlow.js](https://js.tensorflow.org/)).
-
-Currently, ImJoy consists of three repositories:
- * [web application](https://github.com/oeway/ImJoy/)
- * [plugin engine](https://github.com/oeway/ImJoy-Python)
- * [plugin repository](https://github.com/oeway/ImJoy-Plugins)
 
 
 # Going offline
