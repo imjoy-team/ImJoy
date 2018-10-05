@@ -322,17 +322,20 @@ Here is how you can use it (suppose the api name is `XXXXX`):
 ```javascript
 // JavaScript
 class JSPlugin(){
+  setup(){
+  }
   run(my){
-      const callback(result){
-        console.log(result)
-      }
-      api.XXXXX().then(callback)
+      api.XXXXX().then(this.callback)
 
       // optionally, you can catch error
       const error_callback(error){
         console.error(error)
       }
-      api.XXXXX().then(callback).catch(error_callback)
+      api.XXXXX().then(this.callback).catch(error_callback)
+  }
+
+  callback(result){
+     console.log(result)
   }
 }
 
@@ -346,7 +349,7 @@ class PyPlugin():
         # optionally, you can catch error
         def error_callback(error):
             print(error)
-        api.XXXXX().then(callback).catch(error_callback)
+        api.XXXXX().then(self.callback).catch(error_callback)
 
      def callback(result):
         print(result)
@@ -355,6 +358,8 @@ class PyPlugin():
  ```javascript
  // JavaScript
  class JSPlugin(){
+   async setup(){
+   }
    async run(my){
      try{
        result = await api.XXXXX()
