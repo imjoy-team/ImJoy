@@ -5,11 +5,19 @@ computational tasks in a robust, secure and easy-to-use environment. The entire 
 
 <img src="./asserts/imjoy-screenshot.png" width="600px"></img>
 
+## ImJoy key features
+ * Rich and interactive user interface powered by web technology
+ * Powerful computational backend powered by Python ecosystem
+ * Easy-to-use workflow composition
+ * Extendable plugin interface supports Python and Javascript
+ * Self-contained plugin development
+ * Easy plugin deployment and sharing through Github or Gist
+
+## Getting started
+
 Here we describe the basic concepts of ImJoy and how to get started. More detailed
 information about ImJoy architecture, existing plugins, can be found
 in dedicated sections.
-
-## Getting started
 
 ###  Two flavors of ImJoy:  web app and Plugin Engine
 ImJoy can be used  directly from your browser (Chrome or Firefox) **without any installation**: [ImJoy web app](https://imjoy.io/#/app). Many plugins can be
