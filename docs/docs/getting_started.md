@@ -4,7 +4,7 @@ Here we describe the basic concepts of ImJoy and how to get started. More detail
 information about ImJoy architecture, existing plugins, can be found
 in dedicated sections.
 
-##  Two flavors of ImJoy:  web app and Plugin Engine
+##  Two flavors of ImJoy: Web App and Plugin Engine
 
 <img src="./asserts/imjoy-webapp-engine.png" width="800px"></img>
 
