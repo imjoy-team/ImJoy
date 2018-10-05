@@ -138,8 +138,8 @@ This function will be called each time a plugin is executed. When executed, an o
 #### optional: `update()` function
 Optionally, you can define an update function which will be called when any setting of the op is changed.
 
-## Plugin operations
-For a plugin, you can define independent operations (or **ops**) with the Plugin API (see **api.register** for details). Each of these **ops** is defined in a similar fashion as
+## Plugin operators (ops)
+For a plugin, you can define independent operators (or **ops**) with the Plugin API (see **api.register** for details). Each of these **ops** is defined in a similar fashion as
 the `<config>` tag and has it's own set of parameters defined via a GUI and can have its dedicated run fucntion. The different ops are displaued when you press on the button down arrow in the Plugin list. Each op can also be added to the workflow separately.
 
 ## Plugin during runtime
