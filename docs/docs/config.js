@@ -4,7 +4,7 @@ docute.init({
   repo: 'oeway/imjoy',
   twitter: 'weioyang',
   'edit-link': 'https://github.com/oeway/ImJoy/blob/master/docs/docs',
-  tocVisibleDepth: 3,
+  tocVisibleDepth: 4,
   nav: [
     // homepage
     {title: 'ImJoy.IO', path: 'https://imjoy.io'},
