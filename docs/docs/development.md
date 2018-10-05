@@ -1,6 +1,6 @@
 # Developing Plugins for ImJoy
 
-<img src="https://github.com/oeway/ImJoy/raw/master/docs/img/imjoy-code-screenshot.png" width="600px"></img>
+<img src="./asserts/imjoy-code-screenshot.png" width="600px"></img>
 
 Developing plugins for ImJoy is easy and fast with the built-in code editor which runs directly in the web app, no additional IDE or compiler is needed for development.
 
@@ -19,8 +19,16 @@ The following list illustrates key features of the plugin system in ImJoy:
 
 ## Getting started
 
+There are three types of plugins available for different purposes:
+ 1) `window` plugin for building rich and interactive user interface using HTML5/CSS and Javascrit;
+ 2) `webworker` plugin for performing computational tasks using JavaScript or WebAssembly;
+ 3) `pyworker` plugin for performing heavy-duty computational tasks using Python and its libraries.
+
+<img src="./asserts/imjoy-plugin-development.png" width="800px"></img>
+
 Click the **+ PLUGINS** button in `Plugins`, then select `Create a New Plugin` with one of the plugin templates. A code editor will open in the workspace, where you can write the code, save it, or install the plugin to the plugin menu. You can then test your plugin by clicking on
 the plugin name in the Plugins list.
+
 
 ## Plugin file format
 The ImJoy plugin file format is built up on html format with customized tags (inspired by the `.vue` format). it consists of two mandatory tags `<config>` and `<script>`, and other optional tags including `<docs>`, `<window>`,`<attachment>`,`<link>` and `<style>`.  For `<style>`, you can also use  multiple `src` tags.

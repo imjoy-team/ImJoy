@@ -5,6 +5,12 @@ computational tasks in a robust, secure and easy-to-use environment. The entire 
 
 <img src="./asserts/imjoy-screenshot.png" width="600px"></img>
 
+Imjoy consists of **two parts**:
+1. the **user interface**
+2. the **computational backend**
+
+<img src="./asserts/imjoy-overview.png" width="800px"></img>
+
 ## ImJoy key features
  * Rich and interactive user interface powered by web technology
  * Powerful computational backend powered by Python ecosystem
@@ -13,7 +19,7 @@ computational tasks in a robust, secure and easy-to-use environment. The entire 
  * Self-contained plugin development
  * Easy plugin deployment and sharing through Github or Gist
 
-<img src="./asserts/imjoy-overview.png" width="800px"></img>
+
 
 ## Source code
 
