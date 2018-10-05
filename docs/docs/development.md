@@ -2,6 +2,24 @@
 
 <img src="https://github.com/oeway/ImJoy/raw/master/docs/img/imjoy-code-screenshot.png" width="600px"></img>
 
+Develop plugins for ImJoy is easy and fast with the built-in code editor which runs directly in the web app, no additional IDE or compiler is needed for development.
+
+This list illustrate key features of the plugin development in ImJoy:
+ * Extendable plugin interface
+   - Support Python and Javascript
+   - Javascript plugins are isolated with secured sandboxes
+   - Python plugins run in their own process
+   - Support `async/await` syntax for Python3 and Javascript
+   - Support virtual environments and pip packages for Python
+   - Support libraries hosted on Github or CDNs for javascript
+   - Deploying your own plugin with Github
+ * Native support for n-dimentional arrays and tensors
+   - Support ndarrays from Numpy or Numjs for data exchange
+   - Support Tensorflow.js and native Tensorflow for deep learning
+ * Rendering muti-dimentional data in 3D with webGL, Three.js etc.
+
+## Getting started
+
 Click the **+ PLUGINS** button in `Plugins`, then select `Create a New Plugin` with one of the plugin templates. A code editor will open in the workspace, where you can write the code, save it, or install the plugin to the plugin menu. You can then test your plugin by clicking on
 the plugin name in the Plugins list.
 
