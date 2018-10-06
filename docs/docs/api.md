@@ -49,7 +49,9 @@ class PyPlugin():
 
 Don't forget to `import asyncio` if you use `async/await` with Python 3.
  
-Notice that, for Javascript and Python 3+, both syntax are available, however, for Python 2, `asyncio` is not supported, therefore you need to use another style called `callback` style. 
+For Javascript and Python 3+, `async/await` style is natively supported and recommended.
+
+However, for Python 2, `asyncio` is not supported, therefore you need to use another style called `callback` style. 
 
 ### `callback` style
 
