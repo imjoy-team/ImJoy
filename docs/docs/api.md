@@ -100,6 +100,10 @@ class PyPlugin():
         print(result)
 ```
 
+`callback` style can be used for Javascript, Python 2 and Python 3.
+
+In the following list of API functions, we provided examples with both styles, if not, you can easily convert between them. Notice also you cannot use both style at the same API function.
+
 ### Input arguments
 When calling the API functions, most functions take an object (Javascript) or dictionaries/named arguments (Python) as its first argument. The following function call will work in both JavaScript and Python:
 ```javascript
