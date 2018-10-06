@@ -5,6 +5,7 @@ docute.init({
   twitter: 'weioyang',
   'edit-link': 'https://github.com/oeway/ImJoy/blob/master/docs/docs',
   tocVisibleDepth: 4,
+  home: 'overview.md',
   nav: [
     // homepage
     {title: 'ImJoy.IO', path: 'https://imjoy.io'},
