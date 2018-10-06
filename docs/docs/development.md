@@ -82,9 +82,9 @@ Here is an outline of the plugin file:
 }
 ```
 * `name` is the name of the plugin. It **must** be unique to avoid conflicts with other plugins.
-* `mode` is the plugin type. Currently supported are:
+* `mode` is the plugin type or execution mode. Currently supported are:
+  * `window` is used for create a new web interface with HTML/CSS and Javascript. If `window` mode is selected, then you need to provide HTML code with the `<window>` tag and CSS code with the `style` tag. Notice that this type of plugin runs in the same thread as the main web page, it may hang the entire web app when running heavy computation. A better choice for computational tasks is `webworker` plugin. However, some WebGL powered libraries including `tensorflow.js` do not support (yet) `webworker` mode, in that case, another mode called `iframe` can be used. `iframe` mode is the same as `window` mode except it does not need an interface, it is especially useful for plugins which needs to access GPU through WebGL.
   * `webworker` to run computationally intensive javascript plugins. It does not have an interface, it runs in a new thread and won't hang the main thread during running.
-  * `iframe` is used for create a new web interface with HTML/CSS and Javascript. It runs in the same thread as the main webpage. If `iframe` mode is selected, then you need to provide HTML code with the `<window>` tag and CSS code with the `style` tag.
   * `pyworker` is used to run plugins written in Python. This requires that the **Python Plugin Engine** is installed and started before using the plugin. See the **Developing Python Plugins** for more details.
 * `tags` defines a list of supported tags, which can be used to provide differentiate configureable modes and can be accessed at various points in the plugin. For an overview we
 we refer to the dedicate description **## Plugins and tags**
