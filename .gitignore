@@ -4,4 +4,5 @@ __pycache__
 mode_modules
 /docs/*
 !/docs/docs
+docs/.DS_Store
 __websocket_relay__.js

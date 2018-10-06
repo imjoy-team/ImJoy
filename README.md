@@ -1,7 +1,7 @@
 # ImJoy
 ## Image processing with joy :)
 
-<img src="https://github.com/oeway/ImJoy/raw/master/docs/img/imjoy-screenshot.png" width="600px"></img>
+<img src="https://github.com/oeway/ImJoy/raw/master/docs/docs/asserts/imjoy-screenshot.png" width="600px"></img>
 
 Currently, ImJoy consists of three repositories:
  * [the ImJoy web application](https://github.com/oeway/ImJoy/) (this repository)
