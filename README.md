@@ -8,6 +8,8 @@ Currently, ImJoy consists of three repositories:
  * [the ImJoy plugin engine](https://github.com/oeway/ImJoy-Python)
  * [the ImJoy plugin repository](https://github.com/oeway/ImJoy-Plugins)
 
+[ImJoy Docs](https://imjoy.io/docs/index.html#/overview)
+
 ## Key Features of ImJoy
  * Serverless solution with offline-first design
  * Easy-to-use workflow composition
