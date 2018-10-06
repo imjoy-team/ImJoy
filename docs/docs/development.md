@@ -280,7 +280,7 @@ Besides the `Plugin API` functions, when a plugin is executed, you can return an
 
 ## ImJoy API functions
 
-For the list of the API functions their usage, we refer to the [ ImJoy API functions](/api).
+For interacting with the main ImJoy user interface and other plugins, the plugin needs to call ImJoy API functions. For the list of the API functions their usage, we refer to the [ ImJoy API functions](/api).
 
 
 ## Developing Window Plugin
