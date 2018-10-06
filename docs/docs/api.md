@@ -7,11 +7,13 @@ shows an alert dialog with a message, example: `api.alert('hello world')`
 Register a new operation (**op**) to perform a specific task. An op can have its own `ui`.
 
 ```javascript
-    api.register({name: "LUT", ui: "apply LUT {id:'lut', type:'choose', options:['hot', 'rainbow'], placeholder: 'hot'}"})
+    api.register({name: "LUT", ui: [ {"apply LUT": {id:'lut', type:'choose', options:['hot', 'rainbow'], placeholder: 'hot'}}
+                                   ]
+    })
 ```
 
 ```python
-    api.register(name="LUT", ui="apply LUT {id:'lut', type:'choose', options:['hot', 'rainbow'], placeholder: 'hot'}")
+    api.register(name="LUT", ui=[ {"apply LUT": {id:'lut', type:'choose', options:['hot', 'rainbow'], placeholder: 'hot'} } ])
 ```
 
 The following version works for both Javascript and Python:
