@@ -15,7 +15,7 @@ By design, ImJoy itself provides very minimal task specific functionality, it pr
 
 <img src="./asserts/imjoy-overview.png" width="800px"></img>
 
-## ImJoy key features
+## Key features
  * Minimal and flexible design
  * Rich and interactive user interface powered by web technology
  * Powerful computational backend powered by Python ecosystem
@@ -27,14 +27,14 @@ By design, ImJoy itself provides very minimal task specific functionality, it pr
 
 
 
-# Source code
+## Source code
 
 Currently, ImJoy source code consists of three repositories:
  * [web application](https://github.com/oeway/ImJoy/)
  * [plugin engine](https://github.com/oeway/ImJoy-Python)
  * [plugin repository](https://github.com/oeway/ImJoy-Plugins)
 
-# Acknowledgements
+## Acknowledgements
 
 This is a non-exhaustive list of the open-source tools and libraries we used in ImJoy:
  * [Vue.js](https://vuejs.org/)
@@ -44,7 +44,7 @@ This is a non-exhaustive list of the open-source tools and libraries we used in 
 
 We thank all the authors for offering these excellent work to the open-source community.
 
-# License
+## License
 
 [MIT License](https://github.com/oeway/ImJoy/blob/master/LICENSE)
 
