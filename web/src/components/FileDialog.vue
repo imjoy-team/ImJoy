@@ -1,6 +1,6 @@
 <template>
   <div class="file-dialog">
-  <md-dialog :md-active.sync="show_" :md-click-outside-to-close="false">
+  <md-dialog :md-active.sync="show_" :md-click-outside-to-close="false" :md-close-on-esc="false">
     <md-dialog-title>{{this.options.title || 'ImJoy File Dialog'}}</md-dialog-title>
     <md-dialog-content>
       <ul v-if="file_tree">

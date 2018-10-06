@@ -261,7 +261,7 @@
   <md-dialog-confirm :md-active.sync="showRemoveConfirmation" md-title="Removing Plugin" md-content="Do you really want to <strong>delete</strong> this plugin" md-confirm-text="Yes" md-cancel-text="Cancel" @md-cancel="showRemoveConfirmation=false" @md-confirm="removePlugin(_plugin2_remove);_plugin2_remove=null;showRemoveConfirmation=false"/>
   <!-- </md-card-content> -->
   <file-dialog ref="file-dialog" :list-files="listEngineDir" :get-file-url="getFileUrl"></file-dialog>
-  <md-dialog :md-active.sync="showPluginDialog" :md-click-outside-to-close="true">
+  <md-dialog :md-active.sync="showPluginDialog" :md-click-outside-to-close="false" :md-close-on-esc="false">
     <md-dialog-content>
       <div v-if="plugin_dialog_config">
         <joy :config="plugin_dialog_config" :showHeader="false" :controlButtons="false" ref="plugin_dialog_joy"></joy>
@@ -324,7 +324,7 @@
       :md-content="share_url_message"
       md-confirm-text="Close" />
 
-  <md-dialog :md-active.sync="showPluginEngineInfo" :md-click-outside-to-close="false">
+  <md-dialog :md-active.sync="showPluginEngineInfo" :md-click-outside-to-close="false" :md-close-on-esc="false">
     <md-dialog-title>Using the Python Plugin Engine</md-dialog-title>
     <md-dialog-content>
         <p>
@@ -361,7 +361,7 @@
     </md-dialog-actions>
   </md-dialog>
 
-  <md-dialog :md-active.sync="showSettingsDialog" :md-click-outside-to-close="false">
+  <md-dialog :md-active.sync="showSettingsDialog" :md-click-outside-to-close="false" :md-close-on-esc="false">
     <md-dialog-title>Settings</md-dialog-title>
     <md-dialog-content>
       <md-divider></md-divider>
