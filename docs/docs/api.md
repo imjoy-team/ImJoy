@@ -116,7 +116,7 @@ api.XXXXX(option1=3, option2='hi')
 shows an alert dialog with a message, example: `api.alert('hello world')`
 
 ## `api.register(...)`
-Register a new operation (**op**) to perform a specific task. An op can have its own `ui`.
+Register a new operation (**op**) to perform a specific task. An op can have its own `ui` which defined with the same rule as the `ui` field in `<config>` -- `ui` can be defined as a single (long) string, an array of strings, or an array of objects for JavaScript (a list of dict for Python). See the `development` page for the examples of different `ui` definition.
 
 ```javascript
     api.register({name: "LUT", ui: [ {"apply LUT": {id:'lut', type:'choose', options:['hot', 'rainbow'], placeholder: 'hot'}}
