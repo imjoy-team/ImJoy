@@ -5,11 +5,10 @@ docute.init({
   twitter: 'weioyang',
   'edit-link': 'https://github.com/oeway/ImJoy/blob/master/docs/docs',
   tocVisibleDepth: 4,
-  home: 'overview.md',
   nav: [
     // homepage
     {title: 'ImJoy.IO', path: 'https://imjoy.io'},
-    {title: 'Overview', path: '/overview', source: 'README.md'},
+    {title: 'Overview', path: '/overview', source: 'overview.md'},
     {title: 'Getting Started', path: '/getting-started', source: 'getting_started.md'},
     {title: 'Architecture', path: '/architecture', source: 'architecture.md'},
     {title: 'Development', path: '/development', source: 'development.md'},

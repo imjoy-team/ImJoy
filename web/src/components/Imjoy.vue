@@ -36,7 +36,7 @@
         <md-button @click="showSettingsDialog=true" class="md-icon-button">
           <md-icon>settings</md-icon>
         </md-button>
-        <md-button class="md-icon-button" href="/docs/index.html" target="_blank">
+        <md-button class="md-icon-button" href="/docs/index.html#/overview" target="_blank">
           <md-icon>help</md-icon>
           <!-- <md-tooltip>Open help information.</md-tooltip> -->
         </md-button>
