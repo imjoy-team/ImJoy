@@ -169,6 +169,8 @@ defined in `<config>`, just set the plugin name as the op name.
 ## `api.createWindow(...)`
 create a new window and add it to the workspace.
 
+`callback` style for Javascript and Python 2/3
+
 ```javascript
 const window_callback = (windowId)=>{
   //use `windowId` here to access the window
@@ -184,6 +186,19 @@ def window_callback(windowId):
 api.createWindow({name: 'new window', type: 'Image Window', w:7, h:7, data: {image: ...}, config: {}}).then(window_callback)
 ```
 
+`async/await` style for Javascript and Python 3+
+
+```javascript
+// remember to add async to the function before using await
+const windowId = await api.createWindow({name: 'new window', type: 'Image Window', w:7, h:7, data: {image: ...}, config: {}})
+console.log(windowId)
+```
+```python
+// remember to add async to the function before using await
+windowId = await api.createWindow({name: 'new window', type: 'Image Window', w:7, h:7, data: {image: ...}, config: {}})
+print(windowId)
+```
+
 If you do not want the window to load immediately, you can add `click2load: true` and the window will ask for an extra click to load the content.
 
 Once an window is created, it will return a window ID, which can be used for updating the window with `api.updateWindow`.
@@ -196,7 +211,11 @@ api.updateWindow({id: windowId, data: {image: ...}})
 ```
 
 ```python
+# pass as a dictionary
 api.updateWindow({'id': windowId, 'data': {'image': ...}})
+
+# or named arguments
+api.updateWindow(id=windowId, data={'image': ...})
 ```
 
 The second parameter is an object contains fields which the plugin wants to update.
