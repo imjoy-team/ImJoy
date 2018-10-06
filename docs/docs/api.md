@@ -194,8 +194,8 @@ const windowId = await api.createWindow({name: 'new window', type: 'Image Window
 console.log(windowId)
 ```
 ```python
-// remember to add async to the function before using await
-windowId = await api.createWindow({name: 'new window', type: 'Image Window', w:7, h:7, data: {image: ...}, config: {}})
+# remember to add async to the function before using await
+windowId = await api.createWindow(name='new window', type='Image Window', w=7, h=7, data={image: ...}, config={})
 print(windowId)
 ```
 
