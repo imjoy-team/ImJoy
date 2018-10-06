@@ -8,7 +8,7 @@ docute.init({
   nav: [
     // homepage
     {title: 'ImJoy.IO', path: 'https://imjoy.io'},
-    {title: 'Overview', path: '/', source: 'overview.md'},
+    {title: 'Overview', path: '/overview', source: 'README.md'},
     {title: 'Getting Started', path: '/getting-started', source: 'getting_started.md'},
     {title: 'Architecture', path: '/architecture', source: 'architecture.md'},
     {title: 'Development', path: '/development', source: 'development.md'},
