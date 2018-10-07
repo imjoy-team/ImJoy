@@ -39,7 +39,7 @@ Currently, ImJoy source code consists of three repositories:
 This is a non-exhaustive list of the open-source tools and libraries we used in ImJoy:
  * [Vue.js](https://vuejs.org/)
  * [Jailed](https://github.com/asvd/jailed)
- * [Joy.js](https://github.com/ncase/joy)
+ * [Joy.js](https://github.com/ncase/joy)(This is where the name `ImJoy` comes from!)
  * [conda](https://conda.io/)
  * [python-socketio](https://github.com/miguelgrinberg/python-socketio)
 
