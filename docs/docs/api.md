@@ -1,6 +1,8 @@
 # ImJoy API
 
-Every plugin is running in its webworker(JS), iframe(JS) or process(Python), the interaction with the main ImJoy app, or another plugins are carried out with a set of functions called `ImJoy API`. During runtime, all the plugin can access a special object called `api`, which exposes a set of internal functions to the plugin.
+Every plugin is running in its own sandbox-like container (webworker or iframe for JS, process for Python) to avoid interfering each other and make the ImJoy more secured, the interaction with the main ImJoy app or between plugins are carried out through a set of API functions (`ImJoy API`). During runtime, all the plugins have access to a special object called `api`, which exposes a set of internal functions to the plugin. 
+
+To make the interaction more efficient, we chose a modern programing pattern called "asynchronous programming" for these API functions.
 
 ## Asynchronous programming
 
