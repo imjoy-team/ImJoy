@@ -4,8 +4,8 @@ Every plugin is running in its webworker(JS), iframe(JS) or process(Python), the
 
 ## Asynchronous programming
 
-All ImJoy API functions are asynchronous. This means when a `ImJoy API` function
-is executed, ImJoy will not block the execution ultil the function return the result, in stead, it will return a object called `Promise`, then you can decide to wait for the result or set a callback function. 
+All ImJoy API functions are asynchronous. This means when an `ImJoy API` function
+is called, ImJoy will not block the execution, instead, it will return a object called `Promise` immediately, then you can decide to wait for the actual result or set a callback function to retrieve the result. 
 
 For example, if you popup a dialog to ask for user input, in many programinig languages (synchronous programing), the code exectuion will be blocked until the user close the dialog. However an asynchronous program will return the `promise` object even if the user haven't close the dialog. 
 
