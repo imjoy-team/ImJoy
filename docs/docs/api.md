@@ -51,6 +51,8 @@ class PyPlugin():
             print(e)
  ```
 
+Notice that you can **only** use `wait` when you add `async` before the definition of your function.
+
 Don't forget to `import asyncio` if you use `async/await` with Python 3.
  
 For Javascript and Python 3+, `async/await` style is natively supported and recommended.
@@ -104,7 +106,12 @@ class PyPlugin():
 
 `callback` style can be used for Javascript, Python 2 and Python 3.
 
-In the following list of API functions, we provided examples with both styles, if not, you can easily convert between them. Notice also you cannot use both style at the same API function.
+In the following list of API functions, we provided examples in `async` style. For Python 2, you can easily convert to callback style accordingly.
+
+
+While you can use `try catch` or `try except` syntax to capture error with `async/await` style, you cannot use them to capture error if you use `callback` style.
+
+Notice also you **cannot** use both style at the same time.
 
 For more information about Asynchronous programming, we refer to [Introduction to Promise in JS](https://developers.google.com/web/fundamentals/primers/promises), [Async functions for JS](https://developers.google.com/web/fundamentals/primers/async-functions), [Asynchronous I/O module for Python 3+](https://docs.python.org/3/library/asyncio.html).
 
@@ -112,12 +119,12 @@ For more information about Asynchronous programming, we refer to [Introduction t
 When calling the API functions, most functions take an object (Javascript) or dictionaries/named arguments (Python) as its first argument. The following function call will work in both JavaScript and Python:
 ```javascript
 //# works for JavaScript and Python
-api.XXXXX({"option1": 3, "option2": 'hi'})
+await api.XXXXX({"option1": 3, "option2": 'hi'})
 ```
 
 ```python
 # only for Python
-api.XXXXX(option1=3, option2='hi')
+await api.XXXXX(option1=3, option2='hi')
 ```
 
 ## `api.alert(...)`
@@ -172,24 +179,6 @@ defined in `<config>`, just set the plugin name as the op name.
 
 ## `api.createWindow(...)`
 create a new window and add it to the workspace.
-
-`callback` style for Javascript and Python 2/3
-
-```javascript
-const window_callback = (windowId)=>{
-  //use `windowId` here to access the window
-  console.log(windowId)
-}
-api.createWindow({name: 'new window', type: 'Image Window', w:7, h:7, data: {image: ...}, config: {}}).then(window_callback)
-```
-
-```python
-def window_callback(windowId):
-  # use `windowId` here to access the window
-  print(windowId)
-api.createWindow({name: 'new window', type: 'Image Window', w:7, h:7, data: {image: ...}, config: {}}).then(window_callback)
-```
-
 `async/await` style for Javascript and Python 3+
 
 ```javascript
@@ -201,6 +190,13 @@ console.log(windowId)
 # remember to add async to the function before using await
 windowId = await api.createWindow(name='new window', type='Image Window', w=7, h=7, data={image: ...}, config={})
 print(windowId)
+```
+
+`callback` style for Python 2 (also works for Javascript and Python 3)
+```python
+def window_callback(windowId):
+  print(windowId)
+api.createWindow({name: 'new window', type: 'Image Window', w:7, h:7, data: {image: ...}, config: {}}).then(window_callback)
 ```
 
 If you do not want the window to load immediately, you can add `click2load: true` and the window will ask for an extra click to load the content.
@@ -228,11 +224,9 @@ The second parameter is an object contains fields which the plugin wants to upda
 show a dialog with customized GUI, example:
 
 ```javascript
-   api.showDialog({
+   const result = await api.showDialog({
       "name": "This is a dialog",
       "ui": "Hey, please select a value for sigma: {id:'sigma', type:'choose', options:['1', '3'], placeholder: '1'}.",
-   }).then((result)=>{
-
    })
 ```
 ## `api.showProgress(...)`
@@ -261,19 +255,33 @@ show a file dialog to select files or directories. It accept the following optio
 Since the file handling is different in the browser environment and Python, this api have different behavior when called from different types of plugin. In Javascrpt and Python, an Imjoy file dialog will be displayed, it will only return a promise from which  you can get the file path string.
 
 ```javascript
-api.showFileDialog().then((file)=>{
-  console.log(file)
-})
+const file_path = await api.showFileDialog()
+console.log(file_path)
 ```
 
 ```python
-def print_path(path):
-  print(path)
-api.showFileDialog().then(print_path)
+path = await api.showFileDialog()
+print(path)
 ```
 
 ## `api.run(...)`
-run another plugin by specifying its name, e.g. `api.run("Python Demo Plugin")` or `api.run("Python Demo Plugin", my)`
+run another plugin by specifying its name, e.g. `await api.run("Python Demo Plugin")` or `await api.run("Python Demo Plugin", my)`
+
+You can also run multiple plugins concurrently:
+```python
+p1 = api.run("name of plugin 1")
+p2 = api.run("name of plugin 2")
+
+result1 = await p1
+result2 = await p2
+```
+The above code will start two plugins simutaneously, then wait for their result one after another.
+
+This is different from the following sequential version, where plugin 2 can only start after plugin 1 is finished:
+```python
+result1 = await api.run("name of plugin 1")
+result2 = await api.run("name of plugin 2")
+```
 
 ## `api.utils.XXXX(...)`
 For Javascript plugins, currently supported functions are:
@@ -307,14 +315,13 @@ Current implementation uses `localStorage` to store settings. Depends on differe
 
 ## `api.getConfig(...)`
 Retrieve configurations set by `api.setConfig(...)`. For example in JavaScript you can use `const sigma = await api.getConfig('sigma')` to access previously stored settings named `sigma`.
-Notice that `await` is needed because the api function is asynchronous. Alternatively, you can use `Promise` to access it: ` api.getConfig('sigma').then((sigma)=>{ console.log(sigma) })`.
+
+Alternatively, you can use `Promise` to access it: ` api.getConfig('sigma').then((sigma)=>{ console.log(sigma) })`.
 
 Similarly, for Python, you will need to use callback function to access the result:
 ```python
-def print_sigma(result):
-    print(result)
-
-api.getConfig('sigma').then(print_sigma)
+sigma = await api.getConfig('sigma')
+print(sigma)
 ```
 
 ## `api.getAttachment(...)`
@@ -328,17 +335,13 @@ To get the content in JavaScript or Python, you can use `api.getAttachment("att_
 
 ```JavaScript
 // JavaScript
-api.getAttachment("att_name").then((content)=>{
-  console.log(content)
-})
+const content = await api.getAttachment("att_name")
 ```
 
 ```python
-def callback(content):
-    print(content)
-
-api.getAttachment("att_name").then(callback)
+content = await api.getAttachment("att_name").then(callback)
 ```
+
 ## `api.TAG` constant
 The current tag choosen by the user during installation.
 
