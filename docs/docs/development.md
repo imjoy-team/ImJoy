@@ -279,7 +279,7 @@ api.export(UntitledPythonPlugin())
 
 
 ## Callback functions
-Besides the `Plugin API` functions, when a plugin is executed, you can return an object which includes functions which will be called by other plugins or ImJoy. However, if the function has never been exported as a `Plugin API` before, it will be treated a `callback` function and can be only called once. Otherwise, if the function has been exported as `Plugin API`, it won't be treated as `callback` function and can be called repeatly.
+Besides the `Plugin API` functions, when a plugin is executed, you can return an object which includes functions which will be called by other plugins or ImJoy. However, if the function has never been exported as a `Plugin API` before, it will be treated as a `callback` function and can be only called once. Otherwise, if the function has been exported as `Plugin API`, it won't be treated as `callback` function and can be called repeatly.
 
 ## ImJoy API functions
 
@@ -287,9 +287,10 @@ For interacting with the main ImJoy user interface and other plugins, the plugin
 
 
 ## Developing Window Plugin
-Window plugin is a special type of plugins running in `iframe` mode, and it will show up as a window. `<window>` and `<style>` can be used to define the actual content of the window.
 
-In order to make a `window` plugin, you need to set `mode` as `window` in the `<config>` block.
+To develop a window plugin, choose the `+ Window(Javasript and HTML)` plugin template when creating a new plugin in the ImJoy app. The key difference is the `mode` field in the `<config>` block which has been set to `window`.
+
+Window plugin is a special type of plugins running in `iframe` mode, and it will show up as a window. `<window>` and `<style>` can be used to define the actual content of the window.
 
 Different from other plugins which will be loaded and intialized when ImJoy is started, a `window` plugin will not be loaded until the actuall plugin is created with `api.createWindow` or clicked by a user in the menu. During execution of `api.createWindow`, `setup` and `run` will be called for the first time, and return with an window ID. After that, if needed, another plugin can call `api.updateWindow` with the window ID, ImJoy will try to execute the `run` function with the new data again.
 
@@ -298,7 +299,15 @@ If the `run` returned with an object, then it will be used to update the window 
 
 ## Developing Webworker Plugin
 
+To develop a window plugin, choose the `+ Webworker(Javascript)` plugin template when creating a new plugin in the ImJoy app. The key difference is the `mode` field in the `<config>` block which has been set to `webworker`.
+
+Webworker plugin is used to do computation tasks in another thread, using a new element called ["web worker"](https://en.wikipedia.org/wiki/Web_worker). It is basically a way for Javascript to achieve multi-threading. 
+
+Since it's designed for perfoming computational tasks, it does not have access to html dom but you can use `ImJoy API` to interact with the graphical interface of ImJoy or other plugin which can trigger changes on the user interface.
+
 ## Developing Python Plugins
+
+To develop a window plugin, choose the `+ PyWorker(Python)` plugin template when creating a new plugin in the ImJoy app.  The key difference is the `mode` field in the `<config>` block which has been set to `pyworker`. 
 
 Here is a python `hello world` example:
 ```html
@@ -336,6 +345,8 @@ api.export(PythonPlugin())
 </script>
 
 ```
+
+Similary to `webworker` plugin, python plugins do not have access to the html dom, but you can use `ImJoy API` to interact with the graphical interface of ImJoy or other plugin which can trigger changes on the user interface.
 
 ### Data exchange
 
