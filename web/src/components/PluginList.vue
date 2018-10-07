@@ -434,10 +434,10 @@ export default {
       if(this.installPlugin){
         const p = this.installPlugin(pconfig, t)
         if(p){
-          p.then(()=>{
-            this.$forceUpdate()
-          }).catch((e)=>{
+          p.catch((e)=>{
             this.$emit('message', e)
+          }).finally(()=>{
+            this.$forceUpdate()
           })
         }
       }
@@ -447,10 +447,10 @@ export default {
       if(this.removePlugin){
         const p = this.removePlugin(pconfig)
         if(p){
-          p.then(()=>{
-            this.$forceUpdate()
-          }).catch((e)=>{
+          p.catch((e)=>{
             this.$emit('message', e)
+          }).finally(()=>{
+            this.$forceUpdate()
           })
         }
       }
