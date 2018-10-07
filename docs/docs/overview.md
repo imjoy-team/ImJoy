@@ -17,14 +17,14 @@ By design, ImJoy itself provides very minimal task specific functionality, it pr
 
 ## Key features
  * Minimal and flexible design
- * Rich and interactive user interface powered by web technology
- * Powerful computational backend powered by Python ecosystem
+ * Rich and interactive user interface powered by web technologies
+ * Powerful computational backend powered by the Python ecosystem
  * Easy-to-use workflow composition
- * Isolated workspaces for different tasks 
+ * Isolated workspaces for grouping plugins 
  * Extendable plugin interface supports Python and Javascript
+ * Concurrent plugin execution through asynchronous programming
  * Self-contained plugin development
  * Easy plugin deployment and sharing through Github or Gist
-
 
 
 ## Source code
@@ -37,11 +37,11 @@ Currently, ImJoy source code consists of three repositories:
 ## Acknowledgements
 
 This is a non-exhaustive list of the open-source tools and libraries we used in ImJoy:
- * [Vue.js](https://vuejs.org/)
- * [Jailed](https://github.com/asvd/jailed)
- * [Joy.js](https://github.com/ncase/joy)
- * [conda](https://conda.io/)
- * [python-socketio](https://github.com/miguelgrinberg/python-socketio)
+ * [Joy.js](https://github.com/ncase/joy) (This is where the name `ImJoy` comes from!)
+ * [Jailed](https://github.com/asvd/jailed) (This helps ImJoy to isolate plugins)
+ * [Vue.js](https://vuejs.org/) (The main ImJoy App is written in Vue.js)
+ * [conda](https://conda.io/) (The plugin engine uses Conda for managing virtual env. and pacakges)
+ * [python-socketio](https://github.com/miguelgrinberg/python-socketio) (This how the plugin engine talk with the ImJoy app)
 
 We thank all the authors for offering these excellent work to the open-source community.
 
