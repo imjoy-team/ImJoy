@@ -10,9 +10,9 @@ docute.init({
     {title: 'ImJoy.IO', path: 'https://imjoy.io'},
     {title: 'Overview', path: '/overview', source: 'overview.md'},
     {title: 'Getting Started', path: '/getting-started', source: 'getting_started.md'},
-    {title: 'Architecture', path: '/architecture', source: 'architecture.md'},
+    {title: 'User Manual', path: '/user-manual', source: 'user_manual.md'},
     {title: 'Development', path: '/development', source: 'development.md'},
-    {title: 'API', path: '/api', source: 'api.md'},
+    {title: 'ImJoy API', path: '/api', source: 'api.md'},
     {title: 'Tutorial', path: '/tutorial', source: 'tutorial.md'},
     // {
     //   title: 'getting started',
