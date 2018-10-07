@@ -267,7 +267,7 @@ print(path)
 ## `api.run(...)`
 run another plugin by specifying its name, e.g. `await api.run("Python Demo Plugin")` or `await api.run("Python Demo Plugin", my)`
 
-You can also run multiple plugins concurrently:
+You can also run multiple plugins concurrently (Python example):
 ```python
 p1 = api.run("name of plugin 1")
 p2 = api.run("name of plugin 2")
@@ -277,11 +277,28 @@ result2 = await p2
 ```
 The above code will start two plugins almost simutaneously, then wait for the result one after another.
 
+Or even better, you can await two tasks simutaneously with `asyncio.gather` by using the following code:
+
+```python
+p1 = api.run("name of plugin 1")
+p2 = api.run("name of plugin 2")
+result1, result2 = await asyncio.gather(p1, p2)
+```
+
+Similary for Javascript, you can do:
+```
+const p1 = api.run("name of plugin 1")
+const p2 = api.run("name of plugin 2")
+const [result1, result2] = [await p1, await p2]
+```
+
 This is different from the following sequential version, where plugin 2 can only start after plugin 1 is finished:
 ```python
 result1 = await api.run("name of plugin 1")
 result2 = await api.run("name of plugin 2")
 ```
+
+
 
 ## `api.utils.XXXX(...)`
 For Javascript plugins, currently supported functions are:
