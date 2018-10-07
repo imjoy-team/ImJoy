@@ -8,7 +8,7 @@ The following list illustrates key features of the plugin system in ImJoy:
  * Support Python and Javascript
    - Javascript plugins are isolated with secured sandboxes
    - Python plugins run in their own process
-   - Support `async/await` syntax for Python3 and Javascript
+   - Support concurrent API calls using `async/await` syntax
    - Support virtual environments and pip packages for Python
    - Support libraries hosted on Github or CDNs for javascript
  * Native support for n-dimentional arrays and tensors
