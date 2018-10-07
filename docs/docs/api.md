@@ -7,9 +7,9 @@ To make the interaction more efficient and concurrently, we chose a modern progr
 ## Asynchronous programming
 
 All ImJoy API functions are asynchronous. This means when an `ImJoy API` function
-is called, ImJoy will not block the execution, instead, it will return an object called [`Promise`(JS)](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) or [`Future`(Python)](https://docs.python.org/3/library/asyncio-future.html) immediately, then you can decide to wait for the actual result or set a callback function to retrieve the result. 
+is called, ImJoy will not block the execution, instead, it will return an object called [`Promise`(JS)](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) or [`Future`(Python)](https://docs.python.org/3/library/asyncio-future.html) immediately, then you can decide to wait for the actual result or set a callback function to retrieve the result.
 
-For example, if you popup a dialog to ask for user input, in many programinig languages (synchronous programing), the code exectuion will be blocked until the user close the dialog. However an asynchronous program will return the `promise` object even if the user haven't close the dialog. 
+For example, if you popup a dialog to ask for user input, in many programinig languages (synchronous programing), the code exectuion will be blocked until the user close the dialog. However an asynchronous program will return the `promise` object even if the user haven't close the dialog.
 
 Since every API call is asynchronous and non-blocking, a certain plugin can easily call multiple other plugins for performing tasks simultaneously without using thread-like techniques.
 
@@ -54,17 +54,17 @@ class PyPlugin():
 Notice that you can **only** use `wait` when you add `async` before the definition of your function.
 
 Don't forget to `import asyncio` if you use `async/await` with Python 3.
- 
+
 For Javascript and Python 3+, `async/await` style is natively supported and recommended.
 
-However, for Python 2, `asyncio` is not supported, therefore you need to use another style called `callback` style. 
+However, for Python 2, `asyncio` is not supported, therefore you need to use another style called `callback` style.
 
 ### `callback` style
 
 Call the asynchronous function and set its callback with `.then(callback_func)`. For Javascrit plugins, a native Javascrit `Promise` will
  be returned ([More about Promise.](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)). For Python plugins, it will return a simplified Python implement of promise.
- 
- 
+
+
  Below examples for an api name `XXXXX`):
 
 ```javascript
@@ -309,6 +309,10 @@ This is different from the following sequential version, where plugin 2 can only
 result1 = await api.run("name of plugin 1")
 result2 = await api.run("name of plugin 2")
 ```
+
+## `api.call(...)`
+
+call a plugin function defined another plugin by specifying the plugin name, the function name and the arguments, e.g. `await api.call("PluginX", "funcX", 1)` for calling a function called `funcX` defined in the plugin named `PluginX`, the argument `1` will be passed to `funcX`.
 
 ## `api.utils.XXXX(...)`
 For Javascript plugins, currently supported functions are:

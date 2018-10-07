@@ -676,6 +676,7 @@ export default {
       showProgress: this.showProgress,
       showStatus: this.showStatus,
       run: this.runPlugin,
+      call: this.callPlugin,
       showPluginProgress: this.showPluginProgress,
       showPluginStatus: this.showPluginStatus,
       showFileDialog: this.showFileDialog,
@@ -687,6 +688,7 @@ export default {
       getFilePath: this.getFilePath,
       $forceUpdate: this.$forceUpdate,
     }
+
     this.resetPlugins()
     this.pluing_context = {}
     this.plugin_loaded = false
@@ -2062,6 +2064,15 @@ export default {
         this.plugins[plugin.id] = plugin
         this.plugin_names[plugin.name] = plugin
       })
+    },
+    async callPlugin(plugin_name, function_name, args, _plugin) {
+      const target_plugin = this.plugin_names[plugin_name]
+      if(target_plugin){
+        return await target_plugin.api[function_name](args)
+      }
+      else{
+        throw 'plugin with type '+plugin_name+ ' not found.'
+      }
     },
     async runPlugin(plugin_name, my, _plugin) {
       let source_plugin
