@@ -223,12 +223,12 @@ api.export(new UntitledPlugin())
 ```html
 <script lang="python">
 class UntitledPythonPlugin():
-  def setup(self):
-    print('initialized from python.')
+    def setup(self):
+        print('initialized from python.')
 
-  def run(self, my):
-    print('hello world.')
-    return my
+    def run(self, my):
+        print('hello world.')
+        return my
 
 api.export(UntitledPythonPlugin())
 </script>
@@ -334,12 +334,12 @@ Here is a python `hello world` example:
 import numpy as np
 
 class PythonPlugin():
-  def setup(self):
-    pass
+    def setup(self):
+        pass
 
-  def run(self, my):
-    print('hello world.')
-    return my
+    def run(self, my):
+        print('hello world.')
+        return my
 
 api.export(PythonPlugin())
 </script>
