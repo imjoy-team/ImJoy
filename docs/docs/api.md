@@ -275,7 +275,7 @@ p2 = api.run("name of plugin 2")
 result1 = await p1
 result2 = await p2
 ```
-The above code will start two plugins simutaneously, then wait for their result one after another.
+The above code will start two plugins almost simutaneously, then wait for the result one after another.
 
 This is different from the following sequential version, where plugin 2 can only start after plugin 1 is finished:
 ```python
