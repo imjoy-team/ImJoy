@@ -1,10 +1,126 @@
-# API
+# ImJoy API
+
+Every plugin is running in its webworker(JS), iframe(JS) or process(Python), the interaction with the main ImJoy app, or another plugins are carried out with a set of functions called `ImJoy API`. During runtime, all the plugin can access a special object called `api`, which exposes a set of internal functions to the plugin.
+
+## Asynchronous programming
+
+All ImJoy API functions are asynchronous. This means that when a `ImJoy API` function
+is executed, it will not return the result immediately but instead return a object called `promise`. 
+
+For example, if you popup a dialog to ask for user input, a synchronous program will block the execution until the user close the dialog. However an synchronous program will return the `promise` object even if the user haven't close the dialog. 
+
+Since every API call is asynchronous and non-blocking, a certain plugin can easily call multiple other plugins for performing tasks simultaneously without using thread-like techniques.
+
+ImJoy suports two asynchronous programming styles to access these asynchronous functions
+for both Python and JavaScript: `callback` style and `async/await` style.
+
+### `async/await` style
+
+Declare your function with the `async` keyword. Append `await` to the asynchronous function to wait fore the result. This essentially allows a synchronous style programming without the need to sett callbacks. For example:
+ ```javascript
+ // JavaScript
+ class JSPlugin(){
+   async setup(){
+   }
+   async run(my){
+     try{
+       result = await api.XXXXX()
+       console.log(result)
+     }
+     catch(e){
+       console.error(e)
+     }
+   }
+ }
+ ```
+
+ ```python
+import asyncio
+
+class PyPlugin():
+    async def setup(self):
+        pass
+
+    async def run(self, my):
+        try:
+            result = await api.XXXXX()
+            print(result)
+        except Exception as e:
+            print(e)
+ ```
+
+Don't forget to `import asyncio` if you use `async/await` with Python 3.
+ 
+For Javascript and Python 3+, `async/await` style is natively supported and recommended.
+
+However, for Python 2, `asyncio` is not supported, therefore you need to use another style called `callback` style. 
+
+### `callback` style
+
+Call the asynchronous function and set its callback with `.then(callback_func)`. For Javascrit plugins, a native Javascrit `Promise` will
+ be returned ([More about Promise.](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)). For Python plugins, it will return a simplified Python implement of promise.
+ 
+ 
+ Below examples for an api name `XXXXX`):
+
+```javascript
+class JSPlugin(){
+  setup(){
+  }
+  run(my){
+      api.XXXXX().then(this.callback)
+
+      // optionally, you can catch error
+      const error_callback(error){
+        console.error(error)
+      }
+      api.XXXXX().then(this.callback).catch(error_callback)
+  }
+
+  callback(result){
+     console.log(result)
+  }
+}
+```
+
+```python
+class PyPlugin():
+    def setup(self):
+        pass
+
+    def run(self, my):
+        api.XXXXX().then(self.callback)
+
+        # optionally, you can catch an error
+        def error_callback(error):
+            print(error)
+        api.XXXXX().then(self.callback).catch(error_callback)
+
+     def callback(result):
+        print(result)
+```
+
+`callback` style can be used for Javascript, Python 2 and Python 3.
+
+In the following list of API functions, we provided examples with both styles, if not, you can easily convert between them. Notice also you cannot use both style at the same API function.
+
+### Input arguments
+When calling the API functions, most functions take an object (Javascript) or dictionaries/named arguments (Python) as its first argument. The following function call will work in both JavaScript and Python:
+```javascript
+//# works for JavaScript and Python
+api.XXXXX({"option1": 3, "option2": 'hi'})
+```
+
+```python
+# only for Python
+api.XXXXX(option1=3, option2='hi')
+```
 
 ## `api.alert(...)`
 shows an alert dialog with a message, example: `api.alert('hello world')`
 
 ## `api.register(...)`
-Register a new operation (**op**) to perform a specific task. An op can have its own `ui`.
+Register a new operation (**op**) to perform a specific task. An op can have its own `ui` which defined with the same rule as the `ui` field in `<config>` -- `ui` can be defined as a single (long) string, an array of strings, or an array of objects for JavaScript (a list of dict for Python). See the `development` page for the examples of different `ui` definition.
 
 ```javascript
     api.register({name: "LUT", ui: [ {"apply LUT": {id:'lut', type:'choose', options:['hot', 'rainbow'], placeholder: 'hot'}}
@@ -25,7 +141,7 @@ By default, all ops of a plugin will call its `run` function defined in the plug
 You can use `my._op` in the `run` function to differentiate which op was called.
 
 Alternatively, you can define another `Plugin API` function which will be used
-when the op is called with the `run` tag when calling `api.register`. For example, you can add  `"run": this.hello` in a Javascript plugin or `"run": self.hello` in a Python plugin if `hello` is a member function of the plugin class.  **Note:** the function must be a member of the plugin class or being exported (with `api.export`) as a `Plugin API` function. This is because a arbitrary function transfered by ImJoy will be treated as `callback` function, thus only allowed to run once.
+when the op is called with the `run` field when calling `api.register`. For example, you can add  `"run": this.hello` in a Javascript plugin or `"run": self.hello` in a Python plugin if `hello` is a member function of the plugin class.  **Note:** the function must be a member of the plugin class or being exported (with `api.export`) as a `Plugin API` function. This is because a arbitrary function transfered by ImJoy will be treated as `callback` function, thus only allowed to run once.
 
 If you want to run a function whenever any option is changed, you can pass a `update` function. Similar to `run`, you need to pass a function from the member of the plugin class. Here is an example defining `run` and `update` in Python:
 
@@ -53,6 +169,8 @@ defined in `<config>`, just set the plugin name as the op name.
 ## `api.createWindow(...)`
 create a new window and add it to the workspace.
 
+`callback` style for Javascript and Python 2/3
+
 ```javascript
 const window_callback = (windowId)=>{
   //use `windowId` here to access the window
@@ -68,6 +186,19 @@ def window_callback(windowId):
 api.createWindow({name: 'new window', type: 'Image Window', w:7, h:7, data: {image: ...}, config: {}}).then(window_callback)
 ```
 
+`async/await` style for Javascript and Python 3+
+
+```javascript
+// remember to add async to the function before using await
+const windowId = await api.createWindow({name: 'new window', type: 'Image Window', w:7, h:7, data: {image: ...}, config: {}})
+console.log(windowId)
+```
+```python
+# remember to add async to the function before using await
+windowId = await api.createWindow(name='new window', type='Image Window', w=7, h=7, data={image: ...}, config={})
+print(windowId)
+```
+
 If you do not want the window to load immediately, you can add `click2load: true` and the window will ask for an extra click to load the content.
 
 Once an window is created, it will return a window ID, which can be used for updating the window with `api.updateWindow`.
@@ -80,7 +211,11 @@ api.updateWindow({id: windowId, data: {image: ...}})
 ```
 
 ```python
+# pass as a dictionary
 api.updateWindow({'id': windowId, 'data': {'image': ...}})
+
+# or named arguments
+api.updateWindow(id=windowId, data={'image': ...})
 ```
 
 The second parameter is an object contains fields which the plugin wants to update.
@@ -136,7 +271,7 @@ api.showFileDialog().then(print_path)
 ## `api.run(...)`
 run another plugin by specifying its name, e.g. `api.run("Python Demo Plugin")` or `api.run("Python Demo Plugin", my)`
 
-## `api.utils`
+## `api.utils.XXXX(...)`
 For Javascript plugins, currently supported functions are:
 `api.utils.$forceUpdate` for force refreshing the GUI.
 
@@ -146,7 +281,7 @@ For Python Plugins, currently supported functions are:
 `api.utils.ndarray` for wrapping ndarray according to ImJoy ndarray format.
 
 
-## `api.getFileUrl`
+## `api.getFileUrl(...)`
 Used to generate an url to access a local file or directory path. For example: `api.getFileUrl('~/data/output.png')`, will return something like `http://127.0.0.1:8080/file/1ba89354-ae98-457c-a53b-39a4bdd14941?name=output.png`.
 
 When this function is called, a confirmation dialog will be displayed to obtain the user's permission. This means a JavaScript plugin cannot access the user's file system without notifying the user.
@@ -156,7 +291,7 @@ There are two optional parameters `password` and `headers`:
 
  * `headers`: By default, the generated url will be served with the header `Content-disposition: inline; filename="XXXXXXXXX.XXX"` for rendering in the browser. If you want to generate a directly downloadable link, you can pass customized `headers`. For example: `headers={'Content-disposition': 'attachment; filename="XXXXXXXXX.XXX"'}` will give you a direct download link. In order to correctly render the file, you may need to pass a `Content-Type` like this:  `headers={'Content-disposition': 'inline; filename="XXXXXXXXX.XXX"', 'Content-Type': 'image/png'}`. If no header is specified, it will use the standard Python library [mimetypes](https://docs.python.org/3/library/mimetypes.html) to guess a MIME type from the file name, if `mimetypes` failed to guess one, the fallback mime type will be `application/octet-stream`.
 
-## `api.getFilePath`
+## `api.getFilePath(...)`
 This api function convert an url generated by `api.getFileUrl` into an absolute file path on the file system, which can be further accessed by a Python Plugin.
 
 ## `api.setConfig(...)`
@@ -179,7 +314,7 @@ api.getConfig('sigma').then(print_sigma)
 ```
 
 ## `api.getAttachment(...)`
-You can store any text data such as base64 encoded images, code and json in the `<attachment>` tag, for example if you have the following tag in the plugin file:
+You can store any text data such as base64 encoded images, code and json in the `<attachment>` block, for example if you have the following attachment block in the plugin file:
 ```
 <attachment name="att_name">
 </attachment>
