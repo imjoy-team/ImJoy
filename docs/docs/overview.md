@@ -17,14 +17,14 @@ By design, ImJoy itself provides very minimal task specific functionality, it pr
 
 ## Key features
  * Minimal and flexible design
- * Rich and interactive user interface powered by web technology
- * Powerful computational backend powered by Python ecosystem
+ * Rich and interactive user interface powered by web technologies
+ * Powerful computational backend powered by the Python ecosystem
  * Easy-to-use workflow composition
- * Isolated workspaces for different tasks 
+ * Isolated workspaces for grouping plugins 
  * Extendable plugin interface supports Python and Javascript
+ * Concurrent plugin execution through asynchronous programming
  * Self-contained plugin development
  * Easy plugin deployment and sharing through Github or Gist
-
 
 
 ## Source code
