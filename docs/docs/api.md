@@ -141,7 +141,7 @@ By default, all ops of a plugin will call its `run` function defined in the plug
 You can use `my._op` in the `run` function to differentiate which op was called.
 
 Alternatively, you can define another `Plugin API` function which will be used
-when the op is called with the `run` tag when calling `api.register`. For example, you can add  `"run": this.hello` in a Javascript plugin or `"run": self.hello` in a Python plugin if `hello` is a member function of the plugin class.  **Note:** the function must be a member of the plugin class or being exported (with `api.export`) as a `Plugin API` function. This is because a arbitrary function transfered by ImJoy will be treated as `callback` function, thus only allowed to run once.
+when the op is called with the `run` field when calling `api.register`. For example, you can add  `"run": this.hello` in a Javascript plugin or `"run": self.hello` in a Python plugin if `hello` is a member function of the plugin class.  **Note:** the function must be a member of the plugin class or being exported (with `api.export`) as a `Plugin API` function. This is because a arbitrary function transfered by ImJoy will be treated as `callback` function, thus only allowed to run once.
 
 If you want to run a function whenever any option is changed, you can pass a `update` function. Similar to `run`, you need to pass a function from the member of the plugin class. Here is an example defining `run` and `update` in Python:
 
@@ -314,7 +314,7 @@ api.getConfig('sigma').then(print_sigma)
 ```
 
 ## `api.getAttachment(...)`
-You can store any text data such as base64 encoded images, code and json in the `<attachment>` tag, for example if you have the following tag in the plugin file:
+You can store any text data such as base64 encoded images, code and json in the `<attachment>` block, for example if you have the following attachment block in the plugin file:
 ```
 <attachment name="att_name">
 </attachment>
