@@ -1,6 +1,10 @@
 # ImJoy
 ## Image processing with joy :)
 
+ImJoy is a modern image processing framework aims to bridge the web and the Python ecosystem with plugins.
+
+With ImJoy, developing and deploying advanced image processing methods such as deep learning with rich and interactive user interface has never been so easy.
+
 <img src="https://github.com/oeway/ImJoy/raw/master/docs/docs/asserts/imjoy-screenshot.png" width="600px"></img>
 
 Currently, ImJoy consists of three repositories:
@@ -31,3 +35,10 @@ Getting started and documentations for the development: [ImJoy Docs](https://imj
 # Documentation
 
 Please refer to: [ImJoy Docs](https://imjoy.io/docs/index.html#/overview)
+
+# Support ImJoy
+
+Please star the ImJoy repo to support ImJoy.
+
+We would like ImJoy to be a community driven framework, everyone is welcome to contribute your idea, feedback, plugins and other code to the project. We don't have a guidline for that yet, for now please feel free to use the [issues](https://github.com/oeway/ImJoy/issues) and fork the project.
+
