@@ -5,7 +5,7 @@ Every plugin is running in its webworker(JS), iframe(JS) or process(Python), the
 ## Asynchronous programming
 
 All ImJoy API functions are asynchronous. This means when an `ImJoy API` function
-is called, ImJoy will not block the execution, instead, it will return a object called `Promise` immediately, then you can decide to wait for the actual result or set a callback function to retrieve the result. 
+is called, ImJoy will not block the execution, instead, it will return an object called [`Promise`(JS)](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) or [`Future`(Python)](https://docs.python.org/3/library/asyncio-future.html) immediately, then you can decide to wait for the actual result or set a callback function to retrieve the result. 
 
 For example, if you popup a dialog to ask for user input, in many programinig languages (synchronous programing), the code exectuion will be blocked until the user close the dialog. However an asynchronous program will return the `promise` object even if the user haven't close the dialog. 
 
@@ -103,6 +103,8 @@ class PyPlugin():
 `callback` style can be used for Javascript, Python 2 and Python 3.
 
 In the following list of API functions, we provided examples with both styles, if not, you can easily convert between them. Notice also you cannot use both style at the same API function.
+
+For more information about Asynchronous programming, we refer to [Introduction to Promise in JS](https://developers.google.com/web/fundamentals/primers/promises), [Async functions for JS](https://developers.google.com/web/fundamentals/primers/async-functions), [Asynchronous I/O module for Python 3+](https://docs.python.org/3/library/asyncio.html).
 
 ### Input arguments
 When calling the API functions, most functions take an object (Javascript) or dictionaries/named arguments (Python) as its first argument. The following function call will work in both JavaScript and Python:
