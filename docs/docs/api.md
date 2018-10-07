@@ -171,16 +171,16 @@ If you want to run a function whenever any option is changed, you can pass a `up
 ```python
 class PythonPlugin():
   def apply_lut(self, my):
-    ...
+      ...
   def lut_updated(self, my):
-    ...
+      ...
   def setup(self):
-    ...
-    api.register(name="LUT",
-                 ui="apply LUT {id:'lut', type:'choose', options:['hot', 'rainbow'], placeholder: 'hot'}",
-                 run=self.apply_lut,
-                 update=self.lut_updated)
-    ...
+      ...
+      api.register(name="LUT",
+                   ui="apply LUT {id:'lut', type:'choose', options:['hot', 'rainbow'], placeholder: 'hot'}",
+                   run=self.apply_lut,
+                   update=self.lut_updated)
+      ...
 ```
 
 If you want to change your interface dynamically, you can run `api.register`
@@ -207,7 +207,7 @@ print(windowId)
 `callback` style for Python 2 (also works for Javascript and Python 3)
 ```python
 def window_callback(windowId):
-  print(windowId)
+    print(windowId)
 api.createWindow({name: 'new window', type: 'Image Window', w:7, h:7, data: {image: ...}, config: {}}).then(window_callback)
 ```
 
@@ -236,10 +236,10 @@ The second parameter is an object contains fields which the plugin wants to upda
 show a dialog with customized GUI, example:
 
 ```javascript
-   const result = await api.showDialog({
-      "name": "This is a dialog",
-      "ui": "Hey, please select a value for sigma: {id:'sigma', type:'choose', options:['1', '3'], placeholder: '1'}.",
-   })
+const result = await api.showDialog({
+   "name": "This is a dialog",
+   "ui": "Hey, please select a value for sigma: {id:'sigma', type:'choose', options:['1', '3'], placeholder: '1'}.",
+})
 ```
 ## `api.showProgress(...)`
 update the progress bar on the Imjoy GUI, example: `api.showProgress(85)`
@@ -309,8 +309,6 @@ This is different from the following sequential version, where plugin 2 can only
 result1 = await api.run("name of plugin 1")
 result2 = await api.run("name of plugin 2")
 ```
-
-
 
 ## `api.utils.XXXX(...)`
 For Javascript plugins, currently supported functions are:
