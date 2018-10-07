@@ -1,9 +1,9 @@
 # ImJoy
 ## Image processing with joy :)
 
-ImJoy is a modern image processing framework aims to bridge the web and the Python ecosystem.
+ImJoy is a modern image processing framework aims to bridge the web and the Python ecosystem with plugins.
 
-With the ImJoy plugin system, deploying advanced image processing methods such as deep learning with rich and interactive user interface has never been so easy.
+With ImJoy, developing and deploying advanced image processing methods such as deep learning with rich and interactive user interface has never been so easy.
 
 <img src="https://github.com/oeway/ImJoy/raw/master/docs/docs/asserts/imjoy-screenshot.png" width="600px"></img>
 
