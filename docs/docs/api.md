@@ -130,6 +130,44 @@ await api.XXXXX(option1=3, option2='hi')
 ## `api.alert(...)`
 shows an alert dialog with a message, example: `api.alert('hello world')`
 
+## `api.run(...)`
+run another plugin by specifying its name, e.g. `await api.run("Python Demo Plugin")` or `await api.run("Python Demo Plugin", my)`
+
+You can also run multiple plugins concurrently (Python example):
+```python
+p1 = api.run("name of plugin 1")
+p2 = api.run("name of plugin 2")
+
+result1 = await p1
+result2 = await p2
+```
+The above code will start two plugins almost simutaneously, then wait for the result one after another.
+
+Or even better, you can await two tasks simutaneously with `asyncio.gather` by using the following code:
+
+```python
+p1 = api.run("name of plugin 1")
+p2 = api.run("name of plugin 2")
+result1, result2 = await asyncio.gather(p1, p2)
+```
+
+Similary for Javascript, you can do:
+```
+const p1 = api.run("name of plugin 1")
+const p2 = api.run("name of plugin 2")
+const [result1, result2] = [await p1, await p2]
+```
+
+This is different from the following sequential version, where plugin 2 can only start after plugin 1 is finished:
+```python
+result1 = await api.run("name of plugin 1")
+result2 = await api.run("name of plugin 2")
+```
+
+## `api.call(...)`
+
+call a function defined in another plugin by specifying the plugin name, the function name and the arguments. E.g. `await api.call("PluginX", "funcX", 1)` for calling a function called `funcX` defined in the plugin named `PluginX`, the argument `1` will be passed to `funcX`. You need to make sure the argument number match the actual function defined in the plugin.
+
 ## `api.register(...)`
 Register a new operation (**op**) to perform a specific task. An op can have its own `ui` which defined with the same rule as the `ui` field in `<config>` -- `ui` can be defined as a single (long) string, an array of strings, or an array of objects for JavaScript (a list of dict for Python). See the `development` page for the examples of different `ui` definition.
 
@@ -275,44 +313,6 @@ console.log(file_path)
 path = await api.showFileDialog()
 print(path)
 ```
-
-## `api.run(...)`
-run another plugin by specifying its name, e.g. `await api.run("Python Demo Plugin")` or `await api.run("Python Demo Plugin", my)`
-
-You can also run multiple plugins concurrently (Python example):
-```python
-p1 = api.run("name of plugin 1")
-p2 = api.run("name of plugin 2")
-
-result1 = await p1
-result2 = await p2
-```
-The above code will start two plugins almost simutaneously, then wait for the result one after another.
-
-Or even better, you can await two tasks simutaneously with `asyncio.gather` by using the following code:
-
-```python
-p1 = api.run("name of plugin 1")
-p2 = api.run("name of plugin 2")
-result1, result2 = await asyncio.gather(p1, p2)
-```
-
-Similary for Javascript, you can do:
-```
-const p1 = api.run("name of plugin 1")
-const p2 = api.run("name of plugin 2")
-const [result1, result2] = [await p1, await p2]
-```
-
-This is different from the following sequential version, where plugin 2 can only start after plugin 1 is finished:
-```python
-result1 = await api.run("name of plugin 1")
-result2 = await api.run("name of plugin 2")
-```
-
-## `api.call(...)`
-
-call a function defined in another plugin by specifying the plugin name, the function name and the arguments. E.g. `await api.call("PluginX", "funcX", 1)` for calling a function called `funcX` defined in the plugin named `PluginX`, the argument `1` will be passed to `funcX`. You need to make sure the argument number match the actual function defined in the plugin.
 
 ## `api.getFileUrl(...)`
 Used to generate an url to access a local file or directory path. For example: `api.getFileUrl('~/data/output.png')`, will return something like `http://127.0.0.1:8080/file/1ba89354-ae98-457c-a53b-39a4bdd14941?name=output.png`.
