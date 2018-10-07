@@ -31,7 +31,7 @@ the plugin name in the Plugins list.
 
 
 ## Plugin file format
-The ImJoy plugin file format is built up on html format with customized tags (inspired by the `.vue` format). it consists of two mandatory tags `<config>` and `<script>`, and other optional tags including `<docs>`, `<window>`,`<attachment>`,`<link>` and `<style>`.  For `<style>`, you can also use  multiple `src` tags.
+The ImJoy plugin file format is built up on html format with customized blocks (inspired by the `.vue` format). it consists of two mandatory blocks `<config>` and `<script>`, and other optional blocks including `<docs>`, `<window>`,`<attachment>`,`<link>` and `<style>`.  For `<style>`, you can also set the `src` attribute.
 
 Here is an outline of the plugin file:
 ```
@@ -45,12 +45,12 @@ Here is an outline of the plugin file:
 
 <window lang="html">
    ** A code block in HTML format**
-   (for plugins in iframe mode)
+   (for plugins in `window` mode)
 </window>
 
 <style lang="css">
    ** A code block in CSS format**
-   (for plugins in iframe mode)
+   (for plugins in `window` mode)
 </style lang="json">
 
 <docs lang="markdown">
@@ -58,10 +58,10 @@ Here is an outline of the plugin file:
 </docs>
 
 <attachment name="XXXXX">
-   ** An optional for storing text data, you can use multiple of them **
+   ** An optional block for storing text data, you can use multiple of them **
 </attachment>
 ```
-### `<config>` tag
+### `<config>` block
 
 ```json
 {
@@ -83,7 +83,7 @@ Here is an outline of the plugin file:
 ```
 * `name` is the name of the plugin. It **must** be unique to avoid conflicts with other plugins.
 * `mode` is the plugin type or execution mode. Currently supported are:
-  * `window` is used for create a new web interface with HTML/CSS and Javascript. If `window` mode is selected, then you need to provide HTML code with the `<window>` tag and CSS code with the `style` tag. Notice that this type of plugin runs in the same thread as the main web page, it may hang the entire web app when running heavy computation. A better choice for computational tasks is `webworker` plugin. However, some WebGL powered libraries including `tensorflow.js` do not support (yet) `webworker` mode, in that case, another mode called `iframe` can be used. `iframe` mode is the same as `window` mode except it does not need an interface, it is especially useful for plugins which needs to access GPU through WebGL.
+  * `window` is used for create a new web interface with HTML/CSS and Javascript. If `window` mode is selected, then you need to provide HTML code with the `<window>` block and CSS code with the `style` block. Notice that this type of plugin runs in the same thread as the main web page, it may hang the entire web app when running heavy computation. A better choice for computational tasks is `webworker` plugin. However, some WebGL powered libraries including `tensorflow.js` do not support (yet) `webworker` mode, in that case, another mode called `iframe` can be used. `iframe` mode is the same as `window` mode except it does not need an interface, it is especially useful for plugins which needs to access GPU through WebGL.
   * `webworker` to run computationally intensive javascript plugins. It does not have an interface, it runs in a new thread and won't hang the main thread during running.
   * `pyworker` is used to run plugins written in Python. This requires that the **Python Plugin Engine** is installed and started before using the plugin. See the **Developing Python Plugins** for more details.
 * `tags` defines a list of supported tags, which can be used to provide differentiate configureable modes and can be accessed at various points in the plugin. For an overview we
@@ -135,20 +135,20 @@ The format is the same as for `inputs`.
 * `requirements` (**for python plugins only**) the pip packages which will be installed before running the plugin defined as a list of pip packages or a command string. ImJoy supports package names and github links. For example, `["numpy", "scipy==1.0"]` or `"pip install numpy scipy==1.0"`. To use conda, you can set the string to `"conda install numpy scipy==1.0"`. For more information see the dedicate section **Using virtual environments**.
 * `dependencies` names of other imjoy plugins which the current pluging depend on. They will be installed automatically during installation. An url can also be used as a dependency for sharing a plugin. For both cases, a hash tag can be used to specify the tag for the plugin. For example: `dependencies: ["Image Denoising#stable"]`, it means this plugin depends on the `stable` version of the `Image Denoising` plugin (of course, the plugin needs to define these tags).
 
-### `<docs>` tag
+### `<docs>` block
 Used to contain documentation for the plugin, it need to be written in `Markdown` language. Here is a document about how to write document in `Markdown`: [Mastering Markdown](https://guides.github.com/features/mastering-markdown/).
 
-### `<window>` tag
+### `<window>` block
 Define the HTML code for displaying in the plugin window.
 
-### `<style>` tag
+### `<style>` block
 Define the CSS code for displaying in the plugin window.
 
-### `<script>` tag
+### `<script>` block
 
 Plugins can be written in Javascript or Python, a minimal plugin needs to implement two functions: `setup()` and `run()`. Optionally, the function `exit` will be called when the plugin is killed.
 
-The `lang` property of the `<script>` tag is used to specify the used programming language:
+The `lang` property of the `<script>` block is used to specify the used programming language:
  * for Javascript, use `<script lang="javascript"> ... </script>`
  * for Python, use `<script lang="python"> ... </script>`
 
@@ -165,13 +165,13 @@ Optionally, you can define an update function which will be called when any sett
 
 ## Plugin operators (ops)
 For a plugin, you can define independent operators (or **ops**) with the Plugin API (see **api.register** for details). Each of these **ops** is defined in a similar fashion as
-the `<config>` tag and has it's own set of parameters defined via a GUI and can have its dedicated run fucntion. The different ops are displaued when you press on the button down arrow in the Plugin list. Each op can also be added to the workflow separately.
+the `<config>` block and has it's own set of parameters defined via a GUI and can have its dedicated run fucntion. The different ops are displaued when you press on the button down arrow in the Plugin list. Each op can also be added to the workflow separately.
 
 ## Plugin during runtime
 When executing a plugin, it can can access the fields `config` and `data` from `my`:
 
  * `my.config`
- The config values from the GUI defined with the `ui` string (from the plugin `<config>` tag
+ The config values from the GUI defined with the `ui` string (from the plugin `<config>` block
  or from a separate operation `api.register`, more below). For example, if you defined an ui string (e.g. `"ui": "option {id: 'opt1', type: 'number'}"`) in the plugin `<config>`, you can access it through `my.config.opt1`.
 
  * `my.data`
@@ -250,7 +250,7 @@ used to control to overall functionality of the plugin.
 
 Within the **<config>** tag, the following fields can be made configurable: `"env", "requirements", "dependencies", "icon", "ui", "mode"`. For example, a python plugin may have two tags `["GPU", "CPU"]`. The user will be asked to choose one of the tag during the installation. For example, you can set different `requirements` according to different tag which selected by the user during installation. In order to support that, the `requirements` can be set to `{"gpu": "pip install tensorflow-gpu keras", "cpu": "pip install tensorflow keras"}` or `{"gpu": ["tensorflow-gpu", "keras"], "cpu": ["tensorflow", "keras"]}`.
 
-The **`<script>`** tag can be configured, and you can select which script script is executed. For this, you have to add the `tag` property to the `<script>` tag. Notice also that you will still need the `lang` property. For example, if you have `"tags": ["stable", "dev"]`, then you can have two script blocks: `<script lang="python" tag="stable">` and `<script lang="python" tag="dev">`.
+The **`<script>`** block can be configured, and you can select which script script is executed. For this, you have to add the `tag` property to the `<script>` block. Notice also that you will still need the `lang` property. For example, if you have `"tags": ["stable", "dev"]`, then you can have two script blocks: `<script lang="python" tag="stable">` and `<script lang="python" tag="dev">`.
 
 When developing and testing a plugin, the ImJoy editor will recognize that the plugin
 has multiple tags and you can select a tag in the tile bar of the plugin. When loading
@@ -286,7 +286,7 @@ For interacting with the main ImJoy user interface and other plugins, the plugin
 ## Developing Window Plugin
 Window plugin is a special type of plugins running in `iframe` mode, and it will show up as a window. `<window>` and `<style>` can be used to define the actual content of the window.
 
-In order to make a `window` plugin, you need to set `mode` as `window` in the `<config>` tag.
+In order to make a `window` plugin, you need to set `mode` as `window` in the `<config>` block.
 
 Different from other plugins which will be loaded and intialized when ImJoy is started, a `window` plugin will not be loaded until the actuall plugin is created with `api.createWindow` or clicked by a user in the menu. During execution of `api.createWindow`, `setup` and `run` will be called for the first time, and return with an window ID. After that, if needed, another plugin can call `api.updateWindow` with the window ID, ImJoy will try to execute the `run` function with the new data again.
 
