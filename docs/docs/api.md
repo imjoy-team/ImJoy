@@ -18,7 +18,7 @@ for both Python and JavaScript: `callback` style and `async/await` style.
 
 ### `async/await` style
 
-Declare your function with the `async` keyword. Append `await` to the asynchronous function to wait fore the result. This essentially allows a synchronous style programming without the need to sett callbacks. For example:
+Declare your function with the `async` keyword. Append `await` to the asynchronous function to wait fore the result. This essentially allows synchronous style programming without the need to set callbacks. For example:
  ```javascript
  // JavaScript
  class JSPlugin(){
