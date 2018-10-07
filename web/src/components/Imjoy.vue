@@ -2065,10 +2065,10 @@ export default {
         this.plugin_names[plugin.name] = plugin
       })
     },
-    async callPlugin(plugin_name, function_name, args, _plugin) {
+    async callPlugin(plugin_name, function_name) {
       const target_plugin = this.plugin_names[plugin_name]
       if(target_plugin){
-        return await target_plugin.api[function_name](args)
+        return await target_plugin.api[function_name].apply(null, Array.prototype.slice.call(arguments, 2, arguments.length-1))
       }
       else{
         throw 'plugin with type '+plugin_name+ ' not found.'
