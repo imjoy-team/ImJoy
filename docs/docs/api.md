@@ -152,7 +152,7 @@ result1, result2 = await asyncio.gather(p1, p2)
 ```
 
 Similary for Javascript, you can do:
-```
+```javascript
 const p1 = api.run("name of plugin 1")
 const p2 = api.run("name of plugin 2")
 const [result1, result2] = [await p1, await p2]
