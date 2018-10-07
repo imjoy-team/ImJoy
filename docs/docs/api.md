@@ -133,6 +133,7 @@ shows an alert dialog with a message, example: `api.alert('hello world')`
 ## `api.register(...)`
 Register a new operation (**op**) to perform a specific task. An op can have its own `ui` which defined with the same rule as the `ui` field in `<config>` -- `ui` can be defined as a single (long) string, an array of strings, or an array of objects for JavaScript (a list of dict for Python). See the `development` page for the examples of different `ui` definition.
 
+For Javascript:
 ```javascript
 api.register({
     name: "LUT",
@@ -147,23 +148,16 @@ api.register({
 })
 ```
 
+For Python:
 ```python
 api.register(name = "LUT", ui = [{
   "apply LUT": {
-    id: 'lut',
-    type: 'choose',
-    options: ['hot', 'rainbow'],
-    placeholder: 'hot'
+    "id": "lut",
+    "type": "choose",
+    "options": ["hot", "rainbow"],
+    "placeholder": "hot"
   }
 }])
-```
-
-The following version works for both Javascript and Python:
-```javascript
-api.register({
-    "name": "LUT",
-    "ui": "apply LUT {id:'lut', type:'choose', options:['hot', 'rainbow'], placeholder: 'hot'}"
-})
 ```
 
 By default, all ops of a plugin will call its `run` function defined in the plugin.
