@@ -61,6 +61,9 @@ Here is an outline of the plugin file:
    ** An optional block for storing text data, you can use multiple of them **
 </attachment>
 ```
+
+The order of these blocks does not matter, so you can shuffle the blocks.
+
 ### `<config>` block
 
 ```json
