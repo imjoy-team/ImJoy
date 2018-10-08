@@ -4,6 +4,14 @@ Here we describe the basic concepts of ImJoy and how to get started. More detail
 information about ImJoy architecture, existing plugins, can be found
 in dedicated sections.
 
+##  Glossary
+* **Web app** - Interface running in the browser allowing to control ImJoy   
+* **Plugin** - Added functionality to ImJoy to either enhance the user interface or perform computational tasks. Plugins developed in Python require the Plugin Engine.
+* **Plugin Engine** - Python program to execute plugins in the background for heavy computations
+* **Operator [Ops]** - One plugin can allow to perform different tasks, which are called operators ("ops"). These ops can be used in a workflow.
+* **Workflow** - Allows to assemble a series of ops to perform a series of processing steps. Ops can access the results of preceding ops in the workflow. Workflows can be saved and reused.
+* **Workspace** - Isolated work environments with a distinct set of plugins. Allow to perform independent calculations. 
+
 ##  Two flavors of ImJoy: Web App and Plugin Engine
 
 <img src="./asserts/imjoy-webapp-engine.png" width="800px"></img>
@@ -46,4 +54,4 @@ then execute the plugin.
 
 ### Workflow
 You can then create your own workflow by defining a sequence of processing steps.
-Such workflows can be saved and then shared with other ImJoy users (**HOW??**).
+Such workflows can be saved and then shared with other ImJoy users (**To be done**).
