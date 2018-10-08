@@ -312,7 +312,7 @@
   </md-dialog>
   <md-dialog-confirm
       :md-active.sync="showPermissionConfirmation"
-      md-title="Request for Permission"
+      md-title="Confirmation Required"
       :md-content="permission_message"
       md-confirm-text="Deny"
       md-cancel-text="Allow"
@@ -1135,11 +1135,14 @@ export default {
               this.showPluginEngineInfo = false
               this.showPermissionConfirmation = true
             }
+            else{
+              connect_client()
+            }
             // this.listEngineDir()
           }
           else{
             socket.disconnect()
-            if(ret.no_retry){
+            if(ret.no_retry && ret.reason){
               this.showStatus('Failed to connect: ' + ret.reason)
               this.showMessage('Failed to connect: ' + ret.reason)
             }
