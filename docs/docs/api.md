@@ -305,11 +305,13 @@ show a file dialog to select files or directories. It accept the following optio
 Since the file handling is different in the browser environment and Python, this api have different behavior when called from different types of plugin. In Javascrpt and Python, an Imjoy file dialog will be displayed, it will only return a promise from which  you can get the file path string.
 
 ```javascript
+//Javascript
 const file_path = await api.showFileDialog()
 console.log(file_path)
 ```
 
 ```python
+#Python
 path = await api.showFileDialog()
 print(path)
 ```
@@ -360,6 +362,7 @@ const content = await api.getAttachment("att_name")
 ```
 
 ```python
+#Python
 content = await api.getAttachment("att_name").then(callback)
 ```
 
