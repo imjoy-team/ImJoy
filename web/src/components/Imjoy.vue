@@ -497,6 +497,7 @@ export default {
       active_windows: [],
       selected_workspace: null,
       connection_token: null,
+      engine_session_id: null,
       showPluginEngineInfo: false,
       workspace_list: [],
       workflow_list: [],
@@ -641,7 +642,7 @@ export default {
       this.client_id = 'imjoy_web_'+randId()
       localStorage.setItem("imjoy_client_id", this.client_id);
     }
-
+    this.engine_session_id = randId()
     if(this.$route.query.token){
       this.connection_token = this.$route.query.token
       const query = Object.assign({}, this.$route.query);
@@ -1106,28 +1107,47 @@ export default {
       socket.on('connect', (d) => {
         clearTimeout(timer)
         this.connection_token = this.connection_token && this.connection_token.trim()
-        socket.emit('register_client', {id: this.client_id, token: this.connection_token}, (ret)=>{
+        socket.emit('register_client', {id: this.client_id, token: this.connection_token, session_id: this.engine_session_id}, (ret)=>{
           if(ret.success){
-            this.resumable_plugins = []//ret.plugins
-            this.socket = socket
-            this.pluing_context.socket = socket
-            this.engine_connected = true
-            this.showPluginEngineInfo = false
-            this.engine_status = 'Connected.'
-            localStorage.setItem("imjoy_connection_token", this.connection_token);
-            localStorage.setItem("imjoy_engine_url", url)
-            // console.log('these python plugins can be resumed: ', ret.plugins)
-            this.showMessage('Plugin Engine is connected.')
-            // console.log('plugin engine connected.')
-            this.store.event_bus.$emit('engine_connected', d)
-            this.reloadPythonPlugins()
+            const connect_client = ()=>{
+              this.resumable_plugins = []//ret.plugins
+              this.socket = socket
+              this.pluing_context.socket = socket
+              this.engine_connected = true
+              this.showPluginEngineInfo = false
+              this.engine_status = 'Connected.'
+              localStorage.setItem("imjoy_connection_token", this.connection_token);
+              localStorage.setItem("imjoy_engine_url", url)
+              // console.log('these python plugins can be resumed: ', ret.plugins)
+              this.showMessage('Plugin Engine is connected.')
+              // console.log('plugin engine connected.')
+              this.store.event_bus.$emit('engine_connected', d)
+              this.reloadPythonPlugins()
+            }
 
+            if(ret.message && ret.confirmation){
+              this.permission_message = ret.message
+              this.resolve_permission = connect_client
+              this.reject_permission = ()=>{
+                socket.disconnect()
+                console.log('you canceled the connection.')
+              }
+              this.showPluginEngineInfo = false
+              this.showPermissionConfirmation = true
+            }
             // this.listEngineDir()
           }
           else{
             socket.disconnect()
-            this.showPluginEngineInfo = true
-            console.error('failed to connect.')
+            if(ret.no_retry){
+              this.showStatus('Failed to connect: ' + ret.reason)
+              this.showMessage('Failed to connect: ' + ret.reason)
+            }
+            else{
+              this.showPluginEngineInfo = true
+              if(ret.reason) this.showMessage('Failed to connect: ' + ret.reason)
+              console.error('failed to connect.', ret.reason)
+            }
           }
         })
 
