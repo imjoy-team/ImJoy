@@ -8,7 +8,7 @@
 We assume that the entire code is contained in the plugin file and no extra
 dependencies are required. [GitHub Gist](https://gist.github.com/) is a service provided by GitHub  to easily share individual files. Every gist is a GIT repository, so it provides version control, it can be forked and cloned.
 
-#### Create gist
+##### Create gist
 
 0. Export your ImJoy plugin (buttone on the title bar)
 0. Go to gist on your GitHub account [https://gist.github.com/](https://gist.github.com/)
@@ -18,7 +18,7 @@ dependencies are required. [GitHub Gist](https://gist.github.com/) is a service 
 0. Link to gist can be obtained from the 'Raw' button. Please note that this url
 will change when you update your file.
 
-#### Distribute plugin with url
+##### Distribute plugin with url
 Once your plugin is on gist, you can distribute it with a single Link
 `http://imjoy.io/#/app?plugin=LinkToGIST.imjoy.html`
 
