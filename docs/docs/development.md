@@ -92,7 +92,7 @@ The order of these blocks does not matter, so you can shuffle the blocks.
 * `tags` defines a list of supported tags, which can be used to provide differentiate configureable modes and can be accessed at various points in the plugin. For an overview we
 we refer to the dedicate description **## Plugins and tags**
 * `ui` is a string specifying the GUI that will be displayed to the user. The following elements can be used to render an input form:
-  * `type: 'choose', options: ['cat', 'dog'], placeholder: 'cat'`
+  * `type: 'choice', options: ['cat', 'dog'], placeholder: 'cat'`
   * `type: 'number', min: 0, max: 10, placeholder:2`
   * `type: 'color'`
   * `type: 'string'`
@@ -102,7 +102,7 @@ we refer to the dedicate description **## Plugins and tags**
   * ...
 
   For each element, you need to define a unique `id`, which can then be used to access
-  the value of this element in the plugin. For example, to render a form with a selection use `"ui": "select an option: {id: 'option1', type: 'choose', options: ['cat', 'dog'], placeholder: 'cat'}"`.  In the plugin, the selection can then be accessed with `my.config.option1`.
+  the value of this element in the plugin. For example, to render a form with a selection use `"ui": "select an option: {id: 'option1', type: 'choice', options: ['cat', 'dog'], placeholder: 'cat'}"`.  In the plugin, the selection can then be accessed with `my.config.option1`.
 
   To define longer forms with multiple lines, we support additional definitions
   of the `ui` string.
@@ -110,7 +110,7 @@ we refer to the dedicate description **## Plugins and tags**
   * an array of strings. For example:
 ```json
 "ui": [
-       "option1: {id: 'option1', type: 'choose', options: ['cat', 'dog'], placeholder: 'cat'}",
+       "option1: {id: 'option1', type: 'choice', options: ['cat', 'dog'], placeholder: 'cat'}",
        "option2: {id: 'option2', type: 'number', placeholder: 3}"
       ],
 ```
@@ -118,7 +118,7 @@ we refer to the dedicate description **## Plugins and tags**
   is defined as an individual string.
 ```json
 "ui": [
-       {"option1": "{id: 'option1', type: 'choose', options: ['cat', 'dog'], placeholder: 'cat'}"},
+       {"option1": "{id: 'option1', type: 'choice', options: ['cat', 'dog'], placeholder: 'cat'}"},
        {"option2": {"id": "option2",
                     "type": "number",
                     "placeholder": 3}}],
@@ -415,6 +415,25 @@ Examples:
   
   
 ### Python plugin process run-time behavior
+You can control the run-time behavior of a Python plugin process with `flags` parameter in the `<config>` block. We provide next some nomenclature and additional explanations to make it 
+
+* **Interface**: web interface of ImJoy. You can have ImJoy running on multiple browser windows, i.e. multiple interfaces. 
+* **Plugin Engine**: running in the background to execute Python code from different Python plugins.
+* **Python plugin**: plugin containing Python code. Some plugins might have **'tags'** to further specify details of how they are exectuted.
+* **Python process**: specific Python plugin running on the Plugin engine. Processes can be seen on the Task Manager.
+* **Workspace**: collection of installed ImJoy plugin. For plugins with `tags`, the user chose the appropriate one. A workspace has a unique name. 
+* **ImJoy instance** is a workspace running in one ImJoy interface.
+
+
+
+
+
+
+In what follows, we ca
+
+Interface
+Python process
+
 
 
 ### TODO: Use Docker Containers
@@ -470,7 +489,7 @@ Here is a list of supported url parameters:
 Below we provide detailed information for the different deployment options ImJoy provides. We also provide some examples in the [Tutorial section](http://imjoy.io/docs/index.html#/tutorial?id=tutorials-for-distribution-and-deployment).
 
 ### Plugins without dependencies
-If the pluging does not depend on libraries or module written by yourself, you can just uploade the file (.imjoy.html) to a Gist or GiHub repository. To share with others, copy the link pointing to the `raw` file. This url can then be used to install the plugin in ImJoy: press the `+ Plugins` button and add the the url in the field `Install plugin from url`. See also the dedicated [Tutorial](http://imjoy.io/docs/index.html#/tutorial?id=distribution-and-deployment-of-a-plugin-with-github-gist).
+If the pluging does not depend on libraries or module written by yourself, you can just uploade the file (.imjoy.html) to a Gist or GiHub repository. To share with others, copy the link pointing to the `raw` file. This url can then be used to install the plugin in ImJoy: press the `+ Plugins` button and add the the url in the field `Install plugin from url`. See also the dedicated [Tutorial](./tutorial#distribution-and-deployment-of-a-plugin-with-github-gist).
 
 If you want to contribute your plugin to the ImJoy central plugin repository, so users can directly install from the plugin store shown on ImJoy.io, you need to send a pull request to the repository. More details about that: [ImJoy-Plugins repository].
 
