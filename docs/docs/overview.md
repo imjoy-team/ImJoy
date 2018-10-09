@@ -1,7 +1,7 @@
 # Overview
 
 ImJoy is a flexible image processing framework allowing the deployment of complex
-computational tasks in a robust, secure and easy-to-use environment. The entire functionality is provided by **plugins**. Within a modern graphical user-interface, these plugins can be assembled into **workflows**. This design makes ImJoy intuitive to work with for end users. Plugins can be grouped and installed into isolated workspaces, this essentially avoids overcrowded plugin menu.
+computational tasks in a robust, secure and easy-to-use environment. The entire functionality is provided by **plugins**. Within a modern graphical user-interface, these plugins can be assembled into **workflows**. This design makes ImJoy intuitive to work with for end users. Plugins can be grouped and installed into isolated workspaces avoiding overcrowded plugin menus.
 
 <img src="./asserts/imjoy-screenshot.png" width="600px"></img>
 
@@ -9,9 +9,9 @@ Imjoy consists of **two parts**:
 1. the **user interface**
 2. the **computational backend**
 
-While ImJoy web app alone can perform computational tasks with the powerful Javascript engine and WebGL which provides GPU access, adding an additional computational backend allows ImJoy to access the entire Python ecosystem.
+While the ImJoy web app alone can perform computational tasks with the powerful Javascript engine and WebGL providing GPU access, adding an additional computational backend allows ImJoy to access the entire Python ecosystem.
 
-By design, ImJoy itself provides very minimal task specific functionality, it provides a flexible plugin interface to support plugins for extending the user interface and performing compuational tasks. Plugins can be designed for performing  simple tasks such as reading tif file, or more complex tasks such as training a deep learning model for image segmentation.
+By design, ImJoy itself provides very minimal task specific functionality, it provides a flexible plugin interface to support plugins to extend the user interface and perform compuational tasks. Plugins can be designed to perform  simple tasks such as reading tif file, or more complex tasks such as training a deep learning model for image segmentation.
 
 <img src="./asserts/imjoy-overview.png" width="800px"></img>
 
