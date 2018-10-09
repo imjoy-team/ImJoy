@@ -179,7 +179,7 @@ For a plugin, you can define independent operators (or **ops**) with the Plugin 
 the `<config>` block and has it's own set of parameters defined via a GUI and can have its dedicated run fucntion. The different ops are displaued when you press on the button down arrow in the Plugin list. Each op can also be added to the workflow separately.
 
 ## Plugin during runtime
-When executing a plugin, it can can access the fields `config` and `data` from `my`:
+When clicking the plugin menu, by default, the `run()` function will be called, an object/dict called `my` will be passed to the function, the following objects/dicts or variables can be accessed with `my`:
 
  * `my.config`
  The config values from the GUI defined with the `ui` string (from the plugin `<config>` block
