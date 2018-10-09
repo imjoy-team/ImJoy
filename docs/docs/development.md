@@ -414,7 +414,7 @@ Examples:
   **Note 2**: in the `env` field, you need to use `-n XXXX` to name your environment, otherwise, it will use the plugin name to name the environment.
   
   
-### Python plugin process run-time behavior
+### Controlling run-time behavior
 You can control the run-time behavior of a Python plugin process with `flags` parameter in the `<config>` block. We provide next some nomenclature and additional explanations to make it 
 
 * **Interface**: web interface of ImJoy. You can have ImJoy running on multiple browser windows, i.e. multiple interfaces. 
