@@ -10,12 +10,12 @@ dependencies are required. [GitHub Gist](https://gist.github.com/) is a service 
 
 ##### Create gist
 
-0. Export your ImJoy plugin (buttone on the title bar)
-0. Go to gist on your GitHub account [https://gist.github.com/](https://gist.github.com/)
-0. Create new gist and copy & paste the code of your plugin
-0. Give a new followed `PluginName.imjoy.html`
-0. Create either public or secret gist.
-0. Link to gist can be obtained from the 'Raw' button. Please note that this url
+1. Export your ImJoy plugin (buttone on the title bar)
+1. Go to gist on your GitHub account [https://gist.github.com/](https://gist.github.com/)
+1. Create new gist and copy & paste the code of your plugin
+1. Give a new followed `PluginName.imjoy.html`
+1. Create either public or secret gist.
+1. Link to gist can be obtained from the 'Raw' button. Please note that this url
 will change when you update your file.
 
 ##### Distribute plugin with url
