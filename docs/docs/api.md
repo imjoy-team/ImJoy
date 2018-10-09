@@ -169,7 +169,7 @@ result2 = await api.run("name of plugin 2")
 call a function defined in another plugin by specifying the plugin name, the function name and the arguments. E.g. `await api.call("PluginX", "funcX", 1)` for calling a function called `funcX` defined in the plugin named `PluginX`, the argument `1` will be passed to `funcX`. You need to make sure the argument number match the actual function defined in the plugin.
 
 ## `api.register(...)`
-Register a new operation (**op**) to perform a specific task. An op can have its own `ui` which defined with the same rule as the `ui` field in `<config>` -- `ui` can be defined as a single (long) string, an array of strings, or an array of objects for JavaScript (a list of dict for Python). See the `development` page for the examples of different `ui` definition.
+Register a new operator (**op**) to perform a specific task. An op can have its own `ui` which defined with the same rule as the `ui` field in `<config>` -- `ui` can be defined as a single (long) string, an array of strings, or an array of objects for JavaScript (a list of dict for Python). See the `development` page for the examples of different `ui` definition.
 
 For Javascript:
 ```javascript
