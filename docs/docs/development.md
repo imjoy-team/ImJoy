@@ -414,7 +414,8 @@ Examples:
   **Note 2**: in the `env` field, you need to use `-n XXXX` to name your environment, otherwise, it will use the plugin name to name the environment.
   
   
-### Python plugin process run-time behavior [TODO]  
+### Python plugin process run-time behavior
+
 
 ### TODO: Use Docker Containers
  **Not yet supported**
@@ -466,10 +467,10 @@ Here is a list of supported url parameters:
 * **Python plugin**: you can use your IDE of choice (Spyder, PyCharm,...) and then wrap the code as a Python module. You can directly import this code by runnning `python -m imjoy` in the directory with your modules.
 
 ## Deployment
-Below we provide detailed information for the different deployment options ImJoy provides. We also provide some examples in the [Tutorial section](./tutorial?id=tutorials-for-distribution-and-deployment).
+Below we provide detailed information for the different deployment options ImJoy provides. We also provide some examples in the [Tutorial section](http://imjoy.io/docs/index.html#/tutorial?id=tutorials-for-distribution-and-deployment).
 
 ### Plugins without dependencies
-If the pluging does not depend on libraries or module written by yourself, you can just uploade the file (.imjoy.html) to a Gist or GiHub repository. To share with others, copy the link pointing to the `raw` file. This url can then be used to install the plugin in ImJoy: press the `+ Plugins` button and add the the url in the field `Install plugin from url`. See also the dedicated [Tutorial](./tutorial?id=distribution-and-deployment-of-a-plugin-with-github-gist).
+If the pluging does not depend on libraries or module written by yourself, you can just uploade the file (.imjoy.html) to a Gist or GiHub repository. To share with others, copy the link pointing to the `raw` file. This url can then be used to install the plugin in ImJoy: press the `+ Plugins` button and add the the url in the field `Install plugin from url`. See also the dedicated [Tutorial](http://imjoy.io/docs/index.html#/tutorial?id=distribution-and-deployment-of-a-plugin-with-github-gist).
 
 If you want to contribute your plugin to the ImJoy central plugin repository, so users can directly install from the plugin store shown on ImJoy.io, you need to send a pull request to the repository. More details about that: [ImJoy-Plugins repository].
 
@@ -477,7 +478,7 @@ If you want to contribute your plugin to the ImJoy central plugin repository, so
 If your plugin depends on non-standard libraries and modules, you have to provid them with your plugin. You can upload those libraries and modules to a [GitHub Gist](https://gist.github.com/), a GitHub repository, or other data-sharing platforms such as Dropbox and link them in the plugin code. 
 
  * for **JavaScript** plugins, you need to create a [gist](https://gist.github.com/) or repository on GitHub named with the plugin name, and upload the plugin file together with other JavaScript files. In the plugin file, you can use `importScripts(url_to_your_js_file)` function to use this libraries. However, due to a restriction of GitHub, you can't use the url of GitHub directly, you need to copy the url of your JavaScript file, and convert it with [RawGit](https://rawgit.com/).
- * for **Python** plugins, you need to create a `setup.py` file to wrap the plugin as a pip module, create a [gist](https://gist.github.com/) or a GitHub repository named with the plugin name, and upload the plugin file together with your python modules. Now add the github link to `requirements` in the `<config>` block of your plugin. The GitHub link should be formated to something like: `git+https://github.com/oeway/ImJoy-Python#egg=imjoy`, you can test with the `pip install ...` command to see if you can install your module. As an alternative recommended during development, you can also use Dropbox as explained in this [Tutorial](./tutorial?id=distribution-and-deployment-of-codedata-stored-on-dropbox).
+ * for **Python** plugins, you need to create a `setup.py` file to wrap the plugin as a pip module, create a [gist](https://gist.github.com/) or a GitHub repository named with the plugin name, and upload the plugin file together with your python modules. Now add the github link to `requirements` in the `<config>` block of your plugin. The GitHub link should be formated to something like: `git+https://github.com/oeway/ImJoy-Python#egg=imjoy`, you can test with the `pip install ...` command to see if you can install your module. As an alternative recommended during development, you can also use Dropbox as explained in this [Tutorial](http://imjoy.io/docs/index.html#/tutorial?id=distribution-and-deployment-of-codedata-stored-on-dropbox).
 
 ## Plugin store 
 The plugin store shown on the ImJoy.IO is served with Github through the [ImJoy-Plugins repository](https://github.com/oeway/ImJoy-Plugins). In order to deploy your plugin to the plugin store, you can fork the repository, add your plugin and then send a pull request to [ImJoy-Plugins](https://github.com/oeway/ImJoy-Plugins). Once the pull request being accepted, the user will be able to install your plugin from the plugin store.
