@@ -79,6 +79,7 @@ The order of these blocks does not matter, so you can shuffle the blocks.
   "icon": "extension",
   "inputs": null,
   "outputs": null,
+  "flags": [],
   "env": null,
   "requirements": null,
   "dependencies": []
@@ -134,10 +135,10 @@ For example, to define that the plugin uses png files, you can specify `"inputs"
 * `outputs` defines the outputs with json-schema syntax (http://json-schema.org/).
 The format is the same as for `inputs`.
 * `flags` defines an array of flags which will be used by ImJoy to control the behavior of the plugin. Currently, we support these `flags` for run-time control. These flags allow to specify how ImJoy instances are handled by the Interface and the Plugin engine. For more information we refer to the section **TODO**.
-  * `single-instance` (**for python plugins only**). Python engine will only run a single plugin process even if pluging is called from multiple BUT identical workspaces. In this case, the different ImJoy instances will share the same plugin process. 
-  * `allow-detach` (**for python plugins only**). Allows the plugin process to detatch from the user interface. This means the plugin will not be killed when the user interface is disconnected or closed. However, in order to reconnect to this process, you also need to add the `single-instance` flag. 
+  * `single-instance` (**for python plugins only**). Python engine will only run a single plugin process even if pluging is called from multiple BUT identical workspaces. In this case, the different ImJoy instances will share the same plugin process.
+  * `allow-detach` (**for python plugins only**). Allows the plugin process to detatch from the user interface. This means the plugin will not be killed when the user interface is disconnected or closed. However, in order to reconnect to this process, you also need to add the `single-instance` flag.
 
-Example: to make a plugin which can run without the user interface in the background and to which you can attach set `"flags": ["single-instance", "allow-detach"]`. The inteface will automatically reconnect to this process when re-launched. Please note that if multiple ImJoy instances attache to this plugin process, each will call the `setup()` function. This may cause conflicts, we therefore 
+Example: to make a plugin which can run without the user interface in the background and to which you can attach set `"flags": ["single-instance", "allow-detach"]`. The inteface will automatically reconnect to this process when re-launched. Please note that if multiple ImJoy instances attache to this plugin process, each will call the `setup()` function. This may cause conflicts, we therefore
 recommend to (1) keep the interface-related code in the `setup()`, e.g. `api.register()`; (2) move code that you only want to run once per process into the `__init__` function of the plugin class.
 
 * `env` (**for python plugins only**) the virtual environment or docker image command used to create an enviroment to run the plugin.
@@ -258,7 +259,7 @@ We provide additional fields in `my` that allow to track, maintain and reconstru
 In a plugin configuration <config> you can define different `tags`. These tags can then be
 used to control to overall functionality of the plugin.
 
-Within the **<config>** tag, the following fields can be made configurable: `"env", "requirements", "dependencies", "icon", "ui", "mode"`. For example, a python plugin may have two tags `["GPU", "CPU"]`. The user will be asked to choose one of the tag during the installation. For example, you can set different `requirements` according to different tag which selected by the user during installation. In order to support that, the `requirements` can be set to `{"gpu": "pip install tensorflow-gpu keras", "cpu": "pip install tensorflow keras"}` or `{"gpu": ["tensorflow-gpu", "keras"], "cpu": ["tensorflow", "keras"]}`.
+Within the **<config>** tag, the following fields can be made configurable: `"env", "requirements", "dependencies", "icon", "ui", "mode", "flags"`. For example, a python plugin may have two tags `["GPU", "CPU"]`. The user will be asked to choose one of the tag during the installation. For example, you can set different `requirements` according to different tag which selected by the user during installation. In order to support that, the `requirements` can be set to `{"gpu": "pip install tensorflow-gpu keras", "cpu": "pip install tensorflow keras"}` or `{"gpu": ["tensorflow-gpu", "keras"], "cpu": ["tensorflow", "keras"]}`.
 
 The **`<script>`** block can be configured, and you can select which script script is executed. For this, you have to add the `tag` property to the `<script>` block. Notice also that you will still need the `lang` property. For example, if you have `"tags": ["stable", "dev"]`, then you can have two script blocks: `<script lang="python" tag="stable">` and `<script lang="python" tag="dev">`.
 
@@ -412,8 +413,8 @@ Examples:
   **Note 1**: in `requirements`, you can also specify the version number, for example `numpy==1.15.0`. If you want to install conda modules or you want to run pip with other parameters, you can set `requirements` as a command string instead of a list, for example: you can do `requirements: "conda install opencv-python && pip install numpy"`.
 
   **Note 2**: in the `env` field, you need to use `-n XXXX` to name your environment, otherwise, it will use the plugin name to name the environment.
-  
-  
+
+
 ###   
 
 ### TODO: Use Docker Containers
@@ -441,7 +442,7 @@ Examples:
 ## Deployment
 
 ### Plugins without new dependencies
-If the pluging does not depend on libraries or module written by yourself, you can just uploade the html file of your plugin to a Github repository. To share with other, you can copy the link pointing to the `raw` file (this links to the unprocessed versions of the file). This url can then be used to install the plugin oin ImJoy: press the `+ Plugins` button and add the the url in the field `Install plugin from url`. 
+If the pluging does not depend on libraries or module written by yourself, you can just uploade the html file of your plugin to a Github repository. To share with other, you can copy the link pointing to the `raw` file (this links to the unprocessed versions of the file). This url can then be used to install the plugin oin ImJoy: press the `+ Plugins` button and add the the url in the field `Install plugin from url`.
 
 If you want to contribute your plugin to the ImJoy central plugin repository, so users can directly install from the plugin store shown on ImJoy.io, you need to send a pull request to the repository. More details about that: [ImJoy-Plugins repository].
 

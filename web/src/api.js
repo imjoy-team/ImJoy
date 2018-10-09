@@ -1,6 +1,6 @@
 import schema from 'js-schema'
 
-export const CONFIGURABLE_FIELDS = ["env", "requirements", "dependencies", "icon", "ui", "mode"]
+export const CONFIGURABLE_FIELDS = ["env", "requirements", "dependencies", "icon", "ui", "mode", "flags"]
 
 export const SUPPORTED_PLUGIN_MODES = ['webworker', 'pyworker', 'iframe', 'window', 'collection']
 
@@ -16,7 +16,7 @@ Describe your plugin here.
   "tags": [],
   "ui": "UI for Untitled Plugin",
   "version": "0.1.0",
-  "api_version": "0.1.0",
+  "api_version": "0.1.1",
   "url": "",
   "description": "describe your plugin here.",
   "icon": "extension",
@@ -57,7 +57,7 @@ Describe your plugin here.
   "tags": [],
   "ui": "UI for Untitled Plugin",
   "version": "0.1.0",
-  "api_version": "0.1.0",
+  "api_version": "0.1.1",
   "description": "describe your plugin here",
   "icon": "extension",
   "inputs": null,
@@ -94,7 +94,7 @@ Describe your plugin here.
   "tags": [],
   "ui": "UI for Untitled Plugin",
   "version": "0.1.0",
-  "api_version": "0.1.0",
+  "api_version": "0.1.1",
   "description": "describe your plugin here.",
   "icon": "extension",
   "inputs": null,
@@ -147,6 +147,7 @@ Describe your plugin here.
   "ui": "UI for this plugin",
   "inputs": null,
   "outputs": null,
+  "flags": [],
   "icon": null,
   "env": null,
   "requirements": [],
