@@ -134,11 +134,11 @@ For example, to define that the plugin uses png files, you can specify `"inputs"
 * `outputs` defines the outputs with json-schema syntax (http://json-schema.org/).
 The format is the same as for `inputs`.
 * `flags` defines an array of flags which will be used by ImJoy to change the behavior of the plugin. Currently, you can set the following `flags`:
-  * `single-instance` make the python plugin only run a single instance of the plugin in the same workspace.
-  * `allow-detach` allow the plugin detatch from the user interface, which also means when the user interface is disconnected, the plugin process will not be killed.
+  * `single-instance` (**for python plugins only**) make the python plugin only run a single instance of the plugin in the same workspace.
+  * `allow-detach` (**for python plugins only**) allow the plugin detatch from the user interface, which also means when the user interface is disconnected, the plugin process will not be killed.
 
-    Note: To make a plugin which can run in the background, you can set `"flags": ["single-instance", "allow-detach"]`, when two instance of ImJoy is connected to the same Plugin Engine,
-    setup will be called for each instance. If you have some code which you only want to run once, you can place them into `__init__` function.
+    Note: To make a plugin which can run in the background, you can set `"flags": ["single-instance", "allow-detach"]`, when two or more instances of ImJoy is connected to the same Plugin Engine,
+    setup will be called for each instance. If you have some code which you only want to run once for the plugin, you should place them into `__init__` function.
 
 * `env` (**for python plugins only**) the virtual environment or docker image command used to create an enviroment to run the plugin.
 * `cmd` (**for python plugins only**) the command used to run the plugin. By default, it will be run with `python`. Depending on the installtion it could also be be something like `python3` or `python27` etc.
