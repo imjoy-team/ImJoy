@@ -452,7 +452,7 @@ Optionally, the `flags` can be made configurable with `tags`, for example:
 
 </config>
 ```
-The above `<config>` block will create a plugin with two tags(`Single` and `Multi`) which the user can choose during installation of the plugin, one allows only a single instance of the plugin process, the other allows multiple plugin processes if multiple ImJoy interface with the same workspace is opened.
+The above `<config>` block will create a plugin with two tags(`Single` and `Multi`). During installation, the user which run-time behavior he would like to use (either a single instance of the plugin process (`Single`), or multiple plugin processes if multiple ImJoy interface with the same workspace are opened (`Multi`)).
 
 ### TODO: Use Docker Containers
  **Not yet supported**
@@ -494,28 +494,26 @@ If your plugin depends on non-standard libraries and modules, you have to provid
 ### Distributing your plugin through the ImJoy Plugin Store 
 The plugin store shown on the ImJoy.IO is served with Github through the [ImJoy-Plugins repository](https://github.com/oeway/ImJoy-Plugins). In order to deploy your plugin to the plugin store, you can fork the repository, add your plugin and then send a pull request to [ImJoy-Plugins](https://github.com/oeway/ImJoy-Plugins). Once the pull request being accepted, the user will be able to install your plugin from the plugin store.
 
-
 ### Distributing your plugin with url
-Besides the Plugin store, you can distribute your own plugin or send it to your collabrators with an url point to the ImJoy plugin file (extension: `*.imjoy.html`) hosted on GitHub, Gist or Dropbox etc. The user can then install the plugin from the plugin url.
+As an alternative to the Plugin store, you can distribute your own plugin with an url pointing to the ImJoy plugin file (extension: `*.imjoy.html`) hosted on GitHub, Gist or Dropbox etc. A user can then install the plugin from the plugin url.
 
-### Generating a plugin url
-
-For generating such an url, the base url is `http://imjoy.io/#/app?`, followed by the url parameter `plugin` set to the **raw** file url of your ImJoy plugin file. For example: `http://imjoy.io/#/app?plugin=https://raw.githubusercontent.com/oeway/ImJoy-Plugins/master/repository/imageWindow.imjoy.html`. 
+#### Generating a plugin url
+This url is composed of  the base url `http://imjoy.io/#/app?`, followed by the url parameter `plugin` set to the **raw** file url of your ImJoy plugin file. For example: `http://imjoy.io/#/app?plugin=https://raw.githubusercontent.com/oeway/ImJoy-Plugins/master/repository/imageWindow.imjoy.html`. 
 
 When **opening such an url**, the ImJoy plugin management dialog will be shown which proposes to install the specified plugin. The user has to simply confirm by clicking `Install`.
 
 You may need to encode all the strings into url, the easiest way to achieve this is copy the url as constructed above in the address bar of your browser and use the url after the web interface has been shown. For example, the previous url will become: `http://imjoy.io/#/app?plugin=https%3A%2F%2Fraw.githubusercontent.com%2Foeway%2FImJoy-Plugins%2Fmaster%2Frepository%2FimageWindow.imjoy.html`.
 
-### Adding a tag to the plugin url
-To distribute a plugin url with predefined tag, you can use `#` to append the tag. For example, you can add `#dev` to tell ImJoy to install with the `dev` tag from the plugin. With option, you can place multiple urls (e.g. in your Github README file) which pointing to the plugin with different tags. Then your user can click correspondingly to install it these different tags of your plugins.
+#### Adding a tag to the plugin url
+To distribute a plugin url with a predefined tag, you can use `#` to append the tag. For example, you can add `#dev` to tell ImJoy to install with the `dev` tag from the plugin. With this option, you can place multiple urls (e.g. in your Github README file) pointing to the plugin with different tags. The user can then choose the appropriate version of the plugin based which will be installed.
 
-### Supported url parameters
+#### Supported url parameters
 
 You can construct ImJoy url with customized functionality. It largely simplify the user operation when installing or using ImJoy. This is particularly useful for sharing plugins through your own project or Github repo. For example, with the `plugin` parameter in an ImJoy url, the defined plugin will be shown to the user directly.
 
 Url parameters can be used after `https://imjoy.io/#/app?`, using `PARAM=VALUE` syntax. Multiple parameters can be concatenate togeter with `&`. For example we want to specify `A=99` and `B=hello`, the corresponding url would be `https://imjoy.io/#/app?A=99&B=hello`.
 
-Here is a list of supported url parameters:
+Following is a list of supported url parameters:
 
  * `w` workspace name, an url contains `w` as a query string (e.g. https://imjoy.io/#/app?w=test) can be used to create or switch to a new workspace.
  * `plugin` show the specified plugin in the plugin management dialog, you can use plugin name or an url for the plugin, for example: `https://imjoy.io/#/app?plugin=Image%20Window` will show up a plugin dialog with `Image Window` in the search. You can also set `plugin` to an url for sharing plugin hosted on github, please refer to `Install from url` for more details.
