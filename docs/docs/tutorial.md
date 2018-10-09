@@ -36,7 +36,7 @@ the code/data by replacing the zip file (see Notes below).
 2. The ImJoy plugin file file (.imjoy.html) is hosted with a secret or public **gist**.
 
 Let's assume the python code is in a Zip archive `testcode.zip` stored on Dropbox and
-unavailable with the link `DROPBOXLINK/testcode.zip`. You can then place the following code-fragment in setup() function of your plugin to make it available. This fragment (requiring 'sys', 'os','requests','shutil') and performs the following steps
+unavailable with the link `DROPBOXLINK/testcode.zip`. You can then place the following code-fragment in setup() function of your plugin to make it available. This fragment performs the following steps
 
 1. Performs an [http request](http://docs.python-requests.org). Please note the **dl=1** option in this request. By default this value is set to 0.
 2. Uses the returned request object to generate the zip file locally, unpacks it, and finally deletes it.
