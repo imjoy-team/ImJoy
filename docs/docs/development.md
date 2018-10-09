@@ -415,7 +415,7 @@ Examples:
   
   
 ### Controlling run-time behavior
-You can control the run-time behavior of a Python plugin process with  the `flags` parameter in the `<config>` block. Next we provide next  nomenclature and additional explanations to explain the different options you have to control how the Python processes running on the plugin engine interact with the ImJoy interface. 
+You can control the run-time behavior of a Python plugin process with the `flags` field in the `<config>` block. Next we provide next  nomenclature and additional explanations to explain the different options you have to control how the Python processes running on the plugin engine interact with the ImJoy interface. 
 
 * **Interface**: web interface of ImJoy. You can have ImJoy running on multiple browser windows, i.e. multiple interfaces. 
 * **Plugin Engine**: running in the background to execute Python code from different Python plugins.
@@ -428,9 +428,31 @@ You can control the run-time behavior of a Python plugin process with  the `flag
 
 Below we describe the three main run-time behavior of python plugins:
 * By **default**, each ImJoy instance has its own process on the plugin engine. If you close the interface, you will kill the process.
-* The **`single-instance`** option will allow only one process to run for a given workspace. A workspace is defined by its name, all installed plugins, and the selected `tags`. If two ImJoy instances run the exact same workspace, then the `single-instance` means that they access the same process. Only closing last instance will  kill the process.
-* The **allow-detach** option means that the process is not killed when its ImJoy instance is closed. For instance, this allows to perform long computional tasks in the background which dont require additional user feedback and which terminate autonomously. Can also be used to protect a long computional tasks again browser instabilties. If you want to be able to attach to a detached process, the plugin has additionally have the `single-instance` tag.
+* The **`single-instance`** flag will allow only one process to run for a given workspace. A workspace is defined by its name, all installed plugins, and the selected `tags`. If two ImJoy instances run the exact same workspace, then the `single-instance` means that they access the same process. Only closing last instance will  kill the process.
+* The **allow-detach** flag means that the process is not killed when its ImJoy instance is closed. For instance, this allows to perform long computional tasks in the background which dont require additional user feedback and which terminate autonomously. Can also be used to protect a long computional tasks again browser instabilties. If you want to be able to attach to a detached process, the plugin has additionally have the `single-instance` flag.
 
+This is how the `flags` option looks like in the `<config>` block:
+```json
+<config lang="json">
+{
+...
+flags: ["single-instance", "allow-detach"],
+...
+}
+</config>
+```
+Optionally, the `flags` can be made configurable with `tags`, for example:
+```json
+<config lang="json">
+{
+...
+tags: ["Single", "Multi"],
+flags: {"Single": ["single-instance", "allow-detach"], "Multi": []},
+...
+}
+</config>
+```
+The above `<config>` block will create a plugin with two tags(`Single` and `Multi`) which the user can choose during installation of the plugin, one allows only a single instance of the plugin process, the other allows multiple plugin processes if multiple ImJoy interface with the same workspace is opened.
 
 ### TODO: Use Docker Containers
  **Not yet supported**
@@ -477,9 +499,10 @@ Here is a list of supported url parameters:
  These parameters are independent from each other, meaning you can combine different parameters with `&` and construct a long url. For example combining engine url and connection token:  `http://imjoy.io/#/app?engine=http://127.0.0.1:8080&token=2760239c-c0a7-4a53-a01e-d6da48b949bc`.
 
 
-## Development
-* **JavaScript plugin**: you can use the [chrome development tool](https://developers.google.com/web/tools/chrome-devtools).
-* **Python plugin**: you can use your IDE of choice (Spyder, PyCharm,...) and then wrap the code as a Python module. You can directly import this code by runnning `python -m imjoy` in the directory with your modules.
+## Development and Debugging
+* **JavaScript plugin**: You can create Javascript plugins from the template(`webworker` or `window`) in the **+ PLUGINS** dialog. With the ImJoy code editor, you can write your code. For testing you can click save on the toolbar in the code editor, and it will automatically load your plugin to the plugin menu shown on the left side. By right click on in the workspace, you use the [chrome development tool](https://developers.google.com/web/tools/chrome-devtools) to see the console and debug your code.
+
+* **Python plugin**: Similary, you can create Python plugins from the `pyworker` template in the **+ PLUGINS** dialog. If your plugin engine is running, you can save and run(Ctrl+S, or through the toolbar) with your code directly in the ImJoy code editor. For larger project with many Python files, the recommended way is to wrap your Python files as standard Python modules, write and test the Python module using your code editor/IDE of choice (Atom, Spyder, PyCharm,...). Then create an ImJoy plugin with the ImJoy code editor, by inserting the module path to `sys.path` (e.g. `sys.insert(0, '~/my_python_module')`), you can then import the module to the ImJoy plugin and test it.
 
 ## Deployment
 Below we provide detailed information for the different deployment options ImJoy provides. We also provide some examples in the [Tutorial section](http://imjoy.io/docs/index.html#/tutorial?id=tutorials-for-distribution-and-deployment).
