@@ -434,22 +434,22 @@ Below we describe the three main run-time behavior of python plugins:
 This is how the `flags` option looks like in the `<config>` block:
 ```json
 <config lang="json">
-{
-...
-flags: ["single-instance", "allow-detach"],
-...
-}
+
+  ...
+  "flags": ["single-instance", "allow-detach"],
+  ...
+
 </config>
 ```
 Optionally, the `flags` can be made configurable with `tags`, for example:
 ```json
 <config lang="json">
-{
-...
-tags: ["Single", "Multi"],
-flags: {"Single": ["single-instance", "allow-detach"], "Multi": []},
-...
-}
+
+  ...
+  "tags": ["Single", "Multi"],
+  "flags": {"Single": ["single-instance", "allow-detach"], "Multi": []},
+  ...
+
 </config>
 ```
 The above `<config>` block will create a plugin with two tags(`Single` and `Multi`) which the user can choose during installation of the plugin, one allows only a single instance of the plugin process, the other allows multiple plugin processes if multiple ImJoy interface with the same workspace is opened.
@@ -461,7 +461,7 @@ The above `<config>` block will create a plugin with two tags(`Single` and `Mult
  Examples:
   * If you want to run your plugin with tensorflow docker, you need to add the following fields to your `<config>`:
  ```json
- <config>
+ <config lang="json">
    ...
    "env": "docker pull tensorflow/tensorflow:1.9.0-py3",
    "requirements": ["numpy", "scipy"],
