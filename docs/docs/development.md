@@ -491,12 +491,14 @@ If your plugin depends on non-standard libraries and modules, you have to provid
  * for **JavaScript** plugins, you need to create a [gist](https://gist.github.com/) or repository on GitHub named with the plugin name, and upload the plugin file together with other JavaScript files. In the plugin file, you can use `importScripts(url_to_your_js_file)` function to use this libraries. However, due to a restriction of GitHub, you can't use the url of GitHub directly, you need to copy the url of your JavaScript file, and convert it with [RawGit](https://rawgit.com/).
  * for **Python** plugins, you need to create a `setup.py` file to wrap the plugin as a pip module, create a [gist](https://gist.github.com/) or a GitHub repository named with the plugin name, and upload the plugin file together with your python modules. Now add the github link to `requirements` in the `<config>` block of your plugin. The GitHub link should be formated to something like: `git+https://github.com/oeway/ImJoy-Python#egg=imjoy`, you can test with the `pip install ...` command to see if you can install your module. As an alternative recommended during development, you can also use Dropbox as explained in this [Tutorial](http://imjoy.io/docs/index.html#/tutorial?id=distribution-and-deployment-of-codedata-stored-on-dropbox).
 
-## Deploying plugins with the ImJoy Plugin Store 
+## Distributing your plugin through the ImJoy Plugin Store 
 The plugin store shown on the ImJoy.IO is served with Github through the [ImJoy-Plugins repository](https://github.com/oeway/ImJoy-Plugins). In order to deploy your plugin to the plugin store, you can fork the repository, add your plugin and then send a pull request to [ImJoy-Plugins](https://github.com/oeway/ImJoy-Plugins). Once the pull request being accepted, the user will be able to install your plugin from the plugin store.
 
 
-## Deploying plugins with url
-Besides the Plugin store, you can distribute your own plugin or send it to your collabrators with an url point to the ImJoy plugin file (extension: `*.imjoy.html`) hosted on GitHub, Gist or Dropbox etc. The user can then install the plugin from the url.
+## Distributing your plugin with url
+Besides the Plugin store, you can distribute your own plugin or send it to your collabrators with an url point to the ImJoy plugin file (extension: `*.imjoy.html`) hosted on GitHub, Gist or Dropbox etc. The user can then install the plugin from the plugin url.
+
+### Generating a plugin url
 
 For generating such an url, the base url is `http://imjoy.io/#/app?`, followed by the url parameter `plugin` set to the **raw** file url of your ImJoy plugin file. For example: `http://imjoy.io/#/app?plugin=https://raw.githubusercontent.com/oeway/ImJoy-Plugins/master/repository/imageWindow.imjoy.html`. 
 
@@ -504,8 +506,8 @@ When **opening such an url**, the ImJoy plugin management dialog will be shown w
 
 You may need to encode all the strings into url, the easiest way to achieve this is copy the url as constructed above in the address bar of your browser and use the url after the web interface has been shown. For example, the previous url will become: `http://imjoy.io/#/app?plugin=https%3A%2F%2Fraw.githubusercontent.com%2Foeway%2FImJoy-Plugins%2Fmaster%2Frepository%2FimageWindow.imjoy.html`.
 
-### Deploying plugins with tags
-To deploy a plugin with predefined tag, you can use `#` to append the tag. For example, you can add `#dev` to tell ImJoy to install with the `dev` tag from the plugin. With option, you can place multiple urls (e.g. in your Github README file) which pointing to the plugin with different tags. Then your user can click correspondingly to install it these different tags of your plugins.
+### Adding a tag to the plugin url
+To distribute a plugin url with predefined tag, you can use `#` to append the tag. For example, you can add `#dev` to tell ImJoy to install with the `dev` tag from the plugin. With option, you can place multiple urls (e.g. in your Github README file) which pointing to the plugin with different tags. Then your user can click correspondingly to install it these different tags of your plugins.
 
 ### Supported url parameters
 
