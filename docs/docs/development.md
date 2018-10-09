@@ -470,14 +470,12 @@ The above `<config>` block will create a plugin with two tags(`Single` and `Mult
  </config>
  ```
 
-# Development and deployment of your plugin
-
 ## Development and Debugging
 * **JavaScript plugin**: You can create Javascript plugins from the template(`webworker` or `window`) in the **+ PLUGINS** dialog. With the ImJoy code editor, you can write your code. For testing you can click save on the toolbar in the code editor, and it will automatically load your plugin to the plugin menu shown on the left side. By right click on in the workspace, you use the [chrome development tool](https://developers.google.com/web/tools/chrome-devtools) to see the console and debug your code.
 
 * **Python plugin**: Similary, you can create Python plugins from the `pyworker` template in the **+ PLUGINS** dialog. If your plugin engine is running, you can save and run(Ctrl+S, or through the toolbar) with your code directly in the ImJoy code editor. For larger project with many Python files, the recommended way is to wrap your Python files as standard Python modules, write and test the Python module using your code editor/IDE of choice (Atom, Spyder, PyCharm,...). Then create an ImJoy plugin with the ImJoy code editor, by inserting the module path to `sys.path` (e.g. `sys.insert(0, '~/my_python_module')`), you can then import the module to the ImJoy plugin and test it.
 
-## Deployment
+## Deployment of your plugin
 Below we provide detailed information for the different deployment options ImJoy provides. We also provide some examples in the [Tutorial section](http://imjoy.io/docs/index.html#/tutorial?id=tutorials-for-distribution-and-deployment).
 
 ### Plugins without dependencies
@@ -491,11 +489,13 @@ If your plugin depends on non-standard libraries and modules, you have to provid
  * for **JavaScript** plugins, you need to create a [gist](https://gist.github.com/) or repository on GitHub named with the plugin name, and upload the plugin file together with other JavaScript files. In the plugin file, you can use `importScripts(url_to_your_js_file)` function to use this libraries. However, due to a restriction of GitHub, you can't use the url of GitHub directly, you need to copy the url of your JavaScript file, and convert it with [RawGit](https://rawgit.com/).
  * for **Python** plugins, you need to create a `setup.py` file to wrap the plugin as a pip module, create a [gist](https://gist.github.com/) or a GitHub repository named with the plugin name, and upload the plugin file together with your python modules. Now add the github link to `requirements` in the `<config>` block of your plugin. The GitHub link should be formated to something like: `git+https://github.com/oeway/ImJoy-Python#egg=imjoy`, you can test with the `pip install ...` command to see if you can install your module. As an alternative recommended during development, you can also use Dropbox as explained in this [Tutorial](http://imjoy.io/docs/index.html#/tutorial?id=distribution-and-deployment-of-codedata-stored-on-dropbox).
 
-## Distributing your plugin through the ImJoy Plugin Store 
+## Distribution of your plugin
+
+### Distributing your plugin through the ImJoy Plugin Store 
 The plugin store shown on the ImJoy.IO is served with Github through the [ImJoy-Plugins repository](https://github.com/oeway/ImJoy-Plugins). In order to deploy your plugin to the plugin store, you can fork the repository, add your plugin and then send a pull request to [ImJoy-Plugins](https://github.com/oeway/ImJoy-Plugins). Once the pull request being accepted, the user will be able to install your plugin from the plugin store.
 
 
-## Distributing your plugin with url
+### Distributing your plugin with url
 Besides the Plugin store, you can distribute your own plugin or send it to your collabrators with an url point to the ImJoy plugin file (extension: `*.imjoy.html`) hosted on GitHub, Gist or Dropbox etc. The user can then install the plugin from the plugin url.
 
 ### Generating a plugin url
