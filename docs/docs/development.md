@@ -444,7 +444,7 @@ You may need to encode all the strings into url, the easiest way to achieve this
 ### Installing plugins with tags
 To installing a plugin with predefined tag, you can use `#` to append the tag. For example, you can add `#dev` to tell ImJoy to install with the `dev` tag from the plugin.
 
-#### Supported url parameters
+### Supported url parameters
 
 Developers can construct ImJoy url with customized functionality. It largely simplify the user operation when installing or using ImJoy. This is particularly useful for sharing plugins through their own project or Github repo. For example, with the `plugin` parameter in an ImJoy url, the defined plugin will be shown to the user directly.
 
