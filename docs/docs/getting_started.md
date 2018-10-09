@@ -1,8 +1,8 @@
 # Getting Started
 
 Here we describe the basic concepts of ImJoy and how to get started. More detailed
-information about ImJoy architecture, existing plugins, can be found
-in dedicated sections.
+information about ImJoy architecture, existing plugins, and how to develop your own
+plugins can be found in dedicated sections.
 
 ##  Glossary
 * **Web app** - Interface running in the browser allowing to control ImJoy   
