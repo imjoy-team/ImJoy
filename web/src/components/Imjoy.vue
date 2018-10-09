@@ -501,7 +501,6 @@ export default {
       showPluginEngineInfo: false,
       workspace_list: [],
       workflow_list: [],
-      resumable_plugins: [],
       showWorkspaceDialog: false,
       show_file_dialog: false,
       plugins: null,
@@ -1110,7 +1109,6 @@ export default {
         socket.emit('register_client', {id: this.client_id, token: this.connection_token, session_id: this.engine_session_id}, (ret)=>{
           if(ret.success){
             const connect_client = ()=>{
-              this.resumable_plugins = []//ret.plugins
               this.socket = socket
               this.pluing_context.socket = socket
               this.engine_connected = true
@@ -1118,7 +1116,6 @@ export default {
               this.engine_status = 'Connected.'
               localStorage.setItem("imjoy_connection_token", this.connection_token);
               localStorage.setItem("imjoy_engine_url", url)
-              // console.log('these python plugins can be resumed: ', ret.plugins)
               this.showMessage('Plugin Engine is connected.')
               // console.log('plugin engine connected.')
               this.store.event_bus.$emit('engine_connected', d)

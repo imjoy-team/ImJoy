@@ -133,6 +133,13 @@ we refer to the dedicate description **## Plugins and tags**
 For example, to define that the plugin uses png files, you can specify `"inputs": {"properties": {"type": {"enum": ["image/png"], "required": true}}, "type": "object"}` . You can also use the simplified format which assumes the inputs is an object and use json schema to describe the properties: `"inputs": {"type": {"enum": ["image/png"], "required": true}}`.
 * `outputs` defines the outputs with json-schema syntax (http://json-schema.org/).
 The format is the same as for `inputs`.
+* `flags` defines an array of flags which will be used by ImJoy to change the behavior of the plugin. Currently, you can set the following `flags`:
+  * `single-instance` make the python plugin only run a single instance of the plugin in the same workspace.
+  * `allow-detach` allow the plugin detatch from the user interface, which also means when the user interface is disconnected, the plugin process will not be killed.
+
+    Note: To make a plugin which can run in the background, you can set `"flags": ["single-instance", "allow-detach"]`, when two instance of ImJoy is connected to the same Plugin Engine,
+    setup will be called for each instance. If you have some code which you only want to run once, you can place them into `__init__` function.
+
 * `env` (**for python plugins only**) the virtual environment or docker image command used to create an enviroment to run the plugin.
 * `cmd` (**for python plugins only**) the command used to run the plugin. By default, it will be run with `python`. Depending on the installtion it could also be be something like `python3` or `python27` etc.
 * `requirements` (**for python plugins only**) the pip packages which will be installed before running the plugin defined as a list of pip packages or a command string. ImJoy supports package names and github links. For example, `["numpy", "scipy==1.0"]` or `"pip install numpy scipy==1.0"`. To use conda, you can set the string to `"conda install numpy scipy==1.0"`. For more information see the dedicate section **Using virtual environments**.
@@ -301,13 +308,13 @@ If the `run` returned with an object, then it will be used to update the window 
 
 To develop a window plugin, choose the `+ Webworker(Javascript)` plugin template when creating a new plugin in the ImJoy app. The key difference is the `mode` field in the `<config>` block which has been set to `webworker`.
 
-Webworker plugin is used to do computation tasks in another thread, using a new element called ["web worker"](https://en.wikipedia.org/wiki/Web_worker). It is basically a way for Javascript to achieve multi-threading. 
+Webworker plugin is used to do computation tasks in another thread, using a new element called ["web worker"](https://en.wikipedia.org/wiki/Web_worker). It is basically a way for Javascript to achieve multi-threading.
 
 Since it's designed for perfoming computational tasks, it does not have access to html dom but you can use `ImJoy API` to interact with the graphical interface of ImJoy or other plugin which can trigger changes on the user interface.
 
 ## Developing Python Plugins
 
-To develop a window plugin, choose the `+ PyWorker(Python)` plugin template when creating a new plugin in the ImJoy app.  The key difference is the `mode` field in the `<config>` block which has been set to `pyworker`. 
+To develop a window plugin, choose the `+ PyWorker(Python)` plugin template when creating a new plugin in the ImJoy app.  The key difference is the `mode` field in the `<config>` block which has been set to `pyworker`.
 
 Here is a python `hello world` example:
 ```html
@@ -458,5 +465,5 @@ Here is a list of supported url parameters:
  * `token` define the connection token, for example: `http://imjoy.io/#/app?token=2760239c-c0a7-4a53-a01e-d6da48b949bc`
  * `repo` specify a imjoy manifest file which point to a customized plugin repository. This can be used by developers to deploy their own plugin repository through Github. Fork the [ImJoy-Plugins](https://github.com/oeway/ImJoy-Plugins) repository, and change the `manifest.imjoy.json` file. Then copy the raw link of the manifest file and use it with `repo` to construct an url for sharing with the users.
  * `load` define a customized url which contains data (e.g. a tif image) loaded automatically into the ImJoy workspace. This can be used to link data to ImJoy, for example, by defining a `open with imjoy` button.
- 
+
  These parameters are independent from each other, meaning you can combine different parameters with `&` and construct a long url. For example combining engine url and connection token:  `http://imjoy.io/#/app?engine=http://127.0.0.1:8080&token=2760239c-c0a7-4a53-a01e-d6da48b949bc`.

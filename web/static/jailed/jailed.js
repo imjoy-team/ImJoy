@@ -455,22 +455,26 @@ function randId() {
             }
             platformInit.whenEmitted(() =>{
               if (!this._disconnected && this.context && this.context.socket) {
-                this.context.socket.on('message_from_plugin_'+this.id,  (data)=>{
-                    // console.log('message_from_plugin_'+this.id, data)
-                    if (data.type == 'initialized') {
-                        this.dedicatedThread = data.dedicatedThread;
-                        this._init.emit();
-                    } else {
-                        this._messageHandler(data);
-                    }
-                })
-                const config_ = {api_version: config.api_version, tag: config.tag, workspace: config.workspace, env: config.env, requirements: config.requirements, cmd: config.cmd, name: config.name, type: config.type, inputs: config.inputs, outputs: config.outputs}
+                const config_ = {api_version: config.api_version, flags: config.flags, tag: config.tag, workspace: config.workspace, env: config.env, requirements: config.requirements, cmd: config.cmd, name: config.name, type: config.type, inputs: config.inputs, outputs: config.outputs}
                 // create a plugin here
                 this.context.socket.emit('init_plugin', {id: id, mode: mode, config: config_}, (result) => {
                   // console.log('init_plugin: ', result)
                   if(result.success){
                     this.secret = result.secret
                     config.work_dir = result.work_dir
+                    this.context.socket.on('message_from_plugin_'+this.secret,  (data)=>{
+                        // console.log('message_from_plugin_'+this.id, data)
+                        if (data.type == 'initialized') {
+                            this.dedicatedThread = data.dedicatedThread;
+                            this._init.emit();
+                        } else {
+                            this._messageHandler(data);
+                        }
+                    })
+                    if(result.initialized){
+                      this.dedicatedThread = true;
+                      this._init.emit();
+                    }
                   }
                   else{
                     console.error('failed to initialize plugin on the plugin engine')
@@ -507,7 +511,7 @@ function randId() {
          * @param {Object} data to send
          */
         SocketioConnection.prototype.send = function(data, transferables) {
-            this.context.socket.emit('message_to_plugin_'+this.id,
+            this.context.socket.emit('message_to_plugin_'+this.secret,
                 {type: 'message', data: data}
             );
             // console.log('message_to_plugin_'+this.id, {type: 'message', data: data})
