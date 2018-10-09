@@ -43,6 +43,11 @@ unavailable with the link `DROPBOXLINK/testcode.zip`. You can then place the fol
 3. Add the local path to the system path.
 
 ```Python
+import sys
+import os
+import requests
+import shutil
+
 url = 'https://DROPBOXLINK/testcode.zip?dl=1'
 r = requests.get(url, allow_redirects=True)
 
@@ -56,4 +61,4 @@ sys.path.append(os.path.join('.','testcode'))
 **Notes**
 1. Code is locally stored in `username/ImJoyWorkspace/WORKSPACENAME/testcode`, where WORKSPACENAME is the name of the current ImJoy workspace. You can set the workspace automatically in the URL your provideto distribute your plugin (next section).
 2. When updating the zip archive, dont delete the old one REPLACE it with the new version. This guarantess that the same link is valid.
-3. This code will install each time the Plugin is called the current version the zip archive.
+3. This code will install each time the plugin is called the current version the zip archive.
