@@ -412,6 +412,9 @@ Examples:
   **Note 1**: in `requirements`, you can also specify the version number, for example `numpy==1.15.0`. If you want to install conda modules or you want to run pip with other parameters, you can set `requirements` as a command string instead of a list, for example: you can do `requirements: "conda install opencv-python && pip install numpy"`.
 
   **Note 2**: in the `env` field, you need to use `-n XXXX` to name your environment, otherwise, it will use the plugin name to name the environment.
+  
+  
+###   
 
 ### TODO: Use Docker Containers
  **Not yet supported**
@@ -438,10 +441,12 @@ Examples:
 ## Deployment
 
 ### Plugins without new dependencies
-If the pluging does not depend on libraries or module written by yourself, you can just uploade the html file of your plugin to a Github repository. To share with other, you can copy the link pointing to the `raw` file (this links to the unprocessed versions of the file). This url can then be used to install the plugin oin ImJoy: press the `+ Plugins` button and add the the url in the field `Install plugin from url`. If you want to contribute your plugin to the ImJoy central plugin repository, so users can directly install from the plugin store shown on ImJoy.io, you need to send a pull request to the repository. More details about that: [ImJoy-Plugins repository].
+If the pluging does not depend on libraries or module written by yourself, you can just uploade the html file of your plugin to a Github repository. To share with other, you can copy the link pointing to the `raw` file (this links to the unprocessed versions of the file). This url can then be used to install the plugin oin ImJoy: press the `+ Plugins` button and add the the url in the field `Install plugin from url`. 
+
+If you want to contribute your plugin to the ImJoy central plugin repository, so users can directly install from the plugin store shown on ImJoy.io, you need to send a pull request to the repository. More details about that: [ImJoy-Plugins repository].
 
 ### Plugins with dependencies
-If your plugin depends on non-standard libraries and modules, and you have to provid them with your plugin. You need to upload those libraries and modules to a github [gist](https://gist.github.com/) or repository, and link them in the plugin code.
+If your plugin depends on non-standard libraries and modules, and you have to provid them with your plugin. You can upload those libraries and modules to a [gist](https://gist.github.com/), a GitHub repository, or Dropbox  and link them in the plugin code.
 
  * for JavaScript plugins with extra dependencies, you need to create a [gist](https://gist.github.com/) or repository on Github named with the plugin name, and upload the plugin file together with other javascript files. In the plugin file, you can use `importScripts(url_to_your_js_file)` function to use this libraries. However, due to a restriction of Github, you can't use the url of github directly, you need to copy the url of your javascript file, and convert it with [RawGit](https://rawgit.com/).
  * for Python plugins with extra dependencies, you need to create a `setup.py` file to wrap the plugin as a pip module, create a [gist](https://gist.github.com/) or repository on Github named with the plugin name, and upload the plugin file together with your python modules. Now add the github link to `requirements` in `<config>` of your plugin. The github link should be formated to something like: `git+https://github.com/oeway/ImJoy-Python#egg=imjoy`, you can test with the `pip install ...` command to see if you can install your module.
