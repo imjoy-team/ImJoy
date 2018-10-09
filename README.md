@@ -40,5 +40,5 @@ Please refer to: [ImJoy Docs](https://imjoy.io/docs/index.html#/overview)
 
 Please star the ImJoy repo to support ImJoy.
 
-We would like ImJoy to be a community driven framework, everyone is welcome to contribute your idea, feedback, plugins and other code to the project. We don't have a guidline for that yet, for now please feel free to use the [issues](https://github.com/oeway/ImJoy/issues) and fork the project.
+We would like ImJoy to be a community driven framework, everyone is welcome to contribute your idea, feedback, plugins and code to the project. We don't have a guidline for that yet, for now please feel free to use the [issues](https://github.com/oeway/ImJoy/issues) and fork the project.
 
