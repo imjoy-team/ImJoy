@@ -8,7 +8,7 @@ in dedicated sections.
 * **Web app** - Interface running in the browser allowing to control ImJoy   
 * **Plugin** - Added functionality to ImJoy to either enhance the user interface or perform computational tasks. Plugins developed in Python require the Plugin Engine.
 * **Plugin Engine** - Python program to execute plugins in the background for heavy computations
-* **Operator [Ops]** - One plugin can allow to perform different tasks, which are called operators ("ops"). These ops can be used in a workflow.
+* **Operator [Ops]** - One plugin can allow to perform tasks with a set of operators ("ops"). These ops can be used in a workflow or accessed from the plugin menu.
 * **Workflow** - Allows to assemble a series of ops to perform a series of processing steps. Ops can access the results of preceding ops in the workflow. Workflows can be saved and reused.
 * **Workspace** - Isolated work environments with a distinct set of plugins. Allow to perform independent calculations. 
 
