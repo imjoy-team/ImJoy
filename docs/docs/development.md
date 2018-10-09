@@ -415,11 +415,11 @@ Examples:
   
   
 ### Controlling run-time behavior
-You can control the run-time behavior of a Python plugin process with `flags` parameter in the `<config>` block. We provide next some nomenclature and additional explanations to make it 
+You can control the run-time behavior of a Python plugin process with  the `flags` parameter in the `<config>` block. Next we provide next  nomenclature and additional explanations to explain the different options you have to control how the Python processes running on the plugin engine interact with the ImJoy interface. 
 
 * **Interface**: web interface of ImJoy. You can have ImJoy running on multiple browser windows, i.e. multiple interfaces. 
 * **Plugin Engine**: running in the background to execute Python code from different Python plugins.
-* **Python plugin**: plugin containing Python code. Some plugins might have **'tags'** to further specify details of how they are exectuted.
+* **Python plugin**: plugin containing Python code. Some plugins might have **`tags`** to further specify details of how they are exectuted.
 * **Python process**: specific Python plugin running on the Plugin engine. Processes can be seen on the Task Manager.
 * **Workspace**: collection of installed ImJoy plugins. For plugins with `tags`, the user choses the appropriate tag. Each Python plugin within a workspace has its own process. Each workspace has a unique name.   
 * **ImJoy instance** is a workspace running in one ImJoy interface.
