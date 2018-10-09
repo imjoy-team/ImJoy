@@ -421,19 +421,15 @@ You can control the run-time behavior of a Python plugin process with `flags` pa
 * **Plugin Engine**: running in the background to execute Python code from different Python plugins.
 * **Python plugin**: plugin containing Python code. Some plugins might have **'tags'** to further specify details of how they are exectuted.
 * **Python process**: specific Python plugin running on the Plugin engine. Processes can be seen on the Task Manager.
-* **Workspace**: collection of installed ImJoy plugin. For plugins with `tags`, the user chose the appropriate one. A workspace has a unique name. 
+* **Workspace**: collection of installed ImJoy plugins. For plugins with `tags`, the user choses the appropriate tag. Each Python plugin within a workspace has its own process. Each workspace has a unique name.   
 * **ImJoy instance** is a workspace running in one ImJoy interface.
 
+<img src="./asserts/imjoy-python-process.png" width="600px"></img>
 
-
-
-
-
-In what follows, we ca
-
-Interface
-Python process
-
+Below we describe the three main run-time behavior of python plugins:
+* By **default**, each ImJoy instance has its own process on the plugin engine. If you close the interface, you will kill the process.
+* The **`single-instance`** option will allow only one process to run for a given workspace. A workspace is defined by its name, all installed plugins, and the selected `tags`. If two ImJoy instances run the exact same workspace, then the `single-instance` means that they access the same process. Only closing last instance will  kill the process.
+* The **allow-detach** option means that the process is not killed when its ImJoy instance is closed. For instance, this allows to perform long computional tasks in the background which dont require additional user feedback and which terminate autonomously. Can also be used to protect a long computional tasks again browser instabilties. If you want to be able to attach to a detached process, the plugin has additionally have the `single-instance` tag.
 
 
 ### TODO: Use Docker Containers
@@ -489,7 +485,7 @@ Here is a list of supported url parameters:
 Below we provide detailed information for the different deployment options ImJoy provides. We also provide some examples in the [Tutorial section](http://imjoy.io/docs/index.html#/tutorial?id=tutorials-for-distribution-and-deployment).
 
 ### Plugins without dependencies
-If the pluging does not depend on libraries or module written by yourself, you can just uploade the file (.imjoy.html) to a Gist or GiHub repository. To share with others, copy the link pointing to the `raw` file. This url can then be used to install the plugin in ImJoy: press the `+ Plugins` button and add the the url in the field `Install plugin from url`. See also the dedicated [Tutorial](./tutorial#distribution-and-deployment-of-a-plugin-with-github-gist).
+If the pluging does not depend on libraries or module written by yourself, you can just uploade the file (.imjoy.html) to a Gist or GiHub repository. To share with others, copy the link pointing to the `raw` file. This url can then be used to install the plugin in ImJoy: press the `+ Plugins` button and add the the url in the field `Install plugin from url`. See also the dedicated [Tutorial](http://imjoy.io/docs/index.html#/tutorial?id=distribution-and-deployment-of-a-plugin-with-github-gist).
 
 If you want to contribute your plugin to the ImJoy central plugin repository, so users can directly install from the plugin store shown on ImJoy.io, you need to send a pull request to the repository. More details about that: [ImJoy-Plugins repository].
 
