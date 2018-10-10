@@ -53,10 +53,16 @@ import shutil
 url = 'https://DROPBOXLINK/testcode.zip?dl=1'
 r = requests.get(url, allow_redirects=True)
 
+# download the zip file
 name_zip = os.path.join('.','testcode.zip')
 open(name_zip, 'wb').write(r.content)
-shutil.unpack_archive(name_zip)
+
+# extract to current folder (the workspace folder)
+with zipfile.ZipFile(name_zip, 'r') as f:
+    f.extractall('./')
 os.remove(name_zip)
+
+# If you want to import python modules, add the code folder into sys.path
 sys.path.append(os.path.join('.','testcode'))
 ```
 
