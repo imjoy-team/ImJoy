@@ -729,7 +729,7 @@ export default {
         }).catch((err) => {
           this.showMessage("Database Error:" + err.toString())
           this.status_text = "Database Error:" + err.toString()
-        }
+        })
       }
       // if (this.selected_workspace != 'default') {
       //   const query = Object.assign({}, this.$route.query);
@@ -1071,7 +1071,7 @@ export default {
         .catch((err) => {
           this.showMessage("Database Error:" + err.toString())
           this.status_text = "Database Error:" + err.toString()
-        }
+        })
 
       }
       // if current workspace is deleted, go to default
@@ -2063,7 +2063,7 @@ export default {
               resolve(plugin)
             }).catch((e) => {
               console.error('error occured when loading plugin ' + template.name + ": ", e)
-              this.showMessage('error occured when loading plugin ' + template.name + ": " + e)
+              this.showMessage(`<${template.name}>: ${e}`)
               reject(e)
               plugin.terminate()
             })
@@ -2075,11 +2075,11 @@ export default {
         plugin.whenFailed((e) => {
           if(e){
             this.status_text = `<${template.name}> ${e.toString()}`
-            this.showMessage('Error occured when loading ' + template.name + ": " + e)
+            this.showMessage(`<${template.name}>: ${e}`)
           }
           else{
-            this.status_text = 'Error occured when loading ' +template.name
-            this.showMessage('Error occured when loading ' + template.name )
+            this.status_text = `Error occured when loading ${template.name}.`
+            this.showMessage(`Error occured when loading ${template.name}.`)
           }
           console.error('error occured when loading ' + template.name + ": ", e)
           plugin.terminate()
@@ -2446,8 +2446,8 @@ export default {
         });
         plugin.whenFailed((e) => {
           console.error('error occured when loading ' + pconfig.name + ":", e)
-          this.status_text = 'error occured when loading ' + pconfig.name + ": " + e
-          this.showMessage('error occured when loading ' + pconfig.name + ": " + e)
+          this.status_text = `Error occured when loading ${pconfig.name}: ${e}.`
+          this.showMessage(`Error occured when loading ${pconfig.name}: ${e}.`)
           plugin.terminate()
           reject(e)
         });
