@@ -1,6 +1,6 @@
 <template>
 <div class="plugin-editor">
-    <md-toolbar class="md-dense editor-toolbar md-layout md-gutter" md-elevation="1">
+    <md-toolbar class="md-dense editor-toolbar md-layout" md-elevation="1">
       <!-- <md-button @click="reload()"  v-if="window" class="md-icon-button">
         <md-icon>autorenew</md-icon>
         <md-tooltip>Update this plugin</md-tooltip>

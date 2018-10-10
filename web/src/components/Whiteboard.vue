@@ -2,7 +2,7 @@
 <div class="whiteboard noselect" ref="whiteboard"  @click="unselectWindows()">
   <div class="overlay" @click="show_overlay=false" v-if="show_overlay"></div>
   <grid-layout :layout="windows" :col-num="col_num" :is-mirrored="false" :auto-size="true" :row-height="row_height" :col-width="column_width" :is-draggable="true" :is-resizable="true" :vertical-compact="true" :margin="[3, 3]" :use-css-transforms="true">
-    <grid-item v-for="(w, wi) in windows" drag-allow-from=".drag-handle" drag-ignore-from=".no-drag" :x="w.x" :y="w.y" :w="w.w" :h="w.h" :i="w.i" @resize="focusWindow(w)" @move="focusWindow(w)" @resized="show_overlay=false;w.resize&&w.resize()" @moved="show_overlay=false;w.move&&w.move()" :key="w.iframe_container">
+    <grid-item v-for="(w, wi) in windows" drag-allow-from=".drag-handle" drag-ignore-from=".no-drag" :x="w.x" :y="w.y" :w="w.w" :h="w.h" :i="w.i" @resize="focusWindow(w)" @move="focusWindow(w)" @resized="show_overlay=false;w.resize&&w.resize()" @moved="show_overlay=false;w.move&&w.move()" :key="w.id">
       <md-card>
         <md-card-expand>
           <md-card-actions md-alignment="space-between" :class="w.selected?'window-selected drag-handle':'window-header drag-handle'">
@@ -37,7 +37,7 @@
                     <span>Close</span>
                     <md-icon>close</md-icon>
                   </md-menu-item>
-                  <md-menu-item @click="printObject(w.type, w.data)">
+                  <md-menu-item @click="printObject(w.type, w.data, w)">
                     <span>Console.log</span>
                     <md-icon>bug_report</md-icon>
                   </md-menu-item>
@@ -290,8 +290,8 @@ export default {
         this.$forceUpdate()
       }, 300)
     },
-    printObject(name, obj){
-      console.log(name, obj)
+    printObject(name, obj, obj2){
+      console.log(name, obj, obj2)
     },
     dataSummary(w){
 
