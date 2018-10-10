@@ -972,14 +972,10 @@ export default {
                 p.tag = tag
               }
             }
+            this.showMessage(`Plugin "${config.name}" has been successfully installed.`)
+            this.$forceUpdate()
             resolve()
-            this.reloadPlugin(config).then(()=>{
-              this.showMessage(`Plugin "${config.name}" has been successfully installed.`)
-              this.$forceUpdate()
-            }).catch(()=>{
-              this.showMessage(`Plugin ${config.name} saved but failed to load.`)
-              this.$forceUpdate()
-            })
+            this.reloadPlugin(config)
           }).catch(()=>{
             reject(`Failed to save the plugin ${config.name}`)
           })
