@@ -9,7 +9,7 @@ Imjoy consists of **two parts**:
 1. the **user interface**
 2. the **computational backend**
 
-While the ImJoy web app alone can perform computational tasks with the powerful Javascript engine and WebGL providing GPU access, adding an additional computational backend allows ImJoy to access the entire Python ecosystem.
+While the ImJoy web app alone can perform computational tasks with the powerful Javascript engine and WebGL providing GPU access, adding an additional computational backend allows ImJoy to access the entire Python ecosystem. The plugin engine can be launched either on the local machine, or remotely to perform compuationally intensive tasks on dedicated workstations, e.g. with state-of-the-art GPUs. 
 
 By design, ImJoy itself provides very minimal task specific functionality, it provides a flexible plugin interface to support plugins to extend the user interface and perform compuational tasks. Plugins can be designed to perform  simple tasks such as reading tif file, or more complex tasks such as training a deep learning model for image segmentation.
 
