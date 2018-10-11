@@ -29,7 +29,7 @@ Describe your plugin here.
 </config>
 
 <script lang="javascript">
-class UntitledPlugin {
+class ImJoyPlugin {
   async setup() {
     //await importScripts("http://xxxx/xxx.js")
   }
@@ -40,7 +40,7 @@ class UntitledPlugin {
   }
 }
 
-api.export(new UntitledPlugin())
+api.export(new ImJoyPlugin())
 </script>
 
 `
@@ -67,7 +67,7 @@ Describe your plugin here.
 </config>
 
 <script lang="javascript">
-class UntitledPlugin {
+class ImJoyPlugin {
   async setup() {
     //await importScripts("http://xxxx/xxx.js")
   }
@@ -78,7 +78,7 @@ class UntitledPlugin {
   }
 }
 
-api.export(new UntitledPlugin())
+api.export(new ImJoyPlugin())
 </script>
 `
 
@@ -104,7 +104,7 @@ Describe your plugin here.
 </config>
 
 <script lang="javascript">
-class UntitledPlugin {
+class ImJoyPlugin {
   async setup() {
     //await importScripts("http://xxxx/xxx.js")
   }
@@ -115,7 +115,7 @@ class UntitledPlugin {
   }
 }
 
-api.export(new UntitledPlugin())
+api.export(new ImJoyPlugin())
 </script>
 
 <window lang="html">
@@ -157,7 +157,7 @@ Describe your plugin here.
 
 <script lang="python">
 import numpy as np
-class PythonPlugin():
+class ImJoyPlugin():
     def setup(self):
         print('setup in python')
 
@@ -165,7 +165,7 @@ class PythonPlugin():
         print('hello world.')
         return my
 
-api.export(PythonPlugin())
+api.export(ImJoyPlugin())
 </script>
 `
 
