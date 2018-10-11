@@ -397,10 +397,28 @@
       <md-divider></md-divider>
       <md-card>
         <md-card-header>
+          <div class="md-title">Install from URL</div>
+          <md-toolbar md-elevation="0">
+            <md-field md-clearable class="md-toolbar-section-start">
+              <md-icon>cloud_download</md-icon>
+              <md-input placeholder="Install plugin from url" type="text" v-model="plugin_url" name="plugin_url"></md-input>
+            </md-field>
+            <md-button @click="installPluginFromUrl(plugin_url)" class="md-button md-primary">
+              <md-icon>cloud_download</md-icon>Install
+            </md-button>
+          </md-toolbar>
+          <!-- <plugin-list :name="repository_name" :description="repository_description" @message="showMessage" :database="db" :install-plugin="installPlugin" :remove-plugin="removePlugin" :init-search="init_plugin_search" display="list" :plugins="available_plugins" :workspace="selected_workspace"></plugin-list> -->
+        </md-card-header>
+        <md-card-content>
+        </md-card-content>
+      </md-card>
+      <md-divider></md-divider>
+      <md-card>
+        <md-card-header>
           <div class="md-title">Install from the Plugin Store</div>
         </md-card-header>
         <md-card-content>
-          <plugin-list show-url :name="repository_name" :description="repository_description" @message="showMessage" :database="db" :install-plugin="installPlugin" :remove-plugin="removePlugin" :init-url="init_plugin_url" :init-search="init_plugin_search" display="list" :plugins="available_plugins" :workspace="selected_workspace"></plugin-list>
+          <plugin-list :name="repository_name" :description="repository_description" @message="showMessage" :database="db" :install-plugin="installPlugin" :remove-plugin="removePlugin" :init-search="init_plugin_search" display="list" :plugins="available_plugins" :workspace="selected_workspace"></plugin-list>
         </md-card-content>
       </md-card>
       <md-divider></md-divider>
@@ -482,7 +500,7 @@ export default {
       _plugin_dialog_promise: {},
       _plugin2_remove: null,
       is_https_mode: true,
-      init_plugin_url: null,
+      plugin_url: null,
       init_plugin_search: null,
       show_plugin_templates: true,
       loading: false,
@@ -777,10 +795,10 @@ export default {
           if(this.$route.query.plugin){
             const p = this.$route.query.plugin.trim()
             if (p.match(url_regex)) {
-              this.init_plugin_url = p
+              this.plugin_url = p
               this.init_plugin_search = null
             } else {
-              this.init_plugin_url = null
+              this.plugin_url = null
               this.init_plugin_search = p
             }
             this.show_plugin_templates = false
@@ -899,6 +917,23 @@ export default {
           this.reloadPlugin(plugin.config)
         }
       }
+    },
+    installPluginFromUrl(plugin_url){
+      this.permission_message = "This plugin is <strong>not</strong> provided by ImJoy.io. <br> Please make sure the plugin code is provided by a trusted source, otherwise it may <strong>harm</strong> your computer. <br> Do you allow this plugin to be installed?"
+      const backup_addplugin = this.showAddPluginDialog
+      this.resolve_permission = ()=>{
+        this.installPlugin(plugin_url).then(()=>{
+          this.showAddPluginDialog = false
+        }).catch(()=>{
+          this.showAddPluginDialog = backup_addplugin
+        })
+      }
+      this.reject_permission = ()=>{
+        this.showAddPluginDialog = backup_addplugin
+      }
+      this.showPluginEngineInfo = false
+      this.showAddPluginDialog = false
+      this.showPermissionConfirmation = true
     },
     installPlugin(pconfig, tag){
       return new Promise((resolve, reject) => {

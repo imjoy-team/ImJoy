@@ -5,18 +5,11 @@
   </md-subheader>
   <p v-if="description">{{description}}</p>
   <md-toolbar md-elevation="0">
-    <md-field md-clearable v-show="!plugin_url" class="md-toolbar-section-start">
+    <md-field md-clearable class="md-toolbar-section-start">
       <md-icon>search</md-icon>
       <md-input placeholder="Search by name..." v-model="search" @input="searchPlugin" />
     </md-field>
-    <md-field v-show="showUrl && !search" md-clearable class="md-toolbar-section-start">
-      <md-icon>cloud_download</md-icon>
-      <md-input placeholder="Install plugin from url" type="text" v-model="plugin_url" name="plugin_url"></md-input>
-    </md-field>
-    <md-button v-show="installPlugin && showUrl && plugin_url&&plugin_url!=''" @click="install(plugin_url)" class="md-button md-primary">
-      <md-icon>cloud_download</md-icon>Install
-    </md-button>
-    <md-button v-show="!search&&!plugin_url && installPlugin" @click="updateAll()" class="md-button md-primary">
+    <md-button v-show="!search && installPlugin" @click="updateAll()" class="md-button md-primary">
       <md-icon>update</md-icon><span class="md-small-hide">Update All</span>
     </md-button>
   </md-toolbar>
@@ -71,9 +64,6 @@
             <md-menu-item @click="showDocs(plugin)">
               <md-icon>description</md-icon>Docs
             </md-menu-item>
-            <!-- <md-menu-item v-if="!plugin.installed && installPlugin" @click="install(plugin)">
-              <md-icon>cloud_download</md-icon>Install
-            </md-menu-item> -->
             <md-menu-item v-if="plugin.installed && installPlugin" @click="install(plugin)">
               <md-icon>update</md-icon>Update
             </md-menu-item>
@@ -85,17 +75,6 @@
             </md-menu-item>
           </md-menu-content>
         </md-menu>
-
-        <!--<md-button v-if="!plugin.installed" @click="install(plugin)" class="md-icon-button md-list-action">
-            <md-icon>cloud_download</md-icon>Install</md-button>
-           <md-button v-if="plugin.installed" @click="install(plugin)" class="md-icon-button md-list-action">
-            <md-icon>update</md-icon>Update</md-button>
-          <md-button v-if="plugin.installed" @click="_plugin2_remove=plugin;showRemoveConfirmation=true;" class="md-icon-button md-list-action md-accent">
-            <md-icon>delete_forever</md-icon>Delete</md-button>
-          <md-button v-if="plugin.installed" @click="showCode(plugin)"class="md-icon-button md-list-action">
-            <md-icon>edit</md-icon>Edit</md-button> -->
-
-
       </md-list-item>
       <md-divider class="md-inset"></md-divider>
     </div>
@@ -242,14 +221,6 @@ export default {
         return 'list'
       }
     },
-    showUrl: {
-      type: Boolean,
-      default: false
-    },
-    initUrl: {
-      type: String,
-      default: null
-    },
     initSearch: {
       type: String,
       default: null
@@ -277,7 +248,6 @@ export default {
     return {
       search: '',
       editorCode: '',
-      plugin_url: '',
       editorPlugin: null,
       showEditor: false,
       containerWidth: 500,
@@ -298,7 +268,6 @@ export default {
     this.marked = marked
   },
   mounted() {
-    this.plugin_url = this.initUrl || '';
     this.search = this.initSearch || '';
     this.containerWidth = this.$refs.container.offsetWidth;
     this.store.event_bus.$on('resize', this.updateSize)
