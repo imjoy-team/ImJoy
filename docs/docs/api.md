@@ -129,7 +129,7 @@ await api.XXXXX(option1=3, option2='hi')
 
 ## `api.export(...)`
 
-export a plugin class or an object/dict as `Plugin API`, this call is mendatory for every ImJoy plugin.
+Export the plugin class or an object/dict as `Plugin API`, this call is mendatory for every ImJoy plugin (typically as the last line of the plugin script).
 ```
 // Javascript
 api.export(new ImJoyPlugin())
