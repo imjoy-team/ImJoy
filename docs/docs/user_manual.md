@@ -17,25 +17,9 @@ installation. Plugins can then only implemented in JavaScript (such as [TensoFlo
 
 ## TODO: How to use workspaces
 
-## Going offline
+## Access the Plugin Engine from a command line interface
 
-If you have already installed the **Python Plugin Engine**, then you can run ImJoy in offline mode. What you do is to run the engine with `python -m imjoy --serve` . And it will download all the files for offline access, after that, if you run `python -m imjoy` in the **same directory**, you will have your personal ImJoy web app which can be access by [http://127.0.0.1:8080](http://127.0.0.1:8080).
-
-Also notice that, even though ImJoy can run without internet, depends on the implementation of the plugin, some plugins maybe unusable when you go offline.
-
-## Use the Plugin Engine remotely
-You can launch the Python engine remotely to perform heavy computations, e.g. on dedicated processing workstations, computational clusters, or the cloud. This can be achieved with a few simple steps as detailed below
-1. Install Python plugin engine on remote computer
-0. Launch Python plugin engine on remote computer and allow access. Please note that the **ImJoy token system** prevent unauthorized access.
-0. Connect from your local ImJoy instance to plugin engine on remote machine. 
-
-#### Install and configure plugin engine on remote environment
-The latest release of the plugin engine is available together with installation instructions on [GitHub](https://github.com/oeway/ImJoy-Python/releases). 
-
-**TODO** How to handle updates? 
-
-#### Launch plugin engine on remote machine
-The installation of the plugin engine will setup an **Miniconda environment** located in `~/ImJoyApp`.
+For advanced users, you can access the Miniconda environment from command line interface.
 
 To access this environment on **Linux or MacOS**, you need to add `~/ImJoyApp/bin` to your `$PATH`:
 ```
@@ -50,11 +34,33 @@ For **Windows**, you can use powershell to add the ImJoyApp to `$env.Path`:
 $env:Path = '%systemdrive%%homepath%\ImJoyApp;%systemdrive%%homepath%\ImJoyApp\Scripts;' + $env:Path;
 ```
 
+**Note: The following sections asumes you have run the above command in your current terminal.**
+
+## Going offline
+
+If you have already installed the **Plugin Engine**, then you can run ImJoy in offline mode. What you do is to run the engine with `python -m imjoy --serve` . And it will download all the files for offline access, after that, if you run `python -m imjoy` in the **same directory**, you will have your personal ImJoy web app which can be access by [http://127.0.0.1:8080](http://127.0.0.1:8080).
+
+Also notice that, even though ImJoy can run without internet, depends on the implementation of the plugin, some plugins maybe unusable when you go offline.
+
+## Use the Plugin Engine remotely
+You can launch the Plugin Engine remotely to perform heavy computations, e.g. on dedicated processing workstations, computational clusters, or the cloud. This can be achieved with a few simple steps as detailed below
+1. Install Python plugin engine on remote computer
+0. Launch Python plugin engine on remote computer and allow access. Please note that the **ImJoy token system** prevent unauthorized access.
+0. Connect from your local ImJoy instance to plugin engine on remote machine. 
+
+#### Install and configure plugin engine on remote environment
+The latest release of the plugin engine is available together with installation instructions on [GitHub](https://github.com/oeway/ImJoy-Python/releases). 
+
+The plugin engine will try to upgrade itself from Github when it starts.
+
+#### Launch the Plugin Engine on remote machine
+The installation of the plugin engine will setup an **Miniconda environment** located in `~/ImJoyApp`.
+
 You can then launch the Plugin engine from a terminal (e.g. by ssh) and specify a host to allow outside connection:
 ```
   python -m imjoy --serve --host=0.0.0.0
 ```
-By default, the host will be set to `127.0.0.1`, which allows only local connection. To allow remote access the host is set to 0.0.0.0. In order to connect to the Python engine, you will need the **token** that is displayed in ther terminal. **KEEP THIS TOKEN PRIVATE!!!!**. Besides the token, you will also need the `hostname` or the IP adress of your remote machine.
+By default, the host will be set to `127.0.0.1`, which allows only local connection. To allow remote access the host is set to 0.0.0.0. In order to connect to the Plugin Engine, you will need the **token** that is displayed in ther terminal. **KEEP THIS TOKEN PRIVATE!!!!**. Besides the token, you will also need the `hostname` or the IP adress of your remote machine.
 
 #### Connect local ImJoy instance to 
 On your local machineThen go to http://IP-OF-YOUR-REMOTE:8080 to connect to the remote machine. In order to launch the plugin engine, you have simply to specify the **token**.
