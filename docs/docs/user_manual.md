@@ -34,11 +34,17 @@ For **Windows**, you can use powershell to add the ImJoyApp to `$env.Path`:
 $env:Path = '%systemdrive%%homepath%\ImJoyApp;%systemdrive%%homepath%\ImJoyApp\Scripts;' + $env:Path;
 ```
 
-**Note: The following sections asumes you have run the above command in your current terminal.**
+**Note: The following sections assume you have run the above command in your current terminal.**
 
 ## Going offline
 
-If you have already installed the **Plugin Engine**, then you can run ImJoy in offline mode. What you do is to run the engine with `python -m imjoy --serve` . And it will download all the files for offline access, after that, if you run `python -m imjoy` in the **same directory**, you will have your personal ImJoy web app which can be access by [http://127.0.0.1:8080](http://127.0.0.1:8080).
+If you have already installed the **Plugin Engine**, then you can run ImJoy in offline mode. What you do is to run the engine manually with the following command:
+
+```
+python -m imjoy --serve
+``` 
+
+And it will download all the files for offline access, you will have your personal ImJoy web app which can be access by [http://127.0.0.1:8080](http://127.0.0.1:8080).
 
 Also notice that, even though ImJoy can run without internet, depends on the implementation of the plugin, some plugins maybe unusable when you go offline.
 
@@ -58,9 +64,9 @@ The installation of the plugin engine will setup an **Miniconda environment** lo
 
 You can then launch the Plugin engine from a terminal (e.g. by ssh) and specify a host to allow outside connection:
 ```
-  python -m imjoy --serve --host=0.0.0.0
+python -m imjoy --serve --host=0.0.0.0
 ```
-By default, the host will be set to `127.0.0.1`, which allows only local connection. To allow remote access the host is set to 0.0.0.0. In order to connect to the Plugin Engine, you will need the **token** that is displayed in ther terminal. **KEEP THIS TOKEN PRIVATE!!!!**. Besides the token, you will also need the `hostname` or the IP adress of your remote machine.
+By default, the host will be set to `127.0.0.1`, which allows only local connection. To allow remote access the host is set to 0.0.0.0. In order to connect to the Plugin Engine, you will need the **connection token** that is displayed in ther terminal. **KEEP THIS TOKEN PRIVATE!!!!**. Besides the token, you will also need the `hostname` or the IP adress of your remote machine.
 
 #### Connect local ImJoy instance to 
-On your local machineThen go to http://IP-OF-YOUR-REMOTE:8080 to connect to the remote machine. In order to launch the plugin engine, you have simply to specify the **token**.
+On your local machineThen go to http://IP-OF-YOUR-REMOTE:8080 to connect to the remote machine. In order to launch the plugin engine, you have simply to specify the **connection token**.
