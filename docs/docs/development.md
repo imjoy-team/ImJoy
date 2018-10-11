@@ -211,7 +211,7 @@ Since ImJoy use postMessage to exchange data between plugins, for Javascript plu
 ### Javascript example
 ```html
 <script lang="javascript">
-class UntitledPlugin {
+class ImJoyPlugin {
   async setup() {
     console.log('initialized from Javascript.');
   }
@@ -222,14 +222,14 @@ class UntitledPlugin {
   }
 }
 
-api.export(new UntitledPlugin())
+api.export(new ImJoyPlugin())
 </script>
 ```
 
 ### Python example
 ```html
 <script lang="python">
-class UntitledPythonPlugin():
+class ImJoyPlugin():
     def setup(self):
         print('initialized from python.')
 
@@ -237,7 +237,7 @@ class UntitledPythonPlugin():
         print('hello world.')
         return my
 
-api.export(UntitledPythonPlugin())
+api.export(ImJoyPlugin())
 </script>
 ```
 
@@ -340,7 +340,7 @@ Here is a python `hello world` example:
 <script lang="python">
 import numpy as np
 
-class PythonPlugin():
+class ImJoyPlugin():
     def setup(self):
         pass
 
@@ -348,7 +348,7 @@ class PythonPlugin():
         print('hello world.')
         return my
 
-api.export(PythonPlugin())
+api.export(ImJoyPlugin())
 </script>
 
 ```
