@@ -924,7 +924,7 @@ export default {
       }
     },
     installPluginFromUrl(plugin_url){
-      this.permission_message = "This plugin is <strong>not</strong> provided by ImJoy.io. <br> Please make sure the plugin code is provided by a trusted source, otherwise it may <strong>harm</strong> your computer. <br> Do you allow this plugin to be installed?"
+      this.permission_message = "This plugin is <strong>not</strong> provided by ImJoy.io. <br> Please make sure the plugin is provided by a trusted source, otherwise it may <strong>harm</strong> your computer. <br> Do you allow this plugin to be installed?"
       const backup_addplugin = this.showAddPluginDialog
       this.resolve_permission = ()=>{
         this.installPlugin(plugin_url).then(()=>{
