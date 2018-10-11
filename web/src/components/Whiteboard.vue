@@ -33,10 +33,10 @@
                     <span>Duplicate</span>
                     <md-icon>filter</md-icon>
                   </md-menu-item>
-                  <md-menu-item v-if="w.type!='main'" @click="close(wi)">
+                  <!-- <md-menu-item v-if="w.type!='main'" @click="close(wi)">
                     <span>Close</span>
                     <md-icon>close</md-icon>
-                  </md-menu-item>
+                  </md-menu-item> -->
                   <md-menu-item @click="printObject(w.type, w.data, w)">
                     <span>Console.log</span>
                     <md-icon>bug_report</md-icon>

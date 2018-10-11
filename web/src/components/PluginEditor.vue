@@ -1,28 +1,35 @@
 <template>
 <div class="plugin-editor">
     <md-toolbar class="md-dense editor-toolbar md-layout" md-elevation="1">
-      <!-- <md-button @click="reload()"  v-if="window" class="md-icon-button">
-        <md-icon>autorenew</md-icon>
-        <md-tooltip>Update this plugin</md-tooltip>
-      </md-button> -->
-      <md-button @click="save()"  v-if="window" class="md-icon-button">
-        <md-icon>save</md-icon>
-        <md-tooltip>Save this plugin</md-tooltip>
-      </md-button>
-      <md-button @click="saveAs()" class="md-icon-button">
-        <md-icon>cloud_download</md-icon>
-        <md-tooltip>Export this plugin</md-tooltip>
-      </md-button>
-      <md-button @click="remove()" v-if="window && window.plugin&&window.plugin.config&&window.plugin.config._id" class="md-icon-button">
-        <md-icon>delete</md-icon>
-        <md-tooltip>Remove this plugin</md-tooltip>
-      </md-button>
-      <md-field class="md-layout-item md-size-20" v-if="window && window.plugin&&window.plugin.tags&&window.plugin.tags.length>1">
-        <!-- <label for="tag">Tag</label> -->
-        <md-select id="tag" @md-selected="reload()" v-model="window.plugin.tag" name="tag">
-          <md-option :value="tag" v-for="tag in window.plugin.tags" :key="tag">{{tag}}</md-option>
-        </md-select>
-      </md-field>
+      <div class="md-toolbar-section-start">
+        <!-- <md-button @click="reload()"  v-if="window" class="md-icon-button">
+          <md-icon>autorenew</md-icon>
+          <md-tooltip>Update this plugin</md-tooltip>
+        </md-button> -->
+        <md-button @click="save()"  v-if="window" class="md-icon-button">
+          <md-icon>save</md-icon>
+          <md-tooltip>Save this plugin</md-tooltip>
+        </md-button>
+        <md-button @click="saveAs()" class="md-icon-button">
+          <md-icon>cloud_download</md-icon>
+          <md-tooltip>Export this plugin</md-tooltip>
+        </md-button>
+        <md-button @click="remove()" v-if="window && window.plugin&&window.plugin.config&&window.plugin.config._id" class="md-icon-button">
+          <md-icon>delete</md-icon>
+          <md-tooltip>Remove this plugin</md-tooltip>
+        </md-button>
+        <span></span>
+        <md-field  v-if="window && window.plugin&&window.plugin.tags&&window.plugin.tags.length>0">
+          <!-- <label for="tag">Tag</label> -->
+          <md-select id="tag" @md-selected="reload()" v-model="window.plugin.tag" name="tag">
+            <md-option :value="tag" v-for="tag in window.plugin.tags" :key="tag">{{tag}}</md-option>
+          </md-select>
+          <md-tooltip>Select a tag for testing, the plugin will be reloaded.</md-tooltip>
+        </md-field>
+      </div>
+      <div class="md-toolbar-section-end">
+
+      </div>
     </md-toolbar>
     <monaco-editor
       class="editor code_editor"
@@ -80,6 +87,7 @@ export default {
   mounted() {
     this.codeValue = this.value
     this.editor = this.$refs.monaco_editor.getMonaco()
+    this.editor.layout();
     if(this.window){
         this.window.resize = ()=>{
         this.editor.layout();
@@ -87,7 +95,7 @@ export default {
     }
     setTimeout(()=>{
       this.editor.layout();
-    }, 1000)
+    }, 500)
 
     this.editor.addCommand( window.monaco.KeyMod.CtrlCmd |  window.monaco.KeyCode.KEY_S, ()=>{
       this.save()
