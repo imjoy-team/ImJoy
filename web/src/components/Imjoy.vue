@@ -1121,7 +1121,7 @@ export default {
     },
     showMessage(info, duration) {
       this.snackbar_info = info
-      this.snackbar_duration = duration || 3000
+      this.snackbar_duration = duration || 10000
       this.show_snackbar = true
     },
     connectEngine(url, auto) {
@@ -1137,7 +1137,7 @@ export default {
       const timer = setTimeout(() => {
         if (!this.engine_connected) {
           this.engine_status = 'Plugin Engine is not connected.'
-          if(!auto) this.showMessage('Failed to connect, please make sure you have started the plugin engine.', 5000)
+          if(!auto) this.showMessage('Failed to connect, please make sure you have started the plugin engine.')
 
           if(auto) socket.disconnect()
         }
@@ -1467,7 +1467,7 @@ export default {
           })
         } catch (e) {
           this.status_text = 'Error: ' + e
-          this.showMessage('Error: ' + e)
+          this.showMessage('Error: ' + e, 15000)
           reject(e)
         }
       })
@@ -1495,7 +1495,7 @@ export default {
               // console.log('Successfully saved!');
               this.showMessage(`${template.name } has been successfully saved.`)
             }).catch((err) => {
-              this.showMessage('failed to save the plugin.')
+              this.showMessage('Failed to save the plugin.', 15000)
               console.error(err)
               reject('failed to save')
             })
@@ -1510,7 +1510,7 @@ export default {
           });
         } catch (e) {
           this.status_text = 'Error: ' + e
-          this.showMessage('Error: ' + e)
+          this.showMessage('Error: ' + e, 15000)
           reject(e)
         }
       })
@@ -1832,7 +1832,7 @@ export default {
       }).catch((e) => {
         console.error(e)
         this.status_text = e.toString() || "Error."
-        this.showMessage('Error: ' + e)
+        this.showMessage('Error: ' + e, 12000)
       })
     },
     saveWorkflow(joy) {
@@ -1854,7 +1854,7 @@ export default {
         this.workflow_list.push(data)
         this.showMessage(name + ' has been successfully saved.')
       }).catch((err) => {
-        this.showMessage('failed to save the workflow.')
+        this.showMessage('Failed to save the workflow.')
         console.error(err)
       })
     },
@@ -1879,7 +1879,7 @@ export default {
         // console.log('Successfully removed!');
         this.showMessage(name + ' has been successfully removed.')
       }).catch((err) => {
-        this.showMessage('failed to remove the workflow.')
+        this.showMessage('Failed to remove the workflow.')
         console.error(err)
       })
     },
@@ -1906,7 +1906,7 @@ export default {
       }).catch((e) => {
         console.error(e)
         this.status_text = '<' +op.name + '>' + (e.toString() || "Error.")
-        this.showMessage('Error: ' + e)
+        this.showMessage('Error: ' + e, 15000)
       })
     },
     selectFileChanged(event) {
@@ -2080,9 +2080,9 @@ export default {
         const plugin = new jailed.DynamicPlugin(tconfig, _.assign({TAG: tconfig.tag, WORKSPACE: this.selected_workspace}, this.plugin_api))
         plugin.whenConnected(() => {
           if (!plugin.api) {
-            console.error('error occured when loading plugin.')
-            this.showMessage('error occured when loading plugin.')
-            throw 'error occured when loading plugin.'
+            console.error('Error occured when loading plugin.')
+            this.showMessage('Error occured when loading plugin.')
+            throw 'Error occured when loading plugin.'
           }
 
           if (template.type) {
@@ -2099,7 +2099,7 @@ export default {
               resolve(plugin)
             }).catch((e) => {
               console.error('error occured when loading plugin ' + template.name + ": ", e)
-              this.showMessage(`<${template.name}>: ${e}`)
+              this.showMessage(`<${template.name}>: ${e}`, 15000)
               reject(e)
               plugin.terminate()
             })

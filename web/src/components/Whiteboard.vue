@@ -87,12 +87,12 @@
             </ul>
             <p v-else> No url.</p>
           </div>
-          <div v-else-if="w.type=='imjoy/image'">
-            <img style="width: 100%" :src="w.data.src" v-if="w.data.src"></img>
+          <div v-else-if="w.type=='imjoy/image'" class="fill-container">
+            <img style="height: 100%; width: 100%; object-fit: contain;" :src="w.data.src" v-if="w.data.src"></img>
             <p v-else> No image available for display.</p>
           </div>
-          <div v-else-if="w.type=='imjoy/images'">
-            <img style="width: 100%" :src="img" v-for="img in w.data.images" v-if="w.data.images"></img>
+          <div v-else-if="w.type=='imjoy/images'" class="allow-scroll fill-container">
+            <img style="height: 100%; width: 100%; object-fit: contain;" :src="img" v-for="img in w.data.images" v-if="w.data.images"></img>
             <p v-else> No image available for display.</p>
           </div>
           <div v-else-if="w.type=='imjoy/panel'">
@@ -347,6 +347,10 @@ export default {
   color: var(--md-theme-default-text-primary-on-primary, #fff) !important;
   background-color: #ddd !important;
   height: 30px;
+}
+.fill-container{
+  width: 100%;
+  height: 100%;
 }
 
 .window-title {
