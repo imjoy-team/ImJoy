@@ -23,7 +23,7 @@ If you have already installed the **Python Plugin Engine**, then you can run ImJ
 
 Also notice that, even though ImJoy can run without internet, depends on the implementation of the plugin, some plugins maybe unusable when you go offline.
 
-## Use the Python engine remotely
+## Use the Plugin Engine remotely
 You can launch the Python engine remotely to perform heavy computations, e.g. on dedicated processing workstations, computational clusters, or the cloud. This can be achieved with a few simple steps as detailed below
 1. Install Python plugin engine on remote computer
 0. Launch Python plugin engine on remote computer and allow access. Please note that the **ImJoy token system** prevent unauthorized access.
