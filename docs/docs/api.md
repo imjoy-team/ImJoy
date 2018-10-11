@@ -21,7 +21,7 @@ for both Python and JavaScript: `callback` style and `async/await` style.
 Declare your function with the `async` keyword. Append `await` to the asynchronous function to wait fore the result. This essentially allows synchronous style programming without the need to set callbacks. For example:
  ```javascript
  // JavaScript
- class JSPlugin(){
+ class ImJoyPlugin(){
    async setup(){
    }
    async run(my){
@@ -39,7 +39,7 @@ Declare your function with the `async` keyword. Append `await` to the asynchrono
  ```python
 import asyncio
 
-class PyPlugin():
+class ImJoyPlugin():
     async def setup(self):
         pass
 
@@ -68,7 +68,7 @@ Call the asynchronous function and set its callback with `.then(callback_func)`.
  Below examples for an api name `XXXXX`):
 
 ```javascript
-class JSPlugin(){
+class ImJoyPlugin(){
   setup(){
   }
   run(my){
@@ -88,7 +88,7 @@ class JSPlugin(){
 ```
 
 ```python
-class PyPlugin():
+class ImJoyPlugin():
     def setup(self):
         pass
 
@@ -126,6 +126,20 @@ await api.XXXXX({"option1": 3, "option2": 'hi'})
 # only for Python
 await api.XXXXX(option1=3, option2='hi')
 ```
+
+## `api.export(...)`
+
+export a plugin class or an object/dict as `Plugin API`, this call is mendatory for every ImJoy plugin.
+```
+// Javascript
+api.export(new ImJoyPlugin())
+
+# Python
+api.export(ImJoyPlugin())
+```
+Every member of the `ImJoyPlugin` instance will be exported as `Plugin API`, which means those exported functions or variables can be called or used by the ImJoy app or another plugin.
+
+Notice that, if a variable or function has a name start with `_`, it means that's an internel varialbe or function, will not be exported.
 
 ## `api.alert(...)`
 shows an alert dialog with a message, example: `api.alert('hello world')`
@@ -207,7 +221,7 @@ when the op is called with the `run` field when calling `api.register`. For exam
 If you want to run a function whenever any option is changed, you can pass a `update` function. Similar to `run`, you need to pass a function from the member of the plugin class. Here is an example defining `run` and `update` in Python:
 
 ```python
-class PythonPlugin():
+class ImJoyPlugin():
   def apply_lut(self, my):
       ...
   def lut_updated(self, my):
