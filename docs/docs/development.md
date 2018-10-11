@@ -276,10 +276,10 @@ As you may see in the above examples, they both contain an `api.export` statemen
 
 ```javascript
 //Javascript
-api.export(new UntitledJSPlugin())
+api.export(new ImJoyPlugin())
 
 # Python
-api.export(UntitledPythonPlugin())
+api.export(ImJoyPlugin())
 ```
 
 **Notice** that in Javascript, the `new` keyword is necessary to create an instance of a class, while in Python there is no `new` keyword.
