@@ -48,7 +48,7 @@ unavailable with the link `DROPBOXLINK/testcode.zip`. You can then place the fol
 import sys
 import os
 import requests
-import shutil
+import zipfile
 
 url = 'https://DROPBOXLINK/testcode.zip?dl=1'
 r = requests.get(url, allow_redirects=True)
@@ -57,12 +57,12 @@ r = requests.get(url, allow_redirects=True)
 name_zip = os.path.join('.','testcode.zip')
 open(name_zip, 'wb').write(r.content)
 
-# extract to current folder (the workspace folder)
+# extract to the current folder (i.e. workspace)
 with zipfile.ZipFile(name_zip, 'r') as f:
     f.extractall('./')
 os.remove(name_zip)
 
-# If you want to import python modules, add the code folder into sys.path
+# If you want to import your python modules, append the folder to sys.path
 sys.path.append(os.path.join('.','testcode'))
 ```
 
