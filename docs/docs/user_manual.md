@@ -18,8 +18,7 @@ installation. Plugins can then only implemented in JavaScript (such as [TensoFlo
 ## TODO: How to use workspaces
 
 ## Access the Plugin Engine from a command line interface
-
-For advanced users, you can access the Miniconda environment from command line interface.
+For advanced users, you can access the Miniconda environment from the command line interface.
 
 To access this environment on **Linux or MacOS**, you need to add `~/ImJoyApp/bin` to your `$PATH`:
 ```
@@ -37,16 +36,14 @@ $env:Path = '%systemdrive%%homepath%\ImJoyApp;%systemdrive%%homepath%\ImJoyApp\S
 **Note: The following sections assume you have run the above command in your current terminal.**
 
 ## Going offline
-
-If you have already installed the **Plugin Engine**, then you can run ImJoy in offline mode. What you do is to run the engine manually with the following command:
+If you have already installed the **Plugin Engine**, then you can run ImJoy in offline mode with the following command (you will need to update you `$PATH` settings as explained above):
 
 ```
 python -m imjoy --serve
 ``` 
+This will download all files necessary for offline access, you will have your own ImJoy web app which can be access by [http://127.0.0.1:8080](http://127.0.0.1:8080).
 
-And it will download all the files for offline access, you will have your personal ImJoy web app which can be access by [http://127.0.0.1:8080](http://127.0.0.1:8080).
-
-Also notice that, even though ImJoy can run without internet, depends on the implementation of the plugin, some plugins maybe unusable when you go offline.
+Also notice that, even though ImJoy can run without internet, depending on the implementation of the plugin, some plugins maybe unusable when you go offline.
 
 ## Use the Plugin Engine remotely
 You can launch the Plugin Engine remotely to perform heavy computations, e.g. on dedicated processing workstations, computational clusters, or the cloud. This can be achieved with a few simple steps as detailed below
@@ -60,13 +57,13 @@ The latest release of the plugin engine is available together with installation 
 The plugin engine will try to upgrade itself from Github when it starts.
 
 #### Launch the Plugin Engine on remote machine
-The installation of the plugin engine will setup an **Miniconda environment** located in `~/ImJoyApp`.
+The installation of the plugin engine will setup an **Miniconda environment** located in `~/ImJoyApp`. 
 
-You can then launch the Plugin engine from a terminal (e.g. by ssh) and specify a host to allow outside connection:
+You can then launch the Plugin engine from a terminal (e.g. by ssh) and specify a host to allow outside connections. Before doing this, you need to update you `$PATH` settings as explained above.
 ```
 python -m imjoy --serve --host=0.0.0.0
 ```
-By default, the host will be set to `127.0.0.1`, which allows only local connection. To allow remote access the host is set to 0.0.0.0. In order to connect to the Plugin Engine, you will need the **connection token** that is displayed in ther terminal. **KEEP THIS TOKEN PRIVATE!!!!**. Besides the token, you will also need the `hostname` or the IP adress of your remote machine.
+By default, the host will be set to `127.0.0.1`, which allows only local connections. To allow remote access, the host is set to `0.0.0.0`. In order to connect to the Plugin Engine, you will need the **connection token** that is displayed in the terminal after you launched the plugin engin. **KEEP THIS TOKEN PRIVATE!!!!**. Besides the token, you will also need the `hostname` or the IP adress of your remote machine.
 
 #### Connect local ImJoy instance to 
 On your local machineThen go to http://IP-OF-YOUR-REMOTE:8080 to connect to the remote machine. In order to launch the plugin engine, you have simply to specify the **connection token**.
