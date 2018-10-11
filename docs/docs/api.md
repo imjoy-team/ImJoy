@@ -254,13 +254,16 @@ If you do not want the window to load immediately, you can add `click2load: true
 Once an window is created, it will return a window ID, which can be used for updating the window with `api.updateWindow`.
 
 ## `api.updateWindow(...)`
-update an existing window, an window ID should be passed in order to perform the update, example:
+update an existing window, an window ID (produced by `api.createWindow`) should be passed in order to perform the update, example:
 
 ```javascript
+//Javascript
 api.updateWindow({id: windowId, data: {image: ...}})
 ```
 
 ```python
+# Python
+
 # pass as a dictionary
 api.updateWindow({'id': windowId, 'data': {'image': ...}})
 
@@ -268,7 +271,7 @@ api.updateWindow({'id': windowId, 'data': {'image': ...}})
 api.updateWindow(id=windowId, data={'image': ...})
 ```
 
-The second parameter is an object contains fields which the plugin wants to update.
+The second parameter is an object contains fields which the plugin wants to update, it will be passed as `my.data` to the `run` function of the target window plugin. If the target window is a internally supported window (e.g. `imjoy/image`), then it will just replace the content (since there is not `run` function).
 
 ## `api.showDialog(...)`
 show a dialog with customized GUI, example:
