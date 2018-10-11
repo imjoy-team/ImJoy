@@ -8,9 +8,8 @@
 We assume that the entire code is contained in the plugin file and no extra
 dependencies are required. [GitHub Gist](https://gist.github.com/) is a service provided by GitHub  to easily share individual files. Every gist is a GIT repository, so it provides version control, it can be forked and cloned.
 
-##### Create gist
+##### Deploy your ImJoy Plugin to Gist
 
-1. Export your ImJoy plugin (press cloud button on the title bar).
 1. Go to gist on your GitHub account [https://gist.github.com/](https://gist.github.com/)
 1. Create new gist and copy & paste the code of your plugin.
 1. Give a new name followed by  `.imjoy.html`
@@ -48,15 +47,21 @@ unavailable with the link `DROPBOXLINK/testcode.zip`. You can then place the fol
 import sys
 import os
 import requests
-import shutil
+import zipfile
 
 url = 'https://DROPBOXLINK/testcode.zip?dl=1'
 r = requests.get(url, allow_redirects=True)
 
+# download the zip file
 name_zip = os.path.join('.','testcode.zip')
 open(name_zip, 'wb').write(r.content)
-shutil.unpack_archive(name_zip)
+
+# extract to the current folder (i.e. workspace)
+with zipfile.ZipFile(name_zip, 'r') as f:
+    f.extractall('./')
 os.remove(name_zip)
+
+# If you want to import your python modules, append the folder to sys.path
 sys.path.append(os.path.join('.','testcode'))
 ```
 

@@ -92,7 +92,7 @@ The order of these blocks does not matter, so you can shuffle the blocks.
 * `tags` defines a list of supported tags, which can be used to provide differentiate configureable modes and can be accessed at various points in the plugin. For an overview we
 we refer to the dedicate description **## Plugins and tags**
 * `ui` is a string specifying the GUI that will be displayed to the user. The following elements can be used to render an input form:
-  * `type: 'choice', options: ['cat', 'dog'], placeholder: 'cat'`
+  * `type: 'choose', options: ['cat', 'dog'], placeholder: 'cat'`
   * `type: 'number', min: 0, max: 10, placeholder:2`
   * `type: 'color'`
   * `type: 'string'`
@@ -102,7 +102,7 @@ we refer to the dedicate description **## Plugins and tags**
   * ...
 
   For each element, you need to define a unique `id`, which can then be used to access
-  the value of this element in the plugin. For example, to render a form with a selection use `"ui": "select an option: {id: 'option1', type: 'choice', options: ['cat', 'dog'], placeholder: 'cat'}"`.  In the plugin, the selection can then be accessed with `my.config.option1`.
+  the value of this element in the plugin. For example, to render a form with a selection use `"ui": "select an option: {id: 'option1', type: 'choose', options: ['cat', 'dog'], placeholder: 'cat'}"`.  In the plugin, the selection can then be accessed with `my.config.option1`.
 
   To define longer forms with multiple lines, we support additional definitions
   of the `ui` string.
@@ -110,7 +110,7 @@ we refer to the dedicate description **## Plugins and tags**
   * an array of strings. For example:
 ```json
 "ui": [
-       "option1: {id: 'option1', type: 'choice', options: ['cat', 'dog'], placeholder: 'cat'}",
+       "option1: {id: 'option1', type: 'choose', options: ['cat', 'dog'], placeholder: 'cat'}",
        "option2: {id: 'option2', type: 'number', placeholder: 3}"
       ],
 ```
@@ -118,7 +118,7 @@ we refer to the dedicate description **## Plugins and tags**
   is defined as an individual string.
 ```json
 "ui": [
-       {"option1": "{id: 'option1', type: 'choice', options: ['cat', 'dog'], placeholder: 'cat'}"},
+       {"option1": "{id: 'option1', type: 'choose', options: ['cat', 'dog'], placeholder: 'cat'}"},
        {"option2": {"id": "option2",
                     "type": "number",
                     "placeholder": 3}}],

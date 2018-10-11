@@ -721,6 +721,8 @@ export default {
       this.workspace_list = doc.list
       default_ws = doc.default
     }).catch((err) => {
+      this.showMessage("Database Error:" + err.toString())
+      this.status_text = "Database Error:" + err.toString()
       console.error(err)
       this.config_db.put({
         _id: 'workspace_list',
@@ -742,6 +744,9 @@ export default {
             list: this.workspace_list,
             default: 'default'
           })
+        }).catch((err) => {
+          this.showMessage("Database Error:" + err.toString())
+          this.status_text = "Database Error:" + err.toString()
         })
       }
       // if (this.selected_workspace != 'default') {
@@ -883,7 +888,7 @@ export default {
     showFileDialog(options, _plugin){
       if(!this.engine_connected){
         this.showMessage('File Dialog requires the plugin engine, please connect to the plugin engine.')
-        throw "Plugin engine is not connected."
+        throw "Please start the Plugin Engine and connect to it."
       }
       if(!_plugin){
         _plugin = options
@@ -1098,6 +1103,10 @@ export default {
             this.showMessage(`Error occured when removing workspace ${w}.`)
           })
         })
+        .catch((err) => {
+          this.showMessage("Database Error:" + err.toString())
+          this.status_text = "Database Error:" + err.toString()
+        })
 
       }
       // if current workspace is deleted, go to default
@@ -1251,8 +1260,8 @@ export default {
     getFileUrl(path, _plugin){
       return new Promise((resolve, reject) => {
         if(!this.engine_connected){
-          reject("Plugin Engine is not connected.")
-          this.showMessage("Error: Plugin Engine is not connected.")
+          reject("Please start the Plugin Engine and connect to it.")
+          this.showMessage("Please start the Plugin Engine and connect to it.")
           return
         }
         if(_plugin !== this.IMJOY_PLUGIN && (!_plugin || !_plugin.id)){
@@ -1302,8 +1311,8 @@ export default {
     getFilePath(url, _plugin){
       return new Promise((resolve, reject) => {
         if(!this.engine_connected){
-          reject("Plugin Engine is not connected.")
-          this.showMessage("Error: Plugin Engine is not connected.")
+          reject("Please start the Plugin Engine and connect to it.")
+          this.showMessage("Please start the Plugin Engine and connect to it.")
           return
         }
         let config = url
@@ -1625,7 +1634,7 @@ export default {
                 this.reloadPlugin(config).catch((e)=>{
                   console.error(config, e)
                   this.showSnackbar(`<${config.name}>: ${e.toString()}` )
-                  if(!e.toString().includes('plugin engine is not connected')){
+                  if(!e.toString().includes('Please start the Plugin Engine and connect to it.')){
                       this.showMessage(`<${config.name}>: ${e.toString()}`)
                   }
                 })
@@ -2062,7 +2071,7 @@ export default {
         config.context = this.pluing_context
         if (template.mode == 'pyworker') {
           if (!this.socket) {
-            console.error("plugin engine is not connected.")
+            console.error("Please start the Plugin Engine and connect to it.")
           }
         }
         const tconfig = _.assign({}, template, config)
@@ -2089,7 +2098,7 @@ export default {
               resolve(plugin)
             }).catch((e) => {
               console.error('error occured when loading plugin ' + template.name + ": ", e)
-              this.showMessage('error occured when loading plugin ' + template.name + ": " + e)
+              this.showMessage(`<${template.name}>: ${e}`)
               reject(e)
               plugin.terminate()
             })
@@ -2101,11 +2110,11 @@ export default {
         plugin.whenFailed((e) => {
           if(e){
             this.status_text = `<${template.name}> ${e.toString()}`
-            this.showMessage('Error occured when loading ' + template.name + ": " + e)
+            this.showMessage(`<${template.name}>: ${e}`)
           }
           else{
-            this.status_text = 'Error occured when loading ' +template.name
-            this.showMessage('Error occured when loading ' + template.name )
+            this.status_text = `Error occured when loading ${template.name}.`
+            this.showMessage(`Error occured when loading ${template.name}.`)
           }
           console.error('error occured when loading ' + template.name + ": ", e)
           plugin.terminate()
@@ -2472,8 +2481,8 @@ export default {
         });
         plugin.whenFailed((e) => {
           console.error('error occured when loading ' + pconfig.name + ":", e)
-          this.status_text = 'error occured when loading ' + pconfig.name + ": " + e
-          this.showMessage('error occured when loading ' + pconfig.name + ": " + e)
+          this.status_text = `Error occured when loading ${pconfig.name}: ${e}.`
+          this.showMessage(`Error occured when loading ${pconfig.name}: ${e}.`)
           plugin.terminate()
           reject(e)
         });
