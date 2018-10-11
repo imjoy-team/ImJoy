@@ -401,7 +401,8 @@
           <md-toolbar md-elevation="0">
             <md-field md-clearable class="md-toolbar-section-start">
               <md-icon>cloud_download</md-icon>
-              <md-input placeholder="Install plugin from url" type="text" v-model="plugin_url" name="plugin_url"></md-input>
+              <md-input placeholder="Please paste the url here and click install." type="text" v-model="plugin_url" name="plugin_url"></md-input>
+              <md-tooltip> Please use the `raw` link if you get it from Github or Gist. </md-tooltip>
             </md-field>
             <md-button @click="installPluginFromUrl(plugin_url)" class="md-button md-primary">
               <md-icon>cloud_download</md-icon>Install
