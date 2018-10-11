@@ -148,13 +148,17 @@ export default {
   /* height: 100%; */
   /* width: 600px; */
   /* width: 100%; */
-  height: calc( 100vh - 16px );
+  height: calc( 100% - 40px );
 }
-/*
+
 .editor-toolbar{
+  padding: 0px;
   min-height: 40px!important;
   height: 40px!important;
 }
+
+/*
+
 .plugin-editor {
   display: flex;
   width: 100%;

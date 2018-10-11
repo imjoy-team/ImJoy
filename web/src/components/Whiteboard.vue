@@ -123,7 +123,7 @@
               </md-list-item>
             </md-list>
           </div>
-          <plugin-editor v-else-if="w.type=='imjoy/plugin-editor'" class="no-drag" :pluginId="w.data.id" :window="w" v-model="w.data.code" :editorId="'editor_'+w.data.id"></plugin-editor>
+          <plugin-editor v-else-if="w.type=='imjoy/plugin-editor'" class="no-drag fill-container" :pluginId="w.data.id" :window="w" v-model="w.data.code" :editorId="'editor_'+w.data.id"></plugin-editor>
           <div v-else class="plugin-iframe">
             <md-button class="iframe-load-button" @click="w.click2load=false;w.renderWindow(w)" v-if="w.click2load">Click to load the window</md-button>
             <div :id="w.iframe_container" class="plugin-iframe">
