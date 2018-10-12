@@ -153,12 +153,13 @@
   />
 
   <md-dialog class="editor-dialog" :md-active.sync="showEditor">
+    <md-dialog-title>{{plugin_name}}</md-dialog-title>
     <md-dialog-content>
       <plugin-editor v-if="showEditor" class="code-editor" v-model="editorCode" title="Plugin Editor"></plugin-editor>
     </md-dialog-content>
     <md-dialog-actions>
-      <!-- <md-button class="md-primary" @click="saveCode(); showEditor=false">Save</md-button> -->
-      <md-button class="md-primary" @click="showEditor=false">OK</md-button>
+      <md-button class="md-primary" @click="downloadCode()">Download</md-button>
+      <md-button class="md-primary" @click="showEditor=false">Exit</md-button>
     </md-dialog-actions>
   </md-dialog>
 
@@ -168,7 +169,7 @@
       <h3 v-else> Oops, this plugin has no documentation!</h3>
     </md-dialog-content>
     <md-dialog-actions>
-      <!-- <md-button class="md-primary" @click="saveCode(); showEditor=false">Save</md-button> -->
+      <!-- <md-button class="md-primary" @click="downloadCode(); showEditor=false">Save</md-button> -->
       <md-button class="md-primary" @click="showDocsDialog=false">OK</md-button>
     </md-dialog-actions>
   </md-dialog>
@@ -176,6 +177,7 @@
 </template>
 
 <script>
+import { saveAs } from 'file-saver';
 import axios from 'axios';
 import marked from 'marked';
 import {
@@ -250,6 +252,7 @@ export default {
       editorCode: '',
       editorPlugin: null,
       showEditor: false,
+      plugin_name: '',
       containerWidth: 500,
       uri_root: null,
       plugin_dir: null,
@@ -334,6 +337,12 @@ export default {
     updateSize() {
       this.containerWidth = this.$refs.container.offsetWidth;
     },
+    downloadCode(){
+      this.$emit('input', this.codeValue)
+      const filename = this.window&&this.window.plugin&&this.window.plugin.name?this.window.plugin.name+"_"+randId()+'.imjoy.html':'plugin_'+randId()+'.imjoy.html'
+      const file = new Blob([this.codeValue], {type: "text/plain;charset=utf-8"})
+      saveAs(file, filename);
+    },
     showDocs(plugin){
       if(plugin.installed){
         this.db.get(plugin._id).then((doc) => {
@@ -364,6 +373,7 @@ export default {
         this.db.get(plugin._id).then((doc) => {
           this.editorCode = doc.code
           this.editorPlugin = plugin
+          this.plugin_name = "Plugin Source Code:" + plugin.name
           this.showEditor = true
           this.$forceUpdate()
         }).catch((err) => {
@@ -379,6 +389,7 @@ export default {
           }
           this.editorCode = response.data
           this.editorPlugin = plugin
+          this.plugin_name = "Plugin Source Code"
           this.showEditor = true
           this.$forceUpdate()
         })
