@@ -584,9 +584,10 @@ export default {
     }
     this.plugin_templates = {
       "Webworker(Javascript)": WEBWORKER_PLUGIN_TEMPLATE,
+      "PyWorker(Python)": PYWORKER_PLUGIN_TEMPLATE,
       // "Iframe(Javascript)": IFRAME_PLUGIN_TEMPLATE,
       "Window(Javascript and HTML)": WINDOW_PLUGIN_TEMPLATE,
-      "PyWorker(Python)": PYWORKER_PLUGIN_TEMPLATE,
+
     }
     this.default_window_pos = {
       i: 0,
