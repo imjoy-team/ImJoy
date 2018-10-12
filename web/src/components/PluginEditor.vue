@@ -89,8 +89,10 @@ export default {
     this.editor = this.$refs.monaco_editor.getMonaco()
     this.editor.layout();
     if(this.window){
-        this.window.resize = ()=>{
-        this.editor.layout();
+      this.window.resize = ()=>{
+        setTimeout(()=>{
+          this.editor.layout();
+        }, 300)
       }
     }
     setTimeout(()=>{
