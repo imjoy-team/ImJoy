@@ -25,7 +25,8 @@
       </div>
     </md-toolbar>
     <monaco-editor
-      class="editor code_editor"
+      class="code_editor"
+      :class="window?'editor-with-toolbar':'editor-without-toolbar' "
       v-model="codeValue"
       language="html"
       ref="monaco_editor">
@@ -146,12 +147,20 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 
-.editor{
+.editor-with-toolbar {
   overflow: hidden;
   /* height: 100%; */
   /* width: 600px; */
   /* width: 100%; */
   height: calc( 100% - 40px );
+}
+
+.editor-without-toolbar {
+  overflow: hidden;
+  /* height: 100%; */
+  /* width: 600px; */
+  /* width: 100%; */
+  height: calc( 100% );
 }
 
 .editor-toolbar{
