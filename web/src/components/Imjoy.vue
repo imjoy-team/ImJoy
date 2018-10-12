@@ -384,7 +384,7 @@
   <md-dialog :md-active.sync="showAddPluginDialog" :md-click-outside-to-close="true">
     <md-dialog-title>ImJoy Plugin Management</md-dialog-title>
     <md-dialog-content>
-      <md-switch v-model="show_installed_plugins">Show Installed Plugins</md-switch>
+      <md-switch v-if="installed_plugins.length>0" v-model="show_installed_plugins">Show Installed Plugins</md-switch>
       <md-card v-if="show_installed_plugins">
         <md-card-header>
           <div class="md-title">Installed Plugins</div>
@@ -804,7 +804,7 @@ export default {
             if (p.match(url_regex)) {
               this.plugin_url = p
               this.init_plugin_search = null
-              this.show_plugin_store = false
+              this.show_plugin_store = true
               this.show_plugin_url = true
             } else {
               this.plugin_url = null
