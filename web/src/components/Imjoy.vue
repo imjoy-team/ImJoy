@@ -33,9 +33,9 @@
           <md-icon>save</md-icon>
           <md-tooltip>Save all windows</md-tooltip>
         </md-button>
-        <md-button @click="showSettingsDialog=true" class="md-icon-button">
+        <!-- <md-button @click="showSettingsDialog=true" class="md-icon-button">
           <md-icon>settings</md-icon>
-        </md-button>
+        </md-button> -->
         <md-button class="md-icon-button" href="/docs/index.html#/overview" target="_blank">
           <md-icon>help</md-icon>
           <!-- <md-tooltip>Open help information.</md-tooltip> -->
@@ -354,10 +354,10 @@
   </md-dialog>
 
   <md-dialog :md-active.sync="showSettingsDialog" :md-click-outside-to-close="false" :md-close-on-esc="false">
-    <md-dialog-title>Settings</md-dialog-title>
+    <md-dialog-title>General Settings</md-dialog-title>
     <md-dialog-content>
       <md-divider></md-divider>
-      <md-card>
+      <!-- <md-card>
         <md-card-header>
           <div class="md-title">General Settings</div>
         </md-card-header>
@@ -374,7 +374,7 @@
           <md-button class="md-primary" @click="disconnectEngine()">Disconnect Plugin Engine</md-button>
           <p>{{engine_status}}</p>
         </md-card-content>
-      </md-card>
+      </md-card> -->
     </md-dialog-content>
     <md-dialog-actions>
       <md-button class="md-primary" @click="showSettingsDialog=false;">OK</md-button>
