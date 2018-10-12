@@ -1,8 +1,8 @@
 <template>
-<div class="whiteboard noselect" ref="whiteboard"  @click="unselectWindows()">
+<div class="whiteboard noselect" ref="whiteboard" @mouseup="show_overlay=false"  @click="unselectWindows()">
   <div class="overlay" @click="show_overlay=false" v-if="show_overlay"></div>
   <grid-layout :layout="windows" :col-num="col_num" :is-mirrored="false" :auto-size="true" :row-height="row_height" :col-width="column_width" :is-draggable="true" :is-resizable="true" :vertical-compact="true" :margin="[3, 3]" :use-css-transforms="true">
-    <grid-item v-for="(w, wi) in windows" drag-allow-from=".drag-handle" drag-ignore-from=".no-drag" :x="w.x" :y="w.y" :w="w.w" :h="w.h" :i="w.i" @resize="focusWindow(w)" @move="focusWindow(w)" @resized="show_overlay=false;w.resize&&w.resize()" @moved="show_overlay=false;w.move&&w.move()" :key="w.id">
+    <grid-item v-for="(w, wi) in windows" drag-allow-from=".drag-handle" drag-ignore-from=".no-drag" :x="w.x" :y="w.y" :w="w.w" :h="w.h" :i="w.i" @resize="viewChanging(w)" @move="viewChanging(w)" @resized="show_overlay=false;w.resize&&w.resize();focusWindow(w)" @moved="show_overlay=false;w.move&&w.move();focusWindow(w)" :key="w.id">
       <md-card>
         <md-card-expand>
           <md-card-actions md-alignment="space-between" :class="w.selected?'window-selected drag-handle':'window-header drag-handle'">
@@ -182,7 +182,6 @@ export default {
 
   },
   mounted() {
-
   },
   beforeDestroy() {
     this.store.event_bus.$off('add_window', this.onWindowAdd)
@@ -277,11 +276,12 @@ export default {
       }
       this.$forceUpdate()
     },
-    focusWindow(w) {
-      // setTimeout(() => {
+    viewChanging(w){
       this.show_overlay = true
-      // this.$forceUpdate()
-      // }, 100)
+      this.$refs.whiteboard.scrollTop = this.$refs.whiteboard.scrollHeight
+    },
+    focusWindow(w) {
+      this.show_overlay = false
       this.selectWindow(w, {})
     },
     stopDragging() {
