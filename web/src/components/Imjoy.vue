@@ -40,7 +40,7 @@
           <md-icon>help</md-icon>
           <!-- <md-tooltip>Open help information.</md-tooltip> -->
         </md-button>
-        <md-button v-if="!engine_connected" @click="connectEngine(engine_url)" class="md-icon-button md-accent">
+        <md-button v-if="!engine_connected" @click="showPluginEngineInfo = true" class="md-icon-button md-accent">
           <md-icon>🚀</md-icon>
           <md-tooltip>Connect to the Plugin Engine</md-tooltip>
         </md-button>
