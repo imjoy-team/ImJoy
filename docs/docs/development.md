@@ -502,8 +502,7 @@ This url is composed of  the base url `http://imjoy.io/#/app?`, followed by the 
 
 When **opening such an url**, the ImJoy plugin management dialog will be shown which proposes to install the specified plugin. The user has to simply confirm by clicking `Install`.
 
-#### Adding a tag to the plugin url
-To distribute a plugin url with a predefined tag, you can use `#` to append the tag. For example, you can add `#dev` to tell ImJoy to install with the `dev` tag from the plugin. With this option, you can place multiple urls (e.g. in your Github README file) pointing to the plugin with different tags. The user can then choose the appropriate version of the plugin based which will be installed.
+Notice that plugin tag after the plugin url (e.g. `#XXXXX`) will be ignored, to specify a plugin tag, you can add another parameter `tag=XXXXXX`.
 
 #### Supported url parameters
 
@@ -515,6 +514,7 @@ Following is a list of supported url parameters:
 
  * `w` workspace name, an url contains `w` as a query string (e.g. https://imjoy.io/#/app?w=test) can be used to create or switch to a new workspace.
  * `plugin` show the specified plugin in the plugin management dialog, you can use plugin name or an url for the plugin, for example: `https://imjoy.io/#/app?plugin=Image%20Window` will show up a plugin dialog with `Image Window` in the search. You can also set `plugin` to an url for sharing plugin hosted on github, please refer to `Install from url` for more details.
+ * `tag` define a plugin tag, this can only be used with `plugin`, if the plugin have multiple tags, the user won't need to select the tag when installing the plugin.
  * `engine` define the engine url, for example: `http://imjoy.io/#/app?engine=http://127.0.0.1:8080`, notice that if you want to connect to a remote machine through http (not https) connection, you can only do it by using `http://imjoy.io` rather than `https://imjoy.io`. This restriction also exist if you use localhost with some browsers (e.g. firefox), to avoid it, you need to use `http://127.0.0.1:8080` rather than `http://localhost:8080`, because most browser will consider `127.0.0.1` is a secured connection, but not `localhost`. However, there is an exception, on Safari, using `127.0.0.1` does not work due to [this](https://bugs.webkit.org/show_bug.cgi?id=171934), if you still want to use Safari, you have to switch to `http://imjoy.io`.
  * `token` define the connection token, for example: `http://imjoy.io/#/app?token=2760239c-c0a7-4a53-a01e-d6da48b949bc`
  * `repo` specify a imjoy manifest file which point to a customized plugin repository. This can be used by developers to deploy their own plugin repository through Github. Fork the [ImJoy-Plugins](https://github.com/oeway/ImJoy-Plugins) repository, and change the `manifest.imjoy.json` file. Then copy the link of the Github repository or the raw link of the manifest file and use it with `repo` to construct an url for sharing with the users.
