@@ -178,7 +178,7 @@
             <div class="md-layout md-gutter md-alignment-center-space-between">
               <div class="md-layout-item md-size-70">
                 <!-- <span class="md-subheading">Plugins</span> -->
-                <md-button class="md-raised" :class="installed_plugins.length>0?'':'md-primary'" @click="show_plugin_templates=true; showAddPluginDialog=true">
+                <md-button class="md-raised" :class="installed_plugins.length>0?'':'md-primary'" @click="show_plugin_templates=true; show_plugin_store=true; show_plugin_url=true; showAddPluginDialog=true">
                   <md-icon>add</md-icon>Plugins
                 </md-button>
               </div>
@@ -382,8 +382,17 @@
   </md-dialog>
 
   <md-dialog :md-active.sync="showAddPluginDialog" :md-click-outside-to-close="true">
-    <md-dialog-title>Plugins Management</md-dialog-title>
+    <md-dialog-title>ImJoy Plugin Management</md-dialog-title>
     <md-dialog-content>
+      <md-switch v-model="show_installed_plugins">Show Installed Plugins</md-switch>
+      <md-card v-if="show_installed_plugins">
+        <md-card-header>
+          <div class="md-title">Installed Plugins</div>
+        </md-card-header>
+        <md-card-content>
+          <plugin-list display="list" :name="repository_name" :description="repository_description" :database="db" :install-plugin="installPlugin" :remove-plugin="removePlugin" @message="showMessage" :plugins="installed_plugins" :workspace="selected_workspace"></plugin-list>
+        </md-card-content>
+      </md-card>
       <md-card v-if="show_plugin_templates">
         <md-card-header>
           <div class="md-title">Create a New Plugin</div>
@@ -394,15 +403,14 @@
           </md-button>
         </md-card-content>
       </md-card>
-      <md-divider></md-divider>
-      <md-card>
+      <md-card  v-if="show_plugin_url">
         <md-card-header>
           <div class="md-title">Install from URL</div>
           <md-toolbar md-elevation="0">
             <md-field md-clearable class="md-toolbar-section-start">
               <md-icon>cloud_download</md-icon>
-              <md-input placeholder="Please paste the url here and click install." type="text" v-model="plugin_url" name="plugin_url"></md-input>
-              <md-tooltip> Please use the `raw` link if you get it from Github or Gist. </md-tooltip>
+              <md-input placeholder="Please paste the URL here and click install." type="text" v-model="plugin_url" name="plugin_url"></md-input>
+              <md-tooltip> If you get the URL from Github or Gist, please use the `raw` link. </md-tooltip>
             </md-field>
             <md-button @click="installPluginFromUrl(plugin_url)" class="md-button md-primary">
               <md-icon>cloud_download</md-icon>Install
@@ -413,8 +421,7 @@
         <md-card-content>
         </md-card-content>
       </md-card>
-      <md-divider></md-divider>
-      <md-card>
+      <md-card v-if="show_plugin_store">
         <md-card-header>
           <div class="md-title">Install from the Plugin Store</div>
         </md-card-header>
@@ -422,18 +429,9 @@
           <plugin-list :name="repository_name" :description="repository_description" @message="showMessage" :database="db" :install-plugin="installPlugin" :remove-plugin="removePlugin" :init-search="init_plugin_search" display="list" :plugins="available_plugins" :workspace="selected_workspace"></plugin-list>
         </md-card-content>
       </md-card>
-      <md-divider></md-divider>
-      <md-card>
-        <md-card-header>
-          <div class="md-title">Installed Plugins</div>
-        </md-card-header>
-        <md-card-content>
-          <plugin-list display="list" :name="repository_name" :description="repository_description" :database="db" :install-plugin="installPlugin" :remove-plugin="removePlugin" @message="showMessage" :plugins="installed_plugins" :workspace="selected_workspace"></plugin-list>
-        </md-card-content>
-      </md-card>
     </md-dialog-content>
     <md-dialog-actions>
-      <md-button class="md-primary" @click="showAddPluginDialog=false;">OK</md-button>
+      <md-button class="md-primary" @click="showAddPluginDialog=false;">Exit</md-button>
     </md-dialog-actions>
   </md-dialog>
 </div>
@@ -504,6 +502,9 @@ export default {
       plugin_url: null,
       init_plugin_search: null,
       show_plugin_templates: true,
+      show_plugin_store: true,
+      show_plugin_url: true,
+      show_installed_plugins: false,
       loading: false,
       progress: 0,
       status_text: '',
@@ -770,7 +771,7 @@ export default {
             this.repository_name = this.manifest.name || 'ImJoy Repository'
             this.repository_description = this.manifest.description
             if (this.repository_url != this.default_repository_url){
-              this.repository_description = "( This repository is not provided by ImJoy, please use it at your own risk. )" + this.manifest.description
+              this.repository_description = "( This repository is not provided by ImJoy, please make sure it is provided by a trusted source. )" + this.manifest.description
             }
             this.available_plugins = this.manifest.plugins.filter((p) => {
               return !p.disabled
@@ -803,9 +804,13 @@ export default {
             if (p.match(url_regex)) {
               this.plugin_url = p
               this.init_plugin_search = null
+              this.show_plugin_store = false
+              this.show_plugin_url = true
             } else {
               this.plugin_url = null
               this.init_plugin_search = p
+              this.show_plugin_store = true
+              this.show_plugin_url = false
             }
             this.show_plugin_templates = false
             this.showAddPluginDialog = true
