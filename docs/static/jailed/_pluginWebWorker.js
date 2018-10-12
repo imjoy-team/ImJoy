@@ -1,0 +1,112 @@
+
+/**
+ * Contains the routines loaded by the plugin Worker under web-browser.
+ *
+ * Initializes the web environment version of the platform-dependent
+ * connection object for the plugin site
+ */
+
+self.application = {};
+self.connection = {};
+
+
+(function(){
+
+    /**
+     * Event lisener for the plugin message
+     */
+    self.addEventListener('message', function(e){
+        var m = e.data.data;
+        switch (m.type) {
+        case 'import':
+        case 'importJailed':  // already jailed in the iframe
+            importScript(m.url);
+            break;
+        case 'execute':
+            execute(m.code);
+            break;
+        case 'message':
+            conn._messageHandler(m.data);
+            break;
+        }
+     });
+
+
+    /**
+     * Loads and executes the JavaScript file with the given url
+     *
+     * @param {String} url to load
+     */
+    var importScript = function(url) {
+        var error = null;
+
+        // importScripts does not throw an exception in old webkits
+        // (Opera 15.0), but we can determine a failure by the
+        // returned value which must be undefined in case of success
+        var returned = true;
+        try {
+            returned = importScripts(url);
+        } catch (e) {
+            error = e;
+            console.error('error occured when loading '+url, e)
+        }
+
+        if (error || typeof returned != 'undefined') {
+            self.postMessage({type: 'importFailure', url: url, error: error});
+            if (error) {
+                throw error;
+            }
+        } else {
+           self.postMessage({type: 'importSuccess', url: url});
+        }
+
+    }
+
+
+    /**
+     * Executes the given code in a jailed environment. For web
+     * implementation, we're already jailed in the iframe and the
+     * worker, so simply eval()
+     *
+     * @param {String} code code to execute
+     */
+    var execute = function(code) {
+      if(code.type == 'script'){
+        try {
+            eval(code.content);
+            if(code.main) self.postMessage({type: 'executeSuccess'});
+        } catch (e) {
+            console.error(e.message, e.stack)
+            self.postMessage({type: 'executeFailure', error: e.toString()});
+            throw e;
+        }
+
+      }
+      else{
+        throw "unsupported code type."
+      }
+
+
+    }
+
+
+    /**
+     * Connection object provided to the JailedSite constructor,
+     * plugin site implementation for the web-based environment.
+     * Global will be then cleared to prevent exposure into the
+     * Worker, so we put this local connection object into a closure
+     */
+    var conn = {
+        disconnect: function(){ self.close(); },
+        send: function(data, transferables) {
+            data.__transferables__ = transferables;
+            self.postMessage({type: 'message', data: data}, transferables);
+        },
+        onMessage: function(h){ conn._messageHandler = h; },
+        _messageHandler: function(){},
+        onDisconnect: function() {}
+    };
+
+    connection = conn;
+
+})();
