@@ -155,10 +155,11 @@ export default {
 
 .editor{
   overflow: hidden;
-  /* height: 100%; */
+  height: 100%;
+  min-height: 500px;
   /* width: 600px; */
   /* width: 100%; */
-  height: calc( 100% - 40px );
+  /* height: calc( 100% - 40px ); */
 }
 
 .editor-toolbar{

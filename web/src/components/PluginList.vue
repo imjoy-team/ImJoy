@@ -154,7 +154,7 @@
 
   <md-dialog class="editor-dialog" :md-active.sync="showEditor">
     <md-dialog-content>
-      <plugin-editor class="code-editor" v-model="editorCode" title="Plugin Editor"></plugin-editor>
+      <plugin-editor v-if="showEditor" class="code-editor" v-model="editorCode" title="Plugin Editor"></plugin-editor>
     </md-dialog-content>
     <md-dialog-actions>
       <!-- <md-button class="md-primary" @click="saveCode(); showEditor=false">Save</md-button> -->
@@ -452,9 +452,16 @@ export default {
   }
 }
 
-.code-editor {
-  height: calc(100%) !important;
-  width: calc(100%) !important;
+.code-editor{
+  display: flex;
+  width: 100%;
+  height: calc(100%);
+  flex-direction: column;
+  overflow: hidden;
+  padding-left: 2px;
+  padding-right: 2px;
+  padding-top: 2px;
+  padding-bottom: 2px;
 }
 
 .grid-container {
@@ -465,5 +472,9 @@ export default {
   max-width: 100%;
 }
 
+.md-dialog-content {
+  height: 100%;
+  padding: 4px;
+}
 
 </style>
