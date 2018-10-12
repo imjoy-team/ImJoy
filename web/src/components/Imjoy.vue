@@ -418,12 +418,12 @@
                   <md-tooltip>Install {{plugin4install.name}}</md-tooltip>
                 </md-button>
                 <md-menu-content>
-                  <md-menu-item v-for="tag in plugin4install.tags" :key="tag" @click="installPlugin(plugin4install, tag)">
+                  <md-menu-item v-for="tag in plugin4install.tags" :key="tag" @click="installPlugin(plugin4install, tag); showAddPluginDialog = false">
                     <md-icon>cloud_download</md-icon>{{tag}}
                   </md-menu-item>
                 </md-menu-content>
               </md-menu>
-              <md-button class="md-button md-primary" v-else @click="installPlugin(plugin4install)">
+              <md-button class="md-button md-primary" v-else @click="installPlugin(plugin4install); showAddPluginDialog = false">
                 <md-icon>cloud_download</md-icon>Install
                 <!-- <md-tooltip>This plugin '{{plugin4install.name}}' is not provided by ImJoy.io.</md-tooltip> -->
               </md-button>
