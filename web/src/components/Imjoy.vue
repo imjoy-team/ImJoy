@@ -178,7 +178,7 @@
             <div class="md-layout md-gutter md-alignment-center-space-between">
               <div class="md-layout-item md-size-70">
                 <!-- <span class="md-subheading">Plugins</span> -->
-                <md-button class="md-raised" :class="installed_plugins.length>0?'':'md-primary'" @click="plugin4install=null; show_plugin_templates=true; show_plugin_store=true; show_plugin_url=true; showAddPluginDialog=true">
+                <md-button class="md-raised" :class="installed_plugins.length>0?'':'md-primary'" @click="showPluginManagement()">
                   <md-icon>add</md-icon>Plugins
                 </md-button>
               </div>
@@ -366,15 +366,6 @@
   <md-dialog :md-active.sync="showAddPluginDialog" :md-click-outside-to-close="false">
     <md-dialog-title>ImJoy Plugin Management</md-dialog-title>
     <md-dialog-content>
-      <md-switch v-if="installed_plugins.length>0 && !plugin4install && !downloading_error && !downloading_plugin" v-model="show_installed_plugins">Show Installed Plugins</md-switch>
-      <md-card v-if="show_installed_plugins">
-        <md-card-header>
-          <div class="md-title">Installed Plugins</div>
-        </md-card-header>
-        <md-card-content>
-          <plugin-list display="list" :name="repository_name" :description="repository_description" :database="db" :install-plugin="installPlugin" :remove-plugin="removePlugin" @message="showMessage" :plugins="installed_plugins" :workspace="selected_workspace"></plugin-list>
-        </md-card-content>
-      </md-card>
       <md-card v-if="show_plugin_templates">
         <md-card-header>
           <div class="md-title">Create a New Plugin</div>
@@ -383,6 +374,15 @@
           <md-button class="md-primary md-raised centered-button" @click="newPlugin(template);showAddPluginDialog=false" v-for="(template, k) in plugin_templates" :key="k">
             <md-icon>add</md-icon>{{k}}
           </md-button>
+        </md-card-content>
+      </md-card>
+      <md-switch v-if="installed_plugins.length>0 && !plugin4install && !downloading_error && !downloading_plugin" v-model="show_installed_plugins">Show Installed Plugins</md-switch>
+      <md-card v-if="show_installed_plugins">
+        <md-card-header>
+          <div class="md-title">Installed Plugins</div>
+        </md-card-header>
+        <md-card-content>
+          <plugin-list display="list" :name="repository_name" :description="repository_description" :database="db" :install-plugin="installPlugin" :remove-plugin="removePlugin" @message="showMessage" :plugins="installed_plugins" :workspace="selected_workspace"></plugin-list>
         </md-card-content>
       </md-card>
       <md-card  v-if="show_plugin_url">
@@ -395,14 +395,11 @@
               <md-tooltip>Press `Enter` to get the plugin</md-tooltip>
             </md-field>
           </md-toolbar>
-        </md-list>
           <!-- <plugin-list :name="repository_name" :description="repository_description" @message="showMessage" :database="db" :install-plugin="installPlugin" :remove-plugin="removePlugin" :init-search="init_plugin_search" display="list" :plugins="available_plugins" :workspace="selected_workspace"></plugin-list> -->
         </md-card-header>
-        <md-card-content>
-        </md-card-content>
       </md-card>
       <md-progress-spinner v-if="downloading_plugin && !plugin4install" class="md-accent" :md-diameter="40" md-mode="indeterminate"></md-progress-spinner>
-      <h2 v-if="downloading_error">{{downloading_error}}</h2>
+      <h2 v-if="downloading_error">&nbsp;&nbsp;{{downloading_error}}</h2>
       <md-card  v-if="plugin4install">
         <md-card-header>
           <md-toolbar md-elevation="0">
@@ -433,6 +430,8 @@
               </md-button>
             </div>
           </md-toolbar>
+        </md-card-header>
+        <md-card-content>
           <p>{{plugin4install.description}}</p>
           <md-chip v-for="tag in plugin4install.tags" :key="tag">{{tag}}</md-chip>
           <!-- <md-button class="md-button md-primary" @click="showCode(plugin4install)">
@@ -443,10 +442,7 @@
           <p>This plugin is <strong>NOT</strong> provided by ImJoy.io. Please make sure the plugin is provided by a trusted source, otherwise it may <strong>harm</strong> your computer.
           </p>
           <plugin-editor v-if="show_plugin_source" class="code-editor" v-model="plugin4install.code" :title="plugin4install.name"></plugin-editor>
-        </md-list>
           <!-- <plugin-list :name="repository_name" :description="repository_description" @message="showMessage" :database="db" :install-plugin="installPlugin" :remove-plugin="removePlugin" :init-search="init_plugin_search" display="list" :plugins="available_plugins" :workspace="selected_workspace"></plugin-list> -->
-        </md-card-header>
-        <md-card-content>
         </md-card-content>
       </md-card>
       <md-card v-if="show_plugin_store">
@@ -1126,6 +1122,16 @@ export default {
           reject(err)
         });
       });
+    },
+    showPluginManagement(){
+      this.plugin4install=null
+      this.downloading_error=''
+      this.downloading_plugin=false
+      this.init_plugin_search=''
+      this.show_plugin_templates=true
+      this.show_plugin_store=true
+      this.show_plugin_url=true
+      this.showAddPluginDialog=true
     },
     sortedPlugins: function() {
         return _.orderBy(this.plugins, 'name');
