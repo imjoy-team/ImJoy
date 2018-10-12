@@ -40,8 +40,9 @@ This is a non-exhaustive list of the open-source tools and libraries we used in 
  * [Joy.js](https://github.com/ncase/joy) (This is where the name `ImJoy` comes from!)
  * [Jailed](https://github.com/asvd/jailed) (This helps ImJoy to isolate plugins)
  * [Vue.js](https://vuejs.org/) (The main ImJoy App is written in Vue.js)
- * [conda](https://conda.io/) (The plugin engine uses Conda for managing virtual env. and pacakges)
+ * [vue-grid-layout](https://github.com/jbaysolutions/vue-grid-layout) (For window management)
  * [python-socketio](https://github.com/miguelgrinberg/python-socketio) (This how the plugin engine talk with the ImJoy app)
+ * [conda](https://conda.io/) (The plugin engine uses Conda for managing virtual env. and pacakges)
 
 We thank all the authors for offering these excellent work to the open-source community.
 
