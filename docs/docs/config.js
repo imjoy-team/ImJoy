@@ -1,12 +1,14 @@
 docute.init({
   title: 'ImJoy Documentation', // Default to `<title>` value
-  landing: [],
   repo: 'oeway/imjoy',
   twitter: 'weioyang',
   'edit-link': 'https://github.com/oeway/ImJoy/blob/master/docs/docs',
   tocVisibleDepth: 4,
+  sidebar: true,
+  disableSidebarToggle: true,
   nav: [
     // homepage
+    {path: '/', source: 'overview.md'},
     {title: 'ImJoy.IO', path: 'https://imjoy.io'},
     {title: 'Overview', path: '/overview', source: 'overview.md'},
     {title: 'Getting Started', path: '/getting-started', source: 'getting_started.md'},
