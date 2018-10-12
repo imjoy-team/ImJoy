@@ -366,7 +366,7 @@
   <md-dialog :md-active.sync="showAddPluginDialog" :md-click-outside-to-close="false">
     <md-dialog-title>ImJoy Plugin Management</md-dialog-title>
     <md-dialog-content>
-      <md-switch v-if="installed_plugins.length>0 && !plugin4install && !downloading_error" v-model="show_installed_plugins">Show Installed Plugins</md-switch>
+      <md-switch v-if="installed_plugins.length>0 && !plugin4install && !downloading_error && !downloading_plugin" v-model="show_installed_plugins">Show Installed Plugins</md-switch>
       <md-card v-if="show_installed_plugins">
         <md-card-header>
           <div class="md-title">Installed Plugins</div>
@@ -391,7 +391,7 @@
           <md-toolbar md-elevation="0">
             <md-field md-clearable class="md-toolbar-section-start">
               <md-icon>cloud_download</md-icon>
-              <md-input placeholder="Please paste the URL here and press enter." type="text" v-model="plugin_url"  @keyup.enter="getPlugin4Install(plugin_url)" name="plugin_url"></md-input>
+              <md-input placeholder="Please paste the URL here and press enter." type="text" v-model="plugin_url"  @keyup.enter="tag4install=''; getPlugin4Install(plugin_url)" name="plugin_url"></md-input>
               <md-tooltip>Press `Enter` to get the plugin</md-tooltip>
             </md-field>
           </md-toolbar>
@@ -411,7 +411,12 @@
                 {{plugin4install.mode == 'pyworker'? plugin4install.name + ' 🚀': plugin4install.name}}
               </h2>
             </div>
-            <div class="md-toolbar-section-end">
+            <div v-if="tag4install" class="md-toolbar-section-end">
+              <md-button class="md-button md-primary" @click="installPlugin(plugin4install, tag4install); showAddPluginDialog = false">
+                <md-icon>cloud_download</md-icon>Install
+              </md-button>
+            </div>
+            <div v-if="!tag4install" class="md-toolbar-section-end">
               <md-menu v-if="plugin4install.tags && plugin4install.tags.length>0">
                 <md-button class="md-button md-primary" md-menu-trigger>
                   <md-icon>cloud_download</md-icon>Install
@@ -423,9 +428,8 @@
                   </md-menu-item>
                 </md-menu-content>
               </md-menu>
-              <md-button class="md-button md-primary" v-else @click="installPlugin(plugin4install); showAddPluginDialog = false">
+              <md-button v-else  class="md-button md-primary"@click="installPlugin(plugin4install); showAddPluginDialog = false">
                 <md-icon>cloud_download</md-icon>Install
-                <!-- <md-tooltip>This plugin '{{plugin4install.name}}' is not provided by ImJoy.io.</md-tooltip> -->
               </md-button>
             </div>
           </md-toolbar>
@@ -529,6 +533,7 @@ export default {
       downloading_plugin: false,
       downloading_error: '',
       plugin4install: null,
+      tag4install: '',
       show_plugin_source: false,
       init_plugin_search: null,
       show_plugin_templates: true,
@@ -851,6 +856,7 @@ export default {
             }
             this.show_plugin_templates = false
             this.showAddPluginDialog = true
+            this.tag4install = this.$route.query.tag || ''
           }
 
           if(this.$route.query.workflow){
