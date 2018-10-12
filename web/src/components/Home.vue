@@ -11,7 +11,7 @@
       <img src="static/img/perspective-hr.jpg" alt="banner"></img>
       <div class="subtitle">Image processing with joy!<br>
         <md-button class="md-raised" to="app">Start ImJoy 😁</md-button>
-        <md-button class="md-raised" href="/docs/#/overview">Docs</md-button>
+        <md-button class="md-raised" href="/docs">Docs</md-button>
       </div>
     </div>
   </div>
