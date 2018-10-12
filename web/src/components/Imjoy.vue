@@ -966,23 +966,23 @@ export default {
         }
       }
     },
-    installPluginFromUrl(plugin_url){
-      this.permission_message = `This plugin is <strong>not</strong> provided by ImJoy.io. <br> Please make sure the plugin is provided by a trusted source, otherwise it may <strong>harm</strong> your computer. <br> <a href="${plugin_url}" target="_blank">View source code</a><br><br>Do you allow this plugin to be installed?`
-      const backup_addplugin = this.showAddPluginDialog
-      this.resolve_permission = ()=>{
-        this.installPlugin(plugin_url).then(()=>{
-          this.showAddPluginDialog = false
-        }).catch(()=>{
-          this.showAddPluginDialog = backup_addplugin
-        })
-      }
-      this.reject_permission = ()=>{
-        this.showAddPluginDialog = backup_addplugin
-      }
-      this.showPluginEngineInfo = false
-      this.showAddPluginDialog = false
-      this.showPermissionConfirmation = true
-    },
+    // installPluginFromUrl(plugin_url){
+    //   this.permission_message = `This plugin is <strong>not</strong> provided by ImJoy.io. <br> Please make sure the plugin is provided by a trusted source, otherwise it may <strong>harm</strong> your computer. <br> <a href="${plugin_url}" target="_blank">View source code</a><br><br>Do you allow this plugin to be installed?`
+    //   const backup_addplugin = this.showAddPluginDialog
+    //   this.resolve_permission = ()=>{
+    //     this.installPlugin(plugin_url).then(()=>{
+    //       this.showAddPluginDialog = false
+    //     }).catch(()=>{
+    //       this.showAddPluginDialog = backup_addplugin
+    //     })
+    //   }
+    //   this.reject_permission = ()=>{
+    //     this.showAddPluginDialog = backup_addplugin
+    //   }
+    //   this.showPluginEngineInfo = false
+    //   this.showAddPluginDialog = false
+    //   this.showPermissionConfirmation = true
+    // },
     getPlugin4Install(plugin_url){
       this.plugin4install = null
       if(plugin_url.includes('github') && plugin_url.includes('/blob/')){
