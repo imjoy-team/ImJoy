@@ -456,7 +456,9 @@ import {
   _clone,
   randId,
   debounce,
-  url_regex
+  url_regex,
+  githubImJoyManifest,
+  githubUrlRaw
 } from '../utils.js'
 import {
   parseComponent
@@ -681,7 +683,12 @@ export default {
 
     this.default_repository_url = "https://raw.githubusercontent.com/oeway/ImJoy-Plugins/master/manifest.imjoy.json"
     if(this.$route.query.repo){
-      this.repository_url = this.$route.query.repo
+      if(this.$route.query.repo.includes('github')){
+        this.repository_url = githubImJoyManifest(this.$route.query.repo)
+      }
+      else{
+        this.repository_url = this.$route.query.repo
+      }
     }
     else{
       this.repository_url = this.default_repository_url
@@ -930,7 +937,10 @@ export default {
       }
     },
     installPluginFromUrl(plugin_url){
-      this.permission_message = "This plugin is <strong>not</strong> provided by ImJoy.io. <br> Please make sure the plugin is provided by a trusted source, otherwise it may <strong>harm</strong> your computer. <br> Do you allow this plugin to be installed?"
+      this.permission_message = `This plugin is <strong>not</strong> provided by ImJoy.io. <br> Please make sure the plugin is provided by a trusted source, otherwise it may <strong>harm</strong> your computer. <br> <a href="${plugin_url}" target="_blank">View source code</a><br><br>Do you allow this plugin to be installed?`
+      if(plugin_url.includes('github') && plugin_url.includes('/blob/')){
+        plugin_url = githubUrlRaw(plugin_url)
+      }
       const backup_addplugin = this.showAddPluginDialog
       this.resolve_permission = ()=>{
         this.installPlugin(plugin_url).then(()=>{
