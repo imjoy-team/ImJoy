@@ -1,12 +1,8 @@
 <template>
 <div class="plugin-editor">
-    <md-toolbar class="md-dense editor-toolbar md-layout" md-elevation="1">
+    <md-toolbar  v-if="window" class="md-dense editor-toolbar md-layout" md-elevation="1">
       <div class="md-toolbar-section-start">
-        <!-- <md-button @click="reload()"  v-if="window" class="md-icon-button">
-          <md-icon>autorenew</md-icon>
-          <md-tooltip>Update this plugin</md-tooltip>
-        </md-button> -->
-        <md-button @click="save()"  v-if="window" class="md-icon-button">
+        <md-button @click="save()" class="md-icon-button">
           <md-icon>save</md-icon>
           <md-tooltip>Save this plugin</md-tooltip>
         </md-button>
@@ -26,9 +22,6 @@
           </md-select>
           <md-tooltip>Select a tag for testing, the plugin will be reloaded.</md-tooltip>
         </md-field>
-      </div>
-      <div class="md-toolbar-section-end">
-
       </div>
     </md-toolbar>
     <monaco-editor

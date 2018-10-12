@@ -178,7 +178,7 @@
             <div class="md-layout md-gutter md-alignment-center-space-between">
               <div class="md-layout-item md-size-70">
                 <!-- <span class="md-subheading">Plugins</span> -->
-                <md-button class="md-raised" :class="installed_plugins.length>0?'':'md-primary'" @click="show_plugin_templates=true; show_plugin_store=true; show_plugin_url=true; showAddPluginDialog=true">
+                <md-button class="md-raised" :class="installed_plugins.length>0?'':'md-primary'" @click="plugin4install=null; show_plugin_templates=true; show_plugin_store=true; show_plugin_url=true; showAddPluginDialog=true">
                   <md-icon>add</md-icon>Plugins
                 </md-button>
               </div>
@@ -357,34 +357,16 @@
     <md-dialog-title>General Settings</md-dialog-title>
     <md-dialog-content>
       <md-divider></md-divider>
-      <!-- <md-card>
-        <md-card-header>
-          <div class="md-title">General Settings</div>
-        </md-card-header>
-        <md-card-content>
-          <md-field>
-            <label for="engine_url">Plugin Engine URL</label>
-            <md-input type="text" v-model="engine_url" name="engine_url"></md-input>
-          </md-field>
-          <md-field>
-            <label for="connection_token">Connection Token</label>
-            <md-input type="text" v-model="connection_token" name="connection_token"></md-input>
-          </md-field>
-          <md-button class="md-primary" @click="connectEngine(engine_url); showSettingsDialog=false;">Connect Plugin Engine</md-button>
-          <md-button class="md-primary" @click="disconnectEngine()">Disconnect Plugin Engine</md-button>
-          <p>{{engine_status}}</p>
-        </md-card-content>
-      </md-card> -->
     </md-dialog-content>
     <md-dialog-actions>
       <md-button class="md-primary" @click="showSettingsDialog=false;">OK</md-button>
     </md-dialog-actions>
   </md-dialog>
 
-  <md-dialog :md-active.sync="showAddPluginDialog" :md-click-outside-to-close="true">
+  <md-dialog :md-active.sync="showAddPluginDialog" :md-click-outside-to-close="false">
     <md-dialog-title>ImJoy Plugin Management</md-dialog-title>
     <md-dialog-content>
-      <md-switch v-if="installed_plugins.length>0" v-model="show_installed_plugins">Show Installed Plugins</md-switch>
+      <md-switch v-if="installed_plugins.length>0 && !plugin4install && !downloading_error" v-model="show_installed_plugins">Show Installed Plugins</md-switch>
       <md-card v-if="show_installed_plugins">
         <md-card-header>
           <div class="md-title">Installed Plugins</div>
@@ -409,13 +391,55 @@
           <md-toolbar md-elevation="0">
             <md-field md-clearable class="md-toolbar-section-start">
               <md-icon>cloud_download</md-icon>
-              <md-input placeholder="Please paste the URL here and click install." type="text" v-model="plugin_url" name="plugin_url"></md-input>
-              <!-- <md-tooltip>  </md-tooltip> -->
+              <md-input placeholder="Please paste the URL here and press enter." type="text" v-model="plugin_url"  @keyup.enter="getPlugin4Install(plugin_url)" name="plugin_url"></md-input>
+              <md-tooltip>Press `Enter` to get the plugin</md-tooltip>
             </md-field>
-            <md-button @click="installPluginFromUrl(plugin_url)" class="md-button md-primary">
-              <md-icon>cloud_download</md-icon>Install
-            </md-button>
           </md-toolbar>
+        </md-list>
+          <!-- <plugin-list :name="repository_name" :description="repository_description" @message="showMessage" :database="db" :install-plugin="installPlugin" :remove-plugin="removePlugin" :init-search="init_plugin_search" display="list" :plugins="available_plugins" :workspace="selected_workspace"></plugin-list> -->
+        </md-card-header>
+        <md-card-content>
+        </md-card-content>
+      </md-card>
+      <md-progress-spinner v-if="downloading_plugin && !plugin4install" class="md-accent" :md-diameter="40" md-mode="indeterminate"></md-progress-spinner>
+      <h2 v-if="downloading_error">{{downloading_error}}</h2>
+      <md-card  v-if="plugin4install">
+        <md-card-header>
+          <md-toolbar md-elevation="0">
+            <div class="md-toolbar-section-start">
+              <h2><md-icon v-if="plugin4install.icon">{{plugin4install.icon}}</md-icon><md-icon v-else>extension</md-icon>
+                {{plugin4install.mode == 'pyworker'? plugin4install.name + ' 🚀': plugin4install.name}}
+              </h2>
+            </div>
+            <div class="md-toolbar-section-end">
+              <md-menu v-if="plugin4install.tags && plugin4install.tags.length>0">
+                <md-button class="md-button md-primary" md-menu-trigger>
+                  <md-icon>cloud_download</md-icon>Install
+                  <md-tooltip>Install {{plugin4install.name}}</md-tooltip>
+                </md-button>
+                <md-menu-content>
+                  <md-menu-item v-for="tag in plugin4install.tags" :key="tag" @click="installPlugin(plugin4install, tag)">
+                    <md-icon>cloud_download</md-icon>{{tag}}
+                  </md-menu-item>
+                </md-menu-content>
+              </md-menu>
+              <md-button class="md-button md-primary" v-else @click="installPlugin(plugin4install)">
+                <md-icon>cloud_download</md-icon>Install
+                <!-- <md-tooltip>This plugin '{{plugin4install.name}}' is not provided by ImJoy.io.</md-tooltip> -->
+              </md-button>
+            </div>
+          </md-toolbar>
+          <p>{{plugin4install.description}}</p>
+          <md-chip v-for="tag in plugin4install.tags" :key="tag">{{tag}}</md-chip>
+          <!-- <md-button class="md-button md-primary" @click="showCode(plugin4install)">
+            <md-icon>code</md-icon>Code
+          </md-button> -->
+          <br>
+          <md-switch v-if="plugin4install.code" v-model="show_plugin_source">Show plugin source code</md-switch>
+          <p>This plugin is <strong>NOT</strong> provided by ImJoy.io. Please make sure the plugin is provided by a trusted source, otherwise it may <strong>harm</strong> your computer.
+          </p>
+          <plugin-editor v-if="show_plugin_source" class="code-editor" v-model="plugin4install.code" :title="plugin4install.name"></plugin-editor>
+        </md-list>
           <!-- <plugin-list :name="repository_name" :description="repository_description" @message="showMessage" :database="db" :install-plugin="installPlugin" :remove-plugin="removePlugin" :init-search="init_plugin_search" display="list" :plugins="available_plugins" :workspace="selected_workspace"></plugin-list> -->
         </md-card-header>
         <md-card-content>
@@ -502,6 +526,10 @@ export default {
       _plugin2_remove: null,
       is_https_mode: true,
       plugin_url: null,
+      downloading_plugin: false,
+      downloading_error: '',
+      plugin4install: null,
+      show_plugin_source: false,
       init_plugin_search: null,
       show_plugin_templates: true,
       show_plugin_store: true,
@@ -808,11 +836,13 @@ export default {
         }).finally(()=>{
           if(this.$route.query.plugin){
             const p = this.$route.query.plugin.trim()
+            console.log(p)
             if (p.match(url_regex)) {
               this.plugin_url = p
               this.init_plugin_search = null
-              this.show_plugin_store = true
-              this.show_plugin_url = true
+              this.show_plugin_store = false
+              this.show_plugin_url = false
+              this.getPlugin4Install(p)
             } else {
               this.plugin_url = null
               this.init_plugin_search = p
@@ -938,9 +968,6 @@ export default {
     },
     installPluginFromUrl(plugin_url){
       this.permission_message = `This plugin is <strong>not</strong> provided by ImJoy.io. <br> Please make sure the plugin is provided by a trusted source, otherwise it may <strong>harm</strong> your computer. <br> <a href="${plugin_url}" target="_blank">View source code</a><br><br>Do you allow this plugin to be installed?`
-      if(plugin_url.includes('github') && plugin_url.includes('/blob/')){
-        plugin_url = githubUrlRaw(plugin_url)
-      }
       const backup_addplugin = this.showAddPluginDialog
       this.resolve_permission = ()=>{
         this.installPlugin(plugin_url).then(()=>{
@@ -956,15 +983,24 @@ export default {
       this.showAddPluginDialog = false
       this.showPermissionConfirmation = true
     },
-    installPlugin(pconfig, tag){
+    getPlugin4Install(plugin_url){
+      this.plugin4install = null
+      if(plugin_url.includes('github') && plugin_url.includes('/blob/')){
+        plugin_url = githubUrlRaw(plugin_url)
+      }
+      this.downloading_error = ""
+      this.downloading_plugin = true
+      this.getPluginFromUrl(plugin_url).then((config)=>{
+        this.plugin4install = config
+        this.downloading_plugin = false
+      }).catch(()=>{
+        this.downloading_plugin = false
+        this.downloading_error = "Sorry, the plugin URL is invalid!"
+        this.showMessage("Sorry, the Plugin URL is invalid!")
+      })
+    },
+    getPluginFromUrl(uri){
       return new Promise((resolve, reject) => {
-        const uri = typeof pconfig == 'string' ? pconfig : pconfig.uri
-        //use the has tag in the uri if no hash tag is defined.
-        if(!uri){
-          reject('No url found for plugin ' + pconfig.name)
-          return
-        }
-        tag = tag || uri.split("#")[1]
         axios.get(uri).then(response => {
           if (!response || !response.data || response.data == '') {
             alert('failed to get plugin code from ' + uri)
@@ -975,15 +1011,30 @@ export default {
           const code = response.data
           const pluginComp = parseComponent(code)
           console.log('code parsed from', pluginComp)
-          let c = null
           try {
             config = JSON.parse(pluginComp.config[0].content)
+            config.code = code
+            config.uri = uri
             console.log('loading config from .html file', config)
           } catch (e) {
             console.error(e)
             reject(e)
             return
           }
+          resolve(config)
+        }).catch(reject)
+      })
+    },
+    installPlugin(pconfig, tag){
+      return new Promise((resolve, reject) => {
+        const uri = typeof pconfig == 'string' ? pconfig : pconfig.uri
+        //use the has tag in the uri if no hash tag is defined.
+        if(!uri){
+          reject('No url found for plugin ' + pconfig.name)
+          return
+        }
+        tag = tag || uri.split("#")[1]
+        this.getPluginFromUrl(uri).then((config)=>{
           if (!config) {
             console.error('Failed to parse the plugin code.', code)
             reject('Failed to parse the plugin code.')
@@ -993,8 +1044,6 @@ export default {
             reject('Unsupported plugin mode: '+config.mode)
             return
           }
-          config.uri = uri
-          config.code = code
           config.tag = tag
           config._id = config.name && config.name.replace(/ /g, '_') || randId()
           if (config.dependencies) {
@@ -2770,4 +2819,7 @@ div#textnode {
   color: orange!important;
 }
 
+.code-editor {
+  height: 500px;
+}
 </style>
