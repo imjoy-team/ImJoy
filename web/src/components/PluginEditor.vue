@@ -96,19 +96,28 @@ export default {
     this.editor.addCommand( window.monaco.KeyMod.CtrlCmd |  window.monaco.KeyCode.KEY_S, ()=>{
       this.save()
     });
-    this.editor.addCommand( window.monaco.KeyMod.CtrlCmd |  window.monaco.KeyCode.KEY_R, ()=>{
-      this.reload()
-    });
+    // this.editor.addCommand( window.monaco.KeyMod.CtrlCmd |  window.monaco.KeyCode.KEY_R, ()=>{
+    //   this.reload()
+    // });
   },
   methods: {
     save(){
       this.$emit('input', this.codeValue)
-      this.window.save({pluginId: this.pluginId, code: this.codeValue}).then((p_id)=>{
-        this.window.data._id = p_id
-        this.window.plugin.config._id= p_id
-        this.$forceUpdate()
+      this.window.save({pluginId: this.pluginId, code: this.codeValue}).then((config)=>{
+        // this.window.data._id = config._id
+        // this.window.plugin._id = config._id
+        // this.window.plugin.config._id= config._id
+
+        this.reload().finally(()=>{
+          this.window.data._id = config._id
+          this.window.plugin = config
+          this.window.name = config.name
+          this.window.data._name = config.name
+          this.$forceUpdate()
+        })
+
       })
-      this.reload()
+
     },
     remove(){
       this.$emit('input', this.codeValue)
@@ -124,9 +133,8 @@ export default {
           if(this.window.plugin && this.window.plugin.config){
             this.window.plugin.config.code = this.codeValue
           }
-          this.window.reload({pluginId: this.pluginId, tag: this.window.plugin.tag, type:this.window.plugin.type, name:this.window.plugin.name, code: this.codeValue, plugin: this.window.plugin}).then((plugin)=>{
+          this.window.reload({_id: this.window.data._id, tag: this.window.plugin.tag, name:this.window.data._name, code: this.codeValue}).then((plugin)=>{
             this.window.plugin = plugin
-            this.window.name = plugin.name
             resolve()
           }).catch((e)=>{
             reject(e)

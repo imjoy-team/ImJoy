@@ -1075,19 +1075,19 @@ export default {
 
             }
           }
-          this.savePlugin(config).then(()=>{
+          this.savePlugin(config).then((template)=>{
             for (let p of this.available_plugins) {
-              if(p.name == config.name && !p.installed){
+              if(p.name == template.name && !p.installed){
                 p.installed = true
                 p.tag = tag
               }
             }
-            this.showMessage(`Plugin "${config.name}" has been successfully installed.`)
+            this.showMessage(`Plugin "${template.name}" has been successfully installed.`)
             this.$forceUpdate()
             resolve()
-            this.reloadPlugin(config)
+            this.reloadPlugin(template)
           }).catch(()=>{
-            reject(`Failed to save the plugin ${config.name}`)
+            reject(`Failed to save the plugin ${template.name}`)
           })
         }).catch((e)=>{
           console.error(e)
@@ -1097,7 +1097,6 @@ export default {
     },
     removePlugin(plugin){
       return new Promise((resolve, reject) => {
-        // console.log('remove plugin', plugin.name)
         // remove if exists
         this.db.get(plugin._id).then((doc) => {
           return this.db.remove(doc);
@@ -1452,7 +1451,6 @@ export default {
     },
     editPlugin(pid) {
       const plugin = this.plugins[pid]
-      console.log('editing plugin:', plugin)
       const pconfig = plugin.config
       const w = {
         name: pconfig.name,
@@ -1526,6 +1524,7 @@ export default {
           }
           this.unloadPlugin(template, true)
           let p
+
           if (template.mode == 'window') {
             p = this.preLoadPlugin(template)
           } else {
@@ -1533,6 +1532,7 @@ export default {
           }
           p.then((plugin) => {
             // console.log('new plugin loaded', plugin)
+            plugin._id = pconfig._id
             pconfig.name = plugin.name
             pconfig.type = plugin.type
             pconfig.plugin = plugin
