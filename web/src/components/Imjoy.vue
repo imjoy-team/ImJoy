@@ -760,9 +760,11 @@ export default {
       this.workspace_list = doc.list
       default_ws = doc.default
     }).catch((err) => {
-      this.showMessage("Database Error:" + err.toString())
-      this.status_text = "Database Error:" + err.toString()
-      console.error(err)
+      if(err.name != 'not_found'){
+        // this.showMessage("Database Error:" + err.toString())
+        // this.status_text = "Database Error:" + err.toString()
+        console.error("Database Error", err)
+      }
       this.config_db.put({
         _id: 'workspace_list',
         list: ['default'],
