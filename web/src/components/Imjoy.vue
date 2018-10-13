@@ -1559,7 +1559,6 @@ export default {
           const template = this.parsePluginCode(code, {tag: pconfig.tag})
           template.code = code
           template._id = template.name.replace(/ /g, '_')
-          pconfig._id = template._id
           const addPlugin = () => {
             this.db.put(template, {
               force: true

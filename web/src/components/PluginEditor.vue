@@ -17,7 +17,7 @@
         <span></span>
         <md-field  v-if="window && window.plugin&&window.plugin.tags&&window.plugin.tags.length>0">
           <!-- <label for="tag">Tag</label> -->
-          <md-select id="tag" @md-selected="reload()" v-model="window.plugin.tag" name="tag">
+          <md-select id="tag" @md-selected="window.plugin.tags.includes(window.plugin.tag) && reload()" v-model="window.plugin.tag" name="tag">
             <md-option :value="tag" v-for="tag in window.plugin.tags" :key="tag">{{tag}}</md-option>
           </md-select>
           <md-tooltip>Select a tag for testing, the plugin will be reloaded.</md-tooltip>
@@ -86,9 +86,15 @@ export default {
       this.window.resize = ()=>{
         setTimeout(()=>{
           this.editor.layout();
-        }, 300)
+        }, 200)
+        setTimeout(()=>{
+          this.editor.layout();
+        }, 500)
       }
     }
+    setTimeout(()=>{
+      this.editor.layout();
+    }, 200)
     setTimeout(()=>{
       this.editor.layout();
     }, 500)
@@ -103,10 +109,11 @@ export default {
   methods: {
     save(){
       this.$emit('input', this.codeValue)
-      this.window.save({pluginId: this.pluginId, code: this.codeValue}).then((config)=>{
+      this.window.save({pluginId: this.pluginId, code: this.codeValue, tag: this.window.plugin && this.window.plugin.tag}).then((config)=>{
         // this.window.data._id = config._id
         // this.window.plugin._id = config._id
         // this.window.plugin.config._id= config._id
+        this.window.data.config = config
 
         this.reload().finally(()=>{
           this.window.data._id = config._id
@@ -133,8 +140,16 @@ export default {
           if(this.window.plugin && this.window.plugin.config){
             this.window.plugin.config.code = this.codeValue
           }
-          this.window.reload({_id: this.window.data._id, tag: this.window.plugin.tag, name:this.window.data._name, code: this.codeValue}).then((plugin)=>{
+          let newTag = this.window.plugin.tag
+          const config = this.window.data && this.window.data.config
+          if(config && this.window.plugin && this.window.plugin.tag){
+            if(!this.window.data.config.tags.includes(this.window.plugin.tag)){
+              newTag = this.window.data.config.tags[0]
+            }
+          }
+          this.window.reload({_id: this.window.data._id, tag: newTag, name:this.window.data._name, code: this.codeValue}).then((plugin)=>{
             this.window.plugin = plugin
+            this.$forceUpdate()
             resolve()
           }).catch((e)=>{
             reject(e)
