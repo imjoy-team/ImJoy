@@ -39,6 +39,12 @@ $env:Path = '%systemdrive%%homepath%\ImJoyApp;%systemdrive%%homepath%\ImJoyApp\S
 If you have already installed the **Plugin Engine**, then you can run ImJoy in offline mode with the following command (you will need to update you `$PATH` settings as explained above):
 
 ```
+# linux and mac
+# export PATH=~/ImJoyApp/bin:$PATH
+
+# windows
+# $env:Path = '%systemdrive%%homepath%\ImJoyApp;%systemdrive%%homepath%\ImJoyApp\Scripts;' + $env:Path;
+
 python -m imjoy --serve
 ``` 
 This will download all files necessary for offline access, you will have your own ImJoy web app which can be access by [http://127.0.0.1:8080](http://127.0.0.1:8080).
@@ -61,9 +67,50 @@ The installation of the plugin engine will setup an **Miniconda environment** lo
 
 You can then launch the Plugin engine from a terminal (e.g. by ssh) and specify a host to allow outside connections. Before doing this, you need to update you `$PATH` settings as explained above.
 ```
+# linux and mac
+# export PATH=~/ImJoyApp/bin:$PATH
+
+# windows
+# $env:Path = '%systemdrive%%homepath%\ImJoyApp;%systemdrive%%homepath%\ImJoyApp\Scripts;' + $env:Path;
+
 python -m imjoy --serve --host=0.0.0.0
 ```
 By default, the host will be set to `127.0.0.1`, which allows only local connections. To allow remote access, the host is set to `0.0.0.0`. In order to connect to the Plugin Engine, you will need the **connection token** that is displayed in the terminal after you launched the plugin engin. **KEEP THIS TOKEN PRIVATE!!!!**. Besides the token, you will also need the `hostname` or the IP adress of your remote machine.
 
 #### Connect local ImJoy instance to 
 On your local machineThen go to http://IP-OF-YOUR-REMOTE:8080 to connect to the remote machine. In order to launch the plugin engine, you have simply to specify the **connection token**.
+
+
+
+## FAQs
+ * Cannot start the ImJoy Plugin Engine any more?
+ Try to run the following command in your terminal to upgrade ImJoy manually.
+ 
+ ```python
+export PATH=~/ImJoyApp/bin:$PATH
+pip install -U git+https://github.com/oeway/ImJoy-Python#egg=imjoy
+ ```
+ 
+ * Can I use my existing python?
+
+  It depends whether it's a conda-compatible distribution or not, try to type `conda -V` command, if you see a version number(e.g:`conda 4.3.30`), it means you can skip the Anaconda/Miniconda installation, and install ImJoy directly with your existing python.
+ * Can I use ImJoy with Python 2.7 or other version lower than Python 3.6?
+
+  Yes, you can if you have the conda environment. You will be able to install and run ImJoy with Python version lower thant 3.6 (e.g.: Anaconda/Miniconda Python2.7). However, in that case, it will bootstrapping itself by creating a Python 3 environment (named `imjoy`) in order to run the actual plugin engine code. Therefore, Anaconda/Miniconda (Python3.6+ version) is still recommended if you have the choice.
+ * What's the difference with [Anaconda](https://www.anaconda.com/download/) and [Miniconda](https://conda.io/miniconda.html)?
+
+ Miniconda is just a reduced version of Anaconda. Since ImJoy only relies on `conda` which included by both, you can choose either of them. If you like minimal installation, choose Miniconda. If you want all those packages which will be used for scientific computing(such as numpy, scipy, scikit-image etc.), choose Anaconda.
+ * Why I can't connect to my plugin engine run on a remote computer?
+
+ First, you needs to make sure the other computer with plugin engine can be accessed from your current network and not blocked by a firewall for example.
+
+ Second, currently you can't use ImJoy.io loaded with `https` with the Plugin Engine, because modern browsers do not allow you to make a insecured connection within a SSL secured website. So, you will have to switch to the offline version.
+
+ * Getting "address already in use error"?
+
+ If you something like this: `OSError: [Errno 48] error while attempting to bind on address ('127.0.0.1', 8080): address already in use`, It means you have another instance which is using the the port needed by the Plugin Engine. You need to find it out and kill that task if you don't known which one. For example, for port `8080`, you can run `lsof -n -i :8082 | grep LISTEN` in a terminal and you will find the pid of the process which occuping the port, support the pid is `27762`, then you can run `kill 27762` to kill it.
+
+ * CommandNotFoundError with 'conda activate'
+
+ By default, ImJoy uses `conda activate` to activate conda environments if it's available. However, you may need to setup `conda activate` according to here: https://github.com/conda/conda/releases/tag/4.4.0
+
