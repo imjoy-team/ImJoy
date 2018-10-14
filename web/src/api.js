@@ -180,7 +180,6 @@ export const PLUGIN_SCHEMA= schema({
 export const REGISTER_SCHEMA= schema({
   name: String,
   type: String,
-  tags: Array,
   ui: [null, String, Array, Object],
   inputs: [null, Object],
   outputs: [null, Object]
@@ -199,7 +198,6 @@ export const OP_SCHEMA = {
   name: String,
   type: String,
   ui: [null, String, Array, Object],
-  tags: Array,
   run: [null, String],
   inputs: [null, Object],
   outputs: [null, Object]

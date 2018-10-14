@@ -1906,7 +1906,9 @@ export default {
           // console.log('result', w)
           w.name = 'result'
           w.type = 'imjoy/generic'
-          this.createWindow(w)
+          if(w.data.length > 3){
+            this.createWindow(w)
+          }
         }
         this.progress = 100
       }).catch((e) => {
@@ -2115,7 +2117,7 @@ export default {
         this.plugin_names[plugin.name] = plugin
         config.click2load = false
         plugin.api = {
-          run: (my) => {
+          run: async (my) => {
             const c = {}
             c.type = template.type
             c.name = template.name
@@ -2123,7 +2125,7 @@ export default {
             // c.op = my.op
             c.data = my.data
             c.config = my.config
-            this.createWindow(c)
+            await this.createWindow(c)
           }
         }
         this.register(config, {
@@ -2613,7 +2615,7 @@ export default {
         const pconfig = wconfig //_clone(window_config)
         //generate a new window id
         pconfig.mode = window_config.mode
-        pconfig.id = window_config.id//window_config.name.trim().replace(/ /g, '_') + '_' + randId()
+        pconfig.id = window_config.id + '_' + randId()//window_config.name.trim().replace(/ /g, '_') + '_' + randId()
         // console.log('creating window: ', pconfig)
         if (pconfig.mode != 'window') {
           throw 'Window plugin must be with mode "window"'
