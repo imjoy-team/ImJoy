@@ -818,7 +818,7 @@ function randId() {
             me.disconnect();
         }
         if(this.mode == 'pyworker' && (!this.config.context || !this.config.context.socket)){
-          me._fail.emit('Please start the Plugin Engine and connect to it.');
+          me._fail.emit('Please connect to the Plugin Engine 🚀.');
           this._connection = null
         }
         else{

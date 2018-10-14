@@ -330,7 +330,7 @@
         <p>
           Python plugins are supported by ImJoy with the Python Plugin Engine. <br><br>
           If this is your first time to use ImJoy Plugin Engine, please <a href="https://github.com/oeway/ImJoy-Python/releases" target="_blank">click here</a> to download the ImJoy Plugin Engine.
-          <br> If you have it already, please start the ImJoy Plugin Engine App, and connect to it.<br>
+          <br> If you have it already, please start the Plugin Engine, and connect to it.<br>
         </p>
         <md-field>
           <label for="engine_url">Plugin Engine URL</label>
@@ -936,7 +936,7 @@ export default {
     showFileDialog(options, _plugin){
       if(!this.engine_connected){
         this.showMessage('File Dialog requires the plugin engine, please connect to the plugin engine.')
-        throw "Please start the Plugin Engine and connect to it."
+        throw "Please connect to the Plugin Engine 🚀."
       }
       if(!_plugin){
         _plugin = options
@@ -1339,8 +1339,8 @@ export default {
     getFileUrl(path, _plugin){
       return new Promise((resolve, reject) => {
         if(!this.engine_connected){
-          reject("Please start the Plugin Engine and connect to it.")
-          this.showMessage("Please start the Plugin Engine and connect to it.")
+          reject("Please connect to the Plugin Engine 🚀.")
+          this.showMessage("Please connect to the Plugin Engine 🚀.")
           return
         }
         if(_plugin !== this.IMJOY_PLUGIN && (!_plugin || !_plugin.id)){
@@ -1390,8 +1390,8 @@ export default {
     getFilePath(url, _plugin){
       return new Promise((resolve, reject) => {
         if(!this.engine_connected){
-          reject("Please start the Plugin Engine and connect to it.")
-          this.showMessage("Please start the Plugin Engine and connect to it.")
+          reject("Please connect to the Plugin Engine 🚀.")
+          this.showMessage("Please connect to the Plugin Engine 🚀.")
           return
         }
         let config = url
@@ -1714,7 +1714,7 @@ export default {
                 this.reloadPlugin(config).catch((e)=>{
                   console.error(config, e)
                   this.showSnackbar(`<${config.name}>: ${e.toString()}` )
-                  if(!e.toString().includes('Please start the Plugin Engine and connect to it.')){
+                  if(!e.toString().includes('Please connect to the Plugin Engine 🚀.')){
                       this.showMessage(`<${config.name}>: ${e.toString()}`)
                   }
                 })
@@ -2151,7 +2151,7 @@ export default {
         config.context = this.pluing_context
         if (template.mode == 'pyworker') {
           if (!this.socket) {
-            console.error("Please start the Plugin Engine and connect to it.")
+            console.error("Please connect to the Plugin Engine 🚀.")
           }
         }
         const tconfig = _.assign({}, template, config)
