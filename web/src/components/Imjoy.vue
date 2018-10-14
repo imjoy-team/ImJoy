@@ -2470,7 +2470,7 @@ export default {
                     w.type = 'imjoy/generic'
                     w.config = res.data
                     w.data = res.target
-                    this.createWindow(w)
+                    await this.createWindow(w)
                   }
                 }
             }
