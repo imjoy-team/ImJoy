@@ -411,13 +411,14 @@
             <div v-if="tag4install" class="md-toolbar-section-end">
               <md-button class="md-button md-primary" @click="installPlugin(plugin4install, tag4install); showAddPluginDialog = false">
                 <md-icon>cloud_download</md-icon>Install
+                <md-tooltip>Install {{plugin4install.name}} (tag=`{{tag4install}}`)</md-tooltip>
               </md-button>
             </div>
-            <div v-if="!tag4install" class="md-toolbar-section-end">
+            <div v-else class="md-toolbar-section-end">
               <md-menu v-if="plugin4install.tags && plugin4install.tags.length>0">
                 <md-button class="md-button md-primary" md-menu-trigger>
                   <md-icon>cloud_download</md-icon>Install
-                  <md-tooltip>Install {{plugin4install.name}}</md-tooltip>
+                  <md-tooltip>Choose a tag to install {{plugin4install.name}}</md-tooltip>
                 </md-button>
                 <md-menu-content>
                   <md-menu-item v-for="tag in plugin4install.tags" :key="tag" @click="installPlugin(plugin4install, tag); showAddPluginDialog = false">
@@ -433,7 +434,7 @@
         </md-card-header>
         <md-card-content>
           <p>{{plugin4install.description}}</p>
-          <md-chip v-for="tag in plugin4install.tags" :key="tag">{{tag}}</md-chip>
+          <md-chip v-for="tag in plugin4install.tags" @click="tag4install=tag" :class="tag4install==tag? 'md-primary':''" :key="tag">{{tag}}</md-chip>
           <!-- <md-button class="md-button md-primary" @click="showCode(plugin4install)">
             <md-icon>code</md-icon>Code
           </md-button> -->
