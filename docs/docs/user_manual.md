@@ -31,6 +31,9 @@ which conda
 For **Windows**, you can use powershell to add the ImJoyApp to `$env.Path`:
 ```
 $env:Path = '%systemdrive%%homepath%\ImJoyApp;%systemdrive%%homepath%\ImJoyApp\Scripts;' + $env:Path;
+
+# now you can use `conda`, `pip`, `python` provided by the ImJoyApp 
+(Get-Command conda.exe).Path
 ```
 
 **Note: The following sections assume you have run the above command in your current terminal.**
