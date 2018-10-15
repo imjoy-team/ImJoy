@@ -363,7 +363,7 @@ Similarly, for Python, you will need to use callback function to access the resu
 sigma = await api.getConfig('sigma')
 print(sigma)
 ```
-Please note, that numbers are converted to string when saved with `api.setConfig`. They have to be converted back (in JavaScript use `parseInt()` or `parseFloat()`, in Python `int()` or `float()`).
+Please note, that numbers are converted to strings when saved with `api.setConfig`. They have to be converted back to numbers before using them (in JavaScript use `parseInt()` or `parseFloat()`, in Python `int()` or `float()`).
 
 ## `api.getAttachment(...)`
 You can store any text data such as base64 encoded images, code and json in the `<attachment>` block, for example if you have the following attachment block in the plugin file:
