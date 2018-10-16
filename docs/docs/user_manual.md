@@ -44,7 +44,7 @@ $env:Path = '%systemdrive%%homepath%\ImJoyApp;%systemdrive%%homepath%\ImJoyApp\S
 **Note: The following sections assume you ran the above command in your current terminal.**
 
 ## Using ImJoy offline
-You can also use ImJoy without being connected to the internet. For this, you need to install the latest version of the [**Plugin Engine**](https://github.com/oeway/ImJoy-Python/releases).
+You can also use ImJoy without being connected to the internet. For this, you need to install the latest version of the [**Plugin Engine**](https://github.com/oeway/ImJoy-Python/releases). You cant then serve the static ImJoy web app. 
 
 You then have to
 1. Update the `$PATH` settings as explained below.
