@@ -30,6 +30,8 @@ describe how to ...
 2. get your data into ImJoy,
 3. define workflows.
 
+<img src="./asserts/imjoy-interface.png" width="800px"></img>
+
 ### Plugins
 The entire functionality of ImJoy is provided by plugins. To install new plugins from the [Plugin Repository](https://github.com/oeway/ImJoy-Plugins), click the **+ PLUGINS**. This will show a window with all available plugins with a short description. A longer description can be
 obtained by pressing on the **...** and **Docs**. To install a plugin, press on cloud button.
