@@ -15,24 +15,23 @@ is connected with the ImJoy Web App through websockets and communicate with a cu
 **Importantly**, ImJoy can run without the Python backend and thus without the need of any
 installation. Plugins can then only implemented in JavaScript (such as [TensoFlow.js](https://js.tensorflow.org/)).
 
-## Python Engine
-The Plugin Engine allows to run Python plugins. You have to **install** it once from [GitHub](https://github.com/oeway/ImJoy-Python/releases), each time you launch it will check for updates. 
+## Plugin Engine
+The Plugin Engine allows to run Python plugins. You have to **install** it once from [GitHub](https://github.com/oeway/ImJoy-Python/releases), it will then check for updates at each launch. 
 
-You have to **launch** the engine each time you re-start the ImJoy app. In order for the ImJoy app to connect to the engine, it requires a connection token. When you **launch the Plugin Engine** for the first time it will show a page in the browser with the connection token (blacked out below). This token can also be found in the terminal window that opens once you start the engine. 
+You have to **launch** the engine each time you re-start the ImJoy app and you use plugins relying on the engine. If the engine is not connected, you will get an error message in the lower part of the ImJoy interface.
+<img
+  src="./asserts/imjoy-warning-connect-engine.png" width="600px"></img>
+
+In order for the ImJoy app to connect to the engine, it requires a connection token. When you **launch the Plugin Engine** for the first time it will show a page in the browser with the connection token (blacked out below). Alternatively, this token can also be found in the terminal window that opens once you start the engine. 
 
 <img
   src="./asserts/imjoy-connectionToken.png" width="600px"></img>
 
-In the ImJoy interface press the 🚀 symbol to connect it to the Plugin Engine. This will open a dialog where you can specify the token in the `Connection token` field. Please note, that the token will be saved and you will not need to enter it anymore to connect to this Plugin Engine.
+In the ImJoy interface press the 🚀 symbol to connect it to the Plugin Engine. This will open a dialog where you can specify the token in the `Connection token` field. Please note, that the token will be saved in the browser and you will not need to enter it anymore to connect to this Plugin Engine.
 
 <img
   src="./asserts/imjoy-install-engine.png" width="600px"></img>
   
-You have to launch and connect to the plugin engine, each time your restart an ImJoy analysis and you use plugins relying on the engine. If the engine is not connected, you will get an error message in the lower part of the ImJoy interface.
-<img
-  src="./asserts/imjoy-warning-connect-engine.png" width="600px"></img>
-
-
 ## TODO: Loading data to the workspace
 
 ## TODO: How to build workflows
