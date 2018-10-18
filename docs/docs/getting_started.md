@@ -21,7 +21,7 @@ directly used, and you can get a good overview of how ImJoy looks like.
 
 For some more advanced processing, the **Python Plugin Engine**  is required.
 We handles the installation of the necessary tools for you, go to the [ImJoy web app](https://imjoy.io/#/app), and click the 🚀 button located on the upper-right corner.
-In the displayed window,you will find instructions on how to set the engine up.
+In the displayed window, you will find instructions on how to set up the engine.
 
 ##  The ImJoy interface
 This interface provides all functionality needed to process your data. We will
