@@ -10,7 +10,7 @@
     </md-dialog-content>
     <md-dialog-actions>
       <md-button class="md-primary" :disabled="!file_tree_selection" @click="show_=false; resolve(file_tree_selection)">OK <md-tooltip v-if="file_tree_selection">Selected: {{file_tree_selection}}</md-tooltip> </md-button>
-      <md-button class="md-primary" @click="show_=false; reject("file dialog canceled by the user.")">Cancel</md-button>
+      <md-button class="md-primary" @click="show_=false; reject('file dialog canceled by the user.')">Cancel</md-button>
     </md-dialog-actions>
   </md-dialog>
 </div>
