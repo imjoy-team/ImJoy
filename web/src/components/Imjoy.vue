@@ -744,7 +744,7 @@ export default {
       getAttachment: this.getAttachment,
       getFileUrl: this.getFileUrl,
       getFilePath: this.getFilePath,
-      $forceUpdate: this.$forceUpdate,
+      utils: {$forceUpdate: this.$forceUpdate},
     }
 
     this.resetPlugins()
@@ -907,12 +907,19 @@ export default {
     setPluginConfig(name, value, _plugin){
       const plugin = this.plugins[_plugin.id]
       if(!plugin) throw "setConfig Error: Plugin not found."
-      return localStorage.setItem("config_"+plugin.name+'_'+name, value)
+      if(name.startsWith('_') && plugin.config.hasOwnProperty(name.slice(1))){
+        throw `'${name.slice(1)}' is a readonly field defined in <config> block, please avoid using it`
+      }
     },
     getPluginConfig(name, _plugin){
       const plugin = this.plugins[_plugin.id]
       if(!plugin) throw "getConfig Error: Plugin not found."
-      return localStorage.getItem("config_"+plugin.name+'_'+name)
+      if(name.startsWith('_') && plugin.config.hasOwnProperty(name.slice(1))){
+        return plugin.config[name.slice(1)]
+      }
+      else{
+        return localStorage.getItem("config_"+plugin.name+'_'+name)
+      }
     },
     getAttachment(name, _plugin){
       const plugin = this.plugins[_plugin.id]
@@ -2573,20 +2580,25 @@ export default {
     },
     async updateWindow(wconfig, _plugin){
       const wid = wconfig.id
-      if(!wid) throw "You must provide the window id for updating."
+      if(!wid) throw "You must provide a window id for updating."
       const w = this.window_ids[wid]
-      if(w && w.update){
-        const ret = await w.update(wconfig)
-        if(ret){
-          for(let k in ret){
-            w[k] = ret[k]
+      if(w){
+        if(w.update){
+          const ret = await w.update(wconfig)
+          if(ret){
+            for(let k in ret){
+              w[k] = ret[k]
+            }
+          }
+        }
+        else{
+          for(let k in wconfig){
+            w[k] = wconfig[k]
           }
         }
       }
       else{
-        for(let k in wconfig){
-          w[k] = wconfig[k]
-        }
+        throw `Window (id=${wid}) not found`
       }
     },
     async createWindow(wconfig, _plugin) {
