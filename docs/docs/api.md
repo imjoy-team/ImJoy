@@ -139,7 +139,7 @@ api.export(ImJoyPlugin())
 ```
 Every member of the `ImJoyPlugin` instance will be exported as `Plugin API`, which means those exported functions or variables can be called or used by the ImJoy app or another plugin.
 
-Notice that, if a variable or function has a name start with `_`, it means that's an internel varialbe or function, will not be exported.
+Notice that, only functions and variables with primitive types can be exported (number, string, boolean). And if a variable or function has a name start with `_`, it means that's an internel varialbe or function, will not be exported.
 
 ## `api.alert(...)`
 shows an alert dialog with a message, example: `api.alert('hello world')`

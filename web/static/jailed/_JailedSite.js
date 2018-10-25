@@ -163,7 +163,7 @@
                   }
                   names.push({name:name, data: data2});
                 }
-                else{
+                else if(Object(data) !== data){
                   names.push({name:name, data: data});
                 }
 
