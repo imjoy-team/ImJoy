@@ -9,7 +9,7 @@
       </ul>
     </md-dialog-content>
     <md-dialog-actions>
-      <md-button class="md-primary" @click="show_=false; resolve(file_tree_selection)">OK <md-tooltip v-if="file_tree_selection">Selected: {{file_tree_selection}}</md-tooltip> </md-button>
+      <md-button class="md-primary" :disabled="!file_tree_selection" @click="show_=false; resolve(file_tree_selection)">OK <md-tooltip v-if="file_tree_selection">Selected: {{file_tree_selection}}</md-tooltip> </md-button>
       <md-button class="md-primary" @click="show_=false; reject()">Cancel</md-button>
     </md-dialog-actions>
   </md-dialog>
@@ -58,9 +58,9 @@ export default {
      },
      loadFile(f){
        if(f.target.type != 'file'){
-         if(f.path == this.root){
-           f.path = f.path+'/../'
-         }
+         // if(f.path == this.root){
+         //   f.path = f.path+'/../'
+         // }
          this.listFiles(f.path, this.options.type, this.options.recursive).then((tree)=>{
            this.root = tree.path
            this.file_tree = tree
@@ -87,7 +87,13 @@ export default {
        this.options.root = this.options.root || '~'
        this.options.mode = this.options.mode || 'single|multiple'
        this.options.uri_type = this.options.uri_type|| 'path'
-       this.file_tree_selection = null
+       if(this.options.type != 'file' && this.options.root){
+         this.file_tree_selection = this.options.root
+       }
+       else{
+         this.file_tree_selection = null
+       }
+
        return new Promise((resolve, reject) => {
          if(this.options.uri_type == 'path'){
            this.resolve = resolve
