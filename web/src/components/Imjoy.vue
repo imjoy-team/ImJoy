@@ -1127,7 +1127,8 @@ export default {
           this.$forceUpdate()
           resolve()
         }).catch((err) => {
-          this.showMessage('Error:'+err)
+          this.status_text = err.toString() || "Error occured."
+          this.showMessage(this.status_text)
           console.error('error occured when removing ', plugin, err)
           reject(err)
         });
@@ -1553,8 +1554,8 @@ export default {
             reject(e)
           })
         } catch (e) {
-          this.status_text = 'Error: ' + e
-          this.showMessage('Error: ' + e, 15000)
+          this.status_text = e || "Error."
+          this.showMessage(e || "Error.", 15000)
           reject(e)
         }
       })
@@ -1596,8 +1597,8 @@ export default {
             addPlugin()
           });
         } catch (e) {
-          this.status_text = 'Error: ' + e
-          this.showMessage('Error: ' + e, 15000)
+          this.status_text = e || "Error."
+          this.showMessage( e || "Error.", 15000)
           reject(e)
         }
       })
@@ -1921,7 +1922,7 @@ export default {
       }).catch((e) => {
         console.error(e)
         this.status_text = e.toString() || "Error."
-        this.showMessage('Error: ' + e, 12000)
+        this.showMessage(e || "Error." , 12000)
       })
     },
     saveWorkflow(joy) {
@@ -1995,7 +1996,7 @@ export default {
       }).catch((e) => {
         console.error(e)
         this.status_text = '<' +op.name + '>' + (e.toString() || "Error.")
-        this.showMessage('Error: ' + e, 15000)
+        this.showMessage(this.status_text, 15000)
       })
     },
     selectFileChanged(event) {
@@ -2556,9 +2557,9 @@ export default {
               resolve()
               this.$forceUpdate()
             }).catch((e) => {
-              this.status_text = plugin.name + '->' + e
+              this.status_text = '<' + plugin.name + '>' + (e.toString() || "Error.")
               console.error('Error in the run function of plugin ' + plugin.name, e)
-              this.showMessage('Error: '+ e)
+              this.showMessage(this.status_text)
               reject(e)
             })
           }).catch((e) => {
