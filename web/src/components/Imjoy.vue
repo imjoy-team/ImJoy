@@ -185,7 +185,7 @@
               <div class="md-layout-item">
                 <md-button @click="reloadPlugins()" class="md-icon-button">
                   <md-icon>autorenew</md-icon>
-                  <md-tooltip>Reload plugins</md-tooltip>
+                  <md-tooltip>Reload/restart all the plugins</md-tooltip>
                 </md-button>
               </div>
             </div>
