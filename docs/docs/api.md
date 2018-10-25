@@ -239,7 +239,7 @@ If you want to change your interface dynamically, you can run `api.register`
 multiple times to overwrite the previous version.
 
 `api.register` can also be used to overwrite the default ui string of the plugin
-defined in `<config>`, just set the plugin name as the op name.
+defined in `<config>`, just set the plugin name as the op name (or without setting a name).
 
 ## `api.createWindow(...)`
 create a new window and add it to the workspace.

@@ -2357,6 +2357,7 @@ export default {
         const plugin = this.plugins[_plugin.id]
         if(!plugin) throw "Plugin not found."
         config = _clone(config)
+        config.name = config.name || plugin.name
         config.type = config.type || config.name
         config.show_panel = config.show_panel || false
         config.ui = this.normalizeUI(config.ui) || ''
