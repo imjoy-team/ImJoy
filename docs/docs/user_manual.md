@@ -42,19 +42,19 @@ In the ImJoy interface press the 🚀 symbol to connect it to the Plugin Engine.
 ## Access the Plugin Engine from a command line interface
 You can also access the Miniconda environment from the command line interface.
 
-To access this environment on **Linux or MacOS**, you need to add `~/ImJoyEngine/bin` to your `$PATH`:
+To access this environment on **Linux or MacOS**, you need to add `~/ImJoyApp/bin` to your `$PATH`:
 ```
-export PATH=~/ImJoyEngine/bin:$PATH
+export PATH=~/ImJoyApp/bin:$PATH
 
-# now you can use `conda`, `pip`, `python` provided by the ImJoyEngine
+# now you can use `conda`, `pip`, `python` provided from ~/ImJoyApp
 which conda
 
 ```
-For **Windows**, you can use powershell to add the ImJoyEngine to `$env.Path`:
+For **Windows**, you can use powershell to add the ImJoyApp to `$env.Path`:
 ```
-$env:Path = '%systemdrive%%homepath%\ImJoyEngine;%systemdrive%%homepath%\ImJoyEngine\Scripts;' + $env:Path;
+$env:Path = '%systemdrive%%homepath%\ImJoyApp;%systemdrive%%homepath%\ImJoyApp\Scripts;' + $env:Path;
 
-# now you can use `conda`, `pip`, `python` provided by the ImJoyEngine
+# now you can use `conda`, `pip`, `python` provided from ~/ImJoyApp
 (Get-Command conda.exe).Path
 ```
 
@@ -67,10 +67,10 @@ You then have to
 1. Update the `$PATH` settings as explained below.
     ```
     # linux and mac
-    # export PATH=~/ImJoyEngine/bin:$PATH
+    # export PATH=~/ImJoyApp/bin:$PATH
 
     # windows
-    # $env:Path = '%systemdrive%%homepath%\ImJoyEngine;%systemdrive%%homepath%\ImJoyEngine\Scripts;' + $env:Path;
+    # $env:Path = '%systemdrive%%homepath%\ImJoyApp;%systemdrive%%homepath%\ImJoyApp\Scripts;' + $env:Path;
     ```
 1. Execute the the following command in the terminal. This will download all files necessary for offline access.
     ```
@@ -93,15 +93,15 @@ To perform computational intensive calculations you can launch the Plugin Engine
 Install the latest version of the Plugin Engine from [GitHub](https://github.com/oeway/ImJoy-Engine/releases).
 
 #### Launch the Plugin Engine on remote machine
-The installation of the Plugin Engine will setup an **Miniconda environment** located in `~/ImJoyEngine`.
+The installation of the Plugin Engine will setup an **Miniconda environment** located in `~/ImJoyApp`.
 
 You can then launch the Plugin Engine from a terminal (e.g. by ssh) and specify a host to allow outside connections. Before doing this, you need to update you `$PATH` settings as explained above.
 ```
 # linux and mac
-# export PATH=~/ImJoyEngine/bin:$PATH
+# export PATH=~/ImJoyApp/bin:$PATH
 
 # windows
-# $env:Path = '%systemdrive%%homepath%\ImJoyEngine;%systemdrive%%homepath%\ImJoyEngine\Scripts;' + $env:Path;
+# $env:Path = '%systemdrive%%homepath%\ImJoyApp;%systemdrive%%homepath%\ImJoyApp\Scripts;' + $env:Path;
 
 python -m imjoy --serve --host=0.0.0.0
 ```
@@ -116,7 +116,7 @@ On your local machineT go to `http://IP-OF-YOUR-REMOTE:8080` to connect to the r
  Try to run the following command in your terminal to upgrade ImJoy manually.
 
  ```python
-export PATH=~/ImJoyEngine/bin:$PATH
+export PATH=~/ImJoyApp/bin:$PATH
 pip install -U git+https://github.com/oeway/ImJoy-Engine#egg=imjoy
  ```
 
