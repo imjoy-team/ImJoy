@@ -858,6 +858,12 @@ export default {
               this.show_plugin_store = true
               this.show_plugin_url = false
             }
+
+            // remove plugin url from the query
+            const query = Object.assign({}, this.$route.query);
+            delete query.plugin;
+            this.$router.replace({ query });
+
             this.show_plugin_templates = false
             this.showAddPluginDialog = true
             this.tag4install = this.$route.query.tag || ''
