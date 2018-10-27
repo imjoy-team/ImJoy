@@ -625,53 +625,57 @@ export default {
       document.querySelector("#dropzone").style.opacity = 0;
       document.querySelector("#textnode").style.fontSize = "42px";
     });
+    const parseFiles = (e)=>{
+      return new Promise((resolve, reject)=>{
+        const filelist = []
+        let folder_supported = false
+        // https://gist.github.com/tiff/3076863
+         const traverseFileTree = (item, path, getDataLoaders, end) => {
+           path = path || "";
+           if (item.isFile) {
+             // Get file
+             item.file((file)=>{
+               file.relativePath = path + file.name
+               file.loaders = getDataLoaders(file)
+               filelist.push(file);
+               if(end) resolve(filelist)
+             });
+           } else if (item.isDirectory) {
+             // Get folder contents
+             var dirReader = item.createReader();
+             dirReader.readEntries((entries)=>{
+               for (var i = 0; i < entries.length; i++) {
+                 traverseFileTree(entries[i], path + item.name + "/", getDataLoaders, end && (i==entries.length-1));
+               }
+             });
+           }
+           else{
+             if(end) resolve(filelist)
+           }
+        };
+        var length = e.dataTransfer.items.length;
+        for (var i = 0; i < length; i++) {
+          if(e.dataTransfer.items[i].webkitGetAsEntry){
+            folder_supported = true
+            var entry = e.dataTransfer.items[i].webkitGetAsEntry();
+            traverseFileTree(entry, null, this.getDataLoaders, i==length-1)
+          }
+        }
+        if(!folder_supported){
+          this.selected_files = e.dataTransfer.files;
+        }
+        else{
+          this.selected_files = filelist
+        }
+      })
+    }
     window.addEventListener("drop", (e) => {
       e.preventDefault();
       document.querySelector("#dropzone").style.visibility = "hidden";
       document.querySelector("#dropzone").style.opacity = 0;
       document.querySelector("#textnode").style.fontSize = "42px";
-      const filelist = []
-      let folder_supported = false
-      // https://gist.github.com/tiff/3076863
-       const traverseFileTree = (item, path, getDataLoaders) => {
-         path = path || "";
-         if (item.isFile) {
-           // Get file
-           item.file((file)=>{
-             file.relativePath = path + file.name
-             file.loaders = getDataLoaders(file)
-             filelist.push(file);
-           });
-         } else if (item.isDirectory) {
-           // Get folder contents
-           var dirReader = item.createReader();
-           dirReader.readEntries((entries)=>{
-             for (var i = 0; i < entries.length; i++) {
-               traverseFileTree(entries[i], path + item.name + "/", getDataLoaders);
-             }
-           });
-         }
-      };
-      var length = e.dataTransfer.items.length;
-      for (var i = 0; i < length; i++) {
-        if(e.dataTransfer.items[i].webkitGetAsEntry){
-          folder_supported = true
-          var entry = e.dataTransfer.items[i].webkitGetAsEntry();
-          traverseFileTree(entry, null, this.getDataLoaders)
-        }
-      }
-      if(!folder_supported){
-        this.selected_files = e.dataTransfer.files;
-      }
-      else{
-        this.selected_files = filelist
-      }
-      // console.log('files loaded: ', this.selected_files)
-      this.loadFiles()
+      parseFiles(e).then(this.loadFiles)
     });
-    // this.importScripts.apply(null, this.preload_main).then(() => {
-    // console.log('preload done.')
-    // })
   },
   beforeRouteLeave(to, from, next) {
     if (this.windows && this.windows.length > 0) {
@@ -1883,6 +1887,14 @@ export default {
       return loaders
     },
     loadFiles() {
+      if(this.selected_files.length == 1 && this.selected_files[0].name.endsWith('.imjoy.html')){
+        const reader = new FileReader();
+        reader.onload = ()=>{
+            this.newPlugin(reader.result)
+        }
+        reader.readAsText(this.selected_files[0]);
+        return
+      }
       for (let f = 0; f < this.selected_files.length; f++) {
         const file = this.selected_files[f]
         const tmp = file.name.split('.')
