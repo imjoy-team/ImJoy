@@ -2136,7 +2136,7 @@ export default {
         config.click2load = false
         plugin.api = {
           run: async (my) => {
-            const c = {}
+            const c = template.defaults || {}
             c.type = template.type
             c.name = template.name
             c.tag = template.tag

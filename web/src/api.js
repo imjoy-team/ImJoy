@@ -99,7 +99,8 @@ Describe your plugin here.
   "icon": "extension",
   "inputs": null,
   "outputs": null,
-  "dependencies": []
+  "dependencies": [],
+  "defaults": {"w": 7, "h": 7}
 }
 </config>
 
