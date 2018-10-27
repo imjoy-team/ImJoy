@@ -714,7 +714,11 @@ export default {
 
     this.default_repository_url = "https://raw.githubusercontent.com/oeway/ImJoy-Plugins/master/manifest.imjoy.json"
     if(this.$route.query.repo){
-      if(this.$route.query.repo.includes('github')){
+      const re = new RegExp('^[^/.]+/[^/.]+$')
+      if(this.$route.query.repo.match(re)){
+        this.repository_url = githubImJoyManifest('https://github.com/'+this.$route.query.repo)
+      }
+      else if(this.$route.query.repo.includes('github')){
         this.repository_url = githubImJoyManifest(this.$route.query.repo)
       }
       else{
