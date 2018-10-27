@@ -329,7 +329,7 @@
     <md-dialog-content>
         <p>
           Python plugins are supported by ImJoy with the Python Plugin Engine. <br><br>
-          If this is your first time to use ImJoy Plugin Engine, please <a href="https://github.com/oeway/ImJoy-Python/releases" target="_blank">click here</a> to download the ImJoy Plugin Engine.
+          If this is your first time to use ImJoy Plugin Engine, please <a href="https://github.com/oeway/ImJoy-Engine/releases" target="_blank">click here</a> to download the ImJoy Plugin Engine.
           <br> If you have it already, please start the Plugin Engine, and connect to it.<br>
         </p>
         <md-field>
@@ -342,7 +342,7 @@
         </md-field>
         <p>&nbsp;{{engine_status}}</p>
         <p>
-          If you failed to install or start the Plugin Engine, please consult <a href="https://github.com/oeway/ImJoy-Python" target="_blank">here</a>, and choose the alternative solution.<br>
+          If you failed to install or start the Plugin Engine, please consult <a href="https://github.com/oeway/ImJoy-Engine" target="_blank">here</a>, and choose the alternative solution.<br>
         </p>
         <p v-if="is_https_mode">Please notice that, browsers such as Safari do not allow the connection form a `https` website to the Plugin Engine, in that case please <a href="http://imjoy.io/#/app" target="_blank">Switch to HTTP version</a> of ImJoy. </p>
         <p v-if="is_https_mode">Also notice that data and settings of ImJoy in the HTTP version and HTTPS version are not shared.</p>

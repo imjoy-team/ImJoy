@@ -1,7 +1,7 @@
 # ImJoy
 
 ImJoy is a flexible image processing framework for the deployment of complex
-computational tasks in a robust, secure and easy-to-use environment. The entire functionality is provided by **plugins**. These plugins can be assembled into **workflows** in a modern graphical user-interface. Plugins can be grouped and installed into isolated workspaces avoiding overcrowded plugin menus. This design makes ImJoy intuitive to work with for end users. 
+computational tasks in a robust, secure and easy-to-use environment. The entire functionality is provided by **plugins**. These plugins can be assembled into **workflows** in a modern graphical user-interface. Plugins can be grouped and installed into isolated workspaces avoiding overcrowded plugin menus. This design makes ImJoy intuitive to work with for end users.
 
 <img src="./asserts/imjoy-screenshot.png" width="600px"></img>
 
@@ -9,7 +9,7 @@ Imjoy consists of **two parts**:
 1. the **user interface**
 2. the **computational backend**
 
-While the ImJoy web app alone can perform computational tasks with the powerful Javascript engine and WebGL providing GPU access, adding an additional computational backend allows ImJoy to access the entire Python ecosystem. The plugin engine can be launched either on the local machine, or remotely to perform compuationally intensive tasks on dedicated workstations, e.g. with state-of-the-art GPUs. 
+While the ImJoy web app alone can perform computational tasks with the powerful Javascript engine and WebGL providing GPU access, adding an additional computational backend allows ImJoy to access the entire Python ecosystem. The plugin engine can be launched either on the local machine, or remotely to perform compuationally intensive tasks on dedicated workstations, e.g. with state-of-the-art GPUs.
 
 By design, ImJoy itself provides very minimal task specific functionality, it provides a flexible plugin interface to support plugins to extend the user interface and perform compuational tasks. Plugins can be designed to perform  simple tasks such as reading tif file, or more complex tasks such as training a deep learning model for image segmentation.
 
@@ -20,7 +20,7 @@ By design, ImJoy itself provides very minimal task specific functionality, it pr
  * Rich and interactive user interface powered by web technologies
  * Powerful computational backend powered by the Python ecosystem
  * Easy-to-use workflow composition
- * Isolated workspaces for grouping plugins 
+ * Isolated workspaces for grouping plugins
  * Extendable plugin interface supports Python and Javascript
  * Concurrent plugin execution through asynchronous programming
  * Self-contained plugin development
@@ -31,7 +31,7 @@ By design, ImJoy itself provides very minimal task specific functionality, it pr
 
 Currently, ImJoy source code consists of three repositories:
  * [web application](https://github.com/oeway/ImJoy/)
- * [plugin engine](https://github.com/oeway/ImJoy-Python)
+ * [plugin engine](https://github.com/oeway/ImJoy-Engine)
  * [plugin repository](https://github.com/oeway/ImJoy-Plugins)
 
 ## Acknowledgements
@@ -49,5 +49,3 @@ We thank all the authors for offering these excellent work to the open-source co
 ## License
 
 [MIT License](https://github.com/oeway/ImJoy/blob/master/LICENSE)
-
-

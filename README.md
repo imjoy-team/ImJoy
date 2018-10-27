@@ -9,7 +9,7 @@ With ImJoy, developing and deploying advanced image processing methods such as d
 
 Currently, ImJoy consists of three repositories:
  * [the ImJoy web application](https://github.com/oeway/ImJoy/) (this repository)
- * [the ImJoy plugin engine](https://github.com/oeway/ImJoy-Python)
+ * [the ImJoy plugin engine](https://github.com/oeway/ImJoy-Engine)
  * [the ImJoy plugin repository](https://github.com/oeway/ImJoy-Plugins)
 
 Getting started and documentations for the development: [ImJoy Docs](https://imjoy.io/docs)
