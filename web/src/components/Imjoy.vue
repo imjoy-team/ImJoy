@@ -2040,71 +2040,75 @@ export default {
       config = config || {}
       const uri = config.uri
       const tag = config.tag
-      if (uri && uri.endsWith('.js')) {
-        config.lang = config.lang || 'javascript'
-        config.script = code
-        config.style = null
-        config.window = null
-        config.tag = tag || null
-      } else {
-        // console.log('parsing the plugin file')
-        const pluginComp = parseComponent(code)
-        // console.log('code parsed from', pluginComp)
-        let c = null
-        config = JSON.parse(pluginComp.config[0].content)
-        config.scripts = []
-        for (let i = 0; i < pluginComp.script.length; i++) {
-          if (pluginComp.script[i].attrs.lang) {
-            config.script = pluginComp.script[i].content
-            config.lang = pluginComp.script[i].attrs.lang || 'javascript'
-          }
-          else{
-            config.scripts.push(pluginComp.script[i])
-          }
-        }
-        if(!config.script){
-          config.script = pluginComp.script[0].content
-          config.lang = pluginComp.script[0].attrs.lang || 'javascript'
-        }
-        config.tag = tag || config.tags && config.tags[0]
-        // try to match the script with current tag
-        for (let i = 0; i < pluginComp.script.length; i++) {
-          if (pluginComp.script[i].attrs.tag == config.tag) {
-            config.script = pluginComp.script[i].content
-            config.lang = pluginComp.script[i].attrs.lang || 'javascript'
-            break
-          }
-        }
-        config.links = pluginComp.link || null
-        config.windows = pluginComp.window || null
-        config.styles = pluginComp.style || null
-        config.docs = pluginComp.docs || null
-        config.attachments = pluginComp.attachment || null
-      }
-      config.type = config.type || config.name
-      config._id = config._id || null
-      config.uri = uri
-      config.code = code
-      config.id = config.name.trim().replace(/ /g, '_') + '_' + randId()
-
-      for (let i = 0; i < CONFIGURABLE_FIELDS.length; i++) {
-          const obj = config[CONFIGURABLE_FIELDS[i]]
-          if(obj && typeof obj === 'object' && !(obj instanceof Array)){
-            if(config.tag){
-              config[CONFIGURABLE_FIELDS[i]] = obj[config.tag]
-              if(!obj.hasOwnProperty(config.tag)){
-                console.log("WARNING: " + CONFIGURABLE_FIELDS[i] + " do not contain a tag named: " + config.tag)
-              }
+      try {
+        if (uri && uri.endsWith('.js')) {
+          config.lang = config.lang || 'javascript'
+          config.script = code
+          config.style = null
+          config.window = null
+          config.tag = tag || null
+        } else {
+          // console.log('parsing the plugin file')
+          const pluginComp = parseComponent(code)
+          // console.log('code parsed from', pluginComp)
+          let c = null
+          config = JSON.parse(pluginComp.config[0].content)
+          config.scripts = []
+          for (let i = 0; i < pluginComp.script.length; i++) {
+            if (pluginComp.script[i].attrs.lang) {
+              config.script = pluginComp.script[i].content
+              config.lang = pluginComp.script[i].attrs.lang || 'javascript'
             }
             else{
-              throw "You must use 'tags' with configurable fields."
+              config.scripts.push(pluginComp.script[i])
             }
           }
-      }
-      if (!PLUGIN_SCHEMA(config)) {
-        const error = PLUGIN_SCHEMA.errors(config)
-        console.error("Invalid plugin config: " + config.name, error)
-        throw error
+          if(!config.script){
+            config.script = pluginComp.script[0].content
+            config.lang = pluginComp.script[0].attrs.lang || 'javascript'
+          }
+          config.tag = tag || config.tags && config.tags[0]
+          // try to match the script with current tag
+          for (let i = 0; i < pluginComp.script.length; i++) {
+            if (pluginComp.script[i].attrs.tag == config.tag) {
+              config.script = pluginComp.script[i].content
+              config.lang = pluginComp.script[i].attrs.lang || 'javascript'
+              break
+            }
+          }
+          config.links = pluginComp.link || null
+          config.windows = pluginComp.window || null
+          config.styles = pluginComp.style || null
+          config.docs = pluginComp.docs || null
+          config.attachments = pluginComp.attachment || null
+        }
+        config.type = config.type || config.name
+        config._id = config._id || null
+        config.uri = uri
+        config.code = code
+        config.id = config.name.trim().replace(/ /g, '_') + '_' + randId()
+
+        for (let i = 0; i < CONFIGURABLE_FIELDS.length; i++) {
+            const obj = config[CONFIGURABLE_FIELDS[i]]
+            if(obj && typeof obj === 'object' && !(obj instanceof Array)){
+              if(config.tag){
+                config[CONFIGURABLE_FIELDS[i]] = obj[config.tag]
+                if(!obj.hasOwnProperty(config.tag)){
+                  console.log("WARNING: " + CONFIGURABLE_FIELDS[i] + " do not contain a tag named: " + config.tag)
+                }
+              }
+              else{
+                throw "You must use 'tags' with configurable fields."
+              }
+            }
+        }
+        if (!PLUGIN_SCHEMA(config)) {
+          const error = PLUGIN_SCHEMA.errors(config)
+          console.error("Invalid plugin config: " + config.name, error)
+          throw error
+        }
+      } catch (e) {
+        throw "Failed to parse the content of the plugin."
       }
       return config
     },
