@@ -1,7 +1,7 @@
 <template>
 <div class="whiteboard noselect" ref="whiteboard" @mouseup="show_overlay=false"  @click="unselectWindows()">
-  <div class="overlay" @click="show_overlay=false" v-if="show_overlay"></div>
-  <grid-layout :layout="windows" :col-num="col_num" :is-mirrored="false" :auto-size="true" :row-height="row_height" :col-width="column_width" :is-draggable="true" :is-resizable="true" :vertical-compact="true" :margin="[3, 3]" :use-css-transforms="true">
+  <div @mousemove="overlayMousemove" class="overlay" @click="show_overlay=false" v-if="show_overlay"></div>
+  <grid-layout :layout="windows" :col-num="col_num" :is-mirrored="false" :auto-size="true" :row-height="row_height" :col-width="column_width" :is-responsive="true" :is-draggable="true" :is-resizable="true" :vertical-compact="true" :margin="[3, 3]" :use-css-transforms="true">
     <grid-item v-for="(w, wi) in windows" drag-allow-from=".drag-handle" drag-ignore-from=".no-drag" :x="w.x" :y="w.y" :w="w.w" :h="w.h" :i="w.i" @resize="viewChanging(w)" @move="viewChanging(w)" @resized="show_overlay=false;w.resize&&w.resize();focusWindow(w)" @moved="show_overlay=false;w.move&&w.move();focusWindow(w)" :key="w.id">
       <md-card>
         <md-card-expand>
@@ -168,6 +168,8 @@ export default {
       col_num: 20,
       active_windows: [],
       show_overlay: false,
+      scrolling: false,
+      scrollClientY: 0,
       screenWidth: window.innerWidth
     }
   },
@@ -188,6 +190,41 @@ export default {
     this.store.event_bus.$off('resize', this.updateSize)
   },
   methods: {
+    overlayMousemove(e){
+      const bbox = this.$refs.whiteboard.getBoundingClientRect()
+      const top = bbox.y
+      const bottom = bbox.y+ bbox.height
+      this.scrollClientY = e.clientY
+      let scroll
+      if(this.scrollClientY<top+10){
+        scroll =()=>{this.$refs.whiteboard.scrollTop = this.$refs.whiteboard.scrollTop - (top-this.scrollClientY)/2
+          if(this.show_overlay && this.scrollClientY<top){
+            this.scrolling = true
+            window.requestAnimationFrame(scroll)
+          }
+          else{
+            this.scrolling = false
+          }
+        }
+        if(!this.scrolling)
+        scroll()
+      }
+      else if(this.scrollClientY>bottom-20){
+        scroll =()=>{this.$refs.whiteboard.scrollTop = this.$refs.whiteboard.scrollTop+(this.scrollClientY-bottom+20)/2
+          if(this.show_overlay && this.scrollClientY>bottom-10){
+            this.scrolling = true
+            window.requestAnimationFrame(scroll)
+          }
+          else{
+            this.scrolling = false
+          }
+        }
+        if(!this.scrolling)
+        scroll()
+      }
+
+      // console.log('hi', top, bottom, this.scrollClientY, this.$refs.whiteboard.scrollTop, this.$refs.whiteboard.scrollHeight, bbox)
+    },
     updateSize(e){
       this.screenWidth = e.width
       // this.column_width = parseInt(this.screenWidth/60)
@@ -278,7 +315,8 @@ export default {
     },
     viewChanging(w){
       this.show_overlay = true
-      this.$refs.whiteboard.scrollTop = this.$refs.whiteboard.scrollHeight
+
+      //this.$refs.whiteboard.scrollTop = this.$refs.whiteboard.scrollHeight
     },
     focusWindow(w) {
       this.show_overlay = false

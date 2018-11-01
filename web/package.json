@@ -1,6 +1,6 @@
 {
   "name": "ImJoy.io",
-  "version": "0.8.50",
+  "version": "0.8.51",
   "description": "Image processing with joy.",
   "author": "Wei OUYANG <wei.ouyang@cri-paris.org>",
   "private": true,
@@ -30,7 +30,7 @@
     "upng-js": "^2.1.0",
     "utif": "^2.0.0",
     "vue": "^2.5.17",
-    "vue-grid-layout": "2.1.13",
+    "vue-grid-layout": "github:jbaysolutions/vue-grid-layout",
     "vue-js-grid": "github:euvl/vue-js-grid",
     "vue-material": "^1.0.0-beta-10.2",
     "vue-monaco": "^0.2.0",
