@@ -857,13 +857,17 @@ function randId() {
 
         this.getRemoteCallStack = this._site.getRemoteCallStack;
 
-        var sCb = function() {
-            me._loadCore();
+        if(this.mode == 'pyworker'){
+          this._sendInterface();
         }
-
-        this._connection.importScript(
-            __jailed__path__+'_JailedSite.js', sCb, this._fCb
-        );
+        else{
+          var sCb = function() {
+              me._loadCore();
+          }
+          this._connection.importScript(
+              __jailed__path__+'_JailedSite.js', sCb, this._fCb
+          );
+        }
     }
 
 
