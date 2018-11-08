@@ -471,6 +471,7 @@ import {
   PLUGIN_SCHEMA,
   PYWORKER_PLUGIN_TEMPLATE,
   WEBWORKER_PLUGIN_TEMPLATE,
+  WEBPYTHON_PLUGIN_TEMPLATE,
   IFRAME_PLUGIN_TEMPLATE,
   WINDOW_PLUGIN_TEMPLATE,
   CONFIGURABLE_FIELDS,
@@ -588,7 +589,7 @@ export default {
       "PyWorker(Python)": PYWORKER_PLUGIN_TEMPLATE,
       // "Iframe(Javascript)": IFRAME_PLUGIN_TEMPLATE,
       "Window(Javascript and HTML)": WINDOW_PLUGIN_TEMPLATE,
-
+      "WebPython(experimental)": WEBPYTHON_PLUGIN_TEMPLATE
     }
     this.default_window_pos = {
       i: 0,
@@ -2398,6 +2399,9 @@ export default {
         }
         else if(config.mode == 'webworker'){
           config.tags.push('webworker')
+        }
+        else if(config.mode == 'webpython'){
+          config.tags.push('webpython')
         }
         else if(config.mode == 'iframe'){
           config.tags.push('iframe')
