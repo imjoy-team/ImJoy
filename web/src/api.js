@@ -2,8 +2,7 @@ import schema from 'js-schema'
 
 export const CONFIGURABLE_FIELDS = ["env", "requirements", "dependencies", "icon", "ui", "mode", "flags"]
 
-export const SUPPORTED_PLUGIN_MODES = ['webworker', 'pyworker', 'iframe', 'window', 'collection']
-
+export const SUPPORTED_PLUGIN_MODES = ['webworker', 'pyworker', 'webpython', 'iframe', 'window', 'collection']
 export const WEBWORKER_PLUGIN_TEMPLATE= `
 <docs>
 Describe your plugin here.
@@ -141,6 +140,45 @@ Describe your plugin here.
 {
   "name": "Untitled Plugin",
   "mode": "pyworker",
+  "version": "0.1.0",
+  "api_version": "0.1.1",
+  "description": "describe your plugin here.",
+  "tags": [],
+  "ui": "UI for this plugin",
+  "inputs": null,
+  "outputs": null,
+  "flags": [],
+  "icon": null,
+  "env": null,
+  "requirements": [],
+  "dependencies": []
+}
+</config>
+
+<script lang="python">
+import numpy as np
+class ImJoyPlugin():
+    def setup(self):
+        print('setup in python')
+
+    def run(self, my):
+        print('hello world.')
+        return my
+
+api.export(ImJoyPlugin())
+</script>
+`
+
+
+export const WEBPYTHON_PLUGIN_TEMPLATE= `
+<docs lang="markdown">
+Describe your plugin here.
+</docs>
+
+<config lang="json">
+{
+  "name": "Untitled Plugin",
+  "mode": "webpython",
   "version": "0.1.0",
   "api_version": "0.1.1",
   "description": "describe your plugin here.",
