@@ -553,7 +553,7 @@
           else if(aObject.__jailed_type__ == 'file'){
              bObject = aObject.__value__
              //patch relativePath
-             bObject.relativePath = aObject.__relativePath__
+             bObject.relativePath = aObject.__relative_path__
           }
           else if(aObject.__jailed_type__ == 'argument'){
              bObject = aObject.__value__
