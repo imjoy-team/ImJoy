@@ -1906,7 +1906,7 @@ export default {
         name: 'Files',
         type: 'imjoy/files',
         config: {},
-        select: 0,
+        select: -1,
         _op: '__file_loader__',
         _source_op: null,
         _workflow_id: 'files_'+randId(),
