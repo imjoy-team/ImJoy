@@ -471,9 +471,12 @@
             else if( v instanceof Error){
               bObject[k] = {__jailed_type__: 'error', __value__ : v.toString()}
             }
+            else if(v instanceof File){
+              bObject[k] =  {__jailed_type__: 'file', __value__ : v, __relative_path__: v.relativePath || v.webkitRelativePath}
+            }
             // send objects supported by structure clone algorithm
             // https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Structured_clone_algorithm
-            else if(v !== Object(v) || v instanceof Boolean || v instanceof String || v instanceof Date || v instanceof RegExp || v instanceof Blob || v instanceof File || v instanceof FileList || v instanceof ImageData){
+            else if(v !== Object(v) || v instanceof Boolean || v instanceof String || v instanceof Date || v instanceof RegExp || v instanceof Blob || v instanceof FileList || v instanceof ImageData){
               bObject[k] =  {__jailed_type__: 'argument', __value__ : v}
             }
             else if(v instanceof ArrayBuffer){
@@ -546,6 +549,11 @@
           }
           else if(aObject.__jailed_type__ == 'error'){
             bObject = new Error(aObject.__value__)
+          }
+          else if(aObject.__jailed_type__ == 'file'){
+             bObject = aObject.__value__
+             //patch relativePath
+             bObject.relativePath = aObject.__relativePath__
           }
           else if(aObject.__jailed_type__ == 'argument'){
              bObject = aObject.__value__
