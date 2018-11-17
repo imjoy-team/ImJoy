@@ -925,6 +925,12 @@ export default {
       if(name.startsWith('_') && plugin.config.hasOwnProperty(name.slice(1))){
         throw `'${name.slice(1)}' is a readonly field defined in <config> block, please avoid using it`
       }
+      if(value){
+        return localStorage.setItem("config_"+plugin.name+'_'+name, value)
+      }
+      else{
+        return localStorage.removeItem("config_"+plugin.name+'_'+name)
+      }
     },
     getPluginConfig(name, _plugin){
       const plugin = this.plugins[_plugin.id]
