@@ -43,6 +43,7 @@ This is a non-exhaustive list of the open-source tools and libraries we used in 
  * [Vue.js](https://vuejs.org/) (The main ImJoy App is written in Vue.js)
  * [vue-grid-layout](https://github.com/jbaysolutions/vue-grid-layout) (For window management)
  * [python-socketio](https://github.com/miguelgrinberg/python-socketio) (This how the plugin engine talk with the ImJoy app)
+ * [pyodide](https://github.com/iodide-project/pyodide) (Enables web python mode with WebAssembly)
  * [conda](https://conda.io/) (The plugin engine uses Conda for managing virtual env. and pacakges)
 
 We thank all the authors for offering these excellent work to the open-source community.
