@@ -22,6 +22,7 @@ By design, ImJoy itself provides very minimal task specific functionality, it pr
  * Easy-to-use workflow composition
  * Isolated workspaces for grouping plugins
  * Extendable plugin interface supports Python and Javascript
+ * WebAssembly powered web Python plugins
  * Concurrent plugin execution through asynchronous programming
  * Self-contained plugin development
  * Easy plugin deployment and sharing through Github or Gist

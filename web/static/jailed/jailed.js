@@ -837,7 +837,17 @@ function randId() {
      */
     DynamicPlugin.prototype._init =
            Plugin.prototype._init = function() {
-        this._site = new JailedSite(this._connection, this.id, this.mode == 'pyworker'?'python':'javascript');
+        var lang;
+        if(this.mode == 'pyworker'){
+          lang = 'python'
+        }
+        else if(this.mode == 'webpython'){
+          lang = 'webpython'
+        }
+        else{
+          lang = 'javascript'
+        }
+        this._site = new JailedSite(this._connection, this.id, lang);
         this.initializing = false;
 
         var me = this;

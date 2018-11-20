@@ -239,24 +239,21 @@ var initWebPythonIframePlugin = function() {
         currentErrorHandler();
     });
 
+    // window.loadScript(
+    //     __pyodide__path__ + 'pyodide.js',
+    //     function(){
+    //       languagePluginLoader.then(() => {
+    //         // pyodide is now ready to use...
+    //         console.log(pyodide.runPython('import sys\nsys.version'));
+    //       });
+    //     }, function(){
+    //     }
+    // );
+
     window.loadScript(
-        __pyodide__path__ + 'pyodide.js',
-        function(){
-          languagePluginLoader.then(() => {
-            // pyodide is now ready to use...
-            console.log(pyodide.runPython('import sys\nsys.version'));
-            window.loadScript(
-                __jailed__path__ + '_pluginWebPython.js',
-                function(){
-                  console.log("initialized.....")
-                }, function(){}
-            );
-          });
-        }, function(){
-        }
+        __jailed__path__ + '_pluginWebPython.js',
+        function(){}, function(){}
     );
-
-
 
 }
 

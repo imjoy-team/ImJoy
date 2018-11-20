@@ -22,7 +22,8 @@ The following list illustrates key features of the plugin system in ImJoy:
 There are three types of plugins available for different purposes:
  1) `window` plugin for building rich and interactive user interface using HTML5/CSS and JavaScript;
  2) `webworker` plugin for performing computational tasks using JavaScript or WebAssembly;
- 3) `pyworker` plugin for performing heavy-duty computational tasks using Python and its libraries.
+ 3) `pyworker` plugin for performing heavy-duty computational tasks using Python and its libraries, this requires additional installation of an desktop app.
+ 4) `webpython` plugin for performing computational tasks using Python with in the browser through WebAssembly.
 
 <img src="./asserts/imjoy-plugin-development.png" width="800px"></img>
 
