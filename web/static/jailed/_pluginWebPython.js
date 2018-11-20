@@ -116,10 +116,19 @@ var execute = function(code) {
             try {
                 if(!_export_plugin_api){
                   _export_plugin_api = api.export
-                  api.export = function(){
-                    var papi = pyodide.pyimport('ImJoyPlugin')
-                    var p = papi();
-                    _export_plugin_api({setup: ()=>{p.setup()}, run: (my)=>{p.run(my)}})
+                  api.export = function(p){
+                    const getattr = pyodide.pyimport('getattr')
+                    const hasattr = pyodide.pyimport('hasattr')
+                    const _api = {}
+                    for(let k of Object.getOwnPropertyNames(p)){
+                      if(!k.startsWith('_') && hasattr(p, k)){
+                        const func = getattr(p, k)
+                        _api[k] = function(){
+                          return func(...Array.prototype.slice.call(arguments,  0, arguments.length-1))
+                        }
+                      }
+                    }
+                    _export_plugin_api(_api)
                   }
                 }
                 pyodide.runPython('from js import api')
