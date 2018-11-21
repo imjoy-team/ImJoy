@@ -53,15 +53,7 @@ window.addEventListener('message', function(e) {
         importScript(m.url);
         break;
     case 'execute':
-        // console.log('loading pyodide.js...')
-        importScripts('https://static.imjoy.io/pyodide/pyodide.js').then(()=>{
-          languagePluginLoader.then(() => {
-              // pyodide is now ready to use...
-              console.log(pyodide.runPython('import sys\nsys.version'));
-              execute(m.code);
-          });
-        })
-        // execute(m.code);
+        execute(m.code);
         break;
     case 'message':
         conn._messageHandler(m.data);
@@ -112,34 +104,33 @@ var execute = function(code) {
       }
       else{
         if(code.content){
-          pyodide.loadPackage(['numpy']).then(()=>{
-            try {
-                if(!_export_plugin_api){
-                  _export_plugin_api = api.export
-                  api.export = function(p){
-                    const getattr = pyodide.pyimport('getattr')
-                    const hasattr = pyodide.pyimport('hasattr')
-                    const _api = {}
-                    for(let k of Object.getOwnPropertyNames(p)){
-                      if(!k.startsWith('_') && hasattr(p, k)){
-                        const func = getattr(p, k)
-                        _api[k] = function(){
-                          return func(...Array.prototype.slice.call(arguments,  0, arguments.length-1))
-                        }
+          try {
+              if(!_export_plugin_api){
+                _export_plugin_api = api.export
+                api.export = function(p){
+                  const getattr = pyodide.pyimport('getattr')
+                  const hasattr = pyodide.pyimport('hasattr')
+                  const _api = {}
+                  for(let k of Object.getOwnPropertyNames(p)){
+                    if(!k.startsWith('_') && hasattr(p, k)){
+                      const func = getattr(p, k)
+                      _api[k] = function(){
+                        return func(...Array.prototype.slice.call(arguments,  0, arguments.length-1))
                       }
                     }
-                    _export_plugin_api(_api)
                   }
+                  _export_plugin_api(_api)
                 }
-                pyodide.runPython('from js import api')
-                pyodide.runPython(code.content)
-                if(code.main)  parent.postMessage({type : 'executeSuccess'}, '*');
-            } catch (e) {
-                console.error(e.message, e.stack)
-                parent.postMessage({type : 'executeFailure', error: e.toString()}, '*');
-                throw e;
-            }
-          })
+              }
+              pyodide.runPython('from js import api')
+              pyodide.runPython(code.content)
+              if(code.main)  parent.postMessage({type : 'executeSuccess'}, '*');
+          } catch (e) {
+              console.error(e.message, e.stack)
+              parent.postMessage({type : 'executeFailure', error: e.toString()}, '*');
+              throw e;
+          }
+
         }
       }
     }
@@ -187,7 +178,16 @@ var conn = {
 
 window.connection = conn;
 
-parent.postMessage({
-    type : 'initialized',
-    dedicatedThread : false
-}, '*');
+// console.log('loading pyodide.js...')
+importScripts('https://static.imjoy.io/pyodide/pyodide.js').then(()=>{
+  languagePluginLoader.then(() => {
+      // pyodide is now ready to use...
+      console.log(pyodide.runPython('import sys\nsys.version'));
+      pyodide.loadPackage(['numpy']).then(()=>{
+        parent.postMessage({
+            type : 'initialized',
+            dedicatedThread : false
+        }, '*');
+      })
+  });
+})
