@@ -107,7 +107,7 @@ we refer to the dedicate description **## Plugins and tags**
   
   For example, to render a form with a selection use `"ui": "select an option: {id: 'option1', type: 'choose', options: ['cat', 'dog'], placeholder: 'cat'}"`. In the plugin, the selection can then be accessed with `my.config.option1`.
 
-   In some cases, the ui might only contain a brief description of the op. This can either be plain text, or you can also specify a **link**    with `"ui": " <a href='https://imjoy.io' target="_blank"> ImJoy</a>"`. The `target="_blank"` will open this page in a new tab. 
+   In some cases, the ui might only contain a brief description of the op. This can either be plain text, or you can also specify a **link**    with `"ui": " <a href='https://imjoy.io' target='_blank'> ImJoy</a>"`. The `target='_blank'` will open this page in a new tab. 
 
 
   To define **longer forms with multiple lines**, we support additional definitions
