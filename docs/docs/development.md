@@ -102,10 +102,15 @@ we refer to the dedicate description **## Plugins and tags**
   * `type: 'variableName'`
   * ...
 
-  For each element, you need to define a unique `id`, which can then be used to access
-  the value of this element in the plugin. For example, to render a form with a selection use `"ui": "select an option: {id: 'option1', type: 'choose', options: ['cat', 'dog'], placeholder: 'cat'}"`.  In the plugin, the selection can then be accessed with `my.config.option1`.
+  For each element, you need to define a unique `id`, which can then be used to **access
+  the value of this element in the plugin** with `my.config.id`. 
+  
+  For example, to render a form with a selection use `"ui": "select an option: {id: 'option1', type: 'choose', options: ['cat', 'dog'], placeholder: 'cat'}"`. In the plugin, the selection can then be accessed with `my.config.option1`.
 
-  To define longer forms with multiple lines, we support additional definitions
+   In some cases, the ui might only contain a brief description of the op. This can either be plain text, or you can also specify a **link**    with `"ui": " <a href='https://imjoy.io' target="_blank"> ImJoy</a>"`. The `target="_blank"` will open this page in a new tab. 
+
+
+  To define **longer forms with multiple lines**, we support additional definitions
   of the `ui` string.
 
   * an array of strings. For example:
