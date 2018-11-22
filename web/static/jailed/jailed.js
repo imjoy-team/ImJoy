@@ -816,6 +816,7 @@ function randId() {
             console.error('execute failure:', error);
             me._fail.emit(error);
             me.disconnect();
+            me.initializing = false;
         }
         if(this.mode == 'pyworker' && (!this.config.context || !this.config.context.socket)){
           me._fail.emit('Please connect to the Plugin Engine 🚀.');
@@ -848,7 +849,7 @@ function randId() {
           lang = 'javascript'
         }
         this._site = new JailedSite(this._connection, this.id, lang);
-        this.initializing = false;
+
 
         var me = this;
         this._site.onDisconnect(function() {
@@ -953,7 +954,8 @@ function randId() {
           this._connection.execute({type: 'html', content: this.config.windows[i].content}, sCb, this._fCb);
         }
       }
-      this._connection.execute({type: 'script', content: this.config.script, lang: this.config.lang, main: true}, sCb, this._fCb);
+
+      this._connection.execute({type: 'script', content: this.config.script, lang: this.config.lang, main: true, requirements: this.config.requirements, env: this.config.env}, sCb, this._fCb);
     }
 
 
@@ -971,6 +973,7 @@ function randId() {
             me.remote = me._site.getRemote();
             me.api = me.remote;
             me._disconnected = false
+            me.initializing = false
             me._connect.emit();
         });
 
