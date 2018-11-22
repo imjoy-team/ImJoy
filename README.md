@@ -20,7 +20,7 @@ Getting started and documentations for the development: [ImJoy Docs](https://imj
  * Extendable plugin interface
    - Support Python and Javascript
    - Javascript plugins are isolated with secured sandboxes
-   - Python plugins run in their own process
+   - Run Python plugins in the browser completely
    - Support `async/await` syntax for Python3 and Javascript
    - Support virtual environments and pip packages for Python
    - Support libraries hosted on Github or CDNs for javascript
