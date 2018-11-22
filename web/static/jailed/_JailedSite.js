@@ -231,7 +231,7 @@
                var [resolve, reject] = this._unwrap(data.promise, false);
                try {
                  var result = method.apply(null, args);
-                 if(result instanceof Promise || method.constructor.name === 'AsyncFunction'){
+                 if(result instanceof Promise || method.constructor && method.constructor.name === 'AsyncFunction'){
                    result.then(resolve).catch(reject);
                  }
                  else{
@@ -428,7 +428,7 @@
               if(!interfaceFuncName){
                 var id = (Date.now().toString(36) + Math.random().toString(36).substr(2, 5)).toUpperCase()
                 callbacks[id] = v
-                bObject[k] = {__jailed_type__: 'callback', __value__ : v.constructor.name, num: id}
+                bObject[k] = {__jailed_type__: 'callback', __value__ : v.constructor && v.constructor.name || id, num: id}
               }
               else{
                 bObject[k] = {__jailed_type__: 'interface', __value__ : interfaceFuncName, num: null}
