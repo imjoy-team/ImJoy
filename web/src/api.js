@@ -196,14 +196,14 @@ Describe your plugin here.
 </config>
 
 <script lang="python">
-import numpy as np
+
 class ImJoyPlugin():
     def setup(self):
         print('setup in python')
 
     def run(self, my):
         print('hello world.')
-        return my
+
 
 api.export(ImJoyPlugin())
 </script>
