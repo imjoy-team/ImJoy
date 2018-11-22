@@ -177,6 +177,16 @@ export default {
     this.store = this.$root.$data.store
     this.store.event_bus.$on('add_window', this.onWindowAdd)
     this.store.event_bus.$on('resize', this.updateSize)
+
+    //open link in a new tab
+    const renderer = new marked.Renderer();
+    renderer.link = function(href, title, text) {
+        var link = marked.Renderer.prototype.link.call(this, href, title, text);
+        return link.replace("<a","<a target='_blank' ");
+    };
+    marked.setOptions({
+        renderer: renderer
+    });
     this.marked = marked
     this.screenWidth = window.innerWidth
     // this.column_width = parseInt(this.screenWidth/60)
