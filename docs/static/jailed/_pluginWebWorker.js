@@ -73,6 +73,20 @@ self.connection = {};
     var execute = function(code) {
       if(code.type == 'script'){
         try {
+            if(code.requirements && (Array.isArray(code.requirements) || typeof code.requirements === 'string') ){
+              try {
+                if(Array.isArray(code.requirements)){
+                  for(var i=0;i<code.requirements.length;i++){
+                    importScripts(code.requirements[i])
+                  }
+                }
+                else{
+                  importScripts(code.requirements)
+                }
+              } catch (e) {
+                throw "failed to import required scripts: " + code.requirements.toString()
+              }
+            }
             eval(code.content);
             if(code.main) self.postMessage({type: 'executeSuccess'});
         } catch (e) {

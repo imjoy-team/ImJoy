@@ -94,7 +94,7 @@ var importScript = function(url) {
 
 
 // evaluates the provided string
-var execute = function(code) {
+var execute = async function(code) {
     if(code.type == 'script'){
       if(code.src){
         var script_node = document.createElement('script');
@@ -105,6 +105,20 @@ var execute = function(code) {
         if(code.content){
           // document.addEventListener("DOMContentLoaded", function(){
           try {
+              if(code.requirements && (Array.isArray(code.requirements) || typeof code.requirements === 'string') ){
+                try {
+                  if(Array.isArray(code.requirements)){
+                    for(var i=0;i<code.requirements.length;i++){
+                      await importScripts(code.requirements[i])
+                    }
+                  }
+                  else{
+                    await importScripts(code.requirements)
+                  }
+                } catch (e) {
+                  throw "failed to import required scripts: " + code.requirements.toString()
+                }
+              }
               eval(code.content);
               if(code.main)  parent.postMessage({type : 'executeSuccess'}, '*');
           } catch (e) {
