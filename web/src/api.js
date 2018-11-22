@@ -21,8 +21,7 @@ Describe your plugin here.
   "icon": "extension",
   "inputs": null,
   "outputs": null,
-  "env": null,
-  "requirements": null,
+  "requirements": [],
   "dependencies": []
 }
 </config>
@@ -30,7 +29,7 @@ Describe your plugin here.
 <script lang="javascript">
 class ImJoyPlugin {
   async setup() {
-    //await importScripts("http://xxxx/xxx.js")
+
   }
 
   run(my) {
@@ -61,6 +60,7 @@ Describe your plugin here.
   "icon": "extension",
   "inputs": null,
   "outputs": null,
+  "requirements": [],
   "dependencies": []
 }
 </config>
@@ -68,7 +68,7 @@ Describe your plugin here.
 <script lang="javascript">
 class ImJoyPlugin {
   async setup() {
-    //await importScripts("http://xxxx/xxx.js")
+
   }
 
   run(my) {
@@ -98,6 +98,7 @@ Describe your plugin here.
   "icon": "extension",
   "inputs": null,
   "outputs": null,
+  "requirements": [],
   "dependencies": [],
   "defaults": {"w": 7, "h": 7}
 }
@@ -106,7 +107,7 @@ Describe your plugin here.
 <script lang="javascript">
 class ImJoyPlugin {
   async setup() {
-    //await importScripts("http://xxxx/xxx.js")
+
   }
 
   run(my) {
