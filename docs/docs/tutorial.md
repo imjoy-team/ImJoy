@@ -1,7 +1,7 @@
 # Tutorials
 
 
-## Tutorials for distribution and deployment
+## Distribution and deployment
 
 ### Distribution and deployment of a plugin with GitHub Gist
 
