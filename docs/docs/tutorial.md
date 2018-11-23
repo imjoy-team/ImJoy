@@ -28,7 +28,7 @@ These two plugins illustrate a number of different important concepts, which we 
 2. How to communicate between the user interface and the Python worker.
 3. How to store data in the Python worker for further calcuations. 
 
-#### HTML elements    
+##### HTML elements    
 There are different **html elements that respond to user interaction**. The corresponding action is defined in the ```setup()``` function. The example below is for the button wiht the id `btn_plot`. When the user clicks on this button (`onclick`) the following function call is invoked. Here the current value of two other html elments (the forms containing the number of data points and the math operator) are retrieved, and passed to another function called `calc_plot()`.
 
 ``` javascript
@@ -40,7 +40,7 @@ document.getElementById('btn_plot').onclick = ()=>{
 };
 ```
 
-#### Communication between main window and Python
+##### Communication between main window and Python
 The function `calc_plot()` will pass these two parameters and an additional callback to the Python plugin `Python worker` and more specifically its function `calc_results`. These parameters are passed as a dictionary. The callback function can be called from within the Python plugin and allows it to plot data in the actual window.
 
 ``` javascript
@@ -55,7 +55,7 @@ calc_plot(n_points,math_op){
   }
  ```
 
-#### Python calculations, storage and window callback
+##### Python calculations, storage and window callback
 Let's have a look at the Python function `calc_results`. It receives the JavaScript dictionary and extracts all necessary parameters. It then perform the desired calculation. Then it stores the data wiht `self.x_values = x`. Lastly, invokes the callback function to print in the main window with `data['callback'](data_plot)`. Here the parameters are again passed as a dictionary. Please note, the **numpy** arrays are not supported, and the data has therefore be transformed to a list. 
 
 ``` python
