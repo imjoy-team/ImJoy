@@ -103,11 +103,11 @@ we refer to the dedicate description **## Plugins and tags**
   * ...
 
   For each element, you need to define a unique `id`, which can then be used to **access
-  the value of this element in the plugin** with `my.config.id`. 
-  
+  the value of this element in the plugin** with `my.config.id`.
+
   For example, to render a form with a selection use `"ui": "select an option: {id: 'option1', type: 'choose', options: ['cat', 'dog'], placeholder: 'cat'}"`. In the plugin, the selection can then be accessed with `my.config.option1`.
 
-   In some cases, the ui might only contain a brief description of the op. This can either be plain text, or you can also specify a **link**    with `"ui": " <a href='https://imjoy.io' target='_blank'> ImJoy</a>"`. The `target='_blank'` will open this page in a new tab. 
+   In some cases, the ui might only contain a brief description of the op. This can either be plain text, or you can also specify a **link**    with `"ui": " <a href='https://imjoy.io' target='_blank'> ImJoy</a>"`. The `target='_blank'` will open this page in a new tab.
 
 
   To define **longer forms with multiple lines**, we support additional definitions
@@ -148,7 +148,7 @@ recommend to (1) keep the interface-related code in the `setup()`, e.g. `api.reg
 
 * `env` (**for python plugins only**) the virtual environment or docker image command used to create an enviroment to run the plugin.
 * `cmd` (**for python plugins only**) the command used to run the plugin. By default, it will be run with `python`. Depending on the installtion it could also be be something like `python3` or `python27` etc.
-* `requirements` (**for python plugins only**) the pip packages which will be installed before running the plugin defined as a list of pip packages or a command string. ImJoy supports package names and github links. For example, `["numpy", "scipy==1.0"]` or `"pip install numpy scipy==1.0"`. To use conda, you can set the string to `"conda install numpy scipy==1.0"`. For more information see the dedicate section **Using virtual environments**.
+* `requirements` for `webworker` plugins written in Javascript, it can be a array of JavaScript url which will be imported using `importScripts`, for `window` plugin, it can be either a list of JavaScript url or CSS url (needs to be end with `.css`). For `webpython` plugins, you can set it as a list of python modules e.g. `["numpy", "matplotlib"]`, please also notice that `webpython` has a limited number of python modules supported. For `pyworker` plugins, it defines the pip packages which will be installed before running the plugin defined as a list of pip packages or a command string. ImJoy supports package names and github links. For example, `["numpy", "scipy==1.0"]` or `"pip install numpy scipy==1.0"`. To use conda, you can set the string to `"conda install numpy scipy==1.0"`. For more information see the dedicate section **Using virtual environments**.
 * `dependencies` names of other imjoy plugins which the current pluging depend on. They will be installed automatically during installation. An url can also be used as a dependency for sharing a plugin. For both cases, a hash tag can be used to specify the tag for the plugin. For example: `dependencies: ["Image Denoising#stable"]`, it means this plugin depends on the `stable` version of the `Image Denoising` plugin (of course, the plugin needs to define these tags).
 * `defaults` (**for window plugin only**) define an object of default values, for example you can specify the default window size by setting `"defaults": {"w": 10, "h": 7}`.
 
