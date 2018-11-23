@@ -393,6 +393,7 @@ content = await api.getAttachment("att_name").then(callback)
 ## `api.utils.XXXX(...)`
 For Javascript plugins, currently supported functions are:
 `api.utils.$forceUpdate` for force refreshing the GUI.
+`api.utils.openUrl` for open an url in a new browser tab.
 
 For Python Plugins, currently supported functions are:
 `api.utils.kill` for kill a `subprocess` in python.
