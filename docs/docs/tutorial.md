@@ -3,12 +3,10 @@
 
 ## User interaction
 
-### Pythonworker plots 
-
+### Python worker plots to window
+**TO BE ADDED**
 
 ### User interface communicating with Python worker
-
-
 
 We provide tutorial plugins illustrating how to develop a user interface that can communicate with Python to perform calculations. 
 The interface is implemented with [Spectre.css](https://picturepan2.github.io/spectre/), an easy to use framework to design webinterfaces.
