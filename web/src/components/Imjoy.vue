@@ -382,7 +382,7 @@
           <div class="md-title">Installed Plugins</div>
         </md-card-header>
         <md-card-content>
-          <plugin-list display="list" :name="repository_name" :description="repository_description" :database="db" :install-plugin="installPlugin" :remove-plugin="removePlugin" @message="showMessage" :plugins="installed_plugins" :workspace="selected_workspace"></plugin-list>
+          <plugin-list display="list" name="Installed Plugins" description="" :database="db" :install-plugin="installPlugin" :remove-plugin="removePlugin" @message="showMessage" :plugins="installed_plugins" :workspace="selected_workspace"></plugin-list>
         </md-card-content>
       </md-card>
       <md-card  v-if="show_plugin_url">
@@ -395,7 +395,6 @@
               <md-tooltip>Press `Enter` to get the plugin</md-tooltip>
             </md-field>
           </md-toolbar>
-          <!-- <plugin-list :name="repository_name" :description="repository_description" @message="showMessage" :database="db" :install-plugin="installPlugin" :remove-plugin="removePlugin" :init-search="init_plugin_search" display="list" :plugins="available_plugins" :workspace="selected_workspace"></plugin-list> -->
         </md-card-header>
       </md-card>
       <md-progress-spinner v-if="downloading_plugin && !plugin4install" class="md-accent" :md-diameter="40" md-mode="indeterminate"></md-progress-spinner>
@@ -443,15 +442,22 @@
           <p>This plugin is <strong>NOT</strong> provided by ImJoy.io. Please make sure the plugin is provided by a trusted source, otherwise it may <strong>harm</strong> your computer.
           </p>
           <plugin-editor v-if="show_plugin_source" class="code-editor" v-model="plugin4install.code" :title="plugin4install.name"></plugin-editor>
-          <!-- <plugin-list :name="repository_name" :description="repository_description" @message="showMessage" :database="db" :install-plugin="installPlugin" :remove-plugin="removePlugin" :init-search="init_plugin_search" display="list" :plugins="available_plugins" :workspace="selected_workspace"></plugin-list> -->
         </md-card-content>
       </md-card>
       <md-card v-if="show_plugin_store">
         <md-card-header>
-          <div class="md-title">Install from the Plugin Store</div>
+          <div class="md-title">Install from the plugin repository</div>
+          <md-chips @md-insert="addRepository" @md-delete="removeRepository(getRepository($event))" class="md-primary shake-on-error" v-model="repository_names" md-placeholder="Add repository (`GITHUB_USER_NAME/REPO_NAME`)">
+            <template slot="md-chip" slot-scope="{ chip }" >
+              <strong class="md-primary" v-if="chip === selected_repository.name">{{ chip }}</strong>
+              <div v-else @click="selectRepository(chip)">{{ chip }}</div>
+            </template>
+            <div class="md-helper-text">{{selected_repository.name}}: {{selected_repository.description}}</div>
+          </md-chips>
+          <!-- <md-chip v-for="repo in repository_list" @click="selected_repository=repo" :class="selected_repository.url==repo.url? 'md-primary':''" :key="repo.url">{{repo.name}}</md-chip> -->
         </md-card-header>
         <md-card-content>
-          <plugin-list :name="repository_name" :description="repository_description" @message="showMessage" :database="db" :install-plugin="installPlugin" :remove-plugin="removePlugin" :init-search="init_plugin_search" display="list" :plugins="available_plugins" :workspace="selected_workspace"></plugin-list>
+          <plugin-list @message="showMessage" :database="db" :install-plugin="installPlugin" :remove-plugin="removePlugin" :init-search="init_plugin_search" display="list" :plugins="available_plugins" :workspace="selected_workspace"></plugin-list>
         </md-card-content>
       </md-card>
     </md-dialog-content>
@@ -484,7 +490,8 @@ import {
   debounce,
   url_regex,
   githubImJoyManifest,
-  githubUrlRaw
+  githubUrlRaw,
+  assert
 } from '../utils.js'
 import {
   parseComponent
@@ -544,8 +551,6 @@ export default {
       engine_status: 'Disconnected',
       engine_connected: false,
       engine_url: 'http://127.0.0.1:8080',
-      repository_name: 'ImJoy Repository',
-      repository_description: '',
       windows: [],
       active_windows: [],
       selected_workspace: null,
@@ -554,6 +559,9 @@ export default {
       showPluginEngineInfo: false,
       workspace_list: [],
       workflow_list: [],
+      repository_list: [],
+      repository_names: [],
+      selected_repository: null,
       showWorkspaceDialog: false,
       show_file_dialog: false,
       plugins: null,
@@ -717,22 +725,7 @@ export default {
       this.engine_url = localStorage.getItem("imjoy_engine_url") || 'http://127.0.0.1:8080'
     }
 
-    this.default_repository_url = "https://raw.githubusercontent.com/oeway/ImJoy-Plugins/master/manifest.imjoy.json"
-    if(this.$route.query.repo){
-      const re = new RegExp('^[^/.]+/[^/.]+$')
-      if(this.$route.query.repo.match(re)){
-        this.repository_url = githubImJoyManifest('https://github.com/'+this.$route.query.repo)
-      }
-      else if(this.$route.query.repo.includes('github')){
-        this.repository_url = githubImJoyManifest(this.$route.query.repo)
-      }
-      else{
-        this.repository_url = this.$route.query.repo
-      }
-    }
-    else{
-      this.repository_url = this.default_repository_url
-    }
+
 
     this.plugin_api = {
       alert: this.showAlert,
@@ -764,8 +757,52 @@ export default {
       revs_limit: 2,
       auto_compaction: true
     })
-    let default_ws = null
+
+    this.default_repository_list = [{name: 'ImJoy Repository', url: "https://raw.githubusercontent.com/oeway/ImJoy-Plugins/master/manifest.imjoy.json", description: 'The official plugin repository provided by ImJoy.io.'},
+                                    {name: 'ImJoy Demos', url: 'https://raw.githubusercontent.com/oeway/ImJoy-Demo-Plugins/master/manifest.imjoy.json', description: 'A set of demo plugins provided by ImJoy.io'}
+    ]
     // console.log('loading workspace: ', this.$route.query.w)
+    this.config_db.get('repository_list').then((doc) => {
+      this.repository_list = doc.list
+      for(let drep of this.default_repository_list){
+        let found = false
+        for(let repo of this.repository_list){
+          if(repo.url == drep.url && repo.name == drep.name){
+            found = repo
+            break
+          }
+        }
+        if(!found){
+          this.addRepository(drep)
+        }
+      }
+
+    }).catch((err) => {
+      if(err.name != 'not_found'){
+        console.error("Database Error", err)
+      }
+      this.repository_list = this.default_repository_list
+      this.config_db.put({
+        _id: 'repository_list',
+        list: this.repository_list
+      })
+    }).then(() => {
+      this.repository_names = []
+      for(let r of this.repository_list){
+        this.repository_names.push(r.name)
+      }
+      if(this.$route.query.repo){
+        const ret = this.addRepository(this.$route.query.repo)
+        if(ret){
+          this.selected_repository = ret
+        }
+      }
+      else{
+        this.selected_repository = this.repository_list[0]
+      }
+    })
+
+    let default_ws = null
     this.config_db.get('workspace_list').then((doc) => {
       this.workspace_list = doc.list
       default_ws = doc.default
@@ -814,40 +851,7 @@ export default {
 
     }).then(() => {
       this.reloadPlugins().then(()=>{
-        axios.get(this.repository_url).then(response => {
-          if (response && response.data && response.data.plugins) {
-            this.manifest = response.data
-            this.repository_name = this.manifest.name || 'ImJoy Repository'
-            this.repository_description = this.manifest.description
-            if (this.repository_url != this.default_repository_url){
-              this.repository_description = "( This repository is not provided by ImJoy, please make sure it is provided by a trusted source. )" + this.manifest.description
-            }
-            this.available_plugins = this.manifest.plugins.filter((p) => {
-              return !p.disabled
-            })
-            const uri_root = this.manifest.uri_root
-            for (let i = 0; i < this.available_plugins.length; i++) {
-                const p = this.available_plugins[i]
-                p.uri = p.uri || p.name + '.html'
-                if (!p.uri.startsWith(uri_root) && !p.uri.startsWith('http')) {
-                  p.uri = uri_root + '/' + p.uri
-                }
-                p._id = p._id || p.name.replace(/ /g, '_')
-
-            }
-            for (let i = 0; i < this.available_plugins.length; i++) {
-              const ap = this.available_plugins[i]
-              const ps = this.installed_plugins.filter((p) => {
-                return ap.name == p.name
-              })
-              // mark as installed
-              if(ps.length>0){
-                ap.installed = true
-                ap.tag = ps[0].tag
-              }
-            }
-          }
-        }).finally(()=>{
+        this.reloadRepository().finally(()=>{
           if(this.$route.query.plugin){
             const p = this.$route.query.plugin.trim()
             console.log(p)
@@ -919,6 +923,146 @@ export default {
     this.disconnectEngine()
   },
   methods: {
+    getRepository(repo_name){
+      for(let r of this.repository_list){
+        if(r.name == repo_name){
+          return r
+        }
+      }
+    },
+    selectRepository(repo){
+      for(let r of this.repository_list){
+        if(r.name == repo){
+          this.selected_repository = r
+          this.reloadRepository()
+          return r
+        }
+      }
+    },
+    reloadRepository(repo){
+      repo = repo || this.selected_repository
+      return new Promise((resolve, reject)=>{
+        axios.get(repo.url).then(response => {
+          if (response && response.data && response.data.plugins) {
+            this.manifest = response.data
+            this.available_plugins = this.manifest.plugins.filter((p) => {
+              return !p.disabled
+            })
+            const uri_root = this.manifest.uri_root
+            for (let i = 0; i < this.available_plugins.length; i++) {
+                const p = this.available_plugins[i]
+                p.uri = p.uri || p.name + '.html'
+                if (!p.uri.startsWith(uri_root) && !p.uri.startsWith('http')) {
+                  p.uri = uri_root + '/' + p.uri
+                }
+                p._id = p._id || p.name.replace(/ /g, '_')
+
+            }
+            for (let i = 0; i < this.available_plugins.length; i++) {
+              const ap = this.available_plugins[i]
+              const ps = this.installed_plugins.filter((p) => {
+                return ap.name == p.name
+              })
+              // mark as installed
+              if(ps.length>0){
+                ap.installed = true
+                ap.tag = ps[0].tag
+              }
+            }
+            this.$forceUpdate()
+            resolve()
+          }
+          else{
+            reject('failed to load url: ' + repo.url)
+          }
+        }).catch(reject)
+      })
+    },
+    addRepository(repo){
+      if(typeof repo == 'string'){
+        const re = new RegExp('^[^/.]+/[^/.]+$')
+        let repository_url
+        if(repo.match(re)){
+          repository_url = githubImJoyManifest('https://github.com/'+repo)
+        }
+        else if(repo.includes('github')){
+          repository_url = githubImJoyManifest(repo)
+        }
+        else{
+          if(this.repository_names.indexOf(repo)>=0)
+            this.repository_names.splice(this.repository_names.indexOf(repo), 1)
+          this.showMessage("Failed to add repository, only github repository is supported.")
+          throw "Failed to add repository, only github repository is supported."
+        }
+        repo = {name: repo, url: repository_url, description: repository_url}
+      }
+      this.reloadRepository(repo).then(()=>{
+        for(let r of this.repository_list){
+          if(r.url == repo.url || r.name == repo.name){
+            // remove it if already exists
+            this.repository_list.splice( this.repository_list.indexOf(r), 1 )
+          }
+        }
+        assert(repo.name && repo.url)
+        this.repository_list.push(repo)
+        this.repository_names = []
+        for(let r of this.repository_list){
+          this.repository_names.push(r.name)
+        }
+        this.config_db.get('repository_list').then((doc) => {
+          this.config_db.put({
+            _id: doc._id,
+            _rev: doc._rev,
+            list: this.repository_list,
+          })
+        }).catch((err) => {
+          this.showMessage("Failed to save repository, database Error:" + err.toString())
+          this.status_text = "Failed to save repository, database Error:" + err.toString()
+        })
+      }).catch(()=>{
+        if(this.repository_names.indexOf(repo)>=0)
+          this.repository_names.splice(this.repository_names.indexOf(repo), 1)
+      })
+    },
+    removeRepository(repo) {
+      let found = false
+      for(let r of this.repository_list){
+        if(r.url == repo.url || r.name == repo.name){
+          found = r
+        }
+      }
+      if (found) {
+        const index = this.repository_list.indexOf(found)
+        this.repository_list.splice(index, 1)
+        this.repository_names = []
+        for(let r of this.repository_list){
+          this.repository_names.push(r.name)
+        }
+        this.config_db.get('repository_list').then((doc) => {
+          this.config_db.put({
+            _id: doc._id,
+            _rev: doc._rev,
+            list: this.repository_list
+          }).then(()=>{
+            this.showMessage(`Repository ${w} has been deleted.`)
+          }).catch(()=>{
+            this.showMessage(`Error occured when removing repository ${w}.`)
+          })
+        })
+        .catch((err) => {
+          this.showMessage("Failed to save repository, database Error:" + err.toString())
+          this.status_text = "Failed to save repository, database Error:" + err.toString()
+        })
+        // if current workspace is deleted, go to default
+        if (this.selected_repository == found.name) {
+          this.$router.replace({
+            query: {
+              w: 'default'
+            }
+          })
+        }
+      }
+    },
     setPluginConfig(name, value, _plugin){
       const plugin = this.plugins[_plugin.id]
       if(!plugin) throw "setConfig Error: Plugin not found."
@@ -1213,8 +1357,8 @@ export default {
           })
         })
         .catch((err) => {
-          this.showMessage("Database Error:" + err.toString())
-          this.status_text = "Database Error:" + err.toString()
+          this.showMessage("Failed to save workspace, database Error:" + err.toString())
+          this.status_text = "Failed to save workspace, database Error:" + err.toString()
         })
 
       }

@@ -321,6 +321,15 @@ export default {
   beforeDestroy() {
     this.store.event_bus.$off('resize', this.updateSize)
   },
+  watch: {
+    plugins: {
+        handler: function(newValue){
+          this.$data.available_plugins = newValue
+          this.$data.searched_plugins = newValue
+        },
+        deep: true
+    }
+  },
   methods: {
     toLower(text){
       return text.toString().toLowerCase()

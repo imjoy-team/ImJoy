@@ -28,7 +28,7 @@ There are four types of plugins available for different purposes:
 
 <img src="./asserts/imjoy-plugin-development.png" width="800px"></img>
 
-Click the **+ PLUGINS** button in `Plugins`, then select `Create a New Plugin` with one of the plugin templates. 
+Click the **+ PLUGINS** button in `Plugins`, then select `Create a New Plugin` with one of the plugin templates.
 A code editor will open in the workspace, where you can write the code, save it, or install the plugin to the plugin menu. You can then test your plugin by clicking on the plugin name in the Plugins list.
 
 
@@ -120,10 +120,10 @@ we refer to the dedicate description **## Plugins and tags**
              "option2: {id: 'option2', type: 'number', placeholder: 3}"
             ],
       ```
-   * an array with keys and values. Here, you have to use `" "` for the keys and the strings. Definitions can also be mixed. 
-     In the   example below, we use a string as above for `option1` and an array with keys and values for `option2`. 
+   * an array with keys and values. Here, you have to use `" "` for the keys and the strings. Definitions can also be mixed.
+     In the   example below, we use a string as above for `option1` and an array with keys and values for `option2`.
      Note how for `option2` each key and value is defined as an individual string.
-     
+
    ```json
    "ui": [
           {"option1": "{id: 'option1', type: 'choose', options: ['cat', 'dog'], placeholder: 'cat'}"},
@@ -134,7 +134,7 @@ we refer to the dedicate description **## Plugins and tags**
 
 * `version` specifies the version of the plugin.
 * `api_version` specifies the api version of ImJoy the plugin is written for.
-* `url` points to current file, and is used to download the plugin  when a user installs it from the plugin store.
+* `url` points to current file, and is used to download the plugin  when a user installs it from the plugin repository.
 * `description` contains a short description about the plugin.
 * `icon` defines the icon used in the plugin menu. You can find different icons here https://material.io/tools/icons/ and used the specified name. Or, you can directly copy and paste Emoji, for example from [here](https://getemoji.com/).
 * `inputs` defines the inputs with json-schema syntax (http://json-schema.org/) .
@@ -143,17 +143,17 @@ For example, to define that the plugin uses png files, you can specify `"inputs"
 The format is the same as for `inputs`.
 * `flags` defines an array of flags which will be used by ImJoy to control the behavior of the plugin. Currently, we support these `flags` for run-time control. These flags allow to specify how ImJoy instances are handled by the Interface and the Plugin engine. For more information we refer to the section **TODO**.
 
-    * `single-instance` (**for python plugins only**). Python engine will only run a single plugin process even if 
-    plugin is called from multiple BUT identical workspaces. In this case, the different ImJoy instances will share 
+    * `single-instance` (**for python plugins only**). Python engine will only run a single plugin process even if
+    plugin is called from multiple BUT identical workspaces. In this case, the different ImJoy instances will share
     the same plugin process.
-    * `allow-detach` (**for python plugins only**). Allows the plugin process to detatch from the user interface. This means 
-    the plugin will not be killed when the user interface is disconnected or closed. However, in order to reconnect to this process, 
+    * `allow-detach` (**for python plugins only**). Allows the plugin process to detatch from the user interface. This means
+    the plugin will not be killed when the user interface is disconnected or closed. However, in order to reconnect to this process,
     you  also need to add the `single-instance` flag.
 
-   Example: to make a plugin which can run without the user interface in the background and to which you can attach set 
-   `"flags": ["single-instance", "allow-detach"]`. The inteface will automatically reconnect to this process when re-launched. 
-   Please note that if  multiple ImJoy instances attache to this plugin process, each will call the `setup()` function. 
-   This may cause conflicts, we therefore recommend to (1) keep the interface-related code in the `setup()`, e.g. `api.register()`; 
+   Example: to make a plugin which can run without the user interface in the background and to which you can attach set
+   `"flags": ["single-instance", "allow-detach"]`. The inteface will automatically reconnect to this process when re-launched.
+   Please note that if  multiple ImJoy instances attache to this plugin process, each will call the `setup()` function.
+   This may cause conflicts, we therefore recommend to (1) keep the interface-related code in the `setup()`, e.g. `api.register()`;
    (2) move code that you only want to run once per process into the `__init__` function of the plugin class.
 
 * `env` (**for python plugins only**) the virtual environment or docker image command used to create an enviroment to run the plugin.
@@ -498,7 +498,7 @@ Below we provide detailed information for the different deployment options we re
 ### Plugins without dependencies
 If the pluging does not depend on libraries or module written by yourself, you can just uploade the file (.imjoy.html) to a Gist or GiHub repository. To share with others, copy the link pointing to the link of the Github file or the `raw` link of the Gist file. This url can then be used to install the plugin in ImJoy: press the `+ Plugins` button and add the the url in the field `Install plugin from url`. See also the dedicated [Tutorial](http://imjoy.io/docs/#/tutorial?id=distribution-and-deployment-of-a-plugin-with-github-gist).
 
-If you want to contribute your plugin to the ImJoy central plugin repository, so users can directly install from the plugin store shown on ImJoy.io, you need to send a pull request to the repository. More details about that: [ImJoy-Plugins repository].
+If you want to contribute your plugin to the ImJoy central plugin repository, so users can directly install from the plugin repository shown on ImJoy.io, you need to send a pull request to the repository. More details about that: [ImJoy-Plugins repository].
 
 ### Plugins with extra dependencies
 If your plugin depends on non-standard libraries and modules, you have to provid them with your plugin. You can upload those libraries and modules to a [GitHub Gist](https://gist.github.com/), a GitHub repository, or other data-sharing platforms such as Dropbox and link them in the plugin code.
@@ -508,11 +508,11 @@ If your plugin depends on non-standard libraries and modules, you have to provid
 
 ## Distribution of your plugin
 
-### Distributing your plugin through the ImJoy Plugin Store
-The plugin store shown on the ImJoy.IO is served with Github through the [ImJoy-Plugins repository](https://github.com/oeway/ImJoy-Plugins). In order to deploy your plugin to the plugin store, you can fork the repository, add your plugin and then send a pull request to [ImJoy-Plugins](https://github.com/oeway/ImJoy-Plugins). Once the pull request being accepted, the user will be able to install your plugin from the plugin store.
+### Distributing your plugin through the ImJoy plugin repository
+The plugin repository shown on the ImJoy.IO is served with Github through the [ImJoy-Plugins repository](https://github.com/oeway/ImJoy-Plugins). In order to deploy your plugin to the plugin repository, you can fork the repository, add your plugin and then send a pull request to [ImJoy-Plugins](https://github.com/oeway/ImJoy-Plugins). Once the pull request being accepted, the user will be able to install your plugin from the plugin repository.
 
 ### Distributing your plugin with url
-As an alternative to the Plugin store, you can distribute your own plugin with an url pointing to the ImJoy plugin file (extension: `*.imjoy.html`) hosted on GitHub, Gist or Dropbox etc. A user can then install the plugin from the plugin url.
+As an alternative to the plugin repository, you can distribute your own plugin with an url pointing to the ImJoy plugin file (extension: `*.imjoy.html`) hosted on GitHub, Gist or Dropbox etc. A user can then install the plugin from the plugin url.
 
 #### Generating a plugin url
 This url is composed of  the base url `http://imjoy.io/#/app?`, followed by the url parameter `plugin` set to the file url of your ImJoy plugin file. For example: `http://imjoy.io/#/app?plugin=https://github.com/oeway/ImJoy-Plugins/blob/master/repository/imageWindow.imjoy.html`.
