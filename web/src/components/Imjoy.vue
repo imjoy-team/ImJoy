@@ -232,7 +232,7 @@
                 <md-button class="md-icon-button" v-show="plugin.panel_expanded && op.name != plugin.name" :disabled="true">
                   <md-icon>chevron_right</md-icon>
                 </md-button>
-                <md-button class="joy-run-button md-primary" :class="plugin.running?'md-accent':'md-primary'" :disabled="plugin._disconnected" v-show="plugin.panel_expanded && op.name != plugin.name" @click="runOp(op)">
+                <md-button class="joy-run-button md-primary op-button" :class="plugin.running?'md-accent':'md-primary'" :disabled="plugin._disconnected" v-show="plugin.panel_expanded && op.name != plugin.name" @click="runOp(op)">
                     {{op.name}}
                 </md-button>
 
@@ -3038,9 +3038,19 @@ div#textnode {
   height: 500px;
 }
 
-.md-icon-button{
-  width: 36px;
-  min-width: 36px;
-  height: 36px;
+.op-button{
+  font-weight: 300;
 }
+
+@media screen and (max-height: 600px) {
+  .md-icon-button{
+    width: 32px;
+    min-width: 32px;
+    height: 32px;
+  }
+  .md-drawer{
+    width: 320px;
+  }
+}
+
 </style>

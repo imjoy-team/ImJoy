@@ -118,6 +118,17 @@ export default {
   font-size: 1.2em;
 }
 
+@media screen and (max-height: 600px) {
+  .joy-run-button{
+    height: 30px;
+    min-height: 28px;
+    font-size: 1.0em;
+  }
+
+  .joy-editor{
+    font-size: 1.0em!important;
+  }
+}
 /*
 More prefixing to avoid NAME COLLISIONS
 */
