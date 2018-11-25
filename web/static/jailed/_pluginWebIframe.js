@@ -110,9 +110,10 @@ var execute = async function(code) {
                   if(Array.isArray(code.requirements)){
                     for(var i=0;i<code.requirements.length;i++){
                       if(code.requirements[i].toLowerCase().endsWith('.css')){
-                        var style_node = document.createElement('style');
-                        style_node.src = code.requirements[i]
-                        document.head.appendChild(style_node)
+                        var link_node = document.createElement('link');
+                        link_node.rel = 'stylesheet'
+                        link_node.href = code.requirements[i]
+                        document.head.appendChild(link_node)
                       }
                       else{
                         await importScripts(code.requirements[i])
@@ -121,9 +122,10 @@ var execute = async function(code) {
                   }
                   else{
                     if(code.requirements.toLowerCase().endsWith('.css')){
-                      var style_node = document.createElement('style');
-                      style_node.src = code.requirements
-                      document.head.appendChild(style_node)
+                      var link_node = document.createElement('link');
+                      link_node.rel = 'stylesheet'
+                      link_node.href = code.requirements
+                      document.head.appendChild(link_node)
                     }
                     else{
                       await importScripts(code.requirements)
