@@ -1194,7 +1194,7 @@ export default {
         name: 'app',
         query: q
       })
-      this.$router.go()
+      window.location.reload()
     },
     removeWorkspace(w) {
       if (this.workspace_list.includes(w)) {
