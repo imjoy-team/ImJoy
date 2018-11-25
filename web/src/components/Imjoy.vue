@@ -3042,6 +3042,12 @@ div#textnode {
   font-weight: 300;
 }
 
+.md-icon-button{
+  width: 36px;
+  min-width: 36px;
+  height: 36px;
+}
+
 @media screen and (max-height: 600px) {
   .md-icon-button{
     width: 32px;
