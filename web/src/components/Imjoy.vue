@@ -230,18 +230,18 @@
               <p v-if="plugin.running&&plugin.status_text">{{plugin.status_text}}</p>
               <div v-for="(op, n) in plugin.ops" :key="op.plugin_id + op.name">
                 <md-button class="md-icon-button" v-show="plugin.panel_expanded && op.name != plugin.name" :disabled="true">
-                  <md-icon>remove</md-icon>
+                  <md-icon>chevron_right</md-icon>
                 </md-button>
                 <md-button class="joy-run-button md-primary" :class="plugin.running?'md-accent':'md-primary'" :disabled="plugin._disconnected" v-show="plugin.panel_expanded && op.name != plugin.name" @click="runOp(op)">
                     {{op.name}}
                 </md-button>
 
-                <md-button class="md-icon-button" v-show="plugin.panel_expanded &&  op.name != plugin.name" @click="op.panel_expanded=!op.panel_expanded; $forceUpdate()">
-                  <md-icon v-if="!op.panel_expanded">expand_more</md-icon>
-                  <md-icon v-else>expand_less</md-icon>
-                </md-button>
+                <!-- <md-button class="md-icon-button" v-show="plugin.panel_expanded &&  op.name != plugin.name" @click="op.panel_expanded=!op.panel_expanded; $forceUpdate()"> -->
+                  <!-- <md-icon v-if="!op.panel_expanded">expand_more</md-icon>
+                  <md-icon v-else>expand_less</md-icon> -->
+                <!-- </md-button> -->
 
-                <joy :config="op" :show="(plugin.panel_expanded || false) && (((plugin.panel_expanded || false)  && op.name == plugin.name) || op.panel_expanded || false )"></joy>
+                <joy :config="op" :show="(plugin.panel_expanded || false)"></joy>
                 <md-divider></md-divider>
               </div>
             </div>
@@ -3036,5 +3036,11 @@ div#textnode {
 
 .code-editor {
   height: 500px;
+}
+
+.md-icon-button{
+  width: 36px;
+  min-width: 36px;
+  height: 36px;
 }
 </style>
