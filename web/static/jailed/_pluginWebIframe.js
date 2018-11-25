@@ -109,11 +109,25 @@ var execute = async function(code) {
                 try {
                   if(Array.isArray(code.requirements)){
                     for(var i=0;i<code.requirements.length;i++){
-                      await importScripts(code.requirements[i])
+                      if(code.requirements[i].toLowerCase().endsWith('.css')){
+                        var style_node = document.createElement('style');
+                        style_node.src = code.requirements[i]
+                        document.head.appendChild(style_node)
+                      }
+                      else{
+                        await importScripts(code.requirements[i])
+                      }
                     }
                   }
                   else{
-                    await importScripts(code.requirements)
+                    if(code.requirements.toLowerCase().endsWith('.css')){
+                      var style_node = document.createElement('style');
+                      style_node.src = code.requirements
+                      document.head.appendChild(style_node)
+                    }
+                    else{
+                      await importScripts(code.requirements)
+                    }
                   }
                 } catch (e) {
                   throw "failed to import required scripts: " + code.requirements.toString()

@@ -1,7 +1,95 @@
 # Tutorials
 
 
-## Tutorials for distribution and deployment
+## User interaction
+
+### Python worker plots to window
+**TO BE ADDED**
+
+### User interface communicating with Python worker
+
+We provide tutorial plugins illustrating how to develop a user interface that can communicate with Python to perform calculations. 
+The interface is implemented with [Spectre.css](https://picturepan2.github.io/spectre/), an easy to use framework to design webinterfaces.
+
+<img src="./asserts/imjoy-demo-gui.png" width="600px"></img>
+
+You can install this plugin from this [link](). This will install the actual interface plugin (called ...) and the Python plugin (called ...) performing the calculations. The purpose of this plugin is self-explanatory, so just play around. 
+
+There are excellent ressources to get started with html and JavaScript
+
+* Hands-on tutorial can be found here [www.w3schools.com/](https://www.w3schools.com/)
+* Different online coding platforms exist to test and develop code, but you can essentially use ImJoy to test your code. Useful platforms are
+    * [https://playcode.io/](https://playcode.io/)
+    * [https://codepen.io](https://codepen.io/)
+
+These two plugins illustrate a number of different important concepts, which we describe briefly below.
+
+1. How to get started in coding an ImJoy user-interface wiht html and Javascript.
+2. How to communicate between the user interface and the Python worker.
+3. How to store data in the Python worker for further calcuations. 
+
+##### HTML elements    
+There are different **html elements that respond to user interaction**. The corresponding action is defined in the ```setup()``` function. The example below is for the button wiht the id `btn_plot`. When the user clicks on this button (`onclick`) the following function call is invoked. Here the current value of two other html elments (the forms containing the number of data points and the math operator) are retrieved, and passed to another function called `calc_plot()`.
+
+``` javascript
+document.getElementById('btn_plot').onclick = ()=>{
+        this.calc_plot(
+                  document.getElementById('n_points').value,
+                  document.getElementById('math_op').value
+        )
+};
+```
+
+##### Communication between main window and Python
+The function `calc_plot()` will pass these two parameters and an additional callback to the Python plugin `Python worker` and more specifically its function `calc_results`. These parameters are passed as a dictionary. The callback function can be called from within the Python plugin and allows it to plot data in the actual window.
+
+``` javascript
+calc_plot(n_points,math_op){
+    api.call('PythonWorker', 'calc_results', 
+                  {'npoints':n_points,
+                  'math_op':math_op,
+                  'callback':this.callback_plot
+                  }
+              );
+    document.getElementById("btn_noise").disabled = false;          
+  }
+ ```
+
+##### Python calculations, storage and window callback
+Let's have a look at the Python function `calc_results`. It receives the JavaScript dictionary and extracts all necessary parameters. It then perform the desired calculation. Then it stores the data wiht `self.x_values = x`. Lastly, invokes the callback function to print in the main window with `data['callback'](data_plot)`. Here the parameters are again passed as a dictionary. Please note, the **numpy** arrays are not supported, and the data has therefore be transformed to a list. 
+
+``` python
+def calc_results(self,data):
+    
+    # x-values
+    n_points = float(data['npoints'])        
+    x = np.arange(0.01, 5.0, 5.0/n_points)
+
+    # y-values
+    math_op = data['math_op']
+    if math_op == 'Sine':
+        y =  np.sin(2*np.pi*x)
+    elif math_op == 'Exponential':
+        y = np.exp(-x)
+    elif math_op == 'Log10':
+        y = np.log10(x)   
+
+    # Store values
+    self.x_values = x
+    self.y_values = y
+
+    # Convert to list for callback
+    data_plot = {'x':x.tolist(),
+                 'y':(y.tolist(),),
+                 'mode':('line',),
+                 'name':('data',)}
+
+    #  callback
+    data['callback'](data_plot)
+```
+
+
+## Distribution and deployment
 
 ### Distribution and deployment of a plugin with GitHub Gist
 

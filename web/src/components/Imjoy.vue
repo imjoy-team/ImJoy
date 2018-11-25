@@ -753,7 +753,7 @@ export default {
       getAttachment: this.getAttachment,
       getFileUrl: this.getFileUrl,
       getFilePath: this.getFilePath,
-      utils: {$forceUpdate: this.$forceUpdate},
+      utils: {$forceUpdate: this.$forceUpdate, openUrl: this.openUrl},
     }
 
     this.resetPlugins()
@@ -2159,7 +2159,7 @@ export default {
         config.click2load = false
         plugin.api = {
           run: async (my) => {
-            const c = template.defaults || {}
+            const c = _clone(template.defaults) || {}
             c.type = template.type
             c.name = template.name
             c.tag = template.tag
@@ -2709,6 +2709,9 @@ export default {
     showAlert(text){
       console.log('alert: ', text)
       alert(text)
+    },
+    openUrl(url){
+      Object.assign(document.createElement('a'), { target: '_blank', href: url}).click();
     }
   }
 }

@@ -19,16 +19,17 @@ The following list illustrates key features of the plugin system in ImJoy:
 
 ## Getting started
 
-There are three types of plugins available for different purposes:
- 1) `window` plugin for building rich and interactive user interface using HTML5/CSS and JavaScript;
- 2) `webworker` plugin for performing computational tasks using JavaScript or WebAssembly;
- 3) `pyworker` plugin for performing heavy-duty computational tasks using Python and its libraries, this requires additional installation of an desktop app.
- 4) `webpython` plugin for performing computational tasks using Python with in the browser through WebAssembly.
+There are four types of plugins available for different purposes:
+
+ 1. `window` plugin for building rich and interactive user interface using HTML5/CSS and JavaScript;
+ 2. `webworker` plugin for performing computational tasks using JavaScript or WebAssembly;
+ 3. `pyworker` plugin for performing heavy-duty computational tasks using Python and its libraries, this requires additional installation of an desktop app;
+ 4. `webpython` plugin for performing computational tasks using Python with in the browser through WebAssembly. This is in developmental stage and only selected number of Python libraries are currently supported.
 
 <img src="./asserts/imjoy-plugin-development.png" width="800px"></img>
 
-Click the **+ PLUGINS** button in `Plugins`, then select `Create a New Plugin` with one of the plugin templates. A code editor will open in the workspace, where you can write the code, save it, or install the plugin to the plugin menu. You can then test your plugin by clicking on
-the plugin name in the Plugins list.
+Click the **+ PLUGINS** button in `Plugins`, then select `Create a New Plugin` with one of the plugin templates. 
+A code editor will open in the workspace, where you can write the code, save it, or install the plugin to the plugin menu. You can then test your plugin by clicking on the plugin name in the Plugins list.
 
 
 ## Plugin file format
@@ -85,6 +86,7 @@ The order of these blocks does not matter, so you can shuffle the blocks.
   "dependencies": []
 }
 ```
+
 * `name` is the name of the plugin. It **must** be unique to avoid conflicts with other plugins.
 * `mode` is the plugin type or execution mode. Currently supported are:
   * `window` is used for create a new web interface with HTML/CSS and Javascript. If `window` mode is selected, then you need to provide HTML code with the `<window>` block and CSS code with the `style` block. Notice that this type of plugin runs in the same thread as the main web page, it may hang the entire web app when running heavy computation. A better choice for computational tasks is `webworker` plugin. However, some WebGL powered libraries including `tensorflow.js` do not support (yet) `webworker` mode, in that case, another mode called `iframe` can be used. `iframe` mode is the same as `window` mode except it does not need an interface, it is especially useful for plugins which needs to access GPU through WebGL.
@@ -93,42 +95,42 @@ The order of these blocks does not matter, so you can shuffle the blocks.
 * `tags` defines a list of supported tags, which can be used to provide differentiate configureable modes and can be accessed at various points in the plugin. For an overview we
 we refer to the dedicate description **## Plugins and tags**
 * `ui` is a string specifying the GUI that will be displayed to the user. The following elements can be used to render an input form:
-  * `type: 'choose', options: ['cat', 'dog'], placeholder: 'cat'`
-  * `type: 'number', min: 0, max: 10, placeholder:2`
-  * `type: 'color'`
-  * `type: 'string'`
-  * `type: 'save'`
-  * `type: 'instructions/comment'`
-  * `type: 'variableName'`
-  * ...
+    * `type: 'choose', options: ['cat', 'dog'], placeholder: 'cat'`
+    * `type: 'number', min: 0, max: 10, placeholder:2`
+    * `type: 'color'`
+    * `type: 'string'`
+    * `type: 'save'`
+    * `type: 'instructions/comment'`
+    * `type: 'variableName'`
+    * ...
 
-  For each element, you need to define a unique `id`, which can then be used to **access
-  the value of this element in the plugin** with `my.config.id`. 
-  
-  For example, to render a form with a selection use `"ui": "select an option: {id: 'option1', type: 'choose', options: ['cat', 'dog'], placeholder: 'cat'}"`. In the plugin, the selection can then be accessed with `my.config.option1`.
+    For each element, you need to define a unique `id`, which can then be used to **access
+    the value of this element in the plugin** with `my.config.id`.
 
-   In some cases, the ui might only contain a brief description of the op. This can either be plain text, or you can also specify a **link**    with `"ui": " <a href='https://imjoy.io' target='_blank'> ImJoy</a>"`. The `target='_blank'` will open this page in a new tab. 
+    For example, to render a form with a selection use `"ui": "select an option: {id: 'option1', type: 'choose', options: ['cat', 'dog'],     placeholder: 'cat'}"`. In the plugin, the selection can then be accessed with `my.config.option1`.
 
+    In some cases, the ui might only contain a brief description of the op. This can either be plain text, or you can also specify a           **link**    with `"ui": " <a href='https://imjoy.io' target='_blank'> ImJoy</a>"`. The `target='_blank'` will open this page in a new     tab.
 
-  To define **longer forms with multiple lines**, we support additional definitions
-  of the `ui` string.
+    To define **longer forms with multiple lines**, we support additional definitions of the `ui` string.
 
-  * an array of strings. For example:
-```json
-"ui": [
-       "option1: {id: 'option1', type: 'choose', options: ['cat', 'dog'], placeholder: 'cat'}",
-       "option2: {id: 'option2', type: 'number', placeholder: 3}"
-      ],
-```
-  * an array with keys and values. Here, you have to use `" "` for the keys and the strings. Definitions can also be mixed. In the example below, we use a string as above for `option1` and an array with keys and values for `option2`. Note how for `option2` each key and value
-  is defined as an individual string.
-```json
-"ui": [
-       {"option1": "{id: 'option1', type: 'choose', options: ['cat', 'dog'], placeholder: 'cat'}"},
-       {"option2": {"id": "option2",
-                    "type": "number",
-                    "placeholder": 3}}],
-```
+    * an array of strings. For example:
+      ```json
+      "ui": [
+             "option1: {id: 'option1', type: 'choose', options: ['cat', 'dog'], placeholder: 'cat'}",
+             "option2: {id: 'option2', type: 'number', placeholder: 3}"
+            ],
+      ```
+   * an array with keys and values. Here, you have to use `" "` for the keys and the strings. Definitions can also be mixed. 
+     In the   example below, we use a string as above for `option1` and an array with keys and values for `option2`. 
+     Note how for `option2` each key and value is defined as an individual string.
+     
+   ```json
+   "ui": [
+          {"option1": "{id: 'option1', type: 'choose', options: ['cat', 'dog'], placeholder: 'cat'}"},
+          {"option2": {"id": "option2",
+                       "type": "number",
+                       "placeholder": 3}}],
+   ```
 
 * `version` specifies the version of the plugin.
 * `api_version` specifies the api version of ImJoy the plugin is written for.
@@ -140,15 +142,23 @@ For example, to define that the plugin uses png files, you can specify `"inputs"
 * `outputs` defines the outputs with json-schema syntax (http://json-schema.org/).
 The format is the same as for `inputs`.
 * `flags` defines an array of flags which will be used by ImJoy to control the behavior of the plugin. Currently, we support these `flags` for run-time control. These flags allow to specify how ImJoy instances are handled by the Interface and the Plugin engine. For more information we refer to the section **TODO**.
-  * `single-instance` (**for python plugins only**). Python engine will only run a single plugin process even if pluging is called from multiple BUT identical workspaces. In this case, the different ImJoy instances will share the same plugin process.
-  * `allow-detach` (**for python plugins only**). Allows the plugin process to detatch from the user interface. This means the plugin will not be killed when the user interface is disconnected or closed. However, in order to reconnect to this process, you also need to add the `single-instance` flag.
 
-Example: to make a plugin which can run without the user interface in the background and to which you can attach set `"flags": ["single-instance", "allow-detach"]`. The inteface will automatically reconnect to this process when re-launched. Please note that if multiple ImJoy instances attache to this plugin process, each will call the `setup()` function. This may cause conflicts, we therefore
-recommend to (1) keep the interface-related code in the `setup()`, e.g. `api.register()`; (2) move code that you only want to run once per process into the `__init__` function of the plugin class.
+    * `single-instance` (**for python plugins only**). Python engine will only run a single plugin process even if 
+    plugin is called from multiple BUT identical workspaces. In this case, the different ImJoy instances will share 
+    the same plugin process.
+    * `allow-detach` (**for python plugins only**). Allows the plugin process to detatch from the user interface. This means 
+    the plugin will not be killed when the user interface is disconnected or closed. However, in order to reconnect to this process, 
+    you  also need to add the `single-instance` flag.
+
+   Example: to make a plugin which can run without the user interface in the background and to which you can attach set 
+   `"flags": ["single-instance", "allow-detach"]`. The inteface will automatically reconnect to this process when re-launched. 
+   Please note that if  multiple ImJoy instances attache to this plugin process, each will call the `setup()` function. 
+   This may cause conflicts, we therefore recommend to (1) keep the interface-related code in the `setup()`, e.g. `api.register()`; 
+   (2) move code that you only want to run once per process into the `__init__` function of the plugin class.
 
 * `env` (**for python plugins only**) the virtual environment or docker image command used to create an enviroment to run the plugin.
 * `cmd` (**for python plugins only**) the command used to run the plugin. By default, it will be run with `python`. Depending on the installtion it could also be be something like `python3` or `python27` etc.
-* `requirements` (**for python plugins only**) the pip packages which will be installed before running the plugin defined as a list of pip packages or a command string. ImJoy supports package names and github links. For example, `["numpy", "scipy==1.0"]` or `"pip install numpy scipy==1.0"`. To use conda, you can set the string to `"conda install numpy scipy==1.0"`. For more information see the dedicate section **Using virtual environments**.
+* `requirements` for `webworker` plugins written in Javascript, it can be a array of JavaScript url which will be imported using `importScripts`, for `window` plugin, it can be either a list of JavaScript url or CSS url (needs to be end with `.css`). For `webpython` plugins, you can set it as a list of python modules e.g. `["numpy", "matplotlib"]`, please also notice that `webpython` has a limited number of python modules supported. For `pyworker` plugins, it defines the pip packages which will be installed before running the plugin defined as a list of pip packages or a command string. ImJoy supports package names and github links. For example, `["numpy", "scipy==1.0"]` or `"pip install numpy scipy==1.0"`. To use conda, you can set the string to `"conda install numpy scipy==1.0"`. For more information see the dedicate section **Using virtual environments**.
 * `dependencies` names of other imjoy plugins which the current pluging depend on. They will be installed automatically during installation. An url can also be used as a dependency for sharing a plugin. For both cases, a hash tag can be used to specify the tag for the plugin. For example: `dependencies: ["Image Denoising#stable"]`, it means this plugin depends on the `stable` version of the `Image Denoising` plugin (of course, the plugin needs to define these tags).
 * `defaults` (**for window plugin only**) define an object of default values, for example you can specify the default window size by setting `"defaults": {"w": 10, "h": 7}`.
 
