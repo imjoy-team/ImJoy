@@ -14,7 +14,7 @@ An important part of ImJoy is to provide a flexible way to interact with the use
 1. The ImJoy API provides several functions to show results, e.g. indicate [progress](https://imjoy.io/docs/#/api?id=api-showprogress-), update the [ImJoy status](https://imjoy.io/docs/#/api?id=api-showstatus-), 
 2. The ImJoy API also provides a function to [create a window](https://imjoy.io/docs/#/api?id=api-createwindow-). In this window, powerful JavaScript visualization librariers can used. For more details, have a look at our window plugin demo **ADD LINK**.
 
-**Dedicate user interface**
+**Dedicated user interface**
 For more advanced purposes, you can can use define a user interface with the [**window plugin**](https://imjoy.io/docs/#/development?id=ltconfiggt-block). Such an interface is designed with web technology (HTML, JavaScript and CSS) and thus provides maximum flexibility. Further, such an interface can communicate with another plugin, e.g. a Python worker that performs the actual analysis. For more details, have a look at the dedicated tutorial below. **ADD LINK**.
 
 ### Python worker plots to window
@@ -62,7 +62,6 @@ HTML5/CSS and JavaScript control the three relevant aspects of an interface. In 
                    "https://unpkg.com/spectre.css/dist/spectre-exp.min.css",
                    "https://unpkg.com/spectre.css/dist/spectre-icons.min.css"],
     ```
-##### Processing user input and calling Python function 
 The image below shows some code snippets to illustrate how user interput is retrieved, and a Python function called. The following sequence is shown.
 
 1. User presses on a button to perform a calculation based on some defined input. 
@@ -73,12 +72,14 @@ The image below shows some code snippets to illustrate how user interput is retr
 
 **Determine behavior of HTML elements**
 
-Different **HTML elements respond to user interaction**. The corresponding action is defined in JavaScript in the ```setup()``` function. In the image above, this is shown for the html element button with the id `btn_plot`. When the user clicks on this button (`onclick`) the defined function call is called. In the example, the current value of two other html elments (the forms containing the number of data points and the math operator) are retrieved, and passed to another function called `calc_plot()`.
+HTML elements can respond to user interaction. The corresponding action is defined in JavaScript in the ```setup()``` function. In the image above, this is shown for the html element button with the id `btn_plot`. When the user clicks on this button (`onclick`) the defined function call is called. In the example, the current value of two other html elments (the forms containing the number of data points and the math operator) are retrieved, and passed to another function called `calc_plot()`.
 
 **Communication between window and Python plugin**
+
 Communication between the window and Python plugin is achieved by the ImJoy API [**api.call()**](https://imjoy.io/docs/#/api?id=api-call-) and so-called **callback functions**. Simply put such a callback is a function that will be executed after another function has finished its execution. The function `calc_plot()` from above will use `api.call()` to call the function `calc_results` from the `Python worker` plugin. It will pass two parameters obtained from the user-interface and a callback function . The callback function allows the Python plugin to plot data in the window plugin.
 
 **Python calculations, storage and callback**
+
 Let's have a look at the Python function `calc_results`. It receives the JavaScript dictionary, extracts all necessary parameters and perform the desired calculation. Then it stores the data wiht `self.x_values = x`. Lastly, invokes the callback function to print in the main window with `callback_fun(...)`. Here the parameters are again passed as a dictionary. Please note, the **numpy** arrays are not supported, and the data has therefore be transformed to a list. 
 
 ## Distribution and deployment
