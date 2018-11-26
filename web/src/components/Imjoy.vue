@@ -1263,7 +1263,7 @@ export default {
         console.log('=====', scoped_plugins)
       }
       else if(!uri.match(url_regex)){
-        let dep = uri.split("#")
+        let dep = uri.split("@")
         const ps = scoped_plugins.filter((p) => {
           return dep[0] && p.name == dep[0].trim()
         });
@@ -1296,8 +1296,8 @@ export default {
           reject('No url found for plugin ' + pconfig.name)
           return
         }
-        tag = tag || uri.split("#")[1]
-        uri = uri.split("#")[0]
+        tag = tag || uri.split("@")[1]
+        uri = uri.split("@")[0]
 
         this.getPluginFromUrl(uri, scoped_plugins).then((config)=>{
           if (!config) {
