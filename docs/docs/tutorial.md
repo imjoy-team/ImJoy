@@ -23,7 +23,7 @@ For more advanced purposes, you can can use define a user interface with the [**
 ### User interface communicating with Python worker
 In this tutorial, we show how to use a **window** plugin to defined a user interface, and how this interface can interact with a **Python worker** plugin to perform calculations. You can install this plugin from this [**ADD**](). This will install the actual interface plugin (called **ADD**) and the Python plugin (**ADD**) performing the calculations. The purpose of this plugin is self-explanatory, so just play around. 
 
-<img src="./asserts/imjoy-demo-gui.png" width="600px"></img>
+<img src="./asserts/imjoy-tutorial-gui-screenshot.png" width="600px"></img>
 
 This tutorial illustrates a number of different important concepts, which we describe briefly below.
 
@@ -62,64 +62,24 @@ HTML5/CSS and JavaScript control the three relevant aspects of an interface. In 
                    "https://unpkg.com/spectre.css/dist/spectre-exp.min.css",
                    "https://unpkg.com/spectre.css/dist/spectre-icons.min.css"],
     ```
-   
-Different **HTML elements respond to user interaction**. The corresponding action is defined in JavaScript in the ```setup()``` function. The example below is for the html element button with the id `btn_plot`. When the user clicks on this button (`onclick`) the defined function call is called. In the exampl, the current value of two other html elments (the forms containing the number of data points and the math operator) are retrieved, and passed to another function called `calc_plot()`.
+##### Processing user input and calling Python function 
+The image below shows some code snippets to illustrate how user interput is retrieved, and a Python function called. The following sequence is shown.
 
-``` javascript
-document.getElementById('btn_plot').onclick = ()=>{
-        this.calc_plot(
-                  document.getElementById('n_points').value,
-                  document.getElementById('math_op').value
-        )
-};
-```
+1. User presses on a button to perform a calculation based on some defined input. 
+2. Python function is called.
+3. Calculations are performed, results stored in Python plugin and shown in main interface.
 
-##### Communication between main window and Python
+<img src="./asserts/imjoy-tutorial-gui-code.png" width="800px"></img>
+
+**Determine behavior of HTML elements**
+
+Different **HTML elements respond to user interaction**. The corresponding action is defined in JavaScript in the ```setup()``` function. In the image above, this is shown for the html element button with the id `btn_plot`. When the user clicks on this button (`onclick`) the defined function call is called. In the example, the current value of two other html elments (the forms containing the number of data points and the math operator) are retrieved, and passed to another function called `calc_plot()`.
+
+**Communication between window and Python plugin**
 Communication between the window and Python plugin is achieved by the ImJoy API [**api.call()**](https://imjoy.io/docs/#/api?id=api-call-) and so-called **callback functions**. Simply put such a callback is a function that will be executed after another function has finished its execution. The function `calc_plot()` from above will use `api.call()` to call the function `calc_results` from the `Python worker` plugin. It will pass two parameters obtained from the user-interface and a callback function . The callback function allows the Python plugin to plot data in the window plugin.
 
-``` javascript
-calc_plot(n_points,math_op){
-    api.call('PythonWorker', 'calc_results', 
-                  {'npoints':n_points,
-                  'math_op':math_op,
-                  'callback':this.callback_plot
-                  }
-              );
-    document.getElementById("btn_noise").disabled = false;          
-  }
- ```
-
-##### Python calculations, storage and callback
+**Python calculations, storage and callback**
 Let's have a look at the Python function `calc_results`. It receives the JavaScript dictionary, extracts all necessary parameters and perform the desired calculation. Then it stores the data wiht `self.x_values = x`. Lastly, invokes the callback function to print in the main window with `callback_fun(...)`. Here the parameters are again passed as a dictionary. Please note, the **numpy** arrays are not supported, and the data has therefore be transformed to a list. 
-
-``` python
-def calc_results(self,data):
-
-        # Extract input parameters
-        n_points = float(data['npoints']) 
-        math_op = data['math_op']
-        callback_fun = data['callback']
-
-        # Calculate desired output
-        x = np.arange(0.01, 5.0, 5.0/n_points)
-        if math_op == 'Sine':
-            y =  np.sin(2*np.pi*x)
-        elif math_op == 'Exponential':
-            y = np.exp(-x)
-        elif math_op == 'Log10':
-            y = np.log10(x)   
-
-        # Store values
-        self.x_values = x
-        self.y_values = y
-
-        # Invoke window callback
-        callback_fun({'x':x.tolist(),
-                      'y':[y.tolist()],
-                      'mode':['line'],
-                      'name':['data']})
-```
-
 
 ## Distribution and deployment
 
