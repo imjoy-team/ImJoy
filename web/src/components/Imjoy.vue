@@ -278,7 +278,7 @@
                   </md-menu-content>
                 </md-menu>
 
-                <md-button class="joy-run-button" :class="plugin.running?'md-accent':(plugin._disconnected && plugin.mode == 'pyworker'? 'disconnected-plugin': '')" :disabled="plugin._disconnected && plugin.mode != 'pyworker'" @click="plugin._disconnected&&connectPlugin(plugin)">
+                <md-button class="joy-run-button" :class="plugin.running?'md-accent':(plugin._disconnected && plugin.mode == 'pyworker'? 'disconnected-plugin': '')" :disabled="plugin.mode != 'pyworker' || !plugin._disconnected" @click="connectPlugin(plugin)">
                   {{plugin.mode == 'pyworker'? plugin.name + ' 🚀': plugin.name}}
                 </md-button>
                 <md-divider></md-divider>
