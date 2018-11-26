@@ -894,7 +894,7 @@ export default {
           if(this.$route.query.plugin){
             const p = this.$route.query.plugin.trim()
             console.log(p)
-            if (p.match(url_regex)) {
+            if (p.match(url_regex) || (p.includes('/') && p.includes(':'))) {
               this.plugin_url = p
               this.init_plugin_search = null
               this.show_plugin_store = false
