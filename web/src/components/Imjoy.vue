@@ -191,7 +191,7 @@
             </div>
           </md-card-header>
           <md-card-content>
-            <div v-for="plugin in sortedPlugins()" :key="plugin.name">
+            <div v-for="plugin in sortedRunnablePlugins()" :key="plugin.name">
               <md-divider></md-divider>
               <md-menu md-size="medium">
                 <md-button class="md-icon-button" :class="plugin.running?'md-accent':''" md-menu-trigger>
@@ -242,6 +242,45 @@
                 <!-- </md-button> -->
 
                 <joy :config="op" :show="(plugin.panel_expanded || false)"></joy>
+                <md-divider></md-divider>
+              </div>
+            </div>
+            <md-divider></md-divider>
+            <div>
+              <!-- <md-button class="md-icon-button" @click="non_runnable_panel_expanded=!non_runnable_panel_expanded; $forceUpdate()">
+                <md-icon v-if="!non_runnable_panel_expanded">add</md-icon>
+                <md-icon v-else>remove</md-icon>
+              </md-button> -->
+              <div v-for="plugin in sortedNonRunnablePlugins()" :key="plugin.name">
+                <md-menu md-size="medium">
+                  <md-button class="md-icon-button" :class="plugin.running?'md-accent':''" md-menu-trigger>
+                    <md-progress-spinner v-if="plugin.initializing" class="md-accent" :md-diameter="20" md-mode="indeterminate"></md-progress-spinner>
+                    <md-icon v-else-if="plugin.config.icon">{{plugin.config.icon}}</md-icon>
+                    <md-icon v-else>extension</md-icon>
+                    <md-tooltip>{{plugin.config.description}}</md-tooltip>
+                  </md-button>
+                  <md-menu-content>
+                    <md-menu-item @click="showDoc(plugin.id)">
+                      <md-icon>description</md-icon>Docs
+                    </md-menu-item>
+                    <md-menu-item @click="editPlugin(plugin.id)">
+                      <md-icon>edit</md-icon>Edit
+                    </md-menu-item>
+                    <md-menu-item @click="reloadPlugin(plugin.config)">
+                      <md-icon>autorenew</md-icon>Reload
+                    </md-menu-item>
+                    <md-menu-item @click="unloadPlugin(plugin)">
+                      <md-icon>clear</md-icon>Terminate
+                    </md-menu-item>
+                    <md-menu-item class="md-accent" @click="_plugin2_remove=plugin;showRemoveConfirmation=true">
+                      <md-icon>delete_forever</md-icon>Remove
+                    </md-menu-item>
+                  </md-menu-content>
+                </md-menu>
+
+                <md-button class="joy-run-button" :class="plugin.running?'md-accent':(plugin._disconnected && plugin.mode == 'pyworker'? 'disconnected-plugin': '')" :disabled="plugin._disconnected && plugin.mode != 'pyworker'" @click="plugin._disconnected&&connectPlugin(plugin)">
+                  {{plugin.mode == 'pyworker'? plugin.name + ' 🚀': plugin.name}}
+                </md-button>
                 <md-divider></md-divider>
               </div>
             </div>
@@ -939,28 +978,50 @@ export default {
         }
       }
     },
+    getRepoManifest(url){
+      return new Promise((resolve, reject)=>{
+        const re = new RegExp('^[^/.]+/[^/.]+$')
+        let repository_url
+        if(url.match(re)){
+          repository_url = githubImJoyManifest('https://github.com/'+url)
+        }
+        else if(url.includes('github') && url.includes('/blob/')){
+          repository_url = githubImJoyManifest(url.split('/blob/')[0])
+        }
+        else{
+          repository_url = url
+        }
+        axios.get(repository_url).then(response => {
+          if (response && response.data && response.data.plugins) {
+            const manifest = response.data
+            manifest.plugins = manifest.plugins.filter((p) => {
+              return !p.disabled
+            })
+            if(!manifest.uri_root.startsWith('http')){
+              manifest.uri_root = repository_url.replace(new RegExp('manifest.imjoy.json$'), _.trim(manifest.uri_root, '/'));
+            }
+            for (let i = 0; i < manifest.plugins.length; i++) {
+                const p = manifest.plugins[i]
+                p.uri = p.uri || p.name + '.html'
+                if (!p.uri.startsWith(manifest.uri_root) && !p.uri.startsWith('http')) {
+                  p.uri = manifest.uri_root + '/' + p.uri
+                }
+                p._id = p._id || p.name.replace(/ /g, '_')
+            }
+            resolve(manifest)
+          }
+          else{
+            reject('failed to load url: ' + repository_url)
+          }
+        }).catch(reject)
+      })
+    },
     reloadRepository(repo){
       repo = repo || this.selected_repository
       return new Promise((resolve, reject)=>{
-        axios.get(repo.url).then(response => {
-          if (response && response.data && response.data.plugins) {
-            const manifest = response.data
-            this.available_plugins = manifest.plugins.filter((p) => {
-              return !p.disabled
-            })
-            let uri_root = manifest.uri_root
-            if(!uri_root.startsWith('http')){
-              uri_root = repo.url.replace(new RegExp('manifest.imjoy.json$'), _.trim(uri_root, '/'));
-            }
-            for (let i = 0; i < this.available_plugins.length; i++) {
-                const p = this.available_plugins[i]
-                p.uri = p.uri || p.name + '.html'
-                if (!p.uri.startsWith(uri_root) && !p.uri.startsWith('http')) {
-                  p.uri = uri_root + '/' + p.uri
-                }
-                p._id = p._id || p.name.replace(/ /g, '_')
+          this.getRepoManifest(repo.url).then((manifest)=>{
+            this.available_plugins = manifest.plugins
 
-            }
             for (let i = 0; i < this.available_plugins.length; i++) {
               const ap = this.available_plugins[i]
               const ps = this.installed_plugins.filter((p) => {
@@ -974,27 +1035,12 @@ export default {
             }
             this.$forceUpdate()
             resolve(manifest)
-          }
-          else{
-            reject('failed to load url: ' + repo.url)
-          }
-        }).catch(reject)
+          }).catch(reject)
       })
     },
     addRepository(repo){
       if(typeof repo == 'string'){
-        const re = new RegExp('^[^/.]+/[^/.]+$')
-        let repository_url
-        if(repo.match(re)){
-          repository_url = githubImJoyManifest('https://github.com/'+repo)
-        }
-        else if(repo.includes('github')){
-          repository_url = githubImJoyManifest(repo.split('/blob')[0])
-        }
-        else{
-          repository_url = repo
-        }
-        repo = {name: repo, url: repository_url, description: repository_url}
+        repo = {name: repo, url: repo, description: repo}
       }
       assert(repo.name && repo.url)
       this.reloadRepository(repo).then((manifest)=>{
@@ -1186,47 +1232,54 @@ export default {
       this.getPluginFromUrl(plugin_url).then((config)=>{
         this.plugin4install = config
         this.downloading_plugin = false
-      }).catch(()=>{
+      }).catch((e)=>{
         this.downloading_plugin = false
-        this.downloading_error = "Sorry, the plugin URL is invalid!"
-        this.showMessage("Sorry, the Plugin URL is invalid!")
+        this.downloading_error = "Sorry, the plugin URL is invalid: " + e.toString()
+        this.showMessage("Sorry, the plugin URL is invalid: " + e.toString())
       })
     },
-    getPluginFromUrl(uri){
-      return new Promise((resolve, reject) => {
-        axios.get(uri).then(response => {
-          if (!response || !response.data || response.data == '') {
-            alert('failed to get plugin code from ' + uri)
-            reject('failed to get code.')
-            return
+    async getPluginFromUrl(uri){
+      // if the uri format is REPO_NAME:PLUGIN_NAME
+      if(!uri.startsWith('http') && uri.includes(':')){
+        let [repo_name, plugin_name] = uri.split(':')
+        plugin_name = plugin_name.trim()
+        repo_name = repo_name.trim()
+        assert(repo_name && plugin_name, 'Wrong URI format, it must be "REPO_NAME:PLUGIN_NAME"')
+        const manifest = await this.getRepoManifest(repo_name)
+        let found = null
+        for(let p of manifest.plugins){
+          if(p.name == plugin_name){
+            found = p
+            break
           }
-          let config = null
-          const code = response.data
-          const pluginComp = parseComponent(code)
-          console.log('code parsed from', pluginComp)
-          try {
-            config = JSON.parse(pluginComp.config[0].content)
-            config.code = code
-            config.uri = uri
-            console.log('loading config from .html file', config)
-          } catch (e) {
-            console.error(e)
-            reject(e)
-            return
-          }
-          resolve(config)
-        }).catch(reject)
-      })
+        }
+        if(!found){
+          throw(`plugin not found ${repo_name}:${plugin_name}`)
+        }
+        uri = found.uri
+      }
+      const response = await axios.get(uri)
+      if (!response || !response.data || response.data == '') {
+        alert('failed to get plugin code from ' + uri)
+        throw 'failed to get code.'
+      }
+      const code = response.data
+      let config = this.parsePluginCode(code)
+      config.uri = uri
+      return config
     },
     installPlugin(pconfig, tag){
+      // pconfig = "oeway/ImJoy-Demo-Plugins:3D Demos"
       return new Promise((resolve, reject) => {
-        const uri = typeof pconfig == 'string' ? pconfig : pconfig.uri
+        let uri = typeof pconfig == 'string' ? pconfig : pconfig.uri
         //use the has tag in the uri if no hash tag is defined.
         if(!uri){
           reject('No url found for plugin ' + pconfig.name)
           return
         }
         tag = tag || uri.split("#")[1]
+        uri = uri.split("#")[0]
+
         this.getPluginFromUrl(uri).then((config)=>{
           if (!config) {
             console.error('Failed to parse the plugin code.', code)
@@ -1324,8 +1377,11 @@ export default {
       this.show_plugin_url=true
       this.showAddPluginDialog=true
     },
-    sortedPlugins: function() {
-        return _.orderBy(this.plugins, 'name');
+    sortedRunnablePlugins: function() {
+        return _.orderBy(this.plugins, 'name').filter((p)=>{return p.config.runnable});
+    },
+    sortedNonRunnablePlugins: function() {
+        return _.orderBy(this.plugins, 'name').filter((p)=>{return !p.config.runnable});
     },
     registerExtension(exts, plugin) {
       for (let i = 0; i < exts.length; i++) {
@@ -2253,6 +2309,7 @@ export default {
         config.uri = uri
         config.code = code
         config.id = config.name.trim().replace(/ /g, '_') + '_' + randId()
+        config.runnable = config.runnable === false ? false : true
 
         for (let i = 0; i < CONFIGURABLE_FIELDS.length; i++) {
             const obj = config[CONFIGURABLE_FIELDS[i]]
