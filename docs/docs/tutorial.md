@@ -38,7 +38,7 @@ The **main steps** are described below and basic data flow is illustrated by das
 4. The `api.createWindow` returns an identifier for the window. When plotting again, the Python plugin attemtps to plot into this window. Please note that here on the actual data are passed as an input and not the larger dictionary containing the specifications of the window. The `try ... except` statement is used to catch error that can arise when the window has been closed. 
 
 ### User interface communicating with Python worker
-In this tutorial, we show how to use a **window** plugin to defined a user interface, and how this interface can interact with a **Python worker** plugin to perform calculations. You can install this plugin from this [**ADD**](). This will install the actual interface plugin (called **ADD**) and automatically the Python plugin (**ADD**) performing the calculations. The purpose of this plugin is self-explanatory, so just play around. 
+In this tutorial, we show how to use a **window** plugin to defined a user interface, and how this interface can interact with a **Python worker** plugin to perform calculations. You can install this plugin from this [**ADD**](). This will install the actual interface plugin [**GUI**](https://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:GUI&w=demo-GUI) and automatically the Python plugin (GUI PyWorker) performing the calculations. The purpose of this plugin is self-explanatory, so just play around. 
 
 <img src="./asserts/imjoy-tutorial-gui-screenshot.png" width="600px"></img>
 
@@ -58,7 +58,7 @@ Useful platforms are
     * [https://playcode.io/](https://playcode.io/)
     * [https://codepen.io](https://codepen.io/) 
 
-HTML5/CSS and JavaScript control the three relevant aspects of an interface. In ImJoy, these three elements are defined in one [single file **ADD**](), and specified in dedicated code blocks.
+HTML5/CSS and JavaScript control the three relevant aspects of an interface. In ImJoy, these three elements are defined in one [single file](https://github.com/oeway/ImJoy-Demo-Plugins/blob/master/repository/GUI.imjoy.html), and specified in dedicated code blocks.
 
 * **HTML**: structure.  The HTML code is in the code block delignated with 
     ```
