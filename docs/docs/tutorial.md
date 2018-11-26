@@ -26,7 +26,7 @@ In this tutorial, we show how data generated in a Python plugin (a damped cosine
 
 The tutorial consists of two plugins
 
-1. The **Python plugin** "Python to JS charts". Here you can select how many data points should be calculated and which JS library should be used for display. You can install this plugin with this [link](http://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:PythonToJScharts#nativePy&w=demo-JS-charts).
+1. The **Python plugin** "Python to JS charts". Here you can select how many data points should be calculated and which JS library should be used for display. You can install this plugin with this [link](https://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:PythonToJScharts&tag=nativePy&w=demo-JS-charts).
 2. The **window plugin** "JScharts". Here the obtained data will be rendered as a line plot. Note that this plugin is automatically installed with the Python plugin from above. 
 
 <img src="./asserts/imjoy-tutorial-python-to-js.png" width="800px"></img>
