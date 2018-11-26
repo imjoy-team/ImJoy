@@ -14,7 +14,7 @@ An important part of ImJoy is to provide a flexible way to interact with the use
 1. The ImJoy API provides several functions to show results, e.g. indicate [progress](https://imjoy.io/docs/#/api?id=api-showprogress-), update the [ImJoy status](https://imjoy.io/docs/#/api?id=api-showstatus-), 
 2. The ImJoy API also provides a function to [create a window](https://imjoy.io/docs/#/api?id=api-createwindow-). In this window, powerful JavaScript visualization librariers can used. For more details, have a look at our window plugin demo **ADD LINK**.
 
-**Dedicate user interface**
+**Dedicated user interface**
 For more advanced purposes, you can can use define a user interface with the [**window plugin**](https://imjoy.io/docs/#/development?id=ltconfiggt-block). Such an interface is designed with web technology (HTML, JavaScript and CSS) and thus provides maximum flexibility. Further, such an interface can communicate with another plugin, e.g. a Python worker that performs the actual analysis. For more details, have a look at the dedicated tutorial below. **ADD LINK**.
 
 ### Python worker plots to window
@@ -62,7 +62,6 @@ HTML5/CSS and JavaScript control the three relevant aspects of an interface. In 
                    "https://unpkg.com/spectre.css/dist/spectre-exp.min.css",
                    "https://unpkg.com/spectre.css/dist/spectre-icons.min.css"],
     ```
-##### Processing user input and calling Python function 
 The image below shows some code snippets to illustrate how user interput is retrieved, and a Python function called. The following sequence is shown.
 
 1. User presses on a button to perform a calculation based on some defined input. 
