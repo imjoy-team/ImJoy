@@ -53,7 +53,7 @@ HTML5/CSS and JavaScript control the three relevant aspects of an interface. In 
     ```
     <script lang="javascript">
        ...
-    </window>
+    </script>
     ```
 
 * **CSS**: visual appearance of the interface. Here, we we recommend [Spectre.css](https://picturepan2.github.io/spectre/), an easy to use framework to design webinterfaces. This framework can be imported in the plugin requirements
