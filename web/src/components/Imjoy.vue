@@ -1238,7 +1238,9 @@ export default {
         this.showMessage("Sorry, the plugin URL is invalid: " + e.toString())
       })
     },
-    async getPluginFromUrl(uri){
+    async getPluginFromUrl(uri, scoped_plugins){
+      scoped_plugins = scoped_plugins || this.available_plugins
+      console.log('-------', scoped_plugins)
       // if the uri format is REPO_NAME:PLUGIN_NAME
       if(!uri.startsWith('http') && uri.includes(':')){
         let [repo_name, plugin_name] = uri.split(':')
@@ -1257,7 +1259,22 @@ export default {
           throw(`plugin not found ${repo_name}:${plugin_name}`)
         }
         uri = found.uri
+        scoped_plugins = manifest.plugins
+        console.log('=====', scoped_plugins)
       }
+      else if(!uri.match(url_regex)){
+        let dep = uri.split("#")
+        const ps = scoped_plugins.filter((p) => {
+          return dep[0] && p.name == dep[0].trim()
+        });
+        if (ps.length <= 0) {
+          throw `Plugin "${dep[0]}" cannot be found in the repository.`
+        }
+        else{
+          uri = ps[0].uri
+        }
+      }
+
       const response = await axios.get(uri)
       if (!response || !response.data || response.data == '') {
         alert('failed to get plugin code from ' + uri)
@@ -1266,12 +1283,14 @@ export default {
       const code = response.data
       let config = this.parsePluginCode(code)
       config.uri = uri
+      config.scoped_plugins = scoped_plugins
       return config
     },
     installPlugin(pconfig, tag){
       // pconfig = "oeway/ImJoy-Demo-Plugins:3D Demos"
       return new Promise((resolve, reject) => {
         let uri = typeof pconfig == 'string' ? pconfig : pconfig.uri
+        let scoped_plugins = pconfig.scoped_plugins || this.available_plugins
         //use the has tag in the uri if no hash tag is defined.
         if(!uri){
           reject('No url found for plugin ' + pconfig.name)
@@ -1280,7 +1299,7 @@ export default {
         tag = tag || uri.split("#")[1]
         uri = uri.split("#")[0]
 
-        this.getPluginFromUrl(uri).then((config)=>{
+        this.getPluginFromUrl(uri, scoped_plugins).then((config)=>{
           if (!config) {
             console.error('Failed to parse the plugin code.', code)
             reject('Failed to parse the plugin code.')
@@ -1292,47 +1311,35 @@ export default {
           }
           config.tag = tag
           config._id = config.name && config.name.replace(/ /g, '_') || randId()
-          if (config.dependencies) {
-            for (let i = 0; i < config.dependencies.length; i++) {
-              let dep
-              if (config.dependencies[i].match(url_regex)) {
-                // this url can contain a hash tag which will be used as tag
-                this.installPlugin(config.dependencies[i])
-              }
-              else{
-                dep = config.dependencies[i].split("#")
-                const ps = this.available_plugins.filter((p) => {
-                  return dep[0] && p.name == dep[0].trim()
-                });
-                if (ps.length <= 0) {
-                  alert(config.name + ' plugin depends on ' + config.dependencies[i] + ', but it can not be found in the repository.')
-                } else {
-                  console.log('installing dependency ', dep)
-                  if (!ps[0].installed){
-                      this.installPlugin(ps[0], dep[1])
-                  }
+          config.dependencies = config.dependencies || []
+          const _deps = []
+          for (let i = 0; i < config.dependencies.length; i++) {
+              _deps.push(this.installPlugin({uri: config.dependencies[i], scoped_plugins: config.scoped_plugins || scoped_plugins}))
+          }
+          Promise.all(_deps).then(()=>{
+            this.savePlugin(config).then((template)=>{
+              for (let p of this.available_plugins) {
+                if(p.name == template.name && !p.installed){
+                  p.installed = true
+                  p.tag = tag
                 }
               }
-
-            }
-          }
-          this.savePlugin(config).then((template)=>{
-            for (let p of this.available_plugins) {
-              if(p.name == template.name && !p.installed){
-                p.installed = true
-                p.tag = tag
-              }
-            }
-            this.showMessage(`Plugin "${template.name}" has been successfully installed.`)
-            this.$forceUpdate()
-            resolve()
-            this.reloadPlugin(template)
-          }).catch(()=>{
-            reject(`Failed to save the plugin ${template.name}`)
+              this.showMessage(`Plugin "${template.name}" has been successfully installed.`)
+              this.$forceUpdate()
+              resolve()
+              this.reloadPlugin(template)
+            }).catch(()=>{
+              reject(`Failed to save the plugin ${template.name}`)
+            })
+          }).catch((error)=>{
+            alert(`Failed to install dependencies for ${config.name}: ${error}`)
+            throw `Failed to install dependencies for ${config.name}: ${error}`
           })
+
         }).catch((e)=>{
           console.error(e)
           this.showMessage('Failed to download, if you download from github, please use the url to the raw file', 6000)
+          reject(e)
         })
       })
     },
