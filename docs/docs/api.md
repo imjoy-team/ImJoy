@@ -287,6 +287,30 @@ api.updateWindow(id=windowId, data={'image': ...})
 
 The second parameter is an object contains fields which the plugin wants to update, it will be passed as `my.data` to the `run` function of the target window plugin. If the target window is a internally supported window (e.g. `imjoy/image`), then it will just replace the content (since there is not `run` function).
 
+In case of the user closed the previous window which the `windowId` refer to, it will throw an error. However, you can also pass `name` and `type` as you will do with `api.createWindow`, if these two fields exists, it will call `api.createWindow` if the windowId do not exists or the window has been closed by the user. If `api.createWindow` is called, the `windowId` needs to be updated, therefore, you need to save the returned `windowId`.
+
+Here is the code for this:
+```javascript
+//Javascript
+windowId = await api.updateWindow({id: windowId, name: 'new window', type: 'Image Window', w:7, h:7, data: {image: ...}})
+```
+
+```python
+# Python
+
+# pass as a dictionary
+windowId = await api.updateWindow({'id': windowId, name: 'new window', type: 'Image Window', w:7, h:7, 'data': {'image': ...}})
+
+# or named arguments
+windowId = await api.updateWindow(id=windowId, name='new window', type='Image Window', w=7, h=7, data={'image': ...})
+
+# callback style
+def cb(wid):
+    windowId = wid
+api.updateWindow({'id': windowId, name: 'new window', type: 'Image Window', w:7, h:7, 'data': {'image': ...}}).then(cb)
+```
+
+
 ## `api.showDialog(...)`
 show a dialog with customized GUI, example:
 

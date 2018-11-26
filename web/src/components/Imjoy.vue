@@ -2857,6 +2857,10 @@ export default {
             w[k] = wconfig[k]
           }
         }
+        return wid
+      }
+      else if(wconfig.name && wconfig.type){
+        return await this.createWindow(wconfig, _plugin)
       }
       else{
         throw `Window (id=${wid}) not found`
