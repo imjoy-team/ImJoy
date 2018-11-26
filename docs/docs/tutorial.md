@@ -1,34 +1,68 @@
 # Tutorials
-
+Here we provide several tutorial illustrating important concepts of ImJoy. 
 
 ## User interaction
+An important part of ImJoy is to provide a flexible way to interact with the user, to either specify input information or provide results. 
+
+**User input**
+
+1. In the simplest case, you can define how the GUI of the plugin is rendered in the plugin dialog. You can ask for general user-input in the [**`<config>` block**](https://imjoy.io/docs/#/development?id=ltconfiggt-block) or specify specific input for the different [**plugin operations**](https://imjoy.io/docs/#/api?id=api-register-).
+2. The ImJoy API provides several functions to ask for user input, e.g. [file dialog](https://imjoy.io/docs/#/api?id=api-showfiledialog-), or a [general dialog](https://imjoy.io/docs/#/api?id=api-showdialog-).
+
+**Provide results**
+
+1. The ImJoy API provides several functions to show results, e.g. indicate [progress](https://imjoy.io/docs/#/api?id=api-showprogress-), update the [ImJoy status](https://imjoy.io/docs/#/api?id=api-showstatus-), 
+2. The ImJoy API also provides a function to [create a window](https://imjoy.io/docs/#/api?id=api-createwindow-). In this window, powerful JavaScript visualization librariers can used. For more details, have a look at our window plugin demo **ADD LINK**.
+
+**Dedicate user interface**
+For more advanced purposes, you can can use define a user interface with the [**window plugin**](https://imjoy.io/docs/#/development?id=ltconfiggt-block). Such an interface is designed with web technology (HTML, JavaScript and CSS) and thus provides maximum flexibility. Further, such an interface can communicate with another plugin, e.g. a Python worker that performs the actual analysis. For more details, have a look at the dedicated tutorial below. **ADD LINK**.
 
 ### Python worker plots to window
 **TO BE ADDED**
 
 ### User interface communicating with Python worker
-
-We provide tutorial plugins illustrating how to develop a user interface that can communicate with Python to perform calculations. 
-The interface is implemented with [Spectre.css](https://picturepan2.github.io/spectre/), an easy to use framework to design webinterfaces.
+In this tutorial, we show how to use a **window** plugin to defined a user interface, and how this interface can interact with a **Python worker** plugin to perform calculations. You can install this plugin from this [**ADD**](). This will install the actual interface plugin (called **ADD**) and the Python plugin (**ADD**) performing the calculations. The purpose of this plugin is self-explanatory, so just play around. 
 
 <img src="./asserts/imjoy-demo-gui.png" width="600px"></img>
 
-You can install this plugin from this [link](). This will install the actual interface plugin (called ...) and the Python plugin (called ...) performing the calculations. The purpose of this plugin is self-explanatory, so just play around. 
+This tutorial illustrates a number of different important concepts, which we describe briefly below.
 
-There are excellent ressources to get started with html and JavaScript
+1. How to get started in coding an ImJoy user-interface with HTML and JavaScript.
+2. How to communicate between the user interface and the Python worker.
+3. How to store data in the Python worker for further calcuations. 
+
+
+#### Web-design for an ImJoy user interface
+The window plugins are developed with HTML5/CSS and JavaScript. Here we provide only a fast overview of these languages. 
+Excellent ressources to get started with HTML and JavaScript
 
 * Hands-on tutorial can be found here [www.w3schools.com/](https://www.w3schools.com/)
 * Different online coding platforms exist to test and develop code, but you can essentially use ImJoy to test your code. Useful platforms are
     * [https://playcode.io/](https://playcode.io/)
-    * [https://codepen.io](https://codepen.io/)
+    * [https://codepen.io](https://codepen.io/) 
 
-These two plugins illustrate a number of different important concepts, which we describe briefly below.
+HTML5/CSS and JavaScript control the three relevant aspects of an interface. In ImJoy, these three elements are defined in one [single file **ADD**](), and specified in dedicated code blocks.
 
-1. How to get started in coding an ImJoy user-interface wiht html and Javascript.
-2. How to communicate between the user interface and the Python worker.
-3. How to store data in the Python worker for further calcuations. 
+* **HTML**: structure.  The HTML code is in the code block delignated with 
+    ```
+    <window lang="html">
+       ...
+    </window>
+    ```
+* **JavaScript**: behavior of the interface
+    ```
+    <script lang="javascript">
+       ...
+    </window>
+    ```
 
-##### HTML elements    
+* **CSS**: visual appearance of the interface. Here, we we recommend [Spectre.css](https://picturepan2.github.io/spectre/), an easy to use framework to design webinterfaces. This framework can be imported in the plugin requirements
+    ```
+   "requirements": ["https://unpkg.com/spectre.css/dist/spectre.min.css",
+                   "https://unpkg.com/spectre.css/dist/spectre-exp.min.css",
+                   "https://unpkg.com/spectre.css/dist/spectre-icons.min.css"],
+    ```
+   
 There are different **html elements that respond to user interaction**. The corresponding action is defined in the ```setup()``` function. The example below is for the button wiht the id `btn_plot`. When the user clicks on this button (`onclick`) the following function call is invoked. Here the current value of two other html elments (the forms containing the number of data points and the math operator) are retrieved, and passed to another function called `calc_plot()`.
 
 ``` javascript
