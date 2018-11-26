@@ -29,8 +29,15 @@ The tutorial consists of two plugins
 1. The **Python plugin** "Python to JS charts". Here you can select how many data points should be calculated and which JS library should be used for display. You can install this plugin with this link **ADD**.
 2. The **window plugin** "JS charts". Here the obtained data will be rendered as a line plot. Note that this plugin is automatically installed with the Python plugin from above. 
 
-**ADD**
-+ update window
+<img src="./asserts/imjoy-tutorial-python-to-js.png" width="800px"></img>
+
+The **main steps** are described below and basic data flow is illustrated by dashed errors in the image above. 
+1. User defines (1) parameters of the plot (how many data points should be calculated), some text that will be added to the plot, and which JavaScript library will be used. 
+2. Upen execution of the Python plugin, the damped cosine curve will be computed. Then a dictionary `data` containing these values, as well as other parameters describing the plot is created. This dictionary will be used with the ImJoy API function `api.createWindow` to call the window plugin. Dictionary has to contain the fields `name` to specify the window title, `type` to specify which window plugin should be called. `w` and `h` specify the size, `data` contains the data in a format specified in the window plugin. 
+3. In the window plugin the transfered data are available as `my.data` and are used to create the JavaScript plot and also populate the HTML text field. 
+
+**Not working yet**
+4. The `api.createWindow` returns an identifier for the window. When plotting again, the Python plugin attemtps to plot into this window. The `try ... except` statement is used to catch error that can arise when the window has been closed. 
 
 ### User interface communicating with Python worker
 In this tutorial, we show how to use a **window** plugin to defined a user interface, and how this interface can interact with a **Python worker** plugin to perform calculations. You can install this plugin from this [**ADD**](). This will install the actual interface plugin (called **ADD**) and automatically the Python plugin (**ADD**) performing the calculations. The purpose of this plugin is self-explanatory, so just play around. 
