@@ -291,7 +291,10 @@ export default {
           this.manifest = response.data
           this.available_plugins = this.manifest.plugins
           this.searched_plugins = this.manifest.plugins
-          const uri_root = this.manifest.uri_root
+          let uri_root = this.manifest.uri_root
+          if(!uri_root.startsWith('http')){
+            uri_root = this.configUrl.replace(new RegExp('manifest.imjoy.json$'), _.trim(uri_root, '/'));
+          }
           for (let i = 0; i < this.available_plugins.length; i++) {
               const p = this.available_plugins[i]
               p.uri = p.uri || p.name + '.html'

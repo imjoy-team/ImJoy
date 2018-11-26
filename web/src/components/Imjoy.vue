@@ -447,12 +447,12 @@
       <md-card v-if="show_plugin_store">
         <md-card-header>
           <div class="md-title">Install from the plugin repository</div>
-          <md-chips @md-insert="addRepository" @md-delete="removeRepository(getRepository($event))" class="md-primary shake-on-error" v-model="repository_names" md-placeholder="Add repository (`GITHUB_USER_NAME/REPO_NAME`)">
+          <md-chips @md-insert="addRepository" @md-delete="removeRepository(getRepository($event))" class="md-primary shake-on-error" v-model="repository_names" md-placeholder="Add a repository url (e.g. GITHUB REPO) and press enter.">
             <template slot="md-chip" slot-scope="{ chip }" >
-              <strong class="md-primary" v-if="chip === selected_repository.name">{{ chip }}</strong>
+              <strong class="md-primary" v-if="selected_repository && chip === selected_repository.name">{{ chip }}</strong>
               <div v-else @click="selectRepository(chip)">{{ chip }}</div>
             </template>
-            <div class="md-helper-text">{{selected_repository.name}}: {{selected_repository.description}}</div>
+            <div class="md-helper-text" v-if="selected_repository">{{selected_repository.name}}: {{selected_repository.description}}</div>
           </md-chips>
           <!-- <md-chip v-for="repo in repository_list" @click="selected_repository=repo" :class="selected_repository.url==repo.url? 'md-primary':''" :key="repo.url">{{repo.name}}</md-chip> -->
         </md-card-header>
@@ -948,7 +948,10 @@ export default {
             this.available_plugins = manifest.plugins.filter((p) => {
               return !p.disabled
             })
-            const uri_root = manifest.uri_root
+            let uri_root = manifest.uri_root
+            if(!uri_root.startsWith('http')){
+              uri_root = repo.url.replace(new RegExp('manifest.imjoy.json$'), _.trim(uri_root, '/'));
+            }
             for (let i = 0; i < this.available_plugins.length; i++) {
                 const p = this.available_plugins[i]
                 p.uri = p.uri || p.name + '.html'
@@ -986,7 +989,7 @@ export default {
           repository_url = githubImJoyManifest('https://github.com/'+repo)
         }
         else if(repo.includes('github')){
-          repository_url = githubImJoyManifest(repo)
+          repository_url = githubImJoyManifest(repo.split('/blob')[0])
         }
         else{
           repository_url = repo
@@ -1000,6 +1003,8 @@ export default {
           if(r.url == repo.url || r.name == repo.name){
             // remove it if already exists
             this.repository_list.splice( this.repository_list.indexOf(r), 1 )
+            this.showMessage("Repository with the same url or name already exists.")
+            break
           }
         }
         assert(repo.name && repo.url)
@@ -1019,11 +1024,13 @@ export default {
           this.status_text = "Failed to save repository, database Error:" + err.toString()
         })
       }).catch(()=>{
-        if(this.repository_names.indexOf(repo)>=0)
-          this.repository_names.splice(this.repository_names.indexOf(repo), 1)
+        if(this.repository_names.indexOf(repo.name)>=0)
+          this.repository_names.splice(this.repository_names.indexOf(repo.name), 1)
+        this.showMessage("Failed to load repository from: " + repo.url)
       })
     },
     removeRepository(repo) {
+      if(!repo) return;
       let found = false
       for(let r of this.repository_list){
         if(r.url == repo.url || r.name == repo.name){
