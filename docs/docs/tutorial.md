@@ -1,5 +1,5 @@
 # Tutorials
-Here we provide several tutorial illustrating important concepts of ImJoy. 
+Here we provide several tutorial illustrating important concepts of ImJoy. You can inspect the code of the provided plugins by clicking on the symbol left of the plugin name and selecting `Edit`.
 
 ## User interaction
 An important part of ImJoy is to provide a flexible way to interact with the user, to either specify input information or provide results. 
@@ -26,8 +26,8 @@ In this tutorial, we show how data generated in a Python plugin (a damped cosine
 
 The tutorial consists of two plugins
 
-1. The **Python plugin** "Python to JS charts". Here you can select how many data points should be calculated and which JS library should be used for display. You can install this plugin with this link **ADD**.
-2. The **window plugin** "JS charts". Here the obtained data will be rendered as a line plot. Note that this plugin is automatically installed with the Python plugin from above. 
+1. The **Python plugin** "Python to JS charts". Here you can select how many data points should be calculated and which JS library should be used for display. You can install this plugin with this [link](http://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:PythonToJScharts#nativePy&w=demo-JS-charts).
+2. The **window plugin** "JScharts". Here the obtained data will be rendered as a line plot. Note that this plugin is automatically installed with the Python plugin from above. 
 
 <img src="./asserts/imjoy-tutorial-python-to-js.png" width="800px"></img>
 
@@ -38,7 +38,7 @@ The **main steps** are described below and basic data flow is illustrated by das
 4. The `api.createWindow` returns an identifier for the window. When plotting again, the Python plugin attemtps to plot into this window. Please note that here on the actual data are passed as an input and not the larger dictionary containing the specifications of the window. The `try ... except` statement is used to catch error that can arise when the window has been closed. 
 
 ### User interface communicating with Python worker
-In this tutorial, we show how to use a **window** plugin to defined a user interface, and how this interface can interact with a **Python worker** plugin to perform calculations. You can install this plugin from this [**ADD**](). This will install the actual interface plugin [**GUI**](https://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:GUI&w=demo-GUI) and automatically the Python plugin (GUI PyWorker) performing the calculations. The purpose of this plugin is self-explanatory, so just play around. 
+In this tutorial, we show how to use a **window** plugin to defined a user interface, and how this interface can interact with a **Python worker** plugin to perform calculations. You can install this plugin from this [link](http://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:GUI&w=demo-GUI). This will install the actual interface plugin (GUI) and automatically the Python plugin (GUI PyWorker) performing the calculations. The purpose of this plugin is self-explanatory, you can open the GUI by double clicking on the plugin title. Just play around. 
 
 <img src="./asserts/imjoy-tutorial-gui-screenshot.png" width="600px"></img>
 
