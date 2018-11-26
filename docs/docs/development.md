@@ -175,7 +175,7 @@ Define the CSS code for displaying in the plugin window.
 
 ### `<script>` block
 
-Plugins can be written in Javascript or Python, a minimal plugin needs to implement two functions: `setup()` and `run()`. Optionally, the function `exit` will be called when the plugin is killed.
+Plugins can be written in Javascript or Python, a minimal plugin needs to implement two functions: `setup()` and `run()`. Exceptions are helper plugins (specified with `"runnable": false`), which don't need the `run()` function. Optionally, the function `exit` will be called when the plugin is killed.
 
 The `lang` property of the `<script>` block is used to specify the used programming language:
  * for Javascript, use `<script lang="javascript"> ... </script>`
