@@ -37,7 +37,8 @@ The window plugins are developed with HTML5/CSS and JavaScript. Here we provide 
 Excellent ressources to get started with HTML and JavaScript
 
 * Hands-on tutorial can be found here [www.w3schools.com/](https://www.w3schools.com/)
-* Different online coding platforms exist to test and develop code, but you can essentially use ImJoy to test your code. Useful platforms are
+* Different online coding platforms exist to test and develop code, but you can essentially use ImJoy to test your code. 
+Useful platforms are
     * [https://playcode.io/](https://playcode.io/)
     * [https://codepen.io](https://codepen.io/) 
 
@@ -63,7 +64,7 @@ HTML5/CSS and JavaScript control the three relevant aspects of an interface. In 
                    "https://unpkg.com/spectre.css/dist/spectre-icons.min.css"],
     ```
    
-There are different **html elements that respond to user interaction**. The corresponding action is defined in the ```setup()``` function. The example below is for the button wiht the id `btn_plot`. When the user clicks on this button (`onclick`) the following function call is invoked. Here the current value of two other html elments (the forms containing the number of data points and the math operator) are retrieved, and passed to another function called `calc_plot()`.
+Different **HTML elements respond to user interaction**. The corresponding action is defined in JavaScript in the ```setup()``` function. The example below is for the html element button with the id `btn_plot`. When the user clicks on this button (`onclick`) the defined function call is called. In the exampl, the current value of two other html elments (the forms containing the number of data points and the math operator) are retrieved, and passed to another function called `calc_plot()`.
 
 ``` javascript
 document.getElementById('btn_plot').onclick = ()=>{
@@ -75,7 +76,7 @@ document.getElementById('btn_plot').onclick = ()=>{
 ```
 
 ##### Communication between main window and Python
-The function `calc_plot()` will pass these two parameters and an additional callback to the Python plugin `Python worker` and more specifically its function `calc_results`. These parameters are passed as a dictionary. The callback function can be called from within the Python plugin and allows it to plot data in the actual window.
+Communication between the window and Python plugin is achieved by the ImJoy API [**api.call()**](https://imjoy.io/docs/#/api?id=api-call-) and so-called **callback functions**. Simply put such a callback is a function that will be executed after another function has finished its execution. The function `calc_plot()` from above will use api.call() to call the function `calc_results` from the `Python worker` plugin. It will pass two parameters obtained from the user-interface and a callback function . The callback function allows the Python plugin to plot data in the window plugin.
 
 ``` javascript
 calc_plot(n_points,math_op){
@@ -89,8 +90,8 @@ calc_plot(n_points,math_op){
   }
  ```
 
-##### Python calculations, storage and window callback
-Let's have a look at the Python function `calc_results`. It receives the JavaScript dictionary and extracts all necessary parameters. It then perform the desired calculation. Then it stores the data wiht `self.x_values = x`. Lastly, invokes the callback function to print in the main window with `data['callback'](data_plot)`. Here the parameters are again passed as a dictionary. Please note, the **numpy** arrays are not supported, and the data has therefore be transformed to a list. 
+##### Python calculations, storage and callback
+Let's have a look at the Python function `calc_results`. It receives the JavaScript dictionary, extracts all necessary parameters and perform the desired calculation. Then it stores the data wiht `self.x_values = x`. Lastly, invokes the callback function to print in the main window with `data['callback'](data_plot)`. Here the parameters are again passed as a dictionary. Please note, the **numpy** arrays are not supported, and the data has therefore be transformed to a list. 
 
 ``` python
 def calc_results(self,data):
