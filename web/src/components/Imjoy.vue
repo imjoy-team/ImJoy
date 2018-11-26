@@ -893,7 +893,6 @@ export default {
         this.reloadRepository().finally(()=>{
           if(this.$route.query.plugin){
             const p = this.$route.query.plugin.trim()
-            console.log(p)
             if (p.match(url_regex) || (p.includes('/') && p.includes(':'))) {
               this.plugin_url = p
               this.init_plugin_search = null
@@ -1250,7 +1249,7 @@ export default {
         selected_tag = plugin_name.split('@')[1]
         plugin_name = plugin_name.split('@')[0]
         plugin_name = plugin_name.trim()
-        const repo_hashtag = repo_name.split('@')[0]
+        const repo_hashtag = repo_name.split('@')[1]
         repo_name = repo_name.split('@')[0]
         repo_name = repo_name.trim()
         assert(repo_name && plugin_name, 'Wrong URI format, it must be "REPO_NAME:PLUGIN_NAME"')
