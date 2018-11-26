@@ -31,7 +31,6 @@ This tutorial illustrates a number of different important concepts, which we des
 2. How to communicate between the user interface and the Python worker.
 3. How to store data in the Python worker for further calcuations. 
 
-
 #### Web-design for an ImJoy user interface
 The window plugins are developed with HTML5/CSS and JavaScript. Here we provide only a fast overview of these languages. 
 Excellent ressources to get started with HTML and JavaScript
@@ -95,32 +94,30 @@ Let's have a look at the Python function `calc_results`. It receives the JavaScr
 
 ``` python
 def calc_results(self,data):
-    
-    # x-values
-    n_points = float(data['npoints'])        
-    x = np.arange(0.01, 5.0, 5.0/n_points)
 
-    # y-values
-    math_op = data['math_op']
-    if math_op == 'Sine':
-        y =  np.sin(2*np.pi*x)
-    elif math_op == 'Exponential':
-        y = np.exp(-x)
-    elif math_op == 'Log10':
-        y = np.log10(x)   
+        # Extract input parameters
+        n_points = float(data['npoints']) 
+        math_op = data['math_op']
+        callback_fun = data['callback']
 
-    # Store values
-    self.x_values = x
-    self.y_values = y
+        # Calculate desired output
+        x = np.arange(0.01, 5.0, 5.0/n_points)
+        if math_op == 'Sine':
+            y =  np.sin(2*np.pi*x)
+        elif math_op == 'Exponential':
+            y = np.exp(-x)
+        elif math_op == 'Log10':
+            y = np.log10(x)   
 
-    # Convert to list for callback
-    data_plot = {'x':x.tolist(),
-                 'y':(y.tolist(),),
-                 'mode':('line',),
-                 'name':('data',)}
+        # Store values
+        self.x_values = x
+        self.y_values = y
 
-    #  callback
-    data['callback'](data_plot)
+        # Invoke window callback
+        callback_fun({'x':x.tolist(),
+                      'y':[y.tolist()],
+                      'mode':['line'],
+                      'name':['data']})
 ```
 
 
