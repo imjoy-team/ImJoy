@@ -944,11 +944,11 @@ export default {
       return new Promise((resolve, reject)=>{
         axios.get(repo.url).then(response => {
           if (response && response.data && response.data.plugins) {
-            this.manifest = response.data
-            this.available_plugins = this.manifest.plugins.filter((p) => {
+            const manifest = response.data
+            this.available_plugins = manifest.plugins.filter((p) => {
               return !p.disabled
             })
-            const uri_root = this.manifest.uri_root
+            const uri_root = manifest.uri_root
             for (let i = 0; i < this.available_plugins.length; i++) {
                 const p = this.available_plugins[i]
                 p.uri = p.uri || p.name + '.html'
@@ -970,7 +970,7 @@ export default {
               }
             }
             this.$forceUpdate()
-            resolve()
+            resolve(manifest)
           }
           else{
             reject('failed to load url: ' + repo.url)
@@ -996,13 +996,15 @@ export default {
         }
         repo = {name: repo, url: repository_url, description: repository_url}
       }
-      this.reloadRepository(repo).then(()=>{
+      this.reloadRepository(repo).then((manifest)=>{
         for(let r of this.repository_list){
           if(r.url == repo.url || r.name == repo.name){
             // remove it if already exists
             this.repository_list.splice( this.repository_list.indexOf(r), 1 )
           }
         }
+        repo.name = manifest.name || repo.name
+        repo.description = manifest.description || repo.description
         assert(repo.name && repo.url)
         this.repository_list.push(repo)
         this.repository_names = []
