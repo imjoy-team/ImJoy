@@ -914,7 +914,6 @@ export default {
 
             this.show_plugin_templates = false
             this.showAddPluginDialog = true
-            this.tag4install = this.$route.query.tag || ''
           }
 
           if(this.$route.query.workflow){
@@ -978,15 +977,18 @@ export default {
         }
       }
     },
-    getRepoManifest(url){
+    getRepoManifest(url, hashtag){
       return new Promise((resolve, reject)=>{
         const re = new RegExp('^[^/.]+/[^/.]+$')
         let repository_url
         if(url.match(re)){
+          if(hashtag){
+            url = url + '/tree/'+ hashtag
+          }
           repository_url = githubImJoyManifest('https://github.com/'+url)
         }
         else if(url.includes('github') && url.includes('/blob/')){
-          repository_url = githubImJoyManifest(url.split('/blob/')[0])
+          repository_url = githubImJoyManifest(url)
         }
         else{
           repository_url = url
@@ -1231,6 +1233,7 @@ export default {
       this.downloading_plugin = true
       this.getPluginFromUrl(plugin_url).then((config)=>{
         this.plugin4install = config
+        this.tag4install = config.tag
         this.downloading_plugin = false
       }).catch((e)=>{
         this.downloading_plugin = false
@@ -1240,14 +1243,18 @@ export default {
     },
     async getPluginFromUrl(uri, scoped_plugins){
       scoped_plugins = scoped_plugins || this.available_plugins
-      console.log('-------', scoped_plugins)
+      let selected_tag
       // if the uri format is REPO_NAME:PLUGIN_NAME
-      if(!uri.startsWith('http') && uri.includes(':')){
+      if(!uri.startsWith('http') && uri.includes('/') && uri.includes(':')){
         let [repo_name, plugin_name] = uri.split(':')
+        selected_tag = plugin_name.split('@')[1]
+        plugin_name = plugin_name.split('@')[0]
         plugin_name = plugin_name.trim()
+        const repo_hashtag = repo_name.split('@')[0]
+        repo_name = repo_name.split('@')[0]
         repo_name = repo_name.trim()
         assert(repo_name && plugin_name, 'Wrong URI format, it must be "REPO_NAME:PLUGIN_NAME"')
-        const manifest = await this.getRepoManifest(repo_name)
+        const manifest = await this.getRepoManifest(repo_name, repo_hashtag)
         let found = null
         for(let p of manifest.plugins){
           if(p.name == plugin_name){
@@ -1260,10 +1267,10 @@ export default {
         }
         uri = found.uri
         scoped_plugins = manifest.plugins
-        console.log('=====', scoped_plugins)
       }
       else if(!uri.match(url_regex)){
-        let dep = uri.split("@")
+        let dep = uri.split('@')
+        selected_tag = dep[1]
         const ps = scoped_plugins.filter((p) => {
           return dep[0] && p.name == dep[0].trim()
         });
@@ -1274,14 +1281,16 @@ export default {
           uri = ps[0].uri
         }
       }
-
+      else{
+        selected_tag = uri.split('@')[1]
+      }
       const response = await axios.get(uri)
       if (!response || !response.data || response.data == '') {
         alert('failed to get plugin code from ' + uri)
         throw 'failed to get code.'
       }
       const code = response.data
-      let config = this.parsePluginCode(code)
+      let config = this.parsePluginCode(code, {tag: selected_tag})
       config.uri = uri
       config.scoped_plugins = scoped_plugins
       return config
@@ -1296,8 +1305,8 @@ export default {
           reject('No url found for plugin ' + pconfig.name)
           return
         }
-        tag = tag || uri.split("@")[1]
-        uri = uri.split("@")[0]
+        // tag = tag || uri.split('@')[1]
+        // uri = uri.split('@')[0]
 
         this.getPluginFromUrl(uri, scoped_plugins).then((config)=>{
           if (!config) {
@@ -1309,7 +1318,7 @@ export default {
             reject('Unsupported plugin mode: '+config.mode)
             return
           }
-          config.tag = tag
+          config.tag = tag || config.tag
           config._id = config.name && config.name.replace(/ /g, '_') || randId()
           config.dependencies = config.dependencies || []
           const _deps = []
