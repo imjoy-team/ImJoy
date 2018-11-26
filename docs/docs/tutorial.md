@@ -17,11 +17,23 @@ An important part of ImJoy is to provide a flexible way to interact with the use
 **Dedicated user interface**
 For more advanced purposes, you can can use define a user interface with the [**window plugin**](https://imjoy.io/docs/#/development?id=ltconfiggt-block). Such an interface is designed with web technology (HTML, JavaScript and CSS) and thus provides maximum flexibility. Further, such an interface can communicate with another plugin, e.g. a Python worker that performs the actual analysis. For more details, have a look at the dedicated tutorial below. **ADD LINK**.
 
-### Python worker plots to window
-**TO BE ADDED**
+### Python plugin plots in window plugin
+In this tutorial, we show how data generated in a Python plugin (a damped cosine) can be displayed in a window plugin. In the window plugin, the data is rendered with JavaScript libararies. This approach thus allows to take full advantage of these very powerful libraries. They provide not only a large variety of different types of graphs, but also user-interactivity. We provde a simple example for three of the major JavaScript chart libraries
+
+* [Plotly](https://plot.ly/javascript/)
+* [C3](https://c3js.org/)    
+* [Chart.js](https://www.chartjs.org/docs/latest/)
+
+The tutorial consists of two plugins
+
+1. The **Python plugin** "Python to JS charts". Here you can select how many data points should be calculated and which JS library should be used for display. You can install this plugin with this link **ADD**.
+2. The **window plugin** "JS charts". Here the obtained data will be rendered as a line plot. Note that this plugin is automatically installed with the Python plugin from above. 
+
+**ADD**
++ update window
 
 ### User interface communicating with Python worker
-In this tutorial, we show how to use a **window** plugin to defined a user interface, and how this interface can interact with a **Python worker** plugin to perform calculations. You can install this plugin from this [**ADD**](). This will install the actual interface plugin (called **ADD**) and the Python plugin (**ADD**) performing the calculations. The purpose of this plugin is self-explanatory, so just play around. 
+In this tutorial, we show how to use a **window** plugin to defined a user interface, and how this interface can interact with a **Python worker** plugin to perform calculations. You can install this plugin from this [**ADD**](). This will install the actual interface plugin (called **ADD**) and automatically the Python plugin (**ADD**) performing the calculations. The purpose of this plugin is self-explanatory, so just play around. 
 
 <img src="./asserts/imjoy-tutorial-gui-screenshot.png" width="600px"></img>
 
