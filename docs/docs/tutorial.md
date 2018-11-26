@@ -15,10 +15,10 @@ An important part of ImJoy is to provide a flexible way to interact with the use
 2. The ImJoy API also provides a function to [create a window](https://imjoy.io/docs/#/api?id=api-createwindow-). In this window, powerful JavaScript visualization librariers can used. For more details, have a look at our window plugin demo **ADD LINK**.
 
 **Dedicated user interface**
-For more advanced purposes, you can can use define a user interface with the [**window plugin**](https://imjoy.io/docs/#/development?id=ltconfiggt-block). Such an interface is designed with web technology (HTML, JavaScript and CSS) and thus provides maximum flexibility. Further, such an interface can communicate with another plugin, e.g. a Python worker that performs the actual analysis. For more details, have a look at the dedicated tutorial below. **ADD LINK**.
+For more advanced purposes, you can can use define a user interface with the [**window plugin**](https://imjoy.io/docs/#/development?id=ltconfiggt-block). Such an interface is designed with web technology (HTML, JavaScript and CSS) and thus provides maximum flexibility. Further, such an interface can communicate with another plugin, e.g. a Python worker that performs the actual analysis. For more details, have a look at the dedicated tutorial below.
 
 ### Python plugin plots in window plugin
-In this tutorial, we show how data generated in a Python plugin (a damped cosine) can be displayed in a window plugin. In the window plugin, the data is rendered with JavaScript libararies. This approach thus allows to take full advantage of these very powerful libraries. They provide not only a large variety of different types of graphs, but also user-interactivity. We provde a simple example for three of the major JavaScript chart libraries
+In this tutorial, we show how data generated in a Python plugin (a damped cosine) can be displayed in a window plugin. In the window plugin, the data is rendered with JavaScript libararies. This approach thus allows to take full advantage of these very powerful libraries. They provide not only a large variety of different types of graphs, but also user-interactivity. We provde a simple example for three of the major JavaScript chart libraries:
 
 * [Plotly](https://plot.ly/javascript/)
 * [C3](https://c3js.org/)    
