@@ -994,14 +994,14 @@ export default {
         repo = {name: repo, url: repository_url, description: repository_url}
       }
       this.reloadRepository(repo).then((manifest)=>{
+        repo.name = manifest.name || repo.name
+        repo.description = manifest.description || repo.description
         for(let r of this.repository_list){
           if(r.url == repo.url || r.name == repo.name){
             // remove it if already exists
             this.repository_list.splice( this.repository_list.indexOf(r), 1 )
           }
         }
-        repo.name = manifest.name || repo.name
-        repo.description = manifest.description || repo.description
         assert(repo.name && repo.url)
         this.repository_list.push(repo)
         this.repository_names = []
