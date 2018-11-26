@@ -1043,9 +1043,9 @@ export default {
             _rev: doc._rev,
             list: this.repository_list
           }).then(()=>{
-            this.showMessage(`Repository ${w} has been deleted.`)
+            this.showMessage(`Repository has been deleted.`)
           }).catch(()=>{
-            this.showMessage(`Error occured when removing repository ${w}.`)
+            this.showMessage(`Error occured when removing repository.`)
           })
         })
         .catch((err) => {
