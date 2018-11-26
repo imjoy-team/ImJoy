@@ -996,18 +996,27 @@ export default {
         }
         repo = {name: repo, url: repository_url, description: repository_url}
       }
+      assert(repo.name && repo.url)
       this.reloadRepository(repo).then((manifest)=>{
         repo.name = manifest.name || repo.name
         repo.description = manifest.description || repo.description
+        // use repo url if name exists
         for(let r of this.repository_list){
-          if(r.url == repo.url || r.name == repo.name){
-            // remove it if already exists
-            this.repository_list.splice( this.repository_list.indexOf(r), 1 )
-            this.showMessage("Repository with the same url or name already exists.")
+          if(r.name == repo.name){
+            repo.name = repo.url.replace('https://github.com/', '').replace('http://github.com/', '')
             break
           }
         }
-        assert(repo.name && repo.url)
+        //remove existing repo if same url already exists
+        for(let r of this.repository_list){
+          if(r.url == repo.url){
+            // remove it if already exists
+            this.repository_list.splice( this.repository_list.indexOf(r), 1 )
+            this.showMessage("Repository with the same url already exists.")
+            break
+          }
+        }
+
         this.repository_list.push(repo)
         this.repository_names = []
         for(let r of this.repository_list){
