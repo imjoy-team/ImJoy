@@ -989,10 +989,7 @@ export default {
           repository_url = githubImJoyManifest(repo)
         }
         else{
-          if(this.repository_names.indexOf(repo)>=0)
-            this.repository_names.splice(this.repository_names.indexOf(repo), 1)
-          this.showMessage("Failed to add repository, only github repository is supported.")
-          throw "Failed to add repository, only github repository is supported."
+          repository_url = repo
         }
         repo = {name: repo, url: repository_url, description: repository_url}
       }
