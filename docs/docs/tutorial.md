@@ -18,27 +18,29 @@ An important part of ImJoy is to provide a flexible way to interact with the use
 For more advanced purposes, you can can use define a user interface with the [**window plugin**](https://imjoy.io/docs/#/development?id=ltconfiggt-block). Such an interface is designed with web technology (HTML, JavaScript and CSS) and thus provides maximum flexibility. Further, such an interface can communicate with another plugin, e.g. a Python worker that performs the actual analysis. For more details, have a look at the dedicated tutorial below.
 
 ### Python plugin plots in window plugin
-In this tutorial, we show how data generated in a Python plugin (a damped cosine) can be displayed in a window plugin. In the window plugin, the data is rendered with JavaScript libraries. This approach thus allows to take full advantage of these very powerful libraries. They provide not only a large variety of different types of graphs, but also user-interactivity. We provde a simple example for three of the major JavaScript chart libraries:
+In this tutorial, we show how data ((a damped cosine) generated in a Python plugin can be displayed in a window plugin. In the window plugin, the data is rendered with JavaScript libraries. This approach thus allows to take full advantage of these very powerful libraries. They provide not only a large variety of different types of graphs, but also user-interactivity.
 
-* [Plotly](https://plot.ly/javascript/)
-* [C3](https://c3js.org/)    
-* [Chart.js](https://www.chartjs.org/docs/latest/)
+You can install the Python plugin either to run in the [Python plugin engine](https://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:PythonToJScharts@nativePy&w=demo-JS-charts) or with [web Python]( https://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:PythonToJScharts@webPy&w=demo-JS-charts). Note that the window plugin is installed automatically as a dependency.
 
-The tutorial consists of two plugins
-
-1. The **Python plugin** "Python to JS charts". Here you can select how many data points should be calculated and which JS library should be used for display. You can install this plugin with this [link](https://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:PythonToJScharts&tag=nativePy&w=demo-JS-charts).
-2. The **window plugin** "JScharts". Here the obtained data will be rendered as a line plot. Note that this plugin is automatically installed with the Python plugin from above. 
-
-<img src="./asserts/imjoy-tutorial-python-to-js.png" width="800px"></img>
+The two plugins perform distinct functions:
+1. The **Python plugin** "Python to JS charts". Here you can select how many data points should be calculated and which JS library should be used for display. 
+2. The **window plugin** "JScharts". Here the obtained data will be rendered as a line plot.  We provde a simple example for three of the major JavaScript chart libraries:
+    * [Plotly](https://plot.ly/javascript/)
+    * [C3](https://c3js.org/)    
+    * [Chart.js](https://www.chartjs.org/docs/latest/)
 
 The **main steps** are described below and basic data flow is illustrated by dashed errors in the image above. 
-1. User defines (1) parameters of the plot (how many data points should be calculated), some text that will be added to the plot, and which JavaScript library will be used. 
-2. Upen execution of the Python plugin, the damped cosine curve will be computed. Then a dictionary `data` containing these values, as well as other parameters describing the plot is created. This dictionary will be used with the ImJoy API function `api.createWindow` to call the window plugin. Dictionary has to contain the fields `name` to specify the window title, `type` to specify which window plugin should be called. `w` and `h` specify the size, `data` contains the data in a format specified in the window plugin. 
+1. User defines how many data points should be calculated, some text that will be displayed in the window plugin, and which JavaScript library will be used to plot the data. 
+2. Upen execution of the Python plugin, the damped cosine curve will be computed. Then a dictionary `data` containing these values, as well as the text and the name of the desired JS library is created. THe necessary content of this dictionary is specified by the window plugin. This will then be added to another dictionary `data_plot` that contains specifications for the window plugin: `type` to specify which window plugin should be called, `name` to specify the window title, `w` and `h` the specify the size. The dictionary `data_plot` will be used with the ImJoy API function `api.createWindow` to call the window plugin.
 3. In the window plugin the transfered data are available as `my.data` and are used to create the JavaScript plot and also populate the HTML text field. 
 4. The `api.createWindow` returns an identifier for the window. When plotting again, the Python plugin attemtps to plot into this window. Please note that here on the actual data are passed as an input and not the larger dictionary containing the specifications of the window. The `try ... except` statement is used to catch error that can arise when the window has been closed. 
 
+<img src="./asserts/imjoy-tutorial-python-to-js.png" width="800px"></img>
+
 ### User interface communicating with Python worker
-In this tutorial, we show how to use a **window** plugin to defined a user interface, and how this interface can interact with a **Python worker** plugin to perform calculations. You can install this plugin from this [link](http://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:GUI&w=demo-GUI). This will install the actual interface plugin (GUI) and automatically the Python plugin (GUI PyWorker) performing the calculations. The purpose of this plugin is self-explanatory, you can open the GUI by double clicking on the plugin title. Just play around. 
+In this tutorial, we show how to use a **window** plugin to defined a user interface, and how this interface can interact with a **Python worker** plugin to perform calculations. 
+
+You can install this plugin from this [link](http://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:GUI&w=demo-GUI). This will install the actual interface plugin (GUI) and automatically the Python plugin (GUI PyWorker) performing the calculations. The purpose of this plugin is self-explanatory, you can open the GUI by double clicking on the plugin title. Just play around. 
 
 <img src="./asserts/imjoy-tutorial-gui-screenshot.png" width="600px"></img>
 
