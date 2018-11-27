@@ -124,13 +124,13 @@ we refer to the dedicate description **## Plugins and tags**
        In the   example below, we use a string as above for `option1` and an array with keys and values for `option2`.
        Note how for `option2` each key and value is defined as an individual string.
 
-      ```json
-      "ui": [
+         ```json
+         "ui": [
           {"option1": "{id: 'option1', type: 'choose', options: ['cat', 'dog'], placeholder: 'cat'}"},
           {"option2": {"id": "option2",
                        "type": "number",
                        "placeholder": 3}}],
-       ```
+          ```
 
 * `version` specifies the version of the plugin.
 * `api_version` specifies the api version of ImJoy the plugin is written for.
