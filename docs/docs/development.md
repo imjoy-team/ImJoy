@@ -112,7 +112,7 @@ we refer to the dedicate description **## Plugins and tags**
     In some cases, the ui might only contain a brief description of the op. This can either be plain text, or you can also specify a           **link**    with `"ui": " <a href='https://imjoy.io' target='_blank'> ImJoy</a>"`. The `target='_blank'` will open this page in a new     tab.
 
     To define **longer forms with multiple lines**, we support additional definitions of the `ui` string.
-   
+
      - an array of strings. For example:
          ```json
          "ui": [
@@ -532,7 +532,7 @@ Url parameters can be used after `https://imjoy.io/#/app?`, using `PARAM=VALUE` 
 Following is a list of supported url parameters:
 
  * `w` workspace name, an url contains `w` as a query string (e.g. https://imjoy.io/#/app?w=test) can be used to create or switch to a new workspace.
- * `plugin` show the specified plugin in the plugin management dialog, you can use plugin name or an url for the plugin, for example: `https://imjoy.io/#/app?plugin=Image%20Window` will show up a plugin dialog with `Image Window` in the search. You can also set `plugin` to an url for sharing plugin hosted on github, please refer to `Install from url` for more details.
+ * `plugin` show the specified plugin in the plugin management dialog, you can use plugin name or an url/URI for the plugin, for example: `https://imjoy.io/#/app?plugin=Image%20Window` will show up a plugin dialog with `Image Window` in the search. If your plugin is hosted from a github repository, you can make it as a `ImJoy Plugin Repository` by adding a manifest file named `manifest.imjoy.json`, an example can be found here: https://github.com/oeway/ImJoy-project-template. By making a git repository as a `ImJoy Plugin Repository`, you can then use shorter plugin URI formated as `GITHUB_USER_NAME/REPO_NAME:PLUGIN_NAME@TAG`, for example, `plugin=oeway/ImJoy-project-template:Untitled Plugin` (without a tag in this case). Please also refer to `Install from url` for more details.
  * `tag` define a plugin tag, this can only be used with `plugin`, if the plugin have multiple tags, the user won't need to select the tag when installing the plugin.
  * `engine` define the engine url, for example: `http://imjoy.io/#/app?engine=http://127.0.0.1:8080`, notice that if you want to connect to a remote machine through http (not https) connection, you can only do it by using `http://imjoy.io` rather than `https://imjoy.io`. This restriction also exist if you use localhost with some browsers (e.g. firefox), to avoid it, you need to use `http://127.0.0.1:8080` rather than `http://localhost:8080`, because most browser will consider `127.0.0.1` is a secured connection, but not `localhost`. However, there is an exception, on Safari, using `127.0.0.1` does not work due to [this](https://bugs.webkit.org/show_bug.cgi?id=171934), if you still want to use Safari, you have to switch to `http://imjoy.io`.
  * `token` define the connection token, for example: `http://imjoy.io/#/app?token=2760239c-c0a7-4a53-a01e-d6da48b949bc`
