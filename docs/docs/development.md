@@ -112,25 +112,25 @@ we refer to the dedicate description **## Plugins and tags**
     In some cases, the ui might only contain a brief description of the op. This can either be plain text, or you can also specify a           **link**    with `"ui": " <a href='https://imjoy.io' target='_blank'> ImJoy</a>"`. The `target='_blank'` will open this page in a new     tab.
 
     To define **longer forms with multiple lines**, we support additional definitions of the `ui` string.
-
-    * an array of strings. For example:
-      ```json
-      "ui": [
+   
+     - an array of strings. For example:
+         ```json
+         "ui": [
              "option1: {id: 'option1', type: 'choose', options: ['cat', 'dog'], placeholder: 'cat'}",
              "option2: {id: 'option2', type: 'number', placeholder: 3}"
             ],
-      ```
-   * an array with keys and values. Here, you have to use `" "` for the keys and the strings. Definitions can also be mixed.
-     In the   example below, we use a string as above for `option1` and an array with keys and values for `option2`.
-     Note how for `option2` each key and value is defined as an individual string.
+          ```
+     - an array with keys and values. Here, you have to use `" "` for the keys and the strings. Definitions can also be mixed.
+       In the   example below, we use a string as above for `option1` and an array with keys and values for `option2`.
+       Note how for `option2` each key and value is defined as an individual string.
 
-   ```json
-   "ui": [
+      ```json
+      "ui": [
           {"option1": "{id: 'option1', type: 'choose', options: ['cat', 'dog'], placeholder: 'cat'}"},
           {"option2": {"id": "option2",
                        "type": "number",
                        "placeholder": 3}}],
-   ```
+       ```
 
 * `version` specifies the version of the plugin.
 * `api_version` specifies the api version of ImJoy the plugin is written for.
