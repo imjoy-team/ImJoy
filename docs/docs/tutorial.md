@@ -20,7 +20,12 @@ For more advanced purposes, you can can use define a user interface with the [**
 ### Python plugin plots in window plugin
 In this tutorial, we show how data ((a damped cosine) generated in a Python plugin can be displayed in a window plugin. In the window plugin, the data is rendered with JavaScript libraries. This approach thus allows to take full advantage of these very powerful libraries. They provide not only a large variety of different types of graphs, but also user-interactivity.
 
-You can install the Python plugin either to run in the [Python plugin engine](https://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:PythonToJScharts@nativePy&w=demo-JS-charts) or with [web Python]( https://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:PythonToJScharts@webPy&w=demo-JS-charts). Note that the window plugin is installed automatically as a dependency.
+You can install the Python plugin either to run 
+
+ * in the <a href="https://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:JS charts PyWorker&w=demo-JS-charts" target="_blank">Python plugin engine</a> 
+ * or with <a href="https://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:JS charts WebPython&w=demo-JS-charts" target="_blank">web Python</a>
+ 
+Note that the window plugin is installed automatically as a dependency.
 
 The two plugins perform distinct functions:
 1. The **Python plugin** "Python to JS charts". Here you can select how many data points should be calculated and which JS library should be used for display. 
