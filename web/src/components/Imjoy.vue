@@ -1281,7 +1281,13 @@ export default {
         }
       }
       else{
-        selected_tag = uri.split('@')[1]
+        selected_tag = uri.split('.imjoy.html@')[1]
+        if(selected_tag){
+          uri = uri.split('@'+selected_tag)[0]
+        }
+      }
+      if(!uri.endsWith('.imjoy.html')){
+        throw 'Plugin url must be ends with ".imjoy.html"'
       }
       const response = await axios.get(uri)
       if (!response || !response.data || response.data == '') {
