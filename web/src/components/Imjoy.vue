@@ -1286,7 +1286,7 @@ export default {
           uri = uri.split('@'+selected_tag)[0]
         }
       }
-      if(!uri.endsWith('.imjoy.html')){
+      if(!uri.split('?')[0].endsWith('.imjoy.html')){
         throw 'Plugin url must be ends with ".imjoy.html"'
       }
       const response = await axios.get(uri)
