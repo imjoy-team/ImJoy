@@ -26,7 +26,7 @@ git config user.email "travis@travis-ci.org"
 # UPDATE THIS!
 # cp -Rf $HOME/dist/* .
 # Copy dirs and files and that we want to update.
-cp -v ../{.gitignore,README.md} .
+cp -Rf ../docs/* ./docs/
 
 # If there are no changes to the compiled output, then exit.
 if git diff --quiet; then
