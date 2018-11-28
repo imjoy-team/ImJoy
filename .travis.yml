@@ -15,6 +15,7 @@ after_success:
   - cd ..
 deploy:
   provider: script
+  skip_cleanup: true # do not delete the built assets
   script: bash ./scripts/deploy
   on:
     branch: master
