@@ -4,9 +4,6 @@ node_js:
 cache:
   directories:
     - node_modules
-branches:
-  only:
-    - master
 notifications:
   email: false
 before_script:
