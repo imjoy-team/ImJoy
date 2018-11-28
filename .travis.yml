@@ -11,6 +11,8 @@ before_script:
   - npm prune
 script:
   - npm run build
+after_success:
+  - cd ..
 deploy:
   provider: script
   script: bash ./scripts/deploy
