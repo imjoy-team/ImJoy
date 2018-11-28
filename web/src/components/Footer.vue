@@ -9,7 +9,7 @@
         <md-tooltip>Except where otherwise noted, content on this site is licensed under a Creative Commons Attribution 4.0 International license.</md-tooltip>
          <img id="cc-by-img" src="static/img/by.svg" alt="CC BY 4.0">
       </md-button>
-      <md-button class="footer-button" to="/about">About ImJoy.io</md-button>
+      <md-button class="footer-button" @click="$router.push('/about')">About ImJoy.io</md-button>
     </div>
     <div class="md-layout md-alignment-center-center">
       <md-button class="footer-button" href="https://github.com/oeway" target="_blank">Made by Wei OUYANG with <span class="red">❤</span></md-button>

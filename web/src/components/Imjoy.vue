@@ -10,7 +10,7 @@
           <md-icon>menu</md-icon>
           <!-- <md-tooltip>show sidebar</md-tooltip> -->
         </md-button>
-        <md-button to="/" v-if="!menuVisible" class="md-medium-hide">
+        <md-button @click="$router.push('/')" v-if="!menuVisible" class="md-medium-hide">
           <div class="site-title">ImJoy.io<span class="superscript md-small-hide">alpha</span></div>
           <md-tooltip>ImJoy home</md-tooltip>
         </md-button>
@@ -98,7 +98,7 @@
       </md-speed-dial>
       <div class="md-toolbar-row">
         <div class="md-toolbar-section-start">
-          <md-button class="site-button" to="/">
+          <md-button class="site-button" @click="$router.push('/')">
             <div class="site-title">ImJoy.io<span class="superscript">alpha</span></div>
           </md-button>
         </div>

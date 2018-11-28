@@ -21,6 +21,7 @@ Describe your plugin here.
   "icon": "extension",
   "inputs": null,
   "outputs": null,
+  "env": "",
   "requirements": [],
   "dependencies": []
 }
@@ -60,6 +61,7 @@ Describe your plugin here.
   "icon": "extension",
   "inputs": null,
   "outputs": null,
+  "env": "",
   "requirements": [],
   "dependencies": []
 }
@@ -98,6 +100,7 @@ Describe your plugin here.
   "icon": "extension",
   "inputs": null,
   "outputs": null,
+  "env": "",
   "requirements": [],
   "dependencies": [],
   "defaults": {"w": 7, "h": 7}
@@ -149,8 +152,8 @@ Describe your plugin here.
   "inputs": null,
   "outputs": null,
   "flags": [],
-  "icon": null,
-  "env": null,
+  "icon": "extension",
+  "env": "",
   "requirements": [],
   "dependencies": []
 }
@@ -188,8 +191,8 @@ Describe your plugin here.
   "inputs": null,
   "outputs": null,
   "flags": [],
-  "icon": null,
-  "env": null,
+  "icon": "extension",
+  "env": "",
   "requirements": [],
   "dependencies": []
 }

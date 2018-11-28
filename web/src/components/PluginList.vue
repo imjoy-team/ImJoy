@@ -308,7 +308,6 @@ export default {
             this.uri_root = location.protocol + '//' + location.host
             if (!this.plugin_dir.startsWith('http')) {
               this.plugin_dir = this.uri_root + this.plugin_dir
-              console.log(this.plugin_dir)
             }
           } else {
             this.uri_root = ''

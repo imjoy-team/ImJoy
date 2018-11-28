@@ -1,4 +1,4 @@
-<template>
+static/static/<template>
   <div class="about">
     <md-app-toolbar class="md-primary">
       <div class="md-toolbar-row" flex>

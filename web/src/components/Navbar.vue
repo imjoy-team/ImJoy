@@ -1,7 +1,7 @@
 <template>
   <div class="md-toolbar-row">
       <div class="md-toolbar-row" flex>
-          <md-button to="/">
+          <md-button @click="$router.push('/')">
             <div class="site-title">ImJoy.io<span class="superscript">alpha</span></div>
           </md-button>
 
@@ -14,22 +14,22 @@
                 <md-icon>menu</md-icon>
               </md-button>
               <md-menu-content>
-                <md-menu-item class="md-primary md-button menu-button" v-show="$route.path != '/'" to="/">Home</md-menu-item>
-                <md-menu-item class="md-primary md-button menu-button" v-show="$route.path != '/app'" to="/app">Start ImJoy</md-menu-item>
+                <md-menu-item class="md-primary md-button menu-button" v-show="$route.path != '/'" @click="$router.push('/')">Home</md-menu-item>
+                <md-menu-item class="md-primary md-button menu-button" v-show="$route.path != '/app'" @click="$router.push('/app')">Start ImJoy</md-menu-item>
                 <md-menu-item class="md-primary md-button menu-button" href="https://github.com/oeway/ImJoy">Source</md-menu-item>
                 <md-menu-item class="md-primary md-button menu-button" href="/docs">Docs</md-menu-item>
                 <!-- <md-menu-item class="md-primary md-button menu-button" href="/static/docs/">Docs</md-menu-item> -->
                 <!-- <md-menu-item class="md-primary md-button menu-button" @click="shareOnTwitter">Share</md-menu-item> -->
-                <md-menu-item class="md-primary md-button menu-button" v-show="$route.path != '/about'" to="/about">About</md-menu-item>
+                <md-menu-item class="md-primary md-button menu-button" v-show="$route.path != '/about'" @click="$router.push('/about')">About</md-menu-item>
               </md-menu-content>
              </md-menu>
 
-            <md-button v-show="$route.path != '/'" class="md-accent" v-if="screenWidth>=600" to="/">
+            <md-button v-show="$route.path != '/'" class="md-accent" v-if="screenWidth>=600" @click="$router.push('/')">
               <md-icon>home</md-icon> Home
               <md-tooltip>Home Page</md-tooltip>
             </md-button>
             &nbsp;
-            <md-button v-show="$route.path != '/app'" class="md-accent" v-if="screenWidth>=600" to="/app">
+            <md-button v-show="$route.path != '/app'" class="md-accent" v-if="screenWidth>=600" @click="$router.push('/app')">
               <md-icon>mood</md-icon> ImJoy
               <md-tooltip>Start ImJoy App</md-tooltip>
             </md-button>
@@ -54,7 +54,7 @@
               <md-tooltip>Share ImJoy on Twitter</md-tooltip>
             </md-button> -->
             &nbsp;
-            <md-button v-show="$route.path != '/about'" class="md-accent" v-if="screenWidth>=600" to="/about">
+            <md-button v-show="$route.path != '/about'" class="md-accent" v-if="screenWidth>=600" @click="$router.push('/about')">
               <md-icon>info</md-icon> About
               <md-tooltip>About ImJoy.io</md-tooltip>
             </md-button>
