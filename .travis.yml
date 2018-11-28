@@ -1,0 +1,26 @@
+sudo: false
+language: node_js
+node_js:
+  - node
+cache:
+  directories:
+    - node_modules
+branches:
+  only:
+    - master
+notifications:
+  email: false
+before_script:
+  - npm prune
+script:
+  - npm run build
+deploy:
+  provider: script
+  script: bash ./scripts/deploy
+  on:
+    branch: master
+env:
+  global:
+  - SOURCE_BRANCH: master
+  - TARGET_BRANCH: gh-pages
+  - secure:
