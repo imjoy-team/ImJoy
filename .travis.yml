@@ -7,6 +7,7 @@ cache:
 notifications:
   email: false
 before_script:
+  - cd ./web
   - npm prune
 script:
   - npm run build
