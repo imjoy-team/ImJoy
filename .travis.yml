@@ -10,6 +10,7 @@ before_script:
   - cd ./web
   - npm prune
 script:
+  - export NODE_OPTIONS="--max-old-space-size=4096"
   - npm run build
 after_success:
   - cd ..
