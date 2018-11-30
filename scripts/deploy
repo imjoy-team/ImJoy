@@ -16,8 +16,8 @@ SHA=`git rev-parse --verify HEAD`
 
 # Decrypt the deploy key.
 openssl aes-256-cbc -K $encrypted_f45bcf07afa7_key \
-  -iv $encrypted_f45bcf07afa7_iv -in imjoy_github_deploy.enc \
-  -out imjoy_github_deploy -d
+  -iv $encrypted_f45bcf07afa7_iv -in utils/imjoy_id_rsa.enc \
+  -out utils/imjoy_github_deploy -d
 
 # Set the correct permission
 chmod 600 ./imjoy_github_deploy
