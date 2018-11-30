@@ -10,7 +10,7 @@ access to the entire Python ecosystem.
 Complex computional tasks can be implemented in plugins, which run in the **Plugin Engine**. The Python Plugin Engine
 is connected with the ImJoy Web App through websockets and communicate with a customized remote procedure calls (RPC) based on `socket.io`.
 
-<img src="./asserts/imjoy-architecture.png" width="800px"></img>
+<img src="./assets/imjoy-architecture.png" width="800px"></img>
 
 **Importantly**, ImJoy can run without the Python backend and thus without the need of any
 installation. Plugins can then only implemented in JavaScript (such as [TensoFlow.js](https://js.tensorflow.org/)).
@@ -20,17 +20,17 @@ The Plugin Engine allows to run Python plugins. You have to **install** it once 
 
 You have to **launch** the engine each time you re-start the ImJoy app and you use plugins relying on the engine. If the engine is not connected, you will get an error message in the lower part of the ImJoy interface.
 <img
-  src="./asserts/imjoy-warning-connect-engine.png" width="600px"></img>
+  src="./assets/imjoy-warning-connect-engine.png" width="600px"></img>
 
 In order for the ImJoy app to connect to the engine, it requires a connection token. When you **launch the Plugin Engine** for the first time it will show a page in the browser with the connection token (blacked out below). Alternatively, this token can also be found in the terminal window that opens once you start the engine.
 
 <img
-  src="./asserts/imjoy-connectionToken.png" width="600px"></img>
+  src="./assets/imjoy-connectionToken.png" width="600px"></img>
 
 In the ImJoy interface press the 🚀 symbol to connect it to the Plugin Engine. This will open a dialog where you can specify the token in the `Connection token` field. Please note, that the token will be saved in the browser and you will not need to enter it anymore to connect to this Plugin Engine.
 
 <img
-  src="./asserts/imjoy-install-engine.png" width="600px"></img>
+  src="./assets/imjoy-install-engine.png" width="600px"></img>
 
 ## TODO: Loading data to the workspace
 

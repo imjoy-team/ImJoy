@@ -14,7 +14,7 @@ plugins can be found in dedicated sections.
 
 ##  Two flavors of ImJoy: Web App and Plugin Engine
 
-<img src="./asserts/imjoy-webapp-engine.png" width="800px"></img>
+<img src="./assets/imjoy-webapp-engine.png" width="800px"></img>
 
 ImJoy can be used  directly from your browser (Chrome or Firefox) **without any installation**: [ImJoy web app](https://imjoy.io/#/app). Many plugins can be
 directly used, and you can get a good overview of how ImJoy looks like.
@@ -30,7 +30,7 @@ describe how to ...
 2. get your data into ImJoy,
 3. define workflows.
 
-<img src="./asserts/imjoy-interface.png" width="800px"></img>
+<img src="./assets/imjoy-interface.png" width="800px"></img>
 
 ### Plugins
 The entire functionality of ImJoy is provided by plugins. To install new plugins from the [Plugin Repository](https://github.com/oeway/ImJoy-Plugins), click the **+ PLUGINS**. This will show a window with all available plugins with a short description. A longer description can be

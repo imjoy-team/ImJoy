@@ -3,7 +3,7 @@ const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin')
 const webpack = require('webpack')
 module.exports = {
   runtimeCompiler: true,
-  outputDir: '../docs',
+  outputDir: './dist',
   devServer: {
     compress: true,
     port: 8000
