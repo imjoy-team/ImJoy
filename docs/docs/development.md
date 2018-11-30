@@ -508,31 +508,67 @@ If your plugin depends on non-standard libraries and modules, you have to provid
  * for **JavaScript** plugins, you need to create a [gist](https://gist.github.com/) or repository on GitHub named with the plugin name, and upload the plugin file together with other JavaScript files. In the plugin file, you can use `importScripts(url_to_your_js_file)` function to use this libraries. However, due to a restriction of GitHub, you can't use the url of GitHub directly, you need to copy the url of your JavaScript file, and convert it with [jsDelivr](https://www.jsdelivr.com/rawgit).
  * for **Python** plugins, you need to create a `setup.py` file to wrap the plugin as a pip module, create a [gist](https://gist.github.com/) or a GitHub repository named with the plugin name, and upload the plugin file together with your python modules. Now add the github link to `requirements` in the `<config>` block of your plugin. The GitHub link should be formated to something like: `git+https://github.com/oeway/ImJoy-Engine#egg=imjoy`, you can test with the `pip install ...` command to see if you can install your module. As an alternative recommended during development, you can also use Dropbox as explained in this [Tutorial](http://imjoy.io/docs/#/tutorial?id=distribution-and-deployment-of-codedata-stored-on-dropbox).
 
-## Distribution of your plugin
+## Deploying your plugins through your own Github repository
+You can easily build a plugin repository by adding a json file named `manifest.imjoy.json`, here is an example: [ImJoy Project Template/manifest.imjoy.json](https://github.com/oeway/ImJoy-project-template/blob/master/manifest.imjoy.json).
+An skeleton of `manifest.imjoy.json` looks like this:
+```json
+{
+ "name": "NAME OF THE REPOSITORY",
+ "description": "DESCRIBE THE REPOSITORY",
+ "version": "0.1.0",
+ "uri_root": "/imjoy-plugins",
+ "plugins": [
+   //copy and paste the <config> block of your plugin here
+ ]
+}
+```
 
-### Distributing your plugin through the ImJoy plugin repository
+1. Place all the plugin files in a folder in your Github repository, for example, a folder called [imjoy-plugins](https://github.com/oeway/ImJoy-project-template/tree/master/imjoy-plugins).
+1. Set `uri_root` in `manifest.imjoy.json` to the name/path of your plugin folder, for example `"uri_root": "/imjoy-plugins"`.
+1. For each plugin you, you can copy and paste the content in your `<config>` block to `plugins` in `manifest.imjoy.json`.
+1. For each plugin `<config>` block you added to `manifest.imjoy.json`, add a field called `"uri"`, and set the value to the actual file name of your plugin file, for example: `"uri": "untitledPlugin.imjoy.html",` if your plugin file is named "untitledPlugin.imjoy.html". You can skip this step if you name your plugin file exactly as the file name of the plugin file name.
+1. In case you place plugins into different subfolders, you can set `uri_root` to empty(`""`), and set `"uri"` to a relative path to that file, for example `"uri": "imjoy-plugins/untitledPlugin.imjoy.html",`.
+
+
+### Deploying your plugins through the ImJoy plugin repository
 The plugin repository shown on the ImJoy.IO is served with Github through the [ImJoy-Plugins repository](https://github.com/oeway/ImJoy-Plugins). In order to deploy your plugin to the plugin repository, you can fork the repository, add your plugin and then send a pull request to [ImJoy-Plugins](https://github.com/oeway/ImJoy-Plugins). Once the pull request being accepted, the user will be able to install your plugin from the plugin repository.
 
-### Distributing your plugin with url
-As an alternative to the plugin repository, you can distribute your own plugin with an url pointing to the ImJoy plugin file (extension: `*.imjoy.html`) hosted on GitHub, Gist or Dropbox etc. A user can then install the plugin from the plugin url.
+### Deploying your plugin for development
+If you only have one plugin and you just want to quickly share with others, this often happens in the early stage of the development. An alternative to make a plugin repository is to send the plugin directly with an url. In that case, the only thing you need is to get an url pointing to the ImJoy plugin file (extension: `*.imjoy.html`), therefore, the plugin file can be hosted on GitHub, Gist or Dropbox etc. A user can then install the plugin from the plugin url.
+
+1. For files on Github, you just need to copy the link to the file, example link would be:
+1. For Gist or other Git providers such as (Gitlab), you need to obtain the `raw` link of the plugin file. For example, a Gist `raw` link would looks like this: `https://gist.githubusercontent.com/oeway/aad257cd9aaab448766c6dc287cb8614/raw/909d0a86e45a9640c0e108adea5ecd7e78b81301/chartJSDemo.imjoy.html`
+
+1. A special case for Dropbox, you need to convert the sharable url: 1) replace `dl=0` to `dl=1`; 2) replace `https://www.dropgox.com/` to `https://dl.dropboxusercontent.com/`. TODO: example
+
+## Distribution of your plugin
+There are in general two ways of distributing your Imjoy plugins, sending the plugin file (`*.imjoy.html`) or with the url.
+The easiest and recommended way is by generating an url and share it directly through email or social networks. The user can then directly click the url and install it in one click.
 
 #### Generating a plugin url
-This url is composed of  the base url `http://imjoy.io/#/app?`, followed by the url parameter `plugin` set to the file url of your ImJoy plugin file. For example: `http://imjoy.io/#/app?plugin=https://github.com/oeway/ImJoy-Plugins/blob/master/repository/imageWindow.imjoy.html`.
+This url is composed of  the base url `http://imjoy.io/#/app?`, followed by the url parameter `plugin` set to the file url of your ImJoy plugin file.
+The basic format is `http://imjoy.io/#/app?plugin=PLUGIN_URI`, you will need to replace `PLUGIN_URI` to your actuall plugin URI.
 
-When **opening such an url**, the ImJoy plugin management dialog will be shown which proposes to install the specified plugin. The user has to simply confirm by clicking `Install`.
+There are two types of plugin URI:
+1. If your plugins are deployed as a `ImJoy Plugin Repository`(as described above), you can then use a short plugin URI formated as `GITHUB_USER_NAME/REPO_NAME:PLUGIN_NAME`. For example, you can use `oeway/ImJoy-project-template:Untitled Plugin` to represent a plugin hosted on https://github.com/oeway/DRFNS-Lite. You can also specify the plugin tag by adding `@TAG` after the `PLUGIN_NAME` For example: `oeway/DRFNS-Lite:DRFNS-Lite@GPU`. In case you want to specify a git commit hashtag to freeze the plugin at a certain commit, you can add `@COMMIT_HASHTAG` after the `REPO_NAME`: for example: `oeway/DRFNS-Lite@4063b24:DRFNS-Lite` where `4063b24` is the short form of the commit of [4063b24f01eab459718ba87678dd5c5db1e1eda1](https://github.com/oeway/DRFNS-Lite/tree/4063b24f01eab459718ba87678dd5c5db1e1eda1).
 
-To specify a plugin tag, you can add `@TAG` e.g. `@CPU`.
+2. Alternatively, you can always use an url to the plugin file hosted on any websites including your own project site, blog, Github, Gist or Dropbox. In that case, the url would be the URI for the plugin. Notice that, the plugin file needs to end with `.imjoy.html`. In case you want to specify the plugin tag, you can just append `@TAG` to the file url, right after `.imjoy.html`. For example: `https://raw.githubusercontent.com/oeway/DRFNS-Lite/master/DRFNS-Lite.imjoy.html@GPU`.
+
+
+Once you generated the URI, you can paste it to the `+ PLUGINS` dialog (`Install from URL`) and press `Enter`, to see the URI is understand by ImJoy. If everything works, you should be able to see a card rendered with your plugins which you can click `INSTALL`.
+
+To share with others, you just need to add the plugin URI to `http://imjoy.io/#/app?plugin=`. For example: [http://imjoy.io/#/app?plugin=https://github.com/oeway/ImJoy-Plugins/blob/master/repository/imageWindow.imjoy.html](http://imjoy.io/#/app?plugin=https://github.com/oeway/ImJoy-Plugins/blob/master/repository/imageWindow.imjoy.html). When the user click this link, a plugin installation dialog will be shown which proposes to install the specified plugin. The user has to simply confirm by clicking `Install`.
 
 #### Supported url parameters
 
-You can construct ImJoy url with customized functionality. It largely simplify the user operation when installing or using ImJoy. This is particularly useful for sharing plugins through your own project or Github repo. For example, with the `plugin` parameter in an ImJoy url, the defined plugin will be shown to the user directly.
+Moreover, you can construct ImJoy url with customized functionality. It largely simplify the user operation when installing or using ImJoy. This is particularly useful for sharing plugins through your own project or Github repo. For example, with the `plugin` parameter in an ImJoy url, the defined plugin will be shown to the user directly.
 
 Url parameters can be used after `https://imjoy.io/#/app?`, using `PARAM=VALUE` syntax. Multiple parameters can be concatenate togeter with `&`. For example we want to specify `A=99` and `B=hello`, the corresponding url would be `https://imjoy.io/#/app?A=99&B=hello`.
 
 Following is a list of supported url parameters:
 
  * `w` workspace name, an url contains `w` as a query string (e.g. https://imjoy.io/#/app?w=test) can be used to create or switch to a new workspace.
- * `plugin` show the specified plugin in the plugin management dialog, you can use plugin name or an url/URI for the plugin, for example: `https://imjoy.io/#/app?plugin=Image%20Window` will show up a plugin dialog with `Image Window` in the search. If your plugin is hosted from a github repository, you can make it as a `ImJoy Plugin Repository` by adding a manifest file named `manifest.imjoy.json`, an example can be found here: https://github.com/oeway/ImJoy-project-template. By making a git repository as a `ImJoy Plugin Repository`, you can then use shorter plugin URI formated as `GITHUB_USER_NAME/REPO_NAME:PLUGIN_NAME@TAG`, for example, `plugin=oeway/ImJoy-project-template:Untitled Plugin` (without a tag in this case). Please also refer to `Install from url` for more details.
+ * `plugin` show the specified plugin in the plugin management dialog, you can use plugin name or an url/URI for the plugin, for example: `https://imjoy.io/#/app?plugin=Image%20Window` will show up a plugin dialog with `Image Window` in the search. If your plugin is hosted from a github repository, you can make it as a `ImJoy Plugin Repository` by adding a manifest file named `manifest.imjoy.json`, an example can be found here: https://github.com/oeway/ImJoy-project-template. Please also refer to `Install from url` for more details.
  * `tag` define a plugin tag, this can only be used with `plugin`, if the plugin have multiple tags, the user won't need to select the tag when installing the plugin.
  * `engine` define the engine url, for example: `http://imjoy.io/#/app?engine=http://127.0.0.1:8080`, notice that if you want to connect to a remote machine through http (not https) connection, you can only do it by using `http://imjoy.io` rather than `https://imjoy.io`. This restriction also exist if you use localhost with some browsers (e.g. firefox), to avoid it, you need to use `http://127.0.0.1:8080` rather than `http://localhost:8080`, because most browser will consider `127.0.0.1` is a secured connection, but not `localhost`. However, there is an exception, on Safari, using `127.0.0.1` does not work due to [this](https://bugs.webkit.org/show_bug.cgi?id=171934), if you still want to use Safari, you have to switch to `http://imjoy.io`.
  * `token` define the connection token, for example: `http://imjoy.io/#/app?token=2760239c-c0a7-4a53-a01e-d6da48b949bc`
