@@ -646,14 +646,12 @@ export default {
       w: 5,
       h: 5
     }
-    this.new_workspace_name = '',
-    // this.preload_main = ['/static/tfjs/tfjs.js', 'https://rawgit.com/nicolaspanel/numjs/893016ec40e62eaaa126e1024dbe250aafb3014b/dist/numjs.min.js'],
+    this.new_workspace_name = ''
     this.workflow_joy_config = {
       expanded: true,
       name: "Workflow",
-      ui: "{id:'workflow', type:'ops'}",
-      // onupdate: this.workflowOnchange
-    },
+      ui: "{id:'workflow', type:'ops'}"
+    }
 
     window.onbeforeunload = s => modified ? "" : null;
     window.addEventListener("dragover", (e) => {
