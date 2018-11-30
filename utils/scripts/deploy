@@ -35,7 +35,7 @@ cp -Rf ../web/dist/* ./
 # Commit the "changes", i.e. the new version.
 # The delta will show diffs between new and old versions.
 git add -A .
-git commit -m "Deploy to GitHub Pages $TARGET_BRANCH branch: ${SHA}"
+git diff-index --quiet HEAD || git commit -m "Deploy to GitHub Pages $TARGET_BRANCH branch: ${SHA}"
 
 # Now that we're all set up, we can push.
 git push $SSH_REPO $TARGET_BRANCH
