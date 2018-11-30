@@ -1,21 +1,22 @@
-sudo: false
 language: node_js
 node_js:
   - node
 cache:
   directories:
     - node_modules
-branches:
-  only:
-    - master
 notifications:
   email: false
 before_script:
+  - cd ./web
   - npm prune
 script:
+  - export NODE_OPTIONS="--max-old-space-size=4096"
   - npm run build
+after_success:
+  - cd ..
 deploy:
   provider: script
+  skip_cleanup: true # do not delete the built assets
   script: bash ./scripts/deploy
   on:
     branch: master
@@ -23,4 +24,3 @@ env:
   global:
   - SOURCE_BRANCH: master
   - TARGET_BRANCH: gh-pages
-  - secure:

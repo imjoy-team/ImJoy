@@ -6,7 +6,7 @@
   "author": "Wei OUYANG <wei.ouyang@cri-paris.org>",
   "scripts": {
     "serve": "vue-cli-service serve",
-    "build": "rimraf ../docs/{css,js,static,index.html} && vue-cli-service build --no-clean",
+    "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
     "test:unit": "vue-cli-service test:unit"
   },
