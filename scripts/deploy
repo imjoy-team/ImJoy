@@ -22,15 +22,15 @@ eval "$(ssh-agent -s)"
 ssh-add ./imjoy_github_deploy
 
 # Clone the existing gh-pages for this repo into gh-pages/
-# Create a new empty branch if gh-pages doesn't exist yet (should only happen on first deploy).
 git clone $REPO gh-pages
 cd gh-pages
-git checkout $TARGET_BRANCH || git checkout --orphan $TARGET_BRANCH
+# Create a new empty branch if gh-pages doesn't exist yet (should only happen on first deploy).
+git checkout $TARGET_BRANCH || { git checkout --orphan $TARGET_BRANCH; git rm -rf .; }
 git config user.name "Travis CI"
 git config user.email "travis@travis-ci.org"
 
 # Copy dirs and files and that we want to update.
-cp -Rf ../docs/* ./docs/
+cp -Rf ../docs/* ./
 
 # If there are no changes to the compiled output, then exit.
 if git diff --quiet; then
