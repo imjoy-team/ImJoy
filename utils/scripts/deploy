@@ -2,7 +2,7 @@
 # Commits all changed files and pushes to GitHub target branch.
 set -e # Exit with nonzero exit code if anything fails
 
-cd "$(dirname "$0")/.."
+cd "$(dirname "$0")/../.."
 
 # Save some useful information
 REPO=`git config remote.origin.url`
