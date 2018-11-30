@@ -29,9 +29,6 @@ git checkout $TARGET_BRANCH || git checkout --orphan $TARGET_BRANCH
 git config user.name "Travis CI"
 git config user.email "travis@travis-ci.org"
 
-# Copy data we're interested in to gh-pages directory
-# UPDATE THIS!
-# cp -Rf $HOME/dist/* .
 # Copy dirs and files and that we want to update.
 cp -Rf ../docs/* ./docs/
 
