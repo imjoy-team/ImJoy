@@ -40,51 +40,59 @@ var walkSync = function(dir, filelist) {
   return filelist;
 };
 
-var files = walkSync(repository_dir)
 
-var plugin_configs = [];
 
-// Loop through all the files in the temp directory
-files.forEach(function(file, index) {
-  var plugin_path = path.join(repository_dir, file);
-  if (plugin_path.endsWith(".imjoy.html")){
-      // console.log("reading '%s'...", plugin_path);
-      var code = fs.readFileSync(plugin_path, "utf8");
-      var config = parsePlugin(code);
-      config.uri = file;
-      plugin_configs.push(config);
-      console.log('Adding plugin ====>', config.name);
-  }
-
-});
-
-var collection_configs = [];
-// Loop through all the files in the temp directory
-fs.readdir(collections_dir, function(err, files) {
-  if (err) {
-    console.error("Could not list the directory.", err);
-    process.exit(1);
-  }
+function get_plugins(files){
+  var plugin_configs = [];
+  // Loop through all the files in the temp directory
   files.forEach(function(file, index) {
-    var collection_path = path.join(collections_dir, file);
-    if (collection_path.endsWith(".json")){
+    var plugin_path = path.join(repository_dir, file);
+    if (plugin_path.endsWith(".imjoy.html")){
         // console.log("reading '%s'...", plugin_path);
-        var coll = fs.readFileSync(collection_path, "utf8");
-        coll = JSON.parse(coll);
-        coll.plugins.forEach(function(p, i) {
-          var dep = p.split(":");
-          var ps = plugin_configs.filter(function(plugin) { return plugin.name == dep[0] })
-          if(ps.length != 1){
-            throw "Plugin does not exits in the repository: '" + dep[0] + "' plugin from " + collection_path
-          }
-        })
-        collection_configs.push(coll);
-        console.log('Adding collection ====>', coll.name);
+        var code = fs.readFileSync(plugin_path, "utf8");
+        var config = parsePlugin(code);
+        config.uri = file;
+        plugin_configs.push(config);
+        console.log('Adding plugin ====>', config.name);
     }
-
   });
+  return plugin_configs
+}
 
-  if(plugin_configs.length>0){
+function get_collections(collections_dir){
+  return new Promise((resolve, reject)=>{
+    var collection_configs = [];
+    // Loop through all the files in the temp directory
+    fs.readdir(collections_dir, function(err, files) {
+      if (err) {
+        console.error("Could not list the directory.", err);
+        reject(err)
+        return
+      }
+      files.forEach(function(file, index) {
+        var collection_path = path.join(collections_dir, file);
+        if (collection_path.endsWith(".json")){
+            // console.log("reading '%s'...", plugin_path);
+            var coll = fs.readFileSync(collection_path, "utf8");
+            coll = JSON.parse(coll);
+            coll.plugins.forEach(function(p, i) {
+              var dep = p.split(":");
+              var ps = plugin_configs.filter(function(plugin) { return plugin.name == dep[0] })
+              if(ps.length != 1){
+                throw "Plugin does not exits in the repository: '" + dep[0] + "' plugin from " + collection_path
+              }
+            })
+            collection_configs.push(coll);
+            console.log('Adding collection ====>', coll.name);
+        }
+      });
+      resolve(collection_configs)
+    });
+  })
+}
+
+
+function write_manifest(plugin_configs, collection_configs){
     console.log("Writing %s plugins into '%s'", plugin_configs.length, manifest_path);
     var repo_manifest =  {}
     if (fs.existsSync(manifest_path)) {
@@ -98,16 +106,21 @@ fs.readdir(collections_dir, function(err, files) {
     repo_manifest.description = repo_manifest.description || default_repo_description
     repo_manifest.uri_root = repo_manifest.uri_root || default_uri_root
     repo_manifest.version = repo_version
-    repo_manifest.plugins = plugin_configs
-    repo_manifest.collections = collection_configs
+    repo_manifest.plugins = plugin_configs || []
+    repo_manifest.collections = collection_configs || []
     var stream = fs.createWriteStream(manifest_path);
     stream.once('open', function(fd) {
       stream.write(JSON.stringify(repo_manifest,null,' '));
       stream.end();
     });
     console.log("manifest file updated!");
-  }
-  else{
-    console.error('no plugin found.');
-  }
-});
+}
+
+var files = walkSync(repository_dir)
+var plugin_configs = get_plugins(files)
+
+get_collections(collections_dir).then((collection_configs)=>{
+  write_manifest(plugin_configs, collection_configs)
+}).catch(()=>{
+  write_manifest(plugin_configs)
+})
