@@ -40,7 +40,7 @@ The **main steps** are described below and basic data flow is illustrated by das
 3. In the window plugin the transfered data are available as `my.data` and are used to create the JavaScript plot and also populate the HTML text field.
 4. The `api.createWindow` returns an identifier for the window. When plotting again, the Python plugin attemtps to plot into this window. Please note that here on the actual data are passed as an input and not the larger dictionary containing the specifications of the window. For the plugin running in the Python engine, we added a  `try ... except` statement to catch error arises when the window has been closed.
 
-<img src="./asserts/imjoy-tutorial-python-to-js.png" width="800px"></img>
+<img src="./assets/imjoy-tutorial-python-to-js.png" width="800px"></img>
 
 ### User interface communicating with Python worker
 In this tutorial, we show how to use a **window** plugin to defined a user interface, and how this interface can interact with a **Python worker** plugin to perform calculations.
@@ -49,7 +49,7 @@ You can install this plugin from this
 <a href="http://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:GUI w3&w=demo-GUI" target="_blank">**link**</a>.
 This will install the actual interface plugin (GUI w3.css) and automatically the Python plugin (GUI PyWorker) performing the calculations. The purpose of this plugin is self-explanatory, you can open the GUI by double clicking on the plugin title. Just play around.
 
-<img src="./asserts/imjoy-tutorial-gui-screenshot.png" width="600px"></img>
+<img src="./assets/imjoy-tutorial-gui-screenshot.png" width="600px"></img>
 
 This tutorial illustrates a number of different important concepts, which we describe briefly below.
 
@@ -94,7 +94,7 @@ a button to showing the plot. The main steps are the following (and detailed mor
 2. In this function, user input from the window plugin is retrieved, and the Python plugin is called.
 2. Calculations are performed, results stored in Python plugin and shown in main interface.
 
-<img src="./asserts/imjoy-tutorial-gui-code.png" width="800px"></img>
+<img src="./assets/imjoy-tutorial-gui-code.png" width="800px"></img>
 
 **Determine behavior of HTML elements**
 
