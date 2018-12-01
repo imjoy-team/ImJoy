@@ -19,7 +19,7 @@
             <md-icon>picture_in_picture</md-icon>
           </md-button>
           <md-menu-content>
-            <md-menu-item @click="selectWindow" :disabled="selected_window == w" v-for="w in windows" :key="w.id">
+            <md-menu-item @click="selectWindow(w)" :disabled="selected_window == w" v-for="w in windows" :key="w.id">
               <span>{{w.name.slice(0, 30)+'(#'+w.i+')'}}</span><md-icon>forward</md-icon>
             </md-menu-item>
           </md-menu-content>
@@ -303,8 +303,7 @@
     </md-app-drawer>
     <md-app-content class="whiteboard-content">
       <md-progress-bar md-mode="determinate" :md-value="progress"></md-progress-bar>
-      <whiteboard v-if="window_mode=='grid'" :windows="windows" :loaders="registered&&registered.loaders" @add="windowAdded" @close="windowClosed" @select="windowSelected"></whiteboard>
-      <window v-if="window_mode=='single'" v-for="w in windows" :key="w.id" v-show="selected_window==w" @close="windows.splice(windows.indexOf(w), 1); windowClosed(w); selected_window=windows[0]" :w="w"></window>
+      <whiteboard :mode="window_mode" :selected_window="selected_window" :windows="windows" :loaders="registered&&registered.loaders" @add="windowAdded" @close="windowClosed" @select="windowSelected"></whiteboard>
     </md-app-content>
   </md-app>
 
@@ -2071,12 +2070,13 @@ export default {
     addWindow(w) {
       w.id = w.id || w.name + randId()
       w.loaders = this.getDataLoaders(w.data)
+      w.refresh = this.$forceUpdate
       this.generateGridPosition(w)
       this.windows.push(w)
       this.window_ids[w.id] = w
       this.store.event_bus.$emit('add_window', w)
       if(this.window_mode == 'single'){
-        this.selected_window = w
+        this.selectWindow(w)
       }
       return w.id
     },
