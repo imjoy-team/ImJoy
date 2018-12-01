@@ -17,6 +17,7 @@ import PluginList from '@/components/PluginList'
 import PluginEditor from '@/components/PluginEditor'
 import FileItem from '@/components/FileItem'
 import FileDialog from '@/components/FileDialog'
+import Window from '@/components/Window'
 import store from './store.js'
 import App from './App'
 import VueGridLayout from 'vue-grid-layout'
@@ -40,6 +41,7 @@ Vue.component('plugin-list', PluginList)
 Vue.component('plugin-editor', PluginEditor)
 Vue.component('file-item', FileItem)
 Vue.component('file-dialog', FileDialog)
+Vue.component('window', Window)
 Vue.component('grid-layout', VueGridLayout.GridLayout)
 Vue.component('grid-item', VueGridLayout.GridItem)
 Vue.component('monaco-editor', MonacoEditor)
