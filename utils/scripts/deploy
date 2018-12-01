@@ -30,7 +30,10 @@ git config user.name "Travis CI"
 git config user.email "travis@travis-ci.org"
 
 # Copy dirs and files and that we want to update.
-cp -Rf ../web/dist .
+cp -Rf ../web/dist/* ./
+
+# Create .nojekyll to bypass Github jekyll
+touch .nojekyll
 
 # Commit the "changes", i.e. the new version.
 # The delta will show diffs between new and old versions.
