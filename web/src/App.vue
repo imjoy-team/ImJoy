@@ -136,5 +136,7 @@ html, body
 
 .md-dialog-container{
   max-width: 100% !important;
+  overflow: auto;
+  -webkit-transform: translateZ(0);
 }
 </style>
