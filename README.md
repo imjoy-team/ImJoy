@@ -1,7 +1,6 @@
 # ImJoy
+[![Build Status](https://travis-ci.com/oeway/ImJoy.svg?branch=master)](https://travis-ci.com/oeway/ImJoy)
 ## Image processing with joy :)
-[![Build Status](https://travis-ci.org/oeway/ImJoy.svg?branch=master)](https://travis-ci.org/oeway/ImJoy)
-
 
 ImJoy is a modern image processing framework aims to bridge the web and the Python ecosystem with plugins.
 
