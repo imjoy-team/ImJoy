@@ -3,9 +3,10 @@
   <div @mousemove="overlayMousemove" class="overlay" @click="show_overlay=false" v-if="show_overlay"></div>
   <grid-layout :layout="windows" :col-num="col_num" :is-mirrored="false" :auto-size="true" :row-height="row_height" :col-width="column_width" :is-responsive="true" :is-draggable="true" :is-resizable="true" :vertical-compact="true" :margin="[3, 3]" :use-css-transforms="true">
     <grid-item v-for="(w, wi) in windows" drag-allow-from=".drag-handle" drag-ignore-from=".no-drag" :x="w.x" :y="w.y" :w="w.w" :h="w.h" :i="w.i" @resize="viewChanging(w)" @move="viewChanging(w)" @resized="show_overlay=false;w.resize&&w.resize();focusWindow(w)" @moved="show_overlay=false;w.move&&w.move();focusWindow(w)" :key="w.id">
-      <window :w="w" @duplicate="duplicate" @select="selectWindow" @close="close" @fullscreen="fullScreen" @normalsize="normalSize"></window>
+      <window :w="w" :withDragHandle="true" @duplicate="duplicate" @select="selectWindow" @close="close" @fullscreen="fullScreen" @normalsize="normalSize"></window>
     </grid-item>
   </grid-layout>
+
   <div class="md-layout md-gutter md-alignment-center-center">
     <md-empty-state v-if="!windows || windows.length==0" md-icon="static/img/anna-palm-icon-circle-animation.svg" md-label="IMJOY.IO" md-description="">
     </md-empty-state>
@@ -121,6 +122,7 @@ export default {
       const ai = this.active_windows.indexOf(w)
       if(ai>=0){
         this.active_windows[ai].selected = false
+        this.active_windows[ai].refresh()
         this.active_windows.splice(ai, 1)
         this.$emit('select', this.active_windows, null)
       }
@@ -174,11 +176,13 @@ export default {
     },
     selectWindow(w, evt) {
       w.selected = true
+      w.refresh && w.refresh()
       if (this.active_windows.length <= 0 || this.active_windows[this.active_windows.length - 1] !== w) {
         //unselect previous windows if no shift key pressed
         if (!evt.shiftKey) {
           for (let i = 0; i < this.active_windows.length; i++) {
             this.active_windows[i].selected = false
+            this.active_windows[i].refresh()
           }
         }
         if (evt.shiftKey && this.active_windows.length > 0) {
@@ -192,11 +196,12 @@ export default {
         for (let i = 0; i < this.active_windows.length; i++) {
           if (this.active_windows[i] !== w)
             this.active_windows[i].selected = false
+            this.active_windows[i].refresh()
         }
         this.active_windows = [w]
       }
       this.$forceUpdate()
-      w.refresh()
+
     },
     viewChanging(w){
       this.show_overlay = true

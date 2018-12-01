@@ -1,16 +1,16 @@
 <template>
 <md-card>
-  <md-card-expand>
-    <md-card-actions md-alignment="space-between" :class="w.selected?'window-selected drag-handle':'window-header drag-handle'">
+  <md-card-expand  @click.native.stop="selectWindow(w, $event)" :class="{'drag-handle': withDragHandle}">
+    <md-card-actions md-alignment="space-between" :class="w.selected?'window-selected':'window-header'">
       <md-card-expand-trigger v-if="w.panel">
         <md-button class="md-icon-button">
           <md-icon>keyboard_arrow_down</md-icon>
         </md-button>
       </md-card-expand-trigger>
-      <md-button class="md-icon-button md-accent" @click="close(wi)" >
+      <md-button class="md-icon-button md-accent" @click="close(w)" >
         <md-icon>close</md-icon>
       </md-button>
-      <div class="window-title noselect" @dblclick="w._h && w._w?normalSize(w):fullScreen(w)" @click.stop="selectWindow(w, $event)">{{w.name.slice(0, 30)+'(#'+w.i+')'}}</div>
+      <div class="window-title noselect" @dblclick="w._h && w._w?normalSize(w):fullScreen(w)">{{w.name.slice(0, 30)+'(#'+w.i+')'}}</div>
       <div>
         <md-menu md-size="big" md-direction="bottom-end">
           <md-button class="md-icon-button" md-menu-trigger>
@@ -29,7 +29,7 @@
               <span>Duplicate</span>
               <md-icon>filter</md-icon>
             </md-menu-item>
-            <!-- <md-menu-item v-if="w.type!='main'" @click="close(wi)">
+            <!-- <md-menu-item v-if="w.type!='main'" @click="close(w)">
               <span>Close</span>
               <md-icon>close</md-icon>
             </md-menu-item> -->
@@ -141,6 +141,12 @@ export default {
       type: Object,
       default: function() {
         return null
+      }
+    },
+    withDragHandle:{
+      type: Boolean,
+      default: function() {
+        return false
       }
     },
   },
