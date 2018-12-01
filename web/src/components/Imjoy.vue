@@ -632,7 +632,12 @@ export default {
   },
   watch: {
     menuVisible() {
-
+      for (var i = this.windows.length; i--;) {
+        try {
+          this.windows[i].resize()
+        } catch (e) {
+        }
+      }
     }
   },
   created() {
@@ -2110,6 +2115,9 @@ export default {
     },
     windowClosed(ws) {
       delete this.window_ids[ws.id]
+      if(this.window_mode == 'single'){
+        this.selected_window = this.windows[0]
+      }
     },
     windowAdded(ws) {
       this.window_ids[ws.id] = ws
