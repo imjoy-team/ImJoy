@@ -38,6 +38,11 @@ export default {
       //   this.store.event_bus.$emit('message', event)
       // }
     })
+
+    // function preventBehavior(e) {
+    // e.preventDefault();
+    // };
+    // document.addEventListener("touchmove", preventBehavior, {passive: false});
   },
   methods: {
     show(info, duration) {
@@ -136,5 +141,7 @@ html, body
 
 .md-dialog-container{
   max-width: 100% !important;
+  overflow: auto;
+  -webkit-transform: translateZ(0);
 }
 </style>

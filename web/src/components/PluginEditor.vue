@@ -70,13 +70,25 @@ export default {
   data() {
     return {
       codeValue: '',
+      editor: null
     }
   },
   created(){
     this.store = this.$root.$data.store
   },
   watch: {
-
+    // window: {
+    //     handler: function(newValue){
+    //       newValue.resize = ()=>{
+    //         setTimeout(()=>{
+    //           this.$data.editor.layout();
+    //         }, 200)
+    //         setTimeout(()=>{
+    //           this.$data.editor.layout();
+    //         }, 500)
+    //       }
+    //     }
+    // }
   },
   mounted() {
     this.codeValue = this.value

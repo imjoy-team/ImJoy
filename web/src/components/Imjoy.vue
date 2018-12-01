@@ -14,6 +14,16 @@
           <div class="site-title">ImJoy.io<span class="superscript md-small-hide">alpha</span></div>
           <md-tooltip>ImJoy home</md-tooltip>
         </md-button>
+        <md-menu v-if="window_mode=='single' && windows.length > 0">
+          <md-button class="md-icon-button md-primary" md-menu-trigger>
+            <md-icon>picture_in_picture</md-icon>
+          </md-button>
+          <md-menu-content>
+            <md-menu-item @click="selectWindow(w)" :disabled="selected_window == w" v-for="w in windows" :key="w.id">
+              <span>{{w.name.slice(0, 30)+'(#'+w.i+')'}}</span><md-icon>forward</md-icon>
+            </md-menu-item>
+          </md-menu-content>
+        </md-menu>
         <md-button v-if="status_text&&status_text.length"class="status-text md-small-hide" @click="showAlert(status_text)" :class="status_text.includes('rror')?'error-message':''">
           {{status_text.slice(0,80)+(status_text.length>80?'...':'')}}
         </md-button>
@@ -293,7 +303,7 @@
     </md-app-drawer>
     <md-app-content class="whiteboard-content">
       <md-progress-bar md-mode="determinate" :md-value="progress"></md-progress-bar>
-      <whiteboard :windows="windows" :loaders="registered&&registered.loaders" @add="windowAdded" @close="windowClosed" @select="windowSelected"></whiteboard>
+      <whiteboard :mode="window_mode" :selected_window="selected_window" :windows="windows" :loaders="registered&&registered.loaders" @add="windowAdded" @close="windowClosed" @select="windowSelected"></whiteboard>
     </md-app-content>
   </md-app>
 
@@ -555,6 +565,8 @@ export default {
       // file_selector_expand: false,
       // file_tree_selection: null,
       // file_tree: null,
+      selected_window: null,
+      window_mode: 'grid',
       file_select: null,
       folder_select: null,
       selected_file: null,
@@ -615,15 +627,24 @@ export default {
       snackbar_info: '',
       snackbar_duration: 3000,
       show_snackbar: false,
+      screenWidth: 1024
     }
   },
   watch: {
     menuVisible() {
-
+      for (var i = this.windows.length; i--;) {
+        try {
+          this.windows[i].resize()
+        } catch (e) {
+        }
+      }
     }
   },
   created() {
     this.store = this.$root.$data.store
+    this.store.event_bus.$on('resize', this.updateSize)
+    this.updateSize({width: window.innerWidth})
+
     this.window_ids = {}
     this.plugin_names = null
     this.db = null
@@ -958,6 +979,15 @@ export default {
     this.disconnectEngine()
   },
   methods: {
+    updateSize(e){
+      this.screenWidth = e.width
+      if(this.screenWidth > 800){
+        this.window_mode = 'grid'
+      }
+      else{
+        this.window_mode = 'single'
+      }
+    },
     getRepository(repo_name){
       for(let r of this.repository_list){
         if(r.name == repo_name){
@@ -2045,11 +2075,26 @@ export default {
     addWindow(w) {
       w.id = w.id || w.name + randId()
       w.loaders = this.getDataLoaders(w.data)
+      w.refresh = this.$forceUpdate
       this.generateGridPosition(w)
       this.windows.push(w)
       this.window_ids[w.id] = w
       this.store.event_bus.$emit('add_window', w)
+      if(this.window_mode == 'single'){
+        this.selectWindow(w)
+      }
       return w.id
+    },
+    selectWindow(w){
+      for (let i = 0; i < this.active_windows.length; i++) {
+        this.active_windows[i].selected = false
+        this.active_windows[i].refresh()
+      }
+      this.selected_window = w
+      w.selected = true
+      console.log('activate window: ', [w])
+      this.active_windows = [w]
+      w.refresh()
     },
     closePluginDialog(ok) {
       this.showPluginDialog = false
@@ -2070,6 +2115,9 @@ export default {
     },
     windowClosed(ws) {
       delete this.window_ids[ws.id]
+      if(this.window_mode == 'single'){
+        this.selected_window = this.windows[0]
+      }
     },
     windowAdded(ws) {
       this.window_ids[ws.id] = ws
