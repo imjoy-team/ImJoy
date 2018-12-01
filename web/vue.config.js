@@ -12,16 +12,11 @@ module.exports = {
   },
   configureWebpack: {
     plugins: [
-      // new CopyWebpackPlugin([{
-      //   from: path.join(__dirname, "public/docs"),
-      //   to: path.join(__dirname, "dist/docs"),
-      //   toType: "dir",
-      //   ignore: [ ".DS_Store" ]
-      // },{
-      //   from: path.join(__dirname, "public/.nojekyll"),
-      //   to: path.join(__dirname, "dist/.nojekyll"),
-      //   toType: "file"
-      // }]),
+      new CopyWebpackPlugin([{
+        from: path.join(__dirname, "public/docs/index.html"),
+        to: path.join(__dirname, "dist/docs/index.html"),
+        toType: "file"
+      }]),
       new MonacoWebpackPlugin(),
       new webpack.DefinePlugin({
         //bypass process check, https://github.com/Microsoft/monaco-editor-webpack-plugin/issues/28
