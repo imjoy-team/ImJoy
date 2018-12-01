@@ -530,7 +530,6 @@ import {
   url_regex,
   githubImJoyManifest,
   githubUrlRaw,
-  pathJoin,
   assert
 } from '../utils.js'
 import {
@@ -1004,7 +1003,7 @@ export default {
                 const p = manifest.plugins[i]
                 p.uri = p.uri || p.name + '.imjoy.html'
                 if (!p.uri.startsWith(manifest.uri_root) && !p.uri.startsWith('http')) {
-                  p.uri = pathJoin(manifest.uri_root, p.uri)
+                  p.uri = manifest.uri_root + '/' + p.uri
                 }
                 p._id = p._id || p.name.replace(/ /g, '_')
             }

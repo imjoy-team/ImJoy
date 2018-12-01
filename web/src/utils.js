@@ -8,7 +8,6 @@ export function assert(condition, message) {
     }
 }
 
-
 export function pathJoin(/* path segments */) {
   // Split the inputs into a list of path commands.
   var parts = [];
@@ -60,7 +59,7 @@ export function debounce(func, wait, immediate) {
 		timeout = setTimeout(later, wait);
 		if (callNow) func.apply(context, args);
 	};
-};
+}
 
 export function animalGenerator() {
     const randAnimal = arrAnimals[Math.floor(Math.random() * arrAnimals.length)].toLowerCase();
@@ -88,7 +87,7 @@ export function _clone(aObject) {
    bObject[k] = (typeof v === "object") ? _clone(v) : v;
  }
  return bObject;
-};
+}
 
 export const Filters = {}
 
@@ -313,7 +312,7 @@ export function githubUrlRaw(url) {
 	var regStr = url.replace(re, "");
 
 	return "https://raw.githubusercontent.com/" + githubUser + "/" + githubRepo + "/" + regStr;
-};
+}
 
 export function githubImJoyManifest(url) {
 	var ghObj = githubUrlToObject(url);
@@ -321,7 +320,7 @@ export function githubImJoyManifest(url) {
 	var githubRepo = ghObj.repo;
 	var githubBranch = ghObj.branch;
 	return "https://raw.githubusercontent.com/" + githubUser + "/" + githubRepo + "/" + githubBranch + "/manifest.imjoy.json";
-};
+}
 
 export const hot_lut = [
   [10, 0, 0],
