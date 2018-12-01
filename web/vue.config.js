@@ -2,7 +2,7 @@
 const path = require('path')
 const webpack = require('webpack')
 const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin')
-const CopyWebpackPlugin = require('copy-Webpack-plugin')
+const CopyWebpackPlugin = require('copy-webpack-plugin')
 module.exports = {
   runtimeCompiler: true,
   outputDir: './dist',
