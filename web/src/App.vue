@@ -91,6 +91,10 @@ html, body
   }
 }
 
+.md-app-content{
+  padding: 0px;
+}
+
 .md-menu-content{
   z-index: 9999;
 }
