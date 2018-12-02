@@ -32,6 +32,10 @@
 
         </div>
         <p>
+        <md-button  class="md-icon-button md-list-action md-accent" v-if="removePlugin && plugin.installed" @click="_plugin2_remove=plugin;showRemoveConfirmation=true;">
+          <md-icon>delete_forever</md-icon>
+          <md-tooltip>Delete {{plugin.name}}</md-tooltip>
+        </md-button>
         <md-menu v-if="installPlugin && !plugin.installed && plugin.tags && plugin.tags.length>0">
           <md-button class="md-icon-button md-list-action md-primary" md-menu-trigger>
             <md-icon>cloud_download</md-icon>
@@ -50,10 +54,6 @@
         <md-button  class="md-icon-button md-list-action md-primary" v-if="plugin.installed && installPlugin" @click="install(plugin)">
           <md-icon>update</md-icon>
           <md-tooltip>Update {{plugin.name}}</md-tooltip>
-        </md-button>
-        <md-button  class="md-icon-button md-list-action md-accent" v-if="removePlugin && plugin.installed" @click="_plugin2_remove=plugin;showRemoveConfirmation=true;">
-          <md-icon>delete_forever</md-icon>
-          <md-tooltip>Delete {{plugin.name}}</md-tooltip>
         </md-button>
         </p>
         <md-menu>
