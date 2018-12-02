@@ -3202,12 +3202,12 @@ div#textnode {
   }
 }
 
-.md-app{
+.md-app {
   height: 100vh;
 }
 
-.md-app-content{
-  height: 100vh;
+.md-app-content {
+  height: calc( 100vh - 48px );
 }
 
 </style>
