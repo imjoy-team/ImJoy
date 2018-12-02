@@ -3202,4 +3202,12 @@ div#textnode {
   }
 }
 
+.md-app{
+  height: 100vh;
+}
+
+.md-app-content{
+  height: 100vh;
+}
+
 </style>
