@@ -3,8 +3,8 @@
 Here we describe the basic concepts of ImJoy and how to get started. At the end of this document, we provide a brief overview of key features corcerning developers of plugins or the ImJoy core.
 
 For more details for how to use ImJoy, we refer to the section **User Manual**, where
-we provide more detailed information about different aspects of ImJoy. For developers,
-we provide more information about how to develop plugins in the section **Development**, and we provide a detailed description of the entire **ImJoy API**.
+we provide more detailed information about different aspects of ImJoy mentioned below.
+For developers, we provide more information about how to develop plugins in the section **Development**, and we provide a detailed description of the entire **ImJoy API**.
 
 ## Glossary
 
@@ -21,6 +21,13 @@ we provide more information about how to develop plugins in the section **Develo
 -   **Workspace** - Isolated work environments with a distinct set of plugins.
     Allows to perform independent calculations.
 
+## The ImJoy interface
+
+This interface provides all functionality needed to process data.
+
+<img src="./assets/imjoy-interface.png" width="800px"></img>
+
+
 ## ImJoy App and Plugin Engine
 
 ImJoy can be used  directly from your browser (Chrome or Firefox) **without any installation** [ImJoy web app](https://imjoy.io/#/app) or as a **standalone** [desktop app](<add link>). Many plugins can be used directly, and you can already get a feeling
@@ -31,11 +38,6 @@ plugins are highlighted with a 🚀. If you use the webApp then you have to inst
 the plugin engine. Click the 🚀 button located on the upper-right corner. In the displayed window, you will find instructions on how to set up the engine. When you use
 the desktopApp, the plugin is alread included!
 
-## The ImJoy interface
-
-This interface provides all functionality needed to process data.
-
-<img src="./assets/imjoy-interface.png" width="800px"></img>
 
 ### Plugins
 
@@ -69,19 +71,20 @@ Such workflows can be saved and then shared with other ImJoy users (**To be done
 ## ImJoy for plugin developers
 
 As mentioned above, Imjoy consists of **two main components**
+<img src="./assets/imjoy-architecture.png" width="800px"></img>
 
 1.  The **ImJoy app**. The app can run alone, and plugins can be developed in
     JavaScript or in Python by using [pyodide](https://github.com/iodide-project/pyodide).
+
 2.  Complex computional tasks can be implemented in plugins, which run in the
     **Plugin Engine**. The latest release of the plugin engine is available
-    together with installation  instructions on [GitHub](https://github.com/oeway/ImJoy-Engine/releases). The plugin engine will try to upgrade itself from Github when it starts. 
+    together with installation  instructions on [GitHub](https://github.com/oeway/ImJoy-Engine/releases). The plugin engine will try to upgrade itself from Github when it starts.
     Packages are managed by `conda` and `pip` which provides thusaccess to the
     entire Python ecosystem.
 
 The Python Plugin Engine is connected with the ImJoy Web App through websockets
 and communicate with a customized remote procedure calls (RPC) based on `socket.io`.
 
-<img src="./assets/imjoy-architecture.png" width="800px"></img>
 
 ## ImJoy for core developers
 
