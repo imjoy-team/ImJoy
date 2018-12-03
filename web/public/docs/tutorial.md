@@ -12,35 +12,47 @@ An important part of ImJoy is to provide a flexible way to interact with the use
 **Provide results**
 
 1. The ImJoy API provides several functions to show results, e.g. indicate [progress](https://imjoy.io/docs/#/api?id=api-showprogress-), update the [ImJoy status](https://imjoy.io/docs/#/api?id=api-showstatus-),
-2. The ImJoy API also provides a function to [create a window](https://imjoy.io/docs/#/api?id=api-createwindow-). In this window, powerful JavaScript visualization librariers can used. For more details, have a look at our window plugin demo **ADD LINK**.
+2. The ImJoy API also provides a function to [create a window](https://imjoy.io/docs/#/api?id=api-createwindow-). Different window types exist, you can either directly
+show an results image (type `imjoy/image`). Or create your own window, where you can use JavaScript visualization librariers to render your results. We provide
+examples for the different approaches below.
 
 **Dedicated user interface**
 For more advanced purposes, you can can use define a user interface with the [**window plugin**](https://imjoy.io/docs/#/development?id=ltconfiggt-block). Such an interface is designed with web technology (HTML, JavaScript and CSS) and thus provides maximum flexibility. Further, such an interface can communicate with another plugin, e.g. a Python worker that performs the actual analysis. For more details, have a look at the dedicated tutorial below.
 
-### Python plugin plots in window plugin
-In this tutorial, we show how data ((a damped cosine) generated in a Python plugin can be displayed in a window plugin. In the window plugin, the data is rendered with JavaScript libraries. This approach thus allows to take full advantage of these very powerful libraries. They provide not only a large variety of different types of graphs, but also user-interactivity.
+### Python plugin displays a chart in a window plugin
+In this tutorial, we show how data generated in a **Python plugin** can be displayed in a window plugin. Ihe plugin interface you can slightly change the data that is generated (you can change the number of data-points) and how the graph is actually displayed: either it is rendered with one of three JavaScript libraries, or the plot is
+generated with Matplotlib and saved as png and then shown.
 
 You can install the Python plugin either to run
 
- * in the <a href="https://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:JS charts PyWorker&w=demo-JS-charts" target="_blank">**Python plugin engine**</a>
- * or with <a href="https://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:JS charts WebPython&w=demo-JS-charts" target="_blank">**web Python**</a>
+ * in the <a href="https://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:Charts PyWorker&w=demo-charts" target="_blank">**Python plugin engine**</a>
+ * or with <a href="https://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:Charts WebPython&w=demo-charts" target="_blank">**web Python**</a>. Please note that
+ here you can only use JS libraries.
 
-Note that the window plugin is installed automatically as a dependency.
 
-The two plugins perform distinct functions:
-1. The **Python plugin** "Python to JS charts". Here you can select how many data points should be calculated and which JS library should be used for display.
-2. The **window plugin** "JScharts". Here the obtained data will be rendered as a line plot.  We provde a simple example for three of the major JavaScript chart libraries:
-    * [Plotly](https://plot.ly/javascript/)
-    * [C3](https://c3js.org/)
-    * [Chart.js](https://www.chartjs.org/docs/latest/)
+#### Plotting with a JavaScript library
+If you select in the Python plugin one of the options `Plotly`, `C3`, or `Charts.js` the Python plugin will send the data to the **window plugin** "Charts JS window".
+This plugin was automatically installed, and provided simple example for three
+of the major JavaScript chart libraries:
+
+* [Plotly](https://plot.ly/javascript/)
+* [C3](https://c3js.org/)
+* [Chart.js](https://www.chartjs.org/docs/latest/)
+
+The Python plugin will send to this plugin the calculated data, specifications of the window size, and which library to use the obtained data will be rendered as a line plot.
 
 The **main steps** are described below and basic data flow is illustrated by dashed errors in the image above.
+
+<img src="./assets/imjoy-tutorial-python-to-js.png" width="800px"></img>
+
 1. User defines how many data points should be calculated, some text that will be displayed in the window plugin, and which JavaScript library will be used to plot the data.
 2. Upen execution of the Python plugin, the damped cosine curve will be computed. Then a dictionary `data` containing these values, as well as the text and the name of the desired JS library is created. THe necessary content of this dictionary is specified by the window plugin. This will then be added to another dictionary `data_plot` that contains specifications for the window plugin: `type` to specify which window plugin should be called, `name` to specify the window title, `w` and `h` the specify the size. The dictionary `data_plot` will be used with the ImJoy API function `api.createWindow` to call the window plugin.
 3. In the window plugin the transfered data are available as `my.data` and are used to create the JavaScript plot and also populate the HTML text field.
 4. The `api.createWindow` returns an identifier for the window. When plotting again, the Python plugin attemtps to plot into this window. Please note that here on the actual data are passed as an input and not the larger dictionary containing the specifications of the window. For the plugin running in the Python engine, we added a  `try ... except` statement to catch error arises when the window has been closed.
 
-<img src="./assets/imjoy-tutorial-python-to-js.png" width="800px"></img>
+#### Opening a chart saved as png in a window
+Rather then sending the data, you can also generate the plot directly in the Python
+plugin,
 
 ### User interface communicating with Python worker
 In this tutorial, we show how to use a **window** plugin to defined a user interface, and how this interface can interact with a **Python worker** plugin to perform calculations.
