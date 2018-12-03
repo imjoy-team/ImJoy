@@ -51,8 +51,25 @@ The **main steps** are described below and basic data flow is illustrated by das
 4. The `api.createWindow` returns an identifier for the window. When plotting again, the Python plugin attemtps to plot into this window. Please note that here on the actual data are passed as an input and not the larger dictionary containing the specifications of the window. For the plugin running in the Python engine, we added a  `try ... except` statement to catch error arises when the window has been closed.
 
 #### Opening a chart saved as png in a window
-Rather then sending the data, you can also generate the plot directly in the Python
-plugin,
+Rather then sending the data, you can directly show an image in a window plugin.
+Before getting to the actual demo, we would like to provide two important clarifications
+concerning the supported file-types and how the file-system is seen by window plugins.
+
+ImJoy plugins communicate witht the provided api functions. These functions support only **limited data types**. You can pass most of the primitive types such as number, string, and dictionaries containing those types. However, the api functions don’t support  other objects, such as an images. If you want toto pass these objects, you need to encode them to supported types, such as a `base64` string that we will use below.
+
+You may then wonder why you just send save the file locally, and send this file path to the window plugin, which will read the file from the disk. Here it is important to note that the browser (where ImJoy is running) can not directly access the file system (for security reasons). ImJoy, provides a solution to this problem with function `api.getFileUrl()`, which converts a provided file path to an url. This url can be passed to a dedicated window, which fetches and displays the encoded data.
+
+In pratice, this can be done with a few line of code. You essentially need to save
+your plot, and convert it to base64, and send this to the provided window type `imjoy/image` with the api function `api.createWindow`. This window will then use the function
+`api.getFileUrl()` to decode the image and display it.
+
+``` Python
+with open(name_plot, 'rb') as f:
+    data = f.read()
+    result = base64.b64encode(data).decode('ascii')
+    imgurl = 'data:image/png;base64,' + result
+    api.createWindow('type':'imjoy/image','w':12, 'h':15,data = {"src": imgurl})
+```
 
 ### User interface communicating with Python worker
 In this tutorial, we show how to use a **window** plugin to defined a user interface, and how this interface can interact with a **Python worker** plugin to perform calculations.
@@ -96,6 +113,14 @@ all options. This framework can be imported in the plugin requirements
    "requirements": ["https://www.w3schools.com/w3css/4/w3.css",
                     "https://www.w3schools.com/lib/w3-theme-indigo.css",
                     "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"],
+    ```
+     The provided default font-size is rather large to ensure readability on web sites.
+     For the purpose of a user-interface it might actually be too large. You can overwrite the default values, by modifying the `css` block in plugin file. Note that the [`!important`](https://css-tricks.com/when-using-important-is-the-right-choice/) is necessary to achieve this.
+     ``` css
+     <style lang="css">
+      /* Overwrite css defaults*/
+        body {font-size: 13px !important;}
+      </style
     ```
 
 #### Workflow in the plugin
