@@ -149,6 +149,12 @@ export default {
         return false
       }
     },
+    loaders: {
+      type: Object,
+      default: function() {
+        return null
+      }
+    }
   },
   data() {
     return {

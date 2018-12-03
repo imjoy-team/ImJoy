@@ -1928,17 +1928,25 @@ export default {
       }
       this.registered.internal_inputs = {
         'Image': { schema: schema({type: ['image/jpeg', 'image/png', 'image/gif'], size: Number})},
+        'Code Editor': { schema: schema.fromJSON({properties: {"name": {"type": "string", "pattern":".*\\.imjoy.html|\\.html|\\.txt|\\.xml", "required": true }}, type: 'object'})},
       }
       this.registered.loaders['Image'] = (file)=>{
-        var fr = new FileReader();
-        fr.onload =  () => {
+        const reader = new FileReader();
+        reader.onload =  () => {
           this.createWindow({
             name: file.name,
             type: 'imjoy/image',
-            data: {src: fr.result}
+            data: {src: reader.result, _file: file}
           })
         }
-        fr.readAsDataURL(file);
+        reader.readAsDataURL(file);
+      }
+      this.registered.loaders['Code Editor'] = (file)=>{
+        const reader = new FileReader();
+        reader.onload = ()=>{
+            this.newPlugin(reader.result)
+        }
+        reader.readAsText(file);
       }
     },
     reloadDB(){
@@ -2176,13 +2184,17 @@ export default {
       return loaders
     },
     loadFiles() {
-      if(this.selected_files.length == 1 && this.selected_files[0].name.endsWith('.imjoy.html')){
-        const reader = new FileReader();
-        reader.onload = ()=>{
-            this.newPlugin(reader.result)
+      if(this.selected_files.length == 1){
+        const file = this.selected_files[0]
+        const loaders = this.getDataLoaders(file)
+        const keys = Object.keys(loaders)
+        if(keys.length == 1){
+          try {
+            return this.registered.loaders[loaders[keys[0]]](file)
+          } catch (e) {
+            console.error(`Failed to load with the matched loader ${loaders[0]}`, e)
+          }
         }
-        reader.readAsText(this.selected_files[0]);
-        return
       }
       for (let f = 0; f < this.selected_files.length; f++) {
         const file = this.selected_files[f]
