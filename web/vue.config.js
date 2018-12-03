@@ -6,6 +6,7 @@ const CopyWebpackPlugin = require('copy-webpack-plugin')
 module.exports = {
   runtimeCompiler: true,
   outputDir: './dist',
+  assetsDir: 'static',
   devServer: {
     compress: true,
     port: 8000
@@ -17,7 +18,7 @@ module.exports = {
         to: path.join(__dirname, "dist/docs/index.html"),
         toType: "file"
       }]),
-      new MonacoWebpackPlugin(),
+      new MonacoWebpackPlugin({output: 'static/vs'}),
       new webpack.DefinePlugin({
         //bypass process check, https://github.com/Microsoft/monaco-editor-webpack-plugin/issues/28
         //TODO: remove this when the bug is fixed

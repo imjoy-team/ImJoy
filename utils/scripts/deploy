@@ -29,6 +29,9 @@ git checkout $TARGET_BRANCH || { git checkout --orphan $TARGET_BRANCH; git rm -r
 git config user.name "Travis CI"
 git config user.email "travis@travis-ci.org"
 
+# Remove all existing files
+rm -rf ./*
+
 # Copy dirs and files and that we want to update.
 cp -Rf ../web/dist/* ./
 
