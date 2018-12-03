@@ -2926,52 +2926,59 @@ export default {
         throw `Window (id=${wid}) not found`
       }
     },
-    async createWindow(wconfig, _plugin) {
-      wconfig.config = wconfig.config || {}
-      wconfig.data = wconfig.data || null
-      wconfig.click2load = wconfig.click2load || false
-      wconfig.panel = wconfig.panel || null
-      if (!WINDOW_SCHEMA(wconfig)) {
-        const error = WINDOW_SCHEMA.errors(wconfig)
-        console.error("Error occured during creating window " + wconfig.name, error)
-        throw error
-      }
-      // console.log('window config', wconfig)
-      if (wconfig.type && wconfig.type.startsWith('imjoy')) {
-        // console.log('creating imjoy window', wconfig)
-        wconfig.id = 'imjoy_'+randId()
-        return this.addWindow(wconfig)
-      } else {
-        const window_config = this.registered.windows[wconfig.type]
-        // console.log(window_config)
-        if (!window_config) {
-          console.error('no plugin registered for window type: ', wconfig.type)
-          throw 'no plugin registered for window type: ', wconfig.type
+    createWindow(wconfig, _plugin) {
+      return new Promise((resolve, reject) => {
+        wconfig.config = wconfig.config || {}
+        wconfig.data = wconfig.data || null
+        wconfig.click2load = wconfig.click2load || false
+        wconfig.panel = wconfig.panel || null
+        if (!WINDOW_SCHEMA(wconfig)) {
+          const error = WINDOW_SCHEMA.errors(wconfig)
+          console.error("Error occured during creating window " + wconfig.name, error)
+          throw error
         }
-        // console.log(window_config)
-        const pconfig = wconfig //_clone(window_config)
-        //generate a new window id
-        pconfig.mode = window_config.mode
-        pconfig.id = window_config.id + '_' + randId()//window_config.name.trim().replace(/ /g, '_') + '_' + randId()
-        // console.log('creating window: ', pconfig)
-        if (pconfig.mode != 'window') {
-          throw 'Window plugin must be with mode "window"'
-        }
-        // this is a unique id for the iframe to attach
-        pconfig.iframe_container = 'plugin_window_' + pconfig.id + randId()
-        // console.log('changing id...')
-        pconfig.iframe_window = null
-        pconfig.plugin = window_config
-        pconfig.context = this.pluing_context
-        if (!pconfig.click2load) {
-          this.showPluginWindow(pconfig)
-          await this.renderWindow(pconfig)
+        // console.log('window config', wconfig)
+        if (wconfig.type && wconfig.type.startsWith('imjoy')) {
+          // console.log('creating imjoy window', wconfig)
+          wconfig.id = 'imjoy_'+randId()
+          resolve(this.addWindow(wconfig))
         } else {
-          pconfig.renderWindow = this.renderWindow
-          this.showPluginWindow(pconfig)
+          const window_config = this.registered.windows[wconfig.type]
+          // console.log(window_config)
+          if (!window_config) {
+            console.error('no plugin registered for window type: ', wconfig.type)
+            throw 'no plugin registered for window type: ', wconfig.type
+          }
+          // console.log(window_config)
+          const pconfig = wconfig //_clone(window_config)
+          //generate a new window id
+          pconfig.mode = window_config.mode
+          pconfig.id = window_config.id + '_' + randId()//window_config.name.trim().replace(/ /g, '_') + '_' + randId()
+          // console.log('creating window: ', pconfig)
+          if (pconfig.mode != 'window') {
+            throw 'Window plugin must be with mode "window"'
+          }
+          // this is a unique id for the iframe to attach
+          pconfig.iframe_container = 'plugin_window_' + pconfig.id + randId()
+          // console.log('changing id...')
+          pconfig.iframe_window = null
+          pconfig.plugin = window_config
+          pconfig.context = this.pluing_context
+          if (!pconfig.click2load) {
+            this.showPluginWindow(pconfig)
+            // make sure the iframe container is ready
+            this.$nextTick(() => {
+              this.renderWindow(pconfig).then(()=>{
+                resolve(pconfig.id)
+              })
+        		});
+          } else {
+            pconfig.renderWindow = this.renderWindow
+            this.showPluginWindow(pconfig)
+            resolve(pconfig.id)
+          }
         }
-        return pconfig.id
-      }
+      })
     },
     showDialog(config, _plugin) {
       return new Promise((resolve, reject) => {
