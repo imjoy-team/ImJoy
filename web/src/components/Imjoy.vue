@@ -2303,7 +2303,7 @@ export default {
       const w = this.active_windows[this.active_windows.length - 1] || {}
       const mw = this.plugin2joy(w) || {}
       mw.target = mw.target || {}
-      mw.target._op = '__op__'
+      mw.target._op = op.name
       mw.target._source_op = null
       // mw.target._transfer = true
       mw.target._workflow_id = mw.target._workflow_id || "op_"+op.name.trim().replace(/ /g, '_')+randId()
