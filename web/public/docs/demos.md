@@ -1,5 +1,5 @@
-# Tutorials
-Here we provide several tutorial illustrating important concepts of ImJoy. You can inspect the code of the provided plugins by clicking on the symbol left of the plugin name and selecting `Edit`.
+# Demos
+Here we provide several demos illustrating important concepts of ImJoy. You can inspect the code of the provided plugins by clicking on the symbol left of the plugin name and selecting `Edit`.
 
 ## User interaction
 An important part of ImJoy is to provide a flexible way to interact with the user, to either specify input information or provide results.
@@ -17,10 +17,10 @@ show an results image (type `imjoy/image`). Or create your own window, where you
 examples for the different approaches below.
 
 **Dedicated user interface**
-For more advanced purposes, you can can use define a user interface with the [**window plugin**](https://imjoy.io/docs/#/development?id=ltconfiggt-block). Such an interface is designed with web technology (HTML, JavaScript and CSS) and thus provides maximum flexibility. Further, such an interface can communicate with another plugin, e.g. a Python worker that performs the actual analysis. For more details, have a look at the dedicated tutorial below.
+For more advanced purposes, you can can use define a user interface with the [**window plugin**](https://imjoy.io/docs/#/development?id=ltconfiggt-block). Such an interface is designed with web technology (HTML, JavaScript and CSS) and thus provides maximum flexibility. Further, such an interface can communicate with another plugin, e.g. a Python worker that performs the actual analysis. For more details, have a look at the dedicated demo below.
 
 ### Python plugin displays a chart in a window plugin
-In this tutorial, we show how data generated in a **Python plugin** can be displayed in a window plugin. Ihe plugin interface you can slightly change the data that is generated (you can change the number of data-points) and how the graph is actually displayed: either it is rendered with one of three JavaScript libraries, or the plot is
+In this demo, we show how data generated in a **Python plugin** can be displayed in a window plugin. Ihe plugin interface you can slightly change the data that is generated (you can change the number of data-points) and how the graph is actually displayed: either it is rendered with one of three JavaScript libraries, or the plot is
 generated with Matplotlib and saved as png and then shown.
 
 You can install the Python plugin either to run
@@ -43,7 +43,7 @@ The Python plugin will send to this plugin the calculated data, specifications o
 
 The **main steps** are described below and basic data flow is illustrated by dashed errors in the image above.
 
-<img src="./assets/imjoy-tutorial-python-to-js.png" width="800px"></img>
+<img src="./assets/imjoy-demo-python-to-js.png" width="800px"></img>
 
 1. User defines how many data points should be calculated, some text that will be displayed in the window plugin, and which JavaScript library will be used to plot the data.
 2. Upen execution of the Python plugin, the damped cosine curve will be computed. Then a dictionary `data` containing these values, as well as the text and the name of the desired JS library is created. THe necessary content of this dictionary is specified by the window plugin. This will then be added to another dictionary `data_plot` that contains specifications for the window plugin: `type` to specify which window plugin should be called, `name` to specify the window title, `w` and `h` the specify the size. The dictionary `data_plot` will be used with the ImJoy API function `api.createWindow` to call the window plugin.
@@ -72,15 +72,15 @@ with open(name_plot, 'rb') as f:
 ```
 
 ### User interface communicating with Python worker
-In this tutorial, we show how to use a **window** plugin to defined a user interface, and how this interface can interact with a **Python worker** plugin to perform calculations.
+In this demo, we show how to use a **window** plugin to defined a user interface, and how this interface can interact with a **Python worker** plugin to perform calculations.
 
 You can install this plugin from this
 <a href="http://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:GUI w3&w=demo-GUI" target="_blank">**link**</a>.
 This will install the actual interface plugin (GUI w3.css) and automatically the Python plugin (GUI PyWorker) performing the calculations. The purpose of this plugin is self-explanatory, you can open the GUI by double clicking on the plugin title. Just play around.
 
-<img src="./assets/imjoy-tutorial-gui-screenshot.png" width="600px"></img>
+<img src="./assets/imjoy-demo-gui-screenshot.png" width="600px"></img>
 
-This tutorial illustrates a number of different important concepts, which we describe briefly below.
+This demo illustrates a number of different important concepts, which we describe briefly below.
 
 1. How to get started in coding an ImJoy user-interface with HTML and JavaScript.
 2. How to communicate between the user interface and the Python worker.
@@ -116,12 +116,13 @@ all options. This framework can be imported in the plugin requirements
     ```
      The provided default font-size is rather large to ensure readability on web sites.
      For the purpose of a user-interface it might actually be too large. You can overwrite the default values, by modifying the `css` block in plugin file. Note that the [`!important`](https://css-tricks.com/when-using-important-is-the-right-choice/) is necessary to achieve this.
-     ``` css
+
+     ```
      <style lang="css">
-      /* Overwrite css defaults*/
+        /* Overwrite css defaults*/
         body {font-size: 13px !important;}
-      </style
-    ```
+     </style
+     ```
 
 #### Workflow in the plugin
 The image below shows some code snippets to illustrate the workflow from clicking
@@ -131,7 +132,7 @@ a button to showing the plot. The main steps are the following (and detailed mor
 2. In this function, user input from the window plugin is retrieved, and the Python plugin is called.
 2. Calculations are performed, results stored in Python plugin and shown in main interface.
 
-<img src="./assets/imjoy-tutorial-gui-code.png" width="800px"></img>
+<img src="./assets/imjoy-demo-gui-code.png" width="800px"></img>
 
 **Determine behavior of HTML elements**
 

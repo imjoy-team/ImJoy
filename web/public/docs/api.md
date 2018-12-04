@@ -7,16 +7,32 @@ To make the interaction more efficient and concurrently, we chose a modern progr
 ## Asynchronous programming
 
 All ImJoy API functions are asynchronous. This means when an `ImJoy API` function
-is called, ImJoy will not block the execution, instead, it will immediately return an object called [`Promise`(JS)](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) or [`Future`(Python)](https://docs.python.org/3/library/asyncio-future.html). You can decide to wait for the actual result or set a callback function to retrieve the result.
-
-For example, if you popup a dialog to ask for user input, in many programinig languages (synchronous programing), the code execution will be blocked until the user closes the dialog. However, an asynchronous program will return the `promise` object even if the user haven't close the dialog and continue processing.
+is called, ImJoy will not block the execution, instead, it will immediately return an object called [`Promise`(JS)](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) or [`Future`(Python)](https://docs.python.org/3/library/asyncio-future.html). You can decide to wait for the actual result or set a callback function to retrieve the result. For example, if you popup a dialog to ask for user input, in many programinig languages (synchronous programing), the code execution will be blocked until the user closes the dialog. However, an asynchronous program will return the `promise` object even if the user haven't close the dialog and continue processing.
 
 Since every API call is asynchronous and non-blocking, a given plugin can easily call multiple other plugins to perform tasks simultaneously without using thread-like techniques.
 
 ImJoy suports two asynchronous programming styles to access these asynchronous functions
-for both Python and JavaScript: `callback` style and `async/await` style.
+for both Python and JavaScript: `async/await` and `callback` style. A few important
+considerations
+
+* `async/await` is recommended for JavaScript and Python 3 (expect webPython, which doesn't support it yet).
+* `callback` style can be used for Javascript, Python 2 and Python 3.
+*  **Note** that you **cannot** use both style at the same time.
+* While you can use `try catch` or `try except` syntax to capture error with `async/await` style, you cannot use them to capture error if you use `callback` style.
+
+In the following list of API functions, we provided examples in `async` style. For Python 2, you can easily convert to callback style accordingly.
+
+For more information about Asynchronous programming, we refer to a number of
+excellent ressources:
+
+* [Introduction to Promise in JS](https://developers.google.com/web/fundamentals/primers/promises)
+* [Async functions for JS](https://developers.google.com/web/fundamentals/primers/async-functions)
+* [Asynchronous I/O module for Python 3+](https://docs.python.org/3/library/asyncio.html).
+
 
 ### `async/await` style
+For Javascript and Python 3+, `async/await` style is natively supported and recommended.
+
 
 Declare your function with the `async` keyword. Add `await` before the asynchronous function to wait for the result. This essentially allows synchronous style programming without the need to set callbacks. For example:
 
@@ -52,15 +68,11 @@ class ImJoyPlugin():
  ```
 
 Notice that you can **only** use `wait` when you add `async` before the
-definition of your function.
+definition of your function. Don't forget to `import asyncio` if you use `async/await` with Python 3.
 
-Don't forget to `import asyncio` if you use `async/await` with Python 3.
-
-For Javascript and Python 3+, `async/await` style is natively supported and recommended.
-
-However, for Python 2, `asyncio` is not supported, therefore you need to use another style called `callback` style.
 
 ### `callback` style
+However, for Python 2 or webPython, `asyncio` is not supported, therefore you need to use `callback` style.
 
 Call the asynchronous function and set its callback with `.then(callback_func)`.
 For Javascrit plugins, a native Javascrit `Promise` will be returned ([More about Promise.](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)). For Python plugins, it will return a simplified Python implement of promise.
@@ -104,20 +116,6 @@ class ImJoyPlugin():
         print(result)
 ```
 
-`callback` style can be used for Javascript, Python 2 and Python 3.
-
-In the following list of API functions, we provided examples in `async` style. For Python 2, you can easily convert to callback style accordingly.
-
-While you can use `try catch` or `try except` syntax to capture error with `async/await` style, you cannot use them to capture error if you use `callback` style.
-
-Notice also you **cannot** use both style at the same time.
-
-For more information about Asynchronous programming, we refer to a number of
-excellent ressources:
-
-* [Introduction to Promise in JS](https://developers.google.com/web/fundamentals/primers/promises)
-* [Async functions for JS](https://developers.google.com/web/fundamentals/primers/async-functions)
-* [Asynchronous I/O module for Python 3+](https://docs.python.org/3/library/asyncio.html).
 
 ## Input arguments
 When calling the API functions, most functions take an object (Javascript) or dictionaries/named arguments (Python) as its first argument.
@@ -134,10 +132,31 @@ await api.XXXXX(option1=3, option2='hi')
 ```
 
 ### API functions
+For each api function we provide a brief code snippet illustrating how this
+function can be used. Below, you will find links **Try it yourself >>**. These will
+open a full example in ImJoy, where see the function in action. The examples are
+in JavaScript, but the api functions are called in similar fashion in Python.
+
+### `api.alert(...)`
+Shows an alert dialog with a message.
+
+``` javascript
+api.alert('hello world')
+```
+[**Try yourself >>**](https://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:alert&w=examples)
+
+### `api.call(...)`
+Call a function defined in another plugin by specifying the plugin name, the function name and the arguments. You need to make sure the argument number match the actual function defined in the plugin. For instance, to call a function called `funcX` defined in the plugin named `PluginX` with the argument `1`, you can use
+
+``` javascript
+await api.call("PluginX", "funcX", 1)
+```
+[**Try yourself >>**](https://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:call&w=examples)
 
 ### `api.export(...)`
+Export the plugin class or an object/dict as `Plugin API`, this call is mendatory for every ImJoy plugin (typically as the last line of the plugin script). This then allows
+to call plugins with the `api.run` or `api.call` function.
 
-Export the plugin class or an object/dict as `Plugin API`, this call is mendatory for every ImJoy plugin (typically as the last line of the plugin script).
 ```javascript
 api.export(new ImJoyPlugin())
 ```
@@ -150,13 +169,87 @@ Every member of the `ImJoyPlugin` instance will be exported as `Plugin API`, whi
 
 Notice that, only functions and variables with primitive types can be exported (number, string, boolean). And if a variable or function has a name start with `_`, it means that's an internel variable or function, will not be exported.
 
-### `api.alert(...)`
-shows an alert dialog with a message, example: `api.alert('hello world')`
+### `api.register(...)`
+Register a new operator (**op**) to perform a specific task. An op can have its own `ui` which defined with the same rule as the `ui` field in `<config>` -- `ui` can be defined as a single (long) string, an array of strings, or an array of objects for JavaScript (a list of dict for Python). See the `development` page for the examples of different `ui` definition.
+
+```javascript
+api.register({
+    name: "LUT",
+    ui: [{
+        "apply LUT": {
+            id: 'lut',
+            type: 'choose',
+            options: ['hot', 'rainbow'],
+            placeholder: 'hot'
+        }
+    }]
+})
+```
+[**Try yourself >>**](https://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:register&w=examples)
+
+
+```python
+api.register(name = "LUT", ui = [{
+  "apply LUT": {
+    "id": "lut",
+    "type": "choose",
+    "options": ["hot", "rainbow"],
+    "placeholder": "hot"
+  }
+}])
+```
+
+By default, all ops of a plugin will call its `run` function defined in the plugin.
+You can use `my.config.type` in the `run` function to differentiate which op was called.
+
+Alternatively, you can define another `Plugin API` function which will be used
+when the op is called with the `run` field when calling `api.register`. For example, you can add  `"run": this.hello` in a Javascript plugin or `"run": self.hello` in a Python plugin if `hello` is a member function of the plugin class.
+
+[**Try yourself >>**](https://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:register&w=examples)  Compare how the ops for favorite number and animal are imlemented.
+
+**Note:** the function must be a member of the plugin class or being exported (with `api.export`) as a `Plugin API` function. This is because a arbitrary function transfered by ImJoy will be treated as `callback` function, thus only allowed to run once.
+
+If you want to run a function whenever any option is changed, you can pass a `update` function. Similar to `run`, you need to pass a function from the member of the plugin class. Here is an example defining `run` and `update` in Python:
+
+```python
+class ImJoyPlugin():
+  def apply_lut(self, my):
+      ...
+  def lut_updated(self, my):
+      ...
+  def setup(self):
+      ...
+      api.register(name="LUT",
+                   ui="apply LUT {id:'lut', type:'choose', options:['hot', 'rainbow'], placeholder: 'hot'}",
+                   run=self.apply_lut,
+                   update=self.lut_updated)
+      ...
+```
+
+If you want to change your interface dynamically, you can run `api.register`
+multiple times to overwrite the previous version.
+
+`api.register` can also be used to overwrite the default ui string of the plugin
+defined in `<config>`, just set the plugin name as the op name (or without setting a name).
+
 
 ### `api.run(...)`
-Run another plugin by specifying its name, e.g. `await api.run("Python Demo Plugin")` or `await api.run("Python Demo Plugin", my)`
+Run another plugin by specifying its name.
+
+``` python
+await api.run("Python Demo Plugin")
+```
+[**Try yourself >>**](https://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:run&w=examples)
+
+You can also pass [`my`](https://imjoy.io/docs/#/development?id=plugin-during-runtime)
+to this plugin to transfer data.
+
+``` python
+await api.run("Python Demo Plugin", my)
+```
 
 You can also run multiple plugins concurrently (Python example):
+
 ```python
 p1 = api.run("name of plugin 1")
 p2 = api.run("name of plugin 2")
@@ -187,70 +280,9 @@ result1 = await api.run("name of plugin 1")
 result2 = await api.run("name of plugin 2")
 ```
 
-### `api.call(...)`
-Call a function defined in another plugin by specifying the plugin name, the function name and the arguments. E.g. `await api.call("PluginX", "funcX", 1)` for calling a function called `funcX` defined in the plugin named `PluginX`, the argument `1` will be passed to `funcX`. You need to make sure the argument number match the actual function defined in the plugin.
-
-### `api.register(...)`
-Register a new operator (**op**) to perform a specific task. An op can have its own `ui` which defined with the same rule as the `ui` field in `<config>` -- `ui` can be defined as a single (long) string, an array of strings, or an array of objects for JavaScript (a list of dict for Python). See the `development` page for the examples of different `ui` definition.
-
-For Javascript:
-```javascript
-api.register({
-    name: "LUT",
-    ui: [{
-        "apply LUT": {
-            id: 'lut',
-            type: 'choose',
-            options: ['hot', 'rainbow'],
-            placeholder: 'hot'
-        }
-    }]
-})
-```
-
-For Python:
-```python
-api.register(name = "LUT", ui = [{
-  "apply LUT": {
-    "id": "lut",
-    "type": "choose",
-    "options": ["hot", "rainbow"],
-    "placeholder": "hot"
-  }
-}])
-```
-
-By default, all ops of a plugin will call its `run` function defined in the plugin.
-You can use `my._op` in the `run` function to differentiate which op was called.
-
-Alternatively, you can define another `Plugin API` function which will be used
-when the op is called with the `run` field when calling `api.register`. For example, you can add  `"run": this.hello` in a Javascript plugin or `"run": self.hello` in a Python plugin if `hello` is a member function of the plugin class.  **Note:** the function must be a member of the plugin class or being exported (with `api.export`) as a `Plugin API` function. This is because a arbitrary function transfered by ImJoy will be treated as `callback` function, thus only allowed to run once.
-
-If you want to run a function whenever any option is changed, you can pass a `update` function. Similar to `run`, you need to pass a function from the member of the plugin class. Here is an example defining `run` and `update` in Python:
-
-```python
-class ImJoyPlugin():
-  def apply_lut(self, my):
-      ...
-  def lut_updated(self, my):
-      ...
-  def setup(self):
-      ...
-      api.register(name="LUT",
-                   ui="apply LUT {id:'lut', type:'choose', options:['hot', 'rainbow'], placeholder: 'hot'}",
-                   run=self.apply_lut,
-                   update=self.lut_updated)
-      ...
-```
-
-If you want to change your interface dynamically, you can run `api.register`
-multiple times to overwrite the previous version.
-
-`api.register` can also be used to overwrite the default ui string of the plugin
-defined in `<config>`, just set the plugin name as the op name (or without setting a name).
-
 ### `api.createWindow(...)`
-create a new window and add it to the workspace.
+Creates a new window and adds it to the workspace.
+
 `async/await` style for Javascript and Python 3+
 
 ```javascript
@@ -322,8 +354,13 @@ const result = await api.showDialog({
    "ui": "Hey, please select a value for sigma: {id:'sigma', type:'choose', options:['1', '3'], placeholder: '1'}.",
 })
 ```
+
 ### `api.showProgress(...)`
-Updates the progress bar on the Imjoy GUI, example: `api.showProgress(85)`
+Updates the progress bar on the Imjoy GUI.
+
+```
+api.showProgress(85)
+```
 
 ### `api.showStatus(...)`
 Updates the status text on the Imjoy GUI, example: `api.showStatus('processing...')`

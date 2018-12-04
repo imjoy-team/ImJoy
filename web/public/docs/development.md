@@ -440,7 +440,7 @@ You can control the run-time behavior of a Python plugin process with the `flags
 * **Plugin Engine**: running in the background to execute Python code from different Python plugins.
 * **Python plugin**: plugin containing Python code. Some plugins might have **`tags`** to further specify details of how they are exectuted.
 * **Python process**: specific Python plugin running on the Plugin engine. Processes can be seen on the Task Manager.
-* **Workspace**: collection of installed ImJoy plugins. For plugins with `tags`, the user choses the appropriate tag. Each Python plugin within a workspace has its own process. Each workspace has a unique name.   
+* **Workspace**: collection of installed ImJoy plugins. For plugins with `tags`, the user choses the appropriate tag. Each Python plugin within a workspace has its own process. Each workspace has a unique name.
 * **ImJoy instance** is a workspace running in one ImJoy interface.
 
 <img src="./assets/imjoy-python-process.png" width="600px"></img>
@@ -540,6 +540,47 @@ If you only have one plugin and you just want to quickly share with others, this
 1. For Gist or other Git providers such as (Gitlab), you need to obtain the `raw` link of the plugin file. For example, a Gist `raw` link would looks like this: `https://gist.githubusercontent.com/oeway/aad257cd9aaab448766c6dc287cb8614/raw/909d0a86e45a9640c0e108adea5ecd7e78b81301/chartJSDemo.imjoy.html`
 
 1. A special case for Dropbox, you need to convert the sharable url: 1) replace `dl=0` to `dl=1`; 2) replace `https://www.dropgox.com/` to `https://dl.dropboxusercontent.com/`. TODO: example
+
+
+#### Example: distribute via Dropbox
+The ImJoy plugin file file (.imjoy.html) is hosted with a secret or public **gist** (see above). The **code** `testcode.zip` is stored as a zip file on Dropbox and
+unavailable with the link `DROPBOXLINK/testcode.zip`. This allows to change
+the code/data by replacing the zip file (see Notes below).
+
+You can then place the following code-fragment in the `setup()` function of
+your plugin. This fragment performs the following steps
+
+1. Performs an [http request](http://docs.python-requests.org). Please note the **dl=1** option in this request. By default this value is set to 0.
+2. Uses the returned request object to generate the zip file locally, unpacks it, and finally deletes it.
+3. Add the local path to the system path.
+
+```python
+import sys
+import os
+import requests
+import zipfile
+
+url = 'https://DROPBOXLINK/testcode.zip?dl=1'
+r = requests.get(url, allow_redirects=True)
+
+# download the zip file
+name_zip = os.path.join('.','testcode.zip')
+open(name_zip, 'wb').write(r.content)
+
+# extract to the current folder (i.e. workspace)
+with zipfile.ZipFile(name_zip, 'r') as f:
+    f.extractall('./')
+os.remove(name_zip)
+
+# If you want to import your python modules, append the folder to sys.path
+sys.path.append(os.path.join('.','testcode'))
+```
+
+**Notes**
+1. Code is locally stored in `username/ImJoyWorkspace/WORKSPACENAME/testcode`, where WORKSPACENAME is the name of the current ImJoy workspace. You can set the workspace automatically in the URL your provideto distribute your plugin (next section).
+2. When updating the zip archive, dont delete the old one REPLACE it with the new version. This guarantess that the same link is valid.
+3. This code will install each time the plugin is called the current version the zip archive.
+
 
 ## Distributing your plugins
 There are in general two ways of distributing your Imjoy plugins, sending the plugin file (`*.imjoy.html`) or with the url.
