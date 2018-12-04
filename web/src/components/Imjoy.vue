@@ -804,7 +804,7 @@ export default {
       getAttachment: this.getAttachment,
       getFileUrl: this.getFileUrl,
       getFilePath: this.getFilePath,
-      utils: {$forceUpdate: this.$forceUpdate, openUrl: this.openUrl},
+      utils: {$forceUpdate: this.$forceUpdate, openUrl: this.openUrl, sleep: this.sleep},
     }
 
     this.resetPlugins()
@@ -3018,6 +3018,9 @@ export default {
     },
     openUrl(url){
       Object.assign(document.createElement('a'), { target: '_blank', href: url}).click();
+    },
+    sleep(seconds) {
+      return new Promise(resolve => setTimeout(resolve, Math.round(seconds*1000)));
     }
   }
 }
