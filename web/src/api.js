@@ -33,7 +33,7 @@ class ImJoyPlugin {
 
   }
 
-  run(my) {
+  async run(my) {
     console.log('running in the plugin ', my)
 
   }
@@ -73,7 +73,7 @@ class ImJoyPlugin {
 
   }
 
-  run(my) {
+  async run(my) {
     console.log('running in the plugin ', my)
 
   }
@@ -113,7 +113,7 @@ class ImJoyPlugin {
 
   }
 
-  run(my) {
+  async run(my) {
     console.log('running in the plugin ', my)
 
   }
@@ -206,7 +206,6 @@ class ImJoyPlugin():
 
     def run(self, my):
         print('hello world.')
-
 
 api.export(ImJoyPlugin())
 </script>
