@@ -416,13 +416,14 @@ content = await api.getAttachment("att_name").then(callback)
 
 ## `api.utils.XXXX(...)`
 For Javascript plugins, currently supported functions are:
-`api.utils.$forceUpdate` for force refreshing the GUI.
-`api.utils.openUrl` for open an url in a new browser tab.
+`api.utils.$forceUpdate`: refreshing the GUI manually.
+`api.utils.openUrl`: opening an url in a new browser tab.
+`api.utils.sleep`: sleep for a number of seconds.
 
 For Python Plugins, currently supported functions are:
-`api.utils.kill` for kill a `subprocess` in python.
+`api.utils.kill`: kill a `subprocess` in python.
 
-`api.utils.ndarray` for wrapping ndarray according to ImJoy ndarray format.
+`api.utils.ndarray`: wrap ndarray according to ImJoy ndarray format.
 
 ## `api.TAG` constant
 The current tag choosen by the user during installation.
