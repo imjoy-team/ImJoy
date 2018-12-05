@@ -18,7 +18,7 @@ considerations
 * `async/await` is recommended for JavaScript and Python 3 (expect webPython, which doesn't support it yet).
 * `callback` style can be used for Javascript, Python 2 and Python 3.
 *  **Note** that you **cannot** use both style at the same time.
-* While you can use `try catch` or `try except` syntax to capture error with `async/await` style, you cannot use them to capture error if you use `callback` style.
+* While you can use `try catch` (JavaScript) or `try except` (Python) syntax to capture error with `async/await` style, you cannot use them to capture error if you use `callback` style.
 
 In the following list of API functions, we provided examples in `async` style. For Python 2, you can easily convert to callback style accordingly.
 
@@ -346,7 +346,10 @@ api.updateWindow({'id': windowId, name: 'new window', type: 'Image Window', w:7,
 ```
 
 ### `api.showDialog(...)`
-Show a dialog with customized GUI, example:
+Show a dialog with customized GUI. The answer is stored in the returned object,
+and can be retrieved with the specified `id`. To consider the case when the user
+presses `cancel`, you can use the `try catch` (JavaScript) or `try except` (Python)
+syntax.
 
 ```javascript
 const result = await api.showDialog({
@@ -354,25 +357,52 @@ const result = await api.showDialog({
    "ui": "Hey, please select a value for sigma: {id:'sigma', type:'choose', options:['1', '3'], placeholder: '1'}.",
 })
 ```
+[**Try yourself >>**](https://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:showDialog&w=examples)
+
 
 ### `api.showProgress(...)`
-Updates the progress bar on the Imjoy GUI.
+Updates the progress bar on the Imjoy GUI. Allowed input value range from 0 to 100.
 
-```
+``` javascript
 api.showProgress(85)
 ```
+[**Try yourself >>**](https://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:showProgress&w=examples)
 
-### `api.showStatus(...)`
-Updates the status text on the Imjoy GUI, example: `api.showStatus('processing...')`
 
 ### `api.showSnackbar(...)`
-Shows a quick message with a snackbar and disappear in a few seconds, example: `api.showSnackbar('processing...', 5)`
+Shows a quick message with a snackbar and disappear in a few seconds.
+
+``` javascript
+api.showSnackbar('processing...', 5)
+```
+
+[**Try yourself >>**](https://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:showSnackbar&w=examples)
+
+
+### `api.showStatus(...)`
+Updates the status text on the Imjoy GUI.
+
+``` javascript
+api.showStatus('processing...')
+```
+
+[**Try yourself >>**](https://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:showStatus&w=examples)
+
 
 ### `api.showPluginProgress(...)`
-update the progress bar of the current plugin (in the plugin menu), example: `api.showPluginProgress(85)`
+update the progress bar of the current plugin (in the plugin menu).
+
+```javascript
+api.showPluginProgress(85)
+```
 
 ### `api.showPluginStatus(...)`
-Updates the status text of the current plugin (in the plugin menu), example: `api.showPluginStatus('processing...')`
+Updates the status text of the current plugin (in the plugin menu).
+
+``` javascript
+api.showPluginStatus('processing...')
+```
+
 
 ### `api.showFileDialog(...)`
 Shows a file dialog to select files or directories. It accept the following options:
@@ -383,12 +413,17 @@ Shows a file dialog to select files or directories. It accept the following opti
  * `mode` two modes are supported. By default, the user can select a single or multiple file (with the `shift` key pressed). If you want to force the dialog to return multiple files or directories in an array or list, set `mode` to `"multiple"`, or you can force it to return only a single file or directory by setting `mode` to `"single"`, if you want to support both, you can explicitly set `mode` to `"single|multiple"` or keep the default setting.
  * `uri_type` choose the type for return between `"url"` or `"path"`. The default value for JavaScript plugins is `"url"` and for Python plugins is `"path"`.
 
-Since the file handling is different in the browser environment and Python, this api have different behavior when called from different types of plugin. In Javascrpt and Python, an Imjoy file dialog will be displayed, it will only return a promise from which  you can get the file path string.
+Since the file handling is different in the browser environment and Python, this api have different behavior when called from different types of plugin. In JavaScript and Python, an Imjoy file dialog will be displayed, it will only return a promise from which  you can get the file path string.
+
+For instance, you can get this error me
+
+<img src="./assets/imjoy-showFileDialog-warning.png" width="600px"></img>
 
 ```javascript
 const file_path = await api.showFileDialog()
 console.log(file_path)
 ```
+[**Try yourself >>**](https://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:showFileDialog&w=examples)
 
 ```python
 path = await api.showFileDialog()
