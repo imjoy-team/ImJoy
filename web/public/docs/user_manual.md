@@ -105,12 +105,12 @@ On your local machineT go to `http://IP-OF-YOUR-REMOTE:8080` to connect to the r
 ### Plugin engine doesn't start anymore
 Try to run the following command in your terminal to upgrade ImJoy manually.
 
- ```python
+```python
 export PATH=~/ImJoyApp/bin:$PATH
 pip install -U git+https://github.com/oeway/ImJoy-Engine#egg=imjoy
- ```
+```
 
-## Use existing Python
+### Use existing Python
 This depends whether it's a conda-compatible distribution or not. Try to type `conda -V` command, if you see a version number(e.g:`conda 4.3.30`), it means you can skip the Anaconda/Miniconda installation, and install ImJoy directly with your existing Python.
 
 ### Using ImJoy with Python 2.7 or version <3.6
@@ -130,6 +130,6 @@ Second, currently you can't use ImJoy.io loaded with `https` with the Plugin Eng
 
 If you see something like this: `OSError: [Errno 48] error while attempting to bind on address ('127.0.0.1', 8080): address already in use`, It means you have another instance running which uses the the port needed by the Plugin Engine. You need to find this instance  and kill that task if you don't known which one. For example, for port `8080`, you can run `lsof -n -i :8080 | grep LISTEN` in a terminal. This will list all process listening to the `8080` port, e.g. `+python3.6 1095 fmueller    7u  IPv4 0xb4b82ae29cbba843      0t0  TCP 127.0.0.1:http-alt (LISTEN)`. The process ID can be found directly after `python3.6`, in this case `1095`, you can then kill this process with `kill 1095`.
 
- ### CommandNotFoundError with 'conda activate'
+### CommandNotFoundError with 'conda activate'
 
 By default, ImJoy uses `conda activate` to activate conda environments if it's available. However, you may need to setup `conda activate` according to here: https://github.com/conda/conda/releases/tag/4.4.0

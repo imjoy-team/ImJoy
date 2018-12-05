@@ -118,10 +118,10 @@ all options. This framework can be imported in the plugin requirements
      For the purpose of a user-interface it might actually be too large. You can overwrite the default values, by modifying the `css` block in plugin file. Note that the [`!important`](https://css-tricks.com/when-using-important-is-the-right-choice/) is necessary to achieve this.
 
      ```
-     <style lang="css">
+      <style lang="css">
         /* Overwrite css defaults*/
         body {font-size: 13px !important;}
-     </style
+      </style>
      ```
 
 #### Workflow in the plugin
@@ -147,30 +147,6 @@ Communication between the window and Python plugin is achieved by the ImJoy API 
 Let's have a look at the Python function `calc_results`. It receives the JavaScript dictionary, extracts all necessary parameters and perform the desired calculation. Then it stores the data wiht `self.x_values = x`. Lastly, invokes the callback function to print in the main window with `callback_fun(...)`. Here the parameters are again passed as a dictionary. Please note, the **numpy** arrays are not supported, and the data has therefore be transformed to a list.
 
 ## Distribution and deployment
-
-### Distribution and deployment of a plugin with GitHub Gist
-
-We assume that the entire code is contained in the plugin file and no extra
-dependencies are required. [GitHub Gist](https://gist.github.com/) is a service provided by GitHub  to easily share individual files. Every gist is a GIT repository, so it provides version control, it can be forked and cloned.
-
-##### Deploy your ImJoy Plugin to Gist
-
-1. Go to gist on your GitHub account [https://gist.github.com/](https://gist.github.com/)
-1. Create new gist and copy & paste the code of your plugin.
-1. Give a new name followed by  `.imjoy.html`
-1. Create either public or secret gist.
-1. Link to gist can be obtained from the 'Raw' button (this links to the unprocessed versions of the file). Please note that this url
-will change when you update your file.
-
-##### Distribute plugin with url
-Once your plugin is on gist, you can distribute it with a single link. When pressing this link, ImJoy will open its Plugin import interface, where the user has to confirm the installation of the plugin.
-`http://imjoy.io/#/app?plugin=LinkToGIST.imjoy.html`
-
-You can also control where the plugin will be installed by setting the
-workspace parameter `w=`:
-`http://imjoy.io/#/app?w=PluginTest&plugin=LinkToGIST.imjoy.html`
-
-Alternatively, this url can then be used to install the plugin directly in ImJoy: press the `+ Plugins` button and add the the url in the field `Install plugin from url`.
 
 ### Distribution and deployment of code/data stored on Dropbox
 This example describes how you can distribute and deploy a Python plugin

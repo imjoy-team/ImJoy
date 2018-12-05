@@ -87,5 +87,6 @@ and communicate with a customized remote procedure calls (RPC) based on `socket.
 
 
 ## ImJoy for core developers
-
 **ADD**
+- How ImJoy is hosted (list different repositories)
+- Automatic buids
