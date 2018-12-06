@@ -72,7 +72,7 @@ Similary to `webworker` plugin, python plugins do not have access to the html do
  ```
 
 ### WebPython
-**ADD**
+**[TODO]**
 
 
 ### Debugging
@@ -81,9 +81,20 @@ Similary to `webworker` plugin, python plugins do not have access to the html do
 
 * **Python plugins**: Similary, you can create Python plugins from the `pyworker` template in the **+ PLUGINS** dialog. If your plugin engine is running, you can save and run(Ctrl+S, or through the toolbar) with your code directly in the ImJoy code editor. For larger project with many Python files, the recommended way is to wrap your Python files as standard Python modules, write and test the Python module using your code editor/IDE of choice (Atom, Spyder, PyCharm,...). Then create an ImJoy plugin with the ImJoy code editor, by inserting the module path to `sys.path` (e.g. `sys.insert(0, '~/my_python_module')`), you can then import the module to the ImJoy plugin and test it.
 
-### Data handling
+## Loading / saving data
+ImJoy is build on webtechnology and is running in the browser. This influences
+how data can be loaded and saved. For security restrictions, a browser has no
+access to your local file-system. Therefore, there are currently
+two different ways to handle loading/saving files for plugins
+with or without the plugin engine. 
 
-**[TODO]**
+For **Python plugins** running on then plugin engine, files can be directly
+loaded and written to the file system. For **JavaScript or WebPython plugins**,
+specific files or folders can be exposed to browser with a dedicated file dialog, where the user
+has to confirm that these files will be accessible. File export can be achieved
+by triggering a downloads for exporting files.  
+
+**[TODO]** This needs more information, maybe something graphical?
 
 ## Plugin file format
 The ImJoy plugin file format (shared by all Plugin types)  is built up on html format with customized blocks (inspired by the `.vue` format). It consists of two mandatory blocks `<config>` and `<script>`, and other optional blocks including `<docs>`, `<window>`,`<attachment>`,`<link>` and `<style>`.  For `<style>`, you can also set the `src` attribute.

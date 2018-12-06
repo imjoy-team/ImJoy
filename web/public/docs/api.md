@@ -285,7 +285,7 @@ await api.run("Python Demo Plugin")
 
 Example for concurrent execution of two plugins
 
-The code below will start two plugins almost simultaneously, but wait  wait for the result one after another.
+The code below will start two plugins almost simultaneously, but wait  for the result one after another.
 
 ```python
 p1 = api.run("name of plugin 1")
@@ -331,7 +331,7 @@ the window with `api.updateWindow`.
 * **window_name**: String. Specifies the name of new window.
 * **window_type**: String. Specifies the window type. This can be either the name of
    window plugin or an internal ImJoy window type. The following types are
-   supported.
+   supported:
 
     - `imjoy/image`. Display an image. Requires `data.src` pointing to an image location.
     - `imjoy/files`. Display a list of files. `data` is an array of file objects.
@@ -372,7 +372,7 @@ api.createWindow({name: 'new window', type: 'Image Window', w:7, h:7, data: {ima
 
 ### api.updateWindow
 ```javascript
-const window_id = await api.updateWindow({id: window_id, name: window_name, type: window_type, w:w, h:h, data: data, config:config},clickload:false)
+window_id = await api.updateWindow({id: window_id, name: window_name, type: window_type, w:w, h:h, data: data, config:config},clickload:false)
 ```
 
 Updates an existing window.
@@ -380,7 +380,7 @@ Updates an existing window.
 An minimal call contains the window ID and the data that should be transmitted.
 The data will be passed as `my.data` to the `run` function of the target window
 plugin. If the target window is a internally supported window (e.g. `imjoy/image`),
-then it will just replace the content (since there is not `run` function).
+then it will just replace the content (since there is no `run` function).
 
 If the previous window was closed, the minimal call will throw an error. However,
 you can also pass `name` and `type` as for `api.createWindow`. If these two fields
@@ -476,13 +476,13 @@ api.showSnackbar('processing...', 5)
 
 ### api.showStatus
 ``` javascript
-api.showStatus(message)
+api.showStatus(status)
 ```
 Updates the status text on the Imjoy GUI.
 
 **Arguments**
 
-* **message**: String. Message to be displayed.
+* **status**: String. Message to be displayed.
 
 **Examples**
 

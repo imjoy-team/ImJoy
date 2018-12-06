@@ -66,7 +66,6 @@ then execute the plugin.
 ### Workflow
 
 You can then create your own workflow by defining a sequence of processing steps.
-Such workflows can be saved and then shared with other ImJoy users (**[TODO]**).
 
 ## ImJoy for plugin developers
 
