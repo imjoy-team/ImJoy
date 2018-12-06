@@ -1,6 +1,6 @@
 {
   "name": "ImJoy.io",
-  "version": "0.8.20",
+  "version": "0.8.21",
   "private": true,
   "description": "Image processing with joy.",
   "author": "Wei OUYANG <wei.ouyang@cri-paris.org>",
@@ -11,13 +11,15 @@
     "test:unit": "vue-cli-service test:unit"
   },
   "dependencies": {
-    "webpack-cli": "^3.1.0",
+    "ajv": "^6.6.1",
     "axios": "^0.18.0",
+    "file-loader": "^1.1.4",
     "file-saver": "^1.3.3",
     "glfx": "0.0.4",
-    "js-schema": "^1.0.1",
+    "html-webpack-plugin": "^2.30.1",
     "lodash": "^4.17.10",
     "marked": "^0.5.1",
+    "module": "^1.2.5",
     "monaco-editor": "^0.15.6",
     "monaco-editor-webpack-plugin": "^1.7.0",
     "socket.io-client": "^2.1.1",
@@ -32,10 +34,7 @@
     "vue-monaco": "^0.2.0",
     "vue-router": "^3.0.1",
     "vue-slider-component": "^2.6.2",
-    "html-webpack-plugin": "^2.30.1",
-    "ajv": "^6.0.0",
-    "file-loader": "^1.1.4",
-    "module": "^1.2.5"
+    "webpack-cli": "^3.1.0"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^3.1.1",
