@@ -554,7 +554,9 @@ import {
   Joy
 } from '../joy'
 
-import schema from 'js-schema'
+
+import Ajv from 'ajv'
+const ajv = new Ajv()
 
 export default {
   name: 'imjoy',
@@ -1927,8 +1929,8 @@ export default {
         loaders: {}
       }
       this.registered.internal_inputs = {
-        'Image': { schema: schema({type: ['image/jpeg', 'image/png', 'image/gif'], size: Number})},
-        'Code Editor': { schema: schema.fromJSON({properties: {"name": {"type": "string", "pattern":".*\\.imjoy.html|\\.html|\\.txt|\\.xml", "required": true }}, type: 'object'})},
+        'Image': { schema: ajv.compile({properties: {type: {"enum": ['image/jpeg', 'image/png', 'image/gif']}, size: {type: 'number'}}}) },
+        'Code Editor': { schema: ajv.compile({properties: {name: { "pattern": ".*\\.imjoy.html|\\.html|\\.txt|\\.xml"}}})},
       }
       this.registered.loaders['Image'] = (file)=>{
         const reader = new FileReader();
@@ -2785,7 +2787,7 @@ export default {
                 throw "inputs schema must be an object."
               }
             }
-            const sch = schema.fromJSON(config.inputs)
+            const sch = ajv.compile(config.inputs)
             // console.log('inputs schema:-->', plugin.name, config.name, sch.toJSON())
             const plugin_name = plugin.name
             const op_name = config.name
@@ -2829,7 +2831,7 @@ export default {
                 throw "inputs schema must be an object."
               }
             }
-            const sch = schema.fromJSON(config.outputs)
+            const sch = ajv.compile(config.outputs)
             this.registered.outputs[plugin.name+'/'+config.name] =  {op_name: config.name, plugin_name: plugin.name, schema: sch}
           } catch (e) {
             console.error(`something went wrong with the output schema for ${config.name}`, config.outputs)
