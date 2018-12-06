@@ -137,15 +137,26 @@ function can be used. Below, you will find links **Try yourself >>**. These will
 open a full example in ImJoy, where see the function in action. The examples are
 in JavaScript, but the api functions are called in similar fashion in Python.
 
-### `api.alert(...)`
+### api.alert
+
+``` javascript
+api.alert(message)
+```
+
 Shows an alert dialog with a message.
 
+**Arguments**
+
+* **message**: String. Contains the message to be displayed.
+
+**Examples**
 ``` javascript
 api.alert('hello world')
 ```
-[**Try yourself >>**](https://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:alert&w=examples)
+[Try yourself >>](https://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:alert&w=examples)
 
-### `api.call(...)`
+
+### api.call
 Call a function defined in another plugin by specifying the plugin name, the function name and the arguments. You need to make sure the argument number match the actual function defined in the plugin. For instance, to call a function called `funcX` defined in the plugin named `PluginX` with the argument `1`, you can use
 
 ``` javascript
@@ -282,7 +293,19 @@ result2 = await api.run("name of plugin 2")
 Creates a new window and adds it to the workspace. The input is an object (JavaScript) or dictionary (Python) with the following fields
 
 * `name` specifies the title of the shown image
-* `type` specifies the window type. This can be either internally supported window type (e.g. `imjoy/image`), or the name of window plugin that you wrote (see example below).
+* `type` specifies the window type. This can be either internally supported window type (e.g. `imjoy/image`),
+
+- `imjoy/image`. This will display an image (formats requires `data.src`)
+-`imjoy/files`. array of file objects. on the local file-system 'data' is directly the array.
+- `imjoy/url_list`. list of url. data is the array. will be rendered with HTML tag `<a> </a>`
+- `imjoy/panel`. have to pass config. will render the contained ui string. **TODO**
+- `imjoy/markdown`. have to provide `data.source` will render the markdown text.
+- `imjoy/generic`. Will show all objects in data, e.g. the window that you obtain with `return.my`
+- `imjoy/plugin-editor`. 'data.id' is a unique string (preferable random) specifying the window id, and data.code' contains the source code
+
+
+
+or the name of window plugin that you wrote (see example below).
 *  `w` and `h` specify the dimensions of the window.
 * `data` contains data that is transfered to the window, where you can access it with `my.data`
 

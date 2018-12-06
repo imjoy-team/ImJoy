@@ -21,9 +21,14 @@ The following list illustrates key features of the plugin system in ImJoy:
 
 There are four types of plugins available for different purposes:
 
+**JavaScript** plugins support these two modes:
+
 1. `Webworker(JavaScript)` plugin for performing computational tasks using JavaScript or WebAssembly;
-0. `PyWorker(Python)` plugin for performing heavy-duty computational tasks using Python and its libraries, this requires additional installation of plugin engine;
 0. `Window(JavaScript and HTML` plugin for building a rich and interactive user interface using HTML5/CSS and JavaScript;
+
+**Python** plugins support these two modes:
+
+1. `PyWorker(Python)` plugin for performing heavy-duty computational tasks using Python and its libraries, this requires additional installation of plugin engine;
 0. `Webpython` plugin for performing computational tasks using Python with in the browser through WebAssembly and the [pyodide project](https://github.com/iodide-project/pyodide). This is in developmental stage and only selected number of Python libraries are currently supported.
 
 Click the **+ PLUGINS** button in `Plugins`, then select `Create a New Plugin`
@@ -35,8 +40,6 @@ with one of the plugin templates. A code editor will open in the workspace, wher
 These plugins are used to do computation tasks in another thread, using a new element called ["web worker"](https://en.wikipedia.org/wiki/Web_worker). It is basically a way for Javascript to achieve multi-threading.
 
 Since it's designed for perfoming computational tasks, it does not have access to html dom but you can use `ImJoy API` to interact with the graphical interface of ImJoy or other plugin which can trigger changes on the user interface.
-
-We provide a dedicate GitHub repository with tried and tested [JavaScript libraries](https://github.com/oeway/static.imjoy.io).
 
 ### Window
 Window plugins run in the `iframe` mode, and it will show up as a window. `<window>` and `<style>` can be used to define the actual content of the window.
@@ -132,13 +135,18 @@ It defines the general properties of a plugin and contains several fields.
 }
 ```
 
-* `name` is the name of the plugin. It **must** be unique to avoid conflicts with other plugins.
+#### name
+`name` is the name of the plugin. It **must** be unique to avoid conflicts with other plugins.
+
+#### mode
 * `mode` is the plugin type or execution mode. Currently supported are:
   * `window` is used for create a new web interface with HTML/CSS and Javascript. If `window` mode is selected, then you need to provide HTML code with the `<window>` block and CSS code with the `style` block. Notice that this type of plugin runs in the same thread as the main web page, it may hang the entire web app when running heavy computation. A better choice for computational tasks is `webworker` plugin. However, some WebGL powered libraries including `tensorflow.js` do not support (yet) `webworker` mode, in that case, another mode called `iframe` can be used. `iframe` mode is the same as `window` mode except it does not need an interface, it is especially useful for plugins which needs to access GPU through WebGL.
   * `webworker` to run computationally intensive javascript plugins. It does not have an interface, it runs in a new thread and won't hang the main thread during running.
   * `pyworker` is used to run plugins written in Python. This requires that the **Python Plugin Engine** is installed and started before using the plugin. See the **Developing Python Plugins** for more details.
 * `tags` defines a list of supported tags, which can be used to provide differentiate configureable modes and can be accessed at various points in the plugin. For an overview we
 we refer to the dedicate description **## Plugins and tags**
+
+
 * `ui` is a string specifying the GUI that will be displayed to the user. The following elements can be used to render an input form:
     * `type: 'choose', options: ['cat', 'dog'], placeholder: 'cat'`
     * `type: 'number', min: 0, max: 10, placeholder:2`
@@ -203,8 +211,18 @@ The format is the same as for `inputs`.
 
 * `env` (**for python plugins only**) the virtual environment or docker image command used to create an enviroment to run the plugin.
 * `cmd` (**for python plugins only**) the command used to run the plugin. By default, it will be run with `python`. Depending on the installtion it could also be be something like `python3` or `python27` etc.
-* `requirements` for `webworker` plugins written in Javascript, it can be a array of JavaScript url which will be imported using `importScripts`, for `window` plugin, it can be either a list of JavaScript url or CSS url (needs to be end with `.css`). For `webpython` plugins, you can set it as a list of python modules e.g. `["numpy", "matplotlib"]`, please also notice that `webpython` has a limited number of python modules supported. For `pyworker` plugins, it defines the pip packages which will be installed before running the plugin defined as a list of pip packages or a command string. ImJoy supports package names and github links. For example, `["numpy", "scipy==1.0"]` or `"pip install numpy scipy==1.0"`. To use conda, you can set the string to `"conda install numpy scipy==1.0"`. For more information see the dedicate section **Using virtual environments**.
-* `dependencies` names of other imjoy plugins which the current pluging depend on. They will be installed automatically during installation. To define a dependency use the following format: 1) for dependencies without tag `REPOSITORY:PLUGIN_NAME` or `PLUGIN_URL`, e.g.: `oeway/ImJoy-Plugins:Image Window`; 2) or with specified tag: `REPOSITORY:PLUGIN_NAME@TAG` or `PLUGIN_URL@TAG`, e.g.: `oeway/ImJoy-Plugins:Unet Segmentation@GPU`. In this case, a hash tag `GPU` is used to specify the tag for the plugin named `Unet Segmentation` hosted on github repository `oeway/ImJoy-Plugin` (https://github.com/oeway/ImJoy-Plugins). If the plugin is not hosted on Github or the github repository is not formated as a ImJoy plugin repository (meaning there is no `manifest.imjoy.json` file defined in the root of the repository), you can use the the url directly, e.g.: `https://github.com/oeway/ImJoy-Demo-Plugins/blob/master/repository/3dDemos.imjoy.html` (tags can be added with `@TAG`).
+
+
+#### requirements
+
+* For `webworker` plugins written in Javascript, it can be a array of JavaScript urls. They will be imported using `importScripts`. ImJoy provides a dedicated [GitHub repository](https://github.com/oeway/static.imjoy.io) hosting commonly used and tested libraries. You can refer to all files contained in the `docs` folder, for this
+you can construct an url with `https://static.imjoy.io` + `RelativePathInDocs`. For instance, the file `FileSaver.js` in the fodler `static.imjoy.io/docs/js/` can be referenced as `https://static.imjoy.io/js/FileSaver.js`.
+* For `window` plugin, it can be either a list of JavaScript url or CSS url (needs to be end with `.css`). Same considerations as for `webworker` apply for import and static hosting.
+* * For `pyworker` plugins, it defines the pip packages which will be installed before running the plugin defined as a list of pip packages or a command string. ImJoy supports package names and github links. For example, `["numpy", "scipy==1.0"]` or `"pip install numpy scipy==1.0"`. To use conda, you can set the string to `"conda install numpy scipy==1.0"`. For more information see the dedicate section **Using virtual environments**.
+* For `webpython` plugins, you can set it as a list of python modules e.g. `["numpy", "matplotlib"]`. Please also notice that `webpython` has a limited number of python modules supported.
+
+#### dependencies
+`dependencies` names of other imjoy plugins which the current pluging depend on. They will be installed automatically during installation. To define a dependency use the following format: 1) for dependencies without tag `REPOSITORY:PLUGIN_NAME` or `PLUGIN_URL`, e.g.: `oeway/ImJoy-Plugins:Image Window`; 2) or with specified tag: `REPOSITORY:PLUGIN_NAME@TAG` or `PLUGIN_URL@TAG`, e.g.: `oeway/ImJoy-Plugins:Unet Segmentation@GPU`. In this case, a hash tag `GPU` is used to specify the tag for the plugin named `Unet Segmentation` hosted on github repository `oeway/ImJoy-Plugin` (https://github.com/oeway/ImJoy-Plugins). If the plugin is not hosted on Github or the github repository is not formated as a ImJoy plugin repository (meaning there is no `manifest.imjoy.json` file defined in the root of the repository), you can use the the url directly, e.g.: `https://github.com/oeway/ImJoy-Demo-Plugins/blob/master/repository/3dDemos.imjoy.html` (tags can be added with `@TAG`).
 
 * `defaults` (**for window plugin only**) define an object of default values, for example you can specify the default window size by setting `"defaults": {"w": 10, "h": 7}`.
 * `runnable` defines whether the plugin can be executed by clicking on the plugin menu (By default, all plugins are `runnable`). For helper plugins which do not run by themselves, (e.g. a `pyworker` plugin can be called by a `window` plugin and do not necessarily executed by the user directly), setting `"runnable": false` would move down the plugin to the bottom of the plugin menu and made non-clickable.

@@ -14,7 +14,7 @@ For developers, we provide more information about how to develop plugins in the 
     or perform computational tasks. Plugins developed in Python require the Plugin Engine.
 -   **Plugin Engine** - Python program to execute plugins in the background for heavy
     computations.
--   **Operator [Ops]** - One plugin can allow to perform tasks with a set of
+-   **Operators [ops]** - One plugin can allow to perform tasks with a set of
     operators ("ops"). These ops can be used in a workflow or accessed from the plugin menu.
 -   **Workflow** - Allows to assemble a series of ops to perform a series of processing
     steps. Ops can access the results of preceding ops in the workflow. Workflows can be saved and reused.
@@ -30,7 +30,7 @@ This interface provides all functionality needed to process data.
 
 ## ImJoy App and Plugin Engine
 
-ImJoy can be used  directly from your browser (Chrome or Firefox) **without any installation** [ImJoy web app](https://imjoy.io/#/app) or as a **standalone** [desktop app](<add link>). Many plugins can be used directly, and you can already get a feeling
+ImJoy can be used  directly from your browser (Chrome or Firefox) **without any installation** [ImJoy web app](https://imjoy.io/#/app) or as a **standalone** [desktop app](<add link>) **[TODO] add link**. Many plugins can be used directly, and you can already get a feeling
 for ImJoy works.
 
 For some more advanced processing, the **Python Plugin Engine**  is required. Such
@@ -66,7 +66,7 @@ then execute the plugin.
 ### Workflow
 
 You can then create your own workflow by defining a sequence of processing steps.
-Such workflows can be saved and then shared with other ImJoy users (**To be done**).
+Such workflows can be saved and then shared with other ImJoy users (**[TODO]**).
 
 ## ImJoy for plugin developers
 
@@ -87,6 +87,6 @@ and communicate with a customized remote procedure calls (RPC) based on `socket.
 
 
 ## ImJoy for core developers
-**ADD**
+**[TODO]**
 - How ImJoy is hosted (list different repositories)
 - Automatic buids
