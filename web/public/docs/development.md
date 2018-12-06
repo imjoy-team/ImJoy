@@ -37,12 +37,13 @@ with one of the plugin templates. A code editor will open in the workspace, wher
 <img src="./assets/imjoy-plugin-types.png" width="800px"></img>
 
 ### Webworker
-These plugins are used to do computation tasks in another thread, using a new element called ["web worker"](https://en.wikipedia.org/wiki/Web_worker). It is basically a way for Javascript to achieve multi-threading.
+These plugins are used to do computation tasks in another thread, using a new element called ["web worker"](https://en.wikipedia.org/wiki/Web_worker). It does not have an interface, it runs in a new thread and won't hang the main thread during running. It is basically a way for Javascript to achieve multi-threading.
 
 Since it's designed for perfoming computational tasks, it does not have access to html dom but you can use `ImJoy API` to interact with the graphical interface of ImJoy or other plugin which can trigger changes on the user interface.
 
 ### Window
-Window plugins run in the `iframe` mode, and it will show up as a window. `<window>` and `<style>` can be used to define the actual content of the window.
+Window plugins are used to create a new web interface with HTML/CSS and Javascript.
+They in the `iframe` mode, and it will show up as a window. The `<window>` and `<style>` blocks (see below) can be used to define the actual content of the window.
 
 Different from other plugins which will be loaded and intialized when ImJoy is started, a `window` plugin will not be loaded until the actuall plugin is created with `api.createWindow` or clicked by a user in the menu. During execution of `api.createWindow`, `setup` and `run` will be called for the first time, and return with an window ID. After that, if needed, another plugin can call `api.updateWindow` with the window ID, ImJoy will try to execute the `run` function with the new data again.
 
@@ -50,6 +51,8 @@ If the `run` returned with an object, then it will be used to update the window 
 
 
 ### PyWorker (Python)
+Used to run Python code. This requires that the **Python Plugin Engine** is installed and started before using the plugin. See the **Developing Python Plugins** for more details.
+
 Similary to `webworker` plugin, python plugins do not have access to the html dom, but you can use `ImJoy API` to interact with the graphical interface of ImJoy or other plugin which can trigger changes on the user interface.
 
 **Use Docker Containers**
@@ -71,12 +74,16 @@ Similary to `webworker` plugin, python plugins do not have access to the html do
 ### WebPython
 **ADD**
 
+
 ### Debugging
 
 *   **JavaScript plugins**: this concerns either Webworker or Window plugins. With the ImJoy code editor, you can write your code. For testing you can click save on the toolbar in the code editor, and it will automatically load your plugin to the plugin menu shown on the left side. By right click on in the workspace, you use the [chrome development tool](https://developers.google.com/web/tools/chrome-devtools) to see the console and debug your code.
 
 * **Python plugins**: Similary, you can create Python plugins from the `pyworker` template in the **+ PLUGINS** dialog. If your plugin engine is running, you can save and run(Ctrl+S, or through the toolbar) with your code directly in the ImJoy code editor. For larger project with many Python files, the recommended way is to wrap your Python files as standard Python modules, write and test the Python module using your code editor/IDE of choice (Atom, Spyder, PyCharm,...). Then create an ImJoy plugin with the ImJoy code editor, by inserting the module path to `sys.path` (e.g. `sys.insert(0, '~/my_python_module')`), you can then import the module to the ImJoy plugin and test it.
 
+### Data handling
+
+**[TODO]**
 
 ## Plugin file format
 The ImJoy plugin file format (shared by all Plugin types)  is built up on html format with customized blocks (inspired by the `.vue` format). It consists of two mandatory blocks `<config>` and `<script>`, and other optional blocks including `<docs>`, `<window>`,`<attachment>`,`<link>` and `<style>`.  For `<style>`, you can also set the `src` attribute.
@@ -136,96 +143,120 @@ It defines the general properties of a plugin and contains several fields.
 ```
 
 #### name
-`name` is the name of the plugin. It **must** be unique to avoid conflicts with other plugins.
+Name of the plugin. It **must** be unique to avoid conflicts with other plugins.
+
+#### version
+Specifies the version of the plugin.
+
+#### api_version
+Specifies the api version of ImJoy the plugin is written for.
+
+#### url
+Points to current file, and is used to download the plugin  when a user installs it from the plugin repository.
+
+#### description
+Contains a short description about the plugin.
 
 #### mode
-* `mode` is the plugin type or execution mode. Currently supported are:
-  * `window` is used for create a new web interface with HTML/CSS and Javascript. If `window` mode is selected, then you need to provide HTML code with the `<window>` block and CSS code with the `style` block. Notice that this type of plugin runs in the same thread as the main web page, it may hang the entire web app when running heavy computation. A better choice for computational tasks is `webworker` plugin. However, some WebGL powered libraries including `tensorflow.js` do not support (yet) `webworker` mode, in that case, another mode called `iframe` can be used. `iframe` mode is the same as `window` mode except it does not need an interface, it is especially useful for plugins which needs to access GPU through WebGL.
-  * `webworker` to run computationally intensive javascript plugins. It does not have an interface, it runs in a new thread and won't hang the main thread during running.
-  * `pyworker` is used to run plugins written in Python. This requires that the **Python Plugin Engine** is installed and started before using the plugin. See the **Developing Python Plugins** for more details.
-* `tags` defines a list of supported tags, which can be used to provide differentiate configureable modes and can be accessed at various points in the plugin. For an overview we
+Plugin type or execution mode. See dedicated section [ImJoy Plugins]() above for more details.
+
+#### tags
+List of supported tags, which can be used to provide differentiate configureable modes and can be accessed at various points in the plugin. For an overview we
 we refer to the dedicate description **## Plugins and tags**
 
+#### ui
+String specifying the GUI that will be displayed to the user. The following elements can be used to render an input form:
 
-* `ui` is a string specifying the GUI that will be displayed to the user. The following elements can be used to render an input form:
-    * `type: 'choose', options: ['cat', 'dog'], placeholder: 'cat'`
-    * `type: 'number', min: 0, max: 10, placeholder:2`
-    * `type: 'color'`
-    * `type: 'string'`
-    * `type: 'save'`
-    * `type: 'instructions/comment'`
-    * `type: 'variableName'`
-    * ...
+* `type: 'choose', options: ['cat', 'dog'], placeholder: 'cat'`
+* `type: 'number', min: 0, max: 10, placeholder:2`
+* `type: 'color'`
+* `type: 'string'`
+* `type: 'save'`
+* `type: 'instructions/comment'`
+* `type: 'variableName'`
+* ...
 
-    For each element, you need to define a unique `id`, which can then be used to **access
-    the value of this element in the plugin** with `my.config.id`.
+For each element, you need to define a unique `id`, which can then be used to **access
+the value of this element in the plugin** with `my.config.id`.
 
-    For example, to render a form with a selection use `"ui": "select an option: {id: 'option1', type: 'choose', options: ['cat', 'dog'],     placeholder: 'cat'}"`. In the plugin, the selection can then be accessed with `my.config.option1`.
+For example, to render a form with a selection use `"ui": "select an option: {id: 'option1', type: 'choose', options: ['cat', 'dog'],     placeholder: 'cat'}"`. In the plugin, the selection can then be accessed with `my.config.option1`.
 
-    In some cases, the ui might only contain a brief description of the op. This can either be plain text, or you can also specify a           **link**    with `"ui": " <a href='https://imjoy.io' target='_blank'> ImJoy</a>"`. The `target='_blank'` will open this page in a new     tab.
+In some cases, the ui might only contain a brief description of the op. This can either be plain text, or you can also specify a           **link**    with `"ui": " <a href='https://imjoy.io' target='_blank'> ImJoy</a>"`. The `target='_blank'` will open this page in a new     tab.
 
-    To define **longer forms with multiple lines**, we support additional definitions of the `ui` string.
+To define **longer forms with multiple lines**, we support additional definitions of the `ui` string.
 
-     - an array of strings. For example:
-         ```javascript
-         "ui": [
-             "option1: {id: 'option1', type: 'choose', options: ['cat', 'dog'], placeholder: 'cat'}",
-             "option2: {id: 'option2', type: 'number', placeholder: 3}"
-            ],
-          ```
-     - an array with keys and values. Here, you have to use `" "` for the keys and the strings. Definitions can also be mixed.
-       In the   example below, we use a string as above for `option1` and an array with keys and values for `option2`.
-       Note how for `option2` each key and value is defined as an individual string.
+* an array of strings. For example:
+       ```javascript
+       "ui": [
+           "option1: {id: 'option1', type: 'choose', options: ['cat', 'dog'], placeholder: 'cat'}",
+           "option2: {id: 'option2', type: 'number', placeholder: 3}"
+          ],
+        ```
+*   an array with keys and values. Here, you have to use `" "` for the keys and
+    the strings. Definitions can also be mixed.
 
-         ```json
-         "ui": [
-          {"option1": "{id: 'option1', type: 'choose', options: ['cat', 'dog'], placeholder: 'cat'}"},
-          {"option2": {"id": "option2",
-                       "type": "number",
-                       "placeholder": 3}}],
-          ```
+In the   example below, we use a string as above for `option1` and an array with keys and values for `option2`. Note how for `option2` each key and value is defined as an individual string.
 
-* `version` specifies the version of the plugin.
-* `api_version` specifies the api version of ImJoy the plugin is written for.
-* `url` points to current file, and is used to download the plugin  when a user installs it from the plugin repository.
-* `description` contains a short description about the plugin.
-* `icon` defines the icon used in the plugin menu. You can find different icons here https://material.io/tools/icons/ and used the specified name. Or, you can directly copy and paste Emoji, for example from [here](https://getemoji.com/).
-* `inputs` defines the inputs with json-schema syntax (http://json-schema.org/) .
+ ```json
+ "ui": [
+  {"option1": "{id: 'option1', type: 'choose', options: ['cat', 'dog'], placeholder: 'cat'}"},
+  {"option2": {"id": "option2",
+               "type": "number",
+               "placeholder": 3}}],
+  ```
+
+#### flags
+Defines an array of flags which will be used by ImJoy to control the behavior of the plugin. Currently, we support these `flags` for run-time control. These flags allow to specify how ImJoy instances are handled by the Interface and the Plugin engine. For more information we refer to the section **TODO**.
+
+* `single-instance` (**for python plugins only**). Python engine will only run a single plugin process even if
+  plugin is called from multiple BUT identical workspaces. In this case, the different ImJoy instances will share
+  the same plugin process.
+
+* `allow-detach` (**for python plugins only**). Allows the plugin process to detatch from the user interface. This means
+  the plugin will not be killed when the user interface is disconnected or closed. However, in order to reconnect to this process,
+  you  also need to add the `single-instance` flag.
+
+Example: to make a plugin which can run without the user interface in the background and to which you can attach set
+ `"flags": ["single-instance", "allow-detach"]`. The inteface willautomaticallyreconnect to this process when re-launched.
+Please note that if  multiple ImJoy instances attache to this plugin process, each will call the `setup()` function.
+This may cause conflicts, we therefore recommend to (1) keep the interface-related code in the `setup()`, e.g. `api.register()`;
+(2) move code that you only want to run once per process into the `__init__` function of the plugin class.
+
+
+#### icon
+Defines the icon used in the plugin menu. You can find different icons here https://material.io/tools/icons/ and used the specified name. Or, you can directly copy and paste Emoji, for example from [here](https://getemoji.com/).
+
+#### inputs
+Defines the inputs with json-schema syntax (http://json-schema.org/) .
 For example, to define that the plugin uses png files, you can specify `"inputs": {"properties": {"type": {"enum": ["image/png"], "required": true}}, "type": "object"}` . You can also use the simplified format which assumes the inputs is an object and use json schema to describe the properties: `"inputs": {"type": {"enum": ["image/png"], "required": true}}`.
-* `outputs` defines the outputs with json-schema syntax (http://json-schema.org/).
+
+#### outputs
+Defines the outputs with json-schema syntax (http://json-schema.org/).
 The format is the same as for `inputs`.
-* `flags` defines an array of flags which will be used by ImJoy to control the behavior of the plugin. Currently, we support these `flags` for run-time control. These flags allow to specify how ImJoy instances are handled by the Interface and the Plugin engine. For more information we refer to the section **TODO**.
 
-    * `single-instance` (**for python plugins only**). Python engine will only run a single plugin process even if
-    plugin is called from multiple BUT identical workspaces. In this case, the different ImJoy instances will share
-    the same plugin process.
-    * `allow-detach` (**for python plugins only**). Allows the plugin process to detatch from the user interface. This means
-    the plugin will not be killed when the user interface is disconnected or closed. However, in order to reconnect to this process,
-    you  also need to add the `single-instance` flag.
+#### env
+(**for python plugins only**) the virtual environment or docker image command used to create an enviroment to run the plugin.
 
-   Example: to make a plugin which can run without the user interface in the background and to which you can attach set
-   `"flags": ["single-instance", "allow-detach"]`. The inteface will automatically reconnect to this process when re-launched.
-   Please note that if  multiple ImJoy instances attache to this plugin process, each will call the `setup()` function.
-   This may cause conflicts, we therefore recommend to (1) keep the interface-related code in the `setup()`, e.g. `api.register()`;
-   (2) move code that you only want to run once per process into the `__init__` function of the plugin class.
-
-* `env` (**for python plugins only**) the virtual environment or docker image command used to create an enviroment to run the plugin.
-* `cmd` (**for python plugins only**) the command used to run the plugin. By default, it will be run with `python`. Depending on the installtion it could also be be something like `python3` or `python27` etc.
+#### cmd
+(**for python plugins only**) the command used to run the plugin. By default, it will be run with `python`. Depending on the installtion it could also be be something like `python3` or `python27` etc.
 
 
-#### requirements
+#### requirementsrequirements
 
 * For `webworker` plugins written in Javascript, it can be a array of JavaScript urls. They will be imported using `importScripts`. ImJoy provides a dedicated [GitHub repository](https://github.com/oeway/static.imjoy.io) hosting commonly used and tested libraries. You can refer to all files contained in the `docs` folder, for this
 you can construct an url with `https://static.imjoy.io` + `RelativePathInDocs`. For instance, the file `FileSaver.js` in the fodler `static.imjoy.io/docs/js/` can be referenced as `https://static.imjoy.io/js/FileSaver.js`.
 * For `window` plugin, it can be either a list of JavaScript url or CSS url (needs to be end with `.css`). Same considerations as for `webworker` apply for import and static hosting.
-* * For `pyworker` plugins, it defines the pip packages which will be installed before running the plugin defined as a list of pip packages or a command string. ImJoy supports package names and github links. For example, `["numpy", "scipy==1.0"]` or `"pip install numpy scipy==1.0"`. To use conda, you can set the string to `"conda install numpy scipy==1.0"`. For more information see the dedicate section **Using virtual environments**.
+* For `pyworker` plugins, it defines the pip packages which will be installed before running the plugin defined as a list of pip packages or a command string. ImJoy supports package names and github links. For example, `["numpy", "scipy==1.0"]` or `"pip install numpy scipy==1.0"`. To use conda, you can set the string to `"conda install numpy scipy==1.0"`. For more information see the dedicate section **Using virtual environments**.
 * For `webpython` plugins, you can set it as a list of python modules e.g. `["numpy", "matplotlib"]`. Please also notice that `webpython` has a limited number of python modules supported.
 
 #### dependencies
-`dependencies` names of other imjoy plugins which the current pluging depend on. They will be installed automatically during installation. To define a dependency use the following format: 1) for dependencies without tag `REPOSITORY:PLUGIN_NAME` or `PLUGIN_URL`, e.g.: `oeway/ImJoy-Plugins:Image Window`; 2) or with specified tag: `REPOSITORY:PLUGIN_NAME@TAG` or `PLUGIN_URL@TAG`, e.g.: `oeway/ImJoy-Plugins:Unet Segmentation@GPU`. In this case, a hash tag `GPU` is used to specify the tag for the plugin named `Unet Segmentation` hosted on github repository `oeway/ImJoy-Plugin` (https://github.com/oeway/ImJoy-Plugins). If the plugin is not hosted on Github or the github repository is not formated as a ImJoy plugin repository (meaning there is no `manifest.imjoy.json` file defined in the root of the repository), you can use the the url directly, e.g.: `https://github.com/oeway/ImJoy-Demo-Plugins/blob/master/repository/3dDemos.imjoy.html` (tags can be added with `@TAG`).
+Array witgh names of other imjoy plugins which the current pluging depend on. They will be installed automatically during installation. To define a dependency use the following format: 1) for dependencies without tag `REPOSITORY:PLUGIN_NAME` or `PLUGIN_URL`, e.g.: `oeway/ImJoy-Plugins:Image Window`; 2) or with specified tag: `REPOSITORY:PLUGIN_NAME@TAG` or `PLUGIN_URL@TAG`, e.g.: `oeway/ImJoy-Plugins:Unet Segmentation@GPU`. In this case, a hash tag `GPU` is used to specify the tag for the plugin named `Unet Segmentation` hosted on github repository `oeway/ImJoy-Plugin` (https://github.com/oeway/ImJoy-Plugins). If the plugin is not hosted on Github or the github repository is not formated as a ImJoy plugin repository (meaning there is no `manifest.imjoy.json` file defined in the root of the repository), you can use the the url directly, e.g.: `https://github.com/oeway/ImJoy-Demo-Plugins/blob/master/repository/3dDemos.imjoy.html` (tags can be added with `@TAG`).
 
-* `defaults` (**for window plugin only**) define an object of default values, for example you can specify the default window size by setting `"defaults": {"w": 10, "h": 7}`.
-* `runnable` defines whether the plugin can be executed by clicking on the plugin menu (By default, all plugins are `runnable`). For helper plugins which do not run by themselves, (e.g. a `pyworker` plugin can be called by a `window` plugin and do not necessarily executed by the user directly), setting `"runnable": false` would move down the plugin to the bottom of the plugin menu and made non-clickable.
+#### defaults
+(**for window plugin only**) define an object of default values, for example you can specify the default window size by setting `"defaults": {"w": 10, "h": 7}`.
+
+#### runnable
+Defines whether the plugin can be executed by clicking on the plugin menu (By default, all plugins are `runnable`). For helper plugins which do not run by themselves, (e.g. a `pyworker` plugin can be called by a `window` plugin and do not necessarily executed by the user directly), setting `"runnable": false` would move down the plugin to the bottom of the plugin menu and made non-clickable.
 
 ### `<docs>` block
 Used to contain documentation for the plugin, it need to be written in `Markdown` language. Here is a document about how to write document in `Markdown`: [Mastering Markdown](https://guides.github.com/features/mastering-markdown/). Please note that if you provide links that these will be opened in another tab, leaving the ImJoy instance running.
