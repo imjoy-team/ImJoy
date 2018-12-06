@@ -228,7 +228,7 @@ Defines the icon used in the plugin menu. You can find different icons here http
 
 #### inputs
 Defines the inputs with json-schema syntax (http://json-schema.org/) .
-For example, to define that the plugin uses png files, you can specify `"inputs": {"properties": {"type": {"enum": ["image/png"], "required": true}}, "type": "object"}` . You can also use the simplified format which assumes the inputs is an object and use json schema to describe the properties: `"inputs": {"type": {"enum": ["image/png"], "required": true}}`.
+For example, to define that the plugin uses png files, you can specify `"inputs": {"properties": {"type": {"enum": ["image/png"]}}, "type": "object"}` . You can also use the simplified format which assumes the inputs is an object and use json schema to describe the properties: `"inputs": {"type": {"enum": ["image/png"]}}`.
 
 #### outputs
 Defines the outputs with json-schema syntax (http://json-schema.org/).
