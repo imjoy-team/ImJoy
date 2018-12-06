@@ -1196,6 +1196,9 @@ export default {
         _plugin = duration
         duration = null
       }
+      if(duration){
+        duration = duration * 1000
+      }
       this.showMessage(msg, duration)
     },
     showFileDialog(options, _plugin){
