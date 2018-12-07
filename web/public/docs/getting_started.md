@@ -30,12 +30,16 @@ This interface provides all functionality needed to process data.
 
 ## ImJoy App and Plugin Engine
 
-ImJoy can be used  directly from your browser (Chrome or Firefox) **without any installation** [ImJoy web app](https://imjoy.io/#/app) or as a **standalone** [desktop app](<add link>) **[TODO] add link**. Many plugins can be used directly, and you can already get a feeling
+ImJoy can be used  directly from your browser (Chrome or Firefox)
+**without any installation** [ImJoy web app](https://imjoy.io/#/app)
+or as a **standalone** [desktop app](<add link>) **[TODO] add link**.
+Many plugins can be used directly, and you can already get a feeling
 for ImJoy works.
 
 For some more advanced processing, the **Python Plugin Engine**  is required. Such
 plugins are highlighted with a 🚀. If you use the webApp then you have to install
-the plugin engine. Click the 🚀 button located on the upper-right corner. In the displayed window, you will find instructions on how to set up the engine. When you use
+the plugin engine. Click the 🚀 button located on the upper-right corner.
+In the displayed window, you will find instructions on how to set up the engine. When you use
 the desktopApp, the plugin is alread included!
 
 
@@ -84,6 +88,27 @@ As mentioned above, Imjoy consists of **two main components**
 The Python Plugin Engine is connected with the ImJoy Web App through websockets
 and communicate with a customized remote procedure calls (RPC) based on `socket.io`.
 
+### How to choose
+ImJoy provides a flexible framework to develop your plugins. Here we provide
+some typical examples for how ImJoy can be used. Please not that these are only
+some suggestions, other combinations are of course possible and be interesting
+for particular applications
+
+1. **ImJoy webApp with JavaScript or WebPython plugins**. Such a framework runs without
+ any installation on different operation systems. It is ideal for not too computational
+ intensive task. Limitations are that WebPython is (currently) slower than native Python
+ and that it doesn't support the entire Python ecosystem.
+
+2. **Desktop App**. Here you can all plugins types (JavaScript included). Further,
+  you have access to the entire python ecosystem thanks to the integrated plugin engine.
+  Ideal for heavy computations or when Python modules that are not available for webPY are used.
+  However, the app has to be installed.
+
+3. **Plugin engine on a remote computer**. You can then connect to the engine either
+  from the web or desktop app. This allows to process data on a dedicated processing
+  workstation or a cluster
+
+**[TODO]** ok like this?
 
 ## ImJoy for core developers
 **[TODO]**

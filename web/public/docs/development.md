@@ -74,7 +74,6 @@ Similary to `webworker` plugin, python plugins do not have access to the html do
 ### WebPython
 **[TODO]**
 
-
 ### Debugging
 
 *   **JavaScript plugins**: this concerns either Webworker or Window plugins. With the ImJoy code editor, you can write your code. For testing you can click save on the toolbar in the code editor, and it will automatically load your plugin to the plugin menu shown on the left side. By right click on in the workspace, you use the [chrome development tool](https://developers.google.com/web/tools/chrome-devtools) to see the console and debug your code.
@@ -186,8 +185,37 @@ Contains a short description about the plugin.
 Plugin type or execution mode. See dedicated section [ImJoy Plugins]() above for more details.
 
 #### tags
-List of supported tags, which can be used to provide differentiate configureable modes and can be accessed at various points in the plugin. For an overview we
-we refer to the dedicate description **## Plugins and tags**
+List of supported tags, which can be used to provide differentiate configureable
+modes and can be accessed at various points in the plugin. If a plugin was defined with
+tags, they will appear  on top of the code editor and during the installation proces.
+If you distribute your plugin with an url **[TODO] add link**, you can specify
+with which tag the plugin will be installed.
+
+Within the **``<config>``** tag, the following fields can be made configurable:
+- `env`
+- `requirements`
+- `dependencies`
+- `icon`
+- `ui`
+- `mode`
+- `script`
+
+**Example 1**. a python plugin should install different requirements depending if it will
+be executed on GPU or CPU. You can then defined two tags: `"tags" : ["GPU", "CPU"]`.
+You can set different `requirements` accordingly: `"requirements": {"gpu": ["tensorflow-gpu", "keras"], "cpu": ["tensorflow", "keras"]}`.
+The user will be asked to choose one of the tags during the installation, which will then install
+the specified requirements.
+
+**Example 2**. You can switch between a stable and development version of a plugin.
+Here, you can configured the  **`<script>`** block can be configured, and you can
+select which script script is executed. For this, you have to add the `tag` property
+to the `<script>` block. Notice also that you will still need the `lang` property.
+For example, if you have `"tags": ["stable", "dev"]`, then you can have two s
+cript blocks: `<script lang="python" tag="stable">` and `<script lang="python" tag="dev">`.
+When developing and testing a plugin, the ImJoy editor will recognize that the plugin
+has multiple tags and you can select a tag in the tile bar of the plugin. When loading
+the plugin, it will be loaded with this tag.
+
 
 #### ui
 String specifying the GUI that will be displayed to the user. The following elements can be used to render an input form:
@@ -266,7 +294,7 @@ The format is the same as for `inputs`.
 (**for python plugins only**) the command used to run the plugin. By default, it will be run with `python`. Depending on the installtion it could also be be something like `python3` or `python27` etc.
 
 
-#### requirementsrequirements
+#### requirements
 
 * For `webworker` plugins written in Javascript, it can be a array of JavaScript urls. They will be imported using `importScripts`. ImJoy provides a dedicated [GitHub repository](https://github.com/oeway/static.imjoy.io) hosting commonly used and tested libraries. You can refer to all files contained in the `docs` folder, for this
 you can construct an url with `https://static.imjoy.io` + `RelativePathInDocs`. For instance, the file `FileSaver.js` in the fodler `static.imjoy.io/docs/js/` can be referenced as `https://static.imjoy.io/js/FileSaver.js`.
@@ -390,18 +418,6 @@ only speed up the transferring of `ArrayBuffers` or `ArrayBufferViews` (and also
 ndarrays produced by Python), and after transferring, you won't be able to access it.
 
 (**Note**: in Python, the data type of `my` is a dictionary, ImJoy added the interface for allowing dot notation, just like in Javascript. If you prefer, you can also use `[]` in both languages to access dictionary or object.)
-
-### Tags
-In a plugin configuration <config> you can define different `tags`. These tags can then be
-used to control to overall functionality of the plugin.
-
-Within the **<config>** tag, the following fields can be made configurable: `"env", "requirements", "dependencies", "icon", "ui", "mode"`. For example, a python plugin may have two tags `["GPU", "CPU"]`. The user will be asked to choose one of the tag during the installation. For example, you can set different `requirements` according to different tag which selected by the user during installation. In order to support that, the `requirements` can be set to `{"gpu": "pip install tensorflow-gpu keras", "cpu": "pip install tensorflow keras"}` or `{"gpu": ["tensorflow-gpu", "keras"], "cpu": ["tensorflow", "keras"]}`.
-
-The **`<script>`** block can be configured, and you can select which script script is executed. For this, you have to add the `tag` property to the `<script>` block. Notice also that you will still need the `lang` property. For example, if you have `"tags": ["stable", "dev"]`, then you can have two script blocks: `<script lang="python" tag="stable">` and `<script lang="python" tag="dev">`.
-
-When developing and testing a plugin, the ImJoy editor will recognize that the plugin
-has multiple tags and you can select a tag in the tile bar of the plugin. When loading
-the plugin, it will be loaded with this tag.
 
 ## Advanced options
 
