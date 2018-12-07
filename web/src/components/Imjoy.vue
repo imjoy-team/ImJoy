@@ -1376,7 +1376,7 @@ export default {
               resolve()
               this.reloadPlugin(template)
             }).catch(()=>{
-              reject(`Failed to save the plugin ${template.name}`)
+              reject(`Failed to save the plugin ${config.name}`)
             })
           }).catch((error)=>{
             alert(`Failed to install dependencies for ${config.name}: ${error}`)
