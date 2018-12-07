@@ -82,19 +82,33 @@ Similary to `webworker` plugin, python plugins do not have access to the html do
 * **Python plugins**: Similary, you can create Python plugins from the `pyworker` template in the **+ PLUGINS** dialog. If your plugin engine is running, you can save and run(Ctrl+S, or through the toolbar) with your code directly in the ImJoy code editor. For larger project with many Python files, the recommended way is to wrap your Python files as standard Python modules, write and test the Python module using your code editor/IDE of choice (Atom, Spyder, PyCharm,...). Then create an ImJoy plugin with the ImJoy code editor, by inserting the module path to `sys.path` (e.g. `sys.insert(0, '~/my_python_module')`), you can then import the module to the ImJoy plugin and test it.
 
 ## Loading / saving data
-ImJoy is build on webtechnology and is running in the browser. This influences
+The **ImJoy app** is build on webtechnology and is running in the browser. This influences
 how data can be loaded and saved. For security restrictions, a browser has no
-access to your local file-system. Therefore, there are currently
-two different ways to handle loading/saving files for plugins
-with or without the plugin engine. 
+access to your local file-system. The **plugin engine** is running outside of
+the browser and has thus full acces to the local file system.
 
-For **Python plugins** running on then plugin engine, files can be directly
-loaded and written to the file system. For **JavaScript or WebPython plugins**,
-specific files or folders can be exposed to browser with a dedicated file dialog, where the user
-has to confirm that these files will be accessible. File export can be achieved
-by triggering a downloads for exporting files.  
+<img src="./assets/imjoy-data-accessibility.png" width="800px"></img>
 
-**[TODO]** This needs more information, maybe something graphical?
+**[TODO]** Is this cartoon for the current implementation correct?
+
+Therefore, there are currently wo different ways to handle loading/saving files for plugins
+with or without the plugin engine. For **Python plugins** running on the plugin engine,
+files can be directly loaded and written to the file system.
+
+For **JavaScript or WebPython plugins**, you have different possibilities.
+1. You can drag a file or a folder directly into the ImJoy workspace. This will render
+ a window with the file/folder content. These data can then be accessed by the plugins
+ and be processed.
+2. Specific files or folders can be exposed with a dedicated file dialog,
+where the user has to confirm that these files will be accessible. This requires
+that the plugin engine is running. See api function `api.showFileDialog` for more details.
+**[TODO] add link**.
+3. If you want to want to make a file from within a Python plugin accessible to a JavaScript plugin, you
+   can use the api function `api.getFileUrl`. **[TODO] add link**
+4. File exports from a JavaScript plugin can be achieved by triggering a download,
+   see `api.getFileUrl` for more details. **[TODO] add link**.
+
+**[TODO]** This needs more information.
 
 ## Plugin file format
 The ImJoy plugin file format (shared by all Plugin types)  is built up on html format with customized blocks (inspired by the `.vue` format). It consists of two mandatory blocks `<config>` and `<script>`, and other optional blocks including `<docs>`, `<window>`,`<attachment>`,`<link>` and `<style>`.  For `<style>`, you can also set the `src` attribute.
@@ -413,7 +427,7 @@ You can control the run-time behavior of a Python plugin process with the `flags
 * **Workspace**: collection of installed ImJoy plugins. For plugins with `tags`, the user choses the appropriate tag. Each Python plugin within a workspace has its own process. Each workspace has a unique name.
 * **ImJoy instance** is a workspace running in one ImJoy interface.
 
-<img src="./assets/imjoy-python-process.png" width="600px"></img>
+<img src="./assets/imjoy-python-process.png" width="800px"></img>
 
 Below we describe the three main run-time behavior of python plugins:
 * By **default** (none of the flags is set), each ImJoy instance has its own process on the plugin engine. If you close the interface, you will kill the process.

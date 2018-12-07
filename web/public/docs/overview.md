@@ -19,6 +19,7 @@ simple tasks such as reading tif file, or more complex tasks such as training
 a deep learning model for image segmentation.
 
 <img src="./assets/imjoy-overview.png" width="800px"></img>
+
 Imjoy consists of **two parts**:
 
 1.  the **ImJoy app**. It can either run in a browser ("webApp") or as a stand-alone app (desktopApp). The app alone can already perform computational tasks with the powerful
