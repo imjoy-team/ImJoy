@@ -146,6 +146,58 @@ Communication between the window and Python plugin is achieved by the ImJoy API 
 
 Let's have a look at the Python function `calc_results`. It receives the JavaScript dictionary, extracts all necessary parameters and perform the desired calculation. Then it stores the data wiht `self.x_values = x`. Lastly, invokes the callback function to print in the main window with `callback_fun(...)`. Here the parameters are again passed as a dictionary. Please note, the **numpy** arrays are not supported, and the data has therefore be transformed to a list.
 
+## Using JavaScript libraries in ImJoy
+Here we provide some examples where we integrate different JavaScript libraries.
+
+<a href="http://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:tSNE&w=demo-js" target="_blank">**Try me >>**</a>
+
+### handlebars.js
+
+From [https://handlebarsjs.com/](https://handlebarsjs.com/):
+
+> Handlebars provides the power necessary to let you build semantic templates   effectively with no frustration. Handlebars is largely compatible with Mustache templates. In most cases it is possible to swap out Mustache with Handlebars and continue using your current templates.
+
+<a href="http://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:handlebars.js&w=demo-js" target="_blank">**Try me >>**</a>
+
+### 3D visualization
+Several 3D visualization libraries exist. We provide examples for some of them.
+
+#### vtk.js
+
+From [https://kitware.github.io/vtk-js/index.html](https://kitware.github.io/vtk-js/index.html)
+
+> VTK.js is a JavaScript library available for scientific visualization in your browser.
+
+<a href="http://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:3D visualization&w=demo-js" target="_blank">**Try me >>**</a>
+
+
+#### sponza by Babylon.js
+
+From [https://www.babylonjs.com/demos/sponza/](https://www.babylonjs.com/demos/sponza/)
+
+**[TODO] not working yet**
+
+<a href="http://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:3D visualization&w=demo-js" target="_blank">**Try me >>**</a>
+
+
+#### three.js
+
+From [https://threejs.org/](https://threejs.org/)
+
+> Three.js is a cross-browser JavaScript library and Application Programming Interface
+  used to create and display animated 3D computer graphics in a web browser.
+  Three.js uses WebGL.
+
+**[TODO] not working yet**
+<a href="http://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:three.js&w=demo-js" target="_blank">**Try me >>**</a>
+
+### t-SNE analysis
+Example from [https://cs.stanford.edu/people/karpathy/tsnejs/]()
+
+
+**[TODO] not working yet**
+
+
 ## Distribution and deployment
 
 ### Distribution and deployment of code/data stored on Dropbox
