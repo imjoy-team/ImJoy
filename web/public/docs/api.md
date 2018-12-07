@@ -170,6 +170,9 @@ You need to make sure the argument number match the actual function defined in t
 * **plugin_op**: String. Name of plugin function (op).
 * **data**: data. Any of the supported primitive data types that can be transfered.
 
+**Returns**
+* **[TODO]**. A promise which can be used to retrieve the call results.
+
 **Example**
 To call a function  `funcX` defined in the plugin  `PluginX` with the argument `1`, use
 
@@ -319,7 +322,7 @@ result2 = await api.run("name of plugin 2")
 
 ### api.createWindow
 ```javascript
-const window_id = await api.createWindow({name: window_name, type: window_type, w:w, h:h, data: data, config:config},clickload:false)
+window_id = await api.createWindow({name: window_name, type: window_type, w:w, h:h, data: data, config:config},clickload:false)
 ```
 Creates a new window in the ImJoy workspace.
 
@@ -353,7 +356,7 @@ the window with `api.updateWindow`.
 
 **Examples**
 ```javascript
-const window_id = await api.createWindow({name: 'new window', type: 'Image Window', w:7, h:7, data: {image: ...}, config: {}})
+window_id = await api.createWindow({name: 'new window', type: 'Image Window', w:7, h:7, data: {image: ...}, config: {}})
 ```
 [Try yourself >>](https://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:createWindow&w=examples)
 
@@ -429,7 +432,7 @@ presses `cancel`, you can use the `try catch` (JavaScript) or `try except` (Pyth
 syntax.
 
 ```javascript
-const result = await api.showDialog({
+result = await api.showDialog({
    "name": "This is a dialog",
    "ui": "Hey, please select a value for sigma: {id:'sigma', type:'choose', options:['1', '3'], placeholder: '1'}.",
 })
@@ -509,7 +512,7 @@ api.showPluginStatus('processing...')
 
 ### api.setConfig
 ``` javascript
-api.setConfig(param_name, param_value)
+api.setConfig(config_name, config_value)
 ```
 Store plugin data in its configuration.
 
@@ -520,9 +523,9 @@ the ImJoy app itself.
 To remove a parameter, set its value to `null` (JavaScript) or `None` (Python).
 
 **Arguments**
-* **param_name**: String. Name of parameter. Don't use names starting with an `_` followed by
+* **config_name**: String. Name of parameter. Don't use names starting with an `_` followed by
 any of the field name of the `<config>` block.
-* **param_value**: Number or String. Neither objects/arrays (JS) nor dict/list (Python). Please note that numbers are stored as strings.
+* **config_value**: Number or String. Neither objects/arrays (JS) nor dict/list (Python). Please note that numbers are stored as strings.
 
 **Examples**
 ``` javascript
@@ -533,7 +536,7 @@ api.setConfig('sigma', 928)
 
 ### api.getConfig
 ``` javascript
-const param = api.getConfig(param_name, param_value)
+config_value = await api.getConfig(config_name)
 ```
 Retrieves configurations for plugin.
 
@@ -547,7 +550,7 @@ Retrieves configurations for plugin.
 **Examples**
 
 ``` javascript
-  const sigma = await api.getConfig('sigma')
+sigma = await api.getConfig('sigma')
 ```
 
 [Try yourself in the setConfig example >>](https://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:setConfig&w=examples)
