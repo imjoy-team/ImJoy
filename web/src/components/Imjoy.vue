@@ -229,8 +229,8 @@
                 </md-menu-content>
               </md-menu>
 
-              <md-button class="joy-run-button" :class="plugin.running?'md-accent':(plugin._disconnected && plugin.mode == 'pyworker'? 'disconnected-plugin': 'md-primary')" :disabled="plugin._disconnected && plugin.mode != 'pyworker'" @click="plugin._disconnected?connectPlugin(plugin):runOp(plugin.ops[plugin.name])">
-                {{plugin.mode == 'pyworker'? plugin.name + ' 🚀': plugin.name}}
+              <md-button class="joy-run-button" :class="plugin.running?'md-accent':(plugin._disconnected && plugin.type == 'pyworker'? 'disconnected-plugin': 'md-primary')" :disabled="plugin._disconnected && plugin.type != 'pyworker'" @click="plugin._disconnected?connectPlugin(plugin):runOp(plugin.ops[plugin.name])">
+                {{plugin.type == 'pyworker'? plugin.name + ' 🚀': plugin.name}}
               </md-button>
               <md-button v-if="!plugin._disconnected" class="md-icon-button" @click="plugin.panel_expanded=!plugin.panel_expanded; $forceUpdate()">
                 <md-icon v-if="!plugin.panel_expanded">expand_more</md-icon>
@@ -288,8 +288,8 @@
                   </md-menu-content>
                 </md-menu>
 
-                <md-button class="joy-run-button" :class="plugin.running?'md-accent':(plugin._disconnected && plugin.mode == 'pyworker'? 'disconnected-plugin': '')" :disabled="plugin.mode != 'pyworker' || !plugin._disconnected" @click="connectPlugin(plugin)">
-                  {{plugin.mode == 'pyworker'? plugin.name + ' 🚀': plugin.name}}
+                <md-button class="joy-run-button" :class="plugin.running?'md-accent':(plugin._disconnected && plugin.type == 'pyworker'? 'disconnected-plugin': '')" :disabled="plugin.type != 'pyworker' || !plugin._disconnected" @click="connectPlugin(plugin)">
+                  {{plugin.type == 'pyworker'? plugin.name + ' 🚀': plugin.name}}
                 </md-button>
                 <md-divider></md-divider>
               </div>
@@ -453,7 +453,7 @@
           <md-toolbar md-elevation="0">
             <div class="md-toolbar-section-start">
               <h2><md-icon v-if="plugin4install.icon">{{plugin4install.icon}}</md-icon><md-icon v-else>extension</md-icon>
-                {{plugin4install.mode == 'pyworker'? plugin4install.name + ' 🚀': plugin4install.name}}
+                {{plugin4install.type == 'pyworker'? plugin4install.name + ' 🚀': plugin4install.name}}
               </h2>
             </div>
             <div v-if="tag4install" class="md-toolbar-section-end">
@@ -540,7 +540,8 @@ import {
   url_regex,
   githubImJoyManifest,
   githubUrlRaw,
-  assert
+  assert,
+  compareVersions
 } from '../utils.js'
 import {
   parseComponent
@@ -1216,7 +1217,7 @@ export default {
           if(source_plugin){
             options.root = options.root || (source_plugin.config && source_plugin.config.work_dir)
           }
-          if(source_plugin && source_plugin.mode != 'pyworker'){
+          if(source_plugin && source_plugin.type != 'pyworker'){
             options.uri_type = options.uri_type || 'url'
           }
           else{
@@ -1231,7 +1232,7 @@ export default {
     },
     connectPlugin(plugin){
       if(plugin._disconnected){
-        if(plugin.mode == 'pyworker' && !this.engine_connected){
+        if(plugin.type == 'pyworker' && !this.engine_connected){
           this.connectEngine(this.engine_url)
         }
         else{
@@ -1352,8 +1353,8 @@ export default {
             reject('Failed to parse the plugin code.')
             return
           }
-          if (!SUPPORTED_PLUGIN_MODES.includes(config.mode)){
-            reject('Unsupported plugin mode: '+config.mode)
+          if (!SUPPORTED_PLUGIN_MODES.includes(config.type)){
+            reject('Unsupported plugin mode: '+config.type)
             return
           }
           config.tag = tag || config.tag
@@ -1818,13 +1819,13 @@ export default {
           // console.log('reloading plugin ', pconfig)
           const template = this.parsePluginCode(pconfig.code, pconfig)
           template._id = pconfig._id
-          if(template.mode == 'collection'){
+          if(template.type == 'collection'){
             return
           }
           this.unloadPlugin(template, true)
           let p
 
-          if (template.mode == 'window') {
+          if (template.type == 'window') {
             p = this.preLoadPlugin(template)
           } else {
             p = this.loadPlugin(template)
@@ -1895,7 +1896,7 @@ export default {
     },
     reloadPythonPlugins(){
       for(let p of this.installed_plugins){
-        if(p.mode == 'pyworker'){
+        if(p.type == 'pyworker'){
           this.reloadPlugin(p)
         }
       }
@@ -1904,7 +1905,7 @@ export default {
       for (let k in this.plugins) {
         if (this.plugins.hasOwnProperty(k)) {
           const plugin = this.plugins[k]
-          if(plugin.mode == 'pyworker'){
+          if(plugin.type == 'pyworker'){
             try {
               Joy.remove(plugin.config.type)
               // console.log('terminating ',plugin)
@@ -2417,12 +2418,19 @@ export default {
       } catch (e) {
         throw "Failed to parse the content of the plugin."
       }
+      return this.upgradeAPI(config)
+    },
+    upgradeAPI(config){
+
+      if(compareVersions(config.api_version, '<=', '0.1.1')){
+        config.type = config.mode
+      }
       return config
     },
     preLoadPlugin(template, rplugin) {
       const config = {
         name: template.name,
-        mode: template.mode,
+        type: template.type,
         type: template.type,
         ui: template.ui,
         tag: template.tag,
@@ -2448,7 +2456,7 @@ export default {
           name: config.name,
           type: config.type,
           config: tconfig,
-          mode: template.mode,
+          type: template.type,
           docs: template.docs,
           tag: template.tag,
           attachments: template.attachments,
@@ -2460,7 +2468,7 @@ export default {
         plugin.api = {
           run: async (my) => {
             const c = _clone(template.defaults) || {}
-            c.type = template.type
+            c.type = template.name
             c.name = template.name
             c.tag = template.tag
             // c.op = my.op
@@ -2493,7 +2501,7 @@ export default {
         }
         config._id = template._id
         config.context = this.pluing_context
-        if (template.mode == 'pyworker') {
+        if (template.type == 'pyworker') {
           if (!this.socket) {
             console.error("Please connect to the Plugin Engine 🚀.")
           }
@@ -2691,7 +2699,6 @@ export default {
         if(!plugin) throw "Plugin not found."
         config = _clone(config)
         config.name = config.name || plugin.name
-        config.type = config.type || config.name
         config.show_panel = config.show_panel || false
         config.ui = this.normalizeUI(config.ui)
         if(plugin.name == config.name){
@@ -2700,21 +2707,24 @@ export default {
         config.tags = ["op", "plugin"]
         config.inputs = config.inputs || null
         config.outputs = config.outputs || null
-        if(config.mode == 'window'){
+        // save type to tags
+        if(config.type == 'window'){
           config.tags.push('window')
         }
-        else if(config.mode == 'pyworker'){
+        else if(config.type == 'pyworker'){
           config.tags.push('python')
         }
-        else if(config.mode == 'webworker'){
+        else if(config.type == 'webworker'){
           config.tags.push('webworker')
         }
-        else if(config.mode == 'webpython'){
+        else if(config.type == 'webpython'){
           config.tags.push('webpython')
         }
-        else if(config.mode == 'iframe'){
+        else if(config.type == 'iframe'){
           config.tags.push('iframe')
         }
+        // use its name for type
+        config.type = config.name
         // console.log('registering op', config)
         if (!REGISTER_SCHEMA(config)) {
           const error = REGISTER_SCHEMA.errors(config)
@@ -2828,7 +2838,7 @@ export default {
             }
 
           } catch (e) {
-            console.error(`something went wrong with the input schema for ${config.name}`, e)
+            console.error(`error occured when parsing the inputs schema of "${config.name}"`, e)
           }
         }
         if (config.outputs){
@@ -2848,7 +2858,7 @@ export default {
             const sch = ajv.compile(config.outputs)
             this.registered.outputs[plugin.name+'/'+config.name] =  {op_name: config.name, plugin_name: plugin.name, schema: sch}
           } catch (e) {
-            console.error(`something went wrong with the output schema for ${config.name}`, config.outputs)
+            console.error(`error occured when parsing the outputs schema of "${config.name}"`, e)
           }
         }
 
@@ -2860,7 +2870,7 @@ export default {
         // console.log('creating panel: ', op_config)
         this.$forceUpdate()
 
-        // if (config.mode != 'window') {
+        // if (config.type != 'window') {
         //   throw 'Window plugin must be with type "window"'
         // }
 
@@ -2980,11 +2990,11 @@ export default {
           // console.log(window_config)
           const pconfig = wconfig //_clone(window_config)
           //generate a new window id
-          pconfig.mode = window_config.mode
+          pconfig.type = window_config.type
           pconfig.id = window_config.id + '_' + randId()//window_config.name.trim().replace(/ /g, '_') + '_' + randId()
           // console.log('creating window: ', pconfig)
-          if (pconfig.mode != 'window') {
-            throw 'Window plugin must be with mode "window"'
+          if (pconfig.type != 'window') {
+            throw 'Window plugin must be with type "window"'
           }
           // this is a unique id for the iframe to attach
           pconfig.iframe_container = 'plugin_window_' + pconfig.id + randId()

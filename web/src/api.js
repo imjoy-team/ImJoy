@@ -1,7 +1,7 @@
 import Ajv from 'ajv'
 var ajv = new Ajv()
 
-export const CONFIGURABLE_FIELDS = ["env", "requirements", "dependencies", "icon", "ui", "mode", "flags"]
+export const CONFIGURABLE_FIELDS = ["env", "requirements", "dependencies", "icon", "ui", "type", "flags"]
 
 export const SUPPORTED_PLUGIN_MODES = ['webworker', 'pyworker', 'webpython', 'iframe', 'window', 'collection']
 export const WEBWORKER_PLUGIN_TEMPLATE= `
@@ -12,11 +12,11 @@ export const WEBWORKER_PLUGIN_TEMPLATE= `
 <config lang="json">
 {
   "name": "Untitled Plugin",
-  "mode": "webworker",
+  "type": "webworker",
   "tags": [],
   "ui": "",
   "version": "0.1.0",
-  "api_version": "0.1.1",
+  "api_version": "0.1.2",
   "url": "",
   "description": "[TODO: describe this plugin in one sentense.]",
   "icon": "extension",
@@ -53,11 +53,11 @@ export const IFRAME_PLUGIN_TEMPLATE= `
 <config lang="json">
 {
   "name": "Untitled Plugin",
-  "mode": "iframe",
+  "type": "iframe",
   "tags": [],
   "ui": "UI for Untitled Plugin",
   "version": "0.1.0",
-  "api_version": "0.1.1",
+  "api_version": "0.1.2",
   "description": "[TODO: describe this plugin in one sentense.]",
   "icon": "extension",
   "inputs": null,
@@ -92,11 +92,11 @@ export const WINDOW_PLUGIN_TEMPLATE= `
 <config lang="json">
 {
   "name": "Untitled Plugin",
-  "mode": "window",
+  "type": "window",
   "tags": [],
   "ui": "UI for Untitled Plugin",
   "version": "0.1.0",
-  "api_version": "0.1.1",
+  "api_version": "0.1.2",
   "description": "[TODO: describe this plugin in one sentense.]",
   "icon": "extension",
   "inputs": null,
@@ -144,9 +144,9 @@ export const PYWORKER_PLUGIN_TEMPLATE= `
 <config lang="json">
 {
   "name": "Untitled Plugin",
-  "mode": "pyworker",
+  "type": "pyworker",
   "version": "0.1.0",
-  "api_version": "0.1.1",
+  "api_version": "0.1.2",
   "description": "[TODO: describe this plugin in one sentense.]",
   "tags": [],
   "ui": "",
@@ -183,9 +183,9 @@ export const WEBPYTHON_PLUGIN_TEMPLATE= `
 <config lang="json">
 {
   "name": "Untitled Plugin",
-  "mode": "webpython",
+  "type": "webpython",
   "version": "0.1.0",
-  "api_version": "0.1.1",
+  "api_version": "0.1.2",
   "description": "[TODO: describe this plugin in one sentense.]",
   "tags": [],
   "ui": "UI for this plugin",

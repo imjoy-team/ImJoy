@@ -313,7 +313,7 @@ var initIframePlugin = function() {
     );
 }
 
-var plugin_mode = getParamValue('mode');
+var plugin_mode = getParamValue('type');
 if(plugin_mode =='webworker'){
   try {
       initWebworkerPlugin();
