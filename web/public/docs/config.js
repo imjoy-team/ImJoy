@@ -15,7 +15,7 @@ docute.init({
     {title: 'User Manual', path: '/user-manual', source: 'user_manual.md'},
     {title: 'Development', path: '/development', source: 'development.md'},
     {title: 'ImJoy API', path: '/api', source: 'api.md'},
-    {title: 'Tutorial', path: '/tutorial', source: 'tutorial.md'},
+    {title: 'Demos', path: '/demos', source: 'demos.md'},
     // {
     //   title: 'getting started',
     //   path: '/get-started',
