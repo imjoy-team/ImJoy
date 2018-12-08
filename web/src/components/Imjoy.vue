@@ -554,7 +554,9 @@ import {
   Joy
 } from '../joy'
 
-import schema from 'js-schema'
+
+import Ajv from 'ajv'
+const ajv = new Ajv()
 
 export default {
   name: 'imjoy',
@@ -804,7 +806,7 @@ export default {
       getAttachment: this.getAttachment,
       getFileUrl: this.getFileUrl,
       getFilePath: this.getFilePath,
-      utils: {$forceUpdate: this.$forceUpdate, openUrl: this.openUrl},
+      utils: {$forceUpdate: this.$forceUpdate, openUrl: this.openUrl, sleep: this.sleep},
     }
 
     this.resetPlugins()
@@ -1194,6 +1196,9 @@ export default {
         _plugin = duration
         duration = null
       }
+      if(duration){
+        duration = duration * 1000
+      }
       this.showMessage(msg, duration)
     },
     showFileDialog(options, _plugin){
@@ -1371,7 +1376,7 @@ export default {
               resolve()
               this.reloadPlugin(template)
             }).catch(()=>{
-              reject(`Failed to save the plugin ${template.name}`)
+              reject(`Failed to save the plugin ${config.name}`)
             })
           }).catch((error)=>{
             alert(`Failed to install dependencies for ${config.name}: ${error}`)
@@ -1927,18 +1932,26 @@ export default {
         loaders: {}
       }
       this.registered.internal_inputs = {
-        'Image': { schema: schema({type: ['image/jpeg', 'image/png', 'image/gif'], size: Number})},
+        'Image': { schema: ajv.compile({properties: {type: {"enum": ['image/jpeg', 'image/png', 'image/gif']}, size: {type: 'number'}}}) },
+        'Code Editor': { schema: ajv.compile({properties: {name: { "pattern": ".*\\.imjoy.html|\\.html|\\.txt|\\.xml"}}})},
       }
       this.registered.loaders['Image'] = (file)=>{
-        var fr = new FileReader();
-        fr.onload =  () => {
+        const reader = new FileReader();
+        reader.onload =  () => {
           this.createWindow({
             name: file.name,
             type: 'imjoy/image',
-            data: {src: fr.result}
+            data: {src: reader.result, _file: file}
           })
         }
-        fr.readAsDataURL(file);
+        reader.readAsDataURL(file);
+      }
+      this.registered.loaders['Code Editor'] = (file)=>{
+        const reader = new FileReader();
+        reader.onload = ()=>{
+            this.newPlugin(reader.result)
+        }
+        reader.readAsText(file);
       }
     },
     reloadDB(){
@@ -2176,13 +2189,17 @@ export default {
       return loaders
     },
     loadFiles() {
-      if(this.selected_files.length == 1 && this.selected_files[0].name.endsWith('.imjoy.html')){
-        const reader = new FileReader();
-        reader.onload = ()=>{
-            this.newPlugin(reader.result)
+      if(this.selected_files.length == 1){
+        const file = this.selected_files[0]
+        const loaders = this.getDataLoaders(file)
+        const keys = Object.keys(loaders)
+        if(keys.length == 1){
+          try {
+            return this.registered.loaders[loaders[keys[0]]](file)
+          } catch (e) {
+            console.error(`Failed to load with the matched loader ${loaders[0]}`, e)
+          }
         }
-        reader.readAsText(this.selected_files[0]);
-        return
       }
       for (let f = 0; f < this.selected_files.length; f++) {
         const file = this.selected_files[f]
@@ -2291,7 +2308,7 @@ export default {
       const w = this.active_windows[this.active_windows.length - 1] || {}
       const mw = this.plugin2joy(w) || {}
       mw.target = mw.target || {}
-      mw.target._op = '__op__'
+      mw.target._op = op.name
       mw.target._source_op = null
       // mw.target._transfer = true
       mw.target._workflow_id = mw.target._workflow_id || "op_"+op.name.trim().replace(/ /g, '_')+randId()
@@ -2773,7 +2790,7 @@ export default {
                 throw "inputs schema must be an object."
               }
             }
-            const sch = schema.fromJSON(config.inputs)
+            const sch = ajv.compile(config.inputs)
             // console.log('inputs schema:-->', plugin.name, config.name, sch.toJSON())
             const plugin_name = plugin.name
             const op_name = config.name
@@ -2817,7 +2834,7 @@ export default {
                 throw "inputs schema must be an object."
               }
             }
-            const sch = schema.fromJSON(config.outputs)
+            const sch = ajv.compile(config.outputs)
             this.registered.outputs[plugin.name+'/'+config.name] =  {op_name: config.name, plugin_name: plugin.name, schema: sch}
           } catch (e) {
             console.error(`something went wrong with the output schema for ${config.name}`, config.outputs)
@@ -3006,6 +3023,9 @@ export default {
     },
     openUrl(url){
       Object.assign(document.createElement('a'), { target: '_blank', href: url}).click();
+    },
+    sleep(seconds) {
+      return new Promise(resolve => setTimeout(resolve, Math.round(seconds*1000)));
     }
   }
 }

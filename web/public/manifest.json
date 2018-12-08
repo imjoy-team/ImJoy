@@ -1,8 +1,11 @@
 {
- "name": "ImJoy.io",
-  "start_url": "/index.html",
-  "display": "standalone",
-  "orientation": "portrait",
+ "name": "ImJoy.IO",
+ "short_name": "ImJoy",
+ "start_url": "/index.html",
+ "display": "standalone",
+ "orientation": "portrait",
+ "theme_color": "#448aff",
+ "background_color": "#fff",
  "icons": [
   {
    "src": "\/static\/icons\/android-icon-36x36.png",

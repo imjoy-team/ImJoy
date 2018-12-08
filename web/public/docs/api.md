@@ -728,12 +728,8 @@ Currently supported functions for **all plugins** are:
  * `api.utils.sleep(duration)`: sleep for a indicated `duration` in seconds. (for Python plugins, use `time.sleep` instead.)
 
 Currently supported functions for **Python plugins** are:
-* `api.utils.kill` for kill a `subprocess` in python.
-* `api.utils.ndarray` for wrapping ndarray according to ImJoy ndarray format.
-
-
-
-
+ * `api.utils.kill` for kill a `subprocess` in python.
+ * `api.utils.ndarray` for wrapping ndarray according to ImJoy ndarray format.
 
 ### api.TAG constant
 The current tag choosen by the user during installation.

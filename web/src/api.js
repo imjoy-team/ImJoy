@@ -1,4 +1,5 @@
-import schema from 'js-schema'
+import Ajv from 'ajv'
+var ajv = new Ajv()
 
 export const CONFIGURABLE_FIELDS = ["env", "requirements", "dependencies", "icon", "ui", "mode", "flags"]
 
@@ -33,7 +34,7 @@ class ImJoyPlugin {
 
   }
 
-  run(my) {
+  async run(my) {
     console.log('running in the plugin ', my)
 
   }
@@ -73,7 +74,7 @@ class ImJoyPlugin {
 
   }
 
-  run(my) {
+  async run(my) {
     console.log('running in the plugin ', my)
 
   }
@@ -113,7 +114,7 @@ class ImJoyPlugin {
 
   }
 
-  run(my) {
+  async run(my) {
     console.log('running in the plugin ', my)
 
   }
@@ -207,41 +208,48 @@ class ImJoyPlugin():
     def run(self, my):
         print('hello world.')
 
-
 api.export(ImJoyPlugin())
 </script>
 `
 
-export const PLUGIN_SCHEMA= schema({
-  _id: [null, String],
-  name: String,
-  code: String,
-  lang: [null, String],
-  script: [null, String],
+export const PLUGIN_SCHEMA= ajv.compile({
+  properties: {
+    _id: {type: ['null', 'string']},
+    name: {type: 'string'},
+    code: {type: 'string'},
+    lang: {type: ['null', 'string']},
+    script: {type: ['null', 'string']}
+  }
 })
 
-export const REGISTER_SCHEMA= schema({
-  name: String,
-  type: String,
-  ui: [null, String, Array, Object],
-  inputs: [null, Object],
-  outputs: [null, Object]
+export const REGISTER_SCHEMA= ajv.compile({
+  properties: {
+    name: {type: 'string'},
+    type: {type: 'string'},
+    ui: {type: ['null', 'string', 'array', 'object']},
+    inputs: {type: ['null', 'object']},
+    outputs: {type: ['null', 'object']}
+  }
 })
 
-export const WINDOW_SCHEMA= schema({
-  name: String,
-  type: String,
-  config: Object,
-  data: [null, Object], //attachments: {}
-  panel: [null, Object],
-  // click2load: Boolean
+export const WINDOW_SCHEMA= ajv.compile({
+  properties: {
+    name: {type: 'string'},
+    type: {type: 'string'},
+    config: {type: 'object'},
+    data: {type: ['null', 'object']}, //attachments: {}
+    panel: {type: ['null', 'object']}
+    // click2load: Boolean
+  }
 })
 
-export const OP_SCHEMA = {
-  name: String,
-  type: String,
-  ui: [null, String, Array, Object],
-  run: [null, String],
-  inputs: [null, Object],
-  outputs: [null, Object]
-}
+export const OP_SCHEMA = ajv.compile({
+  properties: {
+    name: {type: 'string'},
+    type: {type: 'string'},
+    ui: {type: ['null', 'string', 'array', 'object']},
+    run: {type: ['null', 'string']},
+    inputs: {type: ['null', 'object']},
+    outputs: {type: ['null', 'object'] }
+  }
+})
