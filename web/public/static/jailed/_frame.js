@@ -36,7 +36,7 @@ var getParamValue = function(paramName) {
 }
 
 /**
- * Initializes the plugin inside a webworker. May throw an exception
+ * Initializes the plugin inside a web worker. May throw an exception
  * in case this was not permitted by the browser.
  */
 var initWebworkerPlugin = function() {
@@ -109,7 +109,7 @@ var initWebworkerPlugin = function() {
 
 
 /**
- * Initializes the pyodide plugin inside a webworker. May throw an exception
+ * Initializes the pyodide plugin inside a web worker. May throw an exception
  * in case this was not permitted by the browser.
  */
 var initWebPythonWorkerPlugin = function() {
@@ -314,7 +314,7 @@ var initIframePlugin = function() {
 }
 
 var plugin_mode = getParamValue('type');
-if(plugin_mode =='webworker'){
+if(plugin_mode =='web-worker'){
   try {
       initWebworkerPlugin();
   } catch(e) {
@@ -322,7 +322,7 @@ if(plugin_mode =='webworker'){
       initIframePlugin();
   }
 }
-else if(plugin_mode =='webpython'){
+else if(plugin_mode =='web-python'){
   initWebPythonIframePlugin();
 }
 else if(plugin_mode=='iframe' || plugin_mode=='window'){

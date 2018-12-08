@@ -21,22 +21,22 @@ The following list illustrates key features of the plugin system in ImJoy:
 
 There are four types of plugins available for different purposes:
 
-**JavaScript** plugins support these two modes:
+**JavaScript** plugins support these two types:
 
-1. `Webworker(JavaScript)` plugin for performing computational tasks using JavaScript or WebAssembly;
-0. `Window(JavaScript and HTML` plugin for building a rich and interactive user interface using HTML5/CSS and JavaScript;
+1. `Web Worker (JavaScript)` plugin for performing computational tasks using JavaScript or WebAssembly;
+0. `Window (JavaScript and HTML)` plugin for building a rich and interactive user interface using HTML5/CSS and JavaScript;
 
-**Python** plugins support these two modes:
+**Python** plugins support these two types:
 
-1. `PyWorker(Python)` plugin for performing heavy-duty computational tasks using Python and its libraries, this requires additional installation of plugin engine;
-0. `Webpython` plugin for performing computational tasks using Python with in the browser through WebAssembly and the [pyodide project](https://github.com/iodide-project/pyodide). This is in developmental stage and only selected number of Python libraries are currently supported.
+1. `Native Python` plugin for performing heavy-duty computational tasks using Python and its libraries, this requires additional installation of plugin engine;
+0. `Web Python` plugin for performing computational tasks using Python with in the browser through WebAssembly and the [pyodide project](https://github.com/iodide-project/pyodide). This is in developmental stage and only selected number of Python libraries are currently supported.
 
 Click the **+ PLUGINS** button in `Plugins`, then select `Create a New Plugin`
 with one of the plugin templates. A code editor will open in the workspace, where you can write the code, save it, or install the plugin to the plugin menu. You can then test your plugin by clicking on the plugin name in the Plugins list.
 
 <img src="./assets/imjoy-plugin-types.png" width="800px"></img>
 
-### Webworker
+### Web Worker
 These plugins are used to do computation tasks in another thread, using a new element called ["web worker"](https://en.wikipedia.org/wiki/Web_worker). It does not have an interface, it runs in a new thread and won't hang the main thread during running. It is basically a way for Javascript to achieve multi-threading.
 
 Since it's designed for perfoming computational tasks, it does not have access to html dom but you can use `ImJoy API` to interact with the graphical interface of ImJoy or other plugin which can trigger changes on the user interface.
@@ -50,10 +50,10 @@ Different from other plugins which will be loaded and intialized when ImJoy is s
 If the `run` returned with an object, then it will be used to update the window status managed by ImJoy. This means, for example, if the user changed the name of the plugin, it can be achieved by returning the same `my` object in the `run` function.
 
 
-### PyWorker (Python)
+### Native Python
 Used to run Python code. This requires that the **Python Plugin Engine** is installed and started before using the plugin. See the **Developing Python Plugins** for more details.
 
-Similary to `webworker` plugin, python plugins do not have access to the html dom, but you can use `ImJoy API` to interact with the graphical interface of ImJoy or other plugin which can trigger changes on the user interface.
+Similary to `web-worker` plugin, python plugins do not have access to the html dom, but you can use `ImJoy API` to interact with the graphical interface of ImJoy or other plugin which can trigger changes on the user interface.
 
 **Use Docker Containers**
  **Not yet supported**
@@ -71,14 +71,14 @@ Similary to `webworker` plugin, python plugins do not have access to the html do
  </config>
  ```
 
-### WebPython
+### Web Python
 **[TODO]**
 
 ### Debugging
 
-*   **JavaScript plugins**: this concerns either Webworker or Window plugins. With the ImJoy code editor, you can write your code. For testing you can click save on the toolbar in the code editor, and it will automatically load your plugin to the plugin menu shown on the left side. By right click on in the workspace, you use the [chrome development tool](https://developers.google.com/web/tools/chrome-devtools) to see the console and debug your code.
+*   **JavaScript plugins**: this concerns either Web Worker (`web-worker`) or Window (`window`) plugins. With the ImJoy code editor, you can write your code. For testing you can click save on the toolbar in the code editor, and it will automatically load your plugin to the plugin menu shown on the left side. By right click on in the workspace, you use the [chrome development tool](https://developers.google.com/web/tools/chrome-devtools) to see the console and debug your code.
 
-* **Python plugins**: Similary, you can create Python plugins from the `pyworker` template in the **+ PLUGINS** dialog. If your plugin engine is running, you can save and run(Ctrl+S, or through the toolbar) with your code directly in the ImJoy code editor. For larger project with many Python files, the recommended way is to wrap your Python files as standard Python modules, write and test the Python module using your code editor/IDE of choice (Atom, Spyder, PyCharm,...). Then create an ImJoy plugin with the ImJoy code editor, by inserting the module path to `sys.path` (e.g. `sys.insert(0, '~/my_python_module')`), you can then import the module to the ImJoy plugin and test it.
+* **Python plugins**: Similary, you can create Python plugins from the `native-python` template in the **+ PLUGINS** dialog. If your plugin engine is running, you can save and run(Ctrl+S, or through the toolbar) with your code directly in the ImJoy code editor. For larger project with many Python files, the recommended way is to wrap your Python files as standard Python modules, write and test the Python module using your code editor/IDE of choice (Atom, Spyder, PyCharm,...). Then create an ImJoy plugin with the ImJoy code editor, by inserting the module path to `sys.path` (e.g. `sys.insert(0, '~/my_python_module')`), you can then import the module to the ImJoy plugin and test it.
 
 ## Loading / saving data
 The **ImJoy app** is build on webtechnology and is running in the browser. This influences
@@ -94,7 +94,7 @@ Therefore, there are currently wo different ways to handle loading/saving files 
 with or without the plugin engine. For **Python plugins** running on the plugin engine,
 files can be directly loaded and written to the file system.
 
-For **JavaScript or WebPython plugins**, you have different possibilities.
+For **JavaScript or Web Python plugins**, you have different possibilities.
 1. You can drag a file or a folder directly into the ImJoy workspace. This will render
  a window with the file/folder content. These data can then be accessed by the plugins
  and be processed.
@@ -150,11 +150,11 @@ It defines the general properties of a plugin and contains several fields.
 ```json
 {
   "name": "Untitled Plugin",
-  "mode": "webworker",
+  "type": "web-worker",
   "tags": [],
   "ui": "image processing",
   "version": "0.1.0",
-  "api_version": "0.1.0",
+  "api_version": "0.1.2",
   "url": "",
   "description": "A plugin for image processing.",
   "icon": "extension",
@@ -169,6 +169,9 @@ It defines the general properties of a plugin and contains several fields.
 #### name
 Name of the plugin. It **must** be unique to avoid conflicts with other plugins.
 
+#### type
+Plugin type. See dedicated section [ImJoy Plugins]() [TODO: add url] above for more details.
+
 #### version
 Specifies the version of the plugin.
 
@@ -181,9 +184,6 @@ Points to current file, and is used to download the plugin  when a user installs
 #### description
 Contains a short description about the plugin.
 
-#### mode
-Plugin type or execution mode. See dedicated section [ImJoy Plugins]() above for more details.
-
 #### tags
 List of supported tags, which can be used to provide differentiate configureable
 modes and can be accessed at various points in the plugin. If a plugin was defined with
@@ -191,14 +191,13 @@ tags, they will appear  on top of the code editor and during the installation pr
 If you distribute your plugin with an url **[TODO] add link**, you can specify
 with which tag the plugin will be installed.
 
-Within the **``<config>``** tag, the following fields can be made configurable:
+Within the **``<config>``** block, the following fields can be made configurable:
 - `env`
 - `requirements`
 - `dependencies`
 - `icon`
 - `ui`
-- `mode`
-- `script`
+- `type`
 
 **Example 1**. a python plugin should install different requirements depending if it will
 be executed on GPU or CPU. You can then defined two tags: `"tags" : ["GPU", "CPU"]`.
@@ -206,12 +205,13 @@ You can set different `requirements` accordingly: `"requirements": {"gpu": ["ten
 The user will be asked to choose one of the tags during the installation, which will then install
 the specified requirements.
 
-**Example 2**. You can switch between a stable and development version of a plugin.
-Here, you can configured the  **`<script>`** block can be configured, and you can
-select which script script is executed. For this, you have to add the `tag` property
+
+Besides the **``<config>``**, you can also configure the **`<script>`** block, and you can
+select which script block will be executed. For this, you have to add the `tag` property
 to the `<script>` block. Notice also that you will still need the `lang` property.
-For example, if you have `"tags": ["stable", "dev"]`, then you can have two s
-cript blocks: `<script lang="python" tag="stable">` and `<script lang="python" tag="dev">`.
+
+**Example 2**. You can switch between a stable and development version of a plugin.
+If you have `"tags": ["stable", "dev"]`, then you can have two script blocks: `<script lang="python" tag="stable">` and `<script lang="python" tag="dev">`.
 When developing and testing a plugin, the ImJoy editor will recognize that the plugin
 has multiple tags and you can select a tag in the tile bar of the plugin. When loading
 the plugin, it will be loaded with this tag.
@@ -296,11 +296,11 @@ The format is the same as for `inputs`.
 
 #### requirements
 
-* For `webworker` plugins written in Javascript, it can be a array of JavaScript urls. They will be imported using `importScripts`. ImJoy provides a dedicated [GitHub repository](https://github.com/oeway/static.imjoy.io) hosting commonly used and tested libraries. You can refer to all files contained in the `docs` folder, for this
+* For `web-worker` plugins written in Javascript, it can be a array of JavaScript urls. They will be imported using `importScripts`. ImJoy provides a dedicated [GitHub repository](https://github.com/oeway/static.imjoy.io) hosting commonly used and tested libraries. You can refer to all files contained in the `docs` folder, for this
 you can construct an url with `https://static.imjoy.io` + `RelativePathInDocs`. For instance, the file `FileSaver.js` in the fodler `static.imjoy.io/docs/js/` can be referenced as `https://static.imjoy.io/js/FileSaver.js`.
-* For `window` plugin, it can be either a list of JavaScript url or CSS url (needs to be end with `.css`). Same considerations as for `webworker` apply for import and static hosting.
-* For `pyworker` plugins, it defines the pip packages which will be installed before running the plugin defined as a list of pip packages or a command string. ImJoy supports package names and github links. For example, `["numpy", "scipy==1.0"]` or `"pip install numpy scipy==1.0"`. To use conda, you can set the string to `"conda install numpy scipy==1.0"`. For more information see the dedicate section **Using virtual environments**.
-* For `webpython` plugins, you can set it as a list of python modules e.g. `["numpy", "matplotlib"]`. Please also notice that `webpython` has a limited number of python modules supported.
+* For `window` plugin, it can be either a list of JavaScript url or CSS url (needs to be end with `.css`). Same considerations as for `web-worker` apply for import and static hosting.
+* For `native-python` plugins, it defines the pip packages which will be installed before running the plugin defined as a list of pip packages or a command string. ImJoy supports package names and github links. For example, `["numpy", "scipy==1.0"]` or `"pip install numpy scipy==1.0"`. To use conda, you can set the string to `"conda install numpy scipy==1.0"`. For more information see the dedicate section **Using virtual environments**.
+* For `web-python` plugins, you can set it as a list of python modules e.g. `["numpy", "matplotlib"]`. Please also notice that `web-python` has a limited number of python modules supported.
 
 #### dependencies
 Array witgh names of other imjoy plugins which the current pluging depend on. They will be installed automatically during installation. To define a dependency use the following format: 1) for dependencies without tag `REPOSITORY:PLUGIN_NAME` or `PLUGIN_URL`, e.g.: `oeway/ImJoy-Plugins:Image Window`; 2) or with specified tag: `REPOSITORY:PLUGIN_NAME@TAG` or `PLUGIN_URL@TAG`, e.g.: `oeway/ImJoy-Plugins:Unet Segmentation@GPU`. In this case, a hash tag `GPU` is used to specify the tag for the plugin named `Unet Segmentation` hosted on github repository `oeway/ImJoy-Plugin` (https://github.com/oeway/ImJoy-Plugins). If the plugin is not hosted on Github or the github repository is not formated as a ImJoy plugin repository (meaning there is no `manifest.imjoy.json` file defined in the root of the repository), you can use the the url directly, e.g.: `https://github.com/oeway/ImJoy-Demo-Plugins/blob/master/repository/3dDemos.imjoy.html` (tags can be added with `@TAG`).
@@ -309,7 +309,7 @@ Array witgh names of other imjoy plugins which the current pluging depend on. Th
 (**for window plugin only**) define an object of default values, for example you can specify the default window size by setting `"defaults": {"w": 10, "h": 7}`.
 
 #### runnable
-Defines whether the plugin can be executed by clicking on the plugin menu (By default, all plugins are `runnable`). For helper plugins which do not run by themselves, (e.g. a `pyworker` plugin can be called by a `window` plugin and do not necessarily executed by the user directly), setting `"runnable": false` would move down the plugin to the bottom of the plugin menu and made non-clickable.
+Defines whether the plugin can be executed by clicking on the plugin menu (By default, all plugins are `runnable`). For helper plugins which do not run by themselves, (e.g. a `native-python` plugin can be called by a `window` plugin and do not necessarily executed by the user directly), setting `"runnable": false` would move down the plugin to the bottom of the plugin menu and made non-clickable.
 
 ### `<docs>` block
 Used to contain documentation for the plugin, it need to be written in `Markdown` language. Here is a document about how to write document in `Markdown`: [Mastering Markdown](https://guides.github.com/features/mastering-markdown/). Please note that if you provide links that these will be opened in another tab, leaving the ImJoy instance running.
@@ -433,7 +433,7 @@ We provide additional fields in `my` that allow to track, maintain and reconstru
 
  Importantly, `_workflow_id`, `_variables`, `_op` and `_source_op` can be used to implement interactivity between plugins, meaning if the user changed a state in one of the result window, the downstream workflow will be updated automatically.
 
-### Controlling run-time behavior of PyWorker
+### Controlling run-time behavior of Native Python plugins
 You can control the run-time behavior of a Python plugin process with the `flags` field in the `<config>` block. Next we provide next nomenclature and additional explanations to explain the different options you have to control how the Python processes running on the plugin engine interact with the ImJoy interface.
 
 * **Interface**: web interface of ImJoy. You can have ImJoy running on multiple browser windows, i.e. multiple interfaces.

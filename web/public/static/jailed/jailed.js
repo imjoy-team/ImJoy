@@ -576,7 +576,7 @@ function randId() {
      * plugin
      */
     var Connection = function(id, type, config){
-        if(type == 'pyworker'){
+        if(type == 'native-python'){
           this._platformConnection = new SocketioConnection(id, type, config);
         }
         else{
@@ -760,7 +760,7 @@ function randId() {
         this.type = config.type;
         this.tag = config.tag;
         this.tags = config.tags;
-        this.type = config.type || 'webworker'
+        this.type = config.type || 'web-worker'
         this._path = config.url;
         this._initialInterface = _interface||{};
         this._disconnected = true
@@ -788,7 +788,7 @@ function randId() {
         this.type = config.type;
         this.tag = config.tag;
         this.tags = config.tags;
-        this.type = config.type || 'webworker';
+        this.type = config.type || 'web-worker';
         this.initializing = false;
         this.running = false;
         this._initialInterface = _interface||{};
@@ -818,7 +818,7 @@ function randId() {
             me.disconnect();
             me.initializing = false;
         }
-        if(this.type == 'pyworker' && (!this.config.context || !this.config.context.socket)){
+        if(this.type == 'native-python' && (!this.config.context || !this.config.context.socket)){
           me._fail.emit('Please connect to the Plugin Engine 🚀.');
           this._connection = null
         }
@@ -839,11 +839,11 @@ function randId() {
     DynamicPlugin.prototype._init =
            Plugin.prototype._init = function() {
         var lang;
-        if(this.type == 'pyworker'){
+        if(this.type == 'native-python'){
           lang = 'python'
         }
-        else if(this.type == 'webpython'){
-          lang = 'webpython'
+        else if(this.type == 'web-python'){
+          lang = 'web-python'
         }
         else{
           lang = 'javascript'
@@ -868,7 +868,7 @@ function randId() {
 
         this.getRemoteCallStack = this._site.getRemoteCallStack;
 
-        if(this.type == 'pyworker'){
+        if(this.type == 'native-python'){
           this._sendInterface();
         }
         else{

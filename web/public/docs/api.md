@@ -1,6 +1,6 @@
 # ImJoy API
 
-Every plugin runs in its own sandbox-like container environment (webworker or iframe for JS, process for Python). This avoids interference with other plugin and makes the entire ImJoy App more secure.
+Every plugin runs in its own sandbox-like container environment (web worker or iframe for JS, process for Python). This avoids interference with other plugin and makes the entire ImJoy App more secure.
 
 Interaction between plugins or betweena  plugin with the main app is carried out through a set of API functions (`ImJoy API`). All the plugins have access to a special object called `api`, with which the plugin can, for example, show a dialog, send results to the main app, or call another plugin with paramenters and data.
 
@@ -17,7 +17,7 @@ ImJoy suports two asynchronous programming styles to access these asynchronous f
 for both Python and JavaScript: `async/await` and `callback` style. A few important
 considerations
 
-* `async/await` is recommended for JavaScript and Python 3 (expect webPython, which doesn't support it yet).
+* `async/await` is recommended for JavaScript and Python 3 (expect web python plugin, which doesn't support it yet).
 * `callback` style can be used for Javascript, Python 2 and Python 3.
 *  **Note** that you **cannot** use both style at the same time.
 * While you can use `try catch` (JavaScript) or `try except` (Python) syntax to capture error with `async/await` style, you cannot use them to capture error if you use `callback` style.
@@ -73,7 +73,7 @@ definition of your function. Don't forget to `import asyncio` if you use `async/
 
 
 ### `callback` style
-However, for Python 2 or webPython, `asyncio` is not supported, therefore you need to use `callback` style.
+However, for Python 2 or Web Python, `asyncio` is not supported, therefore you need to use `callback` style.
 
 Call the asynchronous function and set its callback with `.then(callback_func)`.
 For Javascrit plugins, a native Javascrit `Promise` will be returned ([More about Promise.](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)). For Python plugins, it will return a simplified Python implement of promise.

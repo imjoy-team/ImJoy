@@ -229,8 +229,8 @@
                 </md-menu-content>
               </md-menu>
 
-              <md-button class="joy-run-button" :class="plugin.running?'md-accent':(plugin._disconnected && plugin.type == 'pyworker'? 'disconnected-plugin': 'md-primary')" :disabled="plugin._disconnected && plugin.type != 'pyworker'" @click="plugin._disconnected?connectPlugin(plugin):runOp(plugin.ops[plugin.name])">
-                {{plugin.type == 'pyworker'? plugin.name + ' 🚀': plugin.name}}
+              <md-button class="joy-run-button" :class="plugin.running?'md-accent':(plugin._disconnected && plugin.type == 'native-python'? 'disconnected-plugin': 'md-primary')" :disabled="plugin._disconnected && plugin.type != 'native-python'" @click="plugin._disconnected?connectPlugin(plugin):runOp(plugin.ops[plugin.name])">
+                {{plugin.type == 'native-python'? plugin.name + ' 🚀': plugin.name}}
               </md-button>
               <md-button v-if="!plugin._disconnected" class="md-icon-button" @click="plugin.panel_expanded=!plugin.panel_expanded; $forceUpdate()">
                 <md-icon v-if="!plugin.panel_expanded">expand_more</md-icon>
@@ -288,8 +288,8 @@
                   </md-menu-content>
                 </md-menu>
 
-                <md-button class="joy-run-button" :class="plugin.running?'md-accent':(plugin._disconnected && plugin.type == 'pyworker'? 'disconnected-plugin': '')" :disabled="plugin.type != 'pyworker' || !plugin._disconnected" @click="connectPlugin(plugin)">
-                  {{plugin.type == 'pyworker'? plugin.name + ' 🚀': plugin.name}}
+                <md-button class="joy-run-button" :class="plugin.running?'md-accent':(plugin._disconnected && plugin.type == 'native-python'? 'disconnected-plugin': '')" :disabled="plugin.type != 'native-python' || !plugin._disconnected" @click="connectPlugin(plugin)">
+                  {{plugin.type == 'native-python'? plugin.name + ' 🚀': plugin.name}}
                 </md-button>
                 <md-divider></md-divider>
               </div>
@@ -453,7 +453,7 @@
           <md-toolbar md-elevation="0">
             <div class="md-toolbar-section-start">
               <h2><md-icon v-if="plugin4install.icon">{{plugin4install.icon}}</md-icon><md-icon v-else>extension</md-icon>
-                {{plugin4install.type == 'pyworker'? plugin4install.name + ' 🚀': plugin4install.name}}
+                {{plugin4install.type == 'native-python'? plugin4install.name + ' 🚀': plugin4install.name}}
               </h2>
             </div>
             <div v-if="tag4install" class="md-toolbar-section-end">
@@ -524,9 +524,9 @@ import {
   WINDOW_SCHEMA,
   OP_SCHEMA,
   PLUGIN_SCHEMA,
-  PYWORKER_PLUGIN_TEMPLATE,
-  WEBWORKER_PLUGIN_TEMPLATE,
-  WEBPYTHON_PLUGIN_TEMPLATE,
+  NATIVE_PYTHON_PLUGIN_TEMPLATE,
+  WEB_WORKER_PLUGIN_TEMPLATE,
+  WEB_PYTHON_PLUGIN_TEMPLATE,
   IFRAME_PLUGIN_TEMPLATE,
   WINDOW_PLUGIN_TEMPLATE,
   CONFIGURABLE_FIELDS,
@@ -656,11 +656,11 @@ export default {
       _id: 'IMJOY_APP'
     }
     this.plugin_templates = {
-      "Webworker(Javascript)": WEBWORKER_PLUGIN_TEMPLATE,
-      "PyWorker(Python)": PYWORKER_PLUGIN_TEMPLATE,
+      "Web Worker (JS)": WEB_WORKER_PLUGIN_TEMPLATE,
+      "Window (JS and HTML)": WINDOW_PLUGIN_TEMPLATE,
+      "Native Python": NATIVE_PYTHON_PLUGIN_TEMPLATE,
       // "Iframe(Javascript)": IFRAME_PLUGIN_TEMPLATE,
-      "Window(Javascript and HTML)": WINDOW_PLUGIN_TEMPLATE,
-      "WebPython(experimental)": WEBPYTHON_PLUGIN_TEMPLATE
+      "Web Python (experimental)": WEB_PYTHON_PLUGIN_TEMPLATE
     }
     this.default_window_pos = {
       i: 0,
@@ -1217,7 +1217,7 @@ export default {
           if(source_plugin){
             options.root = options.root || (source_plugin.config && source_plugin.config.work_dir)
           }
-          if(source_plugin && source_plugin.type != 'pyworker'){
+          if(source_plugin && source_plugin.type != 'native-python'){
             options.uri_type = options.uri_type || 'url'
           }
           else{
@@ -1232,7 +1232,7 @@ export default {
     },
     connectPlugin(plugin){
       if(plugin._disconnected){
-        if(plugin.type == 'pyworker' && !this.engine_connected){
+        if(plugin.type == 'native-python' && !this.engine_connected){
           this.connectEngine(this.engine_url)
         }
         else{
@@ -1896,7 +1896,7 @@ export default {
     },
     reloadPythonPlugins(){
       for(let p of this.installed_plugins){
-        if(p.type == 'pyworker'){
+        if(p.type == 'native-python'){
           this.reloadPlugin(p)
         }
       }
@@ -1905,7 +1905,7 @@ export default {
       for (let k in this.plugins) {
         if (this.plugins.hasOwnProperty(k)) {
           const plugin = this.plugins[k]
-          if(plugin.type == 'pyworker'){
+          if(plugin.type == 'native-python'){
             try {
               Joy.remove(plugin.config.type)
               // console.log('terminating ',plugin)
@@ -2421,9 +2421,18 @@ export default {
       return this.upgradeAPI(config)
     },
     upgradeAPI(config){
-
       if(compareVersions(config.api_version, '<=', '0.1.1')){
         config.type = config.mode
+        delete config.mode
+        if(config.type == 'pyworker'){
+          config.type = 'native-python'
+        }
+        else if(config.type == 'webworker'){
+          config.type = 'web-worker'
+        }
+        else if(config.type == 'webpython'){
+          config.type = 'web-python'
+        }
       }
       return config
     },
@@ -2501,7 +2510,7 @@ export default {
         }
         config._id = template._id
         config.context = this.pluing_context
-        if (template.type == 'pyworker') {
+        if (template.type == 'native-python') {
           if (!this.socket) {
             console.error("Please connect to the Plugin Engine 🚀.")
           }
@@ -2711,14 +2720,14 @@ export default {
         if(config.type == 'window'){
           config.tags.push('window')
         }
-        else if(config.type == 'pyworker'){
+        else if(config.type == 'native-python'){
           config.tags.push('python')
         }
-        else if(config.type == 'webworker'){
-          config.tags.push('webworker')
+        else if(config.type == 'web-worker'){
+          config.tags.push('web-worker')
         }
-        else if(config.type == 'webpython'){
-          config.tags.push('webpython')
+        else if(config.type == 'web-python'){
+          config.tags.push('web-python')
         }
         else if(config.type == 'iframe'){
           config.tags.push('iframe')

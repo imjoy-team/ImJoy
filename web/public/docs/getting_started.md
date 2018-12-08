@@ -94,9 +94,9 @@ some typical examples for how ImJoy can be used. Please not that these are only
 some suggestions, other combinations are of course possible and be interesting
 for particular applications
 
-1. **ImJoy webApp with JavaScript or WebPython plugins**. Such a framework runs without
+1. **ImJoy webApp with JavaScript or Web Python plugins**. Such a framework runs without
  any installation on different operation systems. It is ideal for not too computational
- intensive task. Limitations are that WebPython is (currently) slower than native Python
+ intensive task. Limitations are that Web Python is (currently) slower than native Python
  and that it doesn't support the entire Python ecosystem.
 
 2. **Desktop App**. Here you can all plugins types (JavaScript included). Further,

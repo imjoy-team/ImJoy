@@ -3,8 +3,8 @@ var ajv = new Ajv()
 
 export const CONFIGURABLE_FIELDS = ["env", "requirements", "dependencies", "icon", "ui", "type", "flags"]
 
-export const SUPPORTED_PLUGIN_MODES = ['webworker', 'pyworker', 'webpython', 'iframe', 'window', 'collection']
-export const WEBWORKER_PLUGIN_TEMPLATE= `
+export const SUPPORTED_PLUGIN_MODES = ['web-worker', 'native-python', 'web-python', 'iframe', 'window', 'collection']
+export const WEB_WORKER_PLUGIN_TEMPLATE= `
 <docs>
 [TODO: write documentation for this plugin.]
 </docs>
@@ -12,13 +12,13 @@ export const WEBWORKER_PLUGIN_TEMPLATE= `
 <config lang="json">
 {
   "name": "Untitled Plugin",
-  "type": "webworker",
+  "type": "web-worker",
   "tags": [],
   "ui": "",
   "version": "0.1.0",
   "api_version": "0.1.2",
   "url": "",
-  "description": "[TODO: describe this plugin in one sentense.]",
+  "description": "[TODO: describe this plugin with one sentense.]",
   "icon": "extension",
   "inputs": null,
   "outputs": null,
@@ -55,10 +55,10 @@ export const IFRAME_PLUGIN_TEMPLATE= `
   "name": "Untitled Plugin",
   "type": "iframe",
   "tags": [],
-  "ui": "UI for Untitled Plugin",
+  "ui": "",
   "version": "0.1.0",
   "api_version": "0.1.2",
-  "description": "[TODO: describe this plugin in one sentense.]",
+  "description": "[TODO: describe this plugin with one sentense.]",
   "icon": "extension",
   "inputs": null,
   "outputs": null,
@@ -94,10 +94,10 @@ export const WINDOW_PLUGIN_TEMPLATE= `
   "name": "Untitled Plugin",
   "type": "window",
   "tags": [],
-  "ui": "UI for Untitled Plugin",
+  "ui": "",
   "version": "0.1.0",
   "api_version": "0.1.2",
-  "description": "[TODO: describe this plugin in one sentense.]",
+  "description": "[TODO: describe this plugin with one sentense.]",
   "icon": "extension",
   "inputs": null,
   "outputs": null,
@@ -136,7 +136,7 @@ api.export(new ImJoyPlugin())
 </style>
 `
 
-export const PYWORKER_PLUGIN_TEMPLATE= `
+export const NATIVE_PYTHON_PLUGIN_TEMPLATE= `
 <docs lang="markdown">
 [TODO: write documentation for this plugin.]
 </docs>
@@ -144,10 +144,10 @@ export const PYWORKER_PLUGIN_TEMPLATE= `
 <config lang="json">
 {
   "name": "Untitled Plugin",
-  "type": "pyworker",
+  "type": "native-python",
   "version": "0.1.0",
   "api_version": "0.1.2",
-  "description": "[TODO: describe this plugin in one sentense.]",
+  "description": "[TODO: describe this plugin with one sentense.]",
   "tags": [],
   "ui": "",
   "inputs": null,
@@ -175,7 +175,7 @@ api.export(ImJoyPlugin())
 `
 
 
-export const WEBPYTHON_PLUGIN_TEMPLATE= `
+export const WEB_PYTHON_PLUGIN_TEMPLATE= `
 <docs lang="markdown">
 [TODO: write documentation for this plugin.]
 </docs>
@@ -183,10 +183,10 @@ export const WEBPYTHON_PLUGIN_TEMPLATE= `
 <config lang="json">
 {
   "name": "Untitled Plugin",
-  "type": "webpython",
+  "type": "web-python",
   "version": "0.1.0",
   "api_version": "0.1.2",
-  "description": "[TODO: describe this plugin in one sentense.]",
+  "description": "[TODO: describe this plugin with one sentense.]",
   "tags": [],
   "ui": "UI for this plugin",
   "inputs": null,
