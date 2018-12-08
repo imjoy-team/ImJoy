@@ -1,5 +1,5 @@
-# Tutorials
-Here we provide several tutorial illustrating important concepts of ImJoy. You can inspect the code of the provided plugins by clicking on the symbol left of the plugin name and selecting `Edit`.
+# Demos
+Here we provide several demos illustrating important concepts of ImJoy. You can inspect the code of the provided plugins by clicking on the symbol left of the plugin name and selecting `Edit`.
 
 ## User interaction
 An important part of ImJoy is to provide a flexible way to interact with the user, to either specify input information or provide results.
@@ -12,46 +12,75 @@ An important part of ImJoy is to provide a flexible way to interact with the use
 **Provide results**
 
 1. The ImJoy API provides several functions to show results, e.g. indicate [progress](https://imjoy.io/docs/#/api?id=api-showprogress-), update the [ImJoy status](https://imjoy.io/docs/#/api?id=api-showstatus-),
-2. The ImJoy API also provides a function to [create a window](https://imjoy.io/docs/#/api?id=api-createwindow-). In this window, powerful JavaScript visualization librariers can used. For more details, have a look at our window plugin demo **ADD LINK**.
+2. The ImJoy API also provides a function to [create a window](https://imjoy.io/docs/#/api?id=api-createwindow-). Different window types exist, you can either directly
+show an results image (type `imjoy/image`). Or create your own window, where you can use JavaScript visualization librariers to render your results. We provide
+examples for the different approaches below.
 
 **Dedicated user interface**
-For more advanced purposes, you can can use define a user interface with the [**window plugin**](https://imjoy.io/docs/#/development?id=ltconfiggt-block). Such an interface is designed with web technology (HTML, JavaScript and CSS) and thus provides maximum flexibility. Further, such an interface can communicate with another plugin, e.g. a Python worker that performs the actual analysis. For more details, have a look at the dedicated tutorial below.
+For more advanced purposes, you can can use define a user interface with the [**window plugin**](https://imjoy.io/docs/#/development?id=ltconfiggt-block). Such an interface is designed with web technology (HTML, JavaScript and CSS) and thus provides maximum flexibility. Further, such an interface can communicate with another plugin, e.g. a Python worker that performs the actual analysis. For more details, have a look at the dedicated demo below.
 
-### Python plugin plots in window plugin
-In this tutorial, we show how data ((a damped cosine) generated in a Python plugin can be displayed in a window plugin. In the window plugin, the data is rendered with JavaScript libraries. This approach thus allows to take full advantage of these very powerful libraries. They provide not only a large variety of different types of graphs, but also user-interactivity.
+### Python plugin displays a chart in a window plugin
+In this demo, we show how data generated in a **Python plugin** can be displayed in a window plugin. Ihe plugin interface you can slightly change the data that is generated (you can change the number of data-points) and how the graph is actually displayed: either it is rendered with one of three JavaScript libraries, or the plot is
+generated with Matplotlib and saved as png and then shown.
 
 You can install the Python plugin either to run
 
- * in the <a href="https://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:JS charts PyWorker&w=demo-JS-charts" target="_blank">**Python plugin engine**</a>
- * or with <a href="https://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:JS charts WebPython&w=demo-JS-charts" target="_blank">**web Python**</a>
+ * in the <a href="https://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:Charts PyWorker&w=demo-charts" target="_blank">**Python plugin engine**</a>
+ * or with <a href="https://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:Charts WebPython&w=demo-charts" target="_blank">**web Python**</a>. Please note that
+ here you can only use JS libraries.
 
-Note that the window plugin is installed automatically as a dependency.
 
-The two plugins perform distinct functions:
-1. The **Python plugin** "Python to JS charts". Here you can select how many data points should be calculated and which JS library should be used for display.
-2. The **window plugin** "JScharts". Here the obtained data will be rendered as a line plot.  We provde a simple example for three of the major JavaScript chart libraries:
-    * [Plotly](https://plot.ly/javascript/)
-    * [C3](https://c3js.org/)
-    * [Chart.js](https://www.chartjs.org/docs/latest/)
+#### Plotting with a JavaScript library
+If you select in the Python plugin one of the options `Plotly`, `C3`, or `Charts.js` the Python plugin will send the data to the **window plugin** "Charts JS window".
+This plugin was automatically installed, and provided simple example for three
+of the major JavaScript chart libraries:
+
+* [Plotly](https://plot.ly/javascript/)
+* [C3](https://c3js.org/)
+* [Chart.js](https://www.chartjs.org/docs/latest/)
+
+The Python plugin will send to this plugin the calculated data, specifications of the window size, and which library to use the obtained data will be rendered as a line plot.
 
 The **main steps** are described below and basic data flow is illustrated by dashed errors in the image above.
+
+<img src="./assets/imjoy-demo-python-to-js.png" width="800px"></img>
+
 1. User defines how many data points should be calculated, some text that will be displayed in the window plugin, and which JavaScript library will be used to plot the data.
 2. Upen execution of the Python plugin, the damped cosine curve will be computed. Then a dictionary `data` containing these values, as well as the text and the name of the desired JS library is created. THe necessary content of this dictionary is specified by the window plugin. This will then be added to another dictionary `data_plot` that contains specifications for the window plugin: `type` to specify which window plugin should be called, `name` to specify the window title, `w` and `h` the specify the size. The dictionary `data_plot` will be used with the ImJoy API function `api.createWindow` to call the window plugin.
 3. In the window plugin the transfered data are available as `my.data` and are used to create the JavaScript plot and also populate the HTML text field.
 4. The `api.createWindow` returns an identifier for the window. When plotting again, the Python plugin attemtps to plot into this window. Please note that here on the actual data are passed as an input and not the larger dictionary containing the specifications of the window. For the plugin running in the Python engine, we added a  `try ... except` statement to catch error arises when the window has been closed.
 
-<img src="./assets/imjoy-tutorial-python-to-js.png" width="800px"></img>
+#### Opening a chart saved as png in a window
+Rather then sending the data, you can directly show an image in a window plugin.
+Before getting to the actual demo, we would like to provide two important clarifications
+concerning the supported file-types and how the file-system is seen by window plugins.
+
+ImJoy plugins communicate witht the provided api functions. These functions support only **limited data types**. You can pass most of the primitive types such as number, string, and dictionaries containing those types. However, the api functions don’t support  other objects, such as an images. If you want toto pass these objects, you need to encode them to supported types, such as a `base64` string that we will use below.
+
+You may then wonder why you just send save the file locally, and send this file path to the window plugin, which will read the file from the disk. Here it is important to note that the browser (where ImJoy is running) can not directly access the file system (for security reasons). ImJoy, provides a solution to this problem with function `api.getFileUrl()`, which converts a provided file path to an url. This url can be passed to a dedicated window, which fetches and displays the encoded data.
+
+In pratice, this can be done with a few line of code. You essentially need to save
+your plot, and convert it to base64, and send this to the provided window type `imjoy/image` with the api function `api.createWindow`. This window will then use the function
+`api.getFileUrl()` to decode the image and display it.
+
+``` Python
+with open(name_plot, 'rb') as f:
+    data = f.read()
+    result = base64.b64encode(data).decode('ascii')
+    imgurl = 'data:image/png;base64,' + result
+    api.createWindow('type':'imjoy/image','w':12, 'h':15,data = {"src": imgurl})
+```
 
 ### User interface communicating with Python worker
-In this tutorial, we show how to use a **window** plugin to defined a user interface, and how this interface can interact with a **Python worker** plugin to perform calculations.
+In this demo, we show how to use a **window** plugin to defined a user interface, and how this interface can interact with a **Python worker** plugin to perform calculations.
 
 You can install this plugin from this
 <a href="http://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:GUI w3&w=demo-GUI" target="_blank">**link**</a>.
 This will install the actual interface plugin (GUI w3.css) and automatically the Python plugin (GUI PyWorker) performing the calculations. The purpose of this plugin is self-explanatory, you can open the GUI by double clicking on the plugin title. Just play around.
 
-<img src="./assets/imjoy-tutorial-gui-screenshot.png" width="600px"></img>
+<img src="./assets/imjoy-demo-gui-screenshot.png" width="600px"></img>
 
-This tutorial illustrates a number of different important concepts, which we describe briefly below.
+This demo illustrates a number of different important concepts, which we describe briefly below.
 
 1. How to get started in coding an ImJoy user-interface with HTML and JavaScript.
 2. How to communicate between the user interface and the Python worker.
@@ -85,6 +114,15 @@ all options. This framework can be imported in the plugin requirements
                     "https://www.w3schools.com/lib/w3-theme-indigo.css",
                     "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"],
     ```
+     The provided default font-size is rather large to ensure readability on web sites.
+     For the purpose of a user-interface it might actually be too large. You can overwrite the default values, by modifying the `css` block in plugin file. Note that the [`!important`](https://css-tricks.com/when-using-important-is-the-right-choice/) is necessary to achieve this.
+
+     ```
+      <style lang="css">
+        /* Overwrite css defaults*/
+        body {font-size: 13px !important;}
+      </style>
+     ```
 
 #### Workflow in the plugin
 The image below shows some code snippets to illustrate the workflow from clicking
@@ -94,7 +132,7 @@ a button to showing the plot. The main steps are the following (and detailed mor
 2. In this function, user input from the window plugin is retrieved, and the Python plugin is called.
 2. Calculations are performed, results stored in Python plugin and shown in main interface.
 
-<img src="./assets/imjoy-tutorial-gui-code.png" width="800px"></img>
+<img src="./assets/imjoy-demo-gui-code.png" width="800px"></img>
 
 **Determine behavior of HTML elements**
 
@@ -108,31 +146,59 @@ Communication between the window and Python plugin is achieved by the ImJoy API 
 
 Let's have a look at the Python function `calc_results`. It receives the JavaScript dictionary, extracts all necessary parameters and perform the desired calculation. Then it stores the data wiht `self.x_values = x`. Lastly, invokes the callback function to print in the main window with `callback_fun(...)`. Here the parameters are again passed as a dictionary. Please note, the **numpy** arrays are not supported, and the data has therefore be transformed to a list.
 
+## Using JavaScript libraries in ImJoy
+Here we provide some examples where we integrate different JavaScript libraries.
+
+<a href="http://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:tSNE&w=demo-js" target="_blank">**Try me >>**</a>
+
+### handlebars.js
+
+From [https://handlebarsjs.com/](https://handlebarsjs.com/):
+
+> Handlebars provides the power necessary to let you build semantic templates   effectively with no frustration. Handlebars is largely compatible with Mustache templates. In most cases it is possible to swap out Mustache with Handlebars and continue using your current templates.
+
+<a href="http://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:handlebars.js&w=demo-js" target="_blank">**Try me >>**</a>
+
+### 3D visualization
+Several 3D visualization libraries exist. We provide examples for some of them.
+
+#### vtk.js
+
+From [https://kitware.github.io/vtk-js/index.html](https://kitware.github.io/vtk-js/index.html)
+
+> VTK.js is a JavaScript library available for scientific visualization in your browser.
+
+<a href="http://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:3D visualization&w=demo-js" target="_blank">**Try me >>**</a>
+
+
+#### sponza by Babylon.js
+
+From [https://www.babylonjs.com/demos/sponza/](https://www.babylonjs.com/demos/sponza/)
+
+**[TODO] not working yet**
+
+<a href="http://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:3D visualization&w=demo-js" target="_blank">**Try me >>**</a>
+
+
+#### three.js
+
+From [https://threejs.org/](https://threejs.org/)
+
+> Three.js is a cross-browser JavaScript library and Application Programming Interface
+  used to create and display animated 3D computer graphics in a web browser.
+  Three.js uses WebGL.
+
+**[TODO] not working yet**
+<a href="http://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:three.js&w=demo-js" target="_blank">**Try me >>**</a>
+
+### t-SNE analysis
+Example from [https://cs.stanford.edu/people/karpathy/tsnejs/]()
+
+
+**[TODO] not working yet**
+
+
 ## Distribution and deployment
-
-### Distribution and deployment of a plugin with GitHub Gist
-
-We assume that the entire code is contained in the plugin file and no extra
-dependencies are required. [GitHub Gist](https://gist.github.com/) is a service provided by GitHub  to easily share individual files. Every gist is a GIT repository, so it provides version control, it can be forked and cloned.
-
-##### Deploy your ImJoy Plugin to Gist
-
-1. Go to gist on your GitHub account [https://gist.github.com/](https://gist.github.com/)
-1. Create new gist and copy & paste the code of your plugin.
-1. Give a new name followed by  `.imjoy.html`
-1. Create either public or secret gist.
-1. Link to gist can be obtained from the 'Raw' button (this links to the unprocessed versions of the file). Please note that this url
-will change when you update your file.
-
-##### Distribute plugin with url
-Once your plugin is on gist, you can distribute it with a single link. When pressing this link, ImJoy will open its Plugin import interface, where the user has to confirm the installation of the plugin.
-`http://imjoy.io/#/app?plugin=LinkToGIST.imjoy.html`
-
-You can also control where the plugin will be installed by setting the
-workspace parameter `w=`:
-`http://imjoy.io/#/app?w=PluginTest&plugin=LinkToGIST.imjoy.html`
-
-Alternatively, this url can then be used to install the plugin directly in ImJoy: press the `+ Plugins` button and add the the url in the field `Install plugin from url`.
 
 ### Distribution and deployment of code/data stored on Dropbox
 This example describes how you can distribute and deploy a Python plugin
