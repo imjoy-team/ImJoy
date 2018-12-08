@@ -6,7 +6,7 @@ export const CONFIGURABLE_FIELDS = ["env", "requirements", "dependencies", "icon
 export const SUPPORTED_PLUGIN_MODES = ['webworker', 'pyworker', 'webpython', 'iframe', 'window', 'collection']
 export const WEBWORKER_PLUGIN_TEMPLATE= `
 <docs>
-Describe your plugin here.
+[TODO: write documentation for this plugin.]
 </docs>
 
 <config lang="json">
@@ -14,11 +14,11 @@ Describe your plugin here.
   "name": "Untitled Plugin",
   "mode": "webworker",
   "tags": [],
-  "ui": "UI for Untitled Plugin",
+  "ui": "",
   "version": "0.1.0",
   "api_version": "0.1.1",
   "url": "",
-  "description": "describe your plugin here.",
+  "description": "[TODO: describe this plugin in one sentense.]",
   "icon": "extension",
   "inputs": null,
   "outputs": null,
@@ -47,7 +47,7 @@ api.export(new ImJoyPlugin())
 
 export const IFRAME_PLUGIN_TEMPLATE= `
 <docs lang="markdown">
-Describe your plugin here.
+[TODO: write documentation for this plugin.]
 </docs>
 
 <config lang="json">
@@ -58,7 +58,7 @@ Describe your plugin here.
   "ui": "UI for Untitled Plugin",
   "version": "0.1.0",
   "api_version": "0.1.1",
-  "description": "describe your plugin here",
+  "description": "[TODO: describe this plugin in one sentense.]",
   "icon": "extension",
   "inputs": null,
   "outputs": null,
@@ -86,7 +86,7 @@ api.export(new ImJoyPlugin())
 
 export const WINDOW_PLUGIN_TEMPLATE= `
 <docs lang="markdown">
-Describe your plugin here.
+[TODO: write documentation for this plugin.]
 </docs>
 
 <config lang="json">
@@ -97,7 +97,7 @@ Describe your plugin here.
   "ui": "UI for Untitled Plugin",
   "version": "0.1.0",
   "api_version": "0.1.1",
-  "description": "describe your plugin here.",
+  "description": "[TODO: describe this plugin in one sentense.]",
   "icon": "extension",
   "inputs": null,
   "outputs": null,
@@ -138,7 +138,7 @@ api.export(new ImJoyPlugin())
 
 export const PYWORKER_PLUGIN_TEMPLATE= `
 <docs lang="markdown">
-Describe your plugin here.
+[TODO: write documentation for this plugin.]
 </docs>
 
 <config lang="json">
@@ -147,9 +147,9 @@ Describe your plugin here.
   "mode": "pyworker",
   "version": "0.1.0",
   "api_version": "0.1.1",
-  "description": "describe your plugin here.",
+  "description": "[TODO: describe this plugin in one sentense.]",
   "tags": [],
-  "ui": "UI for this plugin",
+  "ui": "",
   "inputs": null,
   "outputs": null,
   "flags": [],
@@ -177,7 +177,7 @@ api.export(ImJoyPlugin())
 
 export const WEBPYTHON_PLUGIN_TEMPLATE= `
 <docs lang="markdown">
-Describe your plugin here.
+[TODO: write documentation for this plugin.]
 </docs>
 
 <config lang="json">
@@ -186,7 +186,7 @@ Describe your plugin here.
   "mode": "webpython",
   "version": "0.1.0",
   "api_version": "0.1.1",
-  "description": "describe your plugin here.",
+  "description": "[TODO: describe this plugin in one sentense.]",
   "tags": [],
   "ui": "UI for this plugin",
   "inputs": null,

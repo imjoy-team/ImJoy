@@ -2693,7 +2693,7 @@ export default {
         config.name = config.name || plugin.name
         config.type = config.type || config.name
         config.show_panel = config.show_panel || false
-        config.ui = this.normalizeUI(config.ui) || ''
+        config.ui = this.normalizeUI(config.ui) || config.description
         config.tags = ["op", "plugin"]
         config.inputs = config.inputs || null
         config.outputs = config.outputs || null
