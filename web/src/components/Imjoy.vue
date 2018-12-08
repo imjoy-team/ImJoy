@@ -2790,6 +2790,10 @@ export default {
                 throw "inputs schema must be an object."
               }
             }
+            // set all the properties as required by default
+            if(config.inputs.type == 'object' && config.inputs.properties && !config.inputs.required){
+              config.inputs.required = Object.keys(config.inputs.properties)
+            }
             const sch = ajv.compile(config.inputs)
             // console.log('inputs schema:-->', plugin.name, config.name, sch.toJSON())
             const plugin_name = plugin.name
@@ -2833,6 +2837,10 @@ export default {
               else{
                 throw "inputs schema must be an object."
               }
+            }
+            // set all the properties as required by default
+            if(config.outputs.type == 'object' && config.outputs.properties && !config.outputs.required){
+              config.outputs.required = Object.keys(config.outputs.properties)
             }
             const sch = ajv.compile(config.outputs)
             this.registered.outputs[plugin.name+'/'+config.name] =  {op_name: config.name, plugin_name: plugin.name, schema: sch}
