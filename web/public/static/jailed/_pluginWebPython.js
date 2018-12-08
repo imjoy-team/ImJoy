@@ -34,7 +34,7 @@ var _importScript = function(url) {
     })
 };
 
-// support importScripts outside webworker
+// support importScripts outside web worker
 
 async function importScripts () {
   var args = Array.prototype.slice.call(arguments), len = args.length, i = 0;

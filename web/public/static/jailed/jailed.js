@@ -201,7 +201,7 @@ function randId() {
          *
          * For Node.js the plugin is created as a forked process
          */
-        BasicConnection = function(id, mode, config) {
+        BasicConnection = function(id, type, config) {
             if(type == 'iframe'){
               throw('You can not use iframe in nodejs.')
             }
@@ -325,7 +325,7 @@ function randId() {
          * For the web-browser environment, the plugin is created as a
          * Worker in a sandbaxed frame
          */
-        BasicConnection = function(id, mode, config) {
+        BasicConnection = function(id, type, config) {
             this._init = new Whenable;
             this._disconnected = false;
             this.id = id;
@@ -336,9 +336,9 @@ function randId() {
             platformInit.whenEmitted(function() {
                 if (!me._disconnected) {
                     me._frame = sample.cloneNode(false);
-                    me._frame.src = me._frame.src+'?mode='+mode+'&name='+config.name;
+                    me._frame.src = me._frame.src+'?type='+type+'&name='+config.name;
                     me._frame.id = 'iframe_'+id;
-                    if(mode == 'iframe' || mode == 'window'){
+                    if(type == 'iframe' || type == 'window'){
                       if(typeof iframe_container == 'string'){
                         iframe_container = document.getElementById(iframe_container)
                       }
@@ -445,7 +445,7 @@ function randId() {
          * For the web-browser environment, the plugin is created as a
          * Worker in a sandbaxed frame
          */
-        SocketioConnection = function(id, mode, config) {
+        SocketioConnection = function(id, type, config) {
             this._init = new Whenable;
             this._disconnected = false;
             this.id = id;
@@ -457,7 +457,7 @@ function randId() {
               if (!this._disconnected && this.context && this.context.socket) {
                 const config_ = {api_version: config.api_version, flags: config.flags, tag: config.tag, workspace: config.workspace, env: config.env, requirements: config.requirements, cmd: config.cmd, name: config.name, type: config.type, inputs: config.inputs, outputs: config.outputs}
                 // create a plugin here
-                this.context.socket.emit('init_plugin', {id: id, mode: mode, config: config_}, (result) => {
+                this.context.socket.emit('init_plugin', {id: id, type: type, config: config_}, (result) => {
                   // console.log('init_plugin: ', result)
                   if(result.success){
                     this.secret = result.secret
@@ -575,12 +575,12 @@ function randId() {
      * methods for loading scripts and executing the given code in the
      * plugin
      */
-    var Connection = function(id, mode, config){
-        if(mode == 'pyworker'){
-          this._platformConnection = new SocketioConnection(id, mode, config);
+    var Connection = function(id, type, config){
+        if(type == 'native-python'){
+          this._platformConnection = new SocketioConnection(id, type, config);
         }
         else{
-          this._platformConnection = new BasicConnection(id, mode, config);
+          this._platformConnection = new BasicConnection(id, type, config);
         }
 
         this._importCallbacks = {};
@@ -760,7 +760,7 @@ function randId() {
         this.type = config.type;
         this.tag = config.tag;
         this.tags = config.tags;
-        this.mode = config.mode || 'webworker'
+        this.type = config.type || 'web-worker'
         this._path = config.url;
         this._initialInterface = _interface||{};
         this._disconnected = true
@@ -788,7 +788,7 @@ function randId() {
         this.type = config.type;
         this.tag = config.tag;
         this.tags = config.tags;
-        this.mode = config.mode || 'webworker';
+        this.type = config.type || 'web-worker';
         this.initializing = false;
         this.running = false;
         this._initialInterface = _interface||{};
@@ -818,12 +818,12 @@ function randId() {
             me.disconnect();
             me.initializing = false;
         }
-        if(this.mode == 'pyworker' && (!this.config.context || !this.config.context.socket)){
+        if(this.type == 'native-python' && (!this.config.context || !this.config.context.socket)){
           me._fail.emit('Please connect to the Plugin Engine 🚀.');
           this._connection = null
         }
         else{
-          this._connection = new Connection(this.id, this.mode, this.config);
+          this._connection = new Connection(this.id, this.type, this.config);
           this.initializing = true;
           this._connection.whenInit(function(){
               me._init();
@@ -839,11 +839,11 @@ function randId() {
     DynamicPlugin.prototype._init =
            Plugin.prototype._init = function() {
         var lang;
-        if(this.mode == 'pyworker'){
+        if(this.type == 'native-python'){
           lang = 'python'
         }
-        else if(this.mode == 'webpython'){
-          lang = 'webpython'
+        else if(this.type == 'web-python'){
+          lang = 'web-python'
         }
         else{
           lang = 'javascript'
@@ -868,7 +868,7 @@ function randId() {
 
         this.getRemoteCallStack = this._site.getRemoteCallStack;
 
-        if(this.mode == 'pyworker'){
+        if(this.type == 'native-python'){
           this._sendInterface();
         }
         else{
@@ -943,7 +943,7 @@ function randId() {
       for (let i = 0; i < this.config.scripts.length; i++) {
         this._connection.execute({type: 'script', content: this.config.scripts[i].content, src: this.config.scripts[i].attrs.src}, sCb, this._fCb);
       }
-      if(this.config.mode == 'iframe' || this.config.mode == 'window'){
+      if(this.config.type == 'iframe' || this.config.type == 'window'){
         for (let i = 0; i < this.config.styles.length; i++) {
           this._connection.execute({type: 'style', content: this.config.styles[i].content, src: this.config.styles[i].attrs.src}, sCb, this._fCb);
         }

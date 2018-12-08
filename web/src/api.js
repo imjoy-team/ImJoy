@@ -1,24 +1,24 @@
 import Ajv from 'ajv'
 var ajv = new Ajv()
 
-export const CONFIGURABLE_FIELDS = ["env", "requirements", "dependencies", "icon", "ui", "mode", "flags"]
+export const CONFIGURABLE_FIELDS = ["env", "requirements", "dependencies", "icon", "ui", "type", "flags"]
 
-export const SUPPORTED_PLUGIN_MODES = ['webworker', 'pyworker', 'webpython', 'iframe', 'window', 'collection']
-export const WEBWORKER_PLUGIN_TEMPLATE= `
+export const SUPPORTED_PLUGIN_MODES = ['web-worker', 'native-python', 'web-python', 'iframe', 'window', 'collection']
+export const WEB_WORKER_PLUGIN_TEMPLATE= `
 <docs>
-Describe your plugin here.
+[TODO: write documentation for this plugin.]
 </docs>
 
 <config lang="json">
 {
   "name": "Untitled Plugin",
-  "mode": "webworker",
+  "type": "web-worker",
   "tags": [],
-  "ui": "UI for Untitled Plugin",
+  "ui": "",
   "version": "0.1.0",
-  "api_version": "0.1.1",
+  "api_version": "0.1.2",
   "url": "",
-  "description": "describe your plugin here.",
+  "description": "[TODO: describe this plugin with one sentense.]",
   "icon": "extension",
   "inputs": null,
   "outputs": null,
@@ -47,18 +47,18 @@ api.export(new ImJoyPlugin())
 
 export const IFRAME_PLUGIN_TEMPLATE= `
 <docs lang="markdown">
-Describe your plugin here.
+[TODO: write documentation for this plugin.]
 </docs>
 
 <config lang="json">
 {
   "name": "Untitled Plugin",
-  "mode": "iframe",
+  "type": "iframe",
   "tags": [],
-  "ui": "UI for Untitled Plugin",
+  "ui": "",
   "version": "0.1.0",
-  "api_version": "0.1.1",
-  "description": "describe your plugin here",
+  "api_version": "0.1.2",
+  "description": "[TODO: describe this plugin with one sentense.]",
   "icon": "extension",
   "inputs": null,
   "outputs": null,
@@ -86,18 +86,18 @@ api.export(new ImJoyPlugin())
 
 export const WINDOW_PLUGIN_TEMPLATE= `
 <docs lang="markdown">
-Describe your plugin here.
+[TODO: write documentation for this plugin.]
 </docs>
 
 <config lang="json">
 {
   "name": "Untitled Plugin",
-  "mode": "window",
+  "type": "window",
   "tags": [],
-  "ui": "UI for Untitled Plugin",
+  "ui": "",
   "version": "0.1.0",
-  "api_version": "0.1.1",
-  "description": "describe your plugin here.",
+  "api_version": "0.1.2",
+  "description": "[TODO: describe this plugin with one sentense.]",
   "icon": "extension",
   "inputs": null,
   "outputs": null,
@@ -136,20 +136,20 @@ api.export(new ImJoyPlugin())
 </style>
 `
 
-export const PYWORKER_PLUGIN_TEMPLATE= `
+export const NATIVE_PYTHON_PLUGIN_TEMPLATE= `
 <docs lang="markdown">
-Describe your plugin here.
+[TODO: write documentation for this plugin.]
 </docs>
 
 <config lang="json">
 {
   "name": "Untitled Plugin",
-  "mode": "pyworker",
+  "type": "native-python",
   "version": "0.1.0",
-  "api_version": "0.1.1",
-  "description": "describe your plugin here.",
+  "api_version": "0.1.2",
+  "description": "[TODO: describe this plugin with one sentense.]",
   "tags": [],
-  "ui": "UI for this plugin",
+  "ui": "",
   "inputs": null,
   "outputs": null,
   "flags": [],
@@ -175,18 +175,18 @@ api.export(ImJoyPlugin())
 `
 
 
-export const WEBPYTHON_PLUGIN_TEMPLATE= `
+export const WEB_PYTHON_PLUGIN_TEMPLATE= `
 <docs lang="markdown">
-Describe your plugin here.
+[TODO: write documentation for this plugin.]
 </docs>
 
 <config lang="json">
 {
   "name": "Untitled Plugin",
-  "mode": "webpython",
+  "type": "web-python",
   "version": "0.1.0",
-  "api_version": "0.1.1",
-  "description": "describe your plugin here.",
+  "api_version": "0.1.2",
+  "description": "[TODO: describe this plugin with one sentense.]",
   "tags": [],
   "ui": "UI for this plugin",
   "inputs": null,
