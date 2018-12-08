@@ -2693,7 +2693,10 @@ export default {
         config.name = config.name || plugin.name
         config.type = config.type || config.name
         config.show_panel = config.show_panel || false
-        config.ui = this.normalizeUI(config.ui) || config.description
+        config.ui = this.normalizeUI(config.ui)
+        if(plugin.name == config.name){
+          config.ui = config.ui || plugin.config.description
+        }
         config.tags = ["op", "plugin"]
         config.inputs = config.inputs || null
         config.outputs = config.outputs || null
@@ -2764,7 +2767,7 @@ export default {
         // console.log('adding joy op', config)
         const joy_template = config
 
-        joy_template.init = joy_template.ui || ''
+        joy_template.init = joy_template.ui
         // joy_template.ui = null
         Joy.add(joy_template);
 
