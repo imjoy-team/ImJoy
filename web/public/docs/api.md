@@ -17,7 +17,7 @@ ImJoy suports two asynchronous programming styles to access these asynchronous f
 for both Python and JavaScript: `async/await` and `callback` style. A few important
 considerations
 
-* `async/await` is recommended for JavaScript and Python 3 (expect web python plugin, which doesn't support it yet).
+* `async/await` is recommended for JavaScript and Python 3 (expect Web Python, which doesn't support it yet).
 * `callback` style can be used for Javascript, Python 2 and Python 3.
 *  **Note** that you **cannot** use both style at the same time.
 * While you can use `try catch` (JavaScript) or `try except` (Python) syntax to capture error with `async/await` style, you cannot use them to capture error if you use `callback` style.
