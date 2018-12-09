@@ -1,7 +1,5 @@
 # Developing Plugins for ImJoy
 
-<img src="./assets/imjoy-plugin-development.png" width="800px"></img>
-
 Developing plugins for ImJoy is easy and fast with the built-in code editor which runs directly in the web app, no additional IDE or compiler is needed for development.
 
 The following list illustrates key features of the plugin system in ImJoy:
@@ -19,17 +17,20 @@ The following list illustrates key features of the plugin system in ImJoy:
 
 ## ImJoy Plugins
 
+<img src="./assets/imjoy-plugin-development.png" width="800px"></img>
+
 There are four types of plugins available for different purposes:
 
 **JavaScript** plugins support these two types:
 
+1. `Window (JavaScript and HTML)` plugin for building a rich and interactive user interface using HTML5/CSS and JavaScript;
+
 1. `Web Worker (JavaScript)` plugin for performing computational tasks using JavaScript or WebAssembly;
-0. `Window (JavaScript and HTML)` plugin for building a rich and interactive user interface using HTML5/CSS and JavaScript;
 
 **Python** plugins support these two types:
 
 1. `Native Python` plugin for performing heavy-duty computational tasks using Python and its libraries, this requires additional installation of plugin engine;
-0. `Web Python` plugin for performing computational tasks using Python with in the browser through WebAssembly and the [pyodide project](https://github.com/iodide-project/pyodide). This is in developmental stage and only selected number of Python libraries are currently supported.
+1. `Web Python` plugin for performing computational tasks using Python with in the browser through WebAssembly and the [pyodide project](https://github.com/iodide-project/pyodide). This is in developmental stage and only selected number of Python libraries are currently supported.
 
 Click the **+ PLUGINS** button in `Plugins`, then select `Create a New Plugin`
 with one of the plugin templates. A code editor will open in the workspace, where you can write the code, save it, or install the plugin to the plugin menu. You can then test your plugin by clicking on the plugin name in the Plugins list.
@@ -55,21 +56,6 @@ Used to run Python code. This requires that the **Python Plugin Engine** is inst
 
 Similary to Web Worker plugins, Native Python plugins do not have access to the html dom, but you can use `ImJoy API` to interact with the graphical interface of ImJoy or other plugin which can trigger changes on the user interface.
 
-**Use Docker Containers**
- **Not yet supported**
-
- Python plugin can also be ran with Docker.
- Examples:
-  * If you want to run your plugin with tensorflow docker, you need to add the following fields to your `<config>`:
- ```json
- <config lang="json">
-   ...
-   "env": "docker pull tensorflow/tensorflow:1.9.0-py3",
-   "requirements": ["numpy", "scipy"],
-   "cmd": "python",
-   ...
- </config>
- ```
 
 ### Web Python
 **[TODO]**

@@ -82,7 +82,7 @@ As mentioned above, Imjoy consists of **two main components**
 2.  Complex computional tasks can be implemented in plugins, which run in the
     **Plugin Engine**. The latest release of the plugin engine is available
     together with installation  instructions on [GitHub](https://github.com/oeway/ImJoy-Engine/releases). The plugin engine will try to upgrade itself from Github when it starts.
-    Packages are managed by `conda` and `pip` which provides thusaccess to the
+    Packages are managed by `conda` and `pip` which provides access to the
     entire Python ecosystem.
 
 The Python Plugin Engine is connected with the ImJoy Web App through websockets
@@ -95,8 +95,7 @@ some suggestions, other combinations are of course possible and be interesting
 for particular applications
 
 1. **ImJoy Web App with JavaScript or Web Python plugins**. Such a framework runs without
- any installation on different operation systems. It is ideal for not too computational
- intensive task. Limitations are that Web Python is (currently) slower than native Python
+ any installation on different operation systems. It can provide effortless user experience and ideal for distributing demos. Limitations are that Web Python is (currently) slower than native Python
  and that it doesn't support the entire Python ecosystem.
 
 2. **Desktop App**. Here you can all plugins types (JavaScript included). Further,
@@ -106,9 +105,8 @@ for particular applications
 
 3. **Plugin engine on a remote computer**. You can then connect to the engine either
   from the web or desktop app. This allows to process data on a dedicated processing
-  workstation or a cluster
+  workstation or a cluster.
 
-**[TODO]** ok like this?
 
 ## ImJoy for core developers
 **[TODO]**
