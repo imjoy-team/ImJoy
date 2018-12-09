@@ -1,4 +1,4 @@
-# imjoy
+# ImJoy
 
 ## Project setup
 ```
