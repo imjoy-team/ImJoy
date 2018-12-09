@@ -126,6 +126,12 @@ First, you needs to make sure the other computer with plugin engine can be acces
 
 Second, currently you can't use ImJoy.io loaded with `https` with the Plugin Engine, because modern browsers do not allow you to make a insecured connection within a SSL secured website. So, you will have to switch to the offline version.
 
+Currently, the recommended way to use ImJoy on a remote computer:
+ 1. login the remote server with SSH, start the plugin engine with `python -m imjoy --serve --host=0.0.0.0`. The plugin engine will download a copy of ImJoy app and serve it through `http://YOUR_REMOTE_IP:8080`. In the meantime, it will give your a **connection token**, copy it from the terminal and you will need it in the next step.
+ 2. use your web browser to access `http://YOUR_REMOTE_IP:8080` (instead of `https://imjoy.io` ), then you can connect to the plugin engine by using `http://YOUR_REMOTE_IP:8080` as host and the **connection token** you get when you start the engine.
+
+Also notice that, the ImJoy web app served from your plugin engine are completely isolated from the one from https://imjoy.io, meaning that the installed plugins, data are not shared.
+
 ### Plugin engine error "address already in use"
 
 If you see something like this: `OSError: [Errno 48] error while attempting to bind on address ('127.0.0.1', 8080): address already in use`, It means you have another instance running which uses the the port needed by the Plugin Engine. You need to find this instance  and kill that task if you don't known which one. For example, for port `8080`, you can run `lsof -n -i :8080 | grep LISTEN` in a terminal. This will list all process listening to the `8080` port, e.g. `+python3.6 1095 fmueller    7u  IPv4 0xb4b82ae29cbba843      0t0  TCP 127.0.0.1:http-alt (LISTEN)`. The process ID can be found directly after `python3.6`, in this case `1095`, you can then kill this process with `kill 1095`.

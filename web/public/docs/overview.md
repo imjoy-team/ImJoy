@@ -23,15 +23,13 @@ a deep learning model for image segmentation.
 
 <img src="./assets/imjoy-overview.png" width="800px"></img>
 
-Imjoy consists of **two parts**:
+Imjoy consists of **three parts**, each part can be extended with plugins:
 
-1.  the **ImJoy app**. It can either run in a browser ("webApp") or as a stand-alone app (desktopApp). The app alone can already perform computational tasks with the powerful
-Javascript engine and WebGL providing GPU access. We further provide support for
-for (pyodide)[https://github.com/iodide-project/pyodide], which allows to run
-Python directly inside the ImJoy app. However, here only a few libraries are
-currenty supported.
+1.  the **Web User Interface**. ImJoy is a web application, it means that using ImJoy is as easy as opening a web page from [ImJoy.io](https://imjoy.io/#/app). With ubiquitousness of the web, ImJoy provides unified user experience with browsers running on different operating systems, including mobile devices. The user can install plugins, and use them from the web interface. Besides a easy-to-use minimal interface, plugins can create their own window to create rich and interactive web interface by making use of the full power of the entire HTML/CSS/JS frameworks. For example, with [D3.js](https://d3js.org/) or [Three.js](https://threejs.org/), one can easily provide powerful interactive charts or 3D visuliaztion plugins. For developers, the web interface is also used for writing and testing code. A stand-alone desktop application (desktopApp) is also provided.
 
-2.  the **Python plugin engine backend**. This allows to access the entire Python ecosystem. The plugin engine can be launched either on the local machine, or remotely to perform compuationally intensive tasks on dedicated workstations, e.g. with state-of-the-art GPUs.
+1. the **Web Computational Backend**. Computational tasks can be execution in web browsers directly. Browsers nowadays are highly optimized such that Javascript engines such as Google Chrome V8 and Firefox Quantum can be used to perform computational tasks. The performance of Javascript Engines are close or even better than native languages such as Java and Python ([Benchmarks](https://benchmarksgame-team.pages.debian.net/benchmarksgame/faster/node-python3.html)). With HTML5/WebGL, browser can access to GPUs, allowing transparent GPU computing with libraries such as [Tensorflow.js](https://js.tensorflow.org/). With a new web standard called [WebAssembly](https://webassembly.org/), softwares/libraries written in high-level languages like C/C++/Rust can be ported to run in the browser. ImJoy uses ["Pyodide"](https://github.com/iodide-project/pyodide) to run Python plugins directly in the browser. The advantage of using the web computational backend is it requires almost zero setup and can run on mobile devices. Importantly, browser provides a unified, secured and sandboxed environment with maximized security and stability.
+
+1.  the **Native Computational Backend**. This is supported with the installation of an additional Python module called ["ImJoy Plugin Engine"](https://github.com/oeway/ImJoy-Engine). This allows to access the entire Python ecosystem which covers most of the scientific computing applications. With [Conda](https://conda.io), ImJoy plugin engine handles the requirements of plugins automatically and provide isolate processes and virtual environments for different Python plugins. It provides maximum flexibility and has full access to the file system, GPU and other local or remote resources. The plugin engine can be launched either on the local machine, or remotely on a cloud server or a cluster to perform compuationally intensive tasks, e.g. with institutional computing cluster, Amazon Cloud, or Google Compute.
 
 
 ## Key features
