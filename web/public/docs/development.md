@@ -91,7 +91,7 @@ that the plugin engine is running. See api function `api.showFileDialog` for mor
 3. If you want to want to make a file from within a Python plugin accessible to a JavaScript plugin, you
    can use the api function `api.getFileUrl`. **[TODO] add link**
 4. File exports from a JavaScript plugin can be achieved by triggering a download,
-   see `api.getFileUrl` for more details. **[TODO] add link**.
+   see `api.exportFile` for more details. **[TODO] add link**.
 
 **[TODO]** This needs more information.
 

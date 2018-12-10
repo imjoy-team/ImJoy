@@ -9,8 +9,7 @@ overcrowded plugin menus. This design makes ImJoy intuitive to work with
 for end users. While ImJoy was developd with image processing in mind, it can
 be use to deploy any kind of data processing task.
 
-
-**[TODO] Add a link for a nice demo app to showcast ImJoy!**
+<!--- **[TODO] Add a link for a nice demo app to showcast ImJoy!** -->
 
 <img src="./assets/imjoy-screenshot.png" width="600px"></img>
 

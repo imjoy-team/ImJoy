@@ -519,6 +519,7 @@
 
 <script>
 import axios from 'axios';
+import { saveAs } from 'file-saver';
 import {
   REGISTER_SCHEMA,
   WINDOW_SCHEMA,
@@ -807,6 +808,7 @@ export default {
       getAttachment: this.getAttachment,
       getFileUrl: this.getFileUrl,
       getFilePath: this.getFilePath,
+      exportFile: this.exportFile,
       utils: {$forceUpdate: this.$forceUpdate, openUrl: this.openUrl, sleep: this.sleep},
     }
 
@@ -1710,6 +1712,13 @@ export default {
           }
         })
       })
+    },
+    exportFile(file, name, _plugin){
+      if(!_plugin){
+        _plugin = name
+        name = null
+      }
+      saveAs(file, name || file._name || 'file_export');
     },
     importScript(url) {
       //url is URL of external file, implementationCode is the code
