@@ -531,7 +531,7 @@ import {
   IFRAME_PLUGIN_TEMPLATE,
   WINDOW_PLUGIN_TEMPLATE,
   CONFIGURABLE_FIELDS,
-  SUPPORTED_PLUGIN_MODES
+  SUPPORTED_PLUGIN_TYPES
 } from '../api.js'
 
 import {
@@ -1340,7 +1340,11 @@ export default {
       // pconfig = "oeway/ImJoy-Demo-Plugins:3D Demos"
       return new Promise((resolve, reject) => {
         let uri = typeof pconfig == 'string' ? pconfig : pconfig.uri
-        let scoped_plugins = pconfig.scoped_plugins || this.available_plugins
+        let scoped_plugins = this.available_plugins
+        if(pconfig.scoped_plugins){
+          scoped_plugins = pconfig.scoped_plugins
+          delete pconfig.scoped_plugins
+        }
         //use the has tag in the uri if no hash tag is defined.
         if(!uri){
           reject('No url found for plugin ' + pconfig.name)
@@ -1355,8 +1359,8 @@ export default {
             reject('Failed to parse the plugin code.')
             return
           }
-          if (!SUPPORTED_PLUGIN_MODES.includes(config.type)){
-            reject('Unsupported plugin mode: '+config.type)
+          if (!SUPPORTED_PLUGIN_TYPES.includes(config.type)){
+            reject('Unsupported plugin type: '+config.type)
             return
           }
           config.tag = tag || config.tag
@@ -2398,13 +2402,11 @@ export default {
           config.docs = pluginComp.docs || null
           config.attachments = pluginComp.attachment || null
         }
-        config.type = config.type || config.name
         config._id = config._id || null
         config.uri = uri
         config.code = code
         config.id = config.name.trim().replace(/ /g, '_') + '_' + randId()
         config.runnable = config.runnable === false ? false : true
-
         for (let i = 0; i < CONFIGURABLE_FIELDS.length; i++) {
             const obj = config[CONFIGURABLE_FIELDS[i]]
             if(obj && typeof obj === 'object' && !(obj instanceof Array)){
@@ -2431,7 +2433,7 @@ export default {
     },
     upgradeAPI(config){
       if(compareVersions(config.api_version, '<=', '0.1.1')){
-        config.type = config.mode
+        config.type = config.type || config.mode
         delete config.mode
         if(config.type == 'pyworker'){
           config.type = 'native-python'
