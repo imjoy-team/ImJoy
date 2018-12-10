@@ -32,7 +32,7 @@ This interface provides all functionality needed to process data.
 
 ImJoy can be used  directly from your browser (Chrome or Firefox)
 **without any installation** [ImJoy web app](https://imjoy.io/#/app)
-or as a **standalone** [desktop app](<add link>) **[TODO] add link**.
+or as a **standalone** [desktop app](https://github.com/oeway/ImJoy-App/releases).
 Many plugins can be used directly, and you can already get a feeling
 for ImJoy works.
 
