@@ -3,7 +3,7 @@ var ajv = new Ajv()
 
 export const CONFIGURABLE_FIELDS = ["env", "requirements", "dependencies", "icon", "ui", "type", "flags"]
 
-export const SUPPORTED_PLUGIN_MODES = ['web-worker', 'native-python', 'web-python', 'iframe', 'window', 'collection']
+export const SUPPORTED_PLUGIN_TYPES = ['web-worker', 'native-python', 'web-python', 'iframe', 'window', 'collection']
 export const WEB_WORKER_PLUGIN_TEMPLATE= `
 <docs>
 [TODO: write documentation for this plugin.]
