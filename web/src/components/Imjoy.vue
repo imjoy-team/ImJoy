@@ -2434,7 +2434,7 @@ export default {
     upgradeAPI(config){
       if(compareVersions(config.api_version, '<=', '0.1.1')){
         config.type = config.type || config.mode
-        //delete config.mode
+        delete config.mode
         if(config.type == 'pyworker'){
           config.type = 'native-python'
         }
