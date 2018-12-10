@@ -59,10 +59,7 @@ You then have to
     ```
     python -m imjoy --serve
     ```
-2. You now have your locally available ImJoy web app that your can access in your browser with this url
-    ```
-    [http://127.0.0.1:8080](http://127.0.0.1:8080).
-    ```
+2. You now have your locally available ImJoy web app that your can access in your browser with this url[(http://127.0.0.1:8080)](http://127.0.0.1:8080).
 
 Also notice that, even though ImJoy can run without internet, depending on the implementation of the plugin, some might be unusable when  offline.
 

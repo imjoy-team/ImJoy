@@ -68,32 +68,18 @@ Similary to Web Worker plugins, Native Python plugins do not have access to the 
 
 ## Loading / saving data
 The **ImJoy app** is build on webtechnology and is running in the browser. This influences
-how data can be loaded and saved. For security restrictions, a browser has no
-access to your local file-system. The **plugin engine** is running outside of
-the browser and has thus full acces to the local file system.
+how data can be loaded and saved. For security restrictions, ImJoy or its plugins running in a browser cannot directly
+access your local file system, the user will need to open or drag files into ImJoy, and the result files can only be saved by triggering downloads. On the other hand, the **Plugin Engine** has full access to the local file system, native python plugins can read and write directly from the local file system.
 
 <img src="./assets/imjoy-data-accessibility.png" width="800px"></img>
 
-**[TODO]** Is this cartoon for the current implementation correct?
+Therefore, there are currently several different ways to handle loading/saving files for plugins
+with or without the plugin engine.
 
-Therefore, there are currently wo different ways to handle loading/saving files for plugins
-with or without the plugin engine. For **Python plugins** running on the plugin engine,
-files can be directly loaded and written to the file system.
+ * If the **Plugin Engine** is running, there are three api functions for **all** types of plugins to access the local file system: `api.showFileDialog`, `api.getFileUrl`, `api.getFilePath`. Specifically for **Python plugins** running on the plugin engine, files can be directly loaded and written to the file system with standard python file operations.
+ **[TODO] add links**
 
-For **JavaScript or Web Python plugins**, you have different possibilities.
-1. You can drag a file or a folder directly into the ImJoy workspace. This will render
- a window with the file/folder content. These data can then be accessed by the plugins
- and be processed.
-2. Specific files or folders can be exposed with a dedicated file dialog,
-where the user has to confirm that these files will be accessible. This requires
-that the plugin engine is running. See api function `api.showFileDialog` for more details.
-**[TODO] add link**.
-3. If you want to want to make a file from within a Python plugin accessible to a JavaScript plugin, you
-   can use the api function `api.getFileUrl`. **[TODO] add link**
-4. File exports from a JavaScript plugin can be achieved by triggering a download,
-   see `api.getFileUrl` for more details. **[TODO] add link**.
-
-**[TODO]** This needs more information.
+ * If the **Plugin Engine** is not running, the only way for **JavaScript or Web Python plugins** to access files is ask the user to drag a file, a set of files or a folder directly into the ImJoy workspace. This will render a window with the file/folder content. These data can then be accessed by the plugins and be processed. For exporting result files, `api.exportFile` function can be used to trigger a download. **[TODO] add links**
 
 ## Plugin file format
 The ImJoy plugin file format (shared by all Plugin types)  is built up on html format with customized blocks (inspired by the `.vue` format). It consists of two mandatory blocks `<config>` and `<script>`, and other optional blocks including `<docs>`, `<window>`,`<attachment>`,`<link>` and `<style>`.  For `<style>`, you can also set the `src` attribute.
