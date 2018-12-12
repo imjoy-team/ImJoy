@@ -8,7 +8,7 @@
   </grid-layout>
   <window v-if="mode=='single'" v-for="w in windows" :key="w.id" v-show="selected_window==w" :loaders="loaders" :withDragHandle="false" @duplicate="duplicate" @select="selectWindow" @close="close" @fullscreen="fullScreen" @normalsize="normalSize" :w="w"></window>
   <div class="md-layout md-gutter md-alignment-center-center">
-    <md-empty-state v-if="!windows || windows.length==0" md-icon="static/img/anna-palm-icon-circle-animation.svg" md-label="IMJOY.IO" md-description="">
+    <md-empty-state v-if="!windows || windows.length==0" md-icon="static/img/imjoy-io-icon.svg" md-label="" md-description="">
     </md-empty-state>
   </div>
 </div>

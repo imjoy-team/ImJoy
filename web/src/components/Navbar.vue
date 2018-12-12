@@ -1,8 +1,9 @@
 <template>
   <div class="md-toolbar-row">
       <div class="md-toolbar-row" flex>
-          <md-button @click="$router.push('/')">
-            <div class="site-title">ImJoy.io<span class="superscript">alpha</span></div>
+          <md-button class="site-title" @click="$router.push('/')">
+            <img class="site-title" src="static/img/imjoy-logo-white.svg" alt="ImJoy"><span class="superscript">alpha</span>
+            <!-- <div class="site-title">ImJoy.io </div> -->
           </md-button>
 
           <span v-show="$route.path!='/'" class="md-layout-item md-medium-hide subheader-title">Image processing with joy.</span>
@@ -30,7 +31,7 @@
             </md-button>
             &nbsp;
             <md-button v-show="$route.path != '/app'" class="md-accent" v-if="screenWidth>=600" @click="$router.push('/app')">
-              <md-icon>mood</md-icon> ImJoy
+              <md-icon md-src="static/img/imjoy-icon-v7.svg" class="md-size-1x svg-icon">mood</md-icon> ImJoy App
               <md-tooltip>Start ImJoy App</md-tooltip>
             </md-button>
             &nbsp;
@@ -123,20 +124,24 @@ export default {
 }
 
 .site-title {
-  font-size: 30px;
+  font-size: 35px;
   font-weight: 300;
+  height: 48px;
 }
 
 @media screen and (max-width: 600px) {
   .site-title {
-    font-size: 25px;
+    font-size: 26px;
     font-weight: 250;
+    height: 40px;
   }
 }
+
 @media screen and (max-width: 400px) {
   .site-title {
-    font-size: 20px;
+    font-size: 22px;
     font-weight: 220;
+      height: 36px;
   }
 }
 

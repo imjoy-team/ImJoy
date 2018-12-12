@@ -10,8 +10,9 @@
           <md-icon>menu</md-icon>
           <!-- <md-tooltip>show sidebar</md-tooltip> -->
         </md-button>
-        <md-button @click="$router.push('/')" v-if="!menuVisible" class="md-medium-hide">
-          <div class="site-title">ImJoy.io<span class="superscript md-small-hide">alpha</span></div>
+        <md-button @click="$router.push('/')" v-if="!menuVisible" class="md-medium-hide site-title">
+          <img class="site-title" src="static/img/imjoy-logo-black.svg" alt="ImJoy"><span class="superscript md-small-hide">alpha</span>
+          <!-- <div class="site-title">ImJoy.io<span class="superscript md-small-hide">alpha</span></div> -->
           <md-tooltip>ImJoy home</md-tooltip>
         </md-button>
         <md-menu v-if="window_mode=='single' && windows.length > 0">
@@ -89,7 +90,7 @@
       <!-- <md-app-toolbar class="md-primary md-dense"> -->
       <md-speed-dial class="md-top-left speed-dial" md-event="hover" md-effect="scale" md-direction="bottom">
         <md-speed-dial-target class="md-primary">
-          <md-icon>add</md-icon>
+          <md-icon class="speed-dial-icon">add</md-icon>
         </md-speed-dial-target>
         <md-speed-dial-content>
           <md-button v-if="engine_connected" @click="showEngineFileDialog()" class="md-icon-button md-primary">
@@ -108,8 +109,9 @@
       </md-speed-dial>
       <div class="md-toolbar-row">
         <div class="md-toolbar-section-start">
-          <md-button class="site-button" @click="$router.push('/')">
-            <div class="site-title">ImJoy.io<span class="superscript">alpha</span></div>
+          <md-button class="site-button site-title" @click="$router.push('/')">
+            <img class="site-title" src="static/img/imjoy-logo-black.svg" alt="ImJoy"><span class="superscript md-small-hide">alpha</span>
+            <!-- <div class="site-title">ImJoy.io<span class="superscript">alpha</span></div> -->
           </md-button>
         </div>
         <div class="md-toolbar-section-end">
@@ -3077,12 +3079,14 @@ export default {
 .site-title {
   font-size: 35px;
   font-weight: 300;
+  height: 48px;
 }
 
 @media screen and (max-width: 600px) {
   .site-title {
     font-size: 26px;
     font-weight: 250;
+    height: 40px;
   }
 }
 
@@ -3090,6 +3094,7 @@ export default {
   .site-title {
     font-size: 22px;
     font-weight: 220;
+      height: 36px;
   }
 }
 
@@ -3172,10 +3177,6 @@ export default {
   padding-top: 102px;
 }
 
-.floating-fab {
-  margin-top: 40px;
-}
-
 .error-message {
   color: red;
   user-select: text;
@@ -3207,6 +3208,15 @@ div#textnode {
 .speed-dial {
   top: 8px !important;
   left: 15px !important;
+
+}
+
+button.md-speed-dial-target {
+  background: white!important;
+}
+
+.speed-dial-icon {
+  color: gray!important;
 }
 
 .md-speed-dial-content {
@@ -3218,6 +3228,7 @@ div#textnode {
 
 .site-button {
   left: 80px;
+  top: 6px;
 }
 
 .fullscreen {
