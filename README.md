@@ -1,4 +1,4 @@
-# ImJoy
+# ![ImJoy](web/public/static/img/imjoy-logo-black.svg)
 [![Build Status](https://travis-ci.com/oeway/ImJoy.svg?branch=master)](https://travis-ci.com/oeway/ImJoy)
 ## Image processing with joy :)
 
