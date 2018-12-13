@@ -185,6 +185,37 @@ await api.call("PluginX", "funcX", 1)
 [Try yourself >>](https://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:call&w=examples)
 
 
+### api.getPlugin
+```JavaScript
+plugin = await api.getPlugin(plugin_name)
+```
+
+Gets the API object of another plugin.
+
+**Arguments**
+
+* **plugin_name**: String. Name of another plugin.
+
+**Returns**
+* **plugin**: Promise. A promise which can be used to retrieve the API object.
+
+**Example**
+To get the API of a plugin named `PluginX`, with the api object,
+you can then access all the api functions of the plugin:
+
+``` javascript
+pluginX = await api.call("PluginX")
+
+result = await pluginX.run({})
+
+// asuming that PluginX defined an API function called `foo`, you can it with:
+await pluginX.foo()
+```
+
+**Note** about `api.getPlugin` and `api.call`: if you want to constantly access different functions from another plugin,
+it's better to get all the API of that plugin with `api.getPlugin`, then access it through the returned object. If you only access
+the API function in another plugin occasionally, you can use both.
+
 ### api.export
 ```javascript
 api.export(new ImJoyPlugin())
