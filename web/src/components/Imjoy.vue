@@ -1383,6 +1383,13 @@ export default {
           }
           config.tag = tag || config.tag
           if(config.tag){
+            // remove existing tag
+            const sp = config.origin.split(':')
+            if(sp[1]){
+              if(sp[1].split('@')[1])
+              config.origin = sp[0] + ':' + sp[1].split('@')[0]
+            }
+            // add a new tag
             config.origin = config.origin + '@' + config.tag
           }
           config._id = config.name && config.name.replace(/ /g, '_') || randId()
