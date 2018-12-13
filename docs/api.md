@@ -204,12 +204,12 @@ To get the API of a plugin named `PluginX`, with the api object,
 you can then access all the api functions of the plugin:
 
 ``` javascript
-pluginX = await api.call("PluginX")
+pluginX = await api.getPlugin("PluginX")
 
-result = await pluginX.run({})
+result = await pluginX.run()
 
-// asuming that PluginX defined an API function called `foo`, you can it with:
-await pluginX.foo()
+// asuming that PluginX defined an API function called `funcX`, you can it with:
+await pluginX.funcX()
 ```
 
 **Note** about `api.getPlugin` and `api.call`: if you want to constantly access different functions from another plugin,

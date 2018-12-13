@@ -2,7 +2,7 @@ docute.init({
   title: 'ImJoy Documentation', // Default to `<title>` value
   repo: 'oeway/imjoy',
   twitter: 'weioyang',
-  'edit-link': 'https://github.com/oeway/ImJoy/blob/master/docs/docs',
+  'edit-link': 'https://github.com/oeway/ImJoy/blob/master/web/public/docs',
   tocVisibleDepth: 4,
   sidebar: true,
   disableSidebarToggle: true,
