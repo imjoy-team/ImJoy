@@ -219,6 +219,9 @@
                   <md-menu-item @click="editPlugin(plugin.id)">
                     <md-icon>edit</md-icon>Edit
                   </md-menu-item>
+                  <md-menu-item @click="sharePlugin(plugin.id)">
+                    <md-icon>share</md-icon>Share
+                  </md-menu-item>
                   <md-menu-item @click="reloadPlugin(plugin.config)">
                     <md-icon>autorenew</md-icon>Reload
                   </md-menu-item>
@@ -825,8 +828,8 @@ export default {
       auto_compaction: true
     })
 
-    this.default_repository_list = [{name: 'ImJoy Repository', url: "https://raw.githubusercontent.com/oeway/ImJoy-Plugins/master/manifest.imjoy.json", description: 'The official plugin repository provided by ImJoy.io.'},
-                                    {name: 'ImJoy Demos', url: 'https://raw.githubusercontent.com/oeway/ImJoy-Demo-Plugins/master/manifest.imjoy.json', description: 'A set of demo plugins provided by ImJoy.io'}
+    this.default_repository_list = [{name: 'ImJoy Repository', url: "oeway/ImJoy-Plugins", description: 'The official plugin repository provided by ImJoy.io.'},
+                                    {name: 'ImJoy Demos', url: 'oeway/ImJoy-Demo-Plugins', description: 'A set of demo plugins provided by ImJoy.io'}
     ]
     // console.log('loading workspace: ', this.$route.query.w)
     this.config_db.get('repository_list').then((doc) => {
@@ -1018,17 +1021,22 @@ export default {
       return new Promise((resolve, reject)=>{
         const re = new RegExp('^[^/.]+/[^/.]+$')
         let repository_url
+        let repo_origin
         if(url.match(re)){
+          repo_origin = url
           if(hashtag){
             url = url + '/tree/'+ hashtag
+            repo_origin = repo_origin + '@' + hashtag
           }
           repository_url = githubImJoyManifest('https://github.com/'+url)
         }
         else if(url.includes('github') && url.includes('/blob/')){
           repository_url = githubImJoyManifest(url)
+          repo_origin = repository_url
         }
         else{
           repository_url = url
+          repo_origin = repo_origin
         }
         axios.get(repository_url).then(response => {
           if (response && response.data && response.data.plugins) {
@@ -1042,6 +1050,7 @@ export default {
             for (let i = 0; i < manifest.plugins.length; i++) {
                 const p = manifest.plugins[i]
                 p.uri = p.uri || p.name + '.imjoy.html'
+                p.origin = repo_origin + ':' + p.name
                 if (!p.uri.startsWith(manifest.uri_root) && !p.uri.startsWith('http')) {
                   p.uri = manifest.uri_root + '/' + p.uri
                 }
@@ -1284,7 +1293,6 @@ export default {
     async getPluginFromUrl(uri, scoped_plugins){
       scoped_plugins = scoped_plugins || this.available_plugins
       let selected_tag
-      const origin = uri
       // if the uri format is REPO_NAME:PLUGIN_NAME
       if(!uri.startsWith('http') && uri.includes('/') && uri.includes(':')){
         let [repo_name, plugin_name] = uri.split(':')
@@ -1339,7 +1347,6 @@ export default {
       const code = response.data
       let config = this.parsePluginCode(code, {tag: selected_tag})
       config.uri = uri
-      config.origin = origin
       config.scoped_plugins = scoped_plugins
       return config
     },
@@ -1361,6 +1368,7 @@ export default {
         // uri = uri.split('@')[0]
 
         this.getPluginFromUrl(uri, scoped_plugins).then((config)=>{
+          config.origin = pconfig.origin || uri
           if (!config) {
             console.error('Failed to parse the plugin code.', code)
             reject('Failed to parse the plugin code.')
@@ -1371,6 +1379,9 @@ export default {
             return
           }
           config.tag = tag || config.tag
+          if(config.tag){
+            config.origin = config.origin + '@' + config.tag
+          }
           config._id = config.name && config.name.replace(/ /g, '_') || randId()
           config.dependencies = config.dependencies || []
           const _deps = []
@@ -1769,6 +1780,18 @@ export default {
       }
       this.addWindow(w)
     },
+    sharePlugin(pid){
+      const plugin = this.plugins[pid]
+      const pconfig = plugin.config
+      if(pconfig.origin){
+        alert('Please share with this URL:  https://imjoy.io/#/app?p=' + pconfig.origin)
+      }
+      else{
+        const filename = plugin.name+"_"+randId()+'.imjoy.html'
+        const file = new Blob([pconfig.code], {type: "text/plain;charset=utf-8"})
+        saveAs(file, filename);
+      }
+    },
     editPlugin(pid) {
       const plugin = this.plugins[pid]
       const pconfig = plugin.config
@@ -1878,6 +1901,7 @@ export default {
         try {
           const template = this.parsePluginCode(code, {tag: pconfig.tag})
           template.code = code
+          template.origin = pconfig.origin
           template._id = template.name.replace(/ /g, '_')
           const addPlugin = () => {
             this.db.put(template, {
@@ -2367,6 +2391,7 @@ export default {
       config = config || {}
       const uri = config.uri
       const tag = config.tag
+      const origin = config.origin
       try {
         if (uri && uri.endsWith('.js')) {
           config.lang = config.lang || 'javascript'
@@ -2411,6 +2436,7 @@ export default {
         }
         config._id = config._id || null
         config.uri = uri
+        config.origin = origin
         config.code = code
         config.id = config.name.trim().replace(/ /g, '_') + '_' + randId()
         config.runnable = config.runnable === false ? false : true
@@ -2596,7 +2622,6 @@ export default {
     },
     async getPluginAPI(plugin_name) {
       const target_plugin = this.plugin_names[plugin_name]
-      console.log('======', plugin_name, target_plugin)
       if(target_plugin){
         return target_plugin.api
       }
