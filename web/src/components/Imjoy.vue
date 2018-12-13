@@ -772,18 +772,19 @@ export default {
       localStorage.setItem("imjoy_client_id", this.client_id);
     }
     this.engine_session_id = randId()
-    if(this.$route.query.token){
-      this.connection_token = this.$route.query.token
+    if(this.$route.query.token || this.$route.query.t){
+      this.connection_token = (this.$route.query.token || this.$route.query.t).trim()
       const query = Object.assign({}, this.$route.query);
       delete query.token;
+      delete query.t;
       this.$router.replace({ query });
     }
     else{
       this.connection_token = localStorage.getItem("imjoy_connection_token")
     }
 
-    if(this.$route.query.engine){
-      this.engine_url = this.$route.query.engine.trim()
+    if(this.$route.query.engine || this.$route.query.e){
+      this.engine_url = (this.$route.query.engine || this.$route.query.e).trim()
     }
     else{
       this.engine_url = localStorage.getItem("imjoy_engine_url") || 'http://127.0.0.1:8080'
@@ -857,8 +858,8 @@ export default {
       for(let r of this.repository_list){
         this.repository_names.push(r.name)
       }
-      if(this.$route.query.repo){
-        const ret = this.addRepository(this.$route.query.repo)
+      if(this.$route.query.repo || this.$route.query.r){
+        const ret = this.addRepository(this.$route.query.repo || this.$route.query.r)
         if(ret){
           this.selected_repository = ret
         }
@@ -886,7 +887,7 @@ export default {
       this.workspace_list = ['default']
       default_ws = 'default'
     }).then(() => {
-      this.selected_workspace = this.$route.query.w || default_ws
+      this.selected_workspace = this.$route.query.workspace || this.$route.query.w || default_ws
       if (!this.workspace_list.includes(this.selected_workspace) || this.selected_workspace != default_ws) {
         if (!this.workspace_list.includes(this.selected_workspace)) {
           this.workspace_list.push(this.selected_workspace)
@@ -918,8 +919,8 @@ export default {
     }).then(() => {
       this.reloadPlugins().then(()=>{
         this.reloadRepository().finally(()=>{
-          if(this.$route.query.plugin){
-            const p = this.$route.query.plugin.trim()
+          if(this.$route.query.plugin || this.$route.query.p){
+            const p = (this.$route.query.plugin || this.$route.query.p).trim()
             if (p.match(url_regex) || (p.includes('/') && p.includes(':'))) {
               this.plugin_url = p
               this.init_plugin_search = null
@@ -936,6 +937,7 @@ export default {
             // remove plugin url from the query
             const query = Object.assign({}, this.$route.query);
             delete query.plugin;
+            delete query.p;
             this.$router.replace({ query });
 
             this.show_plugin_templates = false
@@ -956,12 +958,12 @@ export default {
             }
           }
 
-          if(this.$route.query.load){
+          if(this.$route.query.load || this.$route.query.l){
             const w = {
               name: "Loaded Url",
               type: 'imjoy/url_list',
               scroll: true,
-              data: [this.$route.query.load]
+              data: [this.$route.query.load || this.$route.query.l]
             }
             this.addWindow(w)
           }
@@ -1282,6 +1284,7 @@ export default {
     async getPluginFromUrl(uri, scoped_plugins){
       scoped_plugins = scoped_plugins || this.available_plugins
       let selected_tag
+      const origin = uri
       // if the uri format is REPO_NAME:PLUGIN_NAME
       if(!uri.startsWith('http') && uri.includes('/') && uri.includes(':')){
         let [repo_name, plugin_name] = uri.split(':')
@@ -1336,6 +1339,7 @@ export default {
       const code = response.data
       let config = this.parsePluginCode(code, {tag: selected_tag})
       config.uri = uri
+      config.origin = origin
       config.scoped_plugins = scoped_plugins
       return config
     },
@@ -1464,7 +1468,7 @@ export default {
         throw "Workspace name should not be empty."
       }
       let q = {
-        w: w
+        workspace: w
       }
       if (w == 'default') {
         q = null
