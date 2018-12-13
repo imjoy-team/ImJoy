@@ -465,7 +465,7 @@
               </h2>
             </div>
             <div v-if="tag4install" class="md-toolbar-section-end">
-              <md-button class="md-button md-primary" @click="installPlugin(plugin4install, tag4install); showAddPluginDialog = false">
+              <md-button class="md-button md-primary" @click="installPlugin(plugin4install, tag4install); showAddPluginDialog = false; clearPluginUrl()">
                 <md-icon>cloud_download</md-icon>Install
                 <md-tooltip>Install {{plugin4install.name}} (tag=`{{tag4install}}`)</md-tooltip>
               </md-button>
@@ -477,12 +477,12 @@
                   <md-tooltip>Choose a tag to install {{plugin4install.name}}</md-tooltip>
                 </md-button>
                 <md-menu-content>
-                  <md-menu-item v-for="tag in plugin4install.tags" :key="tag" @click="installPlugin(plugin4install, tag); showAddPluginDialog = false">
+                  <md-menu-item v-for="tag in plugin4install.tags" :key="tag" @click="installPlugin(plugin4install, tag); showAddPluginDialog = false; clearPluginUrl()">
                     <md-icon>cloud_download</md-icon>{{tag}}
                   </md-menu-item>
                 </md-menu-content>
               </md-menu>
-              <md-button v-else  class="md-button md-primary"@click="installPlugin(plugin4install); showAddPluginDialog = false">
+              <md-button v-else  class="md-button md-primary"@click="installPlugin(plugin4install); showAddPluginDialog = false; clearPluginUrl()">
                 <md-icon>cloud_download</md-icon>Install
               </md-button>
             </div>
@@ -519,7 +519,7 @@
       </md-card>
     </md-dialog-content>
     <md-dialog-actions>
-      <md-button class="md-primary" @click="showAddPluginDialog=false;">Exit</md-button>
+      <md-button class="md-primary" @click="showAddPluginDialog=false; clearPluginUrl();">Exit</md-button>
     </md-dialog-actions>
   </md-dialog>
 </div>
@@ -939,12 +939,6 @@ export default {
               this.show_plugin_store = true
               this.show_plugin_url = false
             }
-
-            // remove plugin url from the query
-            const query = Object.assign({}, this.$route.query);
-            delete query.plugin;
-            delete query.p;
-            this.$router.replace({ query });
 
             this.show_plugin_templates = false
             this.showAddPluginDialog = true
@@ -1790,11 +1784,21 @@ export default {
       }
       this.addWindow(w)
     },
+    clearPluginUrl(){
+      const query = Object.assign({}, this.$route.query);
+      delete query.p;
+      delete query.plugin;
+      this.$router.replace({ query });
+    },
     sharePlugin(pid){
       const plugin = this.plugins[pid]
       const pconfig = plugin.config
       if(pconfig.origin){
-        alert(`Please use this URL for sharing "${plugin.name}":  https://imjoy.io/#/app?p=${pconfig.origin}`)
+        this.share_url_message = `<h2>Sharing "${plugin.name}"</h2> <br> <a href="https://imjoy.io/#/app?p=${pconfig.origin}" target="_blank">https://imjoy.io/#/app?p=${pconfig.origin}</a> <br> (Right click on the link and select "Copy Link Address")`
+        this.showShareUrl = true
+        const query = Object.assign({}, this.$route.query);
+        query.p = pconfig.origin;
+        this.$router.replace({ query });
       }
       else{
         const filename = plugin.name+"_"+randId()+'.imjoy.html'
