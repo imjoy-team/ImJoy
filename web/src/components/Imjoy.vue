@@ -219,6 +219,9 @@
                   <md-menu-item @click="editPlugin(plugin.id)">
                     <md-icon>edit</md-icon>Edit
                   </md-menu-item>
+                  <md-menu-item v-if="plugin.config.origin" @click="updatePlugin(plugin.id)">
+                    <md-icon>cloud_download</md-icon>Update
+                  </md-menu-item>
                   <md-menu-item @click="sharePlugin(plugin.id)">
                     <md-icon>share</md-icon>Share
                   </md-menu-item>
@@ -1784,12 +1787,22 @@ export default {
       const plugin = this.plugins[pid]
       const pconfig = plugin.config
       if(pconfig.origin){
-        alert('Please share with this URL:  https://imjoy.io/#/app?p=' + pconfig.origin)
+        alert(`Please use this URL for sharing "${plugin.name}":  https://imjoy.io/#/app?p=${pconfig.origin}`)
       }
       else{
         const filename = plugin.name+"_"+randId()+'.imjoy.html'
         const file = new Blob([pconfig.code], {type: "text/plain;charset=utf-8"})
         saveAs(file, filename);
+      }
+    },
+    updatePlugin(pid){
+      const plugin = this.plugins[pid]
+      const pconfig = plugin.config
+      if(pconfig.origin){
+        this.installPlugin(pconfig.origin)
+      }
+      else{
+        alert('Origin not found for this plugin.')
       }
     },
     editPlugin(pid) {
