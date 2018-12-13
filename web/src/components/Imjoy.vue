@@ -801,6 +801,7 @@ export default {
       showStatus: this.showStatus,
       run: this.runPlugin,
       call: this.callPlugin,
+      getPlugin: this.getPluginAPI,
       showPluginProgress: this.showPluginProgress,
       showPluginStatus: this.showPluginStatus,
       showFileDialog: this.showFileDialog,
@@ -2589,6 +2590,16 @@ export default {
         throw 'plugin with type '+plugin_name+ ' not found.'
       }
     },
+    async getPluginAPI(plugin_name) {
+      const target_plugin = this.plugin_names[plugin_name]
+      console.log('======', plugin_name, target_plugin)
+      if(target_plugin){
+        return target_plugin.api
+      }
+      else{
+        throw 'plugin with type '+plugin_name+ ' not found.'
+      }
+    },
     async runPlugin(plugin_name, my, _plugin) {
       let source_plugin
       if(_plugin && _plugin.id){
@@ -3216,7 +3227,7 @@ button.md-speed-dial-target {
 }
 
 .speed-dial-icon {
-  color: gray!important;
+  color: rgba(0,0,0,0.87)!important;
 }
 
 .md-speed-dial-content {
