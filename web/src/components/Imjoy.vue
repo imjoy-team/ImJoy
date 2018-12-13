@@ -219,6 +219,12 @@
                   <md-menu-item @click="editPlugin(plugin.id)">
                     <md-icon>edit</md-icon>Edit
                   </md-menu-item>
+                  <md-menu-item v-if="plugin.config.origin" @click="updatePlugin(plugin.id)">
+                    <md-icon>cloud_download</md-icon>Update
+                  </md-menu-item>
+                  <md-menu-item @click="sharePlugin(plugin.id)">
+                    <md-icon>share</md-icon>Share
+                  </md-menu-item>
                   <md-menu-item @click="reloadPlugin(plugin.config)">
                     <md-icon>autorenew</md-icon>Reload
                   </md-menu-item>
@@ -459,7 +465,7 @@
               </h2>
             </div>
             <div v-if="tag4install" class="md-toolbar-section-end">
-              <md-button class="md-button md-primary" @click="installPlugin(plugin4install, tag4install); showAddPluginDialog = false">
+              <md-button class="md-button md-primary" @click="installPlugin(plugin4install, tag4install); showAddPluginDialog = false; clearPluginUrl()">
                 <md-icon>cloud_download</md-icon>Install
                 <md-tooltip>Install {{plugin4install.name}} (tag=`{{tag4install}}`)</md-tooltip>
               </md-button>
@@ -471,12 +477,12 @@
                   <md-tooltip>Choose a tag to install {{plugin4install.name}}</md-tooltip>
                 </md-button>
                 <md-menu-content>
-                  <md-menu-item v-for="tag in plugin4install.tags" :key="tag" @click="installPlugin(plugin4install, tag); showAddPluginDialog = false">
+                  <md-menu-item v-for="tag in plugin4install.tags" :key="tag" @click="installPlugin(plugin4install, tag); showAddPluginDialog = false; clearPluginUrl()">
                     <md-icon>cloud_download</md-icon>{{tag}}
                   </md-menu-item>
                 </md-menu-content>
               </md-menu>
-              <md-button v-else  class="md-button md-primary"@click="installPlugin(plugin4install); showAddPluginDialog = false">
+              <md-button v-else  class="md-button md-primary"@click="installPlugin(plugin4install); showAddPluginDialog = false; clearPluginUrl()">
                 <md-icon>cloud_download</md-icon>Install
               </md-button>
             </div>
@@ -513,7 +519,7 @@
       </md-card>
     </md-dialog-content>
     <md-dialog-actions>
-      <md-button class="md-primary" @click="showAddPluginDialog=false;">Exit</md-button>
+      <md-button class="md-primary" @click="showAddPluginDialog=false; clearPluginUrl();">Exit</md-button>
     </md-dialog-actions>
   </md-dialog>
 </div>
@@ -772,18 +778,19 @@ export default {
       localStorage.setItem("imjoy_client_id", this.client_id);
     }
     this.engine_session_id = randId()
-    if(this.$route.query.token){
-      this.connection_token = this.$route.query.token
+    if(this.$route.query.token || this.$route.query.t){
+      this.connection_token = (this.$route.query.token || this.$route.query.t).trim()
       const query = Object.assign({}, this.$route.query);
       delete query.token;
+      delete query.t;
       this.$router.replace({ query });
     }
     else{
       this.connection_token = localStorage.getItem("imjoy_connection_token")
     }
 
-    if(this.$route.query.engine){
-      this.engine_url = this.$route.query.engine.trim()
+    if(this.$route.query.engine || this.$route.query.e){
+      this.engine_url = (this.$route.query.engine || this.$route.query.e).trim()
     }
     else{
       this.engine_url = localStorage.getItem("imjoy_engine_url") || 'http://127.0.0.1:8080'
@@ -824,8 +831,8 @@ export default {
       auto_compaction: true
     })
 
-    this.default_repository_list = [{name: 'ImJoy Repository', url: "https://raw.githubusercontent.com/oeway/ImJoy-Plugins/master/manifest.imjoy.json", description: 'The official plugin repository provided by ImJoy.io.'},
-                                    {name: 'ImJoy Demos', url: 'https://raw.githubusercontent.com/oeway/ImJoy-Demo-Plugins/master/manifest.imjoy.json', description: 'A set of demo plugins provided by ImJoy.io'}
+    this.default_repository_list = [{name: 'ImJoy Repository', url: "oeway/ImJoy-Plugins", description: 'The official plugin repository provided by ImJoy.io.'},
+                                    {name: 'ImJoy Demos', url: 'oeway/ImJoy-Demo-Plugins', description: 'A set of demo plugins provided by ImJoy.io'}
     ]
     // console.log('loading workspace: ', this.$route.query.w)
     this.config_db.get('repository_list').then((doc) => {
@@ -857,8 +864,8 @@ export default {
       for(let r of this.repository_list){
         this.repository_names.push(r.name)
       }
-      if(this.$route.query.repo){
-        const ret = this.addRepository(this.$route.query.repo)
+      if(this.$route.query.repo || this.$route.query.r){
+        const ret = this.addRepository(this.$route.query.repo || this.$route.query.r)
         if(ret){
           this.selected_repository = ret
         }
@@ -886,7 +893,7 @@ export default {
       this.workspace_list = ['default']
       default_ws = 'default'
     }).then(() => {
-      this.selected_workspace = this.$route.query.w || default_ws
+      this.selected_workspace = this.$route.query.workspace || this.$route.query.w || default_ws
       if (!this.workspace_list.includes(this.selected_workspace) || this.selected_workspace != default_ws) {
         if (!this.workspace_list.includes(this.selected_workspace)) {
           this.workspace_list.push(this.selected_workspace)
@@ -918,8 +925,8 @@ export default {
     }).then(() => {
       this.reloadPlugins().then(()=>{
         this.reloadRepository().finally(()=>{
-          if(this.$route.query.plugin){
-            const p = this.$route.query.plugin.trim()
+          if(this.$route.query.plugin || this.$route.query.p){
+            const p = (this.$route.query.plugin || this.$route.query.p).trim()
             if (p.match(url_regex) || (p.includes('/') && p.includes(':'))) {
               this.plugin_url = p
               this.init_plugin_search = null
@@ -932,11 +939,6 @@ export default {
               this.show_plugin_store = true
               this.show_plugin_url = false
             }
-
-            // remove plugin url from the query
-            const query = Object.assign({}, this.$route.query);
-            delete query.plugin;
-            this.$router.replace({ query });
 
             this.show_plugin_templates = false
             this.showAddPluginDialog = true
@@ -956,12 +958,12 @@ export default {
             }
           }
 
-          if(this.$route.query.load){
+          if(this.$route.query.load || this.$route.query.l){
             const w = {
               name: "Loaded Url",
               type: 'imjoy/url_list',
               scroll: true,
-              data: [this.$route.query.load]
+              data: [this.$route.query.load || this.$route.query.l]
             }
             this.addWindow(w)
           }
@@ -1016,17 +1018,22 @@ export default {
       return new Promise((resolve, reject)=>{
         const re = new RegExp('^[^/.]+/[^/.]+$')
         let repository_url
+        let repo_origin
         if(url.match(re)){
+          repo_origin = url
           if(hashtag){
             url = url + '/tree/'+ hashtag
+            repo_origin = repo_origin + '@' + hashtag
           }
           repository_url = githubImJoyManifest('https://github.com/'+url)
         }
         else if(url.includes('github') && url.includes('/blob/')){
           repository_url = githubImJoyManifest(url)
+          repo_origin = repository_url
         }
         else{
           repository_url = url
+          repo_origin = repo_origin
         }
         axios.get(repository_url).then(response => {
           if (response && response.data && response.data.plugins) {
@@ -1040,6 +1047,7 @@ export default {
             for (let i = 0; i < manifest.plugins.length; i++) {
                 const p = manifest.plugins[i]
                 p.uri = p.uri || p.name + '.imjoy.html'
+                p.origin = repo_origin + ':' + p.name
                 if (!p.uri.startsWith(manifest.uri_root) && !p.uri.startsWith('http')) {
                   p.uri = manifest.uri_root + '/' + p.uri
                 }
@@ -1357,6 +1365,7 @@ export default {
         // uri = uri.split('@')[0]
 
         this.getPluginFromUrl(uri, scoped_plugins).then((config)=>{
+          config.origin = pconfig.origin || uri
           if (!config) {
             console.error('Failed to parse the plugin code.', code)
             reject('Failed to parse the plugin code.')
@@ -1367,6 +1376,16 @@ export default {
             return
           }
           config.tag = tag || config.tag
+          if(config.tag){
+            // remove existing tag
+            const sp = config.origin.split(':')
+            if(sp[1]){
+              if(sp[1].split('@')[1])
+              config.origin = sp[0] + ':' + sp[1].split('@')[0]
+            }
+            // add a new tag
+            config.origin = config.origin + '@' + config.tag
+          }
           config._id = config.name && config.name.replace(/ /g, '_') || randId()
           config.dependencies = config.dependencies || []
           const _deps = []
@@ -1464,7 +1483,7 @@ export default {
         throw "Workspace name should not be empty."
       }
       let q = {
-        w: w
+        workspace: w
       }
       if (w == 'default') {
         q = null
@@ -1765,6 +1784,38 @@ export default {
       }
       this.addWindow(w)
     },
+    clearPluginUrl(){
+      const query = Object.assign({}, this.$route.query);
+      delete query.p;
+      delete query.plugin;
+      this.$router.replace({ query });
+    },
+    sharePlugin(pid){
+      const plugin = this.plugins[pid]
+      const pconfig = plugin.config
+      if(pconfig.origin){
+        this.share_url_message = `<h2>Sharing "${plugin.name}"</h2> <br> <a href="https://imjoy.io/#/app?p=${pconfig.origin}" target="_blank">https://imjoy.io/#/app?p=${pconfig.origin}</a> <br> (Right click on the link and select "Copy Link Address")`
+        this.showShareUrl = true
+        const query = Object.assign({}, this.$route.query);
+        query.p = pconfig.origin;
+        this.$router.replace({ query });
+      }
+      else{
+        const filename = plugin.name+"_"+randId()+'.imjoy.html'
+        const file = new Blob([pconfig.code], {type: "text/plain;charset=utf-8"})
+        saveAs(file, filename);
+      }
+    },
+    updatePlugin(pid){
+      const plugin = this.plugins[pid]
+      const pconfig = plugin.config
+      if(pconfig.origin){
+        this.installPlugin(pconfig.origin)
+      }
+      else{
+        alert('Origin not found for this plugin.')
+      }
+    },
     editPlugin(pid) {
       const plugin = this.plugins[pid]
       const pconfig = plugin.config
@@ -1874,6 +1925,7 @@ export default {
         try {
           const template = this.parsePluginCode(code, {tag: pconfig.tag})
           template.code = code
+          template.origin = pconfig.origin
           template._id = template.name.replace(/ /g, '_')
           const addPlugin = () => {
             this.db.put(template, {
@@ -2363,6 +2415,7 @@ export default {
       config = config || {}
       const uri = config.uri
       const tag = config.tag
+      const origin = config.origin
       try {
         if (uri && uri.endsWith('.js')) {
           config.lang = config.lang || 'javascript'
@@ -2407,6 +2460,7 @@ export default {
         }
         config._id = config._id || null
         config.uri = uri
+        config.origin = origin
         config.code = code
         config.id = config.name.trim().replace(/ /g, '_') + '_' + randId()
         config.runnable = config.runnable === false ? false : true
@@ -2592,7 +2646,6 @@ export default {
     },
     async getPluginAPI(plugin_name) {
       const target_plugin = this.plugin_names[plugin_name]
-      console.log('======', plugin_name, target_plugin)
       if(target_plugin){
         return target_plugin.api
       }
