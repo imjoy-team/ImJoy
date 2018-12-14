@@ -972,6 +972,8 @@ function randId() {
         this._site.onRemoteUpdate(function(){
             me.remote = me._site.getRemote();
             me.api = me.remote;
+            me.api.__jailed_type__ = 'plugin_api';
+            me.api.__id__ = me.id;
             me._disconnected = false
             me.initializing = false
             me._connect.emit();
