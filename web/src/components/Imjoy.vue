@@ -3022,6 +3022,7 @@ export default {
         });
       })
     },
+    //TODO: remove updateWindow from api
     async updateWindow(wconfig, _plugin){
       api.showMessage('Warning: `api.updateWindow` is deprecated, please use the new api.`')
       const w = wconfig.id
