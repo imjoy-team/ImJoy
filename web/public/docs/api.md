@@ -352,7 +352,7 @@ result2 = await api.run("name of plugin 2")
 
 ### api.createWindow
 ```javascript
-window_id = await api.createWindow({name: window_name, type: window_type, w:w, h:h, data: data, config:config},clickload:false)
+win = await api.createWindow({name: window_name, type: window_type, w:w, h:h, data: data, config:config})
 ```
 Creates a new window in the ImJoy workspace.
 
@@ -377,82 +377,51 @@ the window with `api.updateWindow`.
 * **w**: Integer. Window width in inches. **[TODO] Correct?**
 * **h**: Integer. Window height in inches.  **[TODO] Correct?**
 * **data**: Object (JavaScript) or dictionary (Python). Contains data to be tranferred to window.
-* **clickload**: Boolean. If true, window will ask for an extra click to load the content.
 * **config**: Object (JavaScript) or dictionary (Python). **[TODO]**.
 
 **Returns**
 
-* **window_id**: String. Unique window ID.
+* **win**: Object. The API object of the created window.
 
 **Examples**
 ```javascript
-window_id = await api.createWindow({name: 'new window', type: 'Image Window', w:7, h:7, data: {image: ...}, config: {}})
+win = await api.createWindow({name: 'new window', type: 'Image Window', w:7, h:7, data: {image: ...}, config: {}})
 ```
 [Try yourself >>](https://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:createWindow&w=examples)
 
 In python you can either use the `async/await` style for Python 3
 
 ```python
-window_id = await api.createWindow(name='new window', type='Image Window', w=7, h=7, data={image: ...}, config={})
+win = await api.createWindow(name='new window', type='Image Window', w=7, h=7, data={image: ...}, config={})
 ```
 
 or the `callback` style for Python 2
 ```python
-def window_callback(window_id):
-    print(window_id)
+def window_callback(win):
+    self.win = win
+    print('window created')
+
 api.createWindow({name: 'new window', type: 'Image Window', w:7, h:7, data: {image: ...}, config: {}}).then(window_callback)
 ```
 
-### api.updateWindow
-```javascript
-window_id = await api.updateWindow({id: window_id, name: window_name, type: window_type, w:w, h:h, data: data, config:config},clickload:false)
-```
+The returned window object from `createWindow` can be stored in the plugin class (`self` for Python, or `this` for JavaScript) for later use.
 
-Updates an existing window.
+For example, you can then use it to update the window.
 
-An minimal call contains the window ID and the data that should be transmitted.
-The data will be passed as `my.data` to the `run` function of the target window
-plugin. If the target window is a internally supported window (e.g. `imjoy/image`),
-then it will just replace the content (since there is no `run` function).
-
-If the previous window was closed, the minimal call will throw an error. However,
-you can also pass `name` and `type` as for `api.createWindow`. If these two fields
-exists, `api.updateWindow` will call `api.createWindow` to create a new window.
-If `api.createWindow` is called, the `windowId` will to be updated, therefore, you
-should save the returned `windowId`.
-
-**Arguments**
-
-Supports same parameters as `api.createWindow`
-
-* **window_id**: String. Window ID returned by `api.createWindow`
-
-
-**Returns**
-
-* **window_id**: String. Unique window ID.
-
-**Examples**
-
-Update a window in JavaScript
-```javascript
-windowId = await api.updateWindow({id: windowId, name: 'new window', type: 'Image Window', w:7, h:7, data: {image: ...}})
-```
-[Try yourself in the createWindow example >>](https://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:createWindow&w=examples)
-
-
-Update a window in Python
+For Python:
 ```python
+# win is the object retured from api.createWindow
 # pass as a dictionary
-window_id = await api.updateWindow({'id': window_id, name: 'new window', type: 'Image Window', w:7, h:7, 'data': {'image': ...}})
+await win.run({'data': {'image': ...}})
 
 # or named arguments
-window_id = await api.updateWindow(id=window_id, name='new window', type='Image Window', w=7, h=7, data={'image': ...})
+await win.run(data={'image': ...})
+```
 
-# callback style
-def cb(wid):
-    window_id = wid
-api.updateWindow({'id': window_id, name: 'new window', type: 'Image Window', w:7, h:7, 'data': {'image': ...}}).then(cb)
+For Javascript:
+```javascript
+// win is the object retured from api.createWindow
+await win.run({'data': {'image': ...}})
 ```
 
 ### api.showDialog

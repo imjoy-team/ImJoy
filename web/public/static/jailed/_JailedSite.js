@@ -47,6 +47,7 @@
         this.id = id;
         this.lang = lang;
         this._interface = {};
+        this._plugin_interfaces = {};
         this._remote = null;
         this._remoteUpdateHandler = function(){};
         this._getInterfaceHandler = function(){};
@@ -191,19 +192,23 @@
          switch(data.type) {
          case 'method':
              var method;
+             var interface = this._interface;
+             if(data.pid){
+               interface = this._plugin_interfaces[data.pid]
+             }
              if(data.name.indexOf('.') !=-1){
                var names = data.name.split('.')
-               method = this._interface[names[0]][names[1]];
+               method = interface[names[0]][names[1]];
              }
              else{
-               method = this._interface[data.name];
+               method = interface[data.name];
              }
              var args = this._unwrap(data.args, true);
              args.push({id: this.id})
              if(data.promise){
                var [resolve, reject] = this._unwrap(data.promise, false);
                try {
-                 var result = method.apply(this._interface, args);
+                 var result = method.apply(interface, args);
                  if(result instanceof Promise || method.constructor.name === 'AsyncFunction'){
                    result.then(resolve).catch(reject);
                  }
@@ -216,7 +221,7 @@
              }
              else{
                try {
-                 method.apply(this._interface, args);
+                 method.apply(interface, args);
                } catch (e) {
                  console.error(e, method, args);
                }
@@ -334,13 +339,13 @@
      *
      * @returns {Function} wrapped remote method
      */
-    JailedSite.prototype._genRemoteMethod = function(name) {
+    JailedSite.prototype._genRemoteMethod = function(name, plugin_id) {
         var me = this;
         var remoteMethod = function() {
           return new Promise((resolve, reject) => {
             let id = null;
             try {
-              id=me._method_refs.put(name)
+              id=me._method_refs.put( plugin_id? plugin_id + '/' + name: name)
               var wrapped_resolve = function () {
                 if(id!==null) me._method_refs.fetch(id);
                 return resolve.apply(this, arguments);
@@ -355,8 +360,8 @@
               me._connection.send({
                   type: 'method',
                   name: name,
+                  pid: plugin_id,
                   args: args,
-                  // pid :  me.id,
                   promise: me._wrap([wrapped_resolve, wrapped_reject])
               }, transferables);
             } catch (e) {
@@ -401,6 +406,21 @@
         if(typeof aObject == 'object' && aObject.hasOwnProperty('__jailed_type__') && aObject.hasOwnProperty('__value__')){
           return aObject
         }
+
+        //encode interfaces
+        if(typeof aObject == 'object' && aObject.hasOwnProperty('__id__') && aObject.__jailed_type__ == 'plugin_api'){
+          const encoded_interface = {}
+          for (k in aObject) {
+            v = aObject[k];
+            if(typeof v == 'function'){
+              bObject[k] = {__jailed_type__: 'plugin_interface', __plugin_id__:aObject['__id__'], __value__ : k, num: null}
+              encoded_interface[k] = v
+            }
+          }
+          this._plugin_interfaces[aObject['__id__']] = encoded_interface
+          return bObject
+        }
+
         for (k in aObject) {
           if (isarray || aObject.hasOwnProperty(k)) {
             v = aObject[k];
@@ -527,6 +547,9 @@
           }
           else if(aObject.__jailed_type__ == 'interface'){
             bObject = this._remote[aObject.__value__] || this._genRemoteMethod(aObject.__value__)
+          }
+          else if(aObject.__jailed_type__ == 'plugin_interface'){
+            bObject = this._genRemoteMethod(aObject.__value__, aObject.__plugin_id__)
           }
           else if(aObject.__jailed_type__ == 'ndarray'){
             //create build array/tensor if used in the plugin

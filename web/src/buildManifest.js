@@ -62,6 +62,10 @@ function get_plugins(files){
 function get_collections(collections_dir){
   return new Promise((resolve, reject)=>{
     var collection_configs = [];
+    if (!fs.existsSync(collections_dir)) {
+      reject('collection folder not exists')
+      return
+    }
     // Loop through all the files in the temp directory
     fs.readdir(collections_dir, function(err, files) {
       if (err) {

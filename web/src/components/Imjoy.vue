@@ -808,7 +808,7 @@ export default {
       showStatus: this.showStatus,
       run: this.runPlugin,
       call: this.callPlugin,
-      getPlugin: this.getPluginAPI,
+      getPlugin: this.getPlugin,
       showPluginProgress: this.showPluginProgress,
       showPluginStatus: this.showPluginStatus,
       showFileDialog: this.showFileDialog,
@@ -2541,7 +2541,6 @@ export default {
         }
         this.plugins[plugin.id] = plugin
         this.plugin_names[plugin.name] = plugin
-        config.click2load = false
         plugin.api = {
           run: async (my) => {
             const c = _clone(template.defaults) || {}
@@ -2644,7 +2643,7 @@ export default {
         throw 'plugin with type '+plugin_name+ ' not found.'
       }
     },
-    async getPluginAPI(plugin_name) {
+    async getPlugin(plugin_name) {
       const target_plugin = this.plugin_names[plugin_name]
       if(target_plugin){
         return target_plugin.api
@@ -2998,7 +2997,7 @@ export default {
                   pconfig[k] = result[k]
                 }
               }
-              resolve()
+              resolve(plugin.api)
               this.$forceUpdate()
             }).catch((e) => {
               this.status_text = '<' + plugin.name + '>' + (e.toString() || "Error.")
@@ -3024,27 +3023,10 @@ export default {
       })
     },
     async updateWindow(wconfig, _plugin){
-      const wid = wconfig.id
-      if(!wid) throw "You must provide a window id for updating."
-      const w = this.window_ids[wid]
-      if(w){
-        if(w.update){
-          const ret = await w.update(wconfig)
-          if(ret){
-            for(let k in ret){
-              w[k] = ret[k]
-            }
-          }
-        }
-        else{
-          for(let k in wconfig){
-            w[k] = wconfig[k]
-          }
-        }
-        return wid
-      }
-      else if(wconfig.name && wconfig.type){
-        return await this.createWindow(wconfig, _plugin)
+      api.showMessage('Warning: `api.updateWindow` is deprecated, please use the new api.`')
+      const w = wconfig.id
+      if(w && w.run){
+        return await w.run(wconfig)
       }
       else{
         throw `Window (id=${wid}) not found`
@@ -3054,7 +3036,6 @@ export default {
       return new Promise((resolve, reject) => {
         wconfig.config = wconfig.config || {}
         wconfig.data = wconfig.data || null
-        wconfig.click2load = wconfig.click2load || false
         wconfig.panel = wconfig.panel || null
         if (!WINDOW_SCHEMA(wconfig)) {
           const error = WINDOW_SCHEMA.errors(wconfig)
@@ -3065,7 +3046,18 @@ export default {
         if (wconfig.type && wconfig.type.startsWith('imjoy')) {
           // console.log('creating imjoy window', wconfig)
           wconfig.id = 'imjoy_'+randId()
-          resolve(this.addWindow(wconfig))
+          const wid = this.addWindow(wconfig)
+          const window_plugin_apis = {
+            __jailed_type__: 'plugin_api',
+            __id__: wid,
+            run: (wconfig)=>{
+              const w = this.window_ids[wid]
+              for(let k in wconfig){
+                w[k] = wconfig[k]
+              }
+            }
+          }
+          resolve(window_plugin_apis)
         } else {
           const window_config = this.registered.windows[wconfig.type]
           // console.log(window_config)
@@ -3088,19 +3080,15 @@ export default {
           pconfig.iframe_window = null
           pconfig.plugin = window_config
           pconfig.context = this.pluing_context
-          if (!pconfig.click2load) {
-            this.showPluginWindow(pconfig)
-            // make sure the iframe container is ready
-            this.$nextTick(() => {
-              this.renderWindow(pconfig).then(()=>{
-                resolve(pconfig.id)
-              })
-        		});
-          } else {
-            pconfig.renderWindow = this.renderWindow
-            this.showPluginWindow(pconfig)
-            resolve(pconfig.id)
-          }
+
+          this.showPluginWindow(pconfig)
+          // make sure the iframe container is ready
+          this.$nextTick(() => {
+            this.renderWindow(pconfig).then((plugin_api)=>{
+              resolve(plugin_api)
+            })
+      		});
+
         }
       })
     },

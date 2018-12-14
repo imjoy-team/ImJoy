@@ -166,8 +166,6 @@ export default {
       if (nw.iframe_container)
         nw.iframe_container = 'plugin_window_' + nw.id + randId()
       nw.i = nw.i + "_"
-      if (!nw.click2load)
-        nw.click2load = true
       if (w.renderWindow) {
         nw.renderWindow = w.renderWindow
       }
