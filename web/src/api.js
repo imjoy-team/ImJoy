@@ -239,7 +239,6 @@ export const WINDOW_SCHEMA= ajv.compile({
     config: {type: 'object'},
     data: {type: ['null', 'object']}, //attachments: {}
     panel: {type: ['null', 'object']}
-    // click2load: Boolean
   }
 })
 

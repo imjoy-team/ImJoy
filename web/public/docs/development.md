@@ -46,10 +46,7 @@ Since it's designed for perfoming computational tasks, it does not have access t
 Window plugins are used to create a new web interface with HTML/CSS and Javascript.
 They in the `iframe` mode, and it will show up as a window. The `<window>` and `<style>` blocks (see below) can be used to define the actual content of the window.
 
-Different from other plugins which will be loaded and intialized when ImJoy is started, a `window` plugin will not be loaded until the actuall plugin is created with `api.createWindow` or clicked by a user in the menu. During execution of `api.createWindow`, `setup` and `run` will be called for the first time, and return with an window ID. After that, if needed, another plugin can call `api.updateWindow` with the window ID, ImJoy will try to execute the `run` function with the new data again.
-
-If the `run` returned with an object, then it will be used to update the window status managed by ImJoy. This means, for example, if the user changed the name of the plugin, it can be achieved by returning the same `my` object in the `run` function.
-
+Different from other plugins which will be loaded and intialized when ImJoy is started, a `window` plugin will not be loaded until the actuall plugin is created with `api.createWindow` or clicked by a user in the menu. During execution of `api.createWindow`, `setup` and `run` will be called for the first time, and return with an window api object (contains all the api functions of the window, including `setup`, `run` and other functions if defined). You can then use the window api object to access all the functions, for example, update the content of the window by `win_obj.run({'data': ... })`.
 
 ### Native Python
 Used to run Python code. This requires that the **Python Plugin Engine** is installed and started before using the plugin. See the **Developing Python Plugins** for more details.
