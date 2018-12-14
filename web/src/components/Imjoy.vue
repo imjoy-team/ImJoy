@@ -796,9 +796,7 @@ export default {
       this.engine_url = localStorage.getItem("imjoy_engine_url") || 'http://127.0.0.1:8080'
     }
 
-
-
-    this.plugin_api = {
+    this.imjoy_api = {
       alert: this.showAlert,
       register: this.register,
       createWindow: this.createWindow,
@@ -2542,6 +2540,8 @@ export default {
         this.plugins[plugin.id] = plugin
         this.plugin_names[plugin.name] = plugin
         plugin.api = {
+          __jailed_type__: 'plugin_api',
+          __id__: plugin.id,
           run: async (my) => {
             const c = _clone(template.defaults) || {}
             c.type = template.name
@@ -2584,7 +2584,7 @@ export default {
         }
         const tconfig = _.assign({}, template, config)
         tconfig.workspace = this.selected_workspace
-        const plugin = new jailed.DynamicPlugin(tconfig, _.assign({TAG: tconfig.tag, WORKSPACE: this.selected_workspace}, this.plugin_api))
+        const plugin = new jailed.DynamicPlugin(tconfig, _.assign({TAG: tconfig.tag, WORKSPACE: this.selected_workspace}, this.imjoy_api))
         plugin.whenConnected(() => {
           if (!plugin.api) {
             console.error('Error occured when loading plugin.')
@@ -2974,7 +2974,7 @@ export default {
         // console.log('rendering window', pconfig)
         const tconfig = _.assign({}, pconfig.plugin, pconfig)
         tconfig.workspace = this.selected_workspace
-        const plugin = new jailed.DynamicPlugin(tconfig, _.assign({TAG: pconfig.tag, WORKSPACE: this.selected_workspace}, this.plugin_api))
+        const plugin = new jailed.DynamicPlugin(tconfig, _.assign({TAG: pconfig.tag, WORKSPACE: this.selected_workspace}, this.imjoy_api))
         plugin.whenConnected(() => {
           if (!plugin.api) {
             console.error('the window plugin seems not ready.')
