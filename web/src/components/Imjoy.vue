@@ -386,7 +386,7 @@
     <md-dialog-content>
         <p>
           Python plugins are supported by ImJoy with the Python Plugin Engine. <br><br>
-          If this is your first time to use ImJoy Plugin Engine, please <a href="https://github.com/oeway/ImJoy-Engine/releases" target="_blank">click here</a> to download the ImJoy Plugin Engine.
+          If this is your first time to use ImJoy Plugin Engine, please <a href="https://github.com/oeway/ImJoy-App/releases" target="_blank">click here</a> to download the ImJoy Desktop App.
           <br> If you have it already, please start the Plugin Engine, and connect to it.<br>
         </p>
         <md-field>
