@@ -31,7 +31,7 @@
             </md-button>
             &nbsp;
             <md-button v-show="$route.path != '/app'" class="md-accent" v-if="screenWidth>=600" @click="$router.push('/app')">
-              <md-icon md-src="static/img/imjoy-icon.svg" class="md-size-1x svg-icon">mood</md-icon> ImJoy App
+              <md-icon md-src="static/img/imjoy-icon-white.svg" class="md-size-1x svg-icon"></md-icon> ImJoy App
               <md-tooltip>Start ImJoy App</md-tooltip>
             </md-button>
             &nbsp;

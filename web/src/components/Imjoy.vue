@@ -1999,8 +1999,8 @@ export default {
         loaders: {}
       }
       this.registered.internal_inputs = {
-        'Image': { schema: ajv.compile({properties: {type: {"enum": ['image/jpeg', 'image/png', 'image/gif']}, size: {type: 'number'}}}) },
-        'Code Editor': { schema: ajv.compile({properties: {name: { "pattern": ".*\\.imjoy.html|\\.html|\\.txt|\\.xml"}}})},
+        'Image': { schema: ajv.compile({properties: {type: {type:"string", "enum": ['image/jpeg', 'image/png', 'image/gif']}, size: {type: 'number'}}, required: ["type", "size"]}) },
+        'Code Editor': { schema: ajv.compile({properties: {name: {type:"string", "pattern": ".*\\.imjoy.html|\\.html|\\.txt|\\.xml"}, size: {type: 'number'}}, required: ["name", "size"]})},
       }
       this.registered.loaders['Image'] = (file)=>{
         const reader = new FileReader();
