@@ -216,20 +216,20 @@
                   <md-menu-item @click="showDoc(plugin.id)">
                     <md-icon>description</md-icon>Docs
                   </md-menu-item>
-                  <md-menu-item @click="editPlugin(plugin.id)">
-                    <md-icon>edit</md-icon>Edit
-                  </md-menu-item>
-                  <md-menu-item v-if="plugin.config.origin" @click="updatePlugin(plugin.id)">
-                    <md-icon>cloud_download</md-icon>Update
-                  </md-menu-item>
                   <md-menu-item @click="sharePlugin(plugin.id)">
                     <md-icon>share</md-icon>Share
+                  </md-menu-item>
+                  <md-menu-item @click="editPlugin(plugin.id)">
+                    <md-icon>edit</md-icon>Edit
                   </md-menu-item>
                   <md-menu-item @click="reloadPlugin(plugin.config)">
                     <md-icon>autorenew</md-icon>Reload
                   </md-menu-item>
                   <md-menu-item @click="unloadPlugin(plugin)">
                     <md-icon>clear</md-icon>Terminate
+                  </md-menu-item>
+                  <md-menu-item v-if="plugin.config.origin" @click="updatePlugin(plugin.id)">
+                    <md-icon>cloud_download</md-icon>Update
                   </md-menu-item>
                   <md-menu-item class="md-accent" @click="_plugin2_remove=plugin;showRemoveConfirmation=true">
                     <md-icon>delete_forever</md-icon>Remove
@@ -281,6 +281,9 @@
                     <md-menu-item @click="showDoc(plugin.id)">
                       <md-icon>description</md-icon>Docs
                     </md-menu-item>
+                    <md-menu-item @click="sharePlugin(plugin.id)">
+                      <md-icon>share</md-icon>Share
+                    </md-menu-item>
                     <md-menu-item @click="editPlugin(plugin.id)">
                       <md-icon>edit</md-icon>Edit
                     </md-menu-item>
@@ -290,6 +293,9 @@
                     <md-menu-item @click="unloadPlugin(plugin)">
                       <md-icon>clear</md-icon>Terminate
                     </md-menu-item>
+                    <md-menu-item v-if="plugin.config.origin" @click="updatePlugin(plugin.id)">
+                      <md-icon>cloud_download</md-icon>Update
+                    </md-menu-item>
                     <md-menu-item class="md-accent" @click="_plugin2_remove=plugin;showRemoveConfirmation=true">
                       <md-icon>delete_forever</md-icon>Remove
                     </md-menu-item>
@@ -298,6 +304,9 @@
 
                 <md-button class="joy-run-button" :class="plugin.running?'md-accent':(plugin._disconnected && plugin.type == 'native-python'? 'disconnected-plugin': '')" :disabled="plugin.type != 'native-python' || !plugin._disconnected" @click="connectPlugin(plugin)">
                   {{plugin.type == 'native-python'? plugin.name + ' 🚀': plugin.name}}
+                </md-button>
+                <md-button class="md-icon-button" :disabled="true">
+                  <md-icon>visibility_off</md-icon>
                 </md-button>
                 <md-divider></md-divider>
               </div>
