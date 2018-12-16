@@ -356,8 +356,8 @@ win = await api.createWindow({name: window_name, type: window_type, w:w, h:h, da
 ```
 Creates a new window in the ImJoy workspace.
 
-Once an window is created, it will return a window ID, which can be used to update
-the window with `api.updateWindow`.
+Once an window is created, it will return an object with the APIs of the corresponding window plugin, which can be used to update
+the window (e.g. `win.run({"data": ...})`).
 
 **Arguments**
 
