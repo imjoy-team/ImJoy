@@ -56,13 +56,13 @@
           <md-tooltip>Connect to the Plugin Engine</md-tooltip>
         </md-button>
         <md-menu v-else md-size="big" md-direction="bottom-end">
-          <md-button class="md-icon-button" :class="engine_connected?'md-primary':'md-accent'" md-menu-trigger>
+          <md-button class="md-icon-button" :class="engine_connected?'md-primary':'md-accent'" md-menu-trigger @click="updateEngineStatus()">
             <md-icon>{{engine_connected?'sync':'sync_disabled'}}</md-icon>
             <md-tooltip>Connection to the Plugin Engine</md-tooltip>
           </md-button>
           <md-menu-content>
             <md-menu-item :disabled="true">
-              <span>🚀{{engine_status}}</span>
+              <span>🚀{{engine_status.connection}}</span>
             </md-menu-item>
             <!-- <md-menu-item @click="connectEngine(engine_url)">
               <span>Connect</span>
@@ -75,6 +75,28 @@
             <md-menu-item @click="showPluginEngineInfo=true">
               <span>About Plugin Engine</span>
               <md-icon>info</md-icon>
+            </md-menu-item>
+            <md-divider></md-divider>
+            <md-menu-item :disabled="true">
+              <span>Plugin Engine Processes</span>
+              <md-button @click.stop="updateEngineStatus()" class="md-icon-button md-primary">
+                <md-icon>autorenew</md-icon>
+              </md-button>
+            </md-menu-item>
+            <md-menu-item v-for="p in engine_status.plugin_processes" :key="p.pid">
+              <md-button @click.stop="killPluginProcess(p)" class="md-icon-button md-accent">
+                <md-icon>clear</md-icon>
+              </md-button>
+              {{p.name}} (#{{p.pid}})
+            </md-menu-item>
+            <md-menu-item :disabled="true" v-if="engine_status.plugin_num>1">
+              <span>{{engine_status.plugin_num}} Running Plugins</span>
+              <md-button @click.stop="killPluginProcess()" class="md-icon-button md-accent">
+                <md-icon>clear</md-icon>
+              </md-button>
+            </md-menu-item>
+            <md-menu-item :disabled="true" v-if="engine_status.plugin_num==0">
+              <span> No plugin process is running</span>
             </md-menu-item>
           </md-menu-content>
         </md-menu>
@@ -406,7 +428,7 @@
           <label for="connection_token">Connection Token</label>
           <md-input type="text" v-model="connection_token" @keyup.enter="connectEngine(engine_url)" name="connection_token"></md-input>
         </md-field>
-        <p>&nbsp;{{engine_status}}</p>
+        <p>&nbsp;{{engine_status.connection}}</p>
         <p>
           If you failed to install or start the Plugin Engine, please consult <a href="https://github.com/oeway/ImJoy-Engine" target="_blank">here</a>, and choose the alternative solution.<br>
         </p>
@@ -620,9 +642,9 @@ export default {
       loading: false,
       progress: 0,
       status_text: '',
-      engine_status: 'Disconnected',
       engine_connected: false,
       engine_url: 'http://127.0.0.1:8080',
+      engine_status: {connection: 'Disconnected'},
       windows: [],
       active_windows: [],
       selected_workspace: null,
@@ -1544,12 +1566,12 @@ export default {
       }
       //enforcing 127.0.0.1 for avoid security restrictions
       url = url.replace('localhost', '127.0.0.1')
-      this.engine_status = 'Connecting...'
+      this.engine_status.connection = 'Connecting...'
       if(!auto) this.showMessage('Trying to connect to the plugin engine...')
       const socket = io(url);
       const timer = setTimeout(() => {
         if (!this.engine_connected) {
-          this.engine_status = 'Plugin Engine is not connected.'
+          this.engine_status.connection = 'Plugin Engine is not connected.'
           if(!auto) this.showMessage('Failed to connect, please make sure you have started the plugin engine.')
 
           if(auto) socket.disconnect()
@@ -1568,7 +1590,7 @@ export default {
               this.pluing_context.socket = socket
               this.engine_connected = true
               this.showPluginEngineInfo = false
-              this.engine_status = 'Connected.'
+              this.engine_status.connection = 'Connected.'
               localStorage.setItem("imjoy_connection_token", this.connection_token);
               localStorage.setItem("imjoy_engine_url", url)
               this.showMessage('Plugin Engine is connected.')
@@ -1611,7 +1633,7 @@ export default {
         // console.log('plugin engine disconnected.')
         this.engine_connected = false
         this.showMessage('Plugin Engine disconnected.')
-        this.engine_status = 'Disconnected.'
+        this.engine_status.connection = 'Disconnected.'
         this.socket = null
         this.pluing_context.socket = null
         // this.pluing_context.socket = null
@@ -1619,6 +1641,38 @@ export default {
       });
       this.socket = socket
 
+    },
+    updateEngineStatus() {
+      return new Promise((resolve, reject) => {
+        this.socket.emit('get_engine_status', {}, (ret)=>{
+          if(ret.success){
+            this.engine_status.plugin_num = ret.plugin_num
+            this.engine_status.plugin_processes = ret.plugin_processes
+            resolve(ret)
+            this.$forceUpdate()
+          }
+          else{
+            this.showMessage(`Failed to get engine status: ${ret.error}`)
+            reject(ret.error)
+            this.$forceUpdate()
+          }
+        })
+      })
+    },
+    killPluginProcess(p){
+      return new Promise((resolve, reject) => {
+        this.socket.emit('kill_plugin_process', {pid: p && p.pid}, (ret)=>{
+          if(ret.success){
+            this.updateEngineStatus()
+            resolve(ret)
+          }
+          else{
+            this.showMessage(`Failed to get engine status: ${ret.error}`)
+            reject(ret.error)
+            this.$forceUpdate()
+          }
+        })
+      })
     },
     disconnectEngine() {
       if (this.socket) {
