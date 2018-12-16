@@ -2,11 +2,11 @@
 
 
 ## Plugin Engine
-The Plugin Engine allows to run Python plugins. You have to **install** it once
-from [GitHub](https://github.com/oeway/ImJoy-Engine/releases), it will then
+The Plugin Engine allows to run native Python plugins. You have to **install** the ImJoy Desktop App
+or the command line script from [here](https://github.com/oeway/ImJoy-App/releases), it will then
 check for updates at each launch.
 
-You have to **launch** the engine each time you re-start the ImJoy app and you
+You have to **launch** the plugin engine each time you re-start the ImJoy app and you
 use plugins relying on the engine. If the engine is not connected, you will
 get an error message in the lower part of the ImJoy interface.
 <img
@@ -22,6 +22,7 @@ In the ImJoy interface press the 🚀 symbol to connect it to the Plugin Engine.
 <img
   src="./assets/imjoy-install-engine.png" width="600px"></img>
 
+
 ## Access the Plugin Engine from a command line interface
 You can also access the Miniconda environment from the command line interface.
 
@@ -32,6 +33,9 @@ export PATH=~/ImJoyApp/bin:$PATH
 # now you can use `conda`, `pip`, `python` provided from ~/ImJoyApp
 which conda
 
+# start the plugin engine
+python -m imjoy
+
 ```
 For **Windows**, you can use powershell to add the ImJoyApp to `$env.Path`:
 ```
@@ -39,6 +43,9 @@ $env:Path = '%systemdrive%%homepath%\ImJoyApp;%systemdrive%%homepath%\ImJoyApp\S
 
 # now you can use `conda`, `pip`, `python` provided from ~/ImJoyApp
 (Get-Command conda.exe).Path
+
+# start the plugin engine
+python -m imjoy
 ```
 
 **Note: The following sections assume you ran the above command in your current terminal.**
@@ -70,7 +77,7 @@ To perform computational intensive calculations you can launch the Plugin Engine
 0. Connect from your local ImJoy instance to plugin engine on remote machine.
 
 #### Install and configure Plugin Engine on remote environment
-Install the latest version of the Plugin Engine from [GitHub](https://github.com/oeway/ImJoy-Engine/releases).
+Install the latest version of the Plugin Engine from [GitHub](https://github.com/oeway/ImJoy-App/releases).
 
 #### Launch the Plugin Engine on remote machine
 The installation of the Plugin Engine will setup an **Miniconda environment** located in `~/ImJoyApp`.

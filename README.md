@@ -1,17 +1,12 @@
 # ![ImJoy](web/public/static/img/imjoy-logo-black.svg)
 [![Build Status](https://travis-ci.com/oeway/ImJoy.svg?branch=master)](https://travis-ci.com/oeway/ImJoy)
-## Image processing with joy :)
+## Image Processing with Joy :)
 
 ImJoy is a modern image processing framework aims to bridge the web and the Python ecosystem with plugins.
 
 With ImJoy, developing and deploying advanced image processing methods such as deep learning with rich and interactive user interface has never been so easy.
 
 <img src="https://github.com/oeway/ImJoy/raw/master/web/public/docs/assets/imjoy-screenshot.png" width="600px"></img>
-
-Currently, ImJoy consists of three repositories:
- * [the ImJoy web application](https://github.com/oeway/ImJoy/) (this repository)
- * [the ImJoy plugin engine](https://github.com/oeway/ImJoy-Engine)
- * [the ImJoy plugin repository](https://github.com/oeway/ImJoy-Plugins)
 
 Getting started and documentations for the development: [ImJoy Docs](https://imjoy.io/docs)
 
@@ -33,9 +28,21 @@ Getting started and documentations for the development: [ImJoy Docs](https://imj
    - Support Tensorflow.js and native Tensorflow for deep learning
  * Rendering muti-dimentional data in 3D with webGL, Three.js etc.
 
+
 # Documentation
 
 Please refer to: [ImJoy Docs](https://imjoy.io/docs/)
+
+# Repositories
+
+Currently, ImJoy consists of the following repositories:
+ * [ImJoy Web App (core)](https://github.com/oeway/ImJoy/) (this repository)
+ * [ImJoy Plugin Engine](https://github.com/oeway/ImJoy-Engine)
+ * [ImJoy Desktop App](https://github.com/oeway/ImJoy-App)
+
+ * [ImJoy Plugin Repository](https://github.com/oeway/ImJoy-Plugins)
+ * [ImJoy Demo Plugins](https://github.com/oeway/ImJoy-Demo-Plugins/)
+ * [ImJoy Project Template](https://github.com/oeway/ImJoy-project-template)
 
 # Support ImJoy
 
