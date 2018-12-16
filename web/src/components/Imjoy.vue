@@ -1661,7 +1661,7 @@ export default {
     },
     killPluginProcess(p){
       return new Promise((resolve, reject) => {
-        this.socket.emit('kill_plugin_process', {pid: p && p.pid}, (ret)=>{
+        this.socket.emit('kill_plugin_process', {pid: p && p.pid, all: !p}, (ret)=>{
           if(ret.success){
             this.updateEngineStatus()
             resolve(ret)
