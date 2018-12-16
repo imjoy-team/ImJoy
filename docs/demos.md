@@ -82,13 +82,13 @@ This will install the actual interface plugin (GUI w3.css) and automatically the
 
 This demo illustrates a number of different important concepts, which we describe briefly below.
 
-1. How to get started in coding an ImJoy user-interface with HTML and JavaScript.
+1. How to get started in coding an ImJoy user-interface with HTML, CSS and JavaScript.
 2. How to communicate between the user interface and the Python worker.
 3. How to store data in the Python worker for further calcuations.
 
 #### Web-design for an ImJoy user interface
 The window plugins are developed with HTML5/CSS and JavaScript. Here we provide
-only a fast overview of these languages. An excellent ressources to get started with HTML and JavaScript is  [www.w3schools.com/](https://www.w3schools.com/). Other coding platforms exist to test and develop code ([playcode.io/](https://playcode.io/) or [codepen.io](https://codepen.io/)), but you can essentially use ImJoy to test your code as well.
+only a fast overview of these languages. An excellent ressources to get started with HTML, CSS and JavaScript is  [www.w3schools.com/](https://www.w3schools.com/). Other coding platforms exist to test and develop code ([playcode.io/](https://playcode.io/) or [codepen.io](https://codepen.io/)), but you can essentially use ImJoy to test your code as well.
 
 HTML5/CSS and JavaScript control the three relevant aspects of an interface. In ImJoy, these three elements are defined in one [single file](https://github.com/oeway/ImJoy-Demo-Plugins/blob/master/repository/GUI.imjoy.html), and specified in dedicated code blocks.
 
