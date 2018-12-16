@@ -666,7 +666,7 @@ export default {
     }
     this.plugin_templates = {
       "Web Worker (JS)": WEB_WORKER_PLUGIN_TEMPLATE,
-      "Window (JS and HTML)": WINDOW_PLUGIN_TEMPLATE,
+      "Window (HTML/CSS/JS)": WINDOW_PLUGIN_TEMPLATE,
       "Native Python": NATIVE_PYTHON_PLUGIN_TEMPLATE,
       // "Iframe(Javascript)": IFRAME_PLUGIN_TEMPLATE,
       "Web Python (experimental)": WEB_PYTHON_PLUGIN_TEMPLATE

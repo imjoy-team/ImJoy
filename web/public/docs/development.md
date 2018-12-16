@@ -23,9 +23,9 @@ There are four types of plugins available for different purposes:
 
 **JavaScript** plugins support these two types:
 
-1. `Window (JavaScript and HTML)` plugin for building a rich and interactive user interface using HTML5/CSS and JavaScript;
+1. `Window (HTML/CSS/JS)` plugin for building a rich and interactive user interface using HTML5/CSS and JavaScript;
 
-1. `Web Worker (JavaScript)` plugin for performing computational tasks using JavaScript or WebAssembly;
+1. `Web Worker (JS)` plugin for performing computational tasks using JavaScript or WebAssembly;
 
 **Python** plugins support these two types:
 
