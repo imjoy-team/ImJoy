@@ -167,6 +167,8 @@ Calls a function from another plugin.
 You can also transfer data. Number of argument number must match the required number
 of arguments of the called function.
 
+If you want to call frequently functions of another plugin, we recommend using `api.getPlugin`.
+
 **Arguments**
 
 * **plugin_name**: String. Name of the called plugin.
@@ -174,9 +176,10 @@ of arguments of the called function.
 * **data**: data. Any of the supported primitive data types that can be transfered.
 
 **Returns**
-* **[TODO]**. A promise which can be used to retrieve the call results.
+<!-- * **[TODO]**. A promise which can be used to retrieve the call results. -->
 
 **Example**
+
 To call a function `funcX` defined in the plugin  `PluginX` with the argument `1`, use
 
 ``` javascript
@@ -192,6 +195,13 @@ plugin = await api.getPlugin(plugin_name)
 
 Gets the API object of another plugin.
 
+**Note** on `api.getPlugin` and `api.call`. If you want to constantly access
+different functions from another plugin, it is preferable to get all the API
+functions of this plugin with `api.getPlugin`. Then you can access them
+through the returned object. If you only access the API function in another
+plugin occasionally, you can also use `api.call`
+
+
 **Arguments**
 
 * **plugin_name**: String. Name of another plugin.
@@ -200,21 +210,19 @@ Gets the API object of another plugin.
 * **plugin**: Promise. A promise which can be used to retrieve the API object.
 
 **Example**
+
 To get the API of a plugin named `PluginX`, with the api object,
 you can then access all the api functions of the plugin:
 
 ``` javascript
 pluginX = await api.getPlugin("PluginX")
-
 result = await pluginX.run()
 
-// asuming that PluginX defined an API function called `funcX`, you can it with:
+// Assuming that PluginX defined an API function `funcX`, you can access it with:
 await pluginX.funcX()
 ```
+[Try yourself >>](https://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:getPlugin&w=examples)
 
-**Note** about `api.getPlugin` and `api.call`: if you want to constantly access different functions from another plugin,
-it's better to get all the API of that plugin with `api.getPlugin`, then access it through the returned object. If you only access
-the API function in another plugin occasionally, you can use both.
 
 ### api.export
 ```javascript
@@ -263,7 +271,7 @@ multiple times to overwrite the previous version. `api.register` can also be use
     - `update`: String. Specifies another `Plugin API` function that will run
       whenever any option in the `ui` is changed.
 
-**[TODO]** Is this list complete? what about returns?
+<!--**[TODO]** Is this list complete? what about returns? -->
 
 
 **Examples**
@@ -311,7 +319,7 @@ to this plugin to transfer data.
 **Examples**
 
 
-Example to call one plugin
+Example to call one plugin:
 
 ``` python
 await api.run("Python Demo Plugin")
@@ -356,8 +364,8 @@ win = await api.createWindow({name: window_name, type: window_type, w:w, h:h, da
 ```
 Creates a new window in the ImJoy workspace.
 
-Once an window is created, it will return an object with the APIs of the corresponding window plugin, which can be used to update
-the window (e.g. `win.run({"data": ...})`).
+Once an window is created, it will return an object with the APIs of the corresponding window plugin,
+which can be used to update the window, e.g. you can update the data field with `win.run({"data": ...})`).
 
 **Arguments**
 
@@ -369,21 +377,24 @@ the window (e.g. `win.run({"data": ...})`).
     - `imjoy/image`. Display an image. Requires `data.src` pointing to an image location.
     - `imjoy/files`. Display a list of files. `data` is an array of file objects.
     - `imjoy/url_list`. Display a list of url rendered with HTML tag `<a> </a>`. `data` is an array of urls.
-    - `imjoy/panel`. Render the `ui` string in a `<config>` block. **[TODO]**
+    - `imjoy/panel`. Render the `ui` string in a `<config>` block. <!--****[TODO] what can you do with this?**-->
     - `imjoy/markdown`. Render some markdown text provided in `data.source`.
     - `imjoy/generic`. Will show all objects in `data`. For instance, the window that you obtain with `return.my`
     - `imjoy/plugin-editor`. Opens the source code editors. `data.id` is a unique string (preferable random) specifying the window id, `data.code` contains the source code
 
-* **w**: Integer. Window width in inches. **[TODO] Correct?**
-* **h**: Integer. Window height in inches.  **[TODO] Correct?**
+* **w**: Integer. Window width in inches. <!--**[TODO] Correct?**-->
+* **h**: Integer. Window height in inches.  <!--**[TODO] Correct?**-->
 * **data**: Object (JavaScript) or dictionary (Python). Contains data to be tranferred to window.
-* **config**: Object (JavaScript) or dictionary (Python). **[TODO]**.
+* **config**: Object (JavaScript) or dictionary (Python). <!--**[TODO] Correct?**.-->
 
 **Returns**
 
-* **win**: Object. The API object of the created window.
+* **win**: Object. The API object of the created window. Can be stored in the plugin class
+  (`self` for Python, or `this` for JavaScript) for later use, e.g. to update the window.
 
 **Examples**
+
+Create a simple window in JavaScript:
 ```javascript
 win = await api.createWindow({name: 'new window', type: 'Image Window', w:7, h:7, data: {image: ...}, config: {}})
 ```
@@ -404,9 +415,14 @@ def window_callback(win):
 api.createWindow({name: 'new window', type: 'Image Window', w:7, h:7, data: {image: ...}, config: {}}).then(window_callback)
 ```
 
-The returned window object from `createWindow` can be stored in the plugin class (`self` for Python, or `this` for JavaScript) for later use.
+You can use the returned object to update the window
 
-For example, you can then use it to update the window.
+
+For Javascript:
+```javascript
+// win is the object retured from api.createWindow
+await win.run({'data': {'image': ...}})
+```
 
 For Python:
 ```python
@@ -418,11 +434,7 @@ await win.run({'data': {'image': ...}})
 await win.run(data={'image': ...})
 ```
 
-For Javascript:
-```javascript
-// win is the object retured from api.createWindow
-await win.run({'data': {'image': ...}})
-```
+
 
 **Note** about `api.getPlugin` and `api.createWindow`: both of these two api can be used for getting the plugin api for `window` plugins,
 however, they are different. This difference from how ImJoy handles different plugin types. When ImJoy load plugins which is not `window` plugin, a standalone python process, webworker or iframe will be started for each plugin and there will be only one instance of the plugin running. `window` plugins will only be registered and a proxy plugin will be created. No actual instance will be started unless the user clicked the plugin menu or executed by another plugin. And each window in the workspace is a new instance of the `window` plugin.
