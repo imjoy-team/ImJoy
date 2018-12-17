@@ -51,9 +51,11 @@ python -m imjoy
 **Note: The following sections assume you ran the above command in your current terminal.**
 
 ## Using ImJoy offline
-You can also use ImJoy without being connected to the internet. For this, you need to install the latest version of the [**Plugin Engine**](https://github.com/oeway/ImJoy-Engine/releases). You cant then serve the static ImJoy web app.
+You can also use ImJoy without being connected to the internet. For this, you
+need to install the latest version of the [**Plugin Engine**](https://github.com/oeway/ImJoy-Engine/releases).
+You can then serve the static ImJoy web app.
 
-You then have to
+You have to
 1. Update the `$PATH` settings as explained below.
     ```
     # linux and mac
@@ -66,15 +68,40 @@ You then have to
     ```
     python -m imjoy --serve
     ```
-2. You now have your locally available ImJoy web app that your can access in your browser with this url[(http://127.0.0.1:8080)](http://127.0.0.1:8080).
+2. You now have your locally available ImJoy web app that your can access in your browser
+   with this url[(http://127.0.0.1:8080)](http://127.0.0.1:8080).
 
-Also notice that, even though ImJoy can run without internet, depending on the implementation of the plugin, some might be unusable when  offline.
+Also notice that, even though ImJoy can run without internet, depending on the
+implementation of the plugin, some might be unusable when  offline.
 
 ## Use the Plugin Engine remotely
-To perform computational intensive calculations you can launch the Plugin Engine remotely, e.g. on dedicated processing workstations computational clusters, or the cloud. This can be achieved with a few simple steps as detailed below
-1. Install Python plugin engine on remote computer
-0. Launch Python plugin engine on remote computer and allow access. Please note that the **ImJoy token system** prevent unauthorized access.
+To perform computational intensive calculations you can launch the Plugin Engine
+remotely, e.g. on dedicated processing workstations computational clusters, or
+the cloud. This can be achieved with a few simple steps.
+
+
+1. Install Python plugin engine on remote computer. If you connect to the remote
+   computer with `ssh`, you can perform ths installation with
+   `wget https://raw.githubusercontent.com/oeway/ImJoy-Engine/master/utils/Linux_Install.sh  -O - | bash`
+
+0. Launch Python plugin engine on remote computer and allow access.
+   Please note that the **ImJoy token system** prevent unauthorized access.
+
 0. Connect from your local ImJoy instance to plugin engine on remote machine.
+
+
+Currently, the recommended way to use ImJoy on a remote computer:
+ 1. Login the remote server with SSH, start the plugin engine with
+    `python -m imjoy --serve --host=0.0.0.0`. The plugin engine will
+    download a copy of ImJoy app and serve it through `http://YOUR_REMOTE_IP:8080`.
+    In the meantime, it will give your a **connection token**, copy it from the
+    terminal and you will need it in the next step.
+
+ 2. Use your web browser to access `http://YOUR_REMOTE_IP:8080`
+    (instead of `https://imjoy.io` ), then you can connect to the plugin engine
+    by using `http://YOUR_REMOTE_IP:8080` as host and the **connection token** you
+    get when you start the engine.
+
 
 #### Install and configure Plugin Engine on remote environment
 Install the latest version of the Plugin Engine from [GitHub](https://github.com/oeway/ImJoy-App/releases).
@@ -82,7 +109,8 @@ Install the latest version of the Plugin Engine from [GitHub](https://github.com
 #### Launch the Plugin Engine on remote machine
 The installation of the Plugin Engine will setup an **Miniconda environment** located in `~/ImJoyApp`.
 
-You can then launch the Plugin Engine from a terminal (e.g. by ssh) and specify a host to allow outside connections. Before doing this, you need to update you `$PATH` settings as explained above.
+You can then launch the Plugin Engine from a terminal (e.g. by ssh) and specify a host to allow outside connections.
+Before doing this, you need to update you `$PATH` settings as explained above.
 ```
 # linux and mac
 # export PATH=~/ImJoyApp/bin:$PATH
@@ -106,8 +134,9 @@ On your local machineT go to `http://IP-OF-YOUR-REMOTE:8080` to connect to the r
 
 ## FAQs
 
-### Plugin engine doesn't start anymore
-Try to run the following command in your terminal to upgrade ImJoy manually.
+### Plugin engine doesn't start (anymore)
+When the plugin engine doesn't start, performing an ImJoy upgrade often resolves this
+problem. For this, you can run the following command in your terminal:
 
 ```python
 export PATH=~/ImJoyApp/bin:$PATH
@@ -126,13 +155,24 @@ Miniconda is just a reduced version of Anaconda. Since ImJoy only relies on `con
 
 ### Can't connect to plugin engine run on a remote computer
 
-First, you needs to make sure the other computer with plugin engine can be accessed from your current network and not blocked by a firewall for example.
+First, you needs to make sure the other computer with plugin engine can be
+accessed from your current network and is no blocked, e.g. by a firewall.
 
-Second, currently you can't use ImJoy.io loaded with `https` with the Plugin Engine, because modern browsers do not allow you to make a insecured connection within a SSL secured website. So, you will have to switch to the offline version.
+Second, currently you can't use ImJoy.io loaded with `https` with the Plugin Engine,
+because modern browsers do not allow you to make a insecured connection within a SSL
+secured website. So, you will have to switch to the offline version.
 
 Currently, the recommended way to use ImJoy on a remote computer:
- 1. login the remote server with SSH, start the plugin engine with `python -m imjoy --serve --host=0.0.0.0`. The plugin engine will download a copy of ImJoy app and serve it through `http://YOUR_REMOTE_IP:8080`. In the meantime, it will give your a **connection token**, copy it from the terminal and you will need it in the next step.
- 2. use your web browser to access `http://YOUR_REMOTE_IP:8080` (instead of `https://imjoy.io` ), then you can connect to the plugin engine by using `http://YOUR_REMOTE_IP:8080` as host and the **connection token** you get when you start the engine.
+ 1. Login the remote server with SSH, start the plugin engine with
+    `python -m imjoy --serve --host=0.0.0.0`. The plugin engine will
+    download a copy of ImJoy app and serve it through `http://YOUR_REMOTE_IP:8080`.
+    In the meantime, it will give your a **connection token**, copy it from the
+    terminal and you will need it in the next step.
+
+ 2. Use your web browser to access `http://YOUR_REMOTE_IP:8080`
+    (instead of `https://imjoy.io` ), then you can connect to the plugin engine
+    by using `http://YOUR_REMOTE_IP:8080` as host and the **connection token** you
+    get when you start the engine.
 
 Also notice that, the ImJoy web app served from your plugin engine are completely isolated from the one from https://imjoy.io, meaning that the installed plugins, data are not shared.
 
