@@ -2983,7 +2983,7 @@ export default {
                   const res = this.plugin2joy(result)
                   if (res) {
                     const w = {}
-                    w.name = res.type || 'result'
+                    w.name = res.name || 'result'
                     w.type = res.type || 'imjoy/generic'
                     w.config = res.data
                     w.data = res.target
