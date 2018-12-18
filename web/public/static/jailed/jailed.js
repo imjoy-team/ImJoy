@@ -1043,6 +1043,7 @@ function randId() {
     DynamicPlugin.prototype.terminate =
            Plugin.prototype.terminate = function() {
         try {
+          console.log('disconnecting .........terminating')
           this.api.exit().finally(()=>{
             this._disconnected = true
             this.running = false

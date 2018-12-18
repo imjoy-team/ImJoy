@@ -2261,6 +2261,7 @@ export default {
       if(this.window_mode == 'single'){
         this.selected_window = this.windows[0]
       }
+      if(ws.plugin) ws.plugin.terminate()
     },
     windowAdded(ws) {
       this.window_ids[ws.id] = ws
