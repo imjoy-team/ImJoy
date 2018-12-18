@@ -1045,7 +1045,9 @@ function randId() {
     DynamicPlugin.prototype.terminate =
            Plugin.prototype.terminate = function(callback) {
         try {
-          this.api.onclose(callback)
+          if(this.api.onclose && typeof this.api.onclose == 'function'){
+            this.api.onclose(callback)
+          }
           if(this.api.exit && typeof this.api.exit == 'function'){
             this.api.exit().finally(()=>{
               this._disconnected = true
