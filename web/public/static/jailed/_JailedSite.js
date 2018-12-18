@@ -281,7 +281,7 @@
          case 'disconnect':
              for(let cb of this._onclose_callbacks){
                try {
-                 cb()
+                 if(cb) cb()
                } catch (e) {
                  console.error('error in onclose callback.', e)
                }
