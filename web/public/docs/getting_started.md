@@ -109,6 +109,6 @@ for particular applications
 
 
 ## ImJoy for core developers
-**[TODO]**
+<!--**[TODO]**-->
 - How ImJoy is hosted (list different repositories)
 - Automatic buids

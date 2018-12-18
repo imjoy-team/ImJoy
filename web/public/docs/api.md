@@ -498,7 +498,7 @@ Shows a quick message with a snackbar.
 **Arguments**
 
 * **message**: String. Message to be displayed.
-* **duration**: Integer. Duration in seconds message will be shown. **[TODO]**
+* **duration**: Integer. Duration in seconds message will be shown. <!--**[TODO]**-->
 
 **Examples**
 
@@ -629,12 +629,12 @@ JavaScript, but you can pass it to another Python plugin for processing.
    you may want to define the path string as raw string using `r"xxxxxx"` syntax,
    we have ncountered unrecognized path issue with normal strings.
 * **mode**: String. Modes for file selection. By default, the user can select a single or multiple file (with the `shift` key pressed)
-    - `single`: only a single file or directory can be selected. **[TODO]** what's returned here?
+    - `single`: only a single file or directory can be selected. <!--**[TODO]** what's returned here?-->
     - `multiple`: multiple files or directories are selected and are returned in an array or list.
-    - `single|multiple` (default): both single and multiple selection are allowed. **[TODO]** why this additional option?
+    - `single|multiple` (default): both single and multiple selection are allowed. <!--**[TODO]** why this additional option?-->
 * **uri_type**: String. Format of returned file path.
-    - `url` (default for JavaScript plugins): **[TODO]**
-    - `path` (default for Python plugins): **[TODO]**
+    - `url` (default for JavaScript plugins): <!--**[TODO]**-->
+    - `path` (default for Python plugins): <!--**[TODO]**-->
 
 **Returns**
 * **file_path**: String. Contains file-path as specified by `uri_type`.
@@ -743,7 +743,7 @@ You can store any text data such as base64 encoded images, code and json in the 
 * **att_name**: String. Identifier of the attachment.
 
 **Returns**
-* **content**: **[TODO]** what is the content exactly?
+* **content**: <!--**[TODO]** what is the content exactly?-->
 
 
 **Examples**

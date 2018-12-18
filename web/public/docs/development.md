@@ -55,7 +55,7 @@ Similary to Web Worker plugins, Native Python plugins do not have access to the 
 
 
 ### Web Python
-**[TODO]**
+<!--**[TODO]**-->
 
 ### Debugging
 
@@ -74,9 +74,8 @@ Therefore, there are currently several different ways to handle loading/saving f
 with or without the plugin engine.
 
  * If the **Plugin Engine** is running, there are three api functions for **all** types of plugins to access the local file system: `api.showFileDialog`, `api.getFileUrl`, `api.getFilePath`. Specifically for **Python plugins** running on the plugin engine, files can be directly loaded and written to the file system with standard python file operations.
- **[TODO] add links**
 
- * If the **Plugin Engine** is not running, the only way for **JavaScript or Web Python plugins** to access files is ask the user to drag a file, a set of files or a folder directly into the ImJoy workspace. This will render a window with the file/folder content. These data can then be accessed by the plugins and be processed. For exporting result files, `api.exportFile` function can be used to trigger a download. **[TODO] add links**
+ * If the **Plugin Engine** is not running, the only way for **JavaScript or Web Python plugins** to access files is ask the user to drag a file, a set of files or a folder directly into the ImJoy workspace. This will render a window with the file/folder content. These data can then be accessed by the plugins and be processed. For exporting result files, `api.exportFile` function can be used to trigger a download.
 
 ## Plugin file format
 The ImJoy plugin file format (shared by all Plugin types)  is built up on html format with customized blocks (inspired by the `.vue` format). It consists of two mandatory blocks `<config>` and `<script>`, and other optional blocks including `<docs>`, `<window>`,`<attachment>`,`<link>` and `<style>`.  For `<style>`, you can also set the `src` attribute.
@@ -139,7 +138,7 @@ It defines the general properties of a plugin and contains several fields.
 Name of the plugin. It **must** be unique to avoid conflicts with other plugins.
 
 #### type
-Plugin type. See dedicated section [ImJoy Plugins]() [TODO: add url] above for more details.
+Plugin type. See dedicated section [ImJoy Plugins](/development#imjoy-plugins] above for more details.
 
 #### version
 Specifies the version of the plugin.
@@ -157,7 +156,7 @@ Contains a short description about the plugin.
 List of supported tags, which can be used to provide differentiate configureable
 modes and can be accessed at various points in the plugin. If a plugin was defined with
 tags, they will appear  on top of the code editor and during the installation proces.
-If you distribute your plugin with an url **[TODO] add link**, you can specify
+If you distribute your plugin with an [url](/development#generating-a-plugin-url), you can specify
 with which tag the plugin will be installed.
 
 Within the **``<config>``** block, the following fields can be made configurable:

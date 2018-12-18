@@ -170,7 +170,7 @@ From [https://kitware.github.io/vtk-js/index.html](https://kitware.github.io/vtk
 
 <a href="http://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:3D visualization&w=demo-js" target="_blank">**Try me >>**</a>
 
-
+<!--
 #### sponza by Babylon.js
 
 From [https://www.babylonjs.com/demos/sponza/](https://www.babylonjs.com/demos/sponza/)
@@ -197,6 +197,7 @@ Example from [https://cs.stanford.edu/people/karpathy/tsnejs/]()
 
 **[TODO] not working yet**
 
+-->
 
 ## Distribution and deployment
 
