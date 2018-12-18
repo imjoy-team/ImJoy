@@ -1045,7 +1045,7 @@ function randId() {
     DynamicPlugin.prototype.terminate =
            Plugin.prototype.terminate = function(callback) {
         try {
-          if(callback && this.api && this.api.onclose && typeof this.api.onclose == 'function'){
+          if(callback && typeof callback == 'function' && this.api && this.api.onclose && typeof this.api.onclose == 'function'){
             this.api.onclose(callback)
           }
           if(this.api.exit && typeof this.api.exit == 'function'){
@@ -1068,7 +1068,9 @@ function randId() {
           this.running = false
           // this._initialInterface.$forceUpdate&&this._initialInterface.$forceUpdate();
           this._site&&this._site.disconnect();
-          callback()
+          if(callback && typeof callback == 'function'){
+            callback()
+          }
         }
     }
 
