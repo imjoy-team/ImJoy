@@ -2181,8 +2181,9 @@ export default {
 
       for (var i = this.windows.length; i--;) {
         if (this.windows[i].type != 'imjoy/plugin-editor') {
-            delete this.window_ids[this.windows[i].id]
-            this.windows.splice(i, 1);
+            // delete this.window_ids[this.windows[i].id]
+            // this.windows.splice(i, 1);
+            this.closeWindow(this.windows[i])
         }
       }
 
@@ -2239,6 +2240,13 @@ export default {
       this.active_windows = [w]
       w.refresh()
     },
+    closeWindow(w){
+      this.windows.splice(this.windows.indexOf(w), 1)
+      delete this.window_ids[w.id]
+      if(this.window_mode == 'single'){
+        this.selected_window = this.windows[0]
+      }
+    },
     closePluginDialog(ok) {
       this.showPluginDialog = false
       let [resolve, reject] = this._plugin_dialog_promise
@@ -2257,11 +2265,9 @@ export default {
       this.active_windows = ws
     },
     windowClosed(ws) {
-      delete this.window_ids[ws.id]
-      if(this.window_mode == 'single'){
-        this.selected_window = this.windows[0]
-      }
-      if(ws.plugin) ws.plugin.terminate()
+      if(ws.plugin) ws.plugin.terminate(()=>{
+        this.closeWindow(ws)
+      })
     },
     windowAdded(ws) {
       this.window_ids[ws.id] = ws

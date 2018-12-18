@@ -62,12 +62,10 @@
             function(data){ me._processMessage(data); }
         );
         this._onclose = (cb)=>{
-          console.log('===============pushing callbacks', cb, id)
           this._onclose_callbacks.push(cb)
         }
         this._connection.onDisconnect(
             function(m){
-              console.log('=====disconnecting site==========closing...')
                 me._disconnectHandler(m);
             }
         );
@@ -136,7 +134,6 @@
      * @param {Object} _interface to set
      */
     JailedSite.prototype.setInterface = function(_interface) {
-      console.log('============set interface', this.id)
         _interface.onclose = this._onclose;
         this._interface = _interface;
         this._sendInterface();
@@ -205,11 +202,12 @@
                if(!interface){
                  if(data.promise){
                    var [resolve, reject] = this._unwrap(data.promise, false);
-                   reject('plugin interface not found or closed: ' + data.pid)
+                   reject(`plugin api function is not avaialbe in "${data.pid}", the plugin maybe terminated.`)
                  }
                  else{
-                  console.error('plugin interface not found or closed: ' + data.pid)
+                  console.error(`plugin api function is not avaialbe in ${data.pid}, the plugin maybe terminated.`)
                  }
+                 return
                }
              }
              if(data.name.indexOf('.') !=-1){
@@ -281,6 +279,13 @@
              this._interfaceSetAsRemoteHandler();
              break;
          case 'disconnect':
+             for(let cb of this._onclose_callbacks){
+               try {
+                 cb()
+               } catch (e) {
+                 console.error('error in onclose callback.', e)
+               }
+             }
              this._disconnectHandler();
              this._connection.disconnect();
              break;
@@ -434,13 +439,11 @@
             }
           }
           this._plugin_interfaces[aObject['__id__']] = encoded_interface
-          console.log('===========encoding api', aObject, this.id)
-          //if(aObject.onclose){
+          if(aObject.onclose){
             aObject.onclose(()=>{
-              console.log('===============closing...', this.id)
               delete this._plugin_interfaces[aObject['__id__']]
             })
-          //}
+          }
           return bObject
         }
 
@@ -720,15 +723,7 @@
      */
     JailedSite.prototype.disconnect = function() {
         this._connection.send({type: 'disconnect'});
-        this._connection.disconnect();
-        console.log('=========disconnecting, running callbacks', me._onclose_callbacks, me.id)
-        for(let cb of me._onclose_callbacks){
-          try {
-            cb()
-          } catch (e) {
-            console.error('error in callback.', e)
-          }
-        }
+        setTimeout(this._connection.disconnect, 1000)
     }
 
 
