@@ -159,7 +159,7 @@ api.alert('hello world')
 
 ### api.call
 ```JavaScript
-api.call(plugin_name,plugin_op,data)
+result = await api.call(plugin_name,plugin_op,data)
 ```
 
 Calls a function from another plugin.
@@ -173,10 +173,10 @@ If you want to call frequently functions of another plugin, we recommend using `
 
 * **plugin_name**: String. Name of the called plugin.
 * **plugin_op**: String. Name of plugin function (op).
-* **data**: data. Any of the supported primitive data types that can be transfered.
+* **data**: Object. Any of the supported primitive data types that can be transfered.
 
 **Returns**
-<!-- * **[TODO]**. A promise which can be used to retrieve the call results. -->
+* **result**: The result retured from the plugin function if any.
 
 **Example**
 
@@ -207,7 +207,7 @@ plugin occasionally, you can also use `api.call`
 * **plugin_name**: String. Name of another plugin.
 
 **Returns**
-* **plugin**: Promise. A promise which can be used to retrieve the API object.
+* **plugin**: Object. An object which can be used to access the plugin API functions.
 
 **Example**
 
@@ -266,13 +266,12 @@ multiple times to overwrite the previous version. `api.register` can also be use
     - `name`: String. Name of op.
     - `ui`: Object (JavaScript) or dictionary (Python). Rendered interface. Defined
        with the same rule as the `ui` field in `<config>`.
-    - `run`: String. Specifies another `Plugin API` function that will run when
-      the op is executed.
-    - `update`: String. Specifies another `Plugin API` function that will run
+    - `run`: String, optional. Specifies the `Plugin API` function that will run when
+      the op is executed. If not specified, the `run` function of the plugin will be executed.
+    - `update`: String, optional. Specifies another `Plugin API` function that will run
       whenever any option in the `ui` is changed.
-
-<!--**[TODO]** Is this list complete? what about returns? -->
-
+    - `inputs`: Object, optional. A [JSON Schema](https://json-schema.org/) which defines the inputs of this op.
+    - `outputs`: Object, optional. A [JSON Schema](https://json-schema.org/) which defines the outputs of this op.
 
 **Examples**
 
@@ -382,10 +381,10 @@ which can be used to update the window, e.g. you can update the data field with 
     - `imjoy/generic`. Will show all objects in `data`. For instance, the window that you obtain with `return.my`
     - `imjoy/plugin-editor`. Opens the source code editors. `data.id` is a unique string (preferable random) specifying the window id, `data.code` contains the source code
 
-* **w**: Integer. Window width in inches. <!--**[TODO] Correct?**-->
-* **h**: Integer. Window height in inches.  <!--**[TODO] Correct?**-->
+* **w**: Integer. Window width in grid columns (1 column = 30 pixels).
+* **h**: Integer. Window height in grid rows (1 row = 30 pixels).
 * **data**: Object (JavaScript) or dictionary (Python). Contains data to be tranferred to window.
-* **config**: Object (JavaScript) or dictionary (Python). <!--**[TODO] Correct?**.-->
+* **config**: Object (JavaScript) or dictionary (Python).
 
 **Returns**
 
@@ -743,7 +742,7 @@ You can store any text data such as base64 encoded images, code and json in the 
 * **att_name**: String. Identifier of the attachment.
 
 **Returns**
-* **content**: <!--**[TODO]** what is the content exactly?-->
+* **content**: The text content stored in the `<attachment>` block.
 
 
 **Examples**
@@ -757,19 +756,19 @@ content = await api.getAttachment(att_name)
 
 ### api.utils.XXXX
 ``` javascript
-api.utils.utility_name
+await api.utils.utility_name()
 ```
 
 Call utility function.
 
 Currently supported functions for **all plugins** are:
- * `api.utils.$forceUpdate`: refreshing the GUI manually.
+ * `api.utils.$forceUpdate()`: refreshing the GUI manually.
  * `api.utils.openUrl(url)`: opening an `url` in a new browser tab.
  * `api.utils.sleep(duration)`: sleep for a indicated `duration` in seconds. (for Python plugins, use `time.sleep` instead.)
 
 Currently supported functions for **Python plugins** are:
- * `api.utils.kill` for kill a `subprocess` in python.
- * `api.utils.ndarray` for wrapping ndarray according to ImJoy ndarray format.
+ * `api.utils.kill(process)` for kill a `subprocess` in python.
+ * `api.utils.ndarray(numpy_array)` for wrapping ndarray according to ImJoy ndarray format.
 
 ### api.TAG constant
 The current tag choosen by the user during installation.
