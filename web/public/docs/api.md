@@ -762,13 +762,13 @@ await api.utils.utility_name()
 Call utility function.
 
 Currently supported functions for **all plugins** are:
- * `api.utils.$forceUpdate()`: refreshing the GUI manually.
- * `api.utils.openUrl(url)`: opening an `url` in a new browser tab.
- * `api.utils.sleep(duration)`: sleep for a indicated `duration` in seconds. (for Python plugins, use `time.sleep` instead.)
+ * `api.utils.$forceUpdate()`: refreshs the GUI manually.
+ * `api.utils.openUrl(url)`: opens an `url` in a new browser tab.
+ * `api.utils.sleep(duration)`: sleeps for the indicated `duration` in seconds. Note for Python plugins, use `time.sleep` instead.)
 
 Currently supported functions for **Python plugins** are:
- * `api.utils.kill(process)` for kill a `subprocess` in python.
- * `api.utils.ndarray(numpy_array)` for wrapping ndarray according to ImJoy ndarray format.
+ * `api.utils.kill(subprocess)`: kills a `subprocess` in python.
+ * `api.utils.ndarray(numpy_array)`: wrapps a ndarray `numpy_array` according to the ImJoy ndarray format.
 
 ### api.TAG constant
 The current tag choosen by the user during installation.
