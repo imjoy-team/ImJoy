@@ -723,7 +723,7 @@
      */
     JailedSite.prototype.disconnect = function() {
         this._connection.send({type: 'disconnect'});
-        setTimeout(this._connection.disconnect, 1000)
+        setTimeout(this._connection.disconnect, 2000)
     }
 
 
