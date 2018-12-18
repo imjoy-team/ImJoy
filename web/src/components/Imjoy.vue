@@ -2265,9 +2265,12 @@ export default {
       this.active_windows = ws
     },
     windowClosed(ws) {
-      if(ws.plugin) ws.plugin.terminate(()=>{
+      if(ws.plugin && ws.plugin.terminate) ws.plugin.terminate(()=>{
         this.closeWindow(ws)
       })
+      else{
+        this.closeWindow(ws)
+      }
     },
     windowAdded(ws) {
       this.window_ids[ws.id] = ws
@@ -2707,6 +2710,8 @@ export default {
     async callPlugin(plugin_name, function_name) {
       const target_plugin = this.plugin_names[plugin_name]
       if(target_plugin){
+        if(!target_plugin.running)
+          throw 'plugin "'+plugin_name+ '" is not running.'
         return await target_plugin.api[function_name].apply(null, Array.prototype.slice.call(arguments, 2, arguments.length-1))
       }
       else{
@@ -2733,6 +2738,8 @@ export default {
       }
       const target_plugin = this.plugin_names[plugin_name]
       if(target_plugin){
+        if(!target_plugin.running)
+          throw 'plugin "'+plugin_name+ '" is not running.'
         my = my || {}
         my.op = {type: source_plugin.type, name:source_plugin.name}
         my.config = my.config || {}
