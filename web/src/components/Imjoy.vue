@@ -1881,7 +1881,7 @@ export default {
       const plugin = this.plugins[pid]
       const pconfig = plugin.config
       const w = {
-        name: pconfig.name,
+        name: pconfig.name || 'plugin',
         type: 'imjoy/plugin-editor',
         config: {},
         plugin: plugin,
@@ -2443,7 +2443,6 @@ export default {
       // mw.target._transfer = true
       mw.target._workflow_id = mw.target._workflow_id || "op_"+op.name.trim().replace(/ /g, '_')+randId()
       op.joy.__op__.execute(mw.target).then((my) => {
-        console.log('================', my.data)
         const w = this.joy2plugin(my)
         if (w) {
           console.log('result', w)
@@ -3117,6 +3116,7 @@ export default {
         if (wconfig.type && wconfig.type.startsWith('imjoy')) {
           // console.log('creating imjoy window', wconfig)
           wconfig.id = 'imjoy_'+randId()
+          wconfig.name = wconfig.name || 'untitled window'
           const wid = this.addWindow(wconfig)
           const window_plugin_apis = {
             __jailed_type__: 'plugin_api',
@@ -3171,6 +3171,7 @@ export default {
       })
     },
     showPluginWindow(config) {
+      config.name = config.name || 'untitiled plugin window'
       config.type = config.type
       config.data = config.data || null
       config.config = config.config || {}
