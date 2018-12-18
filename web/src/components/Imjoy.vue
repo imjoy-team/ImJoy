@@ -2368,14 +2368,14 @@ export default {
       mw.target._workflow_id = mw.target._workflow_id || "workflow_"+randId()
       joy.workflow.execute(mw.target).then((my) => {
         const w = this.joy2plugin(my)
-        if (w) {
+
+        if(w && w.data && Object.keys(w.data).length>2){
           // console.log('result', w)
-          w.name = 'result'
-          w.type = 'imjoy/generic'
-          if(w.data.length > 3){
-            this.createWindow(w)
-          }
+          w.name = w.name || 'result'
+          w.type = w.type || 'imjoy/generic'
+          this.createWindow(w)
         }
+
         this.progress = 100
       }).catch((e) => {
         console.error(e)
@@ -2443,11 +2443,12 @@ export default {
       // mw.target._transfer = true
       mw.target._workflow_id = mw.target._workflow_id || "op_"+op.name.trim().replace(/ /g, '_')+randId()
       op.joy.__op__.execute(mw.target).then((my) => {
+        console.log('================', my.data)
         const w = this.joy2plugin(my)
         if (w) {
           console.log('result', w)
-          w.name = 'result'
-          w.type = 'imjoy/generic'
+          w.name = w.name || 'result'
+          w.type = w.type || 'imjoy/generic'
           this.createWindow(w)
         }
         this.progress = 100
@@ -2744,14 +2745,18 @@ export default {
       if(!my) return null
       //conver config--> data  data-->target
       const res = {}
-      if(my.data && my.config){
+
+      if(my.type && my.data){
         res.data = my.config
         res.target = my.data
+        res.target.name = my.name
+        res.target.type = my.type
       }
       else{
         res.data = null
         res.target = my
       }
+
       res.target = res.target || {}
       if(Array.isArray(res.target) && res.target.length>0){
         if(my.select !== undefined && res.target[my.select]){
@@ -2798,6 +2803,8 @@ export default {
         _workflow_id: my.target && my.target._workflow_id,
         config: my.data,
         data: my.target,
+        name: my.target && my.target.name,
+        type: my.target && my.target.type
       }
       if(my.target){
         delete my.target._op
@@ -2976,8 +2983,8 @@ export default {
                   const res = this.plugin2joy(result)
                   if (res) {
                     const w = {}
-                    w.name = 'result'
-                    w.type = 'imjoy/generic'
+                    w.name = res.type || 'result'
+                    w.type = res.type || 'imjoy/generic'
                     w.config = res.data
                     w.data = res.target
                     await this.createWindow(w)
