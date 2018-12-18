@@ -366,6 +366,30 @@ Creates a new window in the ImJoy workspace.
 Once an window is created, it will return an object with the APIs of the corresponding window plugin,
 which can be used to update the window, e.g. you can update the data field with `win.run({"data": ...})`).
 
+**Note** the difference between `api.createWindow` and `api.getPlugin`. Both
+functions can be used to obtain an object containing the plugin api for `window`
+plugins. However, only the object obtained by `api.createWindow` can be used to
+update an existing window. In contrast, the object returned by `api.getPlugin`
+will create a new window each time used.
+
+This difference in behavior can be explained by the way ImJoy handles the different
+plugin types. When ImJoy loads a plugin which is not `window` plugin, it will start
+the appropriate standalone python process, webworker or iframe. This ensures that
+only one instance of the plugin is running. In contrast, `window` plugins will
+only be registered and a proxy plugin will be created. No actual instance will
+be started unless the user clicks the plugin menu or the plugin is called by
+another plugin. Each windown in the workspace is then a new instance of the `window` plugin.
+
+When `api.getPlugin` is called, it will return the api of the proxy plugin, e.g.
+`proxy = await api.getPlugin('Image Window')`). Every time the `run` function
+is executed, a new window will be created. For example, if you run `proxy.run({data: ...})`
+for 10 times, 10 windows will be created.
+
+When `api.createWindow` is used, it will return an instance of the window plugin,
+e.g. `win = await api.createWindow({'name': 'new window', 'type': 'Image Window', 'data': {...}})`).
+If you run `win.run({'data': ...})` for 10 times, the same window instance will be updated.
+
+
 **Arguments**
 
 * **window_name**: String. Specifies the name of new window.
@@ -432,17 +456,6 @@ await win.run({'data': {'image': ...}})
 # or named arguments
 await win.run(data={'image': ...})
 ```
-
-
-
-**Note** about `api.getPlugin` and `api.createWindow`: both of these two api can be used for getting the plugin api for `window` plugins,
-however, they are different. This difference from how ImJoy handles different plugin types. When ImJoy load plugins which is not `window` plugin, a standalone python process, webworker or iframe will be started for each plugin and there will be only one instance of the plugin running. `window` plugins will only be registered and a proxy plugin will be created. No actual instance will be started unless the user clicked the plugin menu or executed by another plugin. And each window in the workspace is a new instance of the `window` plugin.
-
-When `api.getPlugin` is called, it will return the api of the proxy plugin (e.g. `proxy = await api.getPlugin('Image Window')`), every time the `run` function of the proxy plugin api is executed, a new window will be created, for example, if you run `proxy.run({data: ...})` for 10 times, you will get 10 windows.
-
-When `api.createWindow` is used, it will return an instance of the window plugin (e.g. `win = await api.createWindow({'name': 'new window', 'type': 'Image Window', 'data': {...}})`), after that if you run `win.run({'data': ...})` for 10 times, the same window instance will be updated.
-
-Therefore, in most of the cases, you should use `api.createWindow` with `window` plugin, and use `api.getPlugin` for other types of plugins.
 
 ### api.showDialog
 ```javascript
