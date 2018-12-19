@@ -139,7 +139,6 @@ export default {
         this.$emit('select', this.active_windows, null)
       }
       this.$emit('close', w)
-      this.windows.splice(this.windows.indexOf(w), 1)
     },
     isTypedArray(obj)
     {

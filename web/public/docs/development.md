@@ -294,7 +294,7 @@ Plugins can be written in Javascript or Python, a minimal plugin needs to implem
 
   * **`setup()` function**: executed when a plugin is loaded and initializes
       it.
-  * **`run()` function**: will be called each time a plugin is executed. When executed, an object (for Javascript) or a dictionary (for Python) called `my` will be passed into the function. More in the section **Plugin during runtime ** below.
+  * **`run()` function**: will be called each time a plugin is executed. When executed, an object (for Javascript) or a dictionary (for Python) called `my` will be passed into the function. The returned result will be displayed as a new window or passed to the next `op` in a workflow. More in the section **Plugin during runtime ** below.
   * optional: **`update()` function**: will be called when any setting of the op is changed.
 
 The `lang` property of the `<script>` block is used to specify the used programming language:
@@ -361,22 +361,18 @@ When executing a plugin, it can can access different fields from `my`:
  * `my._variables`
      When the plugin is executed in a workflow, variables will be set in the workflow will be passed as `my._variables`. It will be set to the actual variable value if the user used ops such as `Set [number]`.
 
-You can directly return your result and they will show as a result window. If you
-want to define the type of your result, or return multiple results, you can construct a new `my` variable(dictionary or object) with two fields `config` and `data`.
+You can directly return your result and they will show as a generic result window.
 
-In the example below, two fields named `data_1` and `result_tensor` will be
-displayed in a result window or passed to the next op in a workflow.
+If you want to define the window type of your result, you can return an object with at least two fields `type` and `data`.
+ImJoy will use `type` to find the window for rendering the result stored in `data`.
+
+In the example below, the image from an url will be displayed in a image window or passed to the next op in a workflow.
 
 ```javascript
-   my = {
-      "config": {},
-      "data": {
-         "data_1": {"type": "image/grayscale", "image": img},
-         "result_tensor": {"type": "tensor", "tensor": t}
-      }
-   }
-   return my
+   return { "type": "imjoy/image", "data": {"src": "https://imjoy.io/static/img/imjoy-icon.png"} }
 ```
+
+
 ImJoy use postMessage to exchange data between plugins. This means that for Javascript
 plugins, objects are cloned during the transfer. If large objects are exchanged,
 if the created objects are not directly transferred. To enable that, you can

@@ -1881,7 +1881,7 @@ export default {
       const plugin = this.plugins[pid]
       const pconfig = plugin.config
       const w = {
-        name: pconfig.name,
+        name: pconfig.name || 'plugin',
         type: 'imjoy/plugin-editor',
         config: {},
         plugin: plugin,
@@ -2181,8 +2181,9 @@ export default {
 
       for (var i = this.windows.length; i--;) {
         if (this.windows[i].type != 'imjoy/plugin-editor') {
-            delete this.window_ids[this.windows[i].id]
-            this.windows.splice(i, 1);
+            // delete this.window_ids[this.windows[i].id]
+            // this.windows.splice(i, 1);
+            this.closeWindow(this.windows[i])
         }
       }
 
@@ -2239,6 +2240,13 @@ export default {
       this.active_windows = [w]
       w.refresh()
     },
+    closeWindow(w){
+      this.windows.splice(this.windows.indexOf(w), 1)
+      delete this.window_ids[w.id]
+      if(this.window_mode == 'single'){
+        this.selected_window = this.windows[0]
+      }
+    },
     closePluginDialog(ok) {
       this.showPluginDialog = false
       let [resolve, reject] = this._plugin_dialog_promise
@@ -2257,9 +2265,11 @@ export default {
       this.active_windows = ws
     },
     windowClosed(ws) {
-      delete this.window_ids[ws.id]
-      if(this.window_mode == 'single'){
-        this.selected_window = this.windows[0]
+      if(ws.plugin && ws.plugin.terminate) ws.plugin.terminate(()=>{
+        this.closeWindow(ws)
+      })
+      else{
+        this.closeWindow(ws)
       }
     },
     windowAdded(ws) {
@@ -2368,14 +2378,14 @@ export default {
       mw.target._workflow_id = mw.target._workflow_id || "workflow_"+randId()
       joy.workflow.execute(mw.target).then((my) => {
         const w = this.joy2plugin(my)
-        if (w) {
+
+        if(w && w.data && Object.keys(w.data).length>2){
           // console.log('result', w)
-          w.name = 'result'
-          w.type = 'imjoy/generic'
-          if(w.data.length > 3){
-            this.createWindow(w)
-          }
+          w.name = w.name || 'result'
+          w.type = w.type || 'imjoy/generic'
+          this.createWindow(w)
         }
+
         this.progress = 100
       }).catch((e) => {
         console.error(e)
@@ -2446,8 +2456,8 @@ export default {
         const w = this.joy2plugin(my)
         if (w) {
           console.log('result', w)
-          w.name = 'result'
-          w.type = 'imjoy/generic'
+          w.name = w.name || 'result'
+          w.type = w.type || 'imjoy/generic'
           this.createWindow(w)
         }
         this.progress = 100
@@ -2700,6 +2710,8 @@ export default {
     async callPlugin(plugin_name, function_name) {
       const target_plugin = this.plugin_names[plugin_name]
       if(target_plugin){
+        if(!target_plugin.running)
+          throw 'plugin "'+plugin_name+ '" is not running.'
         return await target_plugin.api[function_name].apply(null, Array.prototype.slice.call(arguments, 2, arguments.length-1))
       }
       else{
@@ -2726,6 +2738,8 @@ export default {
       }
       const target_plugin = this.plugin_names[plugin_name]
       if(target_plugin){
+        if(!target_plugin.running)
+          throw 'plugin "'+plugin_name+ '" is not running.'
         my = my || {}
         my.op = {type: source_plugin.type, name:source_plugin.name}
         my.config = my.config || {}
@@ -2744,14 +2758,18 @@ export default {
       if(!my) return null
       //conver config--> data  data-->target
       const res = {}
-      if(my.data && my.config){
+
+      if(my.type && my.data){
         res.data = my.config
         res.target = my.data
+        res.target.name = my.name
+        res.target.type = my.type
       }
       else{
         res.data = null
         res.target = my
       }
+
       res.target = res.target || {}
       if(Array.isArray(res.target) && res.target.length>0){
         if(my.select !== undefined && res.target[my.select]){
@@ -2798,6 +2816,8 @@ export default {
         _workflow_id: my.target && my.target._workflow_id,
         config: my.data,
         data: my.target,
+        name: my.target && my.target.name,
+        type: my.target && my.target.type
       }
       if(my.target){
         delete my.target._op
@@ -2976,8 +2996,8 @@ export default {
                   const res = this.plugin2joy(result)
                   if (res) {
                     const w = {}
-                    w.name = 'result'
-                    w.type = 'imjoy/generic'
+                    w.name = res.name || 'result'
+                    w.type = res.type || 'imjoy/generic'
                     w.config = res.data
                     w.data = res.target
                     await this.createWindow(w)
@@ -3110,6 +3130,7 @@ export default {
         if (wconfig.type && wconfig.type.startsWith('imjoy')) {
           // console.log('creating imjoy window', wconfig)
           wconfig.id = 'imjoy_'+randId()
+          wconfig.name = wconfig.name || 'untitled window'
           const wid = this.addWindow(wconfig)
           const window_plugin_apis = {
             __jailed_type__: 'plugin_api',
@@ -3164,6 +3185,7 @@ export default {
       })
     },
     showPluginWindow(config) {
+      config.name = config.name || 'untitiled plugin window'
       config.type = config.type
       config.data = config.data || null
       config.config = config.config || {}

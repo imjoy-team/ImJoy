@@ -53,7 +53,6 @@ function get_plugins(files){
         var config = parsePlugin(code);
         config.uri = file;
         plugin_configs.push(config);
-        console.log('Adding plugin ====>', config.name);
     }
   });
   return plugin_configs
