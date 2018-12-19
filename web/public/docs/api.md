@@ -2,23 +2,23 @@
 
 Every plugin runs in its own sandbox-like container environment (web worker or iframe for JS, process for Python). This avoids interference with other plugin and makes the entire ImJoy App more secure.
 
-Interaction between plugins or betweena  plugin with the main app is carried out through a set of API functions (`ImJoy API`). All the plugins have access to a special object called `api`, with which the plugin can, for example, show a dialog, send results to the main app, or call another plugin with paramenters and data.
+Interaction between plugins or between a  plugin with the main app is carried out through a set of API functions (`ImJoy API`). All the plugins have access to a special object called `api`, with which the plugin can, for example, show a dialog, send results to the main app, or call another plugin with paramenters and data.
 
 To make the interaction more efficient and concurrently, we chose a programing pattern called ["asynchronous programming"](http://cs.brown.edu/courses/cs168/s12/handouts/async.pdf) for these API functions.
 
 ## Asynchronous programming
 
 All ImJoy API functions are asynchronous. This means when an `ImJoy API` function
-is called, ImJoy will not block its execution, but instead it will immediately return an object called [`Promise`(JS)](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) or [`Future`(Python)](https://docs.python.org/3/library/asyncio-future.html). You can decide to wait for the actual result or set a callback function to retrieve the result once the process terminated. For example, if you popup a dialog to ask for user input, in many programinig languages (synchronous programing), the code execution will be blocked until the user closes the dialog. However, an asynchronous program will return the `promise` object even if the user haven't close the dialog and continue processing.
+is called, ImJoy will not block its execution, but instead it will immediately return an object called [`Promise`(JS)](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) or [`Future`(Python)](https://docs.python.org/3/library/asyncio-future.html). You can decide to wait for the actual result or set a callback function to retrieve the result once the process terminated. For example, if you popup a dialog to ask for user input, in many programming languages (synchronous programing), the code execution will be blocked until the user closes the dialog. However, an asynchronous program will return the `promise` object even if the user haven't close the dialog and continue processing.
 
 Since every API call is asynchronous and non-blocking, a given plugin can call multiple other plugins to perform tasks simultaneously without using thread-like techniques.
 
-ImJoy suports two asynchronous programming styles to access these asynchronous functions
+ImJoy supports two asynchronous programming styles to access these asynchronous functions
 for both Python and JavaScript: `async/await` and `callback` style. A few important
 considerations
 
 * `async/await` is recommended for JavaScript and Python 3 (expect Web Python, which doesn't support it yet).
-* `callback` style can be used for Javascript, Python 2 and Python 3.
+* `callback` style can be used for JavaScript, Python 2 and Python 3.
 *  **Note** that you **cannot** use both style at the same time.
 * While you can use `try catch` (JavaScript) or `try except` (Python) syntax to capture error with `async/await` style, you cannot use them to capture error if you use `callback` style.
 
@@ -76,7 +76,7 @@ definition of your function. Don't forget to `import asyncio` if you use `async/
 However, for Python 2 or Web Python, `asyncio` is not supported, therefore you need to use `callback` style.
 
 Call the asynchronous function and set its callback with `.then(callback_func)`.
-For Javascrit plugins, a native Javascrit `Promise` will be returned ([More about Promise.](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)). For Python plugins, it will return a simplified Python implement of promise.
+For JavaScript plugins, a native JavaScript `Promise` will be returned ([More about Promise.](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)). For Python plugins, it will return a simplified Python implement of promise.
 
 Below examples for an api name `XXXXX`:
 
@@ -119,7 +119,7 @@ class ImJoyPlugin():
 
 
 ## Input arguments
-When calling the API functions, most functions take an object (Javascript) or dictionaries/named arguments (Python) as its first argument.
+When calling the API functions, most functions take an object (JavaScript) or dictionaries/named arguments (Python) as its first argument.
 
 The following function call will work both in JavaScript and Python:
 
@@ -173,10 +173,10 @@ If you want to call frequently functions of another plugin, we recommend using `
 
 * **plugin_name**: String. Name of the called plugin.
 * **plugin_op**: String. Name of plugin function (op).
-* **data**: Object. Any of the supported primitive data types that can be transfered.
+* **data**: Object. Any of the supported primitive data types that can be transferred.
 
 **Returns**
-* **result**: The result retured from the plugin function if any.
+* **result**: The result returned from the plugin function if any.
 
 **Example**
 
@@ -236,9 +236,9 @@ api.export(ImJoyPlugin())
 ```
 Exports the plugin class or an object/dict as `Plugin API`.
 
-This call is mandatory for every ImJoy plugin (typically as the last line of the plugin script). Every member of the `ImJoyPlugin` instance will be exported as `Plugin API`, which means those exported functions or variables can be called or used by the ImJoy app or another plugin.This then allows other plugins to use `api.run` or `api.call` to call the plugin or its functions.
+This call is mandatory for every ImJoy plugin (typically as the last line of the plugin script). Every member of the `ImJoyPlugin` instance will be exported as `Plugin API`, which means those exported functions or variables can be called or used by the ImJoy app or another plugin. This then allows other plugins to use `api.run` or `api.call` to call the plugin or its functions.
 
-Only functions and variables with primitive types can be exported (number, string, boolean). And if a variable or function has a name start with `_`, it means that's an interal variable or function, will not be exported.
+Only functions and variables with primitive types can be exported (number, string, boolean). And if a variable or function has a name start with `_`, it means that's an internal variable or function, will not be exported.
 
 **Note** that in JavaScript, the `new` keyword is necessary to create an
 instance of a class, while in Python there is no `new` keyword.
@@ -255,8 +255,8 @@ An op can have its own GUI defined by the `ui` string.
 By default, all ops of a plugin will call the `run` function of the plugin.
 You can use `my.config.type` in the `run` function to differentiate which op was called.
 
-Alternatively, you can define another `Plugin API` function in the the `run` field.
-The function must be a member of the plugin class or being exported (with `api.export`) as a `Plugin API` function. This is because a arbitrary function transfered by ImJoy will be treated as `callback` function, thus only allowed to run once.
+Alternatively, you can define another `Plugin API` function in the `run` field.
+The function must be a member of the plugin class or being exported (with `api.export`) as a `Plugin API` function. This is because a arbitrary function transferred by ImJoy will be treated as `callback` function, thus only allowed to run once.
 
 If you want to change your interface dynamically, you can run `api.register`
 multiple times to overwrite the previous version. `api.register` can also be used to overwrite the default ui string of the plugin defined in `<config>`, just set the plugin name as the op name (or without setting a name).

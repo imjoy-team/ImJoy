@@ -1,7 +1,7 @@
 # Getting Started
 
 Here we describe the basic concepts of ImJoy and how to get started. At the end of this document,
-we provide a brief overview of key features corcerning developers of plugins or the ImJoy core.
+we provide a brief overview of key features concerning developers of either plugins or the ImJoy core.
 
 For more details for how to use ImJoy, we refer to the section **User Manual**, where
 we provide more detailed information about different aspects of ImJoy mentioned below.
@@ -108,7 +108,7 @@ As mentioned above, Imjoy consists of **two main components**
 2.  Complex computional tasks can be implemented in plugins, which run in the
     **Plugin Engine**. The latest release of the plugin engine is available
     together with installation  instructions on [GitHub](https://github.com/oeway/ImJoy-Engine/releases).
-    The plugin engine will try to upgrade itself from Github when it starts.
+    The plugin engine will try to upgrade itself from GitHub when it starts.
     Packages are managed by `conda` and `pip` which provides access to the
     entire Python ecosystem.
 
@@ -138,5 +138,6 @@ for particular applications
 
 ## ImJoy for core developers
 <!--**[TODO]**-->
-- How ImJoy is hosted (list different repositories)
-- Automatic buids
+- How ImJoy is hosted (different repositories)
+- Automatic builds
+- ...
