@@ -49,6 +49,7 @@
         this._interface = {};
         this._plugin_interfaces = {};
         this._remote = null;
+        this._onclose_callbacks = [];
         this._remoteUpdateHandler = function(){};
         this._getInterfaceHandler = function(){};
         this._interfaceSetAsRemoteHandler = function(){};
@@ -60,7 +61,9 @@
         this._connection.onMessage(
             function(data){ me._processMessage(data); }
         );
-
+        this._onclose = (cb)=>{
+          this._onclose_callbacks.push(cb)
+        }
         this._connection.onDisconnect(
             function(m){
                 me._disconnectHandler(m);
@@ -131,6 +134,7 @@
      * @param {Object} _interface to set
      */
     JailedSite.prototype.setInterface = function(_interface) {
+        _interface.onclose = this._onclose;
         this._interface = _interface;
         this._sendInterface();
     }
@@ -195,6 +199,16 @@
              var interface = this._interface;
              if(data.pid){
                interface = this._plugin_interfaces[data.pid]
+               if(!interface){
+                 if(data.promise){
+                   var [resolve, reject] = this._unwrap(data.promise, false);
+                   reject(`plugin api function is not avaialbe in "${data.pid}", the plugin maybe terminated.`)
+                 }
+                 else{
+                  console.error(`plugin api function is not avaialbe in ${data.pid}, the plugin maybe terminated.`)
+                 }
+                 return
+               }
              }
              if(data.name.indexOf('.') !=-1){
                var names = data.name.split('.')
@@ -265,6 +279,13 @@
              this._interfaceSetAsRemoteHandler();
              break;
          case 'disconnect':
+             for(let cb of this._onclose_callbacks){
+               try {
+                 if(cb) cb()
+               } catch (e) {
+                 console.error('error in onclose callback.', e)
+               }
+             }
              this._disconnectHandler();
              this._connection.disconnect();
              break;
@@ -418,6 +439,11 @@
             }
           }
           this._plugin_interfaces[aObject['__id__']] = encoded_interface
+          if(aObject.onclose){
+            aObject.onclose(()=>{
+              delete this._plugin_interfaces[aObject['__id__']]
+            })
+          }
           return bObject
         }
 
@@ -697,7 +723,7 @@
      */
     JailedSite.prototype.disconnect = function() {
         this._connection.send({type: 'disconnect'});
-        this._connection.disconnect();
+        setTimeout(this._connection.disconnect, 2000)
     }
 
 

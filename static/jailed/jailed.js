@@ -739,7 +739,9 @@ function randId() {
      * Disconnects the plugin when it is not needed anymore
      */
     Connection.prototype.disconnect = function() {
-        this._platformConnection.disconnect();
+        if(this._platformConnection){
+          this._platformConnection.disconnect();
+        }
     }
 
 
@@ -1041,20 +1043,34 @@ function randId() {
     }
 
     DynamicPlugin.prototype.terminate =
-           Plugin.prototype.terminate = function() {
+           Plugin.prototype.terminate = function(callback) {
         try {
-          this.api.exit().finally(()=>{
+          if(callback && typeof callback == 'function' && this.api && this.api.onclose && typeof this.api.onclose == 'function'){
+            this.api.onclose(callback)
+          }
+          if(this.api.exit && typeof this.api.exit == 'function'){
+            this.api.exit().finally(()=>{
+              this._disconnected = true
+              this.running = false
+              // this._initialInterface.$forceUpdate&&this._initialInterface.$forceUpdate();
+              this._site&&this._site.disconnect();
+            })
+          }
+          else{
             this._disconnected = true
             this.running = false
             // this._initialInterface.$forceUpdate&&this._initialInterface.$forceUpdate();
             this._site&&this._site.disconnect();
-          })
+          }
         } catch (e) {
-          // console.error('error occured when terminating the plugin',e)
+          console.error('error occured when terminating the plugin',e)
           this._disconnected = true
           this.running = false
           // this._initialInterface.$forceUpdate&&this._initialInterface.$forceUpdate();
           this._site&&this._site.disconnect();
+          if(callback && typeof callback == 'function'){
+            callback()
+          }
         }
     }
 
