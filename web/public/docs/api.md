@@ -212,7 +212,9 @@ result = await pluginX.run()
 await pluginX.funcX()
 ```
 
-**Note** about `api.getPlugin` and `api.call`: if you want to constantly access different functions from another plugin,
+**Note 1** If the plugin is terminated and you try to call its function, you will get an error. One solution to this is to use `try ... catch `(JavaScript) or `try: ... except: ...`(Python) statement to capture the error. (TODO: this does not work for `native-python` plugin yet.)
+
+**Note 2** about `api.getPlugin` and `api.call`: if you want to constantly access different functions from another plugin,
 it's better to get all the API of that plugin with `api.getPlugin`, then access it through the returned object. If you only access
 the API function in another plugin occasionally, you can use both.
 
@@ -406,7 +408,7 @@ api.createWindow({name: 'new window', type: 'Image Window', w:7, h:7, data: {ima
 
 The returned window object from `createWindow` can be stored in the plugin class (`self` for Python, or `this` for JavaScript) for later use.
 
-For example, you can then use it to update the window.
+For example, you can then use it to update the window, or use `onclose` to set a callback function which will be called hen the window is being closed.
 
 For Python:
 ```python
@@ -416,15 +418,26 @@ await win.run({'data': {'image': ...}})
 
 # or named arguments
 await win.run(data={'image': ...})
+
+# set `onclose` callback
+def close_callback():
+    print('closing window.')
+
+win.onclose(close_callback)
 ```
 
 For Javascript:
 ```javascript
 // win is the object retured from api.createWindow
 await win.run({'data': {'image': ...}})
-```
 
-**Note** about `api.getPlugin` and `api.createWindow`: both of these two api can be used for getting the plugin api for `window` plugins,
+// set `onclose` callback
+win.onclose(()=>{
+  console.log('closing window.')
+})
+```
+**Note 1** If the window is closed and you try to call its function, you will get an error, one solution to this is to use `try ... catch `(JavaScript) or `try: ... except: ...`(Python) statement to capture the error.
+**Note 2** about `api.getPlugin` and `api.createWindow`: both of these two api can be used for getting the plugin api for `window` plugins,
 however, they are different. This difference from how ImJoy handles different plugin types. When ImJoy load plugins which is not `window` plugin, a standalone python process, webworker or iframe will be started for each plugin and there will be only one instance of the plugin running. `window` plugins will only be registered and a proxy plugin will be created. No actual instance will be started unless the user clicked the plugin menu or executed by another plugin. And each window in the workspace is a new instance of the `window` plugin.
 
 When `api.getPlugin` is called, it will return the api of the proxy plugin (e.g. `proxy = await api.getPlugin('Image Window')`), every time the `run` function of the proxy plugin api is executed, a new window will be created, for example, if you run `proxy.run({data: ...})` for 10 times, you will get 10 windows.
@@ -560,9 +573,9 @@ config_value = await api.getConfig(config_name)
 ```
 Retrieves configurations for plugin.
 
-**Note1** numbers are converted to strings when saved with `api.setConfig`. They have to be converted back to numbers before using them (in JavaScript use `parseInt()` or `parseFloat()`, in Python `int()` or `float()`).
+**Note 1** numbers are converted to strings when saved with `api.setConfig`. They have to be converted back to numbers before using them (in JavaScript use `parseInt()` or `parseFloat()`, in Python `int()` or `float()`).
 
-**Note2** you can also access the fields defined in the `<config>` block by adding `_` to the field name, for example, if you want to read the plugin name `defined` in the `<config>` block, you can use `plugin_name = await api.getConfig('_name')`.
+**Note 2** you can also access the fields defined in the `<config>` block by adding `_` to the field name, for example, if you want to read the plugin name `defined` in the `<config>` block, you can use `plugin_name = await api.getConfig('_name')`.
 
 **Arguments**
 * **param_name**: String. Name of parameter.
