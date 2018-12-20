@@ -199,19 +199,16 @@ Example from [https://cs.stanford.edu/people/karpathy/tsnejs/]()
 
 -->
 
-## Distribution and deployment
-
-### Distribution and deployment of code/data stored on Dropbox
-This example describes how you can distribute and deploy a Python plugin
-with code or data that is stored on Dropbox. Data could be example data to test
-the plugin or a pre-trained model for a neural network. This allows to share projects that are private.
+## Distribution of code/data stored on Dropbox
+This example describes how you can deploy and distribute a Python plugin stored on Dropbox.
+This allows to share projects that are private.
 
 1. The **code** or **data** is stored as a zip file on Dropbox. This allows to change
 the code/data by replacing the zip file (see Notes below).
-2. The ImJoy plugin file file (.imjoy.html) is hosted with a secret or public **gist**.
+2. The ImJoy plugin file (`.imjoy.html`) is hosted with a secret or public **gist**.
 
 Let's assume the python code is in a Zip archive `testcode.zip` stored on Dropbox and
-unavailable with the link `DROPBOXLINK/testcode.zip`. You can then place the following code-fragment in setup() function of your plugin to make it available. This fragment performs the following steps
+available with the link `DROPBOXLINK/testcode.zip`. You can then place the following code-fragment in the `setup()` function of your plugin to make it available. This fragment performs the following steps
 
 1. Performs an [http request](http://docs.python-requests.org). Please note the **dl=1** option in this request. By default this value is set to 0.
 2. Uses the returned request object to generate the zip file locally, unpacks it, and finally deletes it.

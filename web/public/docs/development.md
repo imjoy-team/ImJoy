@@ -478,28 +478,68 @@ Examples:
 ## Hosting and deploying your plugins
 Here, we provide detailed information for the different available deployment
 options, ranging from a single file to setup your own ImJoy plugin repository.
+In either case, you can then distribute your plugin either directly as files or
+with a dedicated url syntax, which allows an automatic installation.
+These distribution options are detailed in the following section.
 
-### How to distribute plugins
-Several options exist to distribute your plugins. In either case,
-you can a simple link that can be shared directly through email or social networks.
-The user can  directly click the url and install it in one click.
+### Hosting on the web
+You can host the plugin code on the web, e.g. GitHub, Gist, or Dropbox. This is
+the typical case  during development.
 
-Several options exist to host your plugins, which we detail below
+### Deployment through your own ImJoy Plugin Repository
+You can easily create a ImJoy plugin repository in a GitHub project. For this,
+you save your ImJoy plugins in a dedicated folder, and you add a manifest json file
+named `manifest.imjoy.json` to the root folder. A template project can be found [here]((https://github.com/oeway/ImJoy-project-template).
 
-1. You can have individual files hosted on the web. This is the typical case
-   during development.
-0. You can create your own ImJoy plugin repository for a given (GitHub) project, and
-   deploy your plugins from there.
-0. You can send a pull-request to host your plugin on the official ImJoy plugin repository.
+The manifest specifies which plugins are in your repository,
+and where they can be found. A skeleton looks is shown below, and a full template
+is can be found [here](https://github.com/oeway/ImJoy-project-template/blob/master/manifest.imjoy.json).
+```json
+{
+ "name": "NAME OF THE REPOSITORY",
+ "description": "DESCRIBE THE REPOSITORY",
+ "version": "0.1.0",
+ "uri_root": "/imjoy-plugins",
+ "plugins": [
+   //copy and paste the <config> block of your plugin here
+ ]
+}
+```
+You can then update this manifest either automatically or manually.
+
+For an automatic update, we provide a [node script](https://github.com/oeway/ImJoy-project-template/blob/master/update_manifest.js).  This script requires node.js to be executed.
+Then run it  with the command `node update_manifest.js` in the root folder
+containing `manifest.imjoy.json`. It will then automatically search for ImJoy plugins and generate the manifest.
+
+Alternatively, you can manually update the manifest:
+
+1. Place all the plugin files in a folder in your GitHub repository, for example, a folder called [imjoy-plugins](https://github.com/oeway/ImJoy-project-template/tree/master/imjoy-plugins).
+1. Set `uri_root` to the name/path of your plugin folder, for example: `"uri_root": "/imjoy-plugins"`.
+1. For each plugin you, you can copy and paste the content in your `<config>` block to `plugins` in `manifest.imjoy.json`.
+1. For each plugin `<config>` block you added to `manifest.imjoy.json`, add a field called `"uri"`, and set the value to the actual file name of your plugin file, for example: `"uri": "untitledPlugin.imjoy.html",` if your plugin file is named "untitledPlugin.imjoy.html". You can skip this step if you name your plugin file exactly as the file name of the plugin.
+1. In case you place plugins into different subfolders, you can set `uri_root` to empty(`""`), and set `"uri"` to a relative path to that file, for example `"uri": "imjoy-plugins/untitledPlugin.imjoy.html",`.
 
 
-As an alternative, you can either directly send the plugin file (extension `*.imjoy.html`),
-which can be dragged into the ImJoy workspace. As a last option, you can send an
-url pointing to the plugin file. This  url can then be used to install the plugin
-in ImJoy: press the `+ Plugins` button and add the url in the field
-`Install plugin from url`. We typically don't recommend these options since
-take longer and provide provides less control about how the
-plugin should be installed.
+### Deployment through the official ImJoy plugin repository
+The plugin repository shown on the ImJoy.IO is served with GitHub through the [ImJoy-Plugins repository](https://github.com/oeway/ImJoy-Plugins).
+
+In order to deploy your plugin to the plugin repository, you can fork the repository, add your plugin and then send a pull request to [ImJoy-Plugins](https://github.com/oeway/ImJoy-Plugins). Once the pull request being accepted, the user will be able to install your plugin from the plugin repository.
+
+
+## Distribute plugins
+To distribute your plugins, two main options exist.
+
+First, you can directly send the plugin file (extension `*.imjoy.html`). This file can then
+be dragged into the ImJoy workspace, where it will be automatically recognized as a plugin.
+
+Second, you can create a complete url which when clicked will automatically open ImJoy
+and install the plugin. This link that can be shared directly through email or
+social networks. We detail below how this link can be created and which options are supported.
+
+In last option, which we typically don't recommend, you can send an url pointing
+to the plugin file. This url can then be used to install the plugin in ImJoy:
+ press the `+ Plugins` button and add the url in the field  `Install plugin from url`.
+However, this option provides less control about how the plugin should be installed.  
 
 
 ### Generating a plugin url
@@ -510,7 +550,7 @@ replace `PLUGIN_URI` to your actuall **plugin URI** (Uniform Resource Identifier
 
 There are **two types of plugin URI**, depending on how your plugin are deployed:
 
-1.  If your plugins are deployed as a **`ImJoy Plugin Repository`** (as described below),
+1.  If your plugins are deployed as a **`ImJoy Plugin Repository`** (as described above),
     you can then use a short plugin URI formatted as `GITHUB_USER_NAME/REPO_NAME:PLUGIN_NAME`. You can create such a repository for any GitHub project you like.
 
     For example, you can use `oeway/ImJoy-project-template:Untitled Plugin` to represent a plugin hosted on https://github.com/oeway/DRFNS-Lite. You can also specify the plugin tag by adding `@TAG` after the `PLUGIN_NAME` For example: `oeway/DRFNS-Lite:DRFNS-Lite@GPU`. In case you want to specify a git commit hashtag to freeze the plugin at a certain commit, you can add `@COMMIT_HASHTAG` after the `REPO_NAME`: for example: `oeway/DRFNS-Lite@4063b24:DRFNS-Lite` where `4063b24` is the short form of the commit of [4063b24f01eab459718ba87678dd5c5db1e1eda1](https://github.com/oeway/DRFNS-Lite/tree/4063b24f01eab459718ba87678dd5c5db1e1eda1).
@@ -524,70 +564,12 @@ To share with others, you just need to add the plugin URI to `http://imjoy.io/#/
 
 For more supported url parameters, please consult the dedicated section below.
 
-### Distribute individual plugins without dependencies
-This is the case for a plugin that does not depend on libraries or modules written
-by yourself, and you just want to quickly share it with others. Here, you create an url for this plugin (extension: `*.imjoy.html`). This file can be hosted on GitHub, Gist or Dropbox etc.
 
-1. For files on Github, you just need to copy the link to the file, example link would be: https://github.com/oeway/DRFNS-Lite/blob/master/DRFNS-Lite.imjoy.html.
-
-1.  For Gist or other Git providers such as (GitLab), you need to obtain the `raw`
-    link of the plugin file.
-
-    For example, to create a Gist link, you follow these steps
-
-    1. Go to gist on your GitHub account [https://gist.github.com/](https://gist.github.com/)
-    0. Create new gist, give a new name followed by  `.imjoy.html`, and copy & paste the code of your plugin.
-    0. Create either public or secret gist.
-    0. Link to gist can be obtained from the `Raw` button (this links to the unprocessed versions of the file). The link would looks like this: `https://gist.githubusercontent.com/oeway/aad257cd9aaab448766c6dc287cb8614/raw/909d0a86e45a9640c0e108adea5ecd7e78b81301/chartJSDemo.imjoy.html`
-    0. Please note that this url will change when you update your file.
-
-0. A special case is Dropbox, you need to convert the sharable url: 1) replace `dl=0` to `dl=1`; 2) replace `https://www.dropbox.com/` to `https://dl.dropboxusercontent.com/`. TODO: example
-
-
-### Distribute individual plugins with extra dependencies
-If your plugin depends on non-standard libraries and modules, you have to provide them with your plugin. You can upload those libraries and modules to a [GitHub Gist](https://gist.github.com/), a GitHub repository, or other data-sharing platforms such as Dropbox and link them in the plugin code.
-
- * for **JavaScript** plugins, you need to create a [gist](https://gist.github.com/) or repository on GitHub named with the plugin name, and upload the plugin file together with other JavaScript files. In the plugin file, you can use `importScripts(url_to_your_js_file)` function to use this libraries. However, due to a restriction of GitHub, you can't use the url of GitHub directly, you need to copy the url of your JavaScript file, and convert it with [jsDelivr](https://www.jsdelivr.com/rawgit).
-
- * for **Python** plugins, you need to create a `setup.py` file to wrap the plugin as a pip module, create a [gist](https://gist.github.com/) or a GitHub repository named with the plugin name, and upload the plugin file together with your python modules. Now add the GitHub link to `requirements` in the `<config>` block of your plugin. The GitHub link should be formatted to something like: `git+https://github.com/oeway/ImJoy-Engine#egg=imjoy`, you can test with the `pip install ...` command to see if you can install your module. As an alternative recommended during development, you can also use Dropbox as explained in this [Tutorial](http://imjoy.io/docs/#/tutorial?id=distribution-and-deployment-of-codedata-stored-on-dropbox).
-
-
-### Deployment through your own ImJoy Plugin Repository
-You can easily build a plugin repository in GitHUb by adding a json file
-named `manifest.imjoy.json`. This is a [ImJoy Project Template/manifest.imjoy.json](https://github.com/oeway/ImJoy-project-template/blob/master/manifest.imjoy.json).
-
-An skeleton of `manifest.imjoy.json` looks like this:
-```json
-{
- "name": "NAME OF THE REPOSITORY",
- "description": "DESCRIBE THE REPOSITORY",
- "version": "0.1.0",
- "uri_root": "/imjoy-plugins",
- "plugins": [
-   //copy and paste the <config> block of your plugin here
- ]
-}
-```
-You can then update this manifest to include your plugins.
-
-1. Place all the plugin files in a folder in your GitHub repository, for example, a folder called [imjoy-plugins](https://github.com/oeway/ImJoy-project-template/tree/master/imjoy-plugins).
-1. Set `uri_root` in `manifest.imjoy.json` to the name/path of your plugin folder, for example: `"uri_root": "/imjoy-plugins"`.
-1. For each plugin you, you can copy and paste the content in your `<config>` block to `plugins` in `manifest.imjoy.json`.
-1. For each plugin `<config>` block you added to `manifest.imjoy.json`, add a field called `"uri"`, and set the value to the actual file name of your plugin file, for example: `"uri": "untitledPlugin.imjoy.html",` if your plugin file is named "untitledPlugin.imjoy.html". You can skip this step if you name your plugin file exactly as the file name of the plugin.
-1. In case you place plugins into different subfolders, you can set `uri_root` to empty(`""`), and set `"uri"` to a relative path to that file, for example `"uri": "imjoy-plugins/untitledPlugin.imjoy.html",`.
-
-
-### Deployment through official ImJoy plugin repository
-The plugin repository shown on the ImJoy.IO is served with GitHub through the [ImJoy-Plugins repository](https://github.com/oeway/ImJoy-Plugins).
-
-In order to deploy your plugin to the plugin repository, you can fork the repository, add your plugin and then send a pull request to [ImJoy-Plugins](https://github.com/oeway/ImJoy-Plugins). Once the pull request being accepted, the user will be able to install your plugin from the plugin repository.
-
-
-### Supported url parameters
-You can construct the ImJoy url with customized functionality for facilitated installation
+#### Supported url parameters
+You can construct the ImJoy url with customized functionality for facilitated installation.
 url parameters can be used after `https://imjoy.io/#/app?`, using `PARAM=VALUE` syntax. Multiple parameters can be concatenate with `&`. For example we want to specify `par1=99` and `par2=hello`, the corresponding url would be `https://imjoy.io/#/app?par1=99&par2=hello`.
 
-Following is a list of supported url parameters:
+The following url parameters are currently supported:
 
  * `workspace` or `w` workspace name, an url contains `workspace` or `w` as a query string (e.g. https://imjoy.io/#/app?workspace=test) can be used to create or switch to a new workspace.
  * `plugin` or `p` show the specified plugin in the plugin management dialog, you can use plugin name or an url/URI for the plugin, for example: `https://imjoy.io/#/app?plugin=Image%20Window` will show up a plugin dialog with `Image Window` in the search. If your plugin is hosted from a GitHub repository, you can make it as a `ImJoy Plugin Repository` by adding a manifest file named `manifest.imjoy.json`, an example can be found here: https://github.com/oeway/ImJoy-project-template. Please also refer to `Install from url` for more details.
@@ -596,3 +578,32 @@ Following is a list of supported url parameters:
  * `repo` or `r` specify a ImJoy manifest file which point to a customized plugin repository, this can be a full repo link such as `repo=https://github.com/oeway/ImJoy-Plugins` or a simplified GitHub link `repo=oeway/ImJoy-Plugins`. If you are hosting your repo from a non-GitHub website (e.g. GitLab), please use the `raw` link to the `manifest.imjoy.json` file. This can be used by developers to deploy their own plugin repository through Github. Fork the [ImJoy-Plugins](https://github.com/oeway/ImJoy-Plugins) repository, and change the `manifest.imjoy.json` file. Then copy the link of the GitHub repository or the raw link of the manifest file and use it with `repo` to construct an url for sharing with the users.
  * `load` or `l` define a customized url which contains data (e.g. a tif image) loaded automatically into the ImJoy workspace. This can be used to link data to ImJoy, for example, by defining a `open with imjoy` button.
  These parameters are independent from each other, meaning you can combine different parameters with `&` and construct a long url. For example combining engine url and connection token:  `http://imjoy.io/#/app?engine=http://127.0.0.1:8080&token=2760239c-c0a7-4a53-a01e-d6da48b949bc`.
+
+
+### Distribute  plugins without dependencies
+This is the case for a plugin that does not depend on libraries or modules written
+by yourself, and you just want to quickly share it with others. Here, you create an
+url for this plugin (extension: `*.imjoy.html`). This file can be hosted on GitHub, Gist or Dropbox etc.
+
+1. For files on GitHub, you just need to copy the link to the file, example link would be: https://github.com/oeway/DRFNS-Lite/blob/master/DRFNS-Lite.imjoy.html.
+
+1.  For Gist or other Git providers such as (GitLab), you need to obtain the `raw`
+    link of the plugin file. For example, to create a Gist link, you follow these steps
+
+    1. Go to gist on your GitHub account [https://gist.github.com/](https://gist.github.com/)
+    0. Create new gist, give a new name followed by  `.imjoy.html`, and copy & paste the code of your plugin.
+    0. Create either public or secret gist.
+    0. Link to gist can be obtained from the `Raw` button (this links to the unprocessed versions of the file). The link would looks like this: `https://gist.githubusercontent.com/oeway/aad257cd9aaab448766c6dc287cb8614/raw/909d0a86e45a9640c0e108adea5ecd7e78b81301/chartJSDemo.imjoy.html`
+    0. Please note that this url will change when you update your file.
+
+0. A special case is Dropbox, you need to convert the sharable url: 1) replace `dl=0` to `dl=1`; 2) replace `https://www.dropbox.com/` to `https://dl.dropboxusercontent.com/`.
+<!--[ToDo]: example-->
+
+
+### Distribute plugins with extra dependencies
+If your plugin depends on non-standard libraries and modules, you have to provide them with your plugin. You can upload those libraries and modules to a [GitHub Gist](https://gist.github.com/), a GitHub repository, or other data-sharing platforms such as Dropbox and link them in the plugin code.
+
+ * for **JavaScript** plugins, you need to create a [gist](https://gist.github.com/) or repository on GitHub named with the plugin name, and upload the plugin file together with other JavaScript files. In the plugin file, you can use `importScripts(url_to_your_js_file)` function to use this libraries. However, due to a restriction of GitHub, you can't use the url of GitHub directly, you need to copy the url of your JavaScript file, and convert it with [jsDelivr](https://www.jsdelivr.com/rawgit).
+
+ * for **Python** plugins, you need to create a `setup.py` file to wrap the plugin as a pip module, create a [gist](https://gist.github.com/) or a GitHub repository named with the plugin name, and upload the plugin file together with your python modules. Now add the GitHub link to `requirements` in the `<config>` block of your plugin. The GitHub link should be formatted to something like: `git+https://github.com/oeway/ImJoy-Engine#egg=imjoy`, you can test with the `pip install ...` command to see if you can install your module. Please note that the `#egg=imjoy` syntax can be used to specify a dedicated [GitHub release](https://help.github.com/articles/creating-releases/). This allows to ensure that the correct
+ version is installed. As an alternative recommended during development, you can also use Dropbox as explained in this [Demo](http://imjoy.io/docs/#/tutorial?id=distribution-and-deployment-of-codedata-stored-on-dropbox).
