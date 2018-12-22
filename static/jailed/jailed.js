@@ -1044,11 +1044,16 @@ function randId() {
 
     DynamicPlugin.prototype.terminate =
            Plugin.prototype.terminate = function(callback) {
+        if(typeof callback != 'function'){
+          throw "callback is not a function"
+        }
         try {
-          if(callback && typeof callback == 'function' && this.api && this.api.onclose && typeof this.api.onclose == 'function'){
+          let callbackset = false
+          if(callback && this.api && this.api.onclose && typeof this.api.onclose == 'function'){
             this.api.onclose(callback)
+            callbackset = true
           }
-          if(this.api.exit && typeof this.api.exit == 'function'){
+          if(this.api && this.api.exit && typeof this.api.exit == 'function'){
             this.api.exit().finally(()=>{
               this._disconnected = true
               this.running = false
@@ -1062,13 +1067,16 @@ function randId() {
             // this._initialInterface.$forceUpdate&&this._initialInterface.$forceUpdate();
             this._site&&this._site.disconnect();
           }
+          if(callback && !callbackset){
+            callback()
+          }
         } catch (e) {
           console.error('error occured when terminating the plugin',e)
           this._disconnected = true
           this.running = false
           // this._initialInterface.$forceUpdate&&this._initialInterface.$forceUpdate();
           this._site&&this._site.disconnect();
-          if(callback && typeof callback == 'function'){
+          if(callback){
             callback()
           }
         }
