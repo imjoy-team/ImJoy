@@ -130,7 +130,6 @@ export default {
       this.selectWindow(w, {})
     },
     close(w) {
-      console.log('close', w)
       const ai = this.active_windows.indexOf(w)
       if(ai>=0){
         this.active_windows[ai].selected = false
@@ -138,6 +137,7 @@ export default {
         this.active_windows.splice(ai, 1)
         this.$emit('select', this.active_windows, null)
       }
+      console.log('closing window', w)
       this.$emit('close', w)
     },
     isTypedArray(obj)

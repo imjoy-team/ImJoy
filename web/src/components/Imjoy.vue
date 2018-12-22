@@ -342,7 +342,7 @@
     </md-app-drawer>
     <md-app-content class="whiteboard-content">
       <md-progress-bar md-mode="determinate" :md-value="progress"></md-progress-bar>
-      <whiteboard :mode="window_mode" :selected_window="selected_window" :windows="windows" :loaders="registered&&registered.loaders" @add="windowAdded" @close="windowClosed" @select="windowSelected"></whiteboard>
+      <whiteboard :mode="window_mode" :selected_window="selected_window" :windows="windows" :loaders="registered&&registered.loaders" @add="windowAdded" @close="onCloseWindow" @select="windowSelected"></whiteboard>
     </md-app-content>
   </md-app>
 
@@ -2264,7 +2264,7 @@ export default {
       console.log('activate window: ', ws)
       this.active_windows = ws
     },
-    windowClosed(ws) {
+    onCloseWindow(ws) {
       if(ws.plugin && ws.plugin.terminate) ws.plugin.terminate(()=>{
         this.closeWindow(ws)
       })
@@ -2608,7 +2608,7 @@ export default {
           docs: template.docs,
           tag: template.tag,
           attachments: template.attachments,
-          terminate: function(){ this._disconnected = true }
+          terminate: function(callback){ this._disconnected = true; if(callback) callback(); }
         }
         this.plugins[plugin.id] = plugin
         this.plugin_names[plugin.name] = plugin
