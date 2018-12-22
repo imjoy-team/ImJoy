@@ -3074,20 +3074,33 @@ export default {
             pconfig.data._workflow_id = pconfig.data && pconfig.data._workflow_id
             pconfig.plugin = plugin
             pconfig.update = plugin.api.run
-            plugin.api.run(this.filter4plugin(pconfig)).then((result)=>{
-              if(result){
-                for(let k in result){
-                  pconfig[k] = result[k]
+            if(plugin.config.runnable && !plugin.api.run){
+              const error_text = 'You must define a `run` function for '+plugin.name+' or set its `runnable` field to false.'
+              reject(error_text)
+              this.status_text = error_text
+              this.showMessage(error_text)
+              return
+            }
+            if(plugin.api.run){
+              plugin.api.run(this.filter4plugin(pconfig)).then((result)=>{
+                if(result){
+                  for(let k in result){
+                    pconfig[k] = result[k]
+                  }
                 }
-              }
+                resolve(plugin.api)
+                this.$forceUpdate()
+              }).catch((e) => {
+                this.status_text = '<' + plugin.name + '>' + (e.toString() || "Error.")
+                console.error('Error in the run function of plugin ' + plugin.name, e)
+                this.showMessage(this.status_text)
+                reject(e)
+              })
+            }
+            else{
               resolve(plugin.api)
               this.$forceUpdate()
-            }).catch((e) => {
-              this.status_text = '<' + plugin.name + '>' + (e.toString() || "Error.")
-              console.error('Error in the run function of plugin ' + plugin.name, e)
-              this.showMessage(this.status_text)
-              reject(e)
-            })
+            }
           }).catch((e) => {
             console.error('Error occured when loading the window plugin ' + pconfig.name + ": ", e)
             this.status_text = 'Error occured when loading the window plugin ' + pconfig.name + ": " + e
