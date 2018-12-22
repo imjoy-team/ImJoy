@@ -10,9 +10,9 @@
           <md-icon>menu</md-icon>
           <!-- <md-tooltip>show sidebar</md-tooltip> -->
         </md-button>
-        <md-button @click="$router.push('/')" v-if="!menuVisible" class="md-medium-hide site-title">
-          <img class="site-title" src="static/img/imjoy-logo-black.svg" alt="ImJoy"><span class="superscript md-small-hide">alpha</span>
-          <!-- <div class="site-title">ImJoy.io<span class="superscript md-small-hide">alpha</span></div> -->
+        <md-button @click="$router.push('/')" v-if="!menuVisible" class="md-small-hide site-title">
+          <img class="site-title" src="static/img/imjoy-logo-black.svg" alt="ImJoy"><span class="superscript md-small-hide">beta</span>
+          <!-- <div class="site-title">ImJoy.io<span class="superscript md-small-hide">beta</span></div> -->
           <md-tooltip>ImJoy home</md-tooltip>
         </md-button>
         <md-menu v-if="window_mode=='single' && windows.length > 0">
@@ -28,7 +28,7 @@
         <md-button v-if="status_text&&status_text.length"class="status-text md-small-hide" @click="showAlert(status_text)" :class="status_text.includes('rror')?'error-message':''">
           {{status_text.slice(0,80)+(status_text.length>80?'...':'')}}
         </md-button>
-        <span class="subheader-title md-small-hide" style="flex: 1" v-else>Image Processing with <span class="subheader-emoji">😁</span></span>
+        <span class="subheader-title md-medium-hide" style="flex: 1" v-else>Image Processing with Joy!</span>
       </div>
 
       <div class="md-toolbar-section-end">
@@ -132,7 +132,7 @@
       <div class="md-toolbar-row">
         <div class="md-toolbar-section-start">
           <md-button class="site-button site-title" @click="$router.push('/')">
-            <img class="site-title" src="static/img/imjoy-logo-black.svg" alt="ImJoy"><span class="superscript md-small-hide">alpha</span>
+            <img class="site-title" src="static/img/imjoy-logo-black.svg" alt="ImJoy"><span class="superscript">beta</span>
             <!-- <div class="site-title">ImJoy.io<span class="superscript">alpha</span></div> -->
           </md-button>
         </div>

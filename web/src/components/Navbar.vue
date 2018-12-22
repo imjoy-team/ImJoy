@@ -2,7 +2,7 @@
   <div class="md-toolbar-row">
       <div class="md-toolbar-row" flex>
           <md-button class="site-title" @click="$router.push('/')">
-            <img class="site-title" src="static/img/imjoy-logo-white.svg" alt="ImJoy"><span class="superscript">alpha</span>
+            <img class="site-title" src="static/img/imjoy-logo-white.svg" alt="ImJoy"><span class="superscript">beta</span>
             <!-- <div class="site-title">ImJoy.io </div> -->
           </md-button>
 
