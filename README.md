@@ -1,5 +1,7 @@
-# ![ImJoy](web/public/static/img/imjoy-logo-black.svg)
 [![Build Status](https://travis-ci.com/oeway/ImJoy.svg?branch=master)](https://travis-ci.com/oeway/ImJoy)
+
+<img src="web/public/static/img/imjoy-logo-black.svg" width="380">
+
 ## Image Processing with Joy :)
 
 ImJoy is a modern image processing framework aims to bridge the web and the Python ecosystem with plugins.
