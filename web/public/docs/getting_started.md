@@ -33,16 +33,16 @@ This interface provides all functionality needed to process data.
 ## ImJoy App and Plugin Engine
 
 ImJoy can be used  directly from your browser (Chrome or Firefox)
-**without any installation** [ImJoy webApp](https://imjoy.io/#/app)
-or as a **standalone** [desktopApp](https://github.com/oeway/ImJoy-App/releases).
+**without any installation** [ImJoy Web App](https://imjoy.io/#/app)
+or as a **standalone** [ImJoy Desktop App](https://github.com/oeway/ImJoy-App/releases).
 Many plugins can be used directly, and you can already get a feeling
 for ImJoy works.
 
 For some more advanced processing, the **Python Plugin Engine** is required.
-Such plugins are highlighted with a 🚀. The plugin engine is included in the desktopApp.
-After installing the [desktopApp](https://github.com/oeway/ImJoy-App/releases),
+Such plugins are highlighted with a 🚀. The plugin engine is included in the ImJoy Desktop App.
+After installing the [ImJoy Desktop App](https://github.com/oeway/ImJoy-App/releases),
 you can start the engine with the button `START PLUGINE ENGINE`.
-You can then connect to the engine either from the Imjoy webApp or desktopApp.
+You can then connect to the engine either from the Imjoy Web App or Desktop App.
 Click the 🚀 button located on the upper-right corner.
 In the displayed window, you will find instructions on how to set up the engine.
 
@@ -102,12 +102,12 @@ files have to be downloaded first. Two options exist:
 As mentioned above, Imjoy consists of **two main components**
 <img src="./assets/imjoy-architecture.png" width="800px"></img>
 
-1.  The **ImJoy app**. The app can run alone, and plugins can be developed in
+1.  The **ImJoy Web App**. The app can run alone, and plugins can be developed in
     JavaScript or in Python by using [pyodide](https://github.com/iodide-project/pyodide).
 
 2.  Complex computional tasks can be implemented in plugins, which run in the
     **Plugin Engine**. The latest release of the plugin engine is available
-    together with installation  instructions on [GitHub](https://github.com/oeway/ImJoy-Engine/releases).
+    together with installation  instructions on [GitHub](https://github.com/oeway/ImJoy-App/releases).
     The plugin engine will try to upgrade itself from GitHub when it starts.
     Packages are managed by `conda` and `pip` which provides access to the
     entire Python ecosystem.
@@ -135,9 +135,3 @@ for particular applications
   from the web or desktop app. This allows to process data on a dedicated processing
   workstation or a cluster.
 
-
-## ImJoy for core developers
-<!--**[TODO]**-->
-- How ImJoy is hosted (different repositories)
-- Automatic builds
-- ...
