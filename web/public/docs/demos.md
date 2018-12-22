@@ -237,6 +237,6 @@ sys.path.append(os.path.join('.','testcode'))
 ```
 
 **Notes**
-1. Code is locally stored in `username/ImJoyWorkspace/WORKSPACENAME/testcode`, where WORKSPACENAME is the name of the current ImJoy workspace. You can set the workspace automatically in the URL your provide to distribute your plugin (next section).
+1. Code is locally stored in `USER_HOME/ImJoyWorkspace/WORKSPACENAME/testcode`, where WORKSPACENAME is the name of the current ImJoy workspace. You can set the workspace automatically in the URL your provide to distribute your plugin (next section).
 2. When updating the zip archive, don't delete the old one REPLACE it with the new version. This guarantees that the same link is valid.
 3. This code will install each time the plugin is called the current version the zip archive.
