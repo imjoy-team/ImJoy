@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.com/oeway/ImJoy.svg?branch=master)](https://travis-ci.com/oeway/ImJoy)
 
-<a href="https://imjoy.io"> <img src="web/public/static/img/imjoy-logo-black.svg" width="380"></img></a>
+<a href="https://imjoy.io" target="_blank"> <img src="web/public/static/img/imjoy-logo-black.svg" width="380"></img></a>
 
 ## Image Processing with Joy :)
 
