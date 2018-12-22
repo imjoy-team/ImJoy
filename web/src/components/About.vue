@@ -11,7 +11,7 @@ static/static/<template>
       <md-card-header>
        </md-card-header>
       <md-card-content class="centered-fixed">
-        <md-icon class="md-size-5x md-small-hide" md-src="static/img/anna-palm-icon-circle.svg" />
+        <md-icon class="md-size-5x md-small-hide" md-src="static/img/imjoy-icon.svg" />
         <!-- <h2>Cite ImJoy.io</h2>
         <p> </p> -->
         <md-button class="normal-text" href="https://github.com/oeway" target="_blank">Made by Wei OUYANG with <span class="red">❤</span></md-button>
