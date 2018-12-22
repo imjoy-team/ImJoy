@@ -1044,7 +1044,7 @@ function randId() {
 
     DynamicPlugin.prototype.terminate =
            Plugin.prototype.terminate = function(callback) {
-        if(typeof callback != 'function'){
+        if(callback && typeof callback != 'function'){
           throw "callback is not a function"
         }
         try {
