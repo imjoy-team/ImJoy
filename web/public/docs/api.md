@@ -2,23 +2,23 @@
 
 Every plugin runs in its own sandbox-like container environment (web worker or iframe for JS, process for Python). This avoids interference with other plugin and makes the entire ImJoy App more secure.
 
-Interaction between plugins or betweena  plugin with the main app is carried out through a set of API functions (`ImJoy API`). All the plugins have access to a special object called `api`, with which the plugin can, for example, show a dialog, send results to the main app, or call another plugin with paramenters and data.
+Interaction between plugins or between a  plugin with the main app is carried out through a set of API functions (`ImJoy API`). All the plugins have access to a special object called `api`, with which the plugin can, for example, show a dialog, send results to the main app, or call another plugin with paramenters and data.
 
 To make the interaction more efficient and concurrently, we chose a programing pattern called ["asynchronous programming"](http://cs.brown.edu/courses/cs168/s12/handouts/async.pdf) for these API functions.
 
 ## Asynchronous programming
 
 All ImJoy API functions are asynchronous. This means when an `ImJoy API` function
-is called, ImJoy will not block its execution, but instead it will immediately return an object called [`Promise`(JS)](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) or [`Future`(Python)](https://docs.python.org/3/library/asyncio-future.html). You can decide to wait for the actual result or set a callback function to retrieve the result once the process terminated. For example, if you popup a dialog to ask for user input, in many programinig languages (synchronous programing), the code execution will be blocked until the user closes the dialog. However, an asynchronous program will return the `promise` object even if the user haven't close the dialog and continue processing.
+is called, ImJoy will not block its execution, but instead it will immediately return an object called [`Promise`(JS)](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) or [`Future`(Python)](https://docs.python.org/3/library/asyncio-future.html). You can decide to wait for the actual result or set a callback function to retrieve the result once the process terminated. For example, if you popup a dialog to ask for user input, in many programming languages (synchronous programing), the code execution will be blocked until the user closes the dialog. However, an asynchronous program will return the `promise` object even if the user haven't close the dialog and continue processing.
 
 Since every API call is asynchronous and non-blocking, a given plugin can call multiple other plugins to perform tasks simultaneously without using thread-like techniques.
 
-ImJoy suports two asynchronous programming styles to access these asynchronous functions
+ImJoy supports two asynchronous programming styles to access these asynchronous functions
 for both Python and JavaScript: `async/await` and `callback` style. A few important
 considerations
 
 * `async/await` is recommended for JavaScript and Python 3 (expect Web Python, which doesn't support it yet).
-* `callback` style can be used for Javascript, Python 2 and Python 3.
+* `callback` style can be used for JavaScript, Python 2 and Python 3.
 *  **Note** that you **cannot** use both style at the same time.
 * While you can use `try catch` (JavaScript) or `try except` (Python) syntax to capture error with `async/await` style, you cannot use them to capture error if you use `callback` style.
 
@@ -76,7 +76,7 @@ definition of your function. Don't forget to `import asyncio` if you use `async/
 However, for Python 2 or Web Python, `asyncio` is not supported, therefore you need to use `callback` style.
 
 Call the asynchronous function and set its callback with `.then(callback_func)`.
-For Javascrit plugins, a native Javascrit `Promise` will be returned ([More about Promise.](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)). For Python plugins, it will return a simplified Python implement of promise.
+For JavaScript plugins, a native JavaScript `Promise` will be returned ([More about Promise.](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)). For Python plugins, it will return a simplified Python implement of promise.
 
 Below examples for an api name `XXXXX`:
 
@@ -119,7 +119,7 @@ class ImJoyPlugin():
 
 
 ## Input arguments
-When calling the API functions, most functions take an object (Javascript) or dictionaries/named arguments (Python) as its first argument.
+When calling the API functions, most functions take an object (JavaScript) or dictionaries/named arguments (Python) as its first argument.
 
 The following function call will work both in JavaScript and Python:
 
@@ -159,7 +159,7 @@ api.alert('hello world')
 
 ### api.call
 ```JavaScript
-api.call(plugin_name,plugin_op,data)
+result = await api.call(plugin_name,plugin_op,data)
 ```
 
 Calls a function from another plugin.
@@ -167,16 +167,19 @@ Calls a function from another plugin.
 You can also transfer data. Number of argument number must match the required number
 of arguments of the called function.
 
+If you want to call frequently functions of another plugin, we recommend using `api.getPlugin`.
+
 **Arguments**
 
 * **plugin_name**: String. Name of the called plugin.
 * **plugin_op**: String. Name of plugin function (op).
-* **data**: data. Any of the supported primitive data types that can be transfered.
+* **data**: Object. Any of the supported primitive data types that can be transferred.
 
 **Returns**
-* **[TODO]**. A promise which can be used to retrieve the call results.
+* **result**: The result returned from the plugin function if any.
 
 **Example**
+
 To call a function `funcX` defined in the plugin  `PluginX` with the argument `1`, use
 
 ``` javascript
@@ -192,31 +195,36 @@ plugin = await api.getPlugin(plugin_name)
 
 Gets the API object of another plugin.
 
+
+**Note 1:** If the plugin is terminated and you try to call its function, you will get an error. One solution to this is to use `try ... catch `(JavaScript) or `try: ... except: ...`(Python) statement to capture the error. <!--(TODO: this does not work for `native-python` plugin yet.)-->
+
+**Note 2** on `api.getPlugin` and `api.call`. If you want to constantly access
+different functions from another plugin, it is preferable to get all the API
+functions of this plugin with `api.getPlugin`. Then you can access them
+through the returned object. If you only access the API function in another
+plugin occasionally, you can also use `api.call`
+
+
 **Arguments**
 
 * **plugin_name**: String. Name of another plugin.
 
 **Returns**
-* **plugin**: Promise. A promise which can be used to retrieve the API object.
+* **plugin**: Object. An object which can be used to access the plugin API functions.
 
 **Example**
-To get the API of a plugin named `PluginX`, with the api object,
-you can then access all the api functions of the plugin:
+
+Get the API of the plugin `PluginX`, and access its functions:
 
 ``` javascript
 pluginX = await api.getPlugin("PluginX")
-
 result = await pluginX.run()
 
-// asuming that PluginX defined an API function called `funcX`, you can it with:
+// Assuming that PluginX defined an API function `funcX`, you can access it with:
 await pluginX.funcX()
 ```
+[Try yourself >>](https://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:getPlugin&w=examples)
 
-**Note 1** If the plugin is terminated and you try to call its function, you will get an error. One solution to this is to use `try ... catch `(JavaScript) or `try: ... except: ...`(Python) statement to capture the error. (TODO: this does not work for `native-python` plugin yet.)
-
-**Note 2** about `api.getPlugin` and `api.call`: if you want to constantly access different functions from another plugin,
-it's better to get all the API of that plugin with `api.getPlugin`, then access it through the returned object. If you only access
-the API function in another plugin occasionally, you can use both.
 
 ### api.export
 ```javascript
@@ -228,11 +236,11 @@ api.export(ImJoyPlugin())
 ```
 Exports the plugin class or an object/dict as `Plugin API`.
 
-This call is mandatory for every ImJoy plugin (typically as the last line of the plugin script). Every member of the `ImJoyPlugin` instance will be exported as `Plugin API`, which means those exported functions or variables can be called or used by the ImJoy app or another plugin.This then allows other plugins to use `api.run` or `api.call` to call the plugin or its functions.
+This call is mandatory for every ImJoy plugin (typically as the last line of the plugin script). Every member of the `ImJoyPlugin` instance will be exported as `Plugin API`, which means those exported functions or variables can be called or used by the ImJoy app or another plugin. This then allows other plugins to use `api.run` or `api.call` to call the plugin or its functions.
 
-Only functions and variables with primitive types can be exported (number, string, boolean). And if a variable or function has a name start with `_`, it means that's an interal variable or function, will not be exported.
+Only functions and variables with primitive types can be exported (number, string, boolean). And if a variable or function has a name start with `_`, it means that's an internal variable or function, will not be exported.
 
-**Note** that in Javascript, the `new` keyword is necessary to create an
+**Note** that in JavaScript, the `new` keyword is necessary to create an
 instance of a class, while in Python there is no `new` keyword.
 
 ### api.register
@@ -247,8 +255,8 @@ An op can have its own GUI defined by the `ui` string.
 By default, all ops of a plugin will call the `run` function of the plugin.
 You can use `my.config.type` in the `run` function to differentiate which op was called.
 
-Alternatively, you can define another `Plugin API` function in the the `run` field.
-The function must be a member of the plugin class or being exported (with `api.export`) as a `Plugin API` function. This is because a arbitrary function transfered by ImJoy will be treated as `callback` function, thus only allowed to run once.
+Alternatively, you can define another `Plugin API` function in the `run` field.
+The function must be a member of the plugin class or being exported (with `api.export`) as a `Plugin API` function. This is because a arbitrary function transferred by ImJoy will be treated as `callback` function, thus only allowed to run once.
 
 If you want to change your interface dynamically, you can run `api.register`
 multiple times to overwrite the previous version. `api.register` can also be used to overwrite the default ui string of the plugin defined in `<config>`, just set the plugin name as the op name (or without setting a name).
@@ -260,13 +268,12 @@ multiple times to overwrite the previous version. `api.register` can also be use
     - `name`: String. Name of op.
     - `ui`: Object (JavaScript) or dictionary (Python). Rendered interface. Defined
        with the same rule as the `ui` field in `<config>`.
-    - `run`: String. Specifies another `Plugin API` function that will run when
-      the op is executed.
-    - `update`: String. Specifies another `Plugin API` function that will run
+    - `run`: String, optional. Specifies the `Plugin API` function that will run when
+      the op is executed. If not specified, the `run` function of the plugin will be executed.
+    - `update`: String, optional. Specifies another `Plugin API` function that will run
       whenever any option in the `ui` is changed.
-
-**[TODO]** Is this list complete? what about returns?
-
+    - `inputs`: Object, optional. A [JSON Schema](https://json-schema.org/) which defines the inputs of this op.
+    - `outputs`: Object, optional. A [JSON Schema](https://json-schema.org/) which defines the outputs of this op.
 
 **Examples**
 
@@ -313,14 +320,15 @@ to this plugin to transfer data.
 **Examples**
 
 
-Example to call one plugin
+Example to call one plugin:
 
 ``` python
 await api.run("Python Demo Plugin")
 ```
 [**Try yourself >>**](https://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:run&w=examples)
 
-Example for concurrent execution of two plugins, where the two plugins are execute simultaneously, but we wait for the result one after another.
+Example for concurrent execution of two plugins, where the two plugins are
+executed simultaneously, but ImJoy waits for the result one after the other.
 
 ```python
 p1 = api.run("name of plugin 1")
@@ -338,7 +346,7 @@ p2 = api.run("name of plugin 2")
 result1, result2 = await asyncio.gather(p1, p2)
 ```
 
-Similarly for Javascript, you can use
+Similarly for JavaScript, you can use
 
 ```javascript
 const p1 = api.run("name of plugin 1")
@@ -358,8 +366,34 @@ win = await api.createWindow({name: window_name, type: window_type, w:w, h:h, da
 ```
 Creates a new window in the ImJoy workspace.
 
-Once an window is created, it will return an object with the APIs of the corresponding window plugin, which can be used to update
-the window (e.g. `win.run({"data": ...})`).
+Once an window is created, it will return an object with the APIs of the corresponding window plugin,
+which can be used to update the window, e.g. you can update the data field with `win.run({"data": ...})`).
+
+**Note 1**: calling functions of a closed window. If the window is closed and you try to call its function, you will get an error, one solution to this is to use `try ... catch `(JavaScript) or `try: ... except: ...`(Python) statement to capture the error.
+
+**Note 2:** difference between `api.createWindow` and `api.getPlugin`. Both
+functions can be used to obtain an object containing the plugin api for `window`
+plugins. However, only the object obtained by `api.createWindow` can be used to
+update an existing window. In contrast, the object returned by `api.getPlugin`
+will create a new window each time used.
+
+This difference in behavior can be explained by the way ImJoy handles the different
+plugin types. When ImJoy loads a plugin which is not `window` plugin, it will start
+the appropriate standalone python process, webworker or iframe. This ensures that
+only one instance of the plugin is running. In contrast, `window` plugins will
+only be registered and a proxy plugin will be created. No actual instance will
+be started unless the user clicks the plugin menu or the plugin is called by
+another plugin. Each window in the workspace is then a new instance of the `window` plugin.
+
+When `api.getPlugin` is called, it will return the api of the proxy plugin, e.g.
+`proxy = await api.getPlugin('Image Window')`). Every time the `run` function
+is executed, a new window will be created. For example, if you run `proxy.run({data: ...})`
+for 10 times, 10 windows will be created.
+
+When `api.createWindow` is used, it will return an instance of the window plugin,
+e.g. `win = await api.createWindow({'name': 'new window', 'type': 'Image Window', 'data': {...}})`).
+If you run `win.run({'data': ...})` for 10 times, the same window instance will be updated.
+
 
 **Arguments**
 
@@ -371,21 +405,24 @@ the window (e.g. `win.run({"data": ...})`).
     - `imjoy/image`. Display an image. Requires `data.src` pointing to an image location.
     - `imjoy/files`. Display a list of files. `data` is an array of file objects.
     - `imjoy/url_list`. Display a list of url rendered with HTML tag `<a> </a>`. `data` is an array of urls.
-    - `imjoy/panel`. Render the `ui` string in a `<config>` block. **[TODO]**
+    - `imjoy/panel`. Render the `ui` string in a `<config>` block. <!--****[TODO] what can you do with this?**-->
     - `imjoy/markdown`. Render some markdown text provided in `data.source`.
     - `imjoy/generic`. Will show all objects in `data`. For instance, the window that you obtain with `return.my`
     - `imjoy/plugin-editor`. Opens the source code editors. `data.id` is a unique string (preferable random) specifying the window id, `data.code` contains the source code
 
-* **w**: Integer. Window width in inches. **[TODO] Correct?**
-* **h**: Integer. Window height in inches.  **[TODO] Correct?**
-* **data**: Object (JavaScript) or dictionary (Python). Contains data to be tranferred to window.
-* **config**: Object (JavaScript) or dictionary (Python). **[TODO]**.
+* **w**: Integer. Window width in grid columns (1 column = 30 pixels).
+* **h**: Integer. Window height in grid rows (1 row = 30 pixels).
+* **data**: Object (JavaScript) or dictionary (Python). Contains data to be transferred to the window.
+* **config**: Object (JavaScript) or dictionary (Python).
 
 **Returns**
 
-* **win**: Object. The API object of the created window.
+* **win**: Object. The API object of the created window. Can be stored in the plugin class
+  (`self` for Python, or `this` for JavaScript) for later use, e.g. to update the window.
 
 **Examples**
+
+Create a simple window in JavaScript:
 ```javascript
 win = await api.createWindow({name: 'new window', type: 'Image Window', w:7, h:7, data: {image: ...}, config: {}})
 ```
@@ -406,9 +443,8 @@ def window_callback(win):
 api.createWindow({name: 'new window', type: 'Image Window', w:7, h:7, data: {image: ...}, config: {}}).then(window_callback)
 ```
 
-The returned window object from `createWindow` can be stored in the plugin class (`self` for Python, or `this` for JavaScript) for later use.
-
-For example, you can then use it to update the window, or use `onclose` to set a callback function which will be called hen the window is being closed.
+Use the returned object to update the window, or use `onclose` to set a callback
+function which will be called hen the window is being closed.
 
 For Python:
 ```python
@@ -436,15 +472,6 @@ win.onclose(()=>{
   console.log('closing window.')
 })
 ```
-**Note 1** If the window is closed and you try to call its function, you will get an error, one solution to this is to use `try ... catch `(JavaScript) or `try: ... except: ...`(Python) statement to capture the error.
-**Note 2** about `api.getPlugin` and `api.createWindow`: both of these two api can be used for getting the plugin api for `window` plugins,
-however, they are different. This difference from how ImJoy handles different plugin types. When ImJoy load plugins which is not `window` plugin, a standalone python process, webworker or iframe will be started for each plugin and there will be only one instance of the plugin running. `window` plugins will only be registered and a proxy plugin will be created. No actual instance will be started unless the user clicked the plugin menu or executed by another plugin. And each window in the workspace is a new instance of the `window` plugin.
-
-When `api.getPlugin` is called, it will return the api of the proxy plugin (e.g. `proxy = await api.getPlugin('Image Window')`), every time the `run` function of the proxy plugin api is executed, a new window will be created, for example, if you run `proxy.run({data: ...})` for 10 times, you will get 10 windows.
-
-When `api.createWindow` is used, it will return an instance of the window plugin (e.g. `win = await api.createWindow({'name': 'new window', 'type': 'Image Window', 'data': {...}})`), after that if you run `win.run({'data': ...})` for 10 times, the same window instance will be updated.
-
-Therefore, in most of the cases, you should use `api.createWindow` with `window` plugin, and use `api.getPlugin` for other types of plugins.
 
 ### api.showDialog
 ```javascript
@@ -453,12 +480,12 @@ answer = await api.showDialog(dialog)
 
 Show a dialog with customized GUI.
 
-The answer is stored in the returned object, and can be retrieved with the specified `id`. To consider the case when the userpresses `cancel`, you can use the `try catch` (JavaScript) or `try except` (Python) syntax.
+The answer is stored in the returned object, and can be retrieved with the specified `id`. To consider the case when the user presses `cancel`, you can use the `try catch` (JavaScript) or `try except` (Python) syntax.
 
 **Arguments**
 * **dialog**. Object (JavaScript) or dictionary (Python). Specifies the dialog.
     Contains following fields:
-    - `name`: String. Title of diaolog.
+    - `name`: String. Title of dialog.
     - `ui`: String. Specifies appearance of GUI. Defined with the same rule as the `ui` field in `<config>`. Defined name in `id` is used to retrieve answer.
 **Returns**
 * **answer**. Object (JavaScript) or dictionary (Python). Contains provided answer as field `answer[id]`.
@@ -499,7 +526,7 @@ Shows a quick message with a snackbar.
 **Arguments**
 
 * **message**: String. Message to be displayed.
-* **duration**: Integer. Duration in seconds message will be shown. **[TODO]**
+* **duration**: Integer. Duration in seconds message will be shown. <!--**[TODO]**-->
 
 **Examples**
 
@@ -573,9 +600,9 @@ config_value = await api.getConfig(config_name)
 ```
 Retrieves configurations for plugin.
 
-**Note 1** numbers are converted to strings when saved with `api.setConfig`. They have to be converted back to numbers before using them (in JavaScript use `parseInt()` or `parseFloat()`, in Python `int()` or `float()`).
+**Note 1:** numbers are converted to strings when saved with `api.setConfig`. They have to be converted back to numbers before using them (in JavaScript use `parseInt()` or `parseFloat()`, in Python `int()` or `float()`).
 
-**Note 2** you can also access the fields defined in the `<config>` block by adding `_` to the field name, for example, if you want to read the plugin name `defined` in the `<config>` block, you can use `plugin_name = await api.getConfig('_name')`.
+**Note 2:** you can also access the fields defined in the `<config>` block by adding `_` to the field name, for example, if you want to read the plugin name `defined` in the `<config>` block, you can use `plugin_name = await api.getConfig('_name')`.
 
 **Arguments**
 * **param_name**: String. Name of parameter.
@@ -608,7 +635,7 @@ The file handling is different for the ImJoy app and the plugin engine. We recom
 reading the dedicated section in the [**TO DO** user manual]() to understand the difference.
 When calling this api function within a **JavaScript** plugin, you will obtain
 a warning message as the one shown below. It essentially indicates that the
-ImJoy app now requests acces to this part of your local file system:
+ImJoy app now requests access to this part of your local file system:
 
 <img src="./assets/imjoy-showFileDialog-warning.png" width="700px"></img>
 
@@ -628,14 +655,14 @@ JavaScript, but you can pass it to another Python plugin for processing.
 * **title**: String. Title of the dialog.
 * **root**: String. Initial path for the dialog to show. Note: for Python plugins on Windows,
    you may want to define the path string as raw string using `r"xxxxxx"` syntax,
-   we have ncountered unrecognized path issue with normal strings.
+   we have encountered unrecognized path issue with normal strings.
 * **mode**: String. Modes for file selection. By default, the user can select a single or multiple file (with the `shift` key pressed)
-    - `single`: only a single file or directory can be selected. **[TODO]** what's returned here?
+    - `single`: only a single file or directory can be selected. <!--**[TODO]** what's returned here?-->
     - `multiple`: multiple files or directories are selected and are returned in an array or list.
-    - `single|multiple` (default): both single and multiple selection are allowed. **[TODO]** why this additional option?
+    - `single|multiple` (default): both single and multiple selection are allowed. <!--**[TODO]** why this additional option?-->
 * **uri_type**: String. Format of returned file path.
-    - `url` (default for JavaScript plugins): **[TODO]**
-    - `path` (default for Python plugins): **[TODO]**
+    - `url` (default for JavaScript plugins): <!--**[TODO]**-->
+    - `path` (default for Python plugins): <!--**[TODO]**-->
 
 **Returns**
 * **file_path**: String. Contains file-path as specified by `uri_type`.
@@ -744,7 +771,7 @@ You can store any text data such as base64 encoded images, code and json in the 
 * **att_name**: String. Identifier of the attachment.
 
 **Returns**
-* **content**: **[TODO]** what is the content exactly?
+* **content**: The text content stored in the `<attachment>` block.
 
 
 **Examples**
@@ -758,22 +785,22 @@ content = await api.getAttachment(att_name)
 
 ### api.utils.XXXX
 ``` javascript
-api.utils.utility_name
+await api.utils.utility_name()
 ```
 
 Call utility function.
 
 Currently supported functions for **all plugins** are:
- * `api.utils.$forceUpdate`: refreshing the GUI manually.
- * `api.utils.openUrl(url)`: opening an `url` in a new browser tab.
- * `api.utils.sleep(duration)`: sleep for a indicated `duration` in seconds. (for Python plugins, use `time.sleep` instead.)
+ * `api.utils.$forceUpdate()`: refreshes the GUI manually.
+ * `api.utils.openUrl(url)`: opens an `url` in a new browser tab.
+ * `api.utils.sleep(duration)`: sleeps for the indicated `duration` in seconds. Note for Python plugins, use `time.sleep` instead.)
 
 Currently supported functions for **Python plugins** are:
- * `api.utils.kill` for kill a `subprocess` in python.
- * `api.utils.ndarray` for wrapping ndarray according to ImJoy ndarray format.
+ * `api.utils.kill(subprocess)`: kills a `subprocess` in python.
+ * `api.utils.ndarray(numpy_array)`: wrapps a ndarray `numpy_array` according to the ImJoy ndarray format.
 
 ### api.TAG constant
-The current tag choosen by the user during installation.
+The current tag chosen by the user during installation.
 
 ### api.WORKSPACE constant
 Name of the current workspace.
