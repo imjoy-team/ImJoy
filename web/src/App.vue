@@ -10,8 +10,7 @@ export default {
   name: 'app',
   data () {
     return {
-      show_navbar: true,
-      store: this.$root.$data.store,
+      show_navbar: true
     }
   },
   mounted(){
@@ -21,28 +20,12 @@ export default {
 
     this.$nextTick(()=>{
       const updateSize = (e)=>{
-        this.store.windowHeight = window.innerHeight
-        this.store.windowWidth = window.innerWidth
-        this.store.event_bus.$emit('resize', {height:this.store.windowHeight, width:this.store.windowWidth})
+        this.$root.$data.store.event_bus.$emit('resize', {height:window.innerHeight, width:window.innerWidth})
       }
       updateSize()
       //window.addEventListener('resize', updateSize);
       document.addEventListener("orientationchange", window.onresize = updateSize);
-
-      // window.addEventListener("message", receiveMessage, false);
-      // function receiveMessage(event)
-      // {
-      //   console.log('message reveived: ', event)
-      //   if (event.origin !== "http://127.0.0.1:8000" || event.origin !== "https://imjoy.io")
-      //     return;
-      //   this.store.event_bus.$emit('message', event)
-      // }
     })
-
-    // function preventBehavior(e) {
-    // e.preventDefault();
-    // };
-    // document.addEventListener("touchmove", preventBehavior, {passive: false});
   },
   methods: {
     show(info, duration) {
