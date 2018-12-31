@@ -261,7 +261,7 @@ Joy.Op = function(options, parent, data){
 	self.update = function(){
 		// if(self.onchange && typeof self.onchange == 'function') self.onchange({});
 		if(self.parent) self.parent.update();
-		if(self.onupdate && typeof self.onupdate == 'function'){
+		if(self.onupdate && typeof self.onupdate === 'function'){
 			// Real or Preview data?
 			var data;
 			if(self.previewData){
@@ -384,7 +384,7 @@ Joy.add = function(template){
 		if(t.type === undefined || template.type === undefined)
 			return false
 		else
-			return t.type == template.type;
+			return t.type === template.type;
 	});
 	if(duplicated.length<=0){
 		Joy.templates.push(template);
@@ -398,7 +398,7 @@ Joy.add = function(template){
 
 Joy.remove = function(type){
 	var duplicated = Joy.templates.filter(function(t){
-		if(t.type == type) return true
+		if(t.type === type) return true
 	});
 	if(duplicated.length>0){
 		// console.log('replacing template ', template.name, template.type)
@@ -413,7 +413,7 @@ Joy.reset = function(){
 // Get Template
 Joy.getTemplateByType = function(type){
 	var template = Joy.templates.find(function(template){
-		return template.type==type;
+		return template.type===type;
 	});
 	if(!template) throw Error("No op template of type '"+type+"'!");
 	return template;

@@ -13,7 +13,7 @@
       <md-icon>update</md-icon><span class="md-small-hide">Update All</span>
     </md-button>
   </md-toolbar>
-  <md-list class="md-triple-line md-dense" v-if="display=='list'">
+  <md-list class="md-triple-line md-dense" v-if="display==='list'">
     <div v-for="(plugin, k) in searched_plugins" :key="k">
       <md-list-item>
         <md-avatar>
@@ -23,7 +23,7 @@
         </md-avatar>
 
         <div class="md-list-item-text">
-          <span>{{plugin.type == 'native-python'? plugin.name + ' 🚀': plugin.name}}</span>
+          <span>{{plugin.type === 'native-python'? plugin.name + ' 🚀': plugin.name}}</span>
           <p>{{plugin.description}}</p>
           <!-- <div>
               <md-chip v-for="tag in plugin.tags" :key="tag">{{tag}}</md-chip>
@@ -81,11 +81,11 @@
 
   </md-list>
 
-  <div v-if="display=='card'">
+  <div v-if="display==='card'">
     <md-card v-if="containerWidth<=500" v-for="(plugin, k) in searched_plugins" :key="k">
       <md-card-header>
         {{plugin.createdAt}}
-        <h2>{{plugin.type == 'native-python'? plugin.name + ' 🚀': plugin.name}}</h2>
+        <h2>{{plugin.type === 'native-python'? plugin.name + ' 🚀': plugin.name}}</h2>
         <p>{{plugin.description}}</p>
         <md-chip v-for="tag in plugin.tags" :key="tag">{{tag}}</md-chip>
       </md-card-header>
@@ -119,7 +119,7 @@
      <md-card>
        <md-card-header>
          <h2><md-icon v-if="props.item.icon">{{props.item.icon}}</md-icon><md-icon v-else>extension</md-icon>
-           {{props.item.type == 'native-python'? props.item.name + ' 🚀': props.item.name}}
+           {{props.item.type === 'native-python'? props.item.name + ' 🚀': props.item.name}}
 
          </h2>
          <p>{{props.item.description}}</p>
@@ -368,7 +368,7 @@ export default {
       else{
         const uri = plugin.uri
         axios.get(uri).then(response => {
-          if (!response || !response.data || response.data == '') {
+          if (!response || !response.data) {
             alert('failed to get plugin code from ' + uri)
             return
           }
@@ -394,7 +394,7 @@ export default {
       else{
         const uri = plugin.uri
         axios.get(uri).then(response => {
-          if (!response || !response.data || response.data == '') {
+          if (!response || !response.data) {
             alert('failed to get plugin code from ' + uri)
             return
           }
