@@ -19,6 +19,7 @@ before_script:
 script:
   - export NODE_OPTIONS="--max-old-space-size=4096"
   - npm run test:unit
+  - npm run lint
   - npm run build
 after_success:
   - cd ..
