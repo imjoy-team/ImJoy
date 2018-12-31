@@ -1,3 +1,5 @@
+/*eslint no-useless-escape: "off"*/
+
 export function assert(condition, message) {
     if (!condition) {
         message = message || "Assertion failed";
@@ -9,7 +11,7 @@ export function assert(condition, message) {
 }
 
 export function compareVersions(v1, comparator, v2) {
-    var comparator = comparator == '=' ? '==' : comparator;
+    comparator = comparator == '=' ? '==' : comparator;
     if(['==','===','<','<=','>','>=','!=','!=='].indexOf(comparator) == -1) {
         throw new Error('Invalid comparator. ' + comparator);
     }
@@ -117,7 +119,7 @@ Filters.getPixels = function(canvas) {
   return ctx.getImageData(0,0,c.width,c.height)
 }
 
-Filters.filterImage = function(pixels, filter, var_args) {
+Filters.filterImage = function(pixels, filter) {
   var args = [pixels];
   for (var i=2; i<arguments.length; i++) {
     args.push(arguments[i]);
@@ -125,7 +127,7 @@ Filters.filterImage = function(pixels, filter, var_args) {
   return filter.apply(null, args);
 }
 
-Filters.grayscale = function(pixels, args) {
+Filters.grayscale = function(pixels) {
   var d = pixels.data;
   for (var i=0; i<d.length; i+=4) {
     var r = d[i];
@@ -160,7 +162,6 @@ Filters.brightness = function(pixels, offset, ratio) {
 
 Filters.min_max = function(pixels) {
   var d = pixels.data;
-  var v;
   var min=Number.POSITIVE_INFINITY, max=Number.NEGATIVE_INFINITY, avg=0;
   for (var i=0; i<d.length; i+=4) {
     if(d[i]<min) min=d[i];
@@ -327,7 +328,7 @@ export function githubUrlRaw(url) {
 	var ghObj = githubUrlToObject(url);
 	var githubUser = ghObj.user;
 	var githubRepo = ghObj.repo;
-	var githubBranch = ghObj.branch;
+	// var githubBranch = ghObj.branch;
 	var re = new RegExp("^https:\/\/github.com\/" + githubUser + "/" + githubRepo + "/blob/","g");
 	var regStr = url.replace(re, "");
 

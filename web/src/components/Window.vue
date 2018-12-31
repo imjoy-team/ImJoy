@@ -37,7 +37,7 @@
               <span>Console.log</span>
               <md-icon>bug_report</md-icon>
             </md-menu-item>
-            <md-menu-item v-for="(loader, name) in w.loaders" v-if="w.loaders" :key="name" @click="loaders && loaders[loader](w.data)">
+            <md-menu-item v-for="(loader, name) in w.loaders" :key="name" @click="loaders && loaders[loader](w.data)">
               <span>{{name}}</span>
               <md-icon>play_arrow</md-icon>
             </md-menu-item>
@@ -52,9 +52,9 @@
     </md-card-expand-content>
   </md-card-expand>
   <md-card-content :class="w.scroll?'plugin-iframe-container allow-scroll':'plugin-iframe-container'">
-  <md-empty-state v-if="w.type=='empty'" md-icon="hourglass_empty" md-label="IMJOY.IO" md-description="">
+  <md-empty-state v-if="w.type==='empty'" md-icon="hourglass_empty" md-label="IMJOY.IO" md-description="">
   </md-empty-state>
-  <div v-if="w.type=='imjoy/files'" class="generic-plugin-window">
+  <div v-if="w.type==='imjoy/files'" class="generic-plugin-window">
     <md-list>
       <md-list-item v-for="(f, i) in w.data" :key="f.name+f.relativePath">
         <md-radio v-model="w.select" :value="i" />
@@ -74,30 +74,30 @@
 
     </md-list>
   </div>
-  <div v-else-if="w.type=='imjoy/url_list'">
+  <div v-else-if="w.type==='imjoy/url_list'">
     <ul v-if="w.data.length && w.data.length>0">
-      <li v-for="u in w.data">
+      <li v-for="u in w.data" :key="u.href || u">
         <a :href="u.href || u" target="_blank">{{u.text || u}}</a>
       </li>
     </ul>
     <p v-else> No url.</p>
   </div>
-  <div v-else-if="w.type=='imjoy/image'" class="fill-container">
-    <img style="height: 100%; width: 100%; object-fit: contain;" :src="w.data.src" v-if="w.data.src"></img>
+  <div v-else-if="w.type==='imjoy/image'" class="fill-container">
+    <img style="height: 100%; width: 100%; object-fit: contain;" :src="w.data.src" v-if="w.data.src" />
     <p v-else> No image available for display.</p>
   </div>
-  <div v-else-if="w.type=='imjoy/images'" class="allow-scroll fill-container">
-    <img style="height: 100%; width: 100%; object-fit: contain;" :src="img" v-for="img in w.data.images" v-if="w.data.images"></img>
-    <p v-else> No image available for display.</p>
+  <div v-else-if="w.type==='imjoy/images'" class="allow-scroll fill-container">
+    <img style="height: 100%; width: 100%; object-fit: contain;" :src="img" v-for="(img, i) in w.data.images" :key="i" />
+    <p v-if="!w.data.images||w.data.images.length == 0"> No image available for display.</p>
   </div>
-  <div v-else-if="w.type=='imjoy/panel'">
+  <div v-else-if="w.type==='imjoy/panel'">
     <joy :config="w.config"></joy>
   </div>
-  <div v-else-if="w.type=='imjoy/markdown'">
+  <div v-else-if="w.type==='imjoy/markdown'">
     <div style="padding-left: 10px; padding-right: 5px; overflow: auto" v-if="w.data.source && w.data.source.trim() !='' " v-html="marked(w.data.source, { sanitize: true })"></div>
     <h3 v-else> Oops, this plugin has no documentation!</h3>
   </div>
-  <div v-else-if="w.type=='imjoy/generic'" class="generic-plugin-window">
+  <div v-else-if="w.type==='imjoy/generic'" class="generic-plugin-window">
     <!-- <p>generic data</p> -->
     <md-list>
       <md-list-item class="md-primary" v-if="loaders&&w.loaders&&Object.keys(w.loaders).length > 0" @click="loaders[w.loaders[Object.keys(w.loaders)[0]]](w.data)">
@@ -107,7 +107,7 @@
       <md-list-item v-else>
         <span class="md-list-item-text">{{dataSummary(w)}}</span>
       </md-list-item>
-      <md-list-item v-for="(v, k) in w.data" v-if=" !isTypedArray(w.data) && (!k.startsWith || !k.startsWith('_')) && w.data && (!w.data.length) || ((w.data.length||w.data.byteLength) && (w.data.length||w.data.byteLength) > 0 && k <= 20)" :key="k">
+      <md-list-item v-for="(v, k) in w.data" v-show=" !isTypedArray(w.data) && (!k.startsWith || !k.startsWith('_')) && w.data && (!w.data.length) || ((w.data.length||w.data.byteLength) && (w.data.length||w.data.byteLength) > 0 && k <= 20)" :key="k">
         <md-icon>insert_drive_file</md-icon>
         <span class="md-list-item-text" @click="printObject(k, v)">{{k}}</span>
       </md-list-item>
@@ -118,7 +118,7 @@
       </md-list-item>
     </md-list>
   </div>
-  <plugin-editor v-else-if="w.type=='imjoy/plugin-editor'" class="no-drag fill-container" :pluginId="w.data.id" :window="w" v-model="w.data.code" :editorId="'editor_'+w.data.id"></plugin-editor>
+  <plugin-editor v-else-if="w.type==='imjoy/plugin-editor'" class="no-drag fill-container" :pluginId="w.data.id" :window="w" v-model="w.data.code" :editorId="'editor_'+w.data.id"></plugin-editor>
   <div v-else class="plugin-iframe">
     <div :id="w.iframe_container" class="plugin-iframe">
     </div>
@@ -129,9 +129,6 @@
 </template>
 
 <script>
-import {
-  randId
-} from '../utils.js'
 import marked from 'marked';
 export default {
   name: 'window',
@@ -205,13 +202,13 @@ export default {
     },
     dataSummary(w){
 
-      if(typeof w.data == 'array'){
+      if(Array.isArray(w.data)){
         return `${w.type}, ${typeof w.data}, length: ${w.data.length}`
       }
       else if(w.data.buffer && Object.prototype.toString.call(w.data.buffer) === "[object ArrayBuffer]"){
         return `${w.type}, typedarray, length: ${w.data.length}`
       }
-      else if(typeof w.data == 'object'){
+      else if(typeof w.data === 'object'){
         return `${w.type}, ${typeof w.data}, length: ${Object.keys(w.data).length}`
       }
       else{

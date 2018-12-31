@@ -8,7 +8,7 @@
 
   <div class="md-toolbar-row md-layout md-alignment-center-center">
     <div class="banner-container">
-      <img src="static/img/perspective-hr.jpg" alt="banner"></img>
+      <img src="static/img/perspective-hr.jpg" alt="banner" />
       <div class="subtitle">Image processing with joy!<br>
         <md-button class="md-raised" @click="$router.push('/app')">Start ImJoy App</md-button>
         <md-button class="md-raised" href="/docs">Docs</md-button>

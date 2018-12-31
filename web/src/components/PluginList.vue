@@ -13,7 +13,7 @@
       <md-icon>update</md-icon><span class="md-small-hide">Update All</span>
     </md-button>
   </md-toolbar>
-  <md-list class="md-triple-line md-dense" v-if="display=='list'">
+  <md-list class="md-triple-line md-dense" v-if="display==='list'">
     <div v-for="(plugin, k) in searched_plugins" :key="k">
       <md-list-item>
         <md-avatar>
@@ -23,7 +23,7 @@
         </md-avatar>
 
         <div class="md-list-item-text">
-          <span>{{plugin.type == 'native-python'? plugin.name + ' 🚀': plugin.name}}</span>
+          <span>{{plugin.type === 'native-python'? plugin.name + ' 🚀': plugin.name}}</span>
           <p>{{plugin.description}}</p>
           <!-- <div>
               <md-chip v-for="tag in plugin.tags" :key="tag">{{tag}}</md-chip>
@@ -32,7 +32,7 @@
 
         </div>
         <p>
-        <md-button  class="md-icon-button md-list-action md-accent" v-if="removePlugin && plugin.installed" @click="_plugin2_remove=plugin;showRemoveConfirmation=true;">
+        <md-button  class="md-icon-button md-list-action md-accent" v-if="removePlugin && plugin.installed" @click="plugin2_remove_=plugin;showRemoveConfirmation=true;">
           <md-icon>delete_forever</md-icon>
           <md-tooltip>Delete {{plugin.name}}</md-tooltip>
         </md-button>
@@ -67,7 +67,7 @@
             <md-menu-item v-if="plugin.installed && installPlugin" @click="install(plugin)">
               <md-icon>update</md-icon>Update
             </md-menu-item>
-            <md-menu-item v-if="plugin.installed && removePlugin" @click="_plugin2_remove=plugin;showRemoveConfirmation=true;">
+            <md-menu-item v-if="plugin.installed && removePlugin" @click="plugin2_remove_=plugin;showRemoveConfirmation=true;">
               <md-icon>delete_forever</md-icon>Delete
             </md-menu-item>
             <md-menu-item @click="showCode(plugin)">
@@ -81,11 +81,11 @@
 
   </md-list>
 
-  <div v-if="display=='card'">
-    <md-card v-if="containerWidth<=500" v-for="(plugin, k) in searched_plugins" :key="k">
+  <div v-if="display==='card'">
+    <md-card v-for="(plugin, k) in searched_plugins" :key="k">
       <md-card-header>
         {{plugin.createdAt}}
-        <h2>{{plugin.type == 'native-python'? plugin.name + ' 🚀': plugin.name}}</h2>
+        <h2>{{plugin.type === 'native-python'? plugin.name + ' 🚀': plugin.name}}</h2>
         <p>{{plugin.description}}</p>
         <md-chip v-for="tag in plugin.tags" :key="tag">{{tag}}</md-chip>
       </md-card-header>
@@ -104,7 +104,7 @@
             <md-icon>cloud_download</md-icon>Install</md-button>
         <md-button v-if="installPlugin && plugin.installed && plugin.uri" @click="install(plugin, plugin.tag)" class="md-button md-primary">
           <md-icon>update</md-icon>Update</md-button>
-        <md-button v-if="removePlugin && plugin.installed" @click="_plugin2_remove=plugin;showRemoveConfirmation=true;" class="md-accent">
+        <md-button v-if="removePlugin && plugin.installed" @click="plugin2_remove_=plugin;showRemoveConfirmation=true;" class="md-accent">
           <md-icon>delete_forever</md-icon>Delete</md-button>
         <md-button  @click="showDocs(plugin)" class="md-button md-primary">
           <md-icon>note</md-icon>Docs
@@ -114,12 +114,12 @@
         </md-button>
       </md-card-content>
     </md-card>
-    <grid v-if="containerWidth>500" :center="center" :draggable="false" :sortable="true" :items="searched_plugins" :cell-width="380" :cell-height="280" :grid-width="containerWidth" class="grid-container">
+    <grid :center="center" :draggable="false" :sortable="true" :items="searched_plugins" :cell-width="380" :cell-height="280" :grid-width="containerWidth" class="grid-container">
       <template slot="cell" slot-scope="props">
      <md-card>
        <md-card-header>
          <h2><md-icon v-if="props.item.icon">{{props.item.icon}}</md-icon><md-icon v-else>extension</md-icon>
-           {{props.item.type == 'native-python'? props.item.name + ' 🚀': props.item.name}}
+           {{props.item.type === 'native-python'? props.item.name + ' 🚀': props.item.name}}
 
          </h2>
          <p>{{props.item.description}}</p>
@@ -138,7 +138,7 @@
          </md-menu>
          <md-button v-else-if="!props.item.installed && installPlugin && props.item.uri" @click="install(props.item)" class="md-button md-primary"><md-icon>cloud_download</md-icon>Install</md-button>
          <md-button v-if="props.item.installed && installPlugin && props.item.uri" @click="install(props.item, props.item.tag)" class="md-button md-primary"><md-icon>update</md-icon>Update</md-button>
-         <md-button v-if="props.item.installed && removePlugin" @click="_plugin2_remove=props.item;showRemoveConfirmation=true;" class="md-accent"><md-icon>delete_forever</md-icon>Delete</md-button>
+         <md-button v-if="props.item.installed && removePlugin" @click="plugin2_remove_=props.item;showRemoveConfirmation=true;" class="md-accent"><md-icon>delete_forever</md-icon>Delete</md-button>
          <md-button  @click="showDocs(props.item)" class="md-button md-primary">
            <md-icon>note</md-icon>Docs
          </md-button>
@@ -149,7 +149,7 @@
     </grid>
   </div>
   <br>
-  <md-dialog-confirm :md-active.sync="showRemoveConfirmation" md-title="Removing Plugin" md-content="Do you really want to <strong>delete</strong> this plugin" md-confirm-text="Yes" md-cancel-text="Cancel" @md-cancel="showRemoveConfirmation=false" @md-confirm="remove(_plugin2_remove);showRemoveConfirmation=false"
+  <md-dialog-confirm :md-active.sync="showRemoveConfirmation" md-title="Removing Plugin" md-content="Do you really want to <strong>delete</strong> this plugin" md-confirm-text="Yes" md-cancel-text="Cancel" @md-cancel="showRemoveConfirmation=false" @md-confirm="remove(plugin2_remove_);showRemoveConfirmation=false"
   />
 
   <md-dialog class="editor-dialog" :md-active.sync="showEditor">
@@ -178,12 +178,12 @@
 
 <script>
 import { saveAs } from 'file-saver';
+import PouchDB from 'pouchdb-browser';
 import axios from 'axios';
 import marked from 'marked';
+import _ from 'lodash';
 import {
-  _clone,
-  randId,
-  url_regex
+  randId
 } from '../utils.js'
 
 import {
@@ -260,20 +260,20 @@ export default {
       available_plugins: [],
       searched_plugins: [],
       showRemoveConfirmation: false,
-      _plugin2_remove: null,
+      plugin2_remove_: null,
       showDocsDialog: false,
       docs: null,
       db: null,
     }
   },
   created(){
-    this.store = this.$root.$data.store
+    this.event_bus = this.$root.$data.store && this.$root.$data.store.event_bus
     this.marked = marked
   },
   mounted() {
     this.search = this.initSearch || '';
     this.containerWidth = this.$refs.container.offsetWidth;
-    this.store.event_bus.$on('resize', this.updateSize)
+    this.event_bus.$on('resize', this.updateSize)
     this.db = this.database || new PouchDB(this.workspace + '_workspace', {
       revs_limit: 2,
       auto_compaction: true
@@ -321,7 +321,7 @@ export default {
     }
   },
   beforeDestroy() {
-    this.store.event_bus.$off('resize', this.updateSize)
+    this.event_bus.$off('resize', this.updateSize)
   },
   watch: {
     plugins: {
@@ -368,7 +368,7 @@ export default {
       else{
         const uri = plugin.uri
         axios.get(uri).then(response => {
-          if (!response || !response.data || response.data == '') {
+          if (!response || !response.data) {
             alert('failed to get plugin code from ' + uri)
             return
           }
@@ -394,7 +394,7 @@ export default {
       else{
         const uri = plugin.uri
         axios.get(uri).then(response => {
-          if (!response || !response.data || response.data == '') {
+          if (!response || !response.data) {
             alert('failed to get plugin code from ' + uri)
             return
           }

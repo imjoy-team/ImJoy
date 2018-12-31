@@ -37,7 +37,7 @@ export default {
     setTimeout(this.setupJoy, 500)
   },
   watch: {
-    config: (newVal, oldVal) => { // watch it
+    config: () => {
       this.setupJoy&&this.setupJoy()
     }
   },

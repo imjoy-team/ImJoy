@@ -1,6 +1,5 @@
 var fs = require('fs');
 var path = require('path');
-var process = require("process");
 var pluginParser = require('./pluginParser');
 
 var repository_dir = "./";
@@ -45,7 +44,7 @@ var walkSync = function(dir, filelist) {
 function get_plugins(files){
   var plugin_configs = [];
   // Loop through all the files in the temp directory
-  files.forEach(function(file, index) {
+  files.forEach(function(file) {
     var plugin_path = path.join(repository_dir, file);
     if (plugin_path.endsWith(".imjoy.html")){
         // console.log("reading '%s'...", plugin_path);
@@ -72,13 +71,13 @@ function get_collections(collections_dir){
         reject(err)
         return
       }
-      files.forEach(function(file, index) {
+      files.forEach(function(file) {
         var collection_path = path.join(collections_dir, file);
         if (collection_path.endsWith(".json")){
             // console.log("reading '%s'...", plugin_path);
             var coll = fs.readFileSync(collection_path, "utf8");
             coll = JSON.parse(coll);
-            coll.plugins.forEach(function(p, i) {
+            coll.plugins.forEach(function(p) {
               var dep = p.split(":");
               var ps = plugin_configs.filter(function(plugin) { return plugin.name == dep[0] })
               if(ps.length != 1){
@@ -112,7 +111,7 @@ function write_manifest(plugin_configs, collection_configs){
     repo_manifest.plugins = plugin_configs || []
     repo_manifest.collections = collection_configs || []
     var stream = fs.createWriteStream(manifest_path);
-    stream.once('open', function(fd) {
+    stream.once('open', function() {
       stream.write(JSON.stringify(repo_manifest,null,' '));
       stream.end();
     });

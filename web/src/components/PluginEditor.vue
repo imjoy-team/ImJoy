@@ -43,10 +43,8 @@ import {
   randId
 } from '../utils.js'
 
-import MonacoEditor from 'vue-monaco'
-
 window.MonacoEnvironment = {
-  getWorkerUrl: function(workerId, label) {
+  getWorkerUrl: function() {
     var fullPath = location.protocol+'//'+location.hostname+(location.port ? ':'+location.port: '');
     return `data:text/javascript;charset=utf-8,${encodeURIComponent(`
       self.MonacoEnvironment = {
