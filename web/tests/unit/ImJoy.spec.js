@@ -1,8 +1,6 @@
 import { expect } from 'chai'
 import { shallowMount, createLocalVue } from '@vue/test-utils'
 import VueRouter from 'vue-router'
-// import { PouchDB } from '../../public/static/js/pouchdb-7.0.0.min.js'
-// import store from '../../src/store.js'
 import { router_config } from '../../src/router'
 const localVue = createLocalVue()
 localVue.use(VueRouter)
@@ -13,11 +11,8 @@ describe('ImJoy.vue', () => {
   it('include ImJoy.io', () => {
     const wrapper = shallowMount(Imjoy, {
       localVue,
-      router
-      // propsData: {default_store: store},
-      // mocks: {
-      //  $route: router_config
-      // }
+      router,
+      propsData: {}
     })
     expect(wrapper.text()).to.include('Image Processing with Joy!')
   })
