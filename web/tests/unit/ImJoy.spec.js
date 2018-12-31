@@ -19,6 +19,6 @@ describe('ImJoy.vue', () => {
       //  $route: router_config
       // }
     })
-    expect(wrapper.text()).to.include('ImJoy.io')
+    expect(wrapper.text()).to.include('Image Processing with Joy!')
   })
 })
