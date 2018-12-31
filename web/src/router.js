@@ -6,7 +6,7 @@ import About from '@/components/About'
 
 Vue.use(Router)
 
-export default new Router({
+export const router_config = {
   // mode: 'history',
   base: window.location.pathName,
   routes: [{
@@ -47,4 +47,6 @@ export default new Router({
       redirect: '/'
     }
   ]
-})
+}
+
+export default new Router(router_config)
