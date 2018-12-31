@@ -8,7 +8,7 @@ const router = new VueRouter(router_config)
 
 import Imjoy from '@/components/Imjoy.vue'
 describe('ImJoy.vue', () => {
-  it('include ImJoy.io', () => {
+  it('should include "Image Processing with Joy!"', () => {
     const wrapper = shallowMount(Imjoy, {
       localVue,
       router,
