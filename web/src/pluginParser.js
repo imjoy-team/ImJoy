@@ -1,3 +1,4 @@
+/* eslint-disable */
 // Taken from https://github.com/vuejs/vue/blob/dev/packages/vue-template-compiler/browser.js
 var splitRE = /\r?\n/g;
 var emptyRE = /^\s*$/;

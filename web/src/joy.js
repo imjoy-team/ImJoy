@@ -1,3 +1,4 @@
+/* eslint-disable */
 /*****************
 
 JOY.js: make happy little programs

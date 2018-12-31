@@ -19,7 +19,7 @@ export default {
     }
 
     this.$nextTick(()=>{
-      const updateSize = (e)=>{
+      const updateSize = ()=>{
         this.$root.$data.store.event_bus.$emit('resize', {height:window.innerHeight, width:window.innerWidth})
       }
       updateSize()

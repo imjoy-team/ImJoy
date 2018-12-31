@@ -37,7 +37,7 @@
               <span>Console.log</span>
               <md-icon>bug_report</md-icon>
             </md-menu-item>
-            <md-menu-item v-for="(loader, name) in w.loaders" v-if="w.loaders" :key="name" @click="loaders && loaders[loader](w.data)">
+            <md-menu-item v-for="(loader, name) in w.loaders" :key="name" @click="loaders && loaders[loader](w.data)">
               <span>{{name}}</span>
               <md-icon>play_arrow</md-icon>
             </md-menu-item>
@@ -76,19 +76,19 @@
   </div>
   <div v-else-if="w.type==='imjoy/url_list'">
     <ul v-if="w.data.length && w.data.length>0">
-      <li v-for="u in w.data">
+      <li v-for="u in w.data" :key="u.href || u">
         <a :href="u.href || u" target="_blank">{{u.text || u}}</a>
       </li>
     </ul>
     <p v-else> No url.</p>
   </div>
   <div v-else-if="w.type==='imjoy/image'" class="fill-container">
-    <img style="height: 100%; width: 100%; object-fit: contain;" :src="w.data.src" v-if="w.data.src"></img>
+    <img style="height: 100%; width: 100%; object-fit: contain;" :src="w.data.src" v-if="w.data.src" />
     <p v-else> No image available for display.</p>
   </div>
   <div v-else-if="w.type==='imjoy/images'" class="allow-scroll fill-container">
-    <img style="height: 100%; width: 100%; object-fit: contain;" :src="img" v-for="img in w.data.images" v-if="w.data.images"></img>
-    <p v-else> No image available for display.</p>
+    <img style="height: 100%; width: 100%; object-fit: contain;" :src="img" v-for="(img, i) in w.data.images" :key="i" />
+    <p v-if="!w.data.images||w.data.images.length == 0"> No image available for display.</p>
   </div>
   <div v-else-if="w.type==='imjoy/panel'">
     <joy :config="w.config"></joy>
@@ -107,7 +107,7 @@
       <md-list-item v-else>
         <span class="md-list-item-text">{{dataSummary(w)}}</span>
       </md-list-item>
-      <md-list-item v-for="(v, k) in w.data" v-if=" !isTypedArray(w.data) && (!k.startsWith || !k.startsWith('_')) && w.data && (!w.data.length) || ((w.data.length||w.data.byteLength) && (w.data.length||w.data.byteLength) > 0 && k <= 20)" :key="k">
+      <md-list-item v-for="(v, k) in w.data" v-show=" !isTypedArray(w.data) && (!k.startsWith || !k.startsWith('_')) && w.data && (!w.data.length) || ((w.data.length||w.data.byteLength) && (w.data.length||w.data.byteLength) > 0 && k <= 20)" :key="k">
         <md-icon>insert_drive_file</md-icon>
         <span class="md-list-item-text" @click="printObject(k, v)">{{k}}</span>
       </md-list-item>
@@ -129,9 +129,6 @@
 </template>
 
 <script>
-import {
-  randId
-} from '../utils.js'
 import marked from 'marked';
 export default {
   name: 'window',
@@ -205,7 +202,7 @@ export default {
     },
     dataSummary(w){
 
-      if(typeof w.data === 'array'){
+      if(Array.isArray(w.data)){
         return `${w.type}, ${typeof w.data}, length: ${w.data.length}`
       }
       else if(w.data.buffer && Object.prototype.toString.call(w.data.buffer) === "[object ArrayBuffer]"){

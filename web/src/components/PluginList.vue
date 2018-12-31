@@ -32,7 +32,7 @@
 
         </div>
         <p>
-        <md-button  class="md-icon-button md-list-action md-accent" v-if="removePlugin && plugin.installed" @click="_plugin2_remove=plugin;showRemoveConfirmation=true;">
+        <md-button  class="md-icon-button md-list-action md-accent" v-if="removePlugin && plugin.installed" @click="plugin2_remove_=plugin;showRemoveConfirmation=true;">
           <md-icon>delete_forever</md-icon>
           <md-tooltip>Delete {{plugin.name}}</md-tooltip>
         </md-button>
@@ -67,7 +67,7 @@
             <md-menu-item v-if="plugin.installed && installPlugin" @click="install(plugin)">
               <md-icon>update</md-icon>Update
             </md-menu-item>
-            <md-menu-item v-if="plugin.installed && removePlugin" @click="_plugin2_remove=plugin;showRemoveConfirmation=true;">
+            <md-menu-item v-if="plugin.installed && removePlugin" @click="plugin2_remove_=plugin;showRemoveConfirmation=true;">
               <md-icon>delete_forever</md-icon>Delete
             </md-menu-item>
             <md-menu-item @click="showCode(plugin)">
@@ -82,7 +82,7 @@
   </md-list>
 
   <div v-if="display==='card'">
-    <md-card v-if="containerWidth<=500" v-for="(plugin, k) in searched_plugins" :key="k">
+    <md-card v-for="(plugin, k) in searched_plugins" :key="k">
       <md-card-header>
         {{plugin.createdAt}}
         <h2>{{plugin.type === 'native-python'? plugin.name + ' 🚀': plugin.name}}</h2>
@@ -104,7 +104,7 @@
             <md-icon>cloud_download</md-icon>Install</md-button>
         <md-button v-if="installPlugin && plugin.installed && plugin.uri" @click="install(plugin, plugin.tag)" class="md-button md-primary">
           <md-icon>update</md-icon>Update</md-button>
-        <md-button v-if="removePlugin && plugin.installed" @click="_plugin2_remove=plugin;showRemoveConfirmation=true;" class="md-accent">
+        <md-button v-if="removePlugin && plugin.installed" @click="plugin2_remove_=plugin;showRemoveConfirmation=true;" class="md-accent">
           <md-icon>delete_forever</md-icon>Delete</md-button>
         <md-button  @click="showDocs(plugin)" class="md-button md-primary">
           <md-icon>note</md-icon>Docs
@@ -114,7 +114,7 @@
         </md-button>
       </md-card-content>
     </md-card>
-    <grid v-if="containerWidth>500" :center="center" :draggable="false" :sortable="true" :items="searched_plugins" :cell-width="380" :cell-height="280" :grid-width="containerWidth" class="grid-container">
+    <grid :center="center" :draggable="false" :sortable="true" :items="searched_plugins" :cell-width="380" :cell-height="280" :grid-width="containerWidth" class="grid-container">
       <template slot="cell" slot-scope="props">
      <md-card>
        <md-card-header>
@@ -138,7 +138,7 @@
          </md-menu>
          <md-button v-else-if="!props.item.installed && installPlugin && props.item.uri" @click="install(props.item)" class="md-button md-primary"><md-icon>cloud_download</md-icon>Install</md-button>
          <md-button v-if="props.item.installed && installPlugin && props.item.uri" @click="install(props.item, props.item.tag)" class="md-button md-primary"><md-icon>update</md-icon>Update</md-button>
-         <md-button v-if="props.item.installed && removePlugin" @click="_plugin2_remove=props.item;showRemoveConfirmation=true;" class="md-accent"><md-icon>delete_forever</md-icon>Delete</md-button>
+         <md-button v-if="props.item.installed && removePlugin" @click="plugin2_remove_=props.item;showRemoveConfirmation=true;" class="md-accent"><md-icon>delete_forever</md-icon>Delete</md-button>
          <md-button  @click="showDocs(props.item)" class="md-button md-primary">
            <md-icon>note</md-icon>Docs
          </md-button>
@@ -149,7 +149,7 @@
     </grid>
   </div>
   <br>
-  <md-dialog-confirm :md-active.sync="showRemoveConfirmation" md-title="Removing Plugin" md-content="Do you really want to <strong>delete</strong> this plugin" md-confirm-text="Yes" md-cancel-text="Cancel" @md-cancel="showRemoveConfirmation=false" @md-confirm="remove(_plugin2_remove);showRemoveConfirmation=false"
+  <md-dialog-confirm :md-active.sync="showRemoveConfirmation" md-title="Removing Plugin" md-content="Do you really want to <strong>delete</strong> this plugin" md-confirm-text="Yes" md-cancel-text="Cancel" @md-cancel="showRemoveConfirmation=false" @md-confirm="remove(plugin2_remove_);showRemoveConfirmation=false"
   />
 
   <md-dialog class="editor-dialog" :md-active.sync="showEditor">
@@ -178,12 +178,12 @@
 
 <script>
 import { saveAs } from 'file-saver';
+import PouchDB from 'pouchdb-browser';
 import axios from 'axios';
 import marked from 'marked';
+import _ from 'lodash';
 import {
-  _clone,
-  randId,
-  url_regex
+  randId
 } from '../utils.js'
 
 import {
@@ -260,7 +260,7 @@ export default {
       available_plugins: [],
       searched_plugins: [],
       showRemoveConfirmation: false,
-      _plugin2_remove: null,
+      plugin2_remove_: null,
       showDocsDialog: false,
       docs: null,
       db: null,

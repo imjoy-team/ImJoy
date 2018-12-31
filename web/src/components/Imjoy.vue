@@ -25,7 +25,7 @@
             </md-menu-item>
           </md-menu-content>
         </md-menu>
-        <md-button v-if="status_text&&status_text.length"class="status-text md-small-hide" @click="showAlert(status_text)" :class="status_text.includes('rror')?'error-message':''">
+        <md-button v-if="status_text&&status_text.length" class="status-text md-small-hide" @click="showAlert(status_text)" :class="status_text.includes('rror')?'error-message':''">
           {{status_text.slice(0,80)+(status_text.length>80?'...':'')}}
         </md-button>
         <span class="subheader-title md-medium-hide" style="flex: 1" v-else>Image Processing with Joy!</span>
@@ -102,10 +102,10 @@
         </md-menu>
       </div>
       <form v-show="false" ref="folder_form">
-        <input class="md-file" type="file" @change="selectFileChanged" ref="folder_select" webkitdirectory mozdirectory msdirectory odirectory directory multiple></input>
+        <input class="md-file" type="file" @change="selectFileChanged" ref="folder_select" webkitdirectory mozdirectory msdirectory odirectory directory multiple />
       </form>
       <form v-show="false" ref="file_form">
-        <input class="md-file" type="file" @change="selectFileChanged" ref="file_select" multiple></input>
+        <input class="md-file" type="file" @change="selectFileChanged" ref="file_select" multiple />
       </form>
     </md-app-toolbar>
     <md-app-drawer :md-active.sync="menuVisible" md-persistent="full">
@@ -253,7 +253,7 @@
                   <md-menu-item v-if="plugin.config.origin" @click="updatePlugin(plugin.id)">
                     <md-icon>cloud_download</md-icon>Update
                   </md-menu-item>
-                  <md-menu-item class="md-accent" @click="_plugin2_remove=plugin;showRemoveConfirmation=true">
+                  <md-menu-item class="md-accent" @click="plugin2_remove=plugin;showRemoveConfirmation=true">
                     <md-icon>delete_forever</md-icon>Remove
                   </md-menu-item>
                 </md-menu-content>
@@ -268,7 +268,7 @@
               </md-button>
               <md-progress-bar md-mode="determinate" v-if="plugin.running&&plugin.progress" :md-value="plugin.progress"></md-progress-bar>
               <p v-if="plugin.running&&plugin.status_text">{{plugin.status_text}}</p>
-              <div v-for="(op, n) in plugin.ops" :key="op.plugin_id + op.name">
+              <div v-for="(op) in plugin.ops" :key="op.plugin_id + op.name">
                 <md-button class="md-icon-button" v-show="plugin.panel_expanded && op.name != plugin.name" :disabled="true">
                   <md-icon>chevron_right</md-icon>
                 </md-button>
@@ -318,7 +318,7 @@
                     <md-menu-item v-if="plugin.config.origin" @click="updatePlugin(plugin.id)">
                       <md-icon>cloud_download</md-icon>Update
                     </md-menu-item>
-                    <md-menu-item class="md-accent" @click="_plugin2_remove=plugin;showRemoveConfirmation=true">
+                    <md-menu-item class="md-accent" @click="plugin2_remove=plugin;showRemoveConfirmation=true">
                       <md-icon>delete_forever</md-icon>Remove
                     </md-menu-item>
                   </md-menu-content>
@@ -346,7 +346,7 @@
     </md-app-content>
   </md-app>
 
-  <md-dialog-confirm :md-active.sync="showRemoveConfirmation" md-title="Removing Plugin" md-content="Do you really want to <strong>delete</strong> this plugin" md-confirm-text="Yes" md-cancel-text="Cancel" @md-cancel="showRemoveConfirmation=false" @md-confirm="removePlugin(_plugin2_remove);_plugin2_remove=null;showRemoveConfirmation=false"/>
+  <md-dialog-confirm :md-active.sync="showRemoveConfirmation" md-title="Removing Plugin" md-content="Do you really want to <strong>delete</strong> this plugin" md-confirm-text="Yes" md-cancel-text="Cancel" @md-cancel="showRemoveConfirmation=false" @md-confirm="removePlugin(plugin2_remove);plugin2_remove=null;showRemoveConfirmation=false"/>
   <!-- </md-card-content> -->
   <file-dialog ref="file-dialog" :list-files="listEngineDir" :get-file-url="getFileUrl"></file-dialog>
   <md-dialog :md-active.sync="showPluginDialog" :md-click-outside-to-close="false" :md-close-on-esc="false">
@@ -513,7 +513,7 @@
                   </md-menu-item>
                 </md-menu-content>
               </md-menu>
-              <md-button v-else  class="md-button md-primary"@click="installPlugin(plugin4install); showAddPluginDialog = false; clearPluginUrl()">
+              <md-button v-else  class="md-button md-primary" @click="installPlugin(plugin4install); showAddPluginDialog = false; clearPluginUrl()">
                 <md-icon>cloud_download</md-icon>Install
               </md-button>
             </div>
@@ -557,17 +557,17 @@
 </template>
 
 <script>
+/*global jailed*/
 import axios from 'axios';
+import PouchDB from 'pouchdb-browser';
 import { saveAs } from 'file-saver';
 import {
   REGISTER_SCHEMA,
   WINDOW_SCHEMA,
-  OP_SCHEMA,
   PLUGIN_SCHEMA,
   NATIVE_PYTHON_PLUGIN_TEMPLATE,
   WEB_WORKER_PLUGIN_TEMPLATE,
   WEB_PYTHON_PLUGIN_TEMPLATE,
-  IFRAME_PLUGIN_TEMPLATE,
   WINDOW_PLUGIN_TEMPLATE,
   CONFIGURABLE_FIELDS,
   SUPPORTED_PLUGIN_TYPES
@@ -625,8 +625,8 @@ export default {
       resolve_permission: null,
       reject_permission: null,
       plugin_dialog_config: null,
-      _plugin_dialog_promise: {},
-      _plugin2_remove: null,
+      plugin_dialog_promise: {},
+      plugin2_remove: null,
       is_https_mode: true,
       plugin_url: null,
       downloading_plugin: false,
@@ -715,8 +715,6 @@ export default {
       name: "Workflow",
       ui: "{id:'workflow', type:'ops'}"
     }
-
-    window.onbeforeunload = s => modified ? "" : null;
     window.addEventListener("dragover", (e) => {
       e.preventDefault();
       document.querySelector("#dropzone").style.visibility = "";
@@ -764,6 +762,10 @@ export default {
            }
         };
         var length = e.dataTransfer.items.length;
+        if(length === 0){
+          reject()
+          return
+        }
         for (var i = 0; i < length; i++) {
           if(e.dataTransfer.items[i].webkitGetAsEntry){
             folder_supported = true
@@ -1062,7 +1064,7 @@ export default {
         }
         else{
           repository_url = url
-          repo_origin = repo_origin
+          repo_origin = repository_url
         }
         axios.get(repository_url).then(response => {
           if (response && response.data && response.data.plugins) {
@@ -1396,8 +1398,8 @@ export default {
         this.getPluginFromUrl(uri, scoped_plugins).then((config)=>{
           config.origin = pconfig.origin || uri
           if (!config) {
-            console.error('Failed to parse the plugin code.', code)
-            reject('Failed to parse the plugin code.')
+            console.error(`Failed to fetch the plugin from "${uri}".`)
+            reject(`Failed to fetch the plugin from "${uri}".`)
             return
           }
           if (!SUPPORTED_PLUGIN_TYPES.includes(config.type)){
@@ -1453,7 +1455,7 @@ export default {
         // remove if exists
         this.db.get(plugin._id).then((doc) => {
           return this.db.remove(doc);
-        }).then((result) => {
+        }).then(() => {
 
           for (let i = 0; i < this.installed_plugins.length; i++) {
             if(this.installed_plugins[i].name === plugin.name){
@@ -1776,7 +1778,7 @@ export default {
         }
       })
     },
-    getFilePath(url, _plugin){
+    getFilePath(url){
       return new Promise((resolve, reject) => {
         if(!this.engine_connected){
           reject("Please connect to the Plugin Engine 🚀.")
@@ -1991,7 +1993,7 @@ export default {
           const addPlugin = () => {
             this.db.put(template, {
               force: true
-            }).then((result) => {
+            }).then(() => {
               for (let i = 0; i < this.installed_plugins.length; i++) {
                 if(this.installed_plugins[i].name === template.name){
                   this.installed_plugins.splice(i, 1)
@@ -2011,9 +2013,9 @@ export default {
           // remove if exists
           this.db.get(template._id).then((doc) => {
             return this.db.remove(doc);
-          }).then((result) => {
+          }).then(() => {
             addPlugin()
-          }).catch((err) => {
+          }).catch(() => {
             addPlugin()
           });
         } catch (e) {
@@ -2086,30 +2088,50 @@ export default {
     },
     reloadDB(){
       return new Promise((resolve, reject) => {
-        if(this.db){
-          try {
-              this.db.close().finally(()=>{
-                this.db = new PouchDB(this.selected_workspace + '_workspace', {
-                  revs_limit: 2,
-                  auto_compaction: true
+        try {
+          if(this.db){
+            try {
+                this.db.close().finally(()=>{
+                  this.db = new PouchDB(this.selected_workspace + '_workspace', {
+                    revs_limit: 2,
+                    auto_compaction: true
+                  })
+                  if(this.db){
+                    resolve()
+                  }
+                  else{
+                    reject('Failed to reload database.')
+                  }
                 })
-                resolve()
+            } catch (e) {
+              console.error('failed to reload database: ', e)
+              this.db = new PouchDB(this.selected_workspace + '_workspace', {
+                revs_limit: 2,
+                auto_compaction: true
               })
-          } catch (e) {
-            console.error('failed to reload database: ', e)
+              if(this.db){
+                resolve()
+              }
+              else{
+                reject('Failed to reload database.')
+              }
+            }
+          }
+          else{
             this.db = new PouchDB(this.selected_workspace + '_workspace', {
               revs_limit: 2,
               auto_compaction: true
             })
-            resolve()
+            if(this.db){
+              resolve()
+            }
+            else{
+              reject('Failed to reload database.')
+            }
           }
-        }
-        else{
-          this.db = new PouchDB(this.selected_workspace + '_workspace', {
-            revs_limit: 2,
-            auto_compaction: true
-          })
-          resolve()
+        } catch (e) {
+          console.error('Failed to reload database.')
+          reject('Failed to reload database.')
         }
       })
     },
@@ -2138,7 +2160,6 @@ export default {
             attachments: true,
             sort: 'name'
           }).then((result) => {
-            const promises = []
             this.workflow_list = []
             this.installed_plugins = []
             for (let i = 0; i < result.total_rows; i++) {
@@ -2249,13 +2270,13 @@ export default {
     },
     closePluginDialog(ok) {
       this.showPluginDialog = false
-      let [resolve, reject] = this._plugin_dialog_promise
+      let [resolve, reject] = this.plugin_dialog_promise
       if (ok) {
         resolve(this.$refs.plugin_dialog_joy.joy.get_config())
       } else {
         reject()
       }
-      this._plugin_dialog_promise = null
+      this.plugin_dialog_promise = null
     },
     // workflowOnchange() {
     //   // console.log('workflow changed ...')
@@ -2343,8 +2364,8 @@ export default {
       }
       for (let f = 0; f < this.selected_files.length; f++) {
         const file = this.selected_files[f]
-        const tmp = file.name.split('.')
-        const ext = tmp[tmp.length - 1]
+        // const tmp = file.name.split('.')
+        // const ext = tmp[tmp.length - 1]
         file.loaders = file.loaders || this.getDataLoaders(file)
         // console.log('loaders', file.loaders)
       }
@@ -2407,7 +2428,7 @@ export default {
       // console.log('saving workflow: ', data)
       this.db.put(data, {
         force: true
-      }).then((result) => {
+      }).then(() => {
         // console.log('Successfully saved!');
         this.workflow_list.push(data)
         this.showMessage(name + ' has been successfully saved.')
@@ -2429,7 +2450,7 @@ export default {
       // console.log('removing: ', w)
       this.db.get(w._id).then((doc) => {
         return this.db.remove(doc);
-      }).then((result) => {
+      }).then(() => {
         var index = this.workflow_list.indexOf(w);
         if (index > -1) {
           this.workflow_list.splice(index, 1);
@@ -2479,9 +2500,6 @@ export default {
       }
       this.loadFiles()
     },
-    closePanel(panel) {
-
-    },
     parsePluginCode(code, config) {
       config = config || {}
       const uri = config.uri
@@ -2498,7 +2516,6 @@ export default {
           // console.log('parsing the plugin file')
           const pluginComp = parseComponent(code)
           // console.log('code parsed from', pluginComp)
-          let c = null
           config = JSON.parse(pluginComp.config[0].content)
           config.scripts = []
           for (let i = 0; i < pluginComp.script.length; i++) {
@@ -2579,7 +2596,6 @@ export default {
       const config = {
         name: template.name,
         type: template.type,
-        type: template.type,
         ui: template.ui,
         tag: template.tag,
         inputs: template.inputs,
@@ -2604,7 +2620,6 @@ export default {
           name: config.name,
           type: config.type,
           config: tconfig,
-          type: template.type,
           docs: template.docs,
           tag: template.tag,
           attachments: template.attachments,
@@ -2626,11 +2641,15 @@ export default {
             await this.createWindow(c)
           }
         }
-        this.register(config, {
-          id: config.id
-        })
-        // console.log('successfully preloaded plugin: ', plugin)
-        resolve(plugin)
+        try {
+          this.register(config, {
+            id: config.id
+          })
+          // console.log('successfully preloaded plugin: ', plugin)
+          resolve(plugin)
+        } catch (e) {
+          reject(e)
+        }
       })
     },
     loadPlugin(template, rplugin) {
@@ -2673,20 +2692,15 @@ export default {
           if (template.extensions && template.extensions.length > 0) {
             this.registerExtension(template.extensions, plugin)
           }
-          // if(!config.initialized){
-            plugin.api.setup().then((result) => {
-              // console.log('successfully setup plugin: ', plugin)
-              resolve(plugin)
-            }).catch((e) => {
-              console.error('error occured when loading plugin ' + template.name + ": ", e)
-              this.showMessage(`<${template.name}>: ${e}`, 15000)
-              reject(e)
-              plugin.terminate()
-            })
-          // }
-          // else{
-          //   resolve(plugin)
-          // }
+          plugin.api.setup().then(() => {
+            resolve(plugin)
+          }).catch((e) => {
+            console.error('error occured when loading plugin ' + template.name + ": ", e)
+            this.showMessage(`<${template.name}>: ${e}`, 15000)
+            reject(e)
+            plugin.terminate()
+          })
+
         });
         plugin.whenFailed((e) => {
           if(e){
@@ -3061,11 +3075,11 @@ export default {
         plugin.whenConnected(() => {
           if (!plugin.api) {
             console.error('the window plugin seems not ready.')
-            reject(e)
+            reject('the window plugin seems not ready.')
             return
           }
           // this.plugins[plugin.id] = plugin
-          plugin.api.setup().then((result) => {
+          plugin.api.setup().then(() => {
             // console.log('successfully setup the window plugin: ', plugin, pconfig)
             //asuming the data._op is passed from last op
             pconfig.data = pconfig.data || {}
@@ -3119,17 +3133,17 @@ export default {
       })
     },
     //TODO: remove updateWindow from api
-    async updateWindow(wconfig, _plugin){
-      api.showMessage('Warning: `api.updateWindow` is deprecated, please use the new api.`')
+    async updateWindow(wconfig){
+      this.showMessage('Warning: `api.updateWindow` is deprecated, please use the new api.`')
       const w = wconfig.id
       if(w && w.run){
         return await w.run(wconfig)
       }
       else{
-        throw `Window (id=${wid}) not found`
+        throw `Window (id=${w.id}) not found`
       }
     },
-    createWindow(wconfig, _plugin) {
+    createWindow(wconfig) {
       return new Promise((resolve, reject) => {
         wconfig.config = wconfig.config || {}
         wconfig.data = wconfig.data || null
@@ -3184,22 +3198,20 @@ export default {
           this.$nextTick(() => {
             this.renderWindow(pconfig).then((plugin_api)=>{
               resolve(plugin_api)
-            })
-      		});
-
+            }).catch(reject)
+          });
         }
       })
     },
-    showDialog(config, _plugin) {
+    showDialog(config) {
       return new Promise((resolve, reject) => {
         this.plugin_dialog_config = config
         this.showPluginDialog = true
-        this._plugin_dialog_promise = [resolve, reject]
+        this.plugin_dialog_promise = [resolve, reject]
       })
     },
     showPluginWindow(config) {
       config.name = config.name || 'untitiled plugin window'
-      config.type = config.type
       config.data = config.data || null
       config.config = config.config || {}
       config.panel = config.panel || null
