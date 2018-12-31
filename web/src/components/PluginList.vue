@@ -267,13 +267,13 @@ export default {
     }
   },
   created(){
-    this.store = this.$root.$data.store
+    this.event_bus = this.$root.$data.store && this.$root.$data.store.event_bus
     this.marked = marked
   },
   mounted() {
     this.search = this.initSearch || '';
     this.containerWidth = this.$refs.container.offsetWidth;
-    this.store.event_bus.$on('resize', this.updateSize)
+    this.event_bus.$on('resize', this.updateSize)
     this.db = this.database || new PouchDB(this.workspace + '_workspace', {
       revs_limit: 2,
       auto_compaction: true
@@ -321,7 +321,7 @@ export default {
     }
   },
   beforeDestroy() {
-    this.store.event_bus.$off('resize', this.updateSize)
+    this.event_bus.$off('resize', this.updateSize)
   },
   watch: {
     plugins: {

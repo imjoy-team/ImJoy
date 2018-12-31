@@ -684,8 +684,8 @@ export default {
     }
   },
   created() {
-    this.store = this.$root.$data.store
-    this.store.event_bus.$on('resize', this.updateSize)
+    this.event_bus = this.$root.$data.store && this.$root.$data.store.event_bus
+    this.event_bus.$on('resize', this.updateSize)
     this.updateSize({width: window.innerWidth})
 
     this.window_ids = {}
@@ -1595,7 +1595,7 @@ export default {
               localStorage.setItem("imjoy_engine_url", url)
               this.showMessage('Plugin Engine is connected.')
               // console.log('plugin engine connected.')
-              this.store.event_bus.$emit('engine_connected', d)
+              this.event_bus.$emit('engine_connected', d)
               this.reloadPythonPlugins()
             }
 
@@ -2223,7 +2223,7 @@ export default {
       this.generateGridPosition(w)
       this.windows.push(w)
       this.window_ids[w.id] = w
-      this.store.event_bus.$emit('add_window', w)
+      this.event_bus.$emit('add_window', w)
       if(this.window_mode === 'single'){
         this.selectWindow(w)
       }

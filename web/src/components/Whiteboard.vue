@@ -60,9 +60,9 @@ export default {
     }
   },
   created(){
-    this.store = this.$root.$data.store
-    this.store.event_bus.$on('add_window', this.onWindowAdd)
-    this.store.event_bus.$on('resize', this.updateSize)
+    this.event_bus = this.$root.$data.store && this.$root.$data.store.event_bus
+    this.event_bus.$on('add_window', this.onWindowAdd)
+    this.event_bus.$on('resize', this.updateSize)
 
     //open link in a new tab
     const renderer = new marked.Renderer();
@@ -82,8 +82,8 @@ export default {
   mounted() {
   },
   beforeDestroy() {
-    this.store.event_bus.$off('add_window', this.onWindowAdd)
-    this.store.event_bus.$off('resize', this.updateSize)
+    this.event_bus.$off('add_window', this.onWindowAdd)
+    this.event_bus.$off('resize', this.updateSize)
   },
   methods: {
     overlayMousemove(e){
