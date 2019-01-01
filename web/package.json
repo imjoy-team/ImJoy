@@ -22,6 +22,7 @@
     "module": "^1.2.5",
     "monaco-editor": "^0.15.6",
     "monaco-editor-webpack-plugin": "^1.7.0",
+    "pouchdb-browser": "^7.0.0",
     "socket.io-client": "^2.1.1",
     "uglify-es": "github:mishoo/UglifyJS2#harmony",
     "uglify-js": "^2.8.29",
@@ -72,7 +73,10 @@
       "plugin:vue/essential",
       "eslint:recommended"
     ],
-    "rules": {},
+    "rules": {
+      "no-console": "off",
+      "no-empty": ["error", { "allowEmptyCatch": true }]
+    },
     "parserOptions": {
       "parser": "babel-eslint"
     }

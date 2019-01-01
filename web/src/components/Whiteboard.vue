@@ -1,14 +1,14 @@
 <template>
 <div class="whiteboard noselect" ref="whiteboard" @mouseup="show_overlay=false"  @click="unselectWindows()">
   <div @mousemove="overlayMousemove" class="overlay" @click="show_overlay=false" v-if="show_overlay"></div>
-  <grid-layout v-if="mode=='grid'" :layout="windows" :col-num="col_num" :is-mirrored="false" :auto-size="true" :row-height="row_height" :col-width="column_width" :is-responsive="true" :is-draggable="true" :is-resizable="true" :vertical-compact="true" :margin="[3, 3]" :use-css-transforms="true">
-    <grid-item v-for="(w, wi) in windows" drag-allow-from=".drag-handle" drag-ignore-from=".no-drag" :x="w.x" :y="w.y" :w="w.w" :h="w.h" :i="w.i" @resize="viewChanging(w)" @move="viewChanging(w)" @resized="show_overlay=false;w.resize&&w.resize();focusWindow(w)" @moved="show_overlay=false;w.move&&w.move();focusWindow(w)" :key="w.id">
+  <grid-layout v-if="mode==='grid'" :layout="windows" :col-num="col_num" :is-mirrored="false" :auto-size="true" :row-height="row_height" :col-width="column_width" :is-responsive="true" :is-draggable="true" :is-resizable="true" :vertical-compact="true" :margin="[3, 3]" :use-css-transforms="true">
+    <grid-item v-for="w in windows" drag-allow-from=".drag-handle" drag-ignore-from=".no-drag" :x="w.x" :y="w.y" :w="w.w" :h="w.h" :i="w.i" @resize="viewChanging(w)" @move="viewChanging(w)" @resized="show_overlay=false;w.resize&&w.resize();focusWindow(w)" @moved="show_overlay=false;w.move&&w.move();focusWindow(w)" :key="w.id">
       <window :w="w" :withDragHandle="true" @duplicate="duplicate" @select="selectWindow" :loaders="loaders" @close="close" @fullscreen="fullScreen" @normalsize="normalSize"></window>
     </grid-item>
   </grid-layout>
-  <window v-if="mode=='single'" v-for="w in windows" :key="w.id" v-show="selected_window==w" :loaders="loaders" :withDragHandle="false" @duplicate="duplicate" @select="selectWindow" @close="close" @fullscreen="fullScreen" @normalsize="normalSize" :w="w"></window>
+  <window v-else v-for="w in windows" :key="w.id" v-show="selected_window===w" :loaders="loaders" :withDragHandle="false" @duplicate="duplicate" @select="selectWindow" @close="close" @fullscreen="fullScreen" @normalsize="normalSize" :w="w"></window>
   <div class="md-layout md-gutter md-alignment-center-center">
-    <md-empty-state v-if="!windows || windows.length==0" md-icon="static/img/imjoy-io-icon.svg" md-label="" md-description="">
+    <md-empty-state v-if="!windows || windows.length===0" md-icon="static/img/imjoy-io-icon.svg" md-label="" md-description="">
     </md-empty-state>
   </div>
 </div>
@@ -60,9 +60,9 @@ export default {
     }
   },
   created(){
-    this.store = this.$root.$data.store
-    this.store.event_bus.$on('add_window', this.onWindowAdd)
-    this.store.event_bus.$on('resize', this.updateSize)
+    this.event_bus = this.$root.$data.store && this.$root.$data.store.event_bus
+    this.event_bus.$on('add_window', this.onWindowAdd)
+    this.event_bus.$on('resize', this.updateSize)
 
     //open link in a new tab
     const renderer = new marked.Renderer();
@@ -82,8 +82,8 @@ export default {
   mounted() {
   },
   beforeDestroy() {
-    this.store.event_bus.$off('add_window', this.onWindowAdd)
-    this.store.event_bus.$off('resize', this.updateSize)
+    this.event_bus.$off('add_window', this.onWindowAdd)
+    this.event_bus.$off('resize', this.updateSize)
   },
   methods: {
     overlayMousemove(e){
@@ -212,9 +212,8 @@ export default {
       this.$forceUpdate()
 
     },
-    viewChanging(w){
+    viewChanging(){
       this.show_overlay = true
-
       //this.$refs.whiteboard.scrollTop = this.$refs.whiteboard.scrollHeight
     },
     focusWindow(w) {

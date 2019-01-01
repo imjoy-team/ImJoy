@@ -82,14 +82,14 @@ export default {
     }
   },
   created(){
-    this.store = this.$root.$data.store
+    this.event_bus = this.$root.$data.store && this.$root.$data.store.event_bus
   },
   mounted(){
     this.screenWidth = window.innerWidth
-    this.store.event_bus.$on('resize',this.updateSize)
+    this.event_bus.$on('resize',this.updateSize)
   },
   beforeDestroy() {
-    this.store.event_bus.$off('resize', this.updateSize)
+    this.event_bus.$off('resize', this.updateSize)
   },
   methods: {
     updateSize(e){

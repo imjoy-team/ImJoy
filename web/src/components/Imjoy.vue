@@ -15,17 +15,17 @@
           <!-- <div class="site-title">ImJoy.io<span class="superscript md-small-hide">beta</span></div> -->
           <md-tooltip>ImJoy home</md-tooltip>
         </md-button>
-        <md-menu v-if="window_mode=='single' && windows.length > 0">
+        <md-menu v-if="window_mode==='single' && windows.length > 0">
           <md-button class="md-icon-button md-primary" md-menu-trigger>
             <md-icon>picture_in_picture</md-icon>
           </md-button>
           <md-menu-content>
-            <md-menu-item @click="selectWindow(w)" :disabled="selected_window == w" v-for="w in windows" :key="w.id">
+            <md-menu-item @click="selectWindow(w)" :disabled="selected_window === w" v-for="w in windows" :key="w.id">
               <span>{{w.name.slice(0, 30)+'(#'+w.i+')'}}</span><md-icon>forward</md-icon>
             </md-menu-item>
           </md-menu-content>
         </md-menu>
-        <md-button v-if="status_text&&status_text.length"class="status-text md-small-hide" @click="showAlert(status_text)" :class="status_text.includes('rror')?'error-message':''">
+        <md-button v-if="status_text&&status_text.length" class="status-text md-small-hide" @click="showAlert(status_text)" :class="status_text.includes('rror')?'error-message':''">
           {{status_text.slice(0,80)+(status_text.length>80?'...':'')}}
         </md-button>
         <span class="subheader-title md-medium-hide" style="flex: 1" v-else>Image Processing with Joy!</span>
@@ -95,17 +95,17 @@
                 <md-icon>clear</md-icon>
               </md-button>
             </md-menu-item>
-            <md-menu-item :disabled="true" v-if="engine_status.plugin_num==0">
+            <md-menu-item :disabled="true" v-if="engine_status.plugin_num===0">
               <span> No plugin process is running</span>
             </md-menu-item>
           </md-menu-content>
         </md-menu>
       </div>
       <form v-show="false" ref="folder_form">
-        <input class="md-file" type="file" @change="selectFileChanged" ref="folder_select" webkitdirectory mozdirectory msdirectory odirectory directory multiple></input>
+        <input class="md-file" type="file" @change="selectFileChanged" ref="folder_select" webkitdirectory mozdirectory msdirectory odirectory directory multiple />
       </form>
       <form v-show="false" ref="file_form">
-        <input class="md-file" type="file" @change="selectFileChanged" ref="file_select" multiple></input>
+        <input class="md-file" type="file" @change="selectFileChanged" ref="file_select" multiple />
       </form>
     </md-app-toolbar>
     <md-app-drawer :md-active.sync="menuVisible" md-persistent="full">
@@ -143,7 +143,7 @@
               <md-tooltip>Current workspace: {{selected_workspace}}</md-tooltip>
             </md-button>
             <md-menu-content>
-              <md-menu-item @click="switchWorkspace(w)" :disabled="w==selected_workspace" v-for="w in workspace_list" :key="w">
+              <md-menu-item @click="switchWorkspace(w)" :disabled="w===selected_workspace" v-for="w in workspace_list" :key="w">
                 <span>{{w}}</span><md-icon>forward</md-icon>
                 <md-tooltip>Switch to workspace: {{w}} </md-tooltip>
               </md-menu-item>
@@ -188,7 +188,7 @@
           </md-button>
 
           <md-menu md-size="big">
-            <md-button class="md-button md-primary" :disabled="workflow_list.length==0" md-menu-trigger>
+            <md-button class="md-button md-primary" :disabled="workflow_list.length===0" md-menu-trigger>
               <md-icon>more_horiz</md-icon> Load
               <md-tooltip>load a workflow</md-tooltip>
             </md-button>
@@ -253,14 +253,14 @@
                   <md-menu-item v-if="plugin.config.origin" @click="updatePlugin(plugin.id)">
                     <md-icon>cloud_download</md-icon>Update
                   </md-menu-item>
-                  <md-menu-item class="md-accent" @click="_plugin2_remove=plugin;showRemoveConfirmation=true">
+                  <md-menu-item class="md-accent" @click="plugin2_remove=plugin;showRemoveConfirmation=true">
                     <md-icon>delete_forever</md-icon>Remove
                   </md-menu-item>
                 </md-menu-content>
               </md-menu>
 
-              <md-button class="joy-run-button" :class="plugin.running?'md-accent':(plugin._disconnected && plugin.type == 'native-python'? 'disconnected-plugin': 'md-primary')" :disabled="plugin._disconnected && plugin.type != 'native-python'" @click="plugin._disconnected?connectPlugin(plugin):runOp(plugin.ops[plugin.name])">
-                {{plugin.type == 'native-python'? plugin.name + ' 🚀': plugin.name}}
+              <md-button class="joy-run-button" :class="plugin.running?'md-accent':(plugin._disconnected && plugin.type === 'native-python'? 'disconnected-plugin': 'md-primary')" :disabled="plugin._disconnected && plugin.type != 'native-python'" @click="plugin._disconnected?connectPlugin(plugin):runOp(plugin.ops[plugin.name])">
+                {{plugin.type === 'native-python'? plugin.name + ' 🚀': plugin.name}}
               </md-button>
               <md-button v-if="!plugin._disconnected" class="md-icon-button" @click="plugin.panel_expanded=!plugin.panel_expanded; $forceUpdate()">
                 <md-icon v-if="!plugin.panel_expanded">expand_more</md-icon>
@@ -268,7 +268,7 @@
               </md-button>
               <md-progress-bar md-mode="determinate" v-if="plugin.running&&plugin.progress" :md-value="plugin.progress"></md-progress-bar>
               <p v-if="plugin.running&&plugin.status_text">{{plugin.status_text}}</p>
-              <div v-for="(op, n) in plugin.ops" :key="op.plugin_id + op.name">
+              <div v-for="(op) in plugin.ops" :key="op.plugin_id + op.name">
                 <md-button class="md-icon-button" v-show="plugin.panel_expanded && op.name != plugin.name" :disabled="true">
                   <md-icon>chevron_right</md-icon>
                 </md-button>
@@ -318,14 +318,14 @@
                     <md-menu-item v-if="plugin.config.origin" @click="updatePlugin(plugin.id)">
                       <md-icon>cloud_download</md-icon>Update
                     </md-menu-item>
-                    <md-menu-item class="md-accent" @click="_plugin2_remove=plugin;showRemoveConfirmation=true">
+                    <md-menu-item class="md-accent" @click="plugin2_remove=plugin;showRemoveConfirmation=true">
                       <md-icon>delete_forever</md-icon>Remove
                     </md-menu-item>
                   </md-menu-content>
                 </md-menu>
 
-                <md-button class="joy-run-button" :class="plugin.running?'md-accent':(plugin._disconnected && plugin.type == 'native-python'? 'disconnected-plugin': '')" :disabled="plugin.type != 'native-python' || !plugin._disconnected" @click="connectPlugin(plugin)">
-                  {{plugin.type == 'native-python'? plugin.name + ' 🚀': plugin.name}}
+                <md-button class="joy-run-button" :class="plugin.running?'md-accent':(plugin._disconnected && plugin.type === 'native-python'? 'disconnected-plugin': '')" :disabled="plugin.type != 'native-python' || !plugin._disconnected" @click="connectPlugin(plugin)">
+                  {{plugin.type === 'native-python'? plugin.name + ' 🚀': plugin.name}}
                 </md-button>
                 <md-button class="md-icon-button" :disabled="true">
                   <md-icon>visibility_off</md-icon>
@@ -346,7 +346,7 @@
     </md-app-content>
   </md-app>
 
-  <md-dialog-confirm :md-active.sync="showRemoveConfirmation" md-title="Removing Plugin" md-content="Do you really want to <strong>delete</strong> this plugin" md-confirm-text="Yes" md-cancel-text="Cancel" @md-cancel="showRemoveConfirmation=false" @md-confirm="removePlugin(_plugin2_remove);_plugin2_remove=null;showRemoveConfirmation=false"/>
+  <md-dialog-confirm :md-active.sync="showRemoveConfirmation" md-title="Removing Plugin" md-content="Do you really want to <strong>delete</strong> this plugin" md-confirm-text="Yes" md-cancel-text="Cancel" @md-cancel="showRemoveConfirmation=false" @md-confirm="removePlugin(plugin2_remove);plugin2_remove=null;showRemoveConfirmation=false"/>
   <!-- </md-card-content> -->
   <file-dialog ref="file-dialog" :list-files="listEngineDir" :get-file-url="getFileUrl"></file-dialog>
   <md-dialog :md-active.sync="showPluginDialog" :md-click-outside-to-close="false" :md-close-on-esc="false">
@@ -492,7 +492,7 @@
           <md-toolbar md-elevation="0">
             <div class="md-toolbar-section-start">
               <h2><md-icon v-if="plugin4install.icon">{{plugin4install.icon}}</md-icon><md-icon v-else>extension</md-icon>
-                {{plugin4install.type == 'native-python'? plugin4install.name + ' 🚀': plugin4install.name}}
+                {{plugin4install.type === 'native-python'? plugin4install.name + ' 🚀': plugin4install.name}}
               </h2>
             </div>
             <div v-if="tag4install" class="md-toolbar-section-end">
@@ -513,7 +513,7 @@
                   </md-menu-item>
                 </md-menu-content>
               </md-menu>
-              <md-button v-else  class="md-button md-primary"@click="installPlugin(plugin4install); showAddPluginDialog = false; clearPluginUrl()">
+              <md-button v-else  class="md-button md-primary" @click="installPlugin(plugin4install); showAddPluginDialog = false; clearPluginUrl()">
                 <md-icon>cloud_download</md-icon>Install
               </md-button>
             </div>
@@ -521,7 +521,7 @@
         </md-card-header>
         <md-card-content>
           <p>{{plugin4install.description}}</p>
-          <md-chip v-for="tag in plugin4install.tags" @click="tag4install=tag" :class="tag4install==tag? 'md-primary':''" :key="tag">{{tag}}</md-chip>
+          <md-chip v-for="tag in plugin4install.tags" @click="tag4install=tag" :class="tag4install===tag? 'md-primary':''" :key="tag">{{tag}}</md-chip>
           <!-- <md-button class="md-button md-primary" @click="showCode(plugin4install)">
             <md-icon>code</md-icon>Code
           </md-button> -->
@@ -557,17 +557,17 @@
 </template>
 
 <script>
+/*global jailed*/
 import axios from 'axios';
+import PouchDB from 'pouchdb-browser';
 import { saveAs } from 'file-saver';
 import {
   REGISTER_SCHEMA,
   WINDOW_SCHEMA,
-  OP_SCHEMA,
   PLUGIN_SCHEMA,
   NATIVE_PYTHON_PLUGIN_TEMPLATE,
   WEB_WORKER_PLUGIN_TEMPLATE,
   WEB_PYTHON_PLUGIN_TEMPLATE,
-  IFRAME_PLUGIN_TEMPLATE,
   WINDOW_PLUGIN_TEMPLATE,
   CONFIGURABLE_FIELDS,
   SUPPORTED_PLUGIN_TYPES
@@ -625,8 +625,8 @@ export default {
       resolve_permission: null,
       reject_permission: null,
       plugin_dialog_config: null,
-      _plugin_dialog_promise: {},
-      _plugin2_remove: null,
+      plugin_dialog_promise: {},
+      plugin2_remove: null,
       is_https_mode: true,
       plugin_url: null,
       downloading_plugin: false,
@@ -684,8 +684,8 @@ export default {
     }
   },
   created() {
-    this.store = this.$root.$data.store
-    this.store.event_bus.$on('resize', this.updateSize)
+    this.event_bus = this.$root.$data.store && this.$root.$data.store.event_bus
+    this.event_bus.$on('resize', this.updateSize)
     this.updateSize({width: window.innerWidth})
 
     this.window_ids = {}
@@ -715,8 +715,6 @@ export default {
       name: "Workflow",
       ui: "{id:'workflow', type:'ops'}"
     }
-
-    window.onbeforeunload = s => modified ? "" : null;
     window.addEventListener("dragover", (e) => {
       e.preventDefault();
       document.querySelector("#dropzone").style.visibility = "";
@@ -755,7 +753,7 @@ export default {
              var dirReader = item.createReader();
              dirReader.readEntries((entries)=>{
                for (var i = 0; i < entries.length; i++) {
-                 traverseFileTree(entries[i], path + item.name + "/", getDataLoaders, end && (i==entries.length-1));
+                 traverseFileTree(entries[i], path + item.name + "/", getDataLoaders, end && (i===entries.length-1));
                }
              });
            }
@@ -764,11 +762,15 @@ export default {
            }
         };
         var length = e.dataTransfer.items.length;
+        if(length === 0){
+          reject()
+          return
+        }
         for (var i = 0; i < length; i++) {
           if(e.dataTransfer.items[i].webkitGetAsEntry){
             folder_supported = true
             var entry = e.dataTransfer.items[i].webkitGetAsEntry();
-            traverseFileTree(entry, null, this.getDataLoaders, i==length-1)
+            traverseFileTree(entry, null, this.getDataLoaders, i===length-1)
           }
         }
         if(!folder_supported){
@@ -800,7 +802,7 @@ export default {
     }
   },
   mounted() {
-    this.is_https_mode = ('https:' == location.protocol)
+    this.is_https_mode = ('https:' === location.protocol)
     // Make sure the GUI is refreshed
     setInterval(()=>{this.$forceUpdate()}, 5000)
     this.client_id = localStorage.getItem("imjoy_client_id")
@@ -869,7 +871,7 @@ export default {
       for(let drep of this.default_repository_list){
         let found = false
         for(let repo of this.repository_list){
-          if(repo.url == drep.url && repo.name == drep.name){
+          if(repo.url === drep.url && repo.name === drep.name){
             found = repo
             break
           }
@@ -1007,7 +1009,7 @@ export default {
       if (this.plugins.hasOwnProperty(k)) {
         const plugin = this.plugins[k]
         try {
-          if (typeof plugin.terminate == 'function') plugin.terminate()
+          if (typeof plugin.terminate === 'function') plugin.terminate()
         } catch (e) {
 
         }
@@ -1029,14 +1031,14 @@ export default {
     },
     getRepository(repo_name){
       for(let r of this.repository_list){
-        if(r.name == repo_name){
+        if(r.name === repo_name){
           return r
         }
       }
     },
     selectRepository(repo){
       for(let r of this.repository_list){
-        if(r.name == repo){
+        if(r.name === repo){
           this.selected_repository = r
           this.reloadRepository()
           return r
@@ -1062,7 +1064,7 @@ export default {
         }
         else{
           repository_url = url
-          repo_origin = repo_origin
+          repo_origin = repository_url
         }
         axios.get(repository_url).then(response => {
           if (response && response.data && response.data.plugins) {
@@ -1099,7 +1101,7 @@ export default {
             for (let i = 0; i < this.available_plugins.length; i++) {
               const ap = this.available_plugins[i]
               const ps = this.installed_plugins.filter((p) => {
-                return ap.name == p.name
+                return ap.name === p.name
               })
               // mark as installed
               if(ps.length>0){
@@ -1113,7 +1115,7 @@ export default {
       })
     },
     addRepository(repo){
-      if(typeof repo == 'string'){
+      if(typeof repo === 'string'){
         repo = {name: repo, url: repo, description: repo}
       }
       assert(repo.name && repo.url)
@@ -1122,14 +1124,14 @@ export default {
         repo.description = manifest.description || repo.description
         // use repo url if name exists
         for(let r of this.repository_list){
-          if(r.name == repo.name){
+          if(r.name === repo.name){
             repo.name = repo.url.replace('https://github.com/', '').replace('http://github.com/', '')
             break
           }
         }
         //remove existing repo if same url already exists
         for(let r of this.repository_list){
-          if(r.url == repo.url){
+          if(r.url === repo.url){
             // remove it if already exists
             this.repository_list.splice( this.repository_list.indexOf(r), 1 )
             this.showMessage("Repository with the same url already exists.")
@@ -1162,7 +1164,7 @@ export default {
       if(!repo) return;
       let found = false
       for(let r of this.repository_list){
-        if(r.url == repo.url || r.name == repo.name){
+        if(r.url === repo.url || r.name === repo.name){
           found = r
         }
       }
@@ -1189,7 +1191,7 @@ export default {
           this.status_text = "Failed to save repository, database Error:" + err.toString()
         })
         // if current workspace is deleted, go to default
-        if (this.selected_repository == found.name) {
+        if (this.selected_repository === found.name) {
           this.$router.replace({
             query: {
               w: 'default'
@@ -1225,7 +1227,7 @@ export default {
       const plugin = this.plugins[_plugin.id]
       if(plugin.attachments){
         for (let i = 0; i < plugin.attachments.length; i++) {
-          if (plugin.attachments[i].attrs.name == name) {
+          if (plugin.attachments[i].attrs.name === name) {
             return plugin.attachments[i].content
           }
         }
@@ -1274,7 +1276,7 @@ export default {
     },
     connectPlugin(plugin){
       if(plugin._disconnected){
-        if(plugin.type == 'native-python' && !this.engine_connected){
+        if(plugin.type === 'native-python' && !this.engine_connected){
           this.connectEngine(this.engine_url)
         }
         else{
@@ -1332,7 +1334,7 @@ export default {
         const manifest = await this.getRepoManifest(repo_name, repo_hashtag)
         let found = null
         for(let p of manifest.plugins){
-          if(p.name == plugin_name){
+          if(p.name === plugin_name){
             found = p
             break
           }
@@ -1347,7 +1349,7 @@ export default {
         let dep = uri.split('@')
         selected_tag = dep[1]
         const ps = scoped_plugins.filter((p) => {
-          return dep[0] && p.name == dep[0].trim()
+          return dep[0] && p.name === dep[0].trim()
         });
         if (ps.length <= 0) {
           throw `Plugin "${dep[0]}" cannot be found in the repository.`
@@ -1366,7 +1368,7 @@ export default {
         throw 'Plugin url must be ends with ".imjoy.html"'
       }
       const response = await axios.get(uri)
-      if (!response || !response.data || response.data == '') {
+      if (!response || !response.data || response.data === '') {
         alert('failed to get plugin code from ' + uri)
         throw 'failed to get code.'
       }
@@ -1379,7 +1381,7 @@ export default {
     installPlugin(pconfig, tag){
       // pconfig = "oeway/ImJoy-Demo-Plugins:3D Demos"
       return new Promise((resolve, reject) => {
-        let uri = typeof pconfig == 'string' ? pconfig : pconfig.uri
+        let uri = typeof pconfig === 'string' ? pconfig : pconfig.uri
         let scoped_plugins = this.available_plugins
         if(pconfig.scoped_plugins){
           scoped_plugins = pconfig.scoped_plugins
@@ -1396,8 +1398,8 @@ export default {
         this.getPluginFromUrl(uri, scoped_plugins).then((config)=>{
           config.origin = pconfig.origin || uri
           if (!config) {
-            console.error('Failed to parse the plugin code.', code)
-            reject('Failed to parse the plugin code.')
+            console.error(`Failed to fetch the plugin from "${uri}".`)
+            reject(`Failed to fetch the plugin from "${uri}".`)
             return
           }
           if (!SUPPORTED_PLUGIN_TYPES.includes(config.type)){
@@ -1424,7 +1426,7 @@ export default {
           Promise.all(_deps).then(()=>{
             this.savePlugin(config).then((template)=>{
               for (let p of this.available_plugins) {
-                if(p.name == template.name && !p.installed){
+                if(p.name === template.name && !p.installed){
                   p.installed = true
                   p.tag = tag
                 }
@@ -1453,15 +1455,15 @@ export default {
         // remove if exists
         this.db.get(plugin._id).then((doc) => {
           return this.db.remove(doc);
-        }).then((result) => {
+        }).then(() => {
 
           for (let i = 0; i < this.installed_plugins.length; i++) {
-            if(this.installed_plugins[i].name == plugin.name){
+            if(this.installed_plugins[i].name === plugin.name){
               this.installed_plugins.splice(i, 1)
             }
           }
           for (let p of this.available_plugins) {
-              if(p.name == plugin.name){
+              if(p.name === plugin.name){
                 p.installed = false
                 p.tag = null
               }
@@ -1514,7 +1516,7 @@ export default {
       let q = {
         workspace: w
       }
-      if (w == 'default') {
+      if (w === 'default') {
         q = null
       }
       this.$router.push({
@@ -1546,7 +1548,7 @@ export default {
 
       }
       // if current workspace is deleted, go to default
-      if (this.selected_workspace == w.name) {
+      if (this.selected_workspace === w.name) {
         this.$router.replace({
           query: {
             w: 'default'
@@ -1595,7 +1597,7 @@ export default {
               localStorage.setItem("imjoy_engine_url", url)
               this.showMessage('Plugin Engine is connected.')
               // console.log('plugin engine connected.')
-              this.store.event_bus.$emit('engine_connected', d)
+              this.event_bus.$emit('engine_connected', d)
               this.reloadPythonPlugins()
             }
 
@@ -1776,7 +1778,7 @@ export default {
         }
       })
     },
-    getFilePath(url, _plugin){
+    getFilePath(url){
       return new Promise((resolve, reject) => {
         if(!this.engine_connected){
           reject("Please connect to the Plugin Engine 🚀.")
@@ -1921,7 +1923,7 @@ export default {
       for (let k in this.plugins) {
         if (this.plugins.hasOwnProperty(k)) {
           const plugin = this.plugins[k]
-          if(plugin.name == name){
+          if(plugin.name === name){
               try {
                 if(temp_remove){
                   delete this.plugins[k]
@@ -1929,7 +1931,7 @@ export default {
                 }
                 Joy.remove(name)
                 // console.log('terminating ',plugin)
-                if (typeof plugin.terminate == 'function') {
+                if (typeof plugin.terminate === 'function') {
                   plugin.terminate()
                 }
               } catch (e) {
@@ -1947,13 +1949,13 @@ export default {
           // console.log('reloading plugin ', pconfig)
           const template = this.parsePluginCode(pconfig.code, pconfig)
           template._id = pconfig._id
-          if(template.type == 'collection'){
+          if(template.type === 'collection'){
             return
           }
           this.unloadPlugin(template, true)
           let p
 
-          if (template.type == 'window') {
+          if (template.type === 'window') {
             p = this.preLoadPlugin(template)
           } else {
             p = this.loadPlugin(template)
@@ -1991,9 +1993,9 @@ export default {
           const addPlugin = () => {
             this.db.put(template, {
               force: true
-            }).then((result) => {
+            }).then(() => {
               for (let i = 0; i < this.installed_plugins.length; i++) {
-                if(this.installed_plugins[i].name == template.name){
+                if(this.installed_plugins[i].name === template.name){
                   this.installed_plugins.splice(i, 1)
                 }
               }
@@ -2011,9 +2013,9 @@ export default {
           // remove if exists
           this.db.get(template._id).then((doc) => {
             return this.db.remove(doc);
-          }).then((result) => {
+          }).then(() => {
             addPlugin()
-          }).catch((err) => {
+          }).catch(() => {
             addPlugin()
           });
         } catch (e) {
@@ -2025,7 +2027,7 @@ export default {
     },
     reloadPythonPlugins(){
       for(let p of this.installed_plugins){
-        if(p.type == 'native-python'){
+        if(p.type === 'native-python'){
           this.reloadPlugin(p)
         }
       }
@@ -2034,11 +2036,11 @@ export default {
       for (let k in this.plugins) {
         if (this.plugins.hasOwnProperty(k)) {
           const plugin = this.plugins[k]
-          if(plugin.type == 'native-python'){
+          if(plugin.type === 'native-python'){
             try {
               Joy.remove(plugin.config.type)
               // console.log('terminating ',plugin)
-              if (typeof plugin.terminate == 'function') {
+              if (typeof plugin.terminate === 'function') {
                 plugin.terminate()
               }
               // delete this.plugins[k]
@@ -2086,30 +2088,50 @@ export default {
     },
     reloadDB(){
       return new Promise((resolve, reject) => {
-        if(this.db){
-          try {
-              this.db.close().finally(()=>{
-                this.db = new PouchDB(this.selected_workspace + '_workspace', {
-                  revs_limit: 2,
-                  auto_compaction: true
+        try {
+          if(this.db){
+            try {
+                this.db.close().finally(()=>{
+                  this.db = new PouchDB(this.selected_workspace + '_workspace', {
+                    revs_limit: 2,
+                    auto_compaction: true
+                  })
+                  if(this.db){
+                    resolve()
+                  }
+                  else{
+                    reject('Failed to reload database.')
+                  }
                 })
-                resolve()
+            } catch (e) {
+              console.error('failed to reload database: ', e)
+              this.db = new PouchDB(this.selected_workspace + '_workspace', {
+                revs_limit: 2,
+                auto_compaction: true
               })
-          } catch (e) {
-            console.error('failed to reload database: ', e)
+              if(this.db){
+                resolve()
+              }
+              else{
+                reject('Failed to reload database.')
+              }
+            }
+          }
+          else{
             this.db = new PouchDB(this.selected_workspace + '_workspace', {
               revs_limit: 2,
               auto_compaction: true
             })
-            resolve()
+            if(this.db){
+              resolve()
+            }
+            else{
+              reject('Failed to reload database.')
+            }
           }
-        }
-        else{
-          this.db = new PouchDB(this.selected_workspace + '_workspace', {
-            revs_limit: 2,
-            auto_compaction: true
-          })
-          resolve()
+        } catch (e) {
+          console.error('Failed to reload database.')
+          reject('Failed to reload database.')
         }
       })
     },
@@ -2119,7 +2141,7 @@ export default {
           for (let k in this.plugins) {
             if (this.plugins.hasOwnProperty(k)) {
               const plugin = this.plugins[k]
-              if (typeof plugin.terminate == 'function') {
+              if (typeof plugin.terminate === 'function') {
                 try {
                   plugin.terminate()
                 } catch (e) {
@@ -2138,7 +2160,6 @@ export default {
             attachments: true,
             sort: 'name'
           }).then((result) => {
-            const promises = []
             this.workflow_list = []
             this.installed_plugins = []
             for (let i = 0; i < result.total_rows; i++) {
@@ -2223,8 +2244,8 @@ export default {
       this.generateGridPosition(w)
       this.windows.push(w)
       this.window_ids[w.id] = w
-      this.store.event_bus.$emit('add_window', w)
-      if(this.window_mode == 'single'){
+      this.event_bus.$emit('add_window', w)
+      if(this.window_mode === 'single'){
         this.selectWindow(w)
       }
       return w.id
@@ -2243,19 +2264,19 @@ export default {
     closeWindow(w){
       this.windows.splice(this.windows.indexOf(w), 1)
       delete this.window_ids[w.id]
-      if(this.window_mode == 'single'){
+      if(this.window_mode === 'single'){
         this.selected_window = this.windows[0]
       }
     },
     closePluginDialog(ok) {
       this.showPluginDialog = false
-      let [resolve, reject] = this._plugin_dialog_promise
+      let [resolve, reject] = this.plugin_dialog_promise
       if (ok) {
         resolve(this.$refs.plugin_dialog_joy.joy.get_config())
       } else {
         reject()
       }
-      this._plugin_dialog_promise = null
+      this.plugin_dialog_promise = null
     },
     // workflowOnchange() {
     //   // console.log('workflow changed ...')
@@ -2329,11 +2350,11 @@ export default {
       return loaders
     },
     loadFiles() {
-      if(this.selected_files.length == 1){
+      if(this.selected_files.length === 1){
         const file = this.selected_files[0]
         const loaders = this.getDataLoaders(file)
         const keys = Object.keys(loaders)
-        if(keys.length == 1){
+        if(keys.length === 1){
           try {
             return this.registered.loaders[loaders[keys[0]]](file)
           } catch (e) {
@@ -2343,8 +2364,8 @@ export default {
       }
       for (let f = 0; f < this.selected_files.length; f++) {
         const file = this.selected_files[f]
-        const tmp = file.name.split('.')
-        const ext = tmp[tmp.length - 1]
+        // const tmp = file.name.split('.')
+        // const ext = tmp[tmp.length - 1]
         file.loaders = file.loaders || this.getDataLoaders(file)
         // console.log('loaders', file.loaders)
       }
@@ -2396,7 +2417,7 @@ export default {
     saveWorkflow(joy) {
       // remove if exists
       const name = prompt("Please enter a name for the workflow", "default");
-      if (name == null) {
+      if (!name) {
         return
       }
       const data = {}
@@ -2407,7 +2428,7 @@ export default {
       // console.log('saving workflow: ', data)
       this.db.put(data, {
         force: true
-      }).then((result) => {
+      }).then(() => {
         // console.log('Successfully saved!');
         this.workflow_list.push(data)
         this.showMessage(name + ' has been successfully saved.')
@@ -2429,7 +2450,7 @@ export default {
       // console.log('removing: ', w)
       this.db.get(w._id).then((doc) => {
         return this.db.remove(doc);
-      }).then((result) => {
+      }).then(() => {
         var index = this.workflow_list.indexOf(w);
         if (index > -1) {
           this.workflow_list.splice(index, 1);
@@ -2479,9 +2500,6 @@ export default {
       }
       this.loadFiles()
     },
-    closePanel(panel) {
-
-    },
     parsePluginCode(code, config) {
       config = config || {}
       const uri = config.uri
@@ -2498,7 +2516,6 @@ export default {
           // console.log('parsing the plugin file')
           const pluginComp = parseComponent(code)
           // console.log('code parsed from', pluginComp)
-          let c = null
           config = JSON.parse(pluginComp.config[0].content)
           config.scripts = []
           for (let i = 0; i < pluginComp.script.length; i++) {
@@ -2517,7 +2534,7 @@ export default {
           config.tag = tag || config.tags && config.tags[0]
           // try to match the script with current tag
           for (let i = 0; i < pluginComp.script.length; i++) {
-            if (pluginComp.script[i].attrs.tag == config.tag) {
+            if (pluginComp.script[i].attrs.tag === config.tag) {
               config.script = pluginComp.script[i].content
               config.lang = pluginComp.script[i].attrs.lang || 'javascript'
               break
@@ -2563,13 +2580,13 @@ export default {
       if(compareVersions(config.api_version, '<=', '0.1.1')){
         config.type = config.type || config.mode
         delete config.mode
-        if(config.type == 'pyworker'){
+        if(config.type === 'pyworker'){
           config.type = 'native-python'
         }
-        else if(config.type == 'webworker'){
+        else if(config.type === 'webworker'){
           config.type = 'web-worker'
         }
-        else if(config.type == 'webpython'){
+        else if(config.type === 'webpython'){
           config.type = 'web-python'
         }
       }
@@ -2578,7 +2595,6 @@ export default {
     preLoadPlugin(template, rplugin) {
       const config = {
         name: template.name,
-        type: template.type,
         type: template.type,
         ui: template.ui,
         tag: template.tag,
@@ -2604,7 +2620,6 @@ export default {
           name: config.name,
           type: config.type,
           config: tconfig,
-          type: template.type,
           docs: template.docs,
           tag: template.tag,
           attachments: template.attachments,
@@ -2626,11 +2641,15 @@ export default {
             await this.createWindow(c)
           }
         }
-        this.register(config, {
-          id: config.id
-        })
-        // console.log('successfully preloaded plugin: ', plugin)
-        resolve(plugin)
+        try {
+          this.register(config, {
+            id: config.id
+          })
+          // console.log('successfully preloaded plugin: ', plugin)
+          resolve(plugin)
+        } catch (e) {
+          reject(e)
+        }
       })
     },
     loadPlugin(template, rplugin) {
@@ -2650,7 +2669,7 @@ export default {
         }
         config._id = template._id
         config.context = this.pluing_context
-        if (template.type == 'native-python') {
+        if (template.type === 'native-python') {
           if (!this.socket) {
             console.error("Please connect to the Plugin Engine 🚀.")
           }
@@ -2673,20 +2692,15 @@ export default {
           if (template.extensions && template.extensions.length > 0) {
             this.registerExtension(template.extensions, plugin)
           }
-          // if(!config.initialized){
-            plugin.api.setup().then((result) => {
-              // console.log('successfully setup plugin: ', plugin)
-              resolve(plugin)
-            }).catch((e) => {
-              console.error('error occured when loading plugin ' + template.name + ": ", e)
-              this.showMessage(`<${template.name}>: ${e}`, 15000)
-              reject(e)
-              plugin.terminate()
-            })
-          // }
-          // else{
-          //   resolve(plugin)
-          // }
+          plugin.api.setup().then(() => {
+            resolve(plugin)
+          }).catch((e) => {
+            console.error('error occured when loading plugin ' + template.name + ": ", e)
+            this.showMessage(`<${template.name}>: ${e}`, 15000)
+            reject(e)
+            plugin.terminate()
+          })
+
         });
         plugin.whenFailed((e) => {
           if(e){
@@ -2869,26 +2883,26 @@ export default {
         config.name = config.name || plugin.name
         config.show_panel = config.show_panel || false
         config.ui = this.normalizeUI(config.ui)
-        if(plugin.name == config.name){
+        if(plugin.name === config.name){
           config.ui = config.ui || plugin.config.description
         }
         config.tags = ["op", "plugin"]
         config.inputs = config.inputs || null
         config.outputs = config.outputs || null
         // save type to tags
-        if(config.type == 'window'){
+        if(config.type === 'window'){
           config.tags.push('window')
         }
-        else if(config.type == 'native-python'){
+        else if(config.type === 'native-python'){
           config.tags.push('python')
         }
-        else if(config.type == 'web-worker'){
+        else if(config.type === 'web-worker'){
           config.tags.push('web-worker')
         }
-        else if(config.type == 'web-python'){
+        else if(config.type === 'web-python'){
           config.tags.push('web-python')
         }
-        else if(config.type == 'iframe'){
+        else if(config.type === 'iframe'){
           config.tags.push('iframe')
         }
         // use its name for type
@@ -2905,7 +2919,7 @@ export default {
         // }
         // console.log('creating Op: ', config, plugin)
         let run = null
-        if(config.run && typeof config.run == 'function'){
+        if(config.run && typeof config.run === 'function'){
           run = config.run
         }
         else{
@@ -2926,7 +2940,7 @@ export default {
           config.onexecute = onexecute
         }
 
-        if(config.update && typeof config.update == 'function'){
+        if(config.update && typeof config.update === 'function'){
           const onupdate = async (my) => {
             // my.target._workflow_id = null;
             const result = await config.update(this.joy2plugin(my))
@@ -2964,7 +2978,7 @@ export default {
         if (config.inputs){
           try {
             if((config.inputs.type != 'object' || !config.inputs.properties) && (config.inputs.type != 'array' || !config.inputs.items)){
-              if(typeof config.inputs == 'object'){
+              if(typeof config.inputs === 'object'){
                 config.inputs = {properties: config.inputs, type: 'object'}
               }
               else{
@@ -2972,7 +2986,7 @@ export default {
               }
             }
             // set all the properties as required by default
-            if(config.inputs.type == 'object' && config.inputs.properties && !config.inputs.required){
+            if(config.inputs.type === 'object' && config.inputs.properties && !config.inputs.required){
               config.inputs.required = Object.keys(config.inputs.properties)
             }
             const sch = ajv.compile(config.inputs)
@@ -3012,7 +3026,7 @@ export default {
         if (config.outputs){
           try {
             if(config.outputs.type != 'object' || !config.outputs.properties){
-              if(typeof config.outputs == 'object'){
+              if(typeof config.outputs === 'object'){
                 config.outputs = {properties: config.outputs, type: 'object'}
               }
               else{
@@ -3020,7 +3034,7 @@ export default {
               }
             }
             // set all the properties as required by default
-            if(config.outputs.type == 'object' && config.outputs.properties && !config.outputs.required){
+            if(config.outputs.type === 'object' && config.outputs.properties && !config.outputs.required){
               config.outputs.required = Object.keys(config.outputs.properties)
             }
             const sch = ajv.compile(config.outputs)
@@ -3061,11 +3075,11 @@ export default {
         plugin.whenConnected(() => {
           if (!plugin.api) {
             console.error('the window plugin seems not ready.')
-            reject(e)
+            reject('the window plugin seems not ready.')
             return
           }
           // this.plugins[plugin.id] = plugin
-          plugin.api.setup().then((result) => {
+          plugin.api.setup().then(() => {
             // console.log('successfully setup the window plugin: ', plugin, pconfig)
             //asuming the data._op is passed from last op
             pconfig.data = pconfig.data || {}
@@ -3119,17 +3133,17 @@ export default {
       })
     },
     //TODO: remove updateWindow from api
-    async updateWindow(wconfig, _plugin){
-      api.showMessage('Warning: `api.updateWindow` is deprecated, please use the new api.`')
+    async updateWindow(wconfig){
+      this.showMessage('Warning: `api.updateWindow` is deprecated, please use the new api.`')
       const w = wconfig.id
       if(w && w.run){
         return await w.run(wconfig)
       }
       else{
-        throw `Window (id=${wid}) not found`
+        throw `Window (id=${w.id}) not found`
       }
     },
-    createWindow(wconfig, _plugin) {
+    createWindow(wconfig) {
       return new Promise((resolve, reject) => {
         wconfig.config = wconfig.config || {}
         wconfig.data = wconfig.data || null
@@ -3184,22 +3198,20 @@ export default {
           this.$nextTick(() => {
             this.renderWindow(pconfig).then((plugin_api)=>{
               resolve(plugin_api)
-            })
-      		});
-
+            }).catch(reject)
+          });
         }
       })
     },
-    showDialog(config, _plugin) {
+    showDialog(config) {
       return new Promise((resolve, reject) => {
         this.plugin_dialog_config = config
         this.showPluginDialog = true
-        this._plugin_dialog_promise = [resolve, reject]
+        this.plugin_dialog_promise = [resolve, reject]
       })
     },
     showPluginWindow(config) {
       config.name = config.name || 'untitiled plugin window'
-      config.type = config.type
       config.data = config.data || null
       config.config = config.config || {}
       config.panel = config.panel || null

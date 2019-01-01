@@ -44,7 +44,7 @@ export default {
    },
    methods: {
      fileTreeSelected(f){
-       if(this.options.type == 'file' && f.target.type == 'dir')
+       if(this.options.type === 'file' && f.target.type === 'dir')
        return
        this.file_tree_selection = f.path
        this.$forceUpdate()
@@ -58,7 +58,7 @@ export default {
      },
      loadFile(f){
        if(f.target.type != 'file'){
-         // if(f.path == this.root){
+         // if(f.path === this.root){
          //   f.path = f.path+'/../'
          // }
          this.listFiles(f.path, this.options.type, this.options.recursive).then((tree)=>{
@@ -69,10 +69,10 @@ export default {
        }
        else{
          this.show_=false
-         if(this.options.mode == 'single' && typeof this.file_tree_selection === "object"){
+         if(this.options.mode === 'single' && typeof this.file_tree_selection === "object"){
            this.resolve(this.file_tree_selection[0])
          }
-         else if(this.options.mode == 'multiple' && typeof this.file_tree_selection === 'string'){
+         else if(this.options.mode === 'multiple' && typeof this.file_tree_selection === 'string'){
            this.resolve([this.file_tree_selection])
          }
          else{
@@ -95,14 +95,14 @@ export default {
        }
 
        return new Promise((resolve, reject) => {
-         if(this.options.uri_type == 'path'){
+         if(this.options.uri_type === 'path'){
            this.resolve = resolve
            this.reject = reject
          }
-         else if(this.options.uri_type == 'url'){
+         else if(this.options.uri_type === 'url'){
            this.reject = reject
            this.resolve = (paths)=>{
-              if(typeof paths == 'string'){
+              if(typeof paths === 'string'){
                 this.getFileUrl(paths, _plugin).then(resolve).catch(reject)
               }
               else{
