@@ -685,6 +685,10 @@ export default {
     }
   },
   created() {
+    this.event_bus = this.$root.$data.store && this.$root.$data.store.event_bus
+    this.event_bus.$on('resize', this.updateSize)
+    this.updateSize({width: window.innerWidth})
+
     this.window_ids = {}
     this.plugin_names = null
     this.db = null

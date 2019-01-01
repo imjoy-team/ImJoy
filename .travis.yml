@@ -18,7 +18,10 @@ before_script:
   - npm prune
 script:
   - export NODE_OPTIONS="--max-old-space-size=4096"
+<<<<<<< HEAD
   - npm run test:unit
+=======
+>>>>>>> master
   - npm run lint
   - npm run build
 after_success:
