@@ -12,6 +12,9 @@ module.exports = {
     port: 8000
   },
   configureWebpack: {
+    module: {
+      exprContextCritical: false
+    },
     plugins: [
       new CopyWebpackPlugin([{
         from: path.join(__dirname, "public/docs/index.html"),

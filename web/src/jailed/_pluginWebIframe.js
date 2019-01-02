@@ -41,7 +41,7 @@ async function importScripts () {
   for (; i < len; i++) {
     await _importScript(args[i])
   }
-};
+}
 
 
 
@@ -87,8 +87,8 @@ var importScript = function(url) {
     }
 
     if (error) {
-        throw error;
         failure();
+        throw error;
     }
 }
 
@@ -107,10 +107,11 @@ var execute = async function(code) {
           try {
               if(code.requirements && (Array.isArray(code.requirements) || typeof code.requirements === 'string') ){
                 try {
+                  var link_node;
                   if(Array.isArray(code.requirements)){
                     for(var i=0;i<code.requirements.length;i++){
                       if(code.requirements[i].toLowerCase().endsWith('.css')){
-                        var link_node = document.createElement('link');
+                        link_node = document.createElement('link');
                         link_node.rel = 'stylesheet'
                         link_node.href = code.requirements[i]
                         document.head.appendChild(link_node)
@@ -122,7 +123,7 @@ var execute = async function(code) {
                   }
                   else{
                     if(code.requirements.toLowerCase().endsWith('.css')){
-                      var link_node = document.createElement('link');
+                      link_node = document.createElement('link');
                       link_node.rel = 'stylesheet'
                       link_node.href = code.requirements
                       document.head.appendChild(link_node)
@@ -155,17 +156,17 @@ var execute = async function(code) {
         document.head.appendChild(style_node)
     }
     else if (code.type == 'link'){
-        var link_node = document.createElement('link');
+        var link_node_ = document.createElement('link');
         if(code.rel){
-          link_node.rel = code.rel
+          link_node_.rel = code.rel
         }
         if(code.href){
-          link_node.href = code.href
+          link_node_.href = code.href
         }
         if(code.type_){
-          link_node.type = code.type_
+          link_node_.type = code.type_
         }
-        document.head.appendChild(link_node)
+        document.head.appendChild(link_node_)
     }
     else if (code.type == 'html'){
          document.body.appendChild(_htmlToElement(code.content));

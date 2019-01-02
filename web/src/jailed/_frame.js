@@ -18,11 +18,11 @@ var __jailed__path__ = thisScript.src
     .split('/')
     .slice(0, -1)
     .join('/')+'/';
-var __pyodide__path__ = thisScript.src
-    .split('?')[0]
-    .split('/')
-    .slice(0, -2)
-    .join('/')+'/pyodide/';
+// var __pyodide__path__ = thisScript.src
+//     .split('?')[0]
+//     .split('/')
+//     .slice(0, -2)
+//     .join('/')+'/pyodide/';
 
 var getParamValue = function(paramName) {
     var url = window.location.search.substring(1); //get rid of "?" in querystring
@@ -107,89 +107,6 @@ var initWebworkerPlugin = function() {
     });
 }
 
-
-/**
- * Initializes the pyodide plugin inside a web worker. May throw an exception
- * in case this was not permitted by the browser.
- */
-var initWebPythonWorkerPlugin = function() {
-    // creating worker as a blob enables import of local files
-    var blobCode = [
-      ' var window = {};                                ',
-      ' self.addEventListener("message", function(m){   ',
-      '     if (m.data.type == "initImport") {          ',
-      '         importScripts(m.data.url);              ',
-      '         self.postMessage({                      ',
-      '             type : "initialized",               ',
-      '             dedicatedThread : true              ',
-      '         });                                     ',
-
-      '     }                                           ',
-      '     else if (m.data.type == "importScript") {          ',
-      '         importScripts(m.data.url);              ',
-      '     }                                           ',
-      ' });                                             ',
-
-    ].join('\n');
-
-    var blobUrl = window.URL.createObjectURL(
-        new Blob([blobCode])
-    );
-
-    var name = getParamValue('name');
-    var worker = new Worker(blobUrl, {'name' : name || 'plugin_pyodide'});
-
-    worker.postMessage({
-        type: 'importScript',
-        url: __pyodide__path__ + 'pyodide.js'
-    });
-
-    // telling worker to load _pluginWebWorker.js (see blob code above)
-    worker.postMessage({
-        type: 'initImport',
-        url: __jailed__path__ + '_pluginWebPython.js'
-    });
-
-
-    // mixed content warning in Chrome silently skips worker
-    // initialization without exception, handling this with timeout
-    var fallbackTimeout = setTimeout(function() {
-        worker.terminate();
-        initWebPythonIframePlugin();
-    }, 2000);
-
-    // forwarding messages between the worker and parent window
-    worker.addEventListener('message', function(m) {
-
-        var transferables = undefined;
-        if (m.data.type == 'initialized') {
-            clearTimeout(fallbackTimeout);
-        }
-        else if(m.data.type == 'disconnect'){
-          worker.terminate();
-        }
-        else if(m.data.type == 'message'){
-          if(m.data.data.__transferables__){
-            transferables = m.data.data.__transferables__;
-            delete m.data.data.__transferables__;
-          }
-        }
-        parent.postMessage(m.data, '*', transferables);
-    });
-
-    window.addEventListener('message', function(m) {
-       var transferables = undefined;
-       if(m.data.type == 'message'){
-        if(m.data.data.__transferables__){
-          transferables = m.data.data.__transferables__;
-          delete m.data.data.__transferables__;
-        }
-      }
-      worker.postMessage(m.data, transferables);
-    });
-}
-
-
 /**
  * Creates plugin right in this iframe
  */
@@ -235,7 +152,7 @@ var initWebPythonIframePlugin = function() {
     // handles script loading error
     // (assuming scripts are loaded one by one in the iframe)
     var currentErrorHandler = function(){};
-    window.addEventListener('error', function(message) {
+    window.addEventListener('error', function() {
         currentErrorHandler();
     });
 
@@ -302,7 +219,7 @@ var initIframePlugin = function() {
     // handles script loading error
     // (assuming scripts are loaded one by one in the iframe)
     var currentErrorHandler = function(){};
-    window.addEventListener('error', function(message) {
+    window.addEventListener('error', function() {
         currentErrorHandler();
     });
 

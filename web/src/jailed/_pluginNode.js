@@ -1,4 +1,3 @@
-
 /**
  * Contains the routines loaded by the plugin process under Node.js
  *
@@ -6,6 +5,9 @@
  * platform-dependent connection object for the plugin site
  */
 
+/*eslint no-global-assign: "off"*/
+/*eslint no-unused-vars: "off"*/
+/*global application connection api*/
 application = {};
 connection = {};
 api = null;
@@ -153,7 +155,7 @@ var execute = function(code) {
  * @param {Function} fCb
  */
 var executeNormal = function(code, url, sCb, fCb) {
-    var err = null;
+    // var err = null;
     try {
         require('vm').runInThisContext(code, url);
         sCb();

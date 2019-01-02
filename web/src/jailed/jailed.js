@@ -71,7 +71,7 @@ Whenable.prototype.emit = function(e){
         this._emitted = true;
         this._e = e;
         var handler;
-        while(handler = this._handlers.pop()) {
+        while((handler = this._handlers.pop())) {
             setTimeout(handler.bind(null, e),0);
         }
     }
@@ -194,7 +194,7 @@ var basicConnectionNode = function() {
      *
      * For Node.js the plugin is created as a forked process
      */
-    BasicConnection = function(id, type, config) {
+    BasicConnection = function(id, type) {
         if(type == 'iframe'){
           throw('You can not use iframe in nodejs.')
         }
@@ -422,6 +422,7 @@ var basicConnectionWeb = function() {
 
 }
 
+var SocketioConnection;
 /**
  * Creates the platform-dependent SocketioConnection object in the
  * web-browser environment
@@ -437,7 +438,7 @@ var SocketioConnectionWeb = function() {
      * For the web-browser environment, the plugin is created as a
      * Worker in a sandbaxed frame
      */
-    var SocketioConnection = function(id, type, config) {
+    SocketioConnection = function(id, type, config) {
         this._init = new Whenable;
         this._disconnected = false;
         this.id = id;
@@ -502,7 +503,7 @@ var SocketioConnectionWeb = function() {
      *
      * @param {Object} data to send
      */
-    SocketioConnection.prototype.send = function(data, transferables) {
+    SocketioConnection.prototype.send = function(data) {
         this.context.socket.emit('message_to_plugin_'+this.secret,
             {type: 'message', data: data}
         );
@@ -842,6 +843,7 @@ DynamicPlugin.prototype._init =
     else{
       lang = 'javascript'
     }
+    /*global JailedSite*/
     this._site = new JailedSite(this._connection, this.id, lang);
 
 

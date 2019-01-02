@@ -5,17 +5,17 @@
  */
 
 (function(){
-    var _dtype2typedarray = {
-      int8: 'Int8Array',
-      int16: 'Int16Array',
-      int32: 'Int32Array',
-      uint8: 'Uint8Array',
-      uint16: 'Uint16Array',
-      uint32: 'Uint32Array',
-      float32: 'Float32Array',
-      float64: 'Float64Array',
-      array: 'Array'
-    }
+    // var _dtype2typedarray = {
+    //   int8: 'Int8Array',
+    //   int16: 'Int16Array',
+    //   int32: 'Int32Array',
+    //   uint8: 'Uint8Array',
+    //   uint16: 'Uint16Array',
+    //   uint32: 'Uint32Array',
+    //   float32: 'Float32Array',
+    //   float64: 'Float64Array',
+    //   array: 'Array'
+    // }
     var _typedarray2dtype = {
       Int8Array: 'int8',
       Int16Array: 'int16',
@@ -43,7 +43,7 @@
      * and receive messages from the opposite site (basically it
      * should only provide send() and onMessage() methods)
      */
-    JailedSite = function(connection, id, lang) {
+    var JailedSite = function(connection, id, lang) {
         this.id = id;
         this.lang = lang;
         this._interface = {};
@@ -178,10 +178,10 @@
         // add prototypes
         var functions = Object.getOwnPropertyNames(Object.getPrototypeOf(this._interface));
         for(var i=0;i<functions.length;i++){
-          var name = functions[i];
-          if(name.startsWith('_')) continue;
-          if(typeof this._interface[name] == 'function'){
-            names.push({name:name, data: null});
+          var name_ = functions[i];
+          if(name_.startsWith('_')) continue;
+          if(typeof this._interface[name_] == 'function'){
+            names.push({name: name_, data: null});
           }
         }
         this._connection.send({type:'setInterface', api: names});
@@ -193,15 +193,15 @@
      */
     // var callback_reg = new RegExp("onupdate|run$")
     JailedSite.prototype._processMessage = function(data) {
+         var resolve, reject, method, args, result;
          switch(data.type) {
          case 'method':
-             var method;
              var _interface = this._interface;
              if(data.pid){
                _interface = this._plugin_interfaces[data.pid]
                if(!_interface){
                  if(data.promise){
-                   var [resolve, reject] = this._unwrap(data.promise, false);
+                   [resolve, reject] = this._unwrap(data.promise, false);
                    reject(`plugin api function is not avaialbe in "${data.pid}", the plugin maybe terminated.`)
                  }
                  else{
@@ -217,12 +217,12 @@
              else{
                method = _interface[data.name];
              }
-             var args = this._unwrap(data.args, true);
+             args = this._unwrap(data.args, true);
              args.push({id: this.id})
              if(data.promise){
-               var [resolve, reject] = this._unwrap(data.promise, false);
+               [resolve, reject] = this._unwrap(data.promise, false);
                try {
-                 var result = method.apply(_interface, args);
+                 result = method.apply(_interface, args);
                  if(result instanceof Promise || method.constructor.name === 'AsyncFunction'){
                    result.then(resolve).catch(reject);
                  }
@@ -243,13 +243,13 @@
 
              break;
          case 'callback':
-             var method = this._store.fetch(data.id)[data.num];
-             var args = this._unwrap(data.args, true);
+             method = this._store.fetch(data.id)[data.num];
+             args = this._unwrap(data.args, true);
              args.push({id: this.id})
              if(data.promise){
-               var [resolve, reject] = this._unwrap(data.promise, false);
+               [resolve, reject] = this._unwrap(data.promise, false);
                try {
-                 var result = method.apply(null, args);
+                 result = method.apply(null, args);
                  if(result instanceof Promise || method.constructor && method.constructor.name === 'AsyncFunction'){
                    result.then(resolve).catch(reject);
                  }
@@ -317,7 +317,7 @@
      */
     JailedSite.prototype._setRemote = function(api) {
         this._remote = {ndarray: this._ndarray};
-        var i, name;
+        var i, name, data;
         for (i = 0; i < api.length; i++) {
             name = api[i].name;
             data = api[i].data;
@@ -464,10 +464,10 @@
               // search for prototypes
               var functions = Object.getOwnPropertyNames(Object.getPrototypeOf(this._interface));
               for(var i=0;i<functions.length;i++){
-                var name = functions[i];
-                if(name.startsWith('_')) continue;
-                if(this._interface[name] === v){
-                  interfaceFuncName = name
+                var name_ = functions[i];
+                if(name_.startsWith('_')) continue;
+                if(this._interface[name_] === v){
+                  interfaceFuncName = name_
                   break
                 }
               }
@@ -481,16 +481,17 @@
               }
 
             }
+            /*global tf*/
             else if(typeof tf != 'undefined' && tf.Tensor && v instanceof tf.Tensor){
               const v_buffer = v.dataSync()
               let v_bytes = v_buffer
               if(v_buffer.length > ARRAY_CHUNK){
                 v_bytes = []
                 const rounds = Math.ceil(v_buffer.length/ARRAY_CHUNK)
-                for(let i of _.range(rounds)){
-                  v_bytes[i] = v_buffer.slice(i*ARRAY_CHUNK, (i+1)*ARRAY_CHUNK)
+                for(var j=0; j<rounds; j++){
+                  v_bytes[j] = v_buffer.slice(j*ARRAY_CHUNK, (j+1)*ARRAY_CHUNK)
                   if(v._transfer || _transfer){
-                    transferables.push(v_bytes[i])
+                    transferables.push(v_bytes[j])
                   }
                 }
                 if(v._transfer){
@@ -505,6 +506,7 @@
               }
               bObject[k] = {__jailed_type__: 'ndarray', __value__ : v_bytes, __shape__: v.shape, __dtype__: v.dtype}
             }
+            /*global nj*/
             else if(typeof nj != 'undefined' && nj.NdArray && v instanceof nj.NdArray){
               var dtype = _typedarray2dtype[v.selection.data.constructor.name]
               if(v._transfer || _transfer){
@@ -539,7 +541,7 @@
               bObject[k] =  {__jailed_type__: 'argument', __value__ : v}
             }
             //TODO: support also Map and Set
-            else if(typeof v == "object" || typeof v == "array"){
+            else if(typeof v == "object" || Array.isArray(v)){
               bObject[k] = this._encode(v, callbacks)
               // move transferables to the top level object
               if(bObject[k].__transferables__){
@@ -576,6 +578,7 @@
           else if(aObject.__jailed_type__ == 'plugin_interface'){
             bObject = this._genRemoteMethod(aObject.__value__, aObject.__plugin_id__)
           }
+          /*global nj tf*/
           else if(aObject.__jailed_type__ == 'ndarray'){
             //create build array/tensor if used in the plugin
             if(this.id == '__plugin__' && typeof nj != 'undefined' && nj.array){
@@ -614,7 +617,7 @@
            for (k in aObject) {
             if (isarray || aObject.hasOwnProperty(k)) {
                 v = aObject[k];
-                if(typeof v == "object" || typeof v == "array"){
+                if(typeof v == "object" || Array.isArray(v)){
                   bObject[k] = this._decode(v, callbackId, withPromise)
                 }
              }
@@ -646,7 +649,7 @@
      * @returns {Array} unwrapped args
      */
     JailedSite.prototype._unwrap = function(args, withPromise) {
-        var called = false;
+        // var called = false;
 
         // wraps each callback so that the only one could be called
         // var once = function(cb) {
@@ -681,8 +684,9 @@
      */
     JailedSite.prototype._genRemoteCallback = function(id, argNum, withPromise) {
       var me = this;
+      var remoteCallback;
       if(withPromise){
-        var remoteCallback = function() {
+        remoteCallback = function() {
           return new Promise((resolve, reject) => {
             var args = me._wrap(Array.prototype.slice.call(arguments));
             var transferables = args.args.__transferables__
@@ -700,7 +704,7 @@
         return remoteCallback;
       }
       else{
-        var remoteCallback = function() {
+        remoteCallback = function() {
             var args = me._wrap(Array.prototype.slice.call(arguments));
             var transferables = args.args.__transferables__
             if(transferables) delete args.args.__transferables__
