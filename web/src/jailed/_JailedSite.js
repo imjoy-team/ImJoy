@@ -3,6 +3,8 @@
  * Contains the JailedSite object used both by the application
  * site, and by each plugin
  */
+/*global JailedSite*/
+/*eslint no-global-assign: "off"*/
 
 (function(){
     // var _dtype2typedarray = {
@@ -43,7 +45,7 @@
      * and receive messages from the opposite site (basically it
      * should only provide send() and onMessage() methods)
      */
-    var JailedSite = function(connection, id, lang) {
+    JailedSite = function(connection, id, lang) {
         this.id = id;
         this.lang = lang;
         this._interface = {};

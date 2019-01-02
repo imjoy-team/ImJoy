@@ -13,6 +13,7 @@ module.exports = {
   },
   configureWebpack: {
     module: {
+      // for supressing webpack warnings
       exprContextCritical: false
     },
     plugins: [
@@ -38,10 +39,14 @@ module.exports = {
       karmaConfig: {
         frameworks: ['mocha'],
         files: [
-          'tests/unit/*.spec.js'
+          'tests/unit/*.spec.js',
+          { pattern: 'src/jailed/*', watched: false, included: true, served: true },
         ],
         preprocessors: {
           '**/*.spec.js': ['webpack', 'sourcemap']
+        },
+        proxies: {
+          "src/jailed/": "/static/jailed/"
         },
 
         browsers: ['ChromeNoSandbox', 'Firefox'],
@@ -73,7 +78,12 @@ module.exports = {
 
         // Concurrency level
         // how many browser should be started simultaneous
-        concurrency: Infinity
+        concurrency: Infinity,
+
+        captureTimeout: 210000,
+        browserDisconnectTolerance: 3,
+        browserDisconnectTimeout : 210000,
+        browserNoActivityTimeout : 210000,
       }
     }
   }

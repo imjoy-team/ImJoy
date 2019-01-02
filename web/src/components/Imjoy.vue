@@ -1969,7 +1969,7 @@ export default {
             p = this.loadPlugin(template)
           }
           p.then((plugin) => {
-            // console.log('new plugin loaded', plugin)
+            console.log('new plugin loaded', plugin)
             plugin._id = pconfig._id
             pconfig.name = plugin.name
             pconfig.type = plugin.type
@@ -2689,6 +2689,7 @@ export default {
           if (!plugin.api) {
             console.error('Error occured when loading plugin.')
             this.showMessage('Error occured when loading plugin.')
+            reject('Error occured when loading plugin.')
             throw 'Error occured when loading plugin.'
           }
 
@@ -2700,15 +2701,20 @@ export default {
           if (template.extensions && template.extensions.length > 0) {
             this.registerExtension(template.extensions, plugin)
           }
-          plugin.api.setup().then(() => {
-            resolve(plugin)
-          }).catch((e) => {
-            console.error('error occured when loading plugin ' + template.name + ": ", e)
-            this.showMessage(`<${template.name}>: ${e}`, 15000)
-            reject(e)
-            plugin.terminate()
-          })
-
+          if(plugin.api.setup){
+            plugin.api.setup().then(() => {
+              resolve(plugin)
+            }).catch((e) => {
+              console.error('error occured when loading plugin ' + template.name + ": ", e)
+              this.showMessage(`<${template.name}>: ${e}`, 15000)
+              reject(e)
+              plugin.terminate()
+            })
+          }
+          else{
+            this.showMessage(`No "setup()" function is defined in plugin "${plugin.name}".`)
+            reject(`No "setup()" function is defined in plugin "${plugin.name}".`)
+          }
         });
         plugin.whenFailed((e) => {
           if(e){

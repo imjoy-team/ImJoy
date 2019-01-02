@@ -29,13 +29,13 @@ if (__is__node__) {
     __jailed__path__ = __dirname + '/';
 } else {
     // web
-    var scripts = document.getElementsByTagName("script");
-    // __jailed__path__ = 'static/jailed/'
-    __jailed__path__ = scripts[scripts.length-1].src
-        .split('?')[0]
-        .split('/')
-        .slice(0, -1)
-        .join('/')+'/static/jailed/';
+    __jailed__path__ = `${location.protocol}//${location.hostname}${location.port?':'+location.port:''}/static/jailed/`
+    // var scripts = document.getElementsByTagName("script");
+    // __jailed__path__ = scripts[scripts.length-1].src
+    //     .split('?')[0]
+    //     .split('/')
+    //     .slice(0, -1)
+    //     .join('/')+'/static/jailed/';
 }
 
 function randId() {
