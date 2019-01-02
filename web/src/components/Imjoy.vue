@@ -176,7 +176,7 @@
           </div>
         </md-card-header>
         <md-card-content v-show="workflow_expand">
-          <joy :config="workflow_joy_config" ref="workflow" v-if="plugin_loaded && !updating_workflow"></joy>
+          <joy :config="workflow_joy_config" ref="workflow" v-if="plugin_loaded"></joy>
           <md-button class="md-button md-primary" v-if="plugin_loaded" @click="runWorkflow(workflow_joy_config.joy)">
             <md-icon>play_arrow</md-icon>Run
             <md-tooltip>run the workflow</md-tooltip>
@@ -662,7 +662,6 @@ export default {
       show_file_dialog: false,
       plugins: null,
       registered: null,
-      updating_workflow: false,
       installed_plugins: [],
       available_plugins: [],
       plugin_api: null,
@@ -1969,12 +1968,12 @@ export default {
             p = this.loadPlugin(template)
           }
           p.then((plugin) => {
-            console.log('new plugin loaded', plugin)
+            // console.log('new plugin loaded', plugin)
             plugin._id = pconfig._id
             pconfig.name = plugin.name
             pconfig.type = plugin.type
             pconfig.plugin = plugin
-            if (this.$refs.workflow) this.$refs.workflow.setupJoy()
+            if (this.$refs.workflow && this.$refs.workflow.setupJoy) this.$refs.workflow.setupJoy()
             this.$forceUpdate()
             resolve(plugin)
           }).catch((e) => {
@@ -3061,7 +3060,7 @@ export default {
         this.registered.ops[plugin.name+'/'+config.name] = op_config
 
         //update the joy workflow if new template added, TODO: preserve settings during reload
-        if (this.$refs.workflow) this.$refs.workflow.setupJoy()
+        if (this.$refs.workflow && this.$refs.workflow.setupJoy) this.$refs.workflow.setupJoy()
 
         // console.log('creating panel: ', op_config)
         this.$forceUpdate()

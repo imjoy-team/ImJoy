@@ -80,10 +80,10 @@ module.exports = {
         // how many browser should be started simultaneous
         concurrency: Infinity,
 
-        captureTimeout: 210000,
-        browserDisconnectTolerance: 3,
-        browserDisconnectTimeout : 210000,
-        browserNoActivityTimeout : 210000,
+        // captureTimeout: 210000,
+        // browserDisconnectTolerance: 3,
+        // browserDisconnectTimeout : 210000,
+        // browserNoActivityTimeout : 210000,
       }
     }
   }
