@@ -17,6 +17,10 @@ module.exports = {
         from: path.join(__dirname, "public/docs/index.html"),
         to: path.join(__dirname, "dist/docs/index.html"),
         toType: "file"
+      },{
+        from: path.join(__dirname, "src/jailed"),
+        to: path.join(__dirname, "dist/static/jailed"),
+        toType: "dir"
       }]),
       new MonacoWebpackPlugin({output: 'static/vs'}),
       new webpack.DefinePlugin({

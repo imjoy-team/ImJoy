@@ -206,13 +206,13 @@
           </md-menu>
         </md-card-content>
       </md-card>
-      <div v-if="plugin_loaded">
+      <div v-show="plugin_loaded">
         <md-card>
           <md-card-header>
             <div class="md-layout md-gutter md-alignment-center-space-between">
               <div class="md-layout-item md-size-70">
                 <!-- <span class="md-subheading">Plugins</span> -->
-                <md-button class="md-raised" :class="installed_plugins.length>0?'':'md-primary'" @click="showPluginManagement()">
+                <md-button ref="add_plugin_button" class="md-raised" :class="installed_plugins.length>0?'':'md-primary'" @click="showPluginManagement()">
                   <md-icon>add</md-icon>Plugins
                 </md-button>
               </div>
@@ -338,7 +338,6 @@
           </md-card-content>
         </md-card>
       </div>
-
     </md-app-drawer>
     <md-app-content class="whiteboard-content">
       <md-progress-bar md-mode="determinate" :md-value="progress"></md-progress-bar>
@@ -459,7 +458,7 @@
           <div class="md-title">Create a New Plugin</div>
         </md-card-header>
         <md-card-content>
-          <md-button class="md-primary md-raised centered-button" @click="newPlugin(template);showAddPluginDialog=false" v-for="(template, k) in plugin_templates" :key="k">
+          <md-button :ref="k" class="md-primary md-raised centered-button" @click="newPlugin(template);showAddPluginDialog=false" v-for="(template, k) in plugin_templates" :key="k">
             <md-icon>add</md-icon>{{k}}
           </md-button>
         </md-card-content>
@@ -557,7 +556,6 @@
 </template>
 
 <script>
-/*global jailed*/
 import Vue from 'vue';
 import axios from 'axios';
 import PouchDB from 'pouchdb-browser';
@@ -596,6 +594,9 @@ import {
   Joy
 } from '../joy'
 
+import {
+  DynamicPlugin
+} from '../jailed/jailed.js'
 
 import Ajv from 'ajv'
 const ajv = new Ajv()
@@ -957,7 +958,10 @@ export default {
 
     }).then(() => {
       this.reloadPlugins().then(()=>{
-        this.reloadRepository().finally(()=>{
+        this.event_bus.$emit('plugins_loaded', this.plugins)
+        this.reloadRepository().then((manifest)=>{
+          this.event_bus.$emit('repositories_loaded', manifest)
+        }).finally(()=>{
           if(this.$route.query.plugin || this.$route.query.p){
             const p = (this.$route.query.plugin || this.$route.query.p).trim()
             if (p.match(url_regex) || (p.includes('/') && p.includes(':'))) {
@@ -1000,7 +1004,9 @@ export default {
             }
             this.addWindow(w)
           }
-
+          this.$nextTick(() => {
+            this.event_bus.$emit('imjoy_ready')
+          })
         })
       })
     })
@@ -1985,7 +1991,7 @@ export default {
     },
     savePlugin(pconfig) {
       return new Promise((resolve, reject) => {
-        console.log('saving plugin ', pconfig)
+        // console.log('saving plugin ', pconfig)
         const code = pconfig.code
         try {
           const template = this.parsePluginCode(code, {tag: pconfig.tag})
@@ -2678,7 +2684,7 @@ export default {
         }
         const tconfig = _.assign({}, template, config)
         tconfig.workspace = this.selected_workspace
-        const plugin = new jailed.DynamicPlugin(tconfig, _.assign({TAG: tconfig.tag, WORKSPACE: this.selected_workspace}, this.imjoy_api))
+        const plugin = new DynamicPlugin(tconfig, _.assign({TAG: tconfig.tag, WORKSPACE: this.selected_workspace}, this.imjoy_api))
         plugin.whenConnected(() => {
           if (!plugin.api) {
             console.error('Error occured when loading plugin.')
@@ -3073,7 +3079,7 @@ export default {
         // console.log('rendering window', pconfig)
         const tconfig = _.assign({}, pconfig.plugin, pconfig)
         tconfig.workspace = this.selected_workspace
-        const plugin = new jailed.DynamicPlugin(tconfig, _.assign({TAG: pconfig.tag, WORKSPACE: this.selected_workspace}, this.imjoy_api))
+        const plugin = new DynamicPlugin(tconfig, _.assign({TAG: pconfig.tag, WORKSPACE: this.selected_workspace}, this.imjoy_api))
         plugin.whenConnected(() => {
           if (!plugin.api) {
             console.error('the window plugin seems not ready.')

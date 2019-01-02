@@ -196,10 +196,10 @@
          switch(data.type) {
          case 'method':
              var method;
-             var interface = this._interface;
+             var _interface = this._interface;
              if(data.pid){
-               interface = this._plugin_interfaces[data.pid]
-               if(!interface){
+               _interface = this._plugin_interfaces[data.pid]
+               if(!_interface){
                  if(data.promise){
                    var [resolve, reject] = this._unwrap(data.promise, false);
                    reject(`plugin api function is not avaialbe in "${data.pid}", the plugin maybe terminated.`)
@@ -212,17 +212,17 @@
              }
              if(data.name.indexOf('.') !=-1){
                var names = data.name.split('.')
-               method = interface[names[0]][names[1]];
+               method = _interface[names[0]][names[1]];
              }
              else{
-               method = interface[data.name];
+               method = _interface[data.name];
              }
              var args = this._unwrap(data.args, true);
              args.push({id: this.id})
              if(data.promise){
                var [resolve, reject] = this._unwrap(data.promise, false);
                try {
-                 var result = method.apply(interface, args);
+                 var result = method.apply(_interface, args);
                  if(result instanceof Promise || method.constructor.name === 'AsyncFunction'){
                    result.then(resolve).catch(reject);
                  }
@@ -235,7 +235,7 @@
              }
              else{
                try {
-                 method.apply(interface, args);
+                 method.apply(_interface, args);
                } catch (e) {
                  console.error(e, method, args);
                }
@@ -493,7 +493,6 @@
                     transferables.push(v_bytes[i])
                   }
                 }
-                delete v_buffer
                 if(v._transfer){
                   delete v._transfer
                 }
