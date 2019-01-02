@@ -40,13 +40,13 @@ module.exports = {
         frameworks: ['mocha'],
         files: [
           'tests/unit/*.spec.js',
-          { pattern: 'src/jailed/*', watched: false, included: true, served: true },
+          { pattern: 'src/jailed/*', watched: false, included: false, served: true, nocache: false },
         ],
         preprocessors: {
           '**/*.spec.js': ['webpack', 'sourcemap']
         },
         proxies: {
-          "src/jailed/": "/static/jailed/"
+          "/static/jailed/": "/base/src/jailed/"
         },
 
         browsers: ['ChromeNoSandbox', 'Firefox'],
