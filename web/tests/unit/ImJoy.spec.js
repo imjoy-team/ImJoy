@@ -45,10 +45,18 @@ describe('ImJoy.vue', async () => {
     expect(pconfig.name).to.equal('Untitled Plugin')
   })
 
-  it('should load the new plugin', async () => {
+  it('should load the new plugin ("Web Worker (JS)")', async () => {
     const code = _.clone(wrapper.vm.plugin_templates["Web Worker (JS)"])
     const plugin = await wrapper.vm.reloadPlugin({_id: 'new plugin', tag: null, name:'new plugin', code: code})
     expect(plugin.name).to.equal('Untitled Plugin')
-  }).timeout(20000)
+    expect(plugin.type).to.equal('web-worker')
+  })
+
+  it('should load the new plugin ("Window (HTML/CSS/JS)")', async () => {
+    const code = _.clone(wrapper.vm.plugin_templates["Window (HTML/CSS/JS)"])
+    const plugin = await wrapper.vm.reloadPlugin({_id: 'new plugin', tag: null, name:'new plugin', code: code})
+    expect(plugin.name).to.equal('Untitled Plugin')
+    expect(plugin.type).to.equal('window')
+  })
 
 })
