@@ -18,6 +18,7 @@ before_script:
   - npm prune
 script:
   - export NODE_OPTIONS="--max-old-space-size=4096"
+  - export NO_PROXY="localhost, 0.0.0.0/4201, 0.0.0.0/9876"
   - npm run test:unit
   - npm run lint
   - npm run build
