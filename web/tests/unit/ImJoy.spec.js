@@ -45,21 +45,21 @@ describe('ImJoy.vue', async () => {
     expect(pconfig.name).to.equal('Untitled Plugin')
   })
 
-  // it('should load the new plugin ("Web Worker (JS)")', async () => {
-  //   const code = _.clone(wrapper.vm.plugin_templates[0].code)
-  //   const plugin = await wrapper.vm.reloadPlugin({_id: 'new plugin', tag: null, name:'new plugin', code: code})
-  //   expect(plugin.name).to.equal('Untitled Plugin')
-  //   expect(plugin.type).to.equal('web-worker')
-  //   expect(typeof plugin.api.run).to.equal('function')
-  //   //plugin.api.run()
-  // }).timeout(10000)
+  it('should load the new plugin ("Web Worker (JS)")', async () => {
+    const code = _.clone(wrapper.vm.plugin_templates[0].code)
+    const plugin = await wrapper.vm.reloadPlugin({_id: 'new plugin', tag: null, name:'new plugin', code: code})
+    expect(plugin.name).to.equal('Untitled Plugin')
+    expect(plugin.type).to.equal('web-worker')
+    expect(typeof plugin.api.run).to.equal('function')
+    //plugin.api.run()
+  }).timeout(10000)
 
-  // it('should load the new plugin ("Window (HTML/CSS/JS)")', async () => {
-  //   const code = _.clone(wrapper.vm.plugin_templates[1].code)
-  //   const plugin = await wrapper.vm.reloadPlugin({_id: 'new plugin', tag: null, name:'new plugin', code: code})
-  //   expect(plugin.name).to.equal('Untitled Plugin')
-  //   expect(plugin.type).to.equal('window')
-  //   expect(typeof plugin.api.run).to.equal('function')
-  // }).timeout(10000)
+  it('should load the new plugin ("Window (HTML/CSS/JS)")', async () => {
+    const code = _.clone(wrapper.vm.plugin_templates[1].code)
+    const plugin = await wrapper.vm.reloadPlugin({_id: 'new plugin', tag: null, name:'new plugin', code: code})
+    expect(plugin.name).to.equal('Untitled Plugin')
+    expect(plugin.type).to.equal('window')
+    expect(typeof plugin.api.run).to.equal('function')
+  }).timeout(10000)
 
 })
