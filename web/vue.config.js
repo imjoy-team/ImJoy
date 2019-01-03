@@ -54,7 +54,12 @@ module.exports = {
         customLaunchers: {
           ChromeNoSandbox: {
             base: 'Chrome',
-            flags: ['--no-sandbox']
+            flags: ["--disable-setuid-sandbox",
+                    "--no-sandbox",
+                    "--user-data-dir=/tmp/chrome-test-profile",
+                    "--disable-web-security",
+                    "--no-proxy-server"
+            ]
           }
         },
 
