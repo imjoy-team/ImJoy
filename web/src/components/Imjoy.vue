@@ -458,8 +458,8 @@
           <div class="md-title">Create a New Plugin</div>
         </md-card-header>
         <md-card-content>
-          <md-button :ref="k" class="md-primary md-raised centered-button" @click="newPlugin(template);showAddPluginDialog=false" v-for="(template, k) in plugin_templates" :key="k">
-            <md-icon>add</md-icon>{{k}}
+          <md-button class="md-primary md-raised centered-button" @click="newPlugin(template.code);showAddPluginDialog=false" v-for="template in plugin_templates" :key="template.name">
+            <md-icon>add</md-icon>{{template.name}}
           </md-button>
         </md-card-content>
       </md-card>
@@ -692,13 +692,13 @@ export default {
     this.IMJOY_PLUGIN = {
       _id: 'IMJOY_APP'
     }
-    this.plugin_templates = {
-      "Web Worker (JS)": WEB_WORKER_PLUGIN_TEMPLATE,
-      "Window (HTML/CSS/JS)": WINDOW_PLUGIN_TEMPLATE,
-      "Native Python": NATIVE_PYTHON_PLUGIN_TEMPLATE,
-      // "Iframe(Javascript)": IFRAME_PLUGIN_TEMPLATE,
-      "Web Python (experimental)": WEB_PYTHON_PLUGIN_TEMPLATE
-    }
+    this.plugin_templates = [
+      {name: "Web Worker (JS)", code: WEB_WORKER_PLUGIN_TEMPLATE},
+      {name: "Window (HTML/CSS/JS)", code: WINDOW_PLUGIN_TEMPLATE},
+      {name: "Native Python", code: NATIVE_PYTHON_PLUGIN_TEMPLATE},
+      // {name: "Iframe(Javascript)", code: IFRAME_PLUGIN_TEMPLATE},
+      {name: "Web Python (experimental)", code: WEB_PYTHON_PLUGIN_TEMPLATE}
+    ]
     this.default_window_pos = {
       i: 0,
       x: 0,
@@ -1907,7 +1907,7 @@ export default {
       }
       this.addWindow(w)
     },
-    newPlugin(template) {
+    newPlugin(code) {
       const w = {
         name: 'New Plugin',
         type: 'imjoy/plugin-editor',
@@ -1920,7 +1920,7 @@ export default {
         data: {
           name: 'new plugin',
           id: 'plugin_' + randId(),
-          code: JSON.parse(JSON.stringify(template))
+          code: JSON.parse(JSON.stringify(code))
         }
       }
       this.addWindow(w)
