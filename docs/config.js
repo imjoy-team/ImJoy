@@ -1,13 +1,13 @@
+/*global docute*/
 docute.init({
-  title: 'ImJoy Documentation', // Default to `<title>` value
+  title: 'ImJoy Documentation',
   repo: 'oeway/imjoy',
   twitter: 'weioyang',
-  'edit-link': 'https://github.com/oeway/ImJoy/blob/master/web/public/docs',
+  'edit-link': 'https://github.com/oeway/ImJoy/blob/master/web/src/docs',
   tocVisibleDepth: 4,
   sidebar: true,
   disableSidebarToggle: true,
   nav: [
-    // homepage
     {path: '/', source: 'overview.md'},
     {title: 'ImJoy.IO', path: 'https://imjoy.io'},
     {title: 'Overview', path: '/overview', source: 'overview.md'},
@@ -16,13 +16,5 @@ docute.init({
     {title: 'Development', path: '/development', source: 'development.md'},
     {title: 'ImJoy API', path: '/api', source: 'api.md'},
     {title: 'Demos', path: '/demos', source: 'demos.md'},
-    // {
-    //   title: 'getting started',
-    //   path: '/get-started',
-    //   markdown: '**click** <button @click="count++">{{count}}</button>',
-    //   component: {
-    //     data: () => ({count: 0})
-    //   }
-    // }
   ]
 })

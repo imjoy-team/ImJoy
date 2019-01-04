@@ -1,9 +1,9 @@
 # User Manual
 
 ## Plugin Engine
-The Plugin Engine allows to run native Python plugins. You have to
-[**install**](https://github.com/oeway/ImJoy-App/releases) the
-by either downloading the ImJoy Desktop App or using a provided command line script.
+The Plugin Engine allows to run native Python plugins. You need to **install**
+either the [ImJoy Desktop App](](https://github.com/oeway/ImJoy-App/releases))
+or the [command line script](https://github.com/oeway/ImJoy-engine).
 
 The plugin engine will then check for updates at each launch.
 
@@ -12,16 +12,24 @@ each time you re-start the ImJoy app. If the engine is not connected, you will
 get an error message in the lower part of the ImJoy interface.
 <img  src="./assets/imjoy-warning-connect-engine.png" width="600px"></img>
 
+In the ImJoy interface press the 🚀 symbol to connect it to the Plugin Engine.
+This will open a dialog and ask you for the `Plugin Engine URL` and `Connection token`.
+
+Make sure you started your Plugin Engine, then you can keep the default `Plugin Engine URL`
+(`http://127.0.0.1:8080`), and go to your Plugin Engine dialog or terminal window to get the `Connection token`.
+
+<img
+  src="./assets/imjoy-connection-token.png" width="600px"></img>
+
+
 In order for the ImJoy app to connect to the engine, it requires a connection token.
 When you **launch the Plugin Engine** for the first time it will show a page in
 the browser with the connection token (indicated in green below). Alternatively, this
 token can also be found in the terminal window that opens once you start the engine.
 
 <img
-  src="./assets/imjoy-connectionToken.png" width="600px"></img>
+  src="./assets/imjoy-connection-token.png" width="600px"></img>
 
-In the ImJoy interface press the 🚀 symbol to connect it to the Plugin Engine.
-This will open a dialog where you can specify the token in the `Connection token` field.
 Please note, that the token will be saved in the browser and you will not need to
 enter it anymore to connect to this Plugin Engine. **KEEP THIS TOKEN PRIVATE!!!!**
 
