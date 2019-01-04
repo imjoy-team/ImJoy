@@ -4,12 +4,12 @@ import VueRouter from 'vue-router'
 import { router_config } from '../src/router'
 import Imjoy from '@/components/Imjoy.vue'
 import _ from 'lodash'
-// import {
-//   NATIVE_PYTHON_PLUGIN_TEMPLATE,
-//   WEB_WORKER_PLUGIN_TEMPLATE,
-//   WEB_PYTHON_PLUGIN_TEMPLATE,
-//   WINDOW_PLUGIN_TEMPLATE,
-// } from '../src/api.js'
+import {
+  // NATIVE_PYTHON_PLUGIN_TEMPLATE,
+  WEB_WORKER_PLUGIN_TEMPLATE,
+  WEB_PYTHON_PLUGIN_TEMPLATE,
+  WINDOW_PLUGIN_TEMPLATE,
+} from '../src/api.js'
 
 describe('ImJoy.vue', async () => {
   const localVue = createLocalVue()
@@ -42,7 +42,7 @@ describe('ImJoy.vue', async () => {
 
   it('should create and save the plugin', async () => {
     const old_len = wrapper.vm.windows.length
-    const code = _.clone(wrapper.vm.plugin_templates[0].code)
+    const code = _.clone(WEB_WORKER_PLUGIN_TEMPLATE)
     wrapper.vm.newPlugin(code)
     expect(wrapper.vm.windows).to.have.lengthOf(old_len+1)
     const w = wrapper.vm.windows[old_len]
@@ -51,22 +51,39 @@ describe('ImJoy.vue', async () => {
     expect(pconfig.name).to.equal('Untitled Plugin')
   })
 
-  it('should load the new plugin ("Web Worker (JS)")', async () => {
-    const code = _.clone(wrapper.vm.plugin_templates[0].code)
+  it('should load the new web-worker plugin', async () => {
+    const code = _.clone(WEB_WORKER_PLUGIN_TEMPLATE)
     const plugin = await wrapper.vm.reloadPlugin({_id: 'new plugin', tag: null, name:'new plugin', code: code})
     expect(plugin.name).to.equal('Untitled Plugin')
     expect(plugin.type).to.equal('web-worker')
     expect(typeof plugin.api.run).to.equal('function')
-    plugin.api.run({})
+    await plugin.api.run({})
   }).timeout(10000)
 
-  it('should load the new plugin ("Window (HTML/CSS/JS)")', async () => {
-    const code = _.clone(wrapper.vm.plugin_templates[1].code)
+  it('should load the new window plugin', async () => {
+    const code = _.clone(WINDOW_PLUGIN_TEMPLATE)
     const plugin = await wrapper.vm.reloadPlugin({_id: 'new plugin', tag: null, name:'new plugin', code: code})
     expect(plugin.name).to.equal('Untitled Plugin')
     expect(plugin.type).to.equal('window')
     expect(typeof plugin.api.run).to.equal('function')
-    plugin.api.run({})
+    await plugin.api.run({})
   }).timeout(10000)
 
+  // it('should load the new native-python plugin', async () => {
+  //   const code = _.clone(NATIVE_PYTHON_PLUGIN_TEMPLATE)
+  //   const plugin = await wrapper.vm.reloadPlugin({_id: 'new plugin', tag: null, name:'new plugin', code: code})
+  //   expect(plugin.name).to.equal('Untitled Plugin')
+  //   expect(plugin.type).to.equal('native-python')
+  //   expect(typeof plugin.api.run).to.equal('function')
+  //   plugin.api.run({})
+  // }).timeout(10000)
+
+  it('should load the new web-python plugin', async () => {
+    const code = _.clone(WEB_PYTHON_PLUGIN_TEMPLATE)
+    const plugin = await wrapper.vm.reloadPlugin({_id: 'new plugin', tag: null, name:'new plugin', code: code})
+    expect(plugin.name).to.equal('Untitled Plugin')
+    expect(plugin.type).to.equal('web-python')
+    expect(typeof plugin.api.run).to.equal('function')
+    await plugin.api.run({})
+  }).timeout(10000)
 })

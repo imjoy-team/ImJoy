@@ -1632,7 +1632,7 @@ export default {
             else{
               this.showPluginEngineInfo = true
               if(ret.reason) this.showMessage('Failed to connect: ' + ret.reason)
-              console.error('failed to connect.', ret.reason)
+              console.error('Failed to connect to the plugin engine.', ret.reason)
             }
           }
         })
