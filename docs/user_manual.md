@@ -7,34 +7,24 @@ or the [command line script](https://github.com/oeway/ImJoy-engine).
 
 The plugin engine will then check for updates at each launch.
 
-If you use plugins relying on the engine, you have  **launch** the plugin engine
-each time you re-start the ImJoy app. If the engine is not connected, you will
-get an error message in the lower part of the ImJoy interface.
-<img  src="./assets/imjoy-warning-connect-engine.png" width="600px"></img>
+If you use `native-python` plugins, you will need to **launch** the Plugin Engine before you can use them. You will get an error message if you try to run those plugins.
 
-In the ImJoy interface press the 🚀 symbol to connect it to the Plugin Engine.
+In order to start the the Plugin Engine, press the 🚀 symbol in the [ImJoy Web App](https://imjoy.io/#/app) to connect it to the Plugin Engine.
+
 This will open a dialog and ask you for the `Plugin Engine URL` and `Connection token`.
-
-Make sure you started your Plugin Engine, then you can keep the default `Plugin Engine URL`
-(`http://127.0.0.1:8080`), and go to your Plugin Engine dialog or terminal window to get the `Connection token`.
-
-<img
-  src="./assets/imjoy-connection-token.png" width="600px"></img>
-
-
-In order for the ImJoy app to connect to the engine, it requires a connection token.
-When you **launch the Plugin Engine** for the first time it will show a page in
-the browser with the connection token (indicated in green below). Alternatively, this
-token can also be found in the terminal window that opens once you start the engine.
-
-<img
-  src="./assets/imjoy-connection-token.png" width="600px"></img>
-
-Please note, that the token will be saved in the browser and you will not need to
-enter it anymore to connect to this Plugin Engine. **KEEP THIS TOKEN PRIVATE!!!!**
-
 <img
   src="./assets/imjoy-install-engine.png" width="600px"></img>
+
+You can keep the default `Plugin Engine URL`(`http://127.0.0.1:8080`), and go to
+your Plugin Engine dialog or terminal window to get the `Connection token`.
+
+<img
+  src="./assets/imjoy-connection-token.png" width="600px"></img>
+
+
+Please note, that the connection token will be saved in the browser and you will
+not need to enter it anymore to connect to this Plugin Engine.
+**KEEP THIS TOKEN PRIVATE!!!!**
 
 
 ## Access the Plugin Engine from a command line interface
