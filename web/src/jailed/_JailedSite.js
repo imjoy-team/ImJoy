@@ -389,7 +389,7 @@
               }, transferables);
             } catch (e) {
               if(id) me._method_refs.fetch(id);
-              console.error(e)
+              reject(`Failed to exectue remote method (plugin: ${plugin_id}, method: ${name}).`)
             }
 
           });
@@ -693,14 +693,18 @@
             var args = me._wrap(Array.prototype.slice.call(arguments));
             var transferables = args.args.__transferables__
             if(transferables) delete args.args.__transferables__
-            me._connection.send({
-                type : 'callback',
-                id   : id,
-                num  : argNum,
-                args : args,
-                // pid :  me.id,
-                promise : me._wrap([resolve, reject])
-            }, transferables);
+            try {
+              me._connection.send({
+                  type : 'callback',
+                  id   : id,
+                  num  : argNum,
+                  args : args,
+                  // pid :  me.id,
+                  promise : me._wrap([resolve, reject])
+              }, transferables);
+            } catch (e) {
+              reject(`Failed to exectue remote callback (id: ${id}, argNum: ${argNum}).`)
+            }
           });
         };
         return remoteCallback;
