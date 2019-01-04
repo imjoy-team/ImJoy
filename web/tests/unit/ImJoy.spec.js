@@ -51,7 +51,7 @@ describe('ImJoy.vue', async () => {
     expect(plugin.name).to.equal('Untitled Plugin')
     expect(plugin.type).to.equal('web-worker')
     expect(typeof plugin.api.run).to.equal('function')
-    //plugin.api.run()
+    plugin.api.run({})
   }).timeout(10000)
 
   it('should load the new plugin ("Window (HTML/CSS/JS)")', async () => {
@@ -60,6 +60,7 @@ describe('ImJoy.vue', async () => {
     expect(plugin.name).to.equal('Untitled Plugin')
     expect(plugin.type).to.equal('window')
     expect(typeof plugin.api.run).to.equal('function')
+    plugin.api.run({})
   }).timeout(10000)
 
 })
