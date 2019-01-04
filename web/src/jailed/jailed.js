@@ -858,7 +858,8 @@ DynamicPlugin.prototype._init =
     });
 
     this._site.onRemoteBusy(function() {
-        me.running = true;
+        if(!me._disconnected)
+          me.running = true;
         // me._initialInterface.$forceUpdate&&me._initialInterface.$forceUpdate();
     });
 
@@ -1051,6 +1052,7 @@ DynamicPlugin.prototype.terminate =
         this.api.exit().finally(()=>{
           this._disconnected = true
           this.running = false
+          this.initializing = false
           // this._initialInterface.$forceUpdate&&this._initialInterface.$forceUpdate();
           this._site&&this._site.disconnect();
         })
@@ -1058,6 +1060,7 @@ DynamicPlugin.prototype.terminate =
       else{
         this._disconnected = true
         this.running = false
+        this.initializing = false
         // this._initialInterface.$forceUpdate&&this._initialInterface.$forceUpdate();
         this._site&&this._site.disconnect();
       }
@@ -1068,6 +1071,7 @@ DynamicPlugin.prototype.terminate =
       console.error('error occured when terminating the plugin',e)
       this._disconnected = true
       this.running = false
+      this.initializing = false
       // this._initialInterface.$forceUpdate&&this._initialInterface.$forceUpdate();
       this._site&&this._site.disconnect();
       if(callback){

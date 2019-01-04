@@ -2045,7 +2045,7 @@ export default {
           const plugin = this.plugins[k]
           if(plugin.type === 'native-python'){
             try {
-              Joy.remove(plugin.config.type)
+              Joy.remove(plugin.name)
               // console.log('terminating ',plugin)
               if (typeof plugin.terminate === 'function') {
                 plugin.terminate()
