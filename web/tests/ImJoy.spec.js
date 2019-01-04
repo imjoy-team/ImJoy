@@ -1,9 +1,15 @@
 import { expect } from 'chai'
 import { shallowMount, createLocalVue } from '@vue/test-utils'
 import VueRouter from 'vue-router'
-import { router_config } from '../../src/router'
+import { router_config } from '../src/router'
 import Imjoy from '@/components/Imjoy.vue'
 import _ from 'lodash'
+// import {
+//   NATIVE_PYTHON_PLUGIN_TEMPLATE,
+//   WEB_WORKER_PLUGIN_TEMPLATE,
+//   WEB_PYTHON_PLUGIN_TEMPLATE,
+//   WINDOW_PLUGIN_TEMPLATE,
+// } from '../src/api.js'
 
 describe('ImJoy.vue', async () => {
   const localVue = createLocalVue()

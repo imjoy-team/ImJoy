@@ -1,3 +1,4 @@
+/*global docute*/
 docute.init({
   title: 'ImJoy Documentation', // Default to `<title>` value
   repo: 'oeway/imjoy',

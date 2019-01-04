@@ -2573,15 +2573,17 @@ export default {
               }
             }
         }
+        config = this.upgradeAPI(config)
         if (!PLUGIN_SCHEMA(config)) {
           const error = PLUGIN_SCHEMA.errors(config)
           console.error("Invalid plugin config: " + config.name, error)
           throw error
         }
+        return config
       } catch (e) {
+        console.error(e)
         throw "Failed to parse the content of the plugin."
       }
-      return this.upgradeAPI(config)
     },
     upgradeAPI(config){
       if(compareVersions(config.api_version, '<=', '0.1.1')){
