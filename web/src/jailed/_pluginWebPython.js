@@ -7,7 +7,7 @@
  * connection object for the plugin site
  */
 
-
+/*global api pyodide languagePluginLoader*/
 window.application = {};
 window.connection = {};
 window.api = null;
@@ -41,7 +41,7 @@ async function importScripts () {
   for (; i < len; i++) {
     await _importScript(args[i])
   }
-};
+}
 
 
 // event listener for the plugin message
@@ -86,8 +86,8 @@ var importScript = function(url) {
     }
 
     if (error) {
-        throw error;
         failure();
+        throw error;
     }
 }
 

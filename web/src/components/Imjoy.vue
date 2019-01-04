@@ -176,7 +176,7 @@
           </div>
         </md-card-header>
         <md-card-content v-show="workflow_expand">
-          <joy :config="workflow_joy_config" ref="workflow" v-if="plugin_loaded && !updating_workflow"></joy>
+          <joy :config="workflow_joy_config" ref="workflow" v-if="plugin_loaded"></joy>
           <md-button class="md-button md-primary" v-if="plugin_loaded" @click="runWorkflow(workflow_joy_config.joy)">
             <md-icon>play_arrow</md-icon>Run
             <md-tooltip>run the workflow</md-tooltip>
@@ -206,13 +206,13 @@
           </md-menu>
         </md-card-content>
       </md-card>
-      <div v-if="plugin_loaded">
+      <div v-show="plugin_loaded">
         <md-card>
           <md-card-header>
             <div class="md-layout md-gutter md-alignment-center-space-between">
               <div class="md-layout-item md-size-70">
                 <!-- <span class="md-subheading">Plugins</span> -->
-                <md-button class="md-raised" :class="installed_plugins.length>0?'':'md-primary'" @click="showPluginManagement()">
+                <md-button ref="add_plugin_button" class="md-raised" :class="installed_plugins.length>0?'':'md-primary'" @click="showPluginManagement()">
                   <md-icon>add</md-icon>Plugins
                 </md-button>
               </div>
@@ -338,7 +338,6 @@
           </md-card-content>
         </md-card>
       </div>
-
     </md-app-drawer>
     <md-app-content class="whiteboard-content">
       <md-progress-bar md-mode="determinate" :md-value="progress"></md-progress-bar>
@@ -459,8 +458,8 @@
           <div class="md-title">Create a New Plugin</div>
         </md-card-header>
         <md-card-content>
-          <md-button class="md-primary md-raised centered-button" @click="newPlugin(template);showAddPluginDialog=false" v-for="(template, k) in plugin_templates" :key="k">
-            <md-icon>add</md-icon>{{k}}
+          <md-button class="md-primary md-raised centered-button" @click="newPlugin(template.code);showAddPluginDialog=false" v-for="template in plugin_templates" :key="template.name">
+            <md-icon>add</md-icon>{{template.name}}
           </md-button>
         </md-card-content>
       </md-card>
@@ -557,7 +556,7 @@
 </template>
 
 <script>
-/*global jailed*/
+import Vue from 'vue';
 import axios from 'axios';
 import PouchDB from 'pouchdb-browser';
 import { saveAs } from 'file-saver';
@@ -595,6 +594,9 @@ import {
   Joy
 } from '../joy'
 
+import {
+  DynamicPlugin
+} from '../jailed/jailed.js'
 
 import Ajv from 'ajv'
 const ajv = new Ajv()
@@ -660,7 +662,6 @@ export default {
       show_file_dialog: false,
       plugins: null,
       registered: null,
-      updating_workflow: false,
       installed_plugins: [],
       available_plugins: [],
       plugin_api: null,
@@ -684,10 +685,6 @@ export default {
     }
   },
   created() {
-    this.event_bus = this.$root.$data.store && this.$root.$data.store.event_bus
-    this.event_bus.$on('resize', this.updateSize)
-    this.updateSize({width: window.innerWidth})
-
     this.window_ids = {}
     this.plugin_names = null
     this.db = null
@@ -695,13 +692,13 @@ export default {
     this.IMJOY_PLUGIN = {
       _id: 'IMJOY_APP'
     }
-    this.plugin_templates = {
-      "Web Worker (JS)": WEB_WORKER_PLUGIN_TEMPLATE,
-      "Window (HTML/CSS/JS)": WINDOW_PLUGIN_TEMPLATE,
-      "Native Python": NATIVE_PYTHON_PLUGIN_TEMPLATE,
-      // "Iframe(Javascript)": IFRAME_PLUGIN_TEMPLATE,
-      "Web Python (experimental)": WEB_PYTHON_PLUGIN_TEMPLATE
-    }
+    this.plugin_templates = [
+      {name: "Web Worker (JS)", code: WEB_WORKER_PLUGIN_TEMPLATE},
+      {name: "Window (HTML/CSS/JS)", code: WINDOW_PLUGIN_TEMPLATE},
+      {name: "Native Python", code: NATIVE_PYTHON_PLUGIN_TEMPLATE},
+      // {name: "Iframe(Javascript)", code: IFRAME_PLUGIN_TEMPLATE},
+      {name: "Web Python (experimental)", code: WEB_PYTHON_PLUGIN_TEMPLATE}
+    ]
     this.default_window_pos = {
       i: 0,
       x: 0,
@@ -802,6 +799,11 @@ export default {
     }
   },
   mounted() {
+    // mocks it for testing if not available
+    this.event_bus = this.$root.$data.store && this.$root.$data.store.event_bus || new Vue()
+    this.event_bus.$on('resize', this.updateSize)
+    this.updateSize({width: window.innerWidth})
+
     this.is_https_mode = ('https:' === location.protocol)
     // Make sure the GUI is refreshed
     setInterval(()=>{this.$forceUpdate()}, 5000)
@@ -955,7 +957,10 @@ export default {
 
     }).then(() => {
       this.reloadPlugins().then(()=>{
-        this.reloadRepository().finally(()=>{
+        this.event_bus.$emit('plugins_loaded', this.plugins)
+        this.reloadRepository().then((manifest)=>{
+          this.event_bus.$emit('repositories_loaded', manifest)
+        }).finally(()=>{
           if(this.$route.query.plugin || this.$route.query.p){
             const p = (this.$route.query.plugin || this.$route.query.p).trim()
             if (p.match(url_regex) || (p.includes('/') && p.includes(':'))) {
@@ -998,7 +1003,9 @@ export default {
             }
             this.addWindow(w)
           }
-
+          this.$nextTick(() => {
+            this.event_bus.$emit('imjoy_ready')
+          })
         })
       })
     })
@@ -1625,7 +1632,7 @@ export default {
             else{
               this.showPluginEngineInfo = true
               if(ret.reason) this.showMessage('Failed to connect: ' + ret.reason)
-              console.error('failed to connect.', ret.reason)
+              console.error('Failed to connect to the plugin engine.', ret.reason)
             }
           }
         })
@@ -1900,7 +1907,7 @@ export default {
       }
       this.addWindow(w)
     },
-    newPlugin(template) {
+    newPlugin(code) {
       const w = {
         name: 'New Plugin',
         type: 'imjoy/plugin-editor',
@@ -1913,7 +1920,7 @@ export default {
         data: {
           name: 'new plugin',
           id: 'plugin_' + randId(),
-          code: JSON.parse(JSON.stringify(template))
+          code: JSON.parse(JSON.stringify(code))
         }
       }
       this.addWindow(w)
@@ -1966,7 +1973,7 @@ export default {
             pconfig.name = plugin.name
             pconfig.type = plugin.type
             pconfig.plugin = plugin
-            if (this.$refs.workflow) this.$refs.workflow.setupJoy()
+            if (this.$refs.workflow && this.$refs.workflow.setupJoy) this.$refs.workflow.setupJoy()
             this.$forceUpdate()
             resolve(plugin)
           }).catch((e) => {
@@ -1983,7 +1990,7 @@ export default {
     },
     savePlugin(pconfig) {
       return new Promise((resolve, reject) => {
-        console.log('saving plugin ', pconfig)
+        // console.log('saving plugin ', pconfig)
         const code = pconfig.code
         try {
           const template = this.parsePluginCode(code, {tag: pconfig.tag})
@@ -2566,15 +2573,17 @@ export default {
               }
             }
         }
+        config = this.upgradeAPI(config)
         if (!PLUGIN_SCHEMA(config)) {
           const error = PLUGIN_SCHEMA.errors(config)
           console.error("Invalid plugin config: " + config.name, error)
           throw error
         }
+        return config
       } catch (e) {
+        console.error(e)
         throw "Failed to parse the content of the plugin."
       }
-      return this.upgradeAPI(config)
     },
     upgradeAPI(config){
       if(compareVersions(config.api_version, '<=', '0.1.1')){
@@ -2676,11 +2685,12 @@ export default {
         }
         const tconfig = _.assign({}, template, config)
         tconfig.workspace = this.selected_workspace
-        const plugin = new jailed.DynamicPlugin(tconfig, _.assign({TAG: tconfig.tag, WORKSPACE: this.selected_workspace}, this.imjoy_api))
+        const plugin = new DynamicPlugin(tconfig, _.assign({TAG: tconfig.tag, WORKSPACE: this.selected_workspace}, this.imjoy_api))
         plugin.whenConnected(() => {
           if (!plugin.api) {
             console.error('Error occured when loading plugin.')
             this.showMessage('Error occured when loading plugin.')
+            reject('Error occured when loading plugin.')
             throw 'Error occured when loading plugin.'
           }
 
@@ -2692,15 +2702,20 @@ export default {
           if (template.extensions && template.extensions.length > 0) {
             this.registerExtension(template.extensions, plugin)
           }
-          plugin.api.setup().then(() => {
-            resolve(plugin)
-          }).catch((e) => {
-            console.error('error occured when loading plugin ' + template.name + ": ", e)
-            this.showMessage(`<${template.name}>: ${e}`, 15000)
-            reject(e)
-            plugin.terminate()
-          })
-
+          if(plugin.api.setup){
+            plugin.api.setup().then(() => {
+              resolve(plugin)
+            }).catch((e) => {
+              console.error('error occured when loading plugin ' + template.name + ": ", e)
+              this.showMessage(`<${template.name}>: ${e}`, 15000)
+              reject(e)
+              plugin.terminate()
+            })
+          }
+          else{
+            this.showMessage(`No "setup()" function is defined in plugin "${plugin.name}".`)
+            reject(`No "setup()" function is defined in plugin "${plugin.name}".`)
+          }
         });
         plugin.whenFailed((e) => {
           if(e){
@@ -3047,7 +3062,7 @@ export default {
         this.registered.ops[plugin.name+'/'+config.name] = op_config
 
         //update the joy workflow if new template added, TODO: preserve settings during reload
-        if (this.$refs.workflow) this.$refs.workflow.setupJoy()
+        if (this.$refs.workflow && this.$refs.workflow.setupJoy) this.$refs.workflow.setupJoy()
 
         // console.log('creating panel: ', op_config)
         this.$forceUpdate()
@@ -3071,7 +3086,7 @@ export default {
         // console.log('rendering window', pconfig)
         const tconfig = _.assign({}, pconfig.plugin, pconfig)
         tconfig.workspace = this.selected_workspace
-        const plugin = new jailed.DynamicPlugin(tconfig, _.assign({TAG: pconfig.tag, WORKSPACE: this.selected_workspace}, this.imjoy_api))
+        const plugin = new DynamicPlugin(tconfig, _.assign({TAG: pconfig.tag, WORKSPACE: this.selected_workspace}, this.imjoy_api))
         plugin.whenConnected(() => {
           if (!plugin.api) {
             console.error('the window plugin seems not ready.')

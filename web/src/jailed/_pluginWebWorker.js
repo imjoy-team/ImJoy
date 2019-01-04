@@ -6,6 +6,7 @@
  * connection object for the plugin site
  */
 
+/*global importScripts*/
 self.application = {};
 self.connection = {};
 
@@ -121,6 +122,6 @@ self.connection = {};
         onDisconnect: function() {}
     };
 
-    connection = conn;
+    self.connection = conn;
 
 })();

@@ -1,16 +1,17 @@
-
+/* eslint-disable */
 /**
  * Core plugin script loaded into the plugin process/thread.
  *
  * Initializes the plugin-site API global methods.
  */
 
+/*global JailedSite connection*/
+/*eslint no-global-assign: "off"*/
 (function(){
-
     // localize
     var site = new JailedSite(connection, '__plugin__', 'javascript');
-    delete JailedSite;
-    delete connection;
+    JailedSite = null;
+    connection = null;
 
     site.onGetInterface(function(){
         launchConnected();
