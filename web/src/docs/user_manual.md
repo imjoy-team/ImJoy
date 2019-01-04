@@ -9,9 +9,9 @@ The plugin engine will then check for updates at each launch.
 
 If you use `native-python` plugins, you will need to **launch** the Plugin Engine before you can use them. You will get an error message if you try to run those plugins.
 
-In order to start the the Plugin Engine, press the 🚀 symbol in the [ImJoy Web App](https://imjoy.io/#/app) to connect it to the Plugin Engine.
+You need to frist start the Plugin Engine from the ImJoy Desktop App or in a terminal. 
 
-This will open a dialog and ask you for the `Plugin Engine URL` and `Connection token`.
+Then go to the ImJoy Web App and click the 🚀 symbol located at the top-right corner. This will open a dialog and ask you for the `Plugin Engine URL` and `Connection token`.
 <img
   src="./assets/imjoy-install-engine.png" width="600px"></img>
 
