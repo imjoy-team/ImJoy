@@ -49,17 +49,12 @@ module.exports = {
           "/static/jailed/": "/base/src/jailed/"
         },
 
-        browsers: ['ChromeNoSandbox', 'Firefox'],
+        browsers: ['ChromeHeadlessNoSandbox', 'Firefox'],
 
         customLaunchers: {
-          ChromeNoSandbox: {
-            base: 'Chrome',
-            flags: ["--disable-setuid-sandbox",
-                    "--no-sandbox",
-                    "--user-data-dir=/tmp/chrome-test-profile",
-                    "--disable-web-security",
-                    "--no-proxy-server"
-            ]
+          ChromeHeadlessNoSandbox: {
+            base: 'ChromeHeadless',
+            flags: ["--no-sandbox"]
           }
         },
 
