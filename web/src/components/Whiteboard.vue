@@ -16,7 +16,8 @@
 
 <script>
 import {
-  randId
+  randId,
+  assert
 } from '../utils.js'
 import {
   WindowManager
@@ -54,6 +55,7 @@ export default {
   created(){
     this.wm = this.windowManager
     this.windows = this.wm && this.wm.windows
+    assert(this.windows)
     this.event_bus = this.$root.$data.store && this.$root.$data.store.event_bus
     this.event_bus.$on('add_window', this.onWindowAdd)
     this.event_bus.$on('resize', this.updateSize)

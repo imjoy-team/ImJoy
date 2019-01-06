@@ -136,7 +136,7 @@
             <!-- <div class="site-title">ImJoy.io<span class="superscript">alpha</span></div> -->
           </md-button>
         </div>
-        <div class="md-toolbar-section-end">
+        <div class="md-toolbar-section-end" v-if="pm">
           <md-menu>
             <md-button class="md-icon-button md-primary" md-menu-trigger>
               <md-icon>widgets</md-icon>
@@ -161,7 +161,7 @@
         </div>
       </div>
       <br>
-      <md-card>
+      <md-card v-if="pm">
         <md-card-header>
           <div class="md-layout md-gutter md-alignment-center-space-between">
             <div class="md-layout-item md-size-70">
@@ -206,7 +206,7 @@
           </md-menu>
         </md-card-content>
       </md-card>
-      <div v-show="plugin_loaded">
+      <div v-show="plugin_loaded" v-if="pm">
         <md-card>
           <md-card-header>
             <div class="md-layout md-gutter md-alignment-center-space-between">
@@ -657,6 +657,8 @@ export default {
     }
   },
   created() {
+    // mocks it for testing if not available
+    this.event_bus = this.$root.$data.store && this.$root.$data.store.event_bus || new Vue()
     const imjoy_api = {
       alert: this.showAlert,
       showDialog: this.showDialog,
@@ -780,8 +782,7 @@ export default {
     }
   },
   mounted() {
-    // mocks it for testing if not available
-    this.event_bus = this.$root.$data.store && this.$root.$data.store.event_bus || new Vue()
+
     this.event_bus.$on('resize', this.updateSize)
     this.event_bus.$on('plugin_loaded', ()=>{
       //update the joy workflow if new template added, TODO: preserve settings during reload
@@ -842,7 +843,7 @@ export default {
         this.pm.reloadPlugins().then(()=>{
           this.plugin_loaded = true
           this.$forceUpdate()
-          this.event_bus.$emit('plugins_loaded', this.plugins)
+          this.event_bus.$emit('plugins_loaded', this.pm.plugins)
           this.pm.reloadRepository().then((manifest)=>{
             this.$forceUpdate()
             this.event_bus.$emit('repositories_loaded', manifest)
@@ -911,6 +912,7 @@ export default {
         try {
           w.refresh = this.$forceUpdate
           this.$nextTick(() => {
+            this.$forceUpdate()
             resolve()
           })
         } catch (e) {
@@ -965,7 +967,6 @@ export default {
       }
       this.showMessage(msg, duration)
     },
-
     showFileDialog(options, _plugin){
       if(!this.em.engine_connected){
         this.showMessage('File Dialog requires the plugin engine, please connect to the plugin engine.')
@@ -976,7 +977,7 @@ export default {
         options = {}
       }
       if(_plugin && _plugin.id){
-        const source_plugin = this.plugins[_plugin.id]
+        const source_plugin = this.pm.plugins[_plugin.id]
         if(source_plugin || _plugin === this.IMJOY_PLUGIN){
           if(source_plugin){
             options.root = options.root || (source_plugin.config && source_plugin.config.work_dir)
@@ -994,7 +995,6 @@ export default {
         return this.$refs['file-dialog'].showDialog(options, _plugin)
       }
     },
-
     connectPlugin(plugin){
       if(plugin._disconnected){
         if(plugin.type === 'native-python' && !this.em.engine_connected){
@@ -1005,7 +1005,6 @@ export default {
         }
       }
     },
-
     getPlugin4Install(plugin_url){
       this.plugin4install = null
       this.downloading_error = ""
@@ -1020,7 +1019,6 @@ export default {
         this.showMessage("Sorry, the plugin URL is invalid: " + e.toString())
       })
     },
-
     showPluginManagement(){
       this.plugin4install=null
       this.downloading_error=''
@@ -1031,7 +1029,6 @@ export default {
       this.show_plugin_url=true
       this.showAddPluginDialog=true
     },
-
     sortedRunnablePlugins: function() {
         return _.orderBy(this.pm.plugins, 'name').filter((p)=>{return p.config.runnable});
     },
@@ -1131,7 +1128,7 @@ export default {
           reject("Plugin not found.")
           return
         }
-        const source_plugin = this.plugins[_plugin.id]
+        const source_plugin = this.pm.plugins[_plugin.id]
         const plugin_name = source_plugin && source_plugin.name
         if(_plugin !== this.IMJOY_PLUGIN && !plugin_name){
           reject("Plugin name not found.")
@@ -1202,7 +1199,7 @@ export default {
       saveAs(file, name || file._name || 'file_export');
     },
     showDoc(pid) {
-      const plugin = this.plugins[pid]
+      const plugin = this.pm.plugins[pid]
       const pconfig = plugin.config
       const w = {
         name: "About " + pconfig.name,
@@ -1225,7 +1222,7 @@ export default {
       this.$router.replace({ query });
     },
     sharePlugin(pid){
-      const plugin = this.plugins[pid]
+      const plugin = this.pm.plugins[pid]
       const pconfig = plugin.config
       if(pconfig.origin){
         this.share_url_message = `<h2>Sharing "${plugin.name}"</h2> <br> <a href="https://imjoy.io/#/app?p=${pconfig.origin}" target="_blank">https://imjoy.io/#/app?p=${pconfig.origin}</a> <br> (Right click on the link and select "Copy Link Address")`
@@ -1241,7 +1238,7 @@ export default {
       }
     },
     updatePlugin(pid){
-      const plugin = this.plugins[pid]
+      const plugin = this.pm.plugins[pid]
       const pconfig = plugin.config
       if(pconfig.origin){
         this.pm.installPlugin(pconfig.origin)
@@ -1251,16 +1248,14 @@ export default {
       }
     },
     editPlugin(pid) {
-      const plugin = this.plugins[pid]
+      const plugin = this.pm.plugins[pid]
       const pconfig = plugin.config
       const w = {
         name: pconfig.name || 'plugin',
         type: 'imjoy/plugin-editor',
         config: {},
         plugin: plugin,
-        reload: this.reloadPlugin,
-        save: this.savePlugin,
-        remove: this.pm.removePlugin,
+        plugin_manager: this.pm,
         w: 10,
         h: 10,
         data: {
@@ -1276,8 +1271,7 @@ export default {
         name: 'New Plugin',
         type: 'imjoy/plugin-editor',
         config: {},
-        reload: this.reloadPlugin,
-        save: this.savePlugin,
+        plugin_manager: this.pm,
         w: 10,
         h: 10,
         plugin: {},
@@ -1289,8 +1283,6 @@ export default {
       }
       this.wm.addWindow(w)
     },
-
-
     showProgress(p) {
       if (p < 1) this.progress = p * 100
       else this.progress = p
@@ -1302,7 +1294,7 @@ export default {
     },
     showPluginProgress(p, _plugin){
       if(_plugin && _plugin.id){
-        const source_plugin = this.plugins[_plugin.id]
+        const source_plugin = this.pm.plugins[_plugin.id]
         if(source_plugin){
           if (p < 1) source_plugin.progress = p * 100
           else source_plugin.progress = p
@@ -1312,7 +1304,7 @@ export default {
     },
     showPluginStatus(s, _plugin){
       if(_plugin && _plugin.id){
-        const source_plugin = this.plugins[_plugin.id]
+        const source_plugin = this.pm.plugins[_plugin.id]
         if(source_plugin){
           source_plugin.status_text = s
           this.$forceUpdate()
@@ -1384,7 +1376,7 @@ export default {
           // console.log('result', w)
           w.name = w.name || 'result'
           w.type = w.type || 'imjoy/generic'
-          this.createWindow(w)
+          this.pm.createWindow(w)
         }
 
         this.progress = 100
@@ -1404,7 +1396,6 @@ export default {
       this.share_url_message = `${location.protocol}//${location.hostname}${location.port ? ':'+location.port: ''}/#/app/?workflow=${url}`
       this.showShareUrl = true
     },
-
     runOp(op) {
       // console.log('run op.', this.wm.active_windows)
       this.status_text = ''
@@ -1422,7 +1413,7 @@ export default {
           console.log('result', w)
           w.name = w.name || 'result'
           w.type = w.type || 'imjoy/generic'
-          this.createWindow(w)
+          this.pm.createWindow(w)
         }
         this.progress = 100
       }).catch((e) => {

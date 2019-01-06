@@ -1,5 +1,4 @@
 import PouchDB from 'pouchdb-browser';
-import Vue from 'vue';
 import axios from 'axios';
 import _ from 'lodash'
 
@@ -40,9 +39,12 @@ const ajv = new Ajv()
 
 export class PluginManager {
   constructor({event_bus=null, engine_manager=null, window_manager=null, imjoy_api={}, show_message_callback=null}){
-    this.event_bus = event_bus || new Vue()
+    this.event_bus = event_bus
     this.em = engine_manager
     this.wm = window_manager
+    assert(this.event_bus)
+    assert(this.em)
+    assert(this.wm)
 
     this.show_message_callback = show_message_callback
 
@@ -81,6 +83,7 @@ export class PluginManager {
     this.pluing_context = {}
     this.imjoy_api_utils = imjoy_api.utils
     this.imjoy_api = _.assign({}, imjoy_api, {
+      __this__: this,
       register: this.register,
       createWindow: this.createWindow,
       updateWindow: this.updateWindow,
@@ -149,7 +152,7 @@ export class PluginManager {
           console.error("Database Error", err)
         }
         else{
-          console.error('Failed to load repository list', err)
+          console.log('Failed to load repository list', err)
         }
         this.repository_list = this.default_repository_list
         this.config_db.put({
@@ -202,7 +205,6 @@ export class PluginManager {
         })
       }).catch((err) => {
         this.showMessage("Failed to save repository, database Error:" + err.toString())
-        this.status_text = "Failed to save repository, database Error:" + err.toString()
       })
     }).catch(()=>{
       if(this.repository_names.indexOf(repo.name)>=0)
@@ -239,7 +241,6 @@ export class PluginManager {
       })
       .catch((err) => {
         this.showMessage("Failed to save repository, database Error:" + err.toString())
-        this.status_text = "Failed to save repository, database Error:" + err.toString()
       })
     }
   }
@@ -673,8 +674,7 @@ export class PluginManager {
         this.showMessage(`"${plugin.name}" has been removed.`)
         resolve()
       }).catch((err) => {
-        this.status_text = err.toString() || "Error occured."
-        this.showMessage(this.status_text)
+        this.showMessage( err.toString() || "Error occured.")
         console.error('error occured when removing ', plugin, err)
         reject(err)
       });
@@ -754,7 +754,6 @@ export class PluginManager {
           reject(e)
         })
       } catch (e) {
-        this.status_text = e || "Error."
         this.showMessage(e || "Error.", 15000)
         reject(e)
       }
@@ -797,7 +796,6 @@ export class PluginManager {
           addPlugin()
         });
       } catch (e) {
-        this.status_text = e || "Error."
         this.showMessage( e || "Error.", 15000)
         reject(e)
       }
@@ -977,7 +975,6 @@ export class PluginManager {
   }
 
   loadPlugin(template, rplugin) {
-    this.status_text = ''
     template = _clone(template)
     this.validatePluginConfig(template)
     //generate a random id for the plugin
@@ -1035,11 +1032,9 @@ export class PluginManager {
       });
       plugin.whenFailed((e) => {
         if(e){
-          this.status_text = `<${template.name}> ${e.toString()}`
           this.showMessage(`<${template.name}>: ${e}`)
         }
         else{
-          this.status_text = `Error occured when loading ${template.name}.`
           this.showMessage(`Error occured when loading ${template.name}.`)
         }
         console.error('error occured when loading ' + template.name + ": ", e)

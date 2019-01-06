@@ -40,7 +40,8 @@
 <script>
 import { saveAs } from 'file-saver';
 import {
-  randId
+  randId,
+  assert
 } from '../utils.js'
 
 window.MonacoEnvironment = {
@@ -115,11 +116,12 @@ export default {
     // this.editor.addCommand( window.monaco.KeyMod.CtrlCmd |  window.monaco.KeyCode.KEY_R, ()=>{
     //   this.reload()
     // });
+    assert(this.window.plugin_manager)
   },
   methods: {
     save(){
       this.$emit('input', this.codeValue)
-      this.window.save({pluginId: this.pluginId, code: this.codeValue, tag: this.window.plugin && this.window.plugin.tag}).then((config)=>{
+      this.window.plugin_manager.savePlugin({pluginId: this.pluginId, code: this.codeValue, tag: this.window.plugin && this.window.plugin.tag}).then((config)=>{
         // this.window.data._id = config._id
         // this.window.plugin._id = config._id
         // this.window.plugin.config._id= config._id
@@ -139,7 +141,7 @@ export default {
     remove(){
       this.$emit('input', this.codeValue)
       this.window.data._id = null
-      this.window.remove(this.window.plugin).then(()=>{
+      this.window.plugin_manager.removePlugin(this.window.plugin).then(()=>{
         this.window.plugin = {}
       })
     },
@@ -157,7 +159,7 @@ export default {
               newTag = this.window.data.config.tags[0]
             }
           }
-          this.window.reload({_id: this.window.data._id, tag: newTag, name:this.window.data._name, code: this.codeValue}).then((plugin)=>{
+          this.window.plugin_manager.reloadPlugin({_id: this.window.data._id, tag: newTag, name:this.window.data._name, code: this.codeValue}).then((plugin)=>{
             this.window.plugin = plugin
             this.$forceUpdate()
             resolve()

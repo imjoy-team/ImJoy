@@ -199,6 +199,7 @@
          switch(data.type) {
          case 'method':
              var _interface = this._interface;
+             var _method_context = _interface.__this__ || _interface
              if(data.pid){
                _interface = this._plugin_interfaces[data.pid]
                if(!_interface){
@@ -224,7 +225,7 @@
              if(data.promise){
                [resolve, reject] = this._unwrap(data.promise, false);
                try {
-                 result = method.apply(_interface, args);
+                 result = method.apply(_method_context, args);
                  if(result instanceof Promise || method.constructor.name === 'AsyncFunction'){
                    result.then(resolve).catch(reject);
                  }
@@ -237,7 +238,7 @@
              }
              else{
                try {
-                 method.apply(_interface, args);
+                 method.apply(_method_context, args);
                } catch (e) {
                  console.error(e, method, args);
                }

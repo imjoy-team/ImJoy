@@ -20,11 +20,14 @@ describe('ImJoy.vue', async () => {
     router,
     propsData: {}
   })
+  const vm = wrapper.vm //vm of ImJoy
+  const wm = vm.wm //window_manager
+  const pm = vm.pm //plugin_manager
 
   before(function(done) {
     this.timeout(10000)
-    wrapper.vm.event_bus.$on('imjoy_ready', ()=>{
-      expect(wrapper.vm.plugin_loaded).to.be.true
+    vm.event_bus.$on('imjoy_ready', ()=>{
+      expect(vm.plugin_loaded).to.be.true
       done()
     })
   })
@@ -35,25 +38,28 @@ describe('ImJoy.vue', async () => {
 
   it('should show add plugin dialog', async () => {
     // wrapper.find({ ref: 'add_plugin_button' }).trigger('click')
-    wrapper.vm.showPluginManagement()
-    await wrapper.vm.$nextTick()
-    expect(wrapper.vm.showAddPluginDialog).to.be.true
+    vm.showPluginManagement()
+    await vm.$nextTick()
+    expect(vm.showAddPluginDialog).to.be.true
   })
 
-  it('should create and save the plugin', async () => {
-    const old_len = wrapper.vm.windows.length
+  it('should create a new plugin', async () => {
+    const old_len = wm.windows.length
     const code = _.clone(WEB_WORKER_PLUGIN_TEMPLATE)
-    wrapper.vm.newPlugin(code)
-    expect(wrapper.vm.windows).to.have.lengthOf(old_len+1)
-    const w = wrapper.vm.windows[old_len]
-    const pconfig = await w.save({pluginId: w.data._id, code: code, tag: null})
+    vm.newPlugin(code)
+    expect(wm.windows).to.have.lengthOf(old_len+1)
+  })
+
+  it('should save a new plugin', async () => {
+    const code = _.clone(WEB_WORKER_PLUGIN_TEMPLATE)
+    const pconfig = await pm.savePlugin({code: code, tag: null, origin: '__test__'})
     expect(pconfig.installed).to.be.true
     expect(pconfig.name).to.equal('Untitled Plugin')
   })
 
   it('should load the new web-worker plugin', async () => {
     const code = _.clone(WEB_WORKER_PLUGIN_TEMPLATE)
-    const plugin = await wrapper.vm.reloadPlugin({_id: 'new plugin', tag: null, name:'new plugin', code: code})
+    const plugin = await pm.reloadPlugin({_id: 'new plugin', tag: null, name:'new plugin', code: code})
     expect(plugin.name).to.equal('Untitled Plugin')
     expect(plugin.type).to.equal('web-worker')
     expect(typeof plugin.api.run).to.equal('function')
@@ -62,7 +68,7 @@ describe('ImJoy.vue', async () => {
 
   it('should load the new window plugin', async () => {
     const code = _.clone(WINDOW_PLUGIN_TEMPLATE)
-    const plugin = await wrapper.vm.reloadPlugin({_id: 'new plugin', tag: null, name:'new plugin', code: code})
+    const plugin = await pm.reloadPlugin({_id: 'new plugin', tag: null, name:'new plugin', code: code})
     expect(plugin.name).to.equal('Untitled Plugin')
     expect(plugin.type).to.equal('window')
     expect(typeof plugin.api.run).to.equal('function')
@@ -71,7 +77,7 @@ describe('ImJoy.vue', async () => {
 
   // it('should load the new native-python plugin', async () => {
   //   const code = _.clone(NATIVE_PYTHON_PLUGIN_TEMPLATE)
-  //   const plugin = await wrapper.vm.reloadPlugin({_id: 'new plugin', tag: null, name:'new plugin', code: code})
+  //   const plugin = await vm.pm.reloadPlugin({_id: 'new plugin', tag: null, name:'new plugin', code: code})
   //   expect(plugin.name).to.equal('Untitled Plugin')
   //   expect(plugin.type).to.equal('native-python')
   //   expect(typeof plugin.api.run).to.equal('function')
@@ -80,7 +86,7 @@ describe('ImJoy.vue', async () => {
 
   it('should load the new web-python plugin', async () => {
     const code = _.clone(WEB_PYTHON_PLUGIN_TEMPLATE)
-    const plugin = await wrapper.vm.reloadPlugin({_id: 'new plugin', tag: null, name:'new plugin', code: code})
+    const plugin = await pm.reloadPlugin({_id: 'new plugin', tag: null, name:'new plugin', code: code})
     expect(plugin.name).to.equal('Untitled Plugin')
     expect(plugin.type).to.equal('web-python')
     expect(typeof plugin.api.run).to.equal('function')
