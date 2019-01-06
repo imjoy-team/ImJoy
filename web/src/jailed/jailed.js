@@ -1080,4 +1080,15 @@ DynamicPlugin.prototype.terminate =
     }
 }
 
+DynamicPlugin.prototype.set_status =
+       Plugin.prototype.set_status = function(status) {
+    this.status = status
+    if(status.type === 'error'){
+      console.error(`Error in Plugin ${this.id}: ${status.text}`)
+    }
+    else{
+      console.log(`Plugin${this.id} Status updated: ${status.text}`)
+    }
+}
+
 export { DynamicPlugin, Plugin }
