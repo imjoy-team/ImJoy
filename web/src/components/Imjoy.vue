@@ -36,7 +36,7 @@
          <span>{{snackbar_info}}</span>
          <md-button class="md-accent" @click="show_snackbar=false">close</md-button>
         </md-snackbar>
-        <md-button @click="wm.closeAll()" class="md-icon-button">
+        <md-button @click="wm.closeAll(); $forceUpdate()" class="md-icon-button">
           <md-icon>cancel</md-icon>
           <md-tooltip>Close all windows</md-tooltip>
         </md-button>

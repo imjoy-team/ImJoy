@@ -59,8 +59,6 @@ export default {
     this.event_bus = this.wm.event_bus
     this.event_bus.$on('add_window', this.onWindowAdd)
     this.event_bus.$on('resize', this.updateSize)
-    this.event_bus.$on('add_window', this.$forceUpdate)
-    this.event_bus.$on('close_window', this.$forceUpdate)
     //open link in a new tab
     const renderer = new marked.Renderer();
     renderer.link = function(href, title, text) {
@@ -80,8 +78,6 @@ export default {
   beforeDestroy() {
     this.event_bus.$off('add_window', this.onWindowAdd)
     this.event_bus.$off('resize', this.updateSize)
-    this.event_bus.$off('add_window', this.$forceUpdate)
-    this.event_bus.$off('close_window', this.$forceUpdate)
   },
   methods: {
     overlayMousemove(e){
@@ -137,13 +133,8 @@ export default {
         this.wm.active_windows = this.active_windows
         this.$emit('select', this.active_windows, null)
       }
-
-      if(w.plugin && w.plugin.terminate) w.plugin.terminate(()=>{
-        this.wm.closeWindow(w)
-      })
-      else{
-        this.wm.closeWindow(w)
-      }
+      this.wm.closeWindow(w)
+      if(w.plugin && w.plugin.terminate) w.plugin.terminate()
       this.$emit('close', w)
     },
     isTypedArray(obj)
