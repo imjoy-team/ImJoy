@@ -102,12 +102,12 @@ export class PluginManager {
     }
   }
 
-  showMessage(msg){
+  showMessage(msg, duration){
     if(this.show_message_callback){
-      this.show_message_callback(msg)
+      this.show_message_callback(msg, duration)
     }
     else{
-      console.log(`==> Message: ${msg}`)
+      console.log(`PLUGIN MESSAGE: ${msg}`)
     }
   }
 

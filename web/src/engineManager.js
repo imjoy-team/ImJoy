@@ -1,9 +1,12 @@
 import io from 'socket.io-client'
-import Vue from 'vue';
+import {
+  assert
+} from './utils.js'
 
 export class EngineManager {
   constructor({event_bus=null, show_message_callback=null}){
-    this.event_bus = event_bus || new Vue()
+    this.event_bus = event_bus
+    assert(this.event_bus)
     this.socket = null
     this.engine_status = {connection: 'Disconnected'}
     this.show_message_callback = show_message_callback
@@ -27,12 +30,13 @@ export class EngineManager {
       }
     })
   }
-  showMessage(msg){
+
+  showMessage(msg, duration){
     if(this.show_message_callback){
-      this.show_message_callback(msg)
+      this.show_message_callback(msg, duration)
     }
     else{
-      console.log('ENGINE MESSAGE: ' + msg)
+      console.log(`ENGINE MESSAGE: ${msg}`)
     }
   }
 

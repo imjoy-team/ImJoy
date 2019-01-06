@@ -36,7 +36,7 @@
          <span>{{snackbar_info}}</span>
          <md-button class="md-accent" @click="show_snackbar=false">close</md-button>
         </md-snackbar>
-        <md-button @click="wm.closeAll" class="md-icon-button">
+        <md-button @click="wm.closeAll()" class="md-icon-button">
           <md-icon>cancel</md-icon>
           <md-tooltip>Close all windows</md-tooltip>
         </md-button>
@@ -341,7 +341,7 @@
     </md-app-drawer>
     <md-app-content class="whiteboard-content">
       <md-progress-bar md-mode="determinate" :md-value="progress"></md-progress-bar>
-      <whiteboard :mode="window_mode" :window-manager="wm"></whiteboard>
+      <whiteboard ref="whiteboard" :mode="window_mode" :window-manager="wm"></whiteboard>
     </md-app-content>
   </md-app>
 
@@ -671,7 +671,7 @@ export default {
       getFileUrl: this.getFileUrl,
       getFilePath: this.getFilePath,
       exportFile: this.exportFile,
-      utils: {$forceUpdate: this.$forceUpdate, openUrl: this.openUrl, sleep: this.sleep},
+      utils: {$forceUpdate: ()=>{ this.$forceUpdate() }, openUrl: this.openUrl, sleep: this.sleep},
     }
 
     this.em = new EngineManager({ event_bus: this.event_bus, show_message_callback: this.showMessage})
@@ -750,7 +750,7 @@ export default {
           if(e.dataTransfer.items[i].webkitGetAsEntry){
             folder_supported = true
             var entry = e.dataTransfer.items[i].webkitGetAsEntry();
-            traverseFileTree(entry, null, this.wm.getDataLoaders, i===length-1)
+            traverseFileTree(entry, null, (f)=>{ return this.wm.getDataLoaders(f) }, i===length-1)
           }
         }
         if(!folder_supported){
@@ -910,7 +910,7 @@ export default {
     addWindow(w) {
       return new Promise((resolve, reject) => {
         try {
-          w.refresh = this.$forceUpdate
+          w.refresh = ()=>{ this.$forceUpdate() }
           this.$nextTick(() => {
             this.$forceUpdate()
             resolve()
@@ -951,7 +951,7 @@ export default {
     selectRepository(repo){
       for(let r of this.pm.repository_list){
         if(r.name === repo){
-          this.pm.reloadRepository(r).then(this.$forceUpdate)
+          this.pm.reloadRepository(r).then(()=>{this.$forceUpdate()})
           return r
         }
       }
@@ -1085,6 +1085,7 @@ export default {
       this.snackbar_info = info
       this.snackbar_duration = duration || 10000
       this.show_snackbar = true
+      this.status_text = info
     },
     showEngineFileDialog(){
       this.showFileDialog({uri_type: 'url'}, this.IMJOY_PLUGIN).then((selection)=>{

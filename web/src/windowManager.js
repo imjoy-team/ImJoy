@@ -1,12 +1,13 @@
 import {
-  randId
+  randId,
+  assert
 } from './utils.js'
 
-import Vue from 'vue';
 
 export class WindowManager {
   constructor({event_bus=null, show_message_callback=null, add_window_callback=null}){
-    this.event_bus = event_bus || new Vue()
+    this.event_bus = event_bus
+    assert(this.event_bus)
     this.windows = []
     this.window_ids = {}
     this.active_windows = []
@@ -21,6 +22,15 @@ export class WindowManager {
       y: 0,
       w: 5,
       h: 5
+    }
+  }
+
+  showMessage(msg, duration){
+    if(this.show_message_callback){
+      this.show_message_callback(msg, duration)
+    }
+    else{
+      console.log(`WINDOW MESSAGE: ${msg}`)
     }
   }
 
@@ -104,9 +114,17 @@ export class WindowManager {
   closeWindow(w){
     this.windows.splice(this.windows.indexOf(w), 1)
     delete this.window_ids[w.id]
-    if(this.window_mode === 'single'){
-      this.selected_window = this.windows[0]
+    if(w.selected || this.selected_window===w){
+      w.selected = false
+      if(this.window_mode === 'single'){
+        this.selected_window = this.windows[0]
+      }
+      else{
+        this.selected_window = null
+      }
     }
+    w.refresh()
+    this.event_bus.$emit('close_window', w)
   }
 
   resizeAll(){
