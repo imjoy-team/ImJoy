@@ -80,7 +80,6 @@ export class PluginManager {
       outputs: {},
       loaders: {}
     }
-    this.pluing_context = {}
     this.imjoy_api_utils = imjoy_api.utils
     this.imjoy_api = _.assign({}, imjoy_api, {
       __this__: this,
@@ -989,7 +988,7 @@ export class PluginManager {
         config.initialized = true
       }
       config._id = template._id
-      config.context = this.pluing_context
+      config.context = this.getPluginContext()
       if (template.type === 'native-python') {
         if (!this.socket) {
           console.error("Please connect to the Plugin Engine 🚀.")
@@ -1365,7 +1364,7 @@ export class PluginManager {
         pconfig.iframe_container = 'plugin_window_' + pconfig.id + randId()
         pconfig.iframe_window = null
         pconfig.plugin = window_config
-        pconfig.context = this.pluing_context
+        pconfig.context = this.getPluginContext()
 
 
         if (!WINDOW_SCHEMA(pconfig)) {
@@ -1380,6 +1379,10 @@ export class PluginManager {
         })
       }
     })
+  }
+  
+  getPluginContext(){
+    return {socket: this.em&&this.em.socket}
   }
 
   async callPlugin(plugin_name, function_name) {

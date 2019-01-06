@@ -64,7 +64,7 @@
             <md-menu-item :disabled="true">
               <span>🚀{{em.engine_status.connection}}</span>
             </md-menu-item>
-            <!-- <md-menu-item @click="connectEngine(engine_url)">
+            <!-- <md-menu-item @click="em.connectEngine(engine_url, connection_token)">
               <span>Connect</span>
               <md-icon>settings_ethernet</md-icon>
             </md-menu-item> -->
@@ -84,14 +84,14 @@
               </md-button>
             </md-menu-item>
             <md-menu-item v-for="p in em.engine_status.plugin_processes" :key="p.pid">
-              <md-button @click.stop="killPluginProcess(p)" class="md-icon-button md-accent">
+              <md-button @click.stop="em.killPluginProcess(p)" class="md-icon-button md-accent">
                 <md-icon>clear</md-icon>
               </md-button>
               {{p.name}} (#{{p.pid}})
             </md-menu-item>
             <md-menu-item :disabled="true" v-if="em.engine_status.plugin_num>1">
               <span>{{em.engine_status.plugin_num}} Running Plugins</span>
-              <md-button @click.stop="killPluginProcess()" class="md-icon-button md-accent">
+              <md-button @click.stop="em.killPluginProcess()" class="md-icon-button md-accent">
                 <md-icon>clear</md-icon>
               </md-button>
             </md-menu-item>
@@ -347,7 +347,7 @@
 
   <md-dialog-confirm :md-active.sync="showRemoveConfirmation" md-title="Removing Plugin" md-content="Do you really want to <strong>delete</strong> this plugin" md-confirm-text="Yes" md-cancel-text="Cancel" @md-cancel="showRemoveConfirmation=false" @md-confirm="pm.removePlugin(plugin2_remove);plugin2_remove=null;showRemoveConfirmation=false"/>
   <!-- </md-card-content> -->
-  <file-dialog ref="file-dialog" :list-files="em.listEngineDir" :get-file-url="getFileUrl"></file-dialog>
+  <file-dialog ref="file-dialog" :list-files="listEngineDir" :get-file-url="getFileUrl"></file-dialog>
   <md-dialog :md-active.sync="showPluginDialog" :md-click-outside-to-close="false" :md-close-on-esc="false">
     <md-dialog-content>
       <div v-if="plugin_dialog_config">
@@ -421,11 +421,11 @@
         </p>
         <md-field>
           <label for="engine_url">Plugin Engine URL</label>
-          <md-input type="text" v-model="engine_url" @keyup.enter="connectEngine(engine_url)" name="engine_url"></md-input>
+          <md-input type="text" v-model="engine_url" @keyup.enter="em.connectEngine(engine_url, connection_token)" name="engine_url"></md-input>
         </md-field>
         <md-field>
           <label for="connection_token">Connection Token</label>
-          <md-input type="text" v-model="connection_token" @keyup.enter="connectEngine(engine_url)" name="connection_token"></md-input>
+          <md-input type="text" v-model="connection_token" @keyup.enter="em.connectEngine(engine_url, connection_token)" name="connection_token"></md-input>
         </md-field>
         <p>&nbsp;{{em.engine_status.connection}}</p>
         <p>
@@ -436,7 +436,7 @@
     </md-dialog-content>
     <md-dialog-actions>
       <md-button class="md-primary" @click="showPluginEngineInfo=false;">Cancel</md-button>
-      <md-button class="md-primary" @click="showPluginEngineInfo=false; connectEngine(engine_url)">Connect</md-button>
+      <md-button class="md-primary" @click="showPluginEngineInfo=false; em.connectEngine(engine_url, connection_token)">Connect</md-button>
     </md-dialog-actions>
   </md-dialog>
 
@@ -792,6 +792,13 @@ export default {
       //update the joy workflow if new template added, TODO: preserve settings during reload
       if (this.$refs.workflow && this.$refs.workflow.setupJoy) this.$refs.workflow.setupJoy()
     })
+    this.event_bus.$on('engine_connected', ()=>{
+      this.pm.reloadPythonPlugins()
+    })
+    this.event_bus.$on('engine_disconnected', ()=>{
+      this.pm.removePythonPlugins()
+    })
+
     this.updateSize({width: window.innerWidth})
 
     this.is_https_mode = ('https:' === location.protocol)
@@ -839,7 +846,7 @@ export default {
     this.pm.loadWorkspaceList().then((workspace_list)=>{
       const selected_workspace = this.$route.query.workspace || this.$route.query.w || workspace_list[0]
       this.pm.loadWorkspace(selected_workspace).then(()=>{
-        this.em.connectEngine(this.engine_url, true)
+        this.em.connectEngine(this.engine_url, this.connection_token, true)
         this.pm.reloadPlugins().then(()=>{
           this.plugin_loaded = true
           this.$forceUpdate()
@@ -998,7 +1005,7 @@ export default {
     connectPlugin(plugin){
       if(plugin._disconnected){
         if(plugin.type === 'native-python' && !this.em.engine_connected){
-          this.em.connectEngine(this.engine_url)
+          this.em.connectEngine(this.engine_url, this.connection_token)
         }
         else{
           this.reloadPlugin(plugin.config)
@@ -1117,6 +1124,9 @@ export default {
       else{
         console.error('permission handler not found.')
       }
+    },
+    listEngineDir(path, type, recursive){
+      return this.em.listEngineDir(path, type, recursive)
     },
     getFileUrl(path, _plugin){
       return new Promise((resolve, reject) => {

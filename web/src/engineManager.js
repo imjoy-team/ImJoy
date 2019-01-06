@@ -40,13 +40,14 @@ export class EngineManager {
     }
   }
 
-  connectEngine(url, auto) {
+  connectEngine(url, token, auto) {
     if (this.socket&&this.engine_connected) {
       return
       //this.socket.disconnect()
     }
     //enforcing 127.0.0.1 for avoid security restrictions
     url = url.replace('localhost', '127.0.0.1')
+    token = token && token.trim() || ''
     this.engine_status.connection = 'Connecting...'
     this.engine_status.url = url
     if(!auto) this.showMessage('Trying to connect to the plugin engine...')
@@ -64,21 +65,20 @@ export class EngineManager {
 
     socket.on('connect', (d) => {
       clearTimeout(timer)
-      this.connection_token = this.connection_token && this.connection_token.trim()
-      socket.emit('register_client', {id: this.client_id, token: this.connection_token, session_id: this.engine_session_id}, (ret)=>{
+      socket.emit('register_client', {id: this.client_id, token: token, session_id: this.engine_session_id}, (ret)=>{
         if(ret.success){
           const connect_client = ()=>{
             this.socket = socket
-            this.pluing_context.socket = socket
             this.engine_connected = true
             this.showPluginEngineInfo = false
             this.engine_status.connection = 'Connected.'
-            localStorage.setItem("imjoy_connection_token", this.connection_token);
+            this.connection_token = token
+            localStorage.setItem("imjoy_connection_token", token);
             localStorage.setItem("imjoy_engine_url", url)
             this.showMessage('Plugin Engine is connected.')
             // console.log('plugin engine connected.')
             this.event_bus.$emit('engine_connected', d)
-            this.reloadPythonPlugins()
+
           }
 
           if(ret.message && ret.confirmation){
@@ -117,9 +117,7 @@ export class EngineManager {
       this.showMessage('Plugin Engine disconnected.')
       this.engine_status.connection = 'Disconnected.'
       this.socket = null
-      this.pluing_context.socket = null
-      // this.pluing_context.socket = null
-      this.removePythonPlugins()
+      this.event_bus.$emit('engine_disconnected')
     });
     this.socket = socket
   }
@@ -131,12 +129,10 @@ export class EngineManager {
           this.engine_status.plugin_num = ret.plugin_num
           this.engine_status.plugin_processes = ret.plugin_processes
           resolve(ret)
-          this.$forceUpdate()
         }
         else{
           this.showMessage(`Failed to get engine status: ${ret.error}`)
           reject(ret.error)
-          this.$forceUpdate()
         }
       })
     })
@@ -152,7 +148,6 @@ export class EngineManager {
         else{
           this.showMessage(`Failed to get engine status: ${ret.error}`)
           reject(ret.error)
-          this.$forceUpdate()
         }
       })
     })
@@ -169,12 +164,10 @@ export class EngineManager {
       this.socket.emit('list_dir', {path: path || '~', type: type || 'file', recursive: recursive || false}, (ret)=>{
         if(ret.success){
           resolve(ret)
-          this.$forceUpdate()
         }
         else{
           this.showMessage(`Failed to list dir: ${path} ${ret.error}`)
           reject(ret.error)
-          this.$forceUpdate()
         }
       })
     })
