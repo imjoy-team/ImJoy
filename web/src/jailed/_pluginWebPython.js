@@ -105,7 +105,7 @@ var execute_python_code = function(code) {
             if(!k.startsWith('_') && hasattr(p, k)){
               const func = getattr(p, k)
               _api[k] = function(){
-                return func(...Array.prototype.slice.call(arguments,  0, arguments.length-1))
+                return func(...Array.prototype.slice.call(arguments))
               }
             }
           }
