@@ -48,6 +48,16 @@ export class WindowManager {
     this.default_window_pos.i = this.default_window_pos.i + 1
   }
 
+  registerInputLoader(op_key, inputs, loader){
+    this.registered_inputs[op_key] = inputs
+    this.registered_loaders[op_key] = loader
+  }
+
+  unregisterInputLoader(op_key){
+    delete this.registered_inputs[op_key]
+    delete this.registered_loaders[op_key]
+  }
+
   getDataLoaders(data){
     const loaders = {}
     // find all the plugins registered for this type

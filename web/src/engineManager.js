@@ -119,7 +119,6 @@ export class EngineManager {
       this.socket = null
       this.event_bus.$emit('engine_disconnected')
     });
-    this.socket = socket
   }
 
   updateEngineStatus() {

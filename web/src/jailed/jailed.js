@@ -446,13 +446,16 @@ var SocketioConnectionWeb = function() {
         if(!this.context){
           throw('connection is not established.')
         }
+        this._disconnectHandler = ()=>{}
         platformInit.whenEmitted(() =>{
           if (!this._disconnected && this.context && this.context.socket) {
             const config_ = {api_version: config.api_version, flags: config.flags, tag: config.tag, workspace: config.workspace, env: config.env, requirements: config.requirements, cmd: config.cmd, name: config.name, type: config.type, inputs: config.inputs, outputs: config.outputs}
             // create a plugin here
             this.context.socket.emit('init_plugin', {id: id, type: type, config: config_}, (result) => {
               // console.log('init_plugin: ', result)
+              this.initializing = false;
               if(result.success){
+                this._disconnected = false;
                 this.secret = result.secret
                 config.work_dir = result.work_dir
                 this.context.socket.on('message_from_plugin_'+this.secret,  (data)=>{
@@ -460,7 +463,11 @@ var SocketioConnectionWeb = function() {
                     if (data.type == 'initialized') {
                         this.dedicatedThread = data.dedicatedThread;
                         this._init.emit();
-                    } else {
+                    }
+                    else if (data.type == 'disconnected'){
+                      this._disconnectHandler(data.details)
+                    }
+                    else {
                         this._messageHandler(data);
                     }
                 })
@@ -470,6 +477,7 @@ var SocketioConnectionWeb = function() {
                 }
               }
               else{
+                this._disconnected = true;
                 console.error('failed to initialize plugin on the plugin engine')
                 throw('failed to initialize plugin on the plugin engine')
               }
@@ -527,7 +535,9 @@ var SocketioConnectionWeb = function() {
      *
      * @param {Function} handler to call upon a disconnect
      */
-    SocketioConnection.prototype.onDisconnect = function(){};
+    SocketioConnection.prototype.onDisconnect = function(handler){
+      this._disconnectHandler = handler;
+    };
 
 
     /**
@@ -543,6 +553,7 @@ var SocketioConnectionWeb = function() {
           );
           // console.log('kill plugin '+this.id)
         }
+        this._disconnectHandler()
     }
 
 }
@@ -838,14 +849,25 @@ DynamicPlugin.prototype._connect =
     }
     if(this.type == 'native-python' && (!this.config.context || !this.config.context.socket)){
       me._fail.emit('Please connect to the Plugin Engine 🚀.');
-      this._connection = null
+      me._connection = null
     }
     else{
-      this._connection = new Connection(this.id, this.type, this.config);
-      this.initializing = true;
-      this._connection.whenInit(function(){
+      me._connection = new Connection(me.id, me.type, me.config);
+      me.initializing = true;
+      me._connection.whenInit(function(){
           me._init();
       });
+      me._connection.onDisconnect(function (details){
+        if(details){
+          if(details.success){
+            me.set_status({type: 'info', text: details.message})
+          }
+          else{
+            me.set_status({type: 'error', text: details.message})
+          }
+        }
+        me.terminate()
+      })
     }
 }
 
@@ -871,8 +893,17 @@ DynamicPlugin.prototype._init =
 
 
     var me = this;
-    this._site.onDisconnect(function() {
+    this._site.onDisconnect(function(details) {
         me._disconnect.emit();
+        if(details){
+          if(details.success){
+            me.set_status({type: 'info', text: details.message})
+          }
+          else{
+            me.set_status({type: 'error', text: details.message})
+          }
+        }
+        me.terminate()
     });
 
     this._site.onRemoteReady(function() {

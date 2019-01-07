@@ -78,7 +78,6 @@
       </md-list-item>
       <md-divider class="md-inset"></md-divider>
     </div>
-
   </md-list>
 
   <div v-if="display==='card'">

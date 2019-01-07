@@ -43,9 +43,9 @@ export class PluginManager {
     this.event_bus = event_bus
     this.em = engine_manager
     this.wm = window_manager
-    assert(this.event_bus)
-    assert(this.em)
-    assert(this.wm)
+    assert(this.event_bus, 'event bus is not available')
+    assert(this.em, 'engine manager is not available')
+    assert(this.wm, 'window manager is not available')
 
     this.show_message_callback = show_message_callback
 
@@ -456,8 +456,7 @@ export class PluginManager {
 
   setInputLoaders(input_loaders){
     for(let inputs of input_loaders){
-      this.wm.registered_inputs[inputs.loader_key] = inputs
-      this.wm.registered_loaders[inputs.loader_key] = inputs.loader
+      this.wm.registerInputLoader(inputs.loader_key, inputs, inputs.loader)
     }
   }
 
@@ -1144,7 +1143,7 @@ export class PluginManager {
   }
 
   getPluginContext(){
-    return {socket: this.em&&this.em.socket}
+    return {socket: this.em && this.em.socket}
   }
 
   plugin2joy(my){
@@ -1416,8 +1415,7 @@ export class PluginManager {
                 }
               }
           }
-          this.wm.registered_inputs[op_key] = this.registered.inputs[op_key]
-          this.wm.registered_loaders[op_key] = this.registered.loaders[op_key]
+          this.wm.registerInputLoader(op_key, this.registered.inputs[op_key], this.registered.loaders[op_key])
 
         } catch (e) {
           console.error(`error occured when parsing the inputs schema of "${config.name}"`, e)
@@ -1476,6 +1474,7 @@ export class PluginManager {
       if(this.registered.loaders[op_key]) delete this.registered.loaders[op_key]
       if(op_name === plugin_name  && this.registered.windows[plugin_name]) delete this.registered.windows[plugin_name]
       if(this.registered.ops[op_key]) delete this.registered.ops[op_key]
+      this.wm.unregisterInputLoader(op_key)
       Joy.remove(op_name)
     }
   }
@@ -1494,7 +1493,6 @@ export class PluginManager {
 
   createWindow(_plugin, wconfig) {
     return new Promise((resolve, reject) => {
-      wconfig.config = wconfig.config || {}
       wconfig.data = wconfig.data || null
       wconfig.panel = wconfig.panel || null
       if (!WINDOW_SCHEMA(wconfig)) {
@@ -1536,7 +1534,6 @@ export class PluginManager {
         pconfig.iframe_window = null
         pconfig.plugin = window_config
         pconfig.context = this.getPluginContext()
-
 
         if (!WINDOW_SCHEMA(pconfig)) {
           const error = WINDOW_SCHEMA.errors
