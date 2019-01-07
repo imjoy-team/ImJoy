@@ -1154,8 +1154,8 @@ export class PluginManager {
     if(my.type && my.data){
       res.data = my.config
       res.target = my.data
-      res.target.name = my.name
-      res.target.type = my.type
+      res.target.name = my.name || ''
+      res.target.type = my.type || ''
     }
     else{
       res.data = null
@@ -1201,24 +1201,24 @@ export class PluginManager {
   joy2plugin(my){
     //conver data-->config target--> data
     if(!my) return null;
+    my.target = my.target || {}
     const ret = {
-      _variables: my.target && my.target._variables || null,
-      _op: my.target && my.target._op,
-      _source_op: my.target && my.target._source_op,
-      _transfer: my.target && my.target._transfer,
-      _workflow_id: my.target && my.target._workflow_id,
+      _variables: my.target._variables || null,
+      _op: my.target._op,
+      _source_op: my.target._source_op,
+      _transfer: my.target._transfer,
+      _workflow_id: my.target._workflow_id,
       config: my.data,
       data: my.target,
-      name: my.target && my.target.name,
-      type: my.target && my.target.type
+      name: my.target.name || '',
+      type: my.target.type || ''
     }
-    if(my.target){
-      delete my.target._op
-      delete my.target._workflow_id
-      delete my.target._variables
-      delete my.target._source_op
-      delete my.target._transfer
-    }
+    delete my.target._op
+    delete my.target._workflow_id
+    delete my.target._variables
+    delete my.target._source_op
+    delete my.target._transfer
+
     return ret
   }
 

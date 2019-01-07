@@ -1284,7 +1284,6 @@ export default {
       op.joy.__op__.execute(mw.target).then((my) => {
         const w = this.pm.joy2plugin(my)
         if (w) {
-          console.log('result', w)
           w.name = w.name || 'result'
           w.type = w.type || 'imjoy/generic'
           this.pm.createWindow(null, w)

@@ -258,7 +258,7 @@ export const WINDOW_SCHEMA= ajv.compile({
   properties: {
     name: {type: 'string'},
     type: {type: 'string'},
-    config: {type: 'object'},
+    config: {type: ['null', 'object']},
     data: {type: ['null', 'object']}, //attachments: {}
     panel: {type: ['null', 'object']}
   }
