@@ -81,38 +81,6 @@
   </md-list>
 
   <div v-if="display==='card'">
-    <md-card v-for="(plugin, k) in searched_plugins" :key="k">
-      <md-card-header>
-        {{plugin.createdAt}}
-        <h2>{{plugin.type === 'native-python'? plugin.name + ' 🚀': plugin.name}}</h2>
-        <p>{{plugin.description}}</p>
-        <md-chip v-for="tag in plugin.tags" :key="tag">{{tag}}</md-chip>
-      </md-card-header>
-      <md-card-content>
-        <md-menu v-if="pm && pm.installPlugin && !plugin.installed && plugin.tags && plugin.tags.length>0 && plugin.uri">
-          <md-button class="md-button md-primary" md-menu-trigger>
-            <md-icon>cloud_download</md-icon>Install
-          </md-button>
-          <md-menu-content>
-            <md-menu-item v-for="tag in plugin.tags" :key="tag" @click="install(plugin, tag)">
-              <md-icon>cloud_download</md-icon>{{tag}}
-            </md-menu-item>
-          </md-menu-content>
-        </md-menu>
-        <md-button v-else-if="pm && pm.installPlugin && !plugin.installed && plugin.uri" @click="install(plugin)" class="md-button md-primary">
-            <md-icon>cloud_download</md-icon>Install</md-button>
-        <md-button v-if="pm && pm.installPlugin && plugin.installed && plugin.uri" @click="install(plugin, plugin.tag)" class="md-button md-primary">
-          <md-icon>update</md-icon>Update</md-button>
-        <md-button v-if="pm && pm.removePlugin && plugin.installed" @click="plugin2_remove_=plugin;showRemoveConfirmation=true;" class="md-accent">
-          <md-icon>delete_forever</md-icon>Delete</md-button>
-        <md-button  @click="showDocs(plugin)" class="md-button md-primary">
-          <md-icon>note</md-icon>Docs
-        </md-button>
-        <md-button @click="showCode(plugin)" class="md-button md-primary">
-          <md-icon>code</md-icon>Code
-        </md-button>
-      </md-card-content>
-    </md-card>
     <grid :center="center" :draggable="false" :sortable="true" :items="searched_plugins" :cell-width="380" :cell-height="280" :grid-width="containerWidth" class="grid-container">
       <template slot="cell" slot-scope="props">
      <md-card>
