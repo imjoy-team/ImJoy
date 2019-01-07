@@ -1068,6 +1068,7 @@ export default {
       this.snackbar_duration = duration || 10000
       this.show_snackbar = true
       this.status_text = info
+      this.$forceUpdate()
     },
     showEngineFileDialog(){
       this.showFileDialog(this.IMJOY_PLUGIN, {uri_type: 'url'}).then((selection)=>{
