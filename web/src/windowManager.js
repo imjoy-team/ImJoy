@@ -133,7 +133,6 @@ export class WindowManager {
         this.selected_window = null
       }
     }
-    w.refresh()
     this.event_bus.$emit('close_window', w)
   }
 
@@ -163,6 +162,7 @@ export class WindowManager {
           this.closeWindow(this.windows[i])
       }
     }
+    //this.event_bus.$emit('close_window')
   }
 
   destroy(){

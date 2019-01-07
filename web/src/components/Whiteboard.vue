@@ -59,6 +59,7 @@ export default {
     this.event_bus = this.wm.event_bus
     this.event_bus.$on('add_window', this.onWindowAdd)
     this.event_bus.$on('resize', this.updateSize)
+
     //open link in a new tab
     const renderer = new marked.Renderer();
     renderer.link = function(href, title, text) {
@@ -74,6 +75,7 @@ export default {
     this.col_num = parseInt(this.screenWidth/80)
   },
   mounted() {
+    this.event_bus.$on('close_window', ()=>{ this.$forceUpdate() })
   },
   beforeDestroy() {
     this.event_bus.$off('add_window', this.onWindowAdd)
