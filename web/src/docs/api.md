@@ -245,7 +245,7 @@ instance of a class, while in Python there is no `new` keyword.
 
 ### api.register
 ```javascript
-api.register(op)
+await api.register(op)
 ```
 
 Register a new operator (**op**) to perform a specific task.
@@ -278,7 +278,7 @@ multiple times to overwrite the previous version. `api.register` can also be use
 **Examples**
 
 ```javascript
-api.register({
+await api.register({
      "name": "LUT",
      "ui": [{
         "apply LUT": {
@@ -302,6 +302,17 @@ update_lut(my) {
 
 ```
 [**Try yourself >>**](https://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:register&w=examples) Compare how the ops for favorite number and animal are implemented.
+
+### api.unregister
+```javascript
+await api.unregister(op_name)
+```
+
+Unregister an existing operator (**op**).
+
+**Arguments**
+
+* **op_name**: String. The name of the op to be removed.
 
 
 ### api.run

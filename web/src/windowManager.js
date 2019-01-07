@@ -55,18 +55,18 @@ export class WindowManager {
       if (this.registered_inputs.hasOwnProperty(k)) {
         // const error = this.registered_inputs[k].schema.errors
         // console.error("schema mismatch: ", data, error)
-        try {
-          if (this.registered_inputs[k].schema(data) && this.registered_inputs[k].loader_key) {
-            const plugin_name = this.registered_inputs[k].plugin_name
+
+        if (this.registered_inputs[k].schema(data) && this.registered_inputs[k].loader_key) {
+          try {
             const loader_key = this.registered_inputs[k].loader_key
-            const plugin_exists = this.plugin_names[plugin_name] || plugin_name === '__internel__'
-            if(plugin_exists && this.registered_loaders[loader_key]){
+            if(this.registered_loaders[loader_key]){
               loaders[loader_key] = loader_key
             }
+          } catch (e) {
+            console.error('Failed to get loaders.', e)
           }
-        } catch (e) {
-          // console.error('error with validation with', k, e)
         }
+
       }
     }
     return loaders

@@ -810,7 +810,7 @@ export default {
       this.pm.reloadPythonPlugins()
     })
     this.event_bus.$on('engine_disconnected', ()=>{
-      this.pm.removePythonPlugins()
+      this.pm.unloadPythonPlugins()
     })
 
     this.updateSize({width: window.innerWidth})
@@ -950,7 +950,7 @@ export default {
         reader.readAsText(file);
       }
       return [
-        {plugin_name: '__internel__', loader_key: 'Code Editor', schema: ajv.compile({properties: {name: {type:"string", "pattern": ".*\\.imjoy.html|\\.html|\\.txt|\\.xml"}, size: {type: 'number'}}, required: ["name", "size"], loader: code_loader})},
+        {loader_key: 'Code Editor', schema: ajv.compile({properties: {name: {type:"string", "pattern": ".*\\.imjoy.html|\\.html|\\.txt|\\.xml"}, size: {type: 'number'}}, required: ["name", "size"], loader: code_loader})},
       ]
     },
     updateSize(e){
@@ -975,37 +975,6 @@ export default {
           this.pm.reloadRepository(r).then(()=>{this.$forceUpdate()})
           return r
         }
-      }
-    },
-    showSnackbar(_plugin, msg, duration){
-      if(duration){
-        duration = duration * 1000
-      }
-      this.showMessage(msg, duration)
-    },
-    showFileDialog(_plugin, options){
-      assert(typeof options === 'object')
-      if(!this.em.engine_connected){
-        this.showMessage('File Dialog requires the plugin engine, please connect to the plugin engine.')
-        throw "Please connect to the Plugin Engine 🚀."
-      }
-      if(_plugin && _plugin.id){
-        const source_plugin = this.pm.plugins[_plugin.id]
-        if(source_plugin || _plugin === this.IMJOY_PLUGIN){
-          if(source_plugin){
-            options.root = options.root || (source_plugin.config && source_plugin.config.work_dir)
-          }
-          if(source_plugin && source_plugin.type != 'native-python'){
-            options.uri_type = options.uri_type || 'url'
-          }
-          else{
-            options.uri_type = options.uri_type || 'path'
-          }
-          return this.$refs['file-dialog'].showDialog(_plugin, options)
-        }
-      }
-      else{
-        return this.$refs['file-dialog'].showDialog(_plugin, options)
       }
     },
     connectPlugin(plugin){
@@ -1134,83 +1103,6 @@ export default {
     listEngineDir(path, type, recursive){
       return this.em.listEngineDir(path, type, recursive)
     },
-    getFileUrl(_plugin, path){
-      return new Promise((resolve, reject) => {
-        if(!this.em.engine_connected){
-          reject("Please connect to the Plugin Engine 🚀.")
-          this.showMessage("Please connect to the Plugin Engine 🚀.")
-          return
-        }
-        if(_plugin !== this.IMJOY_PLUGIN && (!_plugin || !_plugin.id)){
-          reject("Plugin not found.")
-          return
-        }
-        const source_plugin = this.pm.plugins[_plugin.id]
-        const plugin_name = source_plugin && source_plugin.name
-        if(_plugin !== this.IMJOY_PLUGIN && !plugin_name){
-          reject("Plugin name not found.")
-          return
-        }
-        if(!this.showPermissionConfirmation){
-          let config = path
-          if(typeof path === 'string'){
-            config = {path: path}
-          }
-          const resolve_permission = ()=>{
-            this.em.getFileUrl(config).then((ret)=>{
-              if(ret.success){
-                resolve(ret.url)
-                this.$forceUpdate()
-              }
-              else{
-                this.showMessage(`Failed to get file url for ${config.path} ${ret.error}`)
-                reject(ret.error)
-                this.$forceUpdate()
-              }
-            })
-          }
-          if(_plugin === this.IMJOY_PLUGIN){
-            resolve_permission()
-          }
-          else{
-            this.permission_message = `Plugin <strong>"${plugin_name}"</strong> would like to access your local file at <strong>"${config.path}"</strong><br>This means files and folders under "${config.path}" will be exposed as an url which can be accessed with the url.<br><strong>Please make sure this file path do not contain any confidential or sensitive data.</strong><br>Do you trust this plugin and allow this operation?`
-            this.resolve_permission = resolve_permission
-            this.reject_permission = reject
-            this.showPermissionConfirmation = true
-          }
-        }
-        else{
-          reject("There is a pending permission request, please try again later.")
-        }
-      })
-    },
-    getFilePath(_plugin, url){
-      return new Promise((resolve, reject) => {
-        if(!this.em.engine_connected){
-          reject("Please connect to the Plugin Engine 🚀.")
-          this.showMessage("Please connect to the Plugin Engine 🚀.")
-          return
-        }
-        let config = url
-        if(typeof url === 'string'){
-          config = {url: url}
-        }
-        this.em.getFilePath(config).then((ret)=>{
-          if(ret.success){
-            resolve(ret.path)
-            this.$forceUpdate()
-          }
-          else{
-            this.showMessage(`Failed to get file path for ${config.url} ${ret.error}`)
-            reject(ret.error)
-            this.$forceUpdate()
-          }
-        })
-      })
-    },
-    exportFile(_plugin, file, name){
-      saveAs(file, name || file._name || 'file_export');
-    },
     showDoc(pid) {
       const plugin = this.pm.plugins[pid]
       const pconfig = plugin.config
@@ -1296,34 +1188,6 @@ export default {
       }
       this.wm.addWindow(w)
     },
-    showProgress(_plugin, p) {
-      if (p < 1) this.progress = p * 100
-      else this.progress = p
-      // this.$forceUpdate()
-    },
-    showStatus(_plugin, s) {
-      this.status_text = s
-      // this.$forceUpdate()
-    },
-    showPluginProgress(_plugin, p){
-      if(_plugin && _plugin.id){
-        const source_plugin = this.pm.plugins[_plugin.id]
-        if(source_plugin){
-          if (p < 1) source_plugin.progress = p * 100
-          else source_plugin.progress = p
-          this.$forceUpdate()
-        }
-      }
-    },
-    showPluginStatus(_plugin, s){
-      if(_plugin && _plugin.id){
-        const source_plugin = this.pm.plugins[_plugin.id]
-        if(source_plugin){
-          source_plugin.status_text = s
-          this.$forceUpdate()
-        }
-      }
-    },
     closePluginDialog(ok) {
       this.showPluginDialog = false
       let [resolve, reject] = this.plugin_dialog_promise
@@ -1334,9 +1198,9 @@ export default {
       }
       this.plugin_dialog_promise = null
     },
-    loadFiles() {
-      if(this.selected_files.length === 1){
-        const file = this.selected_files[0]
+    loadFiles(selected_files) {
+      if(selected_files.length === 1){
+        const file = selected_files[0]
         const loaders = this.wm.getDataLoaders(file)
         const keys = Object.keys(loaders)
         if(keys.length === 1){
@@ -1347,12 +1211,9 @@ export default {
           }
         }
       }
-      for (let f = 0; f < this.selected_files.length; f++) {
-        const file = this.selected_files[f]
-        // const tmp = file.name.split('.')
-        // const ext = tmp[tmp.length - 1]
+      for (let f = 0; f < selected_files.length; f++) {
+        const file = selected_files[f]
         file.loaders = file.loaders || this.wm.getDataLoaders(file)
-        // console.log('loaders', file.loaders)
       }
       const w = {
         name: 'Files',
@@ -1363,7 +1224,7 @@ export default {
         _source_op: null,
         _workflow_id: 'files_'+randId(),
         _transfer: false,
-        data: this.selected_files
+        data: selected_files
       }
       this.wm.addWindow(w)
     },
@@ -1445,9 +1306,148 @@ export default {
         file.relativePath = file.webkitRelativePath;
         file.loaders = this.wm.getDataLoaders(file)
       }
-      this.loadFiles()
+      this.loadFiles(this.selected_files)
+    },
+
+    //#################ImJoy API functions##################
+    showSnackbar(_plugin, msg, duration){
+      if(duration){
+        duration = duration * 1000
+      }
+      this.showMessage(msg, duration)
+    },
+    showFileDialog(_plugin, options){
+      assert(typeof options === 'object')
+      if(!this.em.engine_connected){
+        this.showMessage('File Dialog requires the plugin engine, please connect to the plugin engine.')
+        throw "Please connect to the Plugin Engine 🚀."
+      }
+      if(_plugin && _plugin.id){
+        const source_plugin = this.pm.plugins[_plugin.id]
+        if(source_plugin || _plugin === this.IMJOY_PLUGIN){
+          if(source_plugin){
+            options.root = options.root || (source_plugin.config && source_plugin.config.work_dir)
+          }
+          if(source_plugin && source_plugin.type != 'native-python'){
+            options.uri_type = options.uri_type || 'url'
+          }
+          else{
+            options.uri_type = options.uri_type || 'path'
+          }
+          return this.$refs['file-dialog'].showDialog(_plugin, options)
+        }
+      }
+      else{
+        return this.$refs['file-dialog'].showDialog(_plugin, options)
+      }
+    },
+    getFileUrl(_plugin, path){
+      return new Promise((resolve, reject) => {
+        if(!this.em.engine_connected){
+          reject("Please connect to the Plugin Engine 🚀.")
+          this.showMessage("Please connect to the Plugin Engine 🚀.")
+          return
+        }
+        if(_plugin !== this.IMJOY_PLUGIN && (!_plugin || !_plugin.id)){
+          reject("Plugin not found.")
+          return
+        }
+        const source_plugin = this.pm.plugins[_plugin.id]
+        const plugin_name = source_plugin && source_plugin.name
+        if(_plugin !== this.IMJOY_PLUGIN && !plugin_name){
+          reject("Plugin name not found.")
+          return
+        }
+        if(!this.showPermissionConfirmation){
+          let config = path
+          if(typeof path === 'string'){
+            config = {path: path}
+          }
+          const resolve_permission = ()=>{
+            this.em.getFileUrl(config).then((ret)=>{
+              if(ret.success){
+                resolve(ret.url)
+                this.$forceUpdate()
+              }
+              else{
+                this.showMessage(`Failed to get file url for ${config.path} ${ret.error}`)
+                reject(ret.error)
+                this.$forceUpdate()
+              }
+            })
+          }
+          if(_plugin === this.IMJOY_PLUGIN){
+            resolve_permission()
+          }
+          else{
+            this.permission_message = `Plugin <strong>"${plugin_name}"</strong> would like to access your local file at <strong>"${config.path}"</strong><br>This means files and folders under "${config.path}" will be exposed as an url which can be accessed with the url.<br><strong>Please make sure this file path do not contain any confidential or sensitive data.</strong><br>Do you trust this plugin and allow this operation?`
+            this.resolve_permission = resolve_permission
+            this.reject_permission = reject
+            this.showPermissionConfirmation = true
+          }
+        }
+        else{
+          reject("There is a pending permission request, please try again later.")
+        }
+      })
+    },
+    getFilePath(_plugin, url){
+      return new Promise((resolve, reject) => {
+        if(!this.em.engine_connected){
+          reject("Please connect to the Plugin Engine 🚀.")
+          this.showMessage("Please connect to the Plugin Engine 🚀.")
+          return
+        }
+        let config = url
+        if(typeof url === 'string'){
+          config = {url: url}
+        }
+        this.em.getFilePath(config).then((ret)=>{
+          if(ret.success){
+            resolve(ret.path)
+            this.$forceUpdate()
+          }
+          else{
+            this.showMessage(`Failed to get file path for ${config.url} ${ret.error}`)
+            reject(ret.error)
+            this.$forceUpdate()
+          }
+        })
+      })
+    },
+    exportFile(_plugin, file, name){
+      saveAs(file, name || file._name || 'file_export');
+    },
+    showProgress(_plugin, p) {
+      if (p < 1) this.progress = p * 100
+      else this.progress = p
+      // this.$forceUpdate()
+    },
+    showStatus(_plugin, s) {
+      this.status_text = s
+      // this.$forceUpdate()
+    },
+    showPluginProgress(_plugin, p){
+      if(_plugin && _plugin.id){
+        const source_plugin = this.pm.plugins[_plugin.id]
+        if(source_plugin){
+          if (p < 1) source_plugin.progress = p * 100
+          else source_plugin.progress = p
+          this.$forceUpdate()
+        }
+      }
+    },
+    showPluginStatus(_plugin, s){
+      if(_plugin && _plugin.id){
+        const source_plugin = this.pm.plugins[_plugin.id]
+        if(source_plugin){
+          source_plugin.status_text = s
+          this.$forceUpdate()
+        }
+      }
     },
     showDialog(_plugin, config) {
+      assert(config)
       return new Promise((resolve, reject) => {
         this.plugin_dialog_config = config
         this.showPluginDialog = true
@@ -1459,9 +1459,11 @@ export default {
       alert(text)
     },
     openUrl(_plugin, url){
+      assert(url)
       Object.assign(document.createElement('a'), { target: '_blank', href: url}).click();
     },
     sleep(_plugin, seconds) {
+      assert(seconds)
       return new Promise(resolve => setTimeout(resolve, Math.round(seconds*1000)));
     }
   }

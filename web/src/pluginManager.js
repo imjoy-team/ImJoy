@@ -84,6 +84,7 @@ export class PluginManager {
     const api_utils_ = imjoy_api.utils
     this.imjoy_api = {
       register: this.register,
+      unregister: this.unregister,
       createWindow: this.createWindow,
       updateWindow: this.updateWindow,
       run: this.runPlugin,
@@ -474,7 +475,7 @@ export class PluginManager {
     }
 
     return [
-      {plugin_name: '__internel__', loader_key:'Image',  schema: ajv.compile({properties: {type: {type:"string", "enum": ['image/jpeg', 'image/png', 'image/gif']}, size: {type: 'number'}}, required: ["type", "size"]}), loader: image_loader},
+      {loader_key:'Image',  schema: ajv.compile({properties: {type: {type:"string", "enum": ['image/jpeg', 'image/png', 'image/gif']}, size: {type: 'number'}}, required: ["type", "size"]}), loader: image_loader},
     ]
   }
 
@@ -727,7 +728,6 @@ export class PluginManager {
                 delete this.plugins[k]
                 delete this.plugin_names[name]
               }
-              Joy.remove(name)
               if (typeof plugin.terminate === 'function') {
                 plugin.terminate()
               }
@@ -737,6 +737,7 @@ export class PluginManager {
         }
       }
     }
+    this.unregister(plugin)
   }
 
   reloadPlugin(pconfig) {
@@ -823,19 +824,12 @@ export class PluginManager {
     }
   }
 
-  removePythonPlugins(){
+  unloadPythonPlugins(){
     for (let k in this.plugins) {
       if (this.plugins.hasOwnProperty(k)) {
         const plugin = this.plugins[k]
         if(plugin.type === 'native-python'){
-          try {
-            Joy.remove(plugin.name)
-            if (typeof plugin.terminate === 'function') {
-              plugin.terminate()
-            }
-          } catch (e) {
-
-          }
+          this.unloadPlugin(plugin, false)
         }
       }
     }
@@ -1091,175 +1085,6 @@ export class PluginManager {
     return normui
   }
 
-  register(plugin, config) {
-    try {
-      if(!plugin) throw "Plugin not found."
-      config = _clone(config)
-      config.name = config.name || plugin.name
-      config.show_panel = config.show_panel || false
-      config.ui = this.normalizeUI(config.ui)
-      if(plugin.name === config.name){
-        config.ui = config.ui || plugin.config.description
-      }
-      config.tags = ["op", "plugin"]
-      config.inputs = config.inputs || null
-      config.outputs = config.outputs || null
-      // save type to tags
-      if(config.type === 'window'){
-        config.tags.push('window')
-      }
-      else if(config.type === 'native-python'){
-        config.tags.push('python')
-      }
-      else if(config.type === 'web-worker'){
-        config.tags.push('web-worker')
-      }
-      else if(config.type === 'web-python'){
-        config.tags.push('web-python')
-      }
-      else if(config.type === 'iframe'){
-        config.tags.push('iframe')
-      }
-      // use its name for type
-      config.type = config.name
-      if (!REGISTER_SCHEMA(config)) {
-        const error = REGISTER_SCHEMA.errors
-        console.error("Error occured during registering " + config.name, error)
-        throw error
-      }
-      let run = null
-      if(config.run && typeof config.run === 'function'){
-        run = config.run
-      }
-      else{
-        run = plugin && plugin.api && plugin.api.run
-      }
-
-      if (!plugin || !run) {
-        console.log("WARNING: no run function found in the config, this op won't be able to do anything: " + config.name)
-        config.onexecute = () => {
-          console.log("WARNING: no run function defined.")
-        }
-      } else {
-        const onexecute = async (my) => {
-          // my.target._workflow_id = null;
-          const result = await run(this.joy2plugin(my))
-          return this.plugin2joy(result)
-        }
-        config.onexecute = onexecute
-      }
-
-      if(config.update && typeof config.update === 'function'){
-        const onupdate = async (my) => {
-          // my.target._workflow_id = null;
-          const result = await config.update(this.joy2plugin(my))
-          return this.plugin2joy(result)
-        }
-        config.onupdate = debounce(onupdate, 300)
-      }
-      else if(plugin && plugin.api && plugin.api.update){
-        const onupdate = async (my) => {
-          // my.target._workflow_id = null;
-          const result = await plugin.api.update(this.joy2plugin(my))
-          return this.plugin2joy(result)
-        }
-        config.onupdate = debounce(onupdate, 300)
-      }
-      const joy_template = config
-
-      joy_template.init = joy_template.ui
-      Joy.add(joy_template);
-
-      const op_config = {
-        plugin_id: plugin.id,
-        name: config.name,
-        ui: "{id: '__op__', type: '" + config.type + "'}",
-        onexecute: config.onexecute
-      }
-      plugin.ops = plugin.ops || {}
-      plugin.ops[config.name] = op_config
-
-      if (config.inputs){
-        try {
-          if((config.inputs.type != 'object' || !config.inputs.properties) && (config.inputs.type != 'array' || !config.inputs.items)){
-            if(typeof config.inputs === 'object'){
-              config.inputs = {properties: config.inputs, type: 'object'}
-            }
-            else{
-              throw "inputs schema must be an object."
-            }
-          }
-          // set all the properties as required by default
-          if(config.inputs.type === 'object' && config.inputs.properties && !config.inputs.required){
-            config.inputs.required = Object.keys(config.inputs.properties)
-          }
-          const sch = ajv.compile(config.inputs)
-          const plugin_name = plugin.name
-          const op_name = config.name
-          const loader_key = plugin_name+'/'+op_name
-          this.wm.registered_inputs[loader_key] =  {loader_key: loader_key, op_name: op_name, plugin_name: plugin_name, schema: sch}
-          this.wm.registered_loaders[loader_key] = async (target) => {
-              let config = {}
-              if (plugin.config && plugin.config.ui) {
-                config = await this.imjoy_api.showDialog(plugin.config)
-              }
-              target.transfer = target.transfer || false
-              target._source_op = target._op
-              target._op = op_name
-              target._workflow_id = target._workflow_id || 'data_loader_'+op_name.trim().replace(/ /g, '_')+randId()
-              const my = {op:{name: op_name}, target: target, data: config}
-              const result = await plugin.api.run(this.joy2plugin(my))
-              if(result){
-                const res = this.plugin2joy(result)
-                if (res) {
-                  const w = {}
-                  w.name = res.name || 'result'
-                  w.type = res.type || 'imjoy/generic'
-                  w.config = res.data
-                  w.data = res.target
-                  await this.createWindow(plugin, w)
-                }
-              }
-          }
-
-        } catch (e) {
-          console.error(`error occured when parsing the inputs schema of "${config.name}"`, e)
-        }
-      }
-      if (config.outputs){
-        try {
-          if(config.outputs.type != 'object' || !config.outputs.properties){
-            if(typeof config.outputs === 'object'){
-              config.outputs = {properties: config.outputs, type: 'object'}
-            }
-            else{
-              throw "inputs schema must be an object."
-            }
-          }
-          // set all the properties as required by default
-          if(config.outputs.type === 'object' && config.outputs.properties && !config.outputs.required){
-            config.outputs.required = Object.keys(config.outputs.properties)
-          }
-          const sch = ajv.compile(config.outputs)
-          this.registered.outputs[plugin.name+'/'+config.name] =  {op_name: config.name, plugin_name: plugin.name, schema: sch}
-        } catch (e) {
-          console.error(`error occured when parsing the outputs schema of "${config.name}"`, e)
-        }
-      }
-
-      this.registered.ops[plugin.name+'/'+config.name] = op_config
-      this.event_bus.$emit('op_registered', op_config)
-
-      this.registered.windows[config.name] = plugin.config
-
-      return true
-    } catch (e) {
-      console.error(e)
-      throw e
-    }
-
-  }
-
   renderWindow(pconfig) {
     return new Promise((resolve, reject) => {
       const tconfig = _.assign({}, pconfig.plugin, pconfig)
@@ -1318,129 +1143,8 @@ export class PluginManager {
     })
   }
 
-  //TODO: remove updateWindow from api
-  async updateWindow(_plugin, wconfig){
-    this.showMessage('Warning: `api.updateWindow` is deprecated, please use the new api.`')
-    const w = wconfig.id
-    if(w && w.run){
-      return await w.run(wconfig)
-    }
-    else{
-      throw `Window (id=${w.id}) not found`
-    }
-  }
-
-  createWindow(_plugin, wconfig) {
-    return new Promise((resolve, reject) => {
-      wconfig.config = wconfig.config || {}
-      wconfig.data = wconfig.data || null
-      wconfig.panel = wconfig.panel || null
-      if (!WINDOW_SCHEMA(wconfig)) {
-        const error = WINDOW_SCHEMA.errors
-        console.error("Error occured during creating window " + wconfig.name, error)
-        throw error
-      }
-      if (wconfig.type && wconfig.type.startsWith('imjoy')) {
-        wconfig.id = 'imjoy_'+randId()
-        wconfig.name = wconfig.name || 'untitled window'
-        this.wm.addWindow(wconfig).then((wid)=>{
-          const window_plugin_apis = {
-            __jailed_type__: 'plugin_api',
-            __id__: wid,
-            run: (wconfig)=>{
-              const w = this.window_ids[wid]
-              for(let k in wconfig){
-                w[k] = wconfig[k]
-              }
-            }
-          }
-          resolve(window_plugin_apis)
-        })
-      } else {
-        const window_config = this.registered.windows[wconfig.type]
-        if (!window_config) {
-          console.error('no plugin registered for window type: ', wconfig.type)
-          throw 'no plugin registered for window type: ', wconfig.type
-        }
-        const pconfig = wconfig
-        //generate a new window id
-        pconfig.type = window_config.type
-        pconfig.id = window_config.id + '_' + randId()//window_config.name.trim().replace(/ /g, '_') + '_' + randId()
-        if (pconfig.type != 'window') {
-          throw 'Window plugin must be with type "window"'
-        }
-        // this is a unique id for the iframe to attach
-        pconfig.iframe_container = 'plugin_window_' + pconfig.id + randId()
-        pconfig.iframe_window = null
-        pconfig.plugin = window_config
-        pconfig.context = this.getPluginContext()
-
-
-        if (!WINDOW_SCHEMA(pconfig)) {
-          const error = WINDOW_SCHEMA.errors
-          console.error("Error occured during creating window " + pconfig.name, error)
-          throw error
-        }
-        this.wm.addWindow(pconfig).then(()=>{
-          this.renderWindow(pconfig).then((plugin_api)=>{
-            resolve(plugin_api)
-          }).catch(reject)
-        })
-      }
-    })
-  }
-
   getPluginContext(){
     return {socket: this.em&&this.em.socket}
-  }
-
-  async callPlugin(_plugin, plugin_name, function_name) {
-    const target_plugin = this.plugin_names[plugin_name]
-    if(target_plugin){
-      if(!target_plugin.running)
-        throw 'plugin "'+plugin_name+ '" is not running.'
-      return await target_plugin.api[function_name].apply(null, Array.prototype.slice.call(arguments, 2, arguments.length-1))
-    }
-    else{
-      throw 'plugin with type '+plugin_name+ ' not found.'
-    }
-  }
-
-  async getPlugin(_plugin, plugin_name) {
-    const target_plugin = this.plugin_names[plugin_name]
-    if(target_plugin){
-      return target_plugin.api
-    }
-    else{
-      throw 'plugin with type '+plugin_name+ ' not found.'
-    }
-  }
-
-  async runPlugin(_plugin, plugin_name, my) {
-    let source_plugin
-    if(_plugin && _plugin.id){
-      source_plugin = _plugin
-    }
-    else{
-      throw 'source plugin is not available.'
-    }
-    const target_plugin = this.plugin_names[plugin_name]
-    if(target_plugin){
-      if(!target_plugin.running)
-        throw 'plugin "'+plugin_name+ '" is not running.'
-      my = my || {}
-      my.op = {type: source_plugin.type, name:source_plugin.name}
-      my.config = my.config || {}
-      my.data = my.data || {}
-      my.data._op = plugin_name
-      my.data._source_op = source_plugin.name
-      my.data._workflow_id = my.data._workflow_id || null
-      my.data._transfer = false
-      return await target_plugin.api.run(this.filter4plugin(my))
-    }
-    else{
-      throw 'plugin with type '+plugin_name+ ' not found.'
-    }
   }
 
   plugin2joy(my){
@@ -1567,6 +1271,335 @@ export class PluginManager {
     })
   }
 
+  destroy(){
+    for (let k in this.plugins) {
+      if (this.plugins.hasOwnProperty(k)) {
+        const plugin = this.plugins[k]
+        try {
+          if (typeof plugin.terminate === 'function') plugin.terminate()
+        } catch (e) {
+
+        }
+      }
+    }
+  }
+
+  //#################ImJoy API functions##################
+  register(plugin, config) {
+    try {
+      if(!plugin) throw "Plugin not found."
+      config = _clone(config)
+      config.name = config.name || plugin.name
+      config.show_panel = config.show_panel || false
+      config.ui = this.normalizeUI(config.ui)
+      if(plugin.name === config.name){
+        config.ui = config.ui || plugin.config.description
+      }
+      config.tags = ["op", "plugin"]
+      config.inputs = config.inputs || null
+      config.outputs = config.outputs || null
+      const plugin_name = plugin.name
+      const op_name = config.name
+      const op_key = op_name === plugin_name ? plugin_name : plugin_name+'/'+op_name
+      // save type to tags
+      if(config.type === 'window'){
+        config.tags.push('window')
+      }
+      else if(config.type === 'native-python'){
+        config.tags.push('python')
+      }
+      else if(config.type === 'web-worker'){
+        config.tags.push('web-worker')
+      }
+      else if(config.type === 'web-python'){
+        config.tags.push('web-python')
+      }
+      else if(config.type === 'iframe'){
+        config.tags.push('iframe')
+      }
+      // use its name for type
+      config.type = config.name
+      if (!REGISTER_SCHEMA(config)) {
+        const error = REGISTER_SCHEMA.errors
+        console.error("Error occured during registering " + config.name, error)
+        throw error
+      }
+      let run = null
+      if(config.run && typeof config.run === 'function'){
+        run = config.run
+      }
+      else{
+        run = plugin && plugin.api && plugin.api.run
+      }
+
+      if (!plugin || !run) {
+        console.log("WARNING: no run function found in the config, this op won't be able to do anything: " + config.name)
+        config.onexecute = () => {
+          console.log("WARNING: no run function defined.")
+        }
+      } else {
+        const onexecute = async (my) => {
+          // my.target._workflow_id = null;
+          const result = await run(this.joy2plugin(my))
+          return this.plugin2joy(result)
+        }
+        config.onexecute = onexecute
+      }
+
+      if(config.update && typeof config.update === 'function'){
+        const onupdate = async (my) => {
+          // my.target._workflow_id = null;
+          const result = await config.update(this.joy2plugin(my))
+          return this.plugin2joy(result)
+        }
+        config.onupdate = debounce(onupdate, 300)
+      }
+      else if(plugin && plugin.api && plugin.api.update){
+        const onupdate = async (my) => {
+          // my.target._workflow_id = null;
+          const result = await plugin.api.update(this.joy2plugin(my))
+          return this.plugin2joy(result)
+        }
+        config.onupdate = debounce(onupdate, 300)
+      }
+      const joy_template = config
+
+      joy_template.init = joy_template.ui
+      Joy.add(joy_template);
+
+      const op_config = {
+        plugin_id: plugin.id,
+        name: config.name,
+        ui: "{id: '__op__', type: '" + config.type + "'}",
+        onexecute: config.onexecute
+      }
+      plugin.ops = plugin.ops || {}
+      plugin.ops[config.name] = op_config
+
+      if (config.inputs){
+        try {
+          if((config.inputs.type != 'object' || !config.inputs.properties) && (config.inputs.type != 'array' || !config.inputs.items)){
+            if(typeof config.inputs === 'object'){
+              config.inputs = {properties: config.inputs, type: 'object'}
+            }
+            else{
+              throw "inputs schema must be an object."
+            }
+          }
+          // set all the properties as required by default
+          if(config.inputs.type === 'object' && config.inputs.properties && !config.inputs.required){
+            config.inputs.required = Object.keys(config.inputs.properties)
+          }
+          const sch = ajv.compile(config.inputs)
+
+          this.registered.inputs[op_key] =  {loader_key: op_key, op_name: op_name, plugin_name: plugin_name, schema: sch}
+          this.registered.loaders[op_key] = async (target) => {
+              let config = {}
+              if (plugin.config && plugin.config.ui) {
+                config = await this.imjoy_api.showDialog(plugin, plugin.config)
+              }
+              target.transfer = target.transfer || false
+              target._source_op = target._op
+              target._op = op_name
+              target._workflow_id = target._workflow_id || 'data_loader_'+op_name.trim().replace(/ /g, '_')+randId()
+              const my = {op:{name: op_name}, target: target, data: config}
+              const result = await plugin.api.run(this.joy2plugin(my))
+              if(result){
+                const res = this.plugin2joy(result)
+                if (res) {
+                  const w = {}
+                  w.name = res.name || 'result'
+                  w.type = res.type || 'imjoy/generic'
+                  w.config = res.data
+                  w.data = res.target
+                  await this.createWindow(plugin, w)
+                }
+              }
+          }
+          this.wm.registered_inputs[op_key] = this.registered.inputs[op_key]
+          this.wm.registered_loaders[op_key] = this.registered.loaders[op_key]
+
+        } catch (e) {
+          console.error(`error occured when parsing the inputs schema of "${config.name}"`, e)
+        }
+      }
+      if (config.outputs){
+        try {
+          if(config.outputs.type != 'object' || !config.outputs.properties){
+            if(typeof config.outputs === 'object'){
+              config.outputs = {properties: config.outputs, type: 'object'}
+            }
+            else{
+              throw "inputs schema must be an object."
+            }
+          }
+          // set all the properties as required by default
+          if(config.outputs.type === 'object' && config.outputs.properties && !config.outputs.required){
+            config.outputs.required = Object.keys(config.outputs.properties)
+          }
+          const sch = ajv.compile(config.outputs)
+          this.registered.outputs[op_key] =  {op_name: config.name, plugin_name: plugin.name, schema: sch}
+        } catch (e) {
+          console.error(`error occured when parsing the outputs schema of "${config.name}"`, e)
+        }
+      }
+
+      this.registered.ops[op_key] = op_config
+      this.event_bus.$emit('op_registered', op_config)
+
+      this.registered.windows[config.name] = plugin.config
+
+      return true
+    } catch (e) {
+      console.error(e)
+      throw e
+    }
+
+  }
+
+  unregister(plugin, config) {
+    if(!plugin) throw "Plugin not found."
+    const plugin_name = plugin.name
+    if(!config){
+      if(plugin.ops && plugin.ops.length>0){
+        for(let op of plugin.ops){
+          if(op.name) this.unregister(plugin, op.name)
+        }
+      }
+      if(plugin.name) this.unregister(plugin, plugin.name)
+      return
+    }
+    else{
+      const op_name = typeof config === 'string'? config : config.name
+      const op_key = op_name === plugin_name ? plugin_name : plugin_name+'/'+op_name
+      if(this.registered.inputs[op_key]) delete this.registered.inputs[op_key]
+      if(this.registered.loaders[op_key]) delete this.registered.loaders[op_key]
+      if(op_name === plugin_name  && this.registered.windows[plugin_name]) delete this.registered.windows[plugin_name]
+      if(this.registered.ops[op_key]) delete this.registered.ops[op_key]
+      Joy.remove(op_name)
+    }
+  }
+
+  //TODO: remove updateWindow from api
+  async updateWindow(_plugin, wconfig){
+    this.showMessage('Warning: `api.updateWindow` is deprecated, please use the new api.`')
+    const w = wconfig.id
+    if(w && w.run){
+      return await w.run(wconfig)
+    }
+    else{
+      throw `Window (id=${w.id}) not found`
+    }
+  }
+
+  createWindow(_plugin, wconfig) {
+    return new Promise((resolve, reject) => {
+      wconfig.config = wconfig.config || {}
+      wconfig.data = wconfig.data || null
+      wconfig.panel = wconfig.panel || null
+      if (!WINDOW_SCHEMA(wconfig)) {
+        const error = WINDOW_SCHEMA.errors
+        console.error("Error occured during creating window " + wconfig.name, error)
+        throw error
+      }
+      if (wconfig.type && wconfig.type.startsWith('imjoy')) {
+        wconfig.id = 'imjoy_'+randId()
+        wconfig.name = wconfig.name || 'untitled window'
+        this.wm.addWindow(wconfig).then((wid)=>{
+          const window_plugin_apis = {
+            __jailed_type__: 'plugin_api',
+            __id__: wid,
+            run: (wconfig)=>{
+              const w = this.window_ids[wid]
+              for(let k in wconfig){
+                w[k] = wconfig[k]
+              }
+            }
+          }
+          resolve(window_plugin_apis)
+        })
+      } else {
+        const window_config = this.registered.windows[wconfig.type]
+        if (!window_config) {
+          console.error('no plugin registered for window type: ', wconfig.type)
+          throw 'no plugin registered for window type: ', wconfig.type
+        }
+        const pconfig = wconfig
+        //generate a new window id
+        pconfig.type = window_config.type
+        pconfig.id = window_config.id + '_' + randId()//window_config.name.trim().replace(/ /g, '_') + '_' + randId()
+        if (pconfig.type != 'window') {
+          throw 'Window plugin must be with type "window"'
+        }
+        // this is a unique id for the iframe to attach
+        pconfig.iframe_container = 'plugin_window_' + pconfig.id + randId()
+        pconfig.iframe_window = null
+        pconfig.plugin = window_config
+        pconfig.context = this.getPluginContext()
+
+
+        if (!WINDOW_SCHEMA(pconfig)) {
+          const error = WINDOW_SCHEMA.errors
+          console.error("Error occured during creating window " + pconfig.name, error)
+          throw error
+        }
+        this.wm.addWindow(pconfig).then(()=>{
+          this.renderWindow(pconfig).then((plugin_api)=>{
+            resolve(plugin_api)
+          }).catch(reject)
+        })
+      }
+    })
+  }
+
+  async callPlugin(_plugin, plugin_name, function_name) {
+    const target_plugin = this.plugin_names[plugin_name]
+    if(target_plugin){
+      if(!target_plugin.running)
+        throw 'plugin "'+plugin_name+ '" is not running.'
+      return await target_plugin.api[function_name].apply(null, Array.prototype.slice.call(arguments, 2, arguments.length-1))
+    }
+    else{
+      throw 'plugin with type '+plugin_name+ ' not found.'
+    }
+  }
+
+  async getPlugin(_plugin, plugin_name) {
+    const target_plugin = this.plugin_names[plugin_name]
+    if(target_plugin){
+      return target_plugin.api
+    }
+    else{
+      throw 'plugin with type '+plugin_name+ ' not found.'
+    }
+  }
+
+  async runPlugin(_plugin, plugin_name, my) {
+    let source_plugin
+    if(_plugin && _plugin.id){
+      source_plugin = _plugin
+    }
+    else{
+      throw 'source plugin is not available.'
+    }
+    const target_plugin = this.plugin_names[plugin_name]
+    if(target_plugin){
+      if(!target_plugin.running)
+        throw 'plugin "'+plugin_name+ '" is not running.'
+      my = my || {}
+      my.op = {type: source_plugin.type, name:source_plugin.name}
+      my.config = my.config || {}
+      my.data = my.data || {}
+      my.data._op = plugin_name
+      my.data._source_op = source_plugin.name
+      my.data._workflow_id = my.data._workflow_id || null
+      my.data._transfer = false
+      return await target_plugin.api.run(this.filter4plugin(my))
+    }
+    else{
+      throw 'plugin with type '+plugin_name+ ' not found.'
+    }
+  }
   setPluginConfig(plugin, name, value){
     if(!plugin) throw "setConfig Error: Plugin not found."
     if(name.startsWith('_') && plugin.config.hasOwnProperty(name.slice(1))){
@@ -1600,19 +1633,6 @@ export class PluginManager {
     }
     else{
       return null
-    }
-  }
-
-  destroy(){
-    for (let k in this.plugins) {
-      if (this.plugins.hasOwnProperty(k)) {
-        const plugin = this.plugins[k]
-        try {
-          if (typeof plugin.terminate === 'function') plugin.terminate()
-        } catch (e) {
-
-        }
-      }
     }
   }
 
