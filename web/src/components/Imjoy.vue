@@ -671,7 +671,19 @@ export default {
       getFileUrl: this.getFileUrl,
       getFilePath: this.getFilePath,
       exportFile: this.exportFile,
-      utils: {$forceUpdate: ()=>{ this.$forceUpdate() }, openUrl: this.openUrl, sleep: this.sleep},
+      utils: {$forceUpdate: this.$forceUpdate, openUrl: this.openUrl, sleep: this.sleep},
+    }
+
+    // bind this to api functions
+    for(let k in this.imjoy_api){
+      if(typeof this.imjoy_api[k] === 'function'){
+        this.imjoy_api[k] = this.imjoy_api[k].bind(this)
+      }
+      else if(typeof this.imjoy_api[k] === 'object'){
+        for(let u in this.imjoy_api[k]){
+          this.imjoy_api[k][u] = this.imjoy_api[k][u].bind(this)
+        }
+      }
     }
 
     this.em = new EngineManager({ event_bus: this.event_bus, show_message_callback: this.showMessage})

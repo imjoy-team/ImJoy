@@ -80,9 +80,8 @@ export class PluginManager {
       outputs: {},
       loaders: {}
     }
-    this.imjoy_api_utils = imjoy_api.utils
-    this.imjoy_api = _.assign({}, imjoy_api, {
-      __this__: this,
+    const api_utils_ = imjoy_api.utils
+    this.imjoy_api = {
       register: this.register,
       createWindow: this.createWindow,
       updateWindow: this.updateWindow,
@@ -93,10 +92,24 @@ export class PluginManager {
       getConfig: this.getPluginConfig,
       getAttachment: this.getAttachment,
       utils: {}
-    })
-    if(this.imjoy_api_utils){
-      for(let k in this.imjoy_api_utils){
-        this.imjoy_api.utils[k] = this.imjoy_api_utils[k]
+    }
+    // bind this to api functions
+    for(let k in this.imjoy_api){
+      if(typeof this.imjoy_api[k] === 'function'){
+        this.imjoy_api[k] = this.imjoy_api[k].bind(this)
+      }
+      else if(typeof this.imjoy_api[k] === 'object'){
+        for(let u in this.imjoy_api[k]){
+          this.imjoy_api[k][u] = this.imjoy_api[k][u].bind(this)
+        }
+      }
+    }
+    // merge imjoy api
+    this.imjoy_api = _.assign({}, imjoy_api, this.imjoy_api)
+    // copy api utils make sure it was not overwritten
+    if(api_utils_){
+      for(let k in api_utils_){
+        this.imjoy_api.utils[k] = api_utils_[k]
       }
     }
   }
@@ -1380,7 +1393,7 @@ export class PluginManager {
       }
     })
   }
-  
+
   getPluginContext(){
     return {socket: this.em&&this.em.socket}
   }
