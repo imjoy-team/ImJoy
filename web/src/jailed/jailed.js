@@ -757,10 +757,10 @@ var Plugin = function( config, _interface) {
     this.tags = config.tags;
     this.type = config.type || 'web-worker'
     this._path = config.url;
-    this._initialInterface = _interface||{};
     this._disconnected = true
     this.initializing = false;
     this.running = false;
+    this._bindInterface(_interface);
     this._connect();
 };
 
@@ -786,12 +786,35 @@ var DynamicPlugin = function(config, _interface) {
     this.type = config.type || 'web-worker';
     this.initializing = false;
     this.running = false;
-    this._initialInterface = _interface||{};
     this._disconnected = true;
+    this._bindInterface(_interface);
     this._connect();
 };
 
-
+/**
+ * Bind the first argument of all the interface functions to this plugin
+ */
+DynamicPlugin.prototype._bindInterface =
+       Plugin.prototype._bindInterface = function(_interface) {
+   _interface = _interface || {}
+   this._initialInterface = {}
+   // bind this plugin to api functions
+   for(var k in _interface){
+     if(typeof _interface[k] === 'function'){
+       this._initialInterface[k] = _interface[k].bind(null, this)
+     }
+     else if(typeof _interface[k] === 'object'){
+       var utils = {}
+       for(var u in _interface[k]){
+         utils[u] = _interface[k][u].bind(null, this)
+       }
+       this._initialInterface[k] = utils
+     }
+     else{
+       this._initialInterface[k] = _interface[k]
+     }
+   }
+}
 /**
  * Creates the connection to the plugin site
  */
@@ -854,13 +877,11 @@ DynamicPlugin.prototype._init =
 
     this._site.onRemoteReady(function() {
         me.running = false;
-        // me._initialInterface.$forceUpdate&&me._initialInterface.$forceUpdate();
     });
 
     this._site.onRemoteBusy(function() {
         if(!me._disconnected)
           me.running = true;
-        // me._initialInterface.$forceUpdate&&me._initialInterface.$forceUpdate();
     });
 
     this.getRemoteCallStack = this._site.getRemoteCallStack;
@@ -1053,7 +1074,6 @@ DynamicPlugin.prototype.terminate =
           this._disconnected = true
           this.running = false
           this.initializing = false
-          // this._initialInterface.$forceUpdate&&this._initialInterface.$forceUpdate();
           this._site&&this._site.disconnect();
         })
       }
@@ -1061,7 +1081,6 @@ DynamicPlugin.prototype.terminate =
         this._disconnected = true
         this.running = false
         this.initializing = false
-        // this._initialInterface.$forceUpdate&&this._initialInterface.$forceUpdate();
         this._site&&this._site.disconnect();
       }
       if(callback && !callbackset){
@@ -1072,7 +1091,6 @@ DynamicPlugin.prototype.terminate =
       this._disconnected = true
       this.running = false
       this.initializing = false
-      // this._initialInterface.$forceUpdate&&this._initialInterface.$forceUpdate();
       this._site&&this._site.disconnect();
       if(callback){
         callback()

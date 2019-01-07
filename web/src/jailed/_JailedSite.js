@@ -221,7 +221,6 @@
                method = _interface[data.name];
              }
              args = this._unwrap(data.args, true);
-             args.push({id: this.id})
              if(data.promise){
                [resolve, reject] = this._unwrap(data.promise, false);
                try {
@@ -248,7 +247,6 @@
          case 'callback':
              method = this._store.fetch(data.id)[data.num];
              args = this._unwrap(data.args, true);
-             args.push({id: this.id})
              if(data.promise){
                [resolve, reject] = this._unwrap(data.promise, false);
                try {

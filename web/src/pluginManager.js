@@ -1,3 +1,4 @@
+/*eslint no-unused-vars: ["error", { "argsIgnorePattern": "^_plugin$" }]*/
 import PouchDB from 'pouchdb-browser';
 import axios from 'axios';
 import _ from 'lodash'
@@ -463,7 +464,7 @@ export class PluginManager {
     const image_loader = (file)=>{
       const reader = new FileReader();
       reader.onload =  () => {
-        this.createWindow({
+        this.createWindow(null, {
           name: file.name,
           type: 'imjoy/image',
           data: {src: reader.result, _file: file}
@@ -906,7 +907,7 @@ export class PluginManager {
       }
       config = upgradePluginAPI(config)
       if (!PLUGIN_SCHEMA(config)) {
-        const error = PLUGIN_SCHEMA.errors(config)
+        const error = PLUGIN_SCHEMA.errors
         console.error("Invalid plugin config: " + config.name, error)
         throw error
       }
@@ -972,13 +973,11 @@ export class PluginManager {
           // c.op = my.op
           c.data = my.data
           c.config = my.config
-          await this.createWindow(c)
+          await this.createWindow(null, c)
         }
       }
       try {
-        this.register(config, {
-          id: config.id
-        })
+        this.register(plugin, config)
         resolve(plugin)
       } catch (e) {
         reject(e)
@@ -1003,7 +1002,7 @@ export class PluginManager {
       config._id = template._id
       config.context = this.getPluginContext()
       if (template.type === 'native-python') {
-        if (!this.socket) {
+        if (!this.em.socket) {
           console.error("Please connect to the Plugin Engine 🚀.")
         }
       }
@@ -1019,9 +1018,7 @@ export class PluginManager {
         }
 
         if (template.type) {
-          this.register(template, {
-            id: plugin.id
-          })
+          this.register(plugin, template)
         }
         if (template.extensions && template.extensions.length > 0) {
           this.registerExtension(template.extensions, plugin)
@@ -1094,9 +1091,8 @@ export class PluginManager {
     return normui
   }
 
-  register(config, _plugin) {
+  register(plugin, config) {
     try {
-      const plugin = this.plugins[_plugin.id]
       if(!plugin) throw "Plugin not found."
       config = _clone(config)
       config.name = config.name || plugin.name
@@ -1127,7 +1123,7 @@ export class PluginManager {
       // use its name for type
       config.type = config.name
       if (!REGISTER_SCHEMA(config)) {
-        const error = REGISTER_SCHEMA.errors(config)
+        const error = REGISTER_SCHEMA.errors
         console.error("Error occured during registering " + config.name, error)
         throw error
       }
@@ -1175,7 +1171,7 @@ export class PluginManager {
       Joy.add(joy_template);
 
       const op_config = {
-        plugin_id: _plugin.id,
+        plugin_id: plugin.id,
         name: config.name,
         ui: "{id: '__op__', type: '" + config.type + "'}",
         onexecute: config.onexecute
@@ -1205,7 +1201,7 @@ export class PluginManager {
           this.wm.registered_loaders[loader_key] = async (target) => {
               let config = {}
               if (plugin.config && plugin.config.ui) {
-                config = await this.showDialog(plugin.config)
+                config = await this.imjoy_api.showDialog(plugin.config)
               }
               target.transfer = target.transfer || false
               target._source_op = target._op
@@ -1221,7 +1217,7 @@ export class PluginManager {
                   w.type = res.type || 'imjoy/generic'
                   w.config = res.data
                   w.data = res.target
-                  await this.createWindow(w)
+                  await this.createWindow(plugin, w)
                 }
               }
           }
@@ -1323,7 +1319,7 @@ export class PluginManager {
   }
 
   //TODO: remove updateWindow from api
-  async updateWindow(wconfig){
+  async updateWindow(_plugin, wconfig){
     this.showMessage('Warning: `api.updateWindow` is deprecated, please use the new api.`')
     const w = wconfig.id
     if(w && w.run){
@@ -1334,13 +1330,13 @@ export class PluginManager {
     }
   }
 
-  createWindow(wconfig) {
+  createWindow(_plugin, wconfig) {
     return new Promise((resolve, reject) => {
       wconfig.config = wconfig.config || {}
       wconfig.data = wconfig.data || null
       wconfig.panel = wconfig.panel || null
       if (!WINDOW_SCHEMA(wconfig)) {
-        const error = WINDOW_SCHEMA.errors(wconfig)
+        const error = WINDOW_SCHEMA.errors
         console.error("Error occured during creating window " + wconfig.name, error)
         throw error
       }
@@ -1381,7 +1377,7 @@ export class PluginManager {
 
 
         if (!WINDOW_SCHEMA(pconfig)) {
-          const error = WINDOW_SCHEMA.errors(pconfig)
+          const error = WINDOW_SCHEMA.errors
           console.error("Error occured during creating window " + pconfig.name, error)
           throw error
         }
@@ -1398,7 +1394,7 @@ export class PluginManager {
     return {socket: this.em&&this.em.socket}
   }
 
-  async callPlugin(plugin_name, function_name) {
+  async callPlugin(_plugin, plugin_name, function_name) {
     const target_plugin = this.plugin_names[plugin_name]
     if(target_plugin){
       if(!target_plugin.running)
@@ -1410,7 +1406,7 @@ export class PluginManager {
     }
   }
 
-  async getPlugin(plugin_name) {
+  async getPlugin(_plugin, plugin_name) {
     const target_plugin = this.plugin_names[plugin_name]
     if(target_plugin){
       return target_plugin.api
@@ -1420,14 +1416,13 @@ export class PluginManager {
     }
   }
 
-  async runPlugin(plugin_name, my, _plugin) {
+  async runPlugin(_plugin, plugin_name, my) {
     let source_plugin
     if(_plugin && _plugin.id){
-      source_plugin = this.plugins[_plugin.id]
+      source_plugin = _plugin
     }
     else{
-      source_plugin = this.plugins[my.id]
-      my = null
+      throw 'source plugin is not available.'
     }
     const target_plugin = this.plugin_names[plugin_name]
     if(target_plugin){
@@ -1572,8 +1567,7 @@ export class PluginManager {
     })
   }
 
-  setPluginConfig(name, value, _plugin){
-    const plugin = this.plugins[_plugin.id]
+  setPluginConfig(plugin, name, value){
     if(!plugin) throw "setConfig Error: Plugin not found."
     if(name.startsWith('_') && plugin.config.hasOwnProperty(name.slice(1))){
       throw `'${name.slice(1)}' is a readonly field defined in <config> block, please avoid using it`
@@ -1586,8 +1580,7 @@ export class PluginManager {
     }
   }
 
-  getPluginConfig(name, _plugin){
-    const plugin = this.plugins[_plugin.id]
+  getPluginConfig(plugin, name){
     if(!plugin) throw "getConfig Error: Plugin not found."
     if(name.startsWith('_') && plugin.config.hasOwnProperty(name.slice(1))){
       return plugin.config[name.slice(1)]
@@ -1597,8 +1590,7 @@ export class PluginManager {
     }
   }
 
-  getAttachment(name, _plugin){
-    const plugin = this.plugins[_plugin.id]
+  getAttachment(plugin, name){
     if(plugin.attachments){
       for (let i = 0; i < plugin.attachments.length; i++) {
         if (plugin.attachments[i].attrs.name === name) {

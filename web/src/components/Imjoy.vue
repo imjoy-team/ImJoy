@@ -25,7 +25,7 @@
             </md-menu-item>
           </md-menu-content>
         </md-menu>
-        <md-button v-if="status_text&&status_text.length" class="status-text md-small-hide" @click="showAlert(status_text)" :class="status_text.includes('rror')?'error-message':''">
+        <md-button v-if="status_text&&status_text.length" class="status-text md-small-hide" @click="showAlert(null, status_text)" :class="status_text.includes('rror')?'error-message':''">
           {{status_text.slice(0,80)+(status_text.length>80?'...':'')}}
         </md-button>
         <span class="subheader-title md-medium-hide" style="flex: 1" v-else>Image Processing with Joy!</span>
@@ -244,10 +244,10 @@
                   <md-menu-item @click="editPlugin(plugin.id)">
                     <md-icon>edit</md-icon>Edit
                   </md-menu-item>
-                  <md-menu-item @click="reloadPlugin(plugin.config)">
+                  <md-menu-item @click="pm.reloadPlugin(plugin.config)">
                     <md-icon>autorenew</md-icon>Reload
                   </md-menu-item>
-                  <md-menu-item @click="unloadPlugin(plugin)">
+                  <md-menu-item @click="pm.unloadPlugin(plugin)">
                     <md-icon>clear</md-icon>Terminate
                   </md-menu-item>
                   <md-menu-item v-if="plugin.config.origin" @click="updatePlugin(plugin.id)">
@@ -309,10 +309,10 @@
                     <md-menu-item @click="editPlugin(plugin.id)">
                       <md-icon>edit</md-icon>Edit
                     </md-menu-item>
-                    <md-menu-item @click="reloadPlugin(plugin.config)">
+                    <md-menu-item @click="pm.reloadPlugin(plugin.config)">
                       <md-icon>autorenew</md-icon>Reload
                     </md-menu-item>
-                    <md-menu-item @click="unloadPlugin(plugin)">
+                    <md-menu-item @click="pm.unloadPlugin(plugin)">
                       <md-icon>clear</md-icon>Terminate
                     </md-menu-item>
                     <md-menu-item v-if="plugin.config.origin" @click="updatePlugin(plugin.id)">
@@ -555,6 +555,7 @@
 </template>
 
 <script>
+/*eslint no-unused-vars: ["error", { "argsIgnorePattern": "^_plugin$" }]*/
 import Vue from 'vue';
 import { saveAs } from 'file-saver';
 import {
@@ -567,6 +568,7 @@ import {
 import {
   randId,
   url_regex,
+  assert
 } from '../utils.js'
 
 import {
@@ -975,25 +977,17 @@ export default {
         }
       }
     },
-
-    showSnackbar(msg, duration, _plugin){
-      if(!_plugin){
-        _plugin = duration
-        duration = null
-      }
+    showSnackbar(_plugin, msg, duration){
       if(duration){
         duration = duration * 1000
       }
       this.showMessage(msg, duration)
     },
-    showFileDialog(options, _plugin){
+    showFileDialog(_plugin, options){
+      assert(typeof options === 'object')
       if(!this.em.engine_connected){
         this.showMessage('File Dialog requires the plugin engine, please connect to the plugin engine.')
         throw "Please connect to the Plugin Engine 🚀."
-      }
-      if(!_plugin){
-        _plugin = options
-        options = {}
       }
       if(_plugin && _plugin.id){
         const source_plugin = this.pm.plugins[_plugin.id]
@@ -1007,11 +1001,11 @@ export default {
           else{
             options.uri_type = options.uri_type || 'path'
           }
-          return this.$refs['file-dialog'].showDialog(options, _plugin)
+          return this.$refs['file-dialog'].showDialog(_plugin, options)
         }
       }
       else{
-        return this.$refs['file-dialog'].showDialog(options, _plugin)
+        return this.$refs['file-dialog'].showDialog(_plugin, options)
       }
     },
     connectPlugin(plugin){
@@ -1020,7 +1014,7 @@ export default {
           this.em.connectEngine(this.engine_url, this.connection_token)
         }
         else{
-          this.reloadPlugin(plugin.config)
+          this.pm.reloadPlugin(plugin.config)
         }
       }
     },
@@ -1107,7 +1101,7 @@ export default {
       this.status_text = info
     },
     showEngineFileDialog(){
-      this.showFileDialog({uri_type: 'url'}, this.IMJOY_PLUGIN).then((selection)=>{
+      this.showFileDialog(this.IMJOY_PLUGIN, {uri_type: 'url'}).then((selection)=>{
         if(typeof selection === 'string'){
           selection = [selection]
         }
@@ -1140,7 +1134,7 @@ export default {
     listEngineDir(path, type, recursive){
       return this.em.listEngineDir(path, type, recursive)
     },
-    getFileUrl(path, _plugin){
+    getFileUrl(_plugin, path){
       return new Promise((resolve, reject) => {
         if(!this.em.engine_connected){
           reject("Please connect to the Plugin Engine 🚀.")
@@ -1190,7 +1184,7 @@ export default {
         }
       })
     },
-    getFilePath(url){
+    getFilePath(_plugin, url){
       return new Promise((resolve, reject) => {
         if(!this.em.engine_connected){
           reject("Please connect to the Plugin Engine 🚀.")
@@ -1214,11 +1208,7 @@ export default {
         })
       })
     },
-    exportFile(file, name, _plugin){
-      if(!_plugin){
-        _plugin = name
-        name = null
-      }
+    exportFile(_plugin, file, name){
       saveAs(file, name || file._name || 'file_export');
     },
     showDoc(pid) {
@@ -1306,16 +1296,16 @@ export default {
       }
       this.wm.addWindow(w)
     },
-    showProgress(p) {
+    showProgress(_plugin, p) {
       if (p < 1) this.progress = p * 100
       else this.progress = p
       // this.$forceUpdate()
     },
-    showStatus(s) {
+    showStatus(_plugin, s) {
       this.status_text = s
       // this.$forceUpdate()
     },
-    showPluginProgress(p, _plugin){
+    showPluginProgress(_plugin, p){
       if(_plugin && _plugin.id){
         const source_plugin = this.pm.plugins[_plugin.id]
         if(source_plugin){
@@ -1325,7 +1315,7 @@ export default {
         }
       }
     },
-    showPluginStatus(s, _plugin){
+    showPluginStatus(_plugin, s){
       if(_plugin && _plugin.id){
         const source_plugin = this.pm.plugins[_plugin.id]
         if(source_plugin){
@@ -1399,7 +1389,7 @@ export default {
           // console.log('result', w)
           w.name = w.name || 'result'
           w.type = w.type || 'imjoy/generic'
-          this.pm.createWindow(w)
+          this.pm.createWindow(null, w)
         }
 
         this.progress = 100
@@ -1436,7 +1426,7 @@ export default {
           console.log('result', w)
           w.name = w.name || 'result'
           w.type = w.type || 'imjoy/generic'
-          this.pm.createWindow(w)
+          this.pm.createWindow(null, w)
         }
         this.progress = 100
       }).catch((e) => {
@@ -1457,21 +1447,21 @@ export default {
       }
       this.loadFiles()
     },
-    showDialog(config) {
+    showDialog(_plugin, config) {
       return new Promise((resolve, reject) => {
         this.plugin_dialog_config = config
         this.showPluginDialog = true
         this.plugin_dialog_promise = [resolve, reject]
       })
     },
-    showAlert(text){
+    showAlert(_plugin, text){
       console.log('alert: ', text)
       alert(text)
     },
-    openUrl(url){
+    openUrl(_plugin, url){
       Object.assign(document.createElement('a'), { target: '_blank', href: url}).click();
     },
-    sleep(seconds) {
+    sleep(_plugin, seconds) {
       return new Promise(resolve => setTimeout(resolve, Math.round(seconds*1000)));
     }
   }
