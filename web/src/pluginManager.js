@@ -86,7 +86,6 @@ export class PluginManager {
       register: this.register,
       unregister: this.unregister,
       createWindow: this.createWindow,
-      updateWindow: this.updateWindow,
       run: this.runPlugin,
       call: this.callPlugin,
       getPlugin: this.getPlugin,
@@ -1459,8 +1458,9 @@ export class PluginManager {
     if(!plugin) throw "Plugin not found."
     const plugin_name = plugin.name
     if(!config){
-      if(plugin.ops && plugin.ops.length>0){
-        for(let op of plugin.ops){
+      if(plugin.ops && Object.keys(plugin.ops).length>0){
+        for(let k in plugin.ops){
+          const op = plugin.ops[k]
           if(op.name) this.unregister(plugin, op.name)
         }
       }
@@ -1474,20 +1474,9 @@ export class PluginManager {
       if(this.registered.loaders[op_key]) delete this.registered.loaders[op_key]
       if(op_name === plugin_name  && this.registered.windows[plugin_name]) delete this.registered.windows[plugin_name]
       if(this.registered.ops[op_key]) delete this.registered.ops[op_key]
+      if(plugin.ops && plugin.ops[op_name]) delete plugin.ops[op_name]
       this.wm.unregisterInputLoader(op_key)
       Joy.remove(op_name)
-    }
-  }
-
-  //TODO: remove updateWindow from api
-  async updateWindow(_plugin, wconfig){
-    this.showMessage('Warning: `api.updateWindow` is deprecated, please use the new api.`')
-    const w = wconfig.id
-    if(w && w.run){
-      return await w.run(wconfig)
-    }
-    else{
-      throw `Window (id=${w.id}) not found`
     }
   }
 
@@ -1552,12 +1541,13 @@ export class PluginManager {
   async callPlugin(_plugin, plugin_name, function_name) {
     const target_plugin = this.plugin_names[plugin_name]
     if(target_plugin){
-      if(!target_plugin.running)
-        throw 'plugin "'+plugin_name+ '" is not running.'
+      if(!target_plugin.api[function_name]){
+        throw `function "${function_name}" of ${plugin_name} is not available.`
+      }
       return await target_plugin.api[function_name].apply(null, Array.prototype.slice.call(arguments, 2, arguments.length-1))
     }
     else{
-      throw 'plugin with type '+plugin_name+ ' not found.'
+      throw `plugin with type ${plugin_name} not found.`
     }
   }
 
@@ -1567,36 +1557,23 @@ export class PluginManager {
       return target_plugin.api
     }
     else{
-      throw 'plugin with type '+plugin_name+ ' not found.'
+      throw `plugin with type ${plugin_name} not found.`
     }
   }
 
   async runPlugin(_plugin, plugin_name, my) {
-    let source_plugin
-    if(_plugin && _plugin.id){
-      source_plugin = _plugin
-    }
-    else{
+    if(!_plugin || !_plugin.id){
       throw 'source plugin is not available.'
     }
     const target_plugin = this.plugin_names[plugin_name]
     if(target_plugin){
-      if(!target_plugin.running)
-        throw 'plugin "'+plugin_name+ '" is not running.'
-      my = my || {}
-      my.op = {type: source_plugin.type, name:source_plugin.name}
-      my.config = my.config || {}
-      my.data = my.data || {}
-      my.data._op = plugin_name
-      my.data._source_op = source_plugin.name
-      my.data._workflow_id = my.data._workflow_id || null
-      my.data._transfer = false
-      return await target_plugin.api.run(this.filter4plugin(my))
+      return await target_plugin.api.run(my)
     }
     else{
       throw 'plugin with type '+plugin_name+ ' not found.'
     }
   }
+
   setPluginConfig(plugin, name, value){
     if(!plugin) throw "setConfig Error: Plugin not found."
     if(name.startsWith('_') && plugin.config.hasOwnProperty(name.slice(1))){
