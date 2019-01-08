@@ -38,6 +38,7 @@ For Javascript and Python 3+, `async/await` style is natively supported and reco
 Declare your function with the `async` keyword. Add `await` before the asynchronous function to wait for the result. This essentially allows synchronous style programming without the need to set callbacks. For example:
 
  ```javascript
+ // JavaScript
  class ImJoyPlugin(){
    async setup(){
    }
@@ -54,6 +55,7 @@ Declare your function with the `async` keyword. Add `await` before the asynchron
  ```
 
 ```python
+# Python
 import asyncio
 
 class ImJoyPlugin():
@@ -68,7 +70,7 @@ class ImJoyPlugin():
             print(e)
  ```
 
-Notice that you can **only** use `wait` when you add `async` before the
+Notice that you can **only** use `await` when you add `async` before the
 definition of your function. Don't forget to `import asyncio` if you use `async/await` with Python 3.
 
 
@@ -81,6 +83,7 @@ For JavaScript plugins, a native JavaScript `Promise` will be returned ([More ab
 Below examples for an api name `XXXXX`:
 
 ```javascript
+// JavaScript
 class ImJoyPlugin(){
   setup(){
   }
@@ -101,6 +104,7 @@ class ImJoyPlugin(){
 ```
 
 ```python
+# Python
 class ImJoyPlugin():
     def setup(self):
         pass
@@ -124,11 +128,13 @@ When calling the API functions, most functions take an object (JavaScript) or di
 The following function call will work both in JavaScript and Python:
 
 ```javascript
+// JavaScript
 await api.XXXXX({"option1": 3, "option2": 'hi'})
 ```
 
 This call will work only for Python:
 ```python
+# Python
 await api.XXXXX(option1=3, option2='hi')
 ```
 
@@ -141,7 +147,7 @@ in JavaScript, but the api functions are called in similar fashion in Python.
 ### api.alert
 
 ``` javascript
-api.alert(message)
+await api.alert(message)
 ```
 
 Shows an alert dialog with a message.
@@ -152,7 +158,7 @@ Shows an alert dialog with a message.
 
 **Example**
 ``` javascript
-api.alert('hello world')
+await api.alert('hello world')
 ```
 [Try yourself >>](https://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:alert&w=examples)
 
@@ -228,10 +234,12 @@ await pluginX.funcX()
 
 ### api.export
 ```javascript
+// JavaScript
 api.export(new ImJoyPlugin())
 ```
 or
 ``` python
+# Python
 api.export(ImJoyPlugin())
 ```
 Exports the plugin class or an object/dict as `Plugin API`.
@@ -278,6 +286,7 @@ multiple times to overwrite the previous version. `api.register` can also be use
 **Examples**
 
 ```javascript
+// JavaScript
 await api.register({
      "name": "LUT",
      "ui": [{
@@ -342,6 +351,7 @@ Example for concurrent execution of two plugins, where the two plugins are
 executed simultaneously, but ImJoy waits for the result one after the other.
 
 ```python
+# Python
 p1 = api.run("name of plugin 1")
 p2 = api.run("name of plugin 2")
 
@@ -766,6 +776,7 @@ Trigger a download for a file object from the browser.
 **Examples**
 
 ```javascript
+// JavaScript
 var blob = new Blob(["Hello, world!"], {type: "text/plain;charset=utf-8"});
 api.exportFile(blob, 'hello.txt')
 ```
