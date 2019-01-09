@@ -3,10 +3,10 @@
   <div @mousemove="overlayMousemove" class="overlay" @click="show_overlay=false" v-if="show_overlay"></div>
   <grid-layout v-if="mode==='grid'" :layout="windows" :col-num="col_num" :is-mirrored="false" :auto-size="true" :row-height="row_height" :col-width="column_width" :is-responsive="true" :is-draggable="true" :is-resizable="true" :vertical-compact="true" :margin="[3, 3]" :use-css-transforms="true">
     <grid-item v-for="w in windows" drag-allow-from=".drag-handle" drag-ignore-from=".no-drag" :x="w.x" :y="w.y" :w="w.w" :h="w.h" :i="w.i" @resize="viewChanging(w)" @move="viewChanging(w)" @resized="show_overlay=false;w.resize&&w.resize();focusWindow(w)" @moved="show_overlay=false;w.move&&w.move();focusWindow(w)" :key="w.id">
-      <window :w="w" :withDragHandle="true" @duplicate="duplicate" @select="selectWindow" :loaders="loaders" @close="close" @fullscreen="fullScreen" @normalsize="normalSize"></window>
+      <window :w="w" :withDragHandle="true" @duplicate="duplicate" @select="selectWindow" :loaders="wm.registered_loaders" @close="close" @fullscreen="fullScreen" @normalsize="normalSize"></window>
     </grid-item>
   </grid-layout>
-  <window v-else v-for="w in windows" :key="w.id" v-show="selected_window===w" :loaders="loaders" :withDragHandle="false" @duplicate="duplicate" @select="selectWindow" @close="close" @fullscreen="fullScreen" @normalsize="normalSize" :w="w"></window>
+  <window v-else v-for="w in windows" :key="w.id" v-show="wm.selected_window===w" :loaders="wm.registered_loaders" :withDragHandle="false" @duplicate="duplicate" @select="selectWindow" @close="close" @fullscreen="fullScreen" @normalsize="normalSize" :w="w"></window>
   <div class="md-layout md-gutter md-alignment-center-center">
     <md-empty-state v-if="!windows || windows.length===0" md-icon="static/img/imjoy-io-icon.svg" md-label="" md-description="">
     </md-empty-state>
@@ -16,8 +16,13 @@
 
 <script>
 import {
-  randId
+  randId,
+  assert
 } from '../utils.js'
+import {
+  WindowManager
+} from '../windowManager.js'
+
 import marked from 'marked';
 export default {
   name: 'whiteboard',
@@ -28,20 +33,8 @@ export default {
         return 'grid'
       }
     },
-    selected_window: {
-      type: Object,
-      default: function() {
-        return null
-      }
-    },
-    windows: {
-      type: Array,
-      default: function() {
-        return null
-      }
-    },
-    loaders: {
-      type: Object,
+    windowManager:{
+      type: WindowManager,
       default: function() {
         return null
       }
@@ -60,7 +53,10 @@ export default {
     }
   },
   created(){
-    this.event_bus = this.$root.$data.store && this.$root.$data.store.event_bus
+    this.wm = this.windowManager
+    this.windows = this.wm && this.wm.windows
+    assert(this.windows)
+    this.event_bus = this.wm.event_bus
     this.event_bus.$on('add_window', this.onWindowAdd)
     this.event_bus.$on('resize', this.updateSize)
 
@@ -77,9 +73,9 @@ export default {
     this.screenWidth = window.innerWidth
     // this.column_width = parseInt(this.screenWidth/60)
     this.col_num = parseInt(this.screenWidth/80)
-
   },
   mounted() {
+    this.event_bus.$on('close_window', ()=>{ this.$forceUpdate() })
   },
   beforeDestroy() {
     this.event_bus.$off('add_window', this.onWindowAdd)
@@ -135,9 +131,12 @@ export default {
         this.active_windows[ai].selected = false
         this.active_windows[ai].refresh()
         this.active_windows.splice(ai, 1)
+        console.log('activate window: ', this.active_windows)
+        this.wm.active_windows = this.active_windows
         this.$emit('select', this.active_windows, null)
       }
-      console.log('closing window', w)
+      this.wm.closeWindow(w)
+      if(w.plugin && w.plugin.terminate) w.plugin.terminate()
       this.$emit('close', w)
     },
     isTypedArray(obj)
@@ -169,7 +168,7 @@ export default {
         nw.renderWindow = w.renderWindow
       }
       nw.id = nw.name + randId()
-      this.windows.push(nw)
+      this.wm.windows.push(nw)
       this.$emit('add', nw)
     },
     unselectWindows(){
@@ -179,7 +178,9 @@ export default {
             this.active_windows[i].refresh()
         }
         this.active_windows = []
-        this.$emit('select', [], null)
+        console.log('activate window: ', this.active_windows)
+        this.wm.active_windows = this.active_windows
+        this.$emit('select', this.active_windows, null)
         this.$forceUpdate()
       }
     },
@@ -199,6 +200,8 @@ export default {
         } else {
           this.active_windows = [w]
         }
+        console.log('activate window: ', this.active_windows)
+        this.wm.active_windows = this.active_windows
         this.$emit('select', this.active_windows, w)
 
       } else if (!evt.shiftKey && this.active_windows.length > 1) {

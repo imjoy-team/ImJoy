@@ -1,9 +1,31 @@
+import {
+  compareVersions
+} from './utils.js'
+
 import Ajv from 'ajv'
 var ajv = new Ajv()
 
 export const CONFIGURABLE_FIELDS = ["env", "requirements", "dependencies", "icon", "ui", "type", "flags"]
 
 export const SUPPORTED_PLUGIN_TYPES = ['web-worker', 'native-python', 'web-python', 'iframe', 'window', 'collection']
+
+export function upgradePluginAPI(config){
+  if(compareVersions(config.api_version, '<=', '0.1.1')){
+    config.type = config.type || config.mode
+    delete config.mode
+    if(config.type === 'pyworker'){
+      config.type = 'native-python'
+    }
+    else if(config.type === 'webworker'){
+      config.type = 'web-worker'
+    }
+    else if(config.type === 'webpython'){
+      config.type = 'web-python'
+    }
+  }
+  return config
+}
+
 export const WEB_WORKER_PLUGIN_TEMPLATE= `
 <docs>
 [TODO: write documentation for this plugin.]
@@ -236,7 +258,7 @@ export const WINDOW_SCHEMA= ajv.compile({
   properties: {
     name: {type: 'string'},
     type: {type: 'string'},
-    config: {type: 'object'},
+    config: {type: ['null', 'object']},
     data: {type: ['null', 'object']}, //attachments: {}
     panel: {type: ['null', 'object']}
   }
