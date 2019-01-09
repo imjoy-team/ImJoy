@@ -4,12 +4,14 @@ import {
 } from './utils.js'
 
 export class EngineManager {
-  constructor({event_bus=null, show_message_callback=null}){
+  constructor({event_bus=null, show_message_callback=null, update_ui_callback=null, show_engine_callback=null}){
     this.event_bus = event_bus
     assert(this.event_bus)
     this.socket = null
     this.engine_status = {connection: 'Disconnected'}
     this.show_message_callback = show_message_callback
+    this.update_ui_callback = update_ui_callback || function (){}
+    this.show_engine_callback = show_engine_callback || function(){}
   }
   getFileUrl(config) {
     return new Promise((resolve, reject)=>{
@@ -41,13 +43,15 @@ export class EngineManager {
   }
 
   connectEngine(url, token, auto) {
-    if (this.socket&&this.engine_connected) {
+    if (this.socket && this.engine_connected && this.connected_url_token_ === (url + token)) {
       return
       //this.socket.disconnect()
     }
     //enforcing 127.0.0.1 for avoid security restrictions
     url = url.replace('localhost', '127.0.0.1')
     token = token && token.trim() || ''
+    let reason = ''
+    this.engine_connected = false
     this.engine_status.connection = 'Connecting...'
     this.engine_status.url = url
     if(!auto) this.showMessage('Trying to connect to the plugin engine...')
@@ -61,7 +65,7 @@ export class EngineManager {
       }
     }, 2500)
 
-    if(!auto) this.showPluginEngineInfo = true
+    if(!auto) {this.show_engine_callback(true)}
 
     socket.on('connect', (d) => {
       clearTimeout(timer)
@@ -70,7 +74,8 @@ export class EngineManager {
           const connect_client = ()=>{
             this.socket = socket
             this.engine_connected = true
-            this.showPluginEngineInfo = false
+            this.connected_url_token_ = url + token
+            this.show_engine_callback(false)
             this.engine_status.connection = 'Connected.'
             this.connection_token = token
             localStorage.setItem("imjoy_connection_token", token);
@@ -78,18 +83,15 @@ export class EngineManager {
             this.showMessage('Plugin Engine is connected.')
             // console.log('plugin engine connected.')
             this.event_bus.$emit('engine_connected', d)
+            this.update_ui_callback()
 
           }
 
           if(ret.message && ret.confirmation){
-            this.permission_message = ret.message
-            this.resolve_permission = connect_client
-            this.reject_permission = ()=>{
+            this.show_engine_callback(true, ret.message, connect_client,  ()=>{
               socket.disconnect()
               console.log('you canceled the connection.')
-            }
-            this.showPluginEngineInfo = false
-            this.showPermissionConfirmation = true
+            })
           }
           else{
             connect_client()
@@ -97,26 +99,38 @@ export class EngineManager {
           // this.listEngineDir()
         }
         else{
-          socket.disconnect()
+          reason = ret.reason
           if(ret.no_retry && ret.reason){
             this.showStatus('Failed to connect: ' + ret.reason)
             this.showMessage('Failed to connect: ' + ret.reason)
           }
           else{
-            this.showPluginEngineInfo = true
+            this.show_engine_callback(true)
             if(ret.reason) this.showMessage('Failed to connect: ' + ret.reason)
             console.error('Failed to connect to the plugin engine.', ret.reason)
           }
+          socket.disconnect()
         }
       })
 
     })
     socket.on('disconnect', () => {
       // console.log('plugin engine disconnected.')
-      this.engine_connected = false
-      this.showMessage('Plugin Engine disconnected.')
+      if(this.engine_connected){
+        this.showMessage('Plugin Engine disconnected.')
+      }
+      else{
+        if(reason){
+          this.showMessage('Failed to connect: ' + reason)
+        }
+        else{
+          this.showMessage('Failed to connect to the plugin engine')
+        }
+      }
+
       this.engine_status.connection = 'Disconnected.'
       this.socket = null
+      this.engine_connected = false
       this.event_bus.$emit('engine_disconnected')
     });
   }

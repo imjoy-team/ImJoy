@@ -39,7 +39,7 @@ import Ajv from 'ajv'
 const ajv = new Ajv()
 
 export class PluginManager {
-  constructor({event_bus=null, engine_manager=null, window_manager=null, imjoy_api={}, show_message_callback=null}){
+  constructor({event_bus=null, engine_manager=null, window_manager=null, imjoy_api={}, show_message_callback=null, update_ui_callback=null}){
     this.event_bus = event_bus
     this.em = engine_manager
     this.wm = window_manager
@@ -48,6 +48,7 @@ export class PluginManager {
     assert(this.wm, 'window manager is not available')
 
     this.show_message_callback = show_message_callback
+    this.update_ui_callback = update_ui_callback || function (){}
 
     this.default_repository_list = [{name: 'ImJoy Repository', url: "oeway/ImJoy-Plugins", description: 'The official plugin repository provided by ImJoy.io.'},
                                     {name: 'ImJoy Demos', url: 'oeway/ImJoy-Demo-Plugins', description: 'A set of demo plugins provided by ImJoy.io'}
@@ -485,7 +486,7 @@ export class PluginManager {
             const plugin = this.plugins[k]
             if (typeof plugin.terminate === 'function') {
               try {
-                plugin.terminate()
+                plugin.terminate(this.update_ui_callback)
               } catch (e) {
                 console.error(e)
               }
@@ -727,7 +728,7 @@ export class PluginManager {
                 delete this.plugin_names[name]
               }
               if (typeof plugin.terminate === 'function') {
-                plugin.terminate()
+                plugin.terminate(this.update_ui_callback)
               }
             } catch (e) {
               console.error(e)
@@ -1023,7 +1024,7 @@ export class PluginManager {
             console.error('error occured when loading plugin ' + template.name + ": ", e)
             this.showMessage(`<${template.name}>: ${e}`, 15000)
             reject(e)
-            plugin.terminate()
+            plugin.terminate(this.update_ui_callback)
           })
         }
         else{
@@ -1039,7 +1040,7 @@ export class PluginManager {
           this.showMessage(`Error occured when loading ${template.name}.`)
         }
         console.error('error occured when loading ' + template.name + ": ", e)
-        plugin.terminate()
+        plugin.terminate(this.update_ui_callback)
         reject(e)
       });
       plugin.docs = template.docs
@@ -1128,14 +1129,14 @@ export class PluginManager {
         }).catch((e) => {
           console.error('Error occured when loading the window plugin ' + pconfig.name + ": ", e)
           plugin.set_status({type: 'error', text: `Error occured when loading the window plugin ${pconfig.name}: ${e.toString()}`})
-          plugin.terminate()
+          plugin.terminate(this.update_ui_callback)
           reject(e)
         })
       });
       plugin.whenFailed((e) => {
         console.error('error occured when loading ' + pconfig.name + ":", e)
         plugin.set_status({type: 'error', text:`Error occured when loading ${pconfig.name}: ${e}.`})
-        plugin.terminate()
+        plugin.terminate(this.update_ui_callback)
         reject(e)
       });
     })
