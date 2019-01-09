@@ -446,13 +446,16 @@ var SocketioConnectionWeb = function() {
         if(!this.context){
           throw('connection is not established.')
         }
+        this._disconnectHandler = ()=>{}
         platformInit.whenEmitted(() =>{
           if (!this._disconnected && this.context && this.context.socket) {
             const config_ = {api_version: config.api_version, flags: config.flags, tag: config.tag, workspace: config.workspace, env: config.env, requirements: config.requirements, cmd: config.cmd, name: config.name, type: config.type, inputs: config.inputs, outputs: config.outputs}
             // create a plugin here
             this.context.socket.emit('init_plugin', {id: id, type: type, config: config_}, (result) => {
               // console.log('init_plugin: ', result)
+              this.initializing = false;
               if(result.success){
+                this._disconnected = false;
                 this.secret = result.secret
                 config.work_dir = result.work_dir
                 this.context.socket.on('message_from_plugin_'+this.secret,  (data)=>{
@@ -460,7 +463,11 @@ var SocketioConnectionWeb = function() {
                     if (data.type == 'initialized') {
                         this.dedicatedThread = data.dedicatedThread;
                         this._init.emit();
-                    } else {
+                    }
+                    else if (data.type == 'disconnected'){
+                      this._disconnectHandler(data.details)
+                    }
+                    else {
                         this._messageHandler(data);
                     }
                 })
@@ -470,6 +477,7 @@ var SocketioConnectionWeb = function() {
                 }
               }
               else{
+                this._disconnected = true;
                 console.error('failed to initialize plugin on the plugin engine')
                 throw('failed to initialize plugin on the plugin engine')
               }
@@ -527,7 +535,9 @@ var SocketioConnectionWeb = function() {
      *
      * @param {Function} handler to call upon a disconnect
      */
-    SocketioConnection.prototype.onDisconnect = function(){};
+    SocketioConnection.prototype.onDisconnect = function(handler){
+      this._disconnectHandler = handler;
+    };
 
 
     /**
@@ -543,6 +553,7 @@ var SocketioConnectionWeb = function() {
           );
           // console.log('kill plugin '+this.id)
         }
+        this._disconnectHandler()
     }
 
 }
@@ -757,10 +768,10 @@ var Plugin = function( config, _interface) {
     this.tags = config.tags;
     this.type = config.type || 'web-worker'
     this._path = config.url;
-    this._initialInterface = _interface||{};
     this._disconnected = true
     this.initializing = false;
     this.running = false;
+    this._bindInterface(_interface);
     this._connect();
 };
 
@@ -786,12 +797,35 @@ var DynamicPlugin = function(config, _interface) {
     this.type = config.type || 'web-worker';
     this.initializing = false;
     this.running = false;
-    this._initialInterface = _interface||{};
     this._disconnected = true;
+    this._bindInterface(_interface);
     this._connect();
 };
 
-
+/**
+ * Bind the first argument of all the interface functions to this plugin
+ */
+DynamicPlugin.prototype._bindInterface =
+       Plugin.prototype._bindInterface = function(_interface) {
+   _interface = _interface || {}
+   this._initialInterface = {}
+   // bind this plugin to api functions
+   for(var k in _interface){
+     if(typeof _interface[k] === 'function'){
+       this._initialInterface[k] = _interface[k].bind(null, this)
+     }
+     else if(typeof _interface[k] === 'object'){
+       var utils = {}
+       for(var u in _interface[k]){
+         utils[u] = _interface[k][u].bind(null, this)
+       }
+       this._initialInterface[k] = utils
+     }
+     else{
+       this._initialInterface[k] = _interface[k]
+     }
+   }
+}
 /**
  * Creates the connection to the plugin site
  */
@@ -815,14 +849,25 @@ DynamicPlugin.prototype._connect =
     }
     if(this.type == 'native-python' && (!this.config.context || !this.config.context.socket)){
       me._fail.emit('Please connect to the Plugin Engine 🚀.');
-      this._connection = null
+      me._connection = null
     }
     else{
-      this._connection = new Connection(this.id, this.type, this.config);
-      this.initializing = true;
-      this._connection.whenInit(function(){
+      me._connection = new Connection(me.id, me.type, me.config);
+      me.initializing = true;
+      me._connection.whenInit(function(){
           me._init();
       });
+      me._connection.onDisconnect(function (details){
+        if(details){
+          if(details.success){
+            me.set_status({type: 'info', text: details.message})
+          }
+          else{
+            me.set_status({type: 'error', text: details.message})
+          }
+        }
+        me.terminate()
+      })
     }
 }
 
@@ -848,19 +893,26 @@ DynamicPlugin.prototype._init =
 
 
     var me = this;
-    this._site.onDisconnect(function() {
+    this._site.onDisconnect(function(details) {
         me._disconnect.emit();
+        if(details){
+          if(details.success){
+            me.set_status({type: 'info', text: details.message})
+          }
+          else{
+            me.set_status({type: 'error', text: details.message})
+          }
+        }
+        me.terminate()
     });
 
     this._site.onRemoteReady(function() {
         me.running = false;
-        // me._initialInterface.$forceUpdate&&me._initialInterface.$forceUpdate();
     });
 
     this._site.onRemoteBusy(function() {
         if(!me._disconnected)
           me.running = true;
-        // me._initialInterface.$forceUpdate&&me._initialInterface.$forceUpdate();
     });
 
     this.getRemoteCallStack = this._site.getRemoteCallStack;
@@ -1053,7 +1105,6 @@ DynamicPlugin.prototype.terminate =
           this._disconnected = true
           this.running = false
           this.initializing = false
-          // this._initialInterface.$forceUpdate&&this._initialInterface.$forceUpdate();
           this._site&&this._site.disconnect();
         })
       }
@@ -1061,7 +1112,6 @@ DynamicPlugin.prototype.terminate =
         this._disconnected = true
         this.running = false
         this.initializing = false
-        // this._initialInterface.$forceUpdate&&this._initialInterface.$forceUpdate();
         this._site&&this._site.disconnect();
       }
       if(callback && !callbackset){
@@ -1072,11 +1122,21 @@ DynamicPlugin.prototype.terminate =
       this._disconnected = true
       this.running = false
       this.initializing = false
-      // this._initialInterface.$forceUpdate&&this._initialInterface.$forceUpdate();
       this._site&&this._site.disconnect();
       if(callback){
         callback()
       }
+    }
+}
+
+DynamicPlugin.prototype.set_status =
+       Plugin.prototype.set_status = function(status) {
+    this.status = status
+    if(status.type === 'error'){
+      console.error(`Error in Plugin ${this.id}: ${status.text}`)
+    }
+    else{
+      console.log(`Plugin${this.id} Status updated: ${status.text}`)
     }
 }
 
