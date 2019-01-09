@@ -688,9 +688,10 @@ export default {
       }
     }
 
-    this.em = new EngineManager({ event_bus: this.event_bus, show_message_callback: this.showMessage})
+    this.em = new EngineManager({ event_bus: this.event_bus, show_message_callback: this.showMessage, show_engine_callback: this.showEngineConnection.bind(this)})
     this.wm = new WindowManager({ event_bus: this.event_bus, show_message_callback: this.showMessage, add_window_callback: this.addWindow})
-    this.pm = new PluginManager({ event_bus: this.event_bus, engine_manager: this.em, window_manager:this.wm, imjoy_api: imjoy_api, show_message_callback: this.showMessage})
+    this.pm = new PluginManager({ event_bus: this.event_bus, engine_manager: this.em, window_manager:this.wm, imjoy_api: imjoy_api, show_message_callback: this.showMessage, update_ui_callback: ()=>{this.$forceUpdate()}})
+
 
     this.client_id = null
     this.IMJOY_PLUGIN = {
@@ -961,6 +962,17 @@ export default {
       else{
         this.window_mode = 'single'
       }
+    },
+    showEngineConnection(show, message, resolve, reject){
+      if(message && resolve && reject){
+        this.permission_message = resolve
+        this.reject_permission = reject
+        this.showPermissionConfirmation = true
+      }
+      else{
+        this.showPluginEngineInfo = show
+      }
+
     },
     getRepository(repo_name){
       for(let r of this.pm.repository_list){
