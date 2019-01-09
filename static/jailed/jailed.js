@@ -825,6 +825,10 @@ DynamicPlugin.prototype._bindInterface =
        this._initialInterface[k] = _interface[k]
      }
    }
+  
+  
+  
+  
 }
 /**
  * Creates the connection to the plugin site
@@ -867,6 +871,8 @@ DynamicPlugin.prototype._connect =
           }
         }
         me.terminate()
+        var iframe_container = document.getElementById(me._connection._frame.id)
+        iframe_container.parentNode.removeChild(iframe_container)
       })
     }
 }
@@ -1105,15 +1111,18 @@ DynamicPlugin.prototype.terminate =
           this._disconnected = true
           this.running = false
           this.initializing = false
-          this._site&&this._site.disconnect();
+          if(this._site) this._site.disconnect();
+          if(this._connection) this._connection.disconnect();
         })
       }
       else{
         this._disconnected = true
         this.running = false
         this.initializing = false
-        this._site&&this._site.disconnect();
+        if(this._site) this._site.disconnect();
+        if(this._connection) this._connection.disconnect();
       }
+      if(this._connection) this._connection.disconnect()
       if(callback && !callbackset){
         callback()
       }
@@ -1122,7 +1131,8 @@ DynamicPlugin.prototype.terminate =
       this._disconnected = true
       this.running = false
       this.initializing = false
-      this._site&&this._site.disconnect();
+      if(this._site) this._site.disconnect();
+      if(this._connection) this._connection.disconnect();
       if(callback){
         callback()
       }
