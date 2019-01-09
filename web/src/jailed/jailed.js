@@ -825,6 +825,10 @@ DynamicPlugin.prototype._bindInterface =
        this._initialInterface[k] = _interface[k]
      }
    }
+  
+  
+  
+  
 }
 /**
  * Creates the connection to the plugin site
@@ -868,7 +872,6 @@ DynamicPlugin.prototype._connect =
         }
         me.terminate()
         var iframe_container = document.getElementById(me._connection._frame.id)
-        console.log('===========================', iframe_container.parentNode, iframe_container)
         iframe_container.parentNode.removeChild(iframe_container)
       })
     }

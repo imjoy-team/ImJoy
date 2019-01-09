@@ -692,6 +692,7 @@ export default {
     this.wm = new WindowManager({ event_bus: this.event_bus, show_message_callback: this.showMessage, add_window_callback: this.addWindow})
     this.pm = new PluginManager({ event_bus: this.event_bus, engine_manager: this.em, window_manager:this.wm, imjoy_api: imjoy_api, show_message_callback: this.showMessage, update_ui_callback: ()=>{this.$forceUpdate()}})
 
+
     this.client_id = null
     this.IMJOY_PLUGIN = {
       _id: 'IMJOY_APP'

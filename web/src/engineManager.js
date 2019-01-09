@@ -59,7 +59,8 @@ export class EngineManager {
     const timer = setTimeout(() => {
       if (!this.engine_connected) {
         this.engine_status.connection = 'Plugin Engine is not connected.'
-        if(!auto) this.showMessage('Failed to connect, please make sure you have started the plugin engine.')
+        if(!auto) this.showMessage('Failed to connect, please make sure you have star
+                                ted the plugin engine.')
 
         if(auto) socket.disconnect()
       }
@@ -84,7 +85,6 @@ export class EngineManager {
             // console.log('plugin engine connected.')
             this.event_bus.$emit('engine_connected', d)
             this.update_ui_callback()
-
           }
 
           if(ret.message && ret.confirmation){
@@ -115,7 +115,6 @@ export class EngineManager {
 
     })
     socket.on('disconnect', () => {
-      // console.log('plugin engine disconnected.')
       if(this.engine_connected){
         this.showMessage('Plugin Engine disconnected.')
       }
