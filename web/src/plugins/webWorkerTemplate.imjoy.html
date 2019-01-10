@@ -1,0 +1,37 @@
+<docs>
+[TODO: write documentation for this plugin.]
+</docs>
+
+<config lang="json">
+{
+  "name": "Untitled Plugin",
+  "type": "web-worker",
+  "tags": [],
+  "ui": "",
+  "version": "0.1.0",
+  "api_version": "0.1.2",
+  "url": "",
+  "description": "[TODO: describe this plugin with one sentense.]",
+  "icon": "extension",
+  "inputs": null,
+  "outputs": null,
+  "env": "",
+  "requirements": [],
+  "dependencies": []
+}
+</config>
+
+<script lang="javascript">
+class ImJoyPlugin {
+  async setup() {
+
+  }
+
+  async run(my) {
+    console.log('running in the plugin ', my)
+
+  }
+}
+
+api.export(new ImJoyPlugin())
+</script>

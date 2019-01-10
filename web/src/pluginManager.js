@@ -182,81 +182,102 @@ export class PluginManager {
   }
 
   addRepository(repo){
-    if(typeof repo === 'string'){
-      repo = {name: repo, url: repo, description: repo}
-    }
-    assert(repo.name && repo.url)
-    this.reloadRepository(repo).then((manifest)=>{
-      repo.name = manifest.name || repo.name
-      repo.description = manifest.description || repo.description
-      // use repo url if name exists
-      for(let r of this.repository_list){
-        if(r.name === repo.name){
-          repo.name = repo.url.replace('https://github.com/', '').replace('http://github.com/', '')
-          break
+    return new Promise((resolve, reject)=>{
+      if(typeof repo === 'string'){
+        repo = {name: repo, url: repo, description: repo}
+      }
+      if(!(repo.name && repo.url)){
+        reject('You need to provide name and url')
+        return
+      }
+      this.reloadRepository(repo).then((manifest)=>{
+        repo.name = manifest.name || repo.name
+        repo.description = manifest.description || repo.description
+        // use repo url if name exists
+        for(let r of this.repository_list){
+          if(r.name === repo.name){
+            repo.name = repo.url.replace('https://github.com/', '').replace('http://github.com/', '')
+            break
+          }
         }
-      }
-      //remove existing repo if same url already exists
-      for(let r of this.repository_list){
-        if(r.url === repo.url){
-          // remove it if already exists
-          this.repository_list.splice( this.repository_list.indexOf(r), 1 )
-          this.showMessage("Repository with the same url already exists.")
-          break
+        //remove existing repo if same url already exists
+        for(let r of this.repository_list){
+          if(r.url === repo.url){
+            // remove it if already exists
+            this.repository_list.splice( this.repository_list.indexOf(r), 1 )
+            this.showMessage("Repository with the same url already exists.")
+            break
+          }
         }
-      }
-
-      this.repository_list.push(repo)
-      this.repository_names = []
-      for(let r of this.repository_list){
-        this.repository_names.push(r.name)
-      }
-      this.config_db.get('repository_list').then((doc) => {
-        this.config_db.put({
-          _id: doc._id,
-          _rev: doc._rev,
-          list: this.repository_list,
+        if(!(repo.name && repo.url)){
+          reject('You need to provide name and url')
+          return
+        }
+        this.repository_list.push(repo)
+        this.repository_names = []
+        for(let r of this.repository_list){
+          this.repository_names.push(r.name)
+        }
+        this.config_db.get('repository_list').then((doc) => {
+          this.config_db.put({
+            _id: doc._id,
+            _rev: doc._rev,
+            list: this.repository_list,
+          }).then(resolve).catch(reject)
+        }).catch((err) => {
+          this.showMessage("Failed to save repository, database Error:" + err.toString())
+          reject("Failed to save repository, database Error:" + err.toString())
         })
-      }).catch((err) => {
-        this.showMessage("Failed to save repository, database Error:" + err.toString())
+      }).catch(()=>{
+        if(this.repository_names.indexOf(repo.name)>=0)
+          this.repository_names.splice(this.repository_names.indexOf(repo.name), 1)
+        this.showMessage("Failed to load repository from: " + repo.url)
+        reject("Failed to load repository from: " + repo.url)
       })
-    }).catch(()=>{
-      if(this.repository_names.indexOf(repo.name)>=0)
-        this.repository_names.splice(this.repository_names.indexOf(repo.name), 1)
-      this.showMessage("Failed to load repository from: " + repo.url)
     })
   }
 
   removeRepository(repo) {
-    if(!repo) return;
-    let found = false
-    for(let r of this.repository_list){
-      if(r.url === repo.url || r.name === repo.name){
-        found = r
+    return new Promise((resolve, reject)=>{
+      if(!repo || !(repo.name && repo.url)){
+        reject('You need to provide name and url')
+        return
       }
-    }
-    if (found) {
-      const index = this.repository_list.indexOf(found)
-      this.repository_list.splice(index, 1)
-      this.repository_names = []
+      let found = false
       for(let r of this.repository_list){
-        this.repository_names.push(r.name)
+        if(r.url === repo.url || r.name === repo.name){
+          found = r
+        }
       }
-      this.config_db.get('repository_list').then((doc) => {
-        this.config_db.put({
-          _id: doc._id,
-          _rev: doc._rev,
-          list: this.repository_list
-        }).then(()=>{
-          this.showMessage(`Repository has been deleted.`)
-        }).catch(()=>{
-          this.showMessage(`Error occured when removing repository.`)
+      if (found) {
+        const index = this.repository_list.indexOf(found)
+        this.repository_list.splice(index, 1)
+        this.repository_names = []
+        for(let r of this.repository_list){
+          this.repository_names.push(r.name)
+        }
+        this.config_db.get('repository_list').then((doc) => {
+          this.config_db.put({
+            _id: doc._id,
+            _rev: doc._rev,
+            list: this.repository_list
+          }).then(()=>{
+            this.showMessage(`Repository has been deleted.`)
+            resolve()
+          }).catch(()=>{
+            this.showMessage(`Error occured when removing repository.`)
+            reject(`Error occured when removing repository.`)
+          })
         })
-      })
-      .catch((err) => {
-        this.showMessage("Failed to save repository, database Error:" + err.toString())
-      })
-    }
+        .catch((err) => {
+          this.showMessage("Failed to save repository, database Error:" + err.toString())
+          reject("Failed to save repository, database Error:" + err.toString())
+        })
+      }
+      else{
+        reject('Repository not found: ' + repo.name)
+      }
+    })
   }
 
   reloadRepository(repo){
@@ -594,7 +615,6 @@ export class PluginManager {
   }
 
   installPlugin(pconfig, tag){
-    // pconfig = "oeway/ImJoy-Demo-Plugins:3D Demos"
     return new Promise((resolve, reject) => {
       let uri = typeof pconfig === 'string' ? pconfig : pconfig.uri
       let scoped_plugins = this.available_plugins
@@ -647,8 +667,7 @@ export class PluginManager {
               }
             }
             this.showMessage(`Plugin "${template.name}" has been successfully installed.`)
-            resolve()
-            this.reloadPlugin(template)
+            resolve(template)
           }).catch(()=>{
             reject(`Failed to save the plugin ${config.name}`)
           })
@@ -995,7 +1014,7 @@ export class PluginManager {
       config._id = template._id
       config.context = this.getPluginContext()
       if (template.type === 'native-python') {
-        if (!this.em.socket) {
+        if (!this.em.connected) {
           console.error("Please connect to the Plugin Engine 🚀.")
         }
       }

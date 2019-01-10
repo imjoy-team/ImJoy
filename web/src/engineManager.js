@@ -43,7 +43,7 @@ export class EngineManager {
   }
 
   connectEngine(url, token, auto) {
-    if (this.socket && this.engine_connected && this.connected_url_token_ === (url + token)) {
+    if (this.socket && this.connected && this.connected_url_token_ === (url + token)) {
       return
       //this.socket.disconnect()
     }
@@ -51,16 +51,15 @@ export class EngineManager {
     url = url.replace('localhost', '127.0.0.1')
     token = token && token.trim() || ''
     let reason = ''
-    this.engine_connected = false
+    this.connected = false
     this.engine_status.connection = 'Connecting...'
     this.engine_status.url = url
     if(!auto) this.showMessage('Trying to connect to the plugin engine...')
     const socket = io(url);
     const timer = setTimeout(() => {
-      if (!this.engine_connected) {
+      if (!this.connected) {
         this.engine_status.connection = 'Plugin Engine is not connected.'
         if(!auto) this.showMessage('Failed to connect, please make sure you have started the plugin engine.')
-
         if(auto) socket.disconnect()
       }
     }, 2500)
@@ -73,7 +72,7 @@ export class EngineManager {
         if(ret.success){
           const connect_client = ()=>{
             this.socket = socket
-            this.engine_connected = true
+            this.connected = true
             this.connected_url_token_ = url + token
             this.show_engine_callback(false)
             this.engine_status.connection = 'Connected.'
@@ -84,7 +83,6 @@ export class EngineManager {
             // console.log('plugin engine connected.')
             this.event_bus.$emit('engine_connected', d)
             this.update_ui_callback()
-
           }
 
           if(ret.message && ret.confirmation){
@@ -115,7 +113,7 @@ export class EngineManager {
 
     })
     socket.on('disconnect', () => {
-      if(this.engine_connected){
+      if(this.connected){
         this.showMessage('Plugin Engine disconnected.')
       }
       else{
@@ -129,7 +127,7 @@ export class EngineManager {
 
       this.engine_status.connection = 'Disconnected.'
       this.socket = null
-      this.engine_connected = false
+      this.connected = false
       this.event_bus.$emit('engine_disconnected')
     });
   }

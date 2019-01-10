@@ -4,138 +4,15 @@ import VueRouter from 'vue-router'
 import { router_config } from '../src/router'
 import Imjoy from '@/components/Imjoy.vue'
 import _ from 'lodash'
-import {
-  // NATIVE_PYTHON_PLUGIN_TEMPLATE,
-  WEB_WORKER_PLUGIN_TEMPLATE,
-  WEB_PYTHON_PLUGIN_TEMPLATE,
-  WINDOW_PLUGIN_TEMPLATE
-} from '../src/api.js'
 
-const TEST_WEB_WORKER_PLUGIN_TEMPLATE= `
-<docs>
-[TODO: write documentation for this plugin.]
-</docs>
+import WEB_WORKER_PLUGIN_TEMPLATE from '../src/plugins/webWorkerTemplate.imjoy.html';
+import WINDOW_PLUGIN_TEMPLATE from '../src/plugins/windowTemplate.imjoy.html';
+// import NATIVE_PYTHON_PLUGIN_TEMPLATE from '../src/plugins/nativePythonTemplate.imjoy.html';
+import WEB_PYTHON_PLUGIN_TEMPLATE from '../src/plugins/webPythonTemplate.imjoy.html';
 
-<config lang="json">
-{
-  "name": "Test Web Worker Plugin",
-  "type": "web-worker",
-  "tags": [],
-  "ui": "",
-  "version": "0.1.0",
-  "api_version": "0.1.2",
-  "url": "",
-  "description": "[TODO: describe this plugin with one sentense.]",
-  "icon": "extension",
-  "inputs": null,
-  "outputs": null,
-  "env": "",
-  "requirements": [],
-  "dependencies": []
-}
-</config>
-
-<script lang="javascript">
-class ImJoyPlugin {
-  async setup() {
-  }
-
-  async run() {
-    console.log('running in the plugin.')
-  }
-
-  async test_register() {
-    await api.register({
-         "name": "LUT",
-         "ui": [{
-            "apply LUT": {
-                id: 'lut',
-                type: 'choose',
-                options: ['hot', 'rainbow'],
-                placeholder: 'hot'
-              }
-          }],
-          "run": this.run,
-          "update": this.run
-    })
-    return true
-  }
-
-  async test_unregister() {
-    await api.unregister('LUT')
-    return true
-  }
-
-  async test_createWindow() {
-    await api.createWindow({
-      name: 'new image',
-      type: 'imjoy/image',
-      data: {src: 'https://imjoy.io/static/img/loader.gif'}
-    })
-    return true
-  }
-
-}
-
-api.export(new ImJoyPlugin())
-</script>
-`
-
-const TEST_WINDOW_PLUGIN_TEMPLATE= `
-<docs lang="markdown">
-[TODO: write documentation for this plugin.]
-</docs>
-
-<config lang="json">
-{
-  "name": "Test Window Plugin",
-  "type": "window",
-  "tags": [],
-  "ui": "",
-  "version": "0.1.0",
-  "api_version": "0.1.2",
-  "description": "[TODO: describe this plugin with one sentense.]",
-  "icon": "extension",
-  "inputs": null,
-  "outputs": null,
-  "env": "",
-  "requirements": [],
-  "dependencies": [],
-  "defaults": {"w": 7, "h": 7}
-}
-</config>
-
-<script lang="javascript">
-class ImJoyPlugin {
-  async setup() {
-
-  }
-
-  async run(my) {
-    console.log('running in the window plugin ')
-    return my
-  }
-
-  async multi2(arg) {
-    return arg*2
-  }
-}
-
-api.export(new ImJoyPlugin())
-</script>
-
-<window lang="html">
-  <div>
-    <p>
-    Hello World
-    </p>
-  </div>
-</window>
-
-<style lang="css">
-
-</style>
-`
+import TEST_WEB_WORKER_PLUGIN_1 from './testWebWorkerPlugin1.imjoy.html';
+import TEST_WEB_WORKER_PLUGIN_2 from './testWebWorkerPlugin2.imjoy.html';
+import TEST_WINDOW_PLUGIN_1 from './testWindowPlugin1.imjoy.html';
 
 describe('ImJoy.vue', async () => {
   const localVue = createLocalVue()
@@ -160,6 +37,28 @@ describe('ImJoy.vue', async () => {
 
   it('should include "Image Processing with Joy!"', async () => {
     expect(wrapper.text()).to.include('Python Plugin Engine')
+  })
+
+  it('should load default repositories', async () => {
+    await pm.loadRepositoryList()
+    expect(pm.repository_names).to.include('ImJoy Repository')
+    expect(pm.repository_names).to.include('ImJoy Demos')
+  })
+
+  it('should add and remove repositories', async () => {
+    await pm.addRepository({name: 'test', url: 'oeway/ImJoy-project-template'})
+    expect(pm.repository_names).to.include('Project Template')
+    await pm.removeRepository({name: 'Project Template', url: 'oeway/ImJoy-project-template'})
+    expect(pm.repository_names).to.not.include('Project Template')
+  })
+
+  it('should load a repository and install plugin from it', async () => {
+    await pm.reloadRepository({url: 'oeway/ImJoy-project-template'})
+    await pm.installPlugin({uri: 'oeway/ImJoy-project-template:Template plugin'})
+    const ps = pm.installed_plugins.filter((p) => {
+      return p.name === 'Template plugin'
+    })
+    expect(ps.length).to.equal(1)
   })
 
   it('should show add plugin dialog', async () => {
@@ -190,6 +89,7 @@ describe('ImJoy.vue', async () => {
     expect(plugin.type).to.equal('web-worker')
     expect(typeof plugin.api.run).to.equal('function')
     await plugin.api.run({})
+    plugin.terminate()
   }).timeout(10000)
 
   it('should load the new window plugin', async () => {
@@ -199,6 +99,7 @@ describe('ImJoy.vue', async () => {
     expect(plugin.type).to.equal('window')
     expect(typeof plugin.api.run).to.equal('function')
     await plugin.api.run({})
+    plugin.terminate()
   }).timeout(10000)
 
   // it('should load the new native-python plugin', async () => {
@@ -223,23 +124,29 @@ describe('ImJoy.vue', async () => {
   describe('Test ImJoy API', async () => {
     let plugin1
     let plugin2
+    let pluginw
     before(function(done){
       this.timeout(10000)
-      pm.reloadPlugin({_id: 'new plugin1', tag: null, name:'new plugin1', code: _.clone(TEST_WEB_WORKER_PLUGIN_TEMPLATE)}).then((p1)=>{
+      pm.reloadPlugin({_id: 'new plugin 1', tag: null, name:'new plugin1', code: _.clone(TEST_WEB_WORKER_PLUGIN_1)}).then((p1)=>{
         plugin1 = p1
-        expect(plugin1.name).to.equal('Test Web Worker Plugin')
+        expect(plugin1.name).to.equal('Test Web Worker Plugin 1')
         expect(plugin1.type).to.equal('web-worker')
         expect(typeof plugin1.api.run).to.equal('function')
-
-        pm.reloadPlugin({_id: 'new plugin2', tag: null, name:'new plugin2', code: _.clone(TEST_WINDOW_PLUGIN_TEMPLATE)}).then((p2)=>{
+        pm.reloadPlugin({_id: 'new plugin 2', tag: null, name:'new plugin2', code: _.clone(TEST_WEB_WORKER_PLUGIN_2)}).then((p2)=>{
           plugin2 = p2
-          expect(plugin2.name).to.equal('Test Window Plugin')
-          expect(plugin2.type).to.equal('window')
+          expect(plugin2.name).to.equal('Test Web Worker Plugin 2')
+          expect(plugin2.type).to.equal('web-worker')
           expect(typeof plugin2.api.run).to.equal('function')
 
-          pm.createWindow(null, {name: 'new window', type: 'Test Window Plugin'}).then((wplugin)=>{
-            expect(typeof wplugin.multi2).to.equal('function')
-            done()
+          pm.reloadPlugin({_id: 'new window plugin', tag: null, name:'new window plugin', code: _.clone(TEST_WINDOW_PLUGIN_1)}).then((pw)=>{
+            pluginw = pw
+            expect(pluginw.name).to.equal('Test Window Plugin')
+            expect(pluginw.type).to.equal('window')
+            expect(typeof pluginw.api.run).to.equal('function')
+            pm.createWindow(null, {name: 'new window', type: 'Test Window Plugin'}).then((wplugin)=>{
+              expect(typeof wplugin.add2).to.equal('function')
+              done()
+            })
           })
 
         })
@@ -261,6 +168,26 @@ describe('ImJoy.vue', async () => {
       expect(wm.windows[wm.windows.length-1].name).to.equal('new image')
       wm.closeWindow(wm.windows[wm.windows.length-1])
       expect(wm.windows.length).to.equal(count)
+    })
+
+    it('should run plugin', async () => {
+      expect(await plugin1.api.test_run()).to.be.true
+    })
+
+    it('should call plugin', async () => {
+      expect(await plugin1.api.test_call()).to.be.true
+    })
+
+    it('should get plugin', async () => {
+      expect(await plugin1.api.test_get_plugin()).to.be.true
+    })
+
+    it('should set/get config', async () => {
+      expect(await plugin1.api.test_config()).to.be.true
+    })
+
+    it('should get attachment', async () => {
+      expect(await plugin1.api.test_get_attachment()).to.be.true
     })
 
   })

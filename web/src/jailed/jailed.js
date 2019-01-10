@@ -825,6 +825,10 @@ DynamicPlugin.prototype._bindInterface =
        this._initialInterface[k] = _interface[k]
      }
    }
+
+
+
+
 }
 /**
  * Creates the connection to the plugin site
@@ -1096,6 +1100,9 @@ DynamicPlugin.prototype.terminate =
     if(callback && typeof callback != 'function'){
       throw "callback is not a function"
     }
+    if(this._disconnected && !this._connection && !this._site){
+      return
+    }
     try {
       let callbackset = false
       if(callback && this.api && this.api.onclose && typeof this.api.onclose == 'function'){
@@ -1107,18 +1114,17 @@ DynamicPlugin.prototype.terminate =
           this._disconnected = true
           this.running = false
           this.initializing = false
-          if(this._site) this._site.disconnect();
-          if(this._connection) this._connection.disconnect();
+          if(this._site) {this._site.disconnect(); this._site = null }
+          if(this._connection) {this._connection.disconnect(); this._connection = null }
         })
       }
       else{
         this._disconnected = true
         this.running = false
         this.initializing = false
-        if(this._site) this._site.disconnect();
-        if(this._connection) this._connection.disconnect();
+        if(this._site) {this._site.disconnect(); this._site = null }
+        if(this._connection) {this._connection.disconnect(); this._connection = null }
       }
-      if(this._connection) this._connection.disconnect()
       if(callback && !callbackset){
         callback()
       }
@@ -1127,8 +1133,8 @@ DynamicPlugin.prototype.terminate =
       this._disconnected = true
       this.running = false
       this.initializing = false
-      if(this._site) this._site.disconnect();
-      if(this._connection) this._connection.disconnect();
+      if(this._site) {this._site.disconnect(); this._site = null }
+      if(this._connection) {this._connection.disconnect(); this._connection = null }
       if(callback){
         callback()
       }
