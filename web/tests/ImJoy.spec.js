@@ -90,7 +90,7 @@ describe('ImJoy.vue', async () => {
     expect(typeof plugin.api.run).to.equal('function')
     await plugin.api.run({})
     plugin.terminate()
-  }).timeout(10000)
+  }).timeout(20000)
 
   it('should load the new window plugin', async () => {
     const code = _.clone(WINDOW_PLUGIN_TEMPLATE)
@@ -100,7 +100,7 @@ describe('ImJoy.vue', async () => {
     expect(typeof plugin.api.run).to.equal('function')
     await plugin.api.run({})
     plugin.terminate()
-  }).timeout(10000)
+  }).timeout(20000)
 
   // it('should load the new native-python plugin', async () => {
   //   const code = _.clone(NATIVE_PYTHON_PLUGIN_TEMPLATE)
@@ -118,7 +118,8 @@ describe('ImJoy.vue', async () => {
     expect(plugin.type).to.equal('web-python')
     expect(typeof plugin.api.run).to.equal('function')
     await plugin.api.run({})
-  }).timeout(10000)
+    plugin.terminate()
+  }).timeout(20000)
 
 
   describe('Test ImJoy API', async () => {
@@ -126,7 +127,7 @@ describe('ImJoy.vue', async () => {
     let plugin2
     let pluginw
     before(function(done){
-      this.timeout(10000)
+      this.timeout(20000)
       pm.reloadPlugin({_id: 'new plugin 1', tag: null, name:'new plugin1', code: _.clone(TEST_WEB_WORKER_PLUGIN_1)}).then((p1)=>{
         plugin1 = p1
         expect(plugin1.name).to.equal('Test Web Worker Plugin 1')
