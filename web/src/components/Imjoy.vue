@@ -15,12 +15,12 @@
           <!-- <div class="site-title">ImJoy.io<span class="superscript md-small-hide">beta</span></div> -->
           <md-tooltip>ImJoy home</md-tooltip>
         </md-button>
-        <md-menu v-if="window_mode==='single' && wm.windows.length > 0">
+        <md-menu v-if="wm.window_mode==='single' && wm.windows.length > 0">
           <md-button class="md-icon-button md-primary" md-menu-trigger>
             <md-icon>picture_in_picture</md-icon>
           </md-button>
           <md-menu-content>
-            <md-menu-item @click="selectWindow(w)" :disabled="selected_window === w" v-for="w in wm.windows" :key="w.id">
+            <md-menu-item @click="wm.selectWindow(w)" :disabled="wm.selected_window === w" v-for="w in wm.windows" :key="w.id">
               <span>{{w.name.slice(0, 30)+'(#'+w.i+')'}}</span><md-icon>forward</md-icon>
             </md-menu-item>
           </md-menu-content>
@@ -341,7 +341,7 @@
     </md-app-drawer>
     <md-app-content class="whiteboard-content">
       <md-progress-bar md-mode="determinate" :md-value="progress"></md-progress-bar>
-      <whiteboard ref="whiteboard" :mode="window_mode" :window-manager="wm"></whiteboard>
+      <whiteboard ref="whiteboard" :mode="wm.window_mode" :window-manager="wm"></whiteboard>
     </md-app-content>
   </md-app>
 
@@ -601,8 +601,6 @@ export default {
       em: null, //engine_manager
       wm: null, //window_manager
       workflow_expand: false,
-      selected_window: null,
-      window_mode: 'grid',
       file_select: null,
       folder_select: null,
       selected_file: null,
@@ -955,10 +953,10 @@ export default {
     updateSize(e){
       this.screenWidth = e.width
       if(this.screenWidth > 800){
-        this.window_mode = 'grid'
+        this.wm.window_mode = 'grid'
       }
       else{
-        this.window_mode = 'single'
+        this.wm.window_mode = 'single'
       }
     },
     showEngineConnection(show, message, resolve, reject){

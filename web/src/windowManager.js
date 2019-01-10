@@ -14,6 +14,7 @@ export class WindowManager {
     this.show_message_callback = show_message_callback
     this.add_window_callback = add_window_callback
     this.selected_window = null
+    this.window_mode = 'grid'
     this.registered_inputs = {}
     this.registered_loaders = {}
     this.default_window_pos = {
@@ -112,13 +113,13 @@ export class WindowManager {
   selectWindow(w){
     for (let i = 0; i < this.active_windows.length; i++) {
       this.active_windows[i].selected = false
-      this.active_windows[i].refresh()
+      // this.active_windows[i].refresh()
     }
     this.selected_window = w
     w.selected = true
     console.log('activate window: ', [w])
     this.active_windows = [w]
-    w.refresh()
+    // w.refresh()
   }
 
   closeWindow(w){
