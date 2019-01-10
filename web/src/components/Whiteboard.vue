@@ -124,6 +124,7 @@ export default {
     },
     onWindowAdd(w) {
       this.selectWindow(w, {})
+      this.$forceUpdate()
     },
     close(w) {
       const ai = this.active_windows.indexOf(w)

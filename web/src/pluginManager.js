@@ -68,8 +68,6 @@ export class PluginManager {
     this.selected_workspace = null
     this.selected_repository = null
     this.workflow_list = []
-    this.windows = []
-    this.window_ids = {}
 
     this.db = null
     this.plugins = {}
@@ -990,8 +988,8 @@ export class PluginManager {
           c.name = template.name
           c.tag = template.tag
           // c.op = my.op
-          c.data = my.data
-          c.config = my.config
+          c.data = my && my.data
+          c.config = my && my.config
           await this.createWindow(null, c)
         }
       }
@@ -1524,7 +1522,7 @@ export class PluginManager {
             __jailed_type__: 'plugin_api',
             __id__: wid,
             run: (wconfig)=>{
-              const w = this.window_ids[wid]
+              const w = this.wm.window_ids[wid]
               for(let k in wconfig){
                 w[k] = wconfig[k]
               }
@@ -1594,7 +1592,7 @@ export class PluginManager {
     }
     const target_plugin = this.plugin_names[plugin_name]
     if(target_plugin){
-      return await target_plugin.api.run(my)
+      return await target_plugin.api.run(my || {})
     }
     else{
       throw 'plugin with type '+plugin_name+ ' not found.'
