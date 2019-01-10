@@ -115,7 +115,6 @@ export class EngineManager {
 
     })
     socket.on('disconnect', () => {
-      // console.log('plugin engine disconnected.')
       if(this.engine_connected){
         this.showMessage('Plugin Engine disconnected.')
       }

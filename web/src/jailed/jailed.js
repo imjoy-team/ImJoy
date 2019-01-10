@@ -868,7 +868,6 @@ DynamicPlugin.prototype._connect =
         }
         me.terminate()
         var iframe_container = document.getElementById(me._connection._frame.id)
-        console.log('===========================', iframe_container.parentNode, iframe_container)
         iframe_container.parentNode.removeChild(iframe_container)
       })
     }
