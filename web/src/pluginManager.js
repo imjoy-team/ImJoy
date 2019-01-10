@@ -507,7 +507,7 @@ export class PluginManager {
             const plugin = this.plugins[k]
             if (typeof plugin.terminate === 'function') {
               try {
-                plugin.terminate(this.update_ui_callback)
+                plugin.terminate().then(()=>{this.update_ui_callback()})
               } catch (e) {
                 console.error(e)
               }
@@ -747,7 +747,7 @@ export class PluginManager {
                 delete this.plugin_names[name]
               }
               if (typeof plugin.terminate === 'function') {
-                plugin.terminate(this.update_ui_callback)
+                plugin.terminate().then(()=>{this.update_ui_callback()})
               }
             } catch (e) {
               console.error(e)
@@ -970,7 +970,14 @@ export class PluginManager {
         docs: template.docs,
         tag: template.tag,
         attachments: template.attachments,
-        terminate: function(callback){ this._disconnected = true; if(callback) callback(); }
+        terminate: () => {
+          return new Promise((resolve)=>{
+            this._disconnected = true;
+            this.running = false
+            this.initializing = false
+            resolve()
+          })
+        }
       }
       this.plugins[plugin.id] = plugin
       this.plugin_names[plugin.name] = plugin
@@ -1043,7 +1050,7 @@ export class PluginManager {
             console.error('error occured when loading plugin ' + template.name + ": ", e)
             this.showMessage(`<${template.name}>: ${e}`, 15000)
             reject(e)
-            plugin.terminate(this.update_ui_callback)
+            plugin.terminate().then(()=>{this.update_ui_callback()})
           })
         }
         else{
@@ -1059,7 +1066,7 @@ export class PluginManager {
           this.showMessage(`Error occured when loading ${template.name}.`)
         }
         console.error('error occured when loading ' + template.name + ": ", e)
-        plugin.terminate(this.update_ui_callback)
+        plugin.terminate().then(()=>{this.update_ui_callback()})
         reject(e)
       });
       plugin.docs = template.docs
@@ -1148,14 +1155,14 @@ export class PluginManager {
         }).catch((e) => {
           console.error('Error occured when loading the window plugin ' + pconfig.name + ": ", e)
           plugin.set_status({type: 'error', text: `Error occured when loading the window plugin ${pconfig.name}: ${e.toString()}`})
-          plugin.terminate(this.update_ui_callback)
+          plugin.terminate().then(()=>{this.update_ui_callback()})
           reject(e)
         })
       });
       plugin.whenFailed((e) => {
         console.error('error occured when loading ' + pconfig.name + ":", e)
         plugin.set_status({type: 'error', text:`Error occured when loading ${pconfig.name}: ${e}.`})
-        plugin.terminate(this.update_ui_callback)
+        plugin.terminate().then(()=>{this.update_ui_callback()})
         reject(e)
       });
     })

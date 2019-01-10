@@ -870,9 +870,12 @@ DynamicPlugin.prototype._connect =
             me.set_status({type: 'error', text: details.message})
           }
         }
-        me.terminate()
-        var iframe_container = document.getElementById(me._connection._frame.id)
-        iframe_container.parentNode.removeChild(iframe_container)
+        if(me._connection._platformConnection._frame){
+          var iframe_container = document.getElementById(me._connection._platformConnection._frame.id)
+          iframe_container.parentNode.removeChild(iframe_container)
+        }
+        me._set_disconnected()
+        // me.terminate()
       })
     }
 }
@@ -909,7 +912,7 @@ DynamicPlugin.prototype._init =
             me.set_status({type: 'error', text: details.message})
           }
         }
-        me.terminate()
+        me._set_disconnected()
     });
 
     this._site.onRemoteReady(function() {
@@ -1095,50 +1098,37 @@ DynamicPlugin.prototype.whenDisconnected =
     this._disconnect.whenEmitted(handler);
 }
 
+DynamicPlugin.prototype._set_disconnected =
+       Plugin.prototype._set_disconnected = function() {
+    this._disconnected = true
+    this.running = false
+    this.initializing = false
+
+}
+
 DynamicPlugin.prototype.terminate =
-       Plugin.prototype.terminate = function(callback) {
-    if(callback && typeof callback != 'function'){
-      throw "callback is not a function"
-    }
-    if(this._disconnected && !this._connection && !this._site){
-      return
-    }
-    try {
-      let callbackset = false
-      if(callback && this.api && this.api.onclose && typeof this.api.onclose == 'function'){
-        this.api.onclose(callback)
-        callbackset = true
+       Plugin.prototype.terminate = function() {
+    return new Promise((resolve)=>{
+      if(this._disconnected){
+        this._set_disconnected()
+        resolve()
+        return
       }
-      if(this.api && this.api.exit && typeof this.api.exit == 'function'){
-        this.api.exit().finally(()=>{
-          this._disconnected = true
-          this.running = false
-          this.initializing = false
-          if(this._site) {this._site.disconnect(); this._site = null }
-          if(this._connection) {this._connection.disconnect(); this._connection = null }
-        })
+
+      try {
+        if(this.api && this.api.exit && typeof this.api.exit == 'function'){
+          this.api.exit()
+        }
+      } catch (e) {
+        console.error('error occured when terminating the plugin',e)
       }
-      else{
-        this._disconnected = true
-        this.running = false
-        this.initializing = false
+      finally{
+        this._set_disconnected()
         if(this._site) {this._site.disconnect(); this._site = null }
         if(this._connection) {this._connection.disconnect(); this._connection = null }
+        resolve()
       }
-      if(callback && !callbackset){
-        callback()
-      }
-    } catch (e) {
-      console.error('error occured when terminating the plugin',e)
-      this._disconnected = true
-      this.running = false
-      this.initializing = false
-      if(this._site) {this._site.disconnect(); this._site = null }
-      if(this._connection) {this._connection.disconnect(); this._connection = null }
-      if(callback){
-        callback()
-      }
-    }
+    })
 }
 
 DynamicPlugin.prototype.set_status =
