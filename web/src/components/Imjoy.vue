@@ -51,13 +51,13 @@
           <md-icon>help</md-icon>
           <!-- <md-tooltip>Open help information.</md-tooltip> -->
         </md-button>
-        <md-button v-if="!em.engine_connected" @click="showPluginEngineInfo = true" class="md-icon-button md-accent">
+        <md-button v-if="!em.connected" @click="showPluginEngineInfo = true" class="md-icon-button md-accent">
           <md-icon>🚀</md-icon>
           <md-tooltip>Connect to the Plugin Engine</md-tooltip>
         </md-button>
         <md-menu v-else md-size="big" md-direction="bottom-end">
-          <md-button class="md-icon-button" :class="em.engine_connected?'md-primary':'md-accent'" md-menu-trigger @click="em.updateEngineStatus()">
-            <md-icon>{{em.engine_connected?'sync':'sync_disabled'}}</md-icon>
+          <md-button class="md-icon-button" :class="em.connected?'md-primary':'md-accent'" md-menu-trigger @click="em.updateEngineStatus()">
+            <md-icon>{{em.connected?'sync':'sync_disabled'}}</md-icon>
             <md-tooltip>Connection to the Plugin Engine</md-tooltip>
           </md-button>
           <md-menu-content>
@@ -115,7 +115,7 @@
           <md-icon class="speed-dial-icon">add</md-icon>
         </md-speed-dial-target>
         <md-speed-dial-content>
-          <md-button v-if="em.engine_connected" @click="showEngineFileDialog()" class="md-icon-button md-primary">
+          <md-button v-if="em.connected" @click="showEngineFileDialog()" class="md-icon-button md-primary">
             <md-icon>add_to_queue</md-icon>
             <md-tooltip>Load files through the Python Plugin Engine</md-tooltip>
           </md-button>
@@ -495,7 +495,7 @@
               </h2>
             </div>
             <div v-if="tag4install" class="md-toolbar-section-end">
-              <md-button class="md-button md-primary" @click="pm.installPlugin(plugin4install, tag4install); showAddPluginDialog = false; clearPluginUrl()">
+              <md-button class="md-button md-primary" @click="installPlugin(plugin4install, tag4install)">
                 <md-icon>cloud_download</md-icon>Install
                 <md-tooltip>Install {{plugin4install.name}} (tag=`{{tag4install}}`)</md-tooltip>
               </md-button>
@@ -507,12 +507,12 @@
                   <md-tooltip>Choose a tag to install {{plugin4install.name}}</md-tooltip>
                 </md-button>
                 <md-menu-content>
-                  <md-menu-item v-for="tag in plugin4install.tags" :key="tag" @click="pm.installPlugin(plugin4install, tag); showAddPluginDialog = false; clearPluginUrl()">
+                  <md-menu-item v-for="tag in plugin4install.tags" :key="tag" @click="installPlugin(plugin4install, tag)">
                     <md-icon>cloud_download</md-icon>{{tag}}
                   </md-menu-item>
                 </md-menu-content>
               </md-menu>
-              <md-button v-else  class="md-button md-primary" @click="pm.installPlugin(plugin4install); showAddPluginDialog = false; clearPluginUrl()">
+              <md-button v-else  class="md-button md-primary" @click="installPlugin(plugin4install)">
                 <md-icon>cloud_download</md-icon>Install
               </md-button>
             </div>
@@ -534,7 +534,7 @@
       <md-card v-if="show_plugin_store">
         <md-card-header>
           <div class="md-title">Install from the plugin repository</div>
-          <md-chips @md-insert="pm.addRepository" @md-delete="pm.removeRepository(getRepository($event))" class="md-primary shake-on-error" v-model="pm.repository_names" md-placeholder="Add a repository url (e.g. GITHUB REPO) and press enter.">
+          <md-chips @md-insert="pm.addRepository($event)" @md-delete="pm.removeRepository(getRepository($event))" class="md-primary shake-on-error" v-model="pm.repository_names" md-placeholder="Add a repository url (e.g. GITHUB REPO) and press enter.">
             <template slot="md-chip" slot-scope="{ chip }" >
               <strong class="md-primary" v-if="pm.selected_repository && chip === pm.selected_repository.name">{{ chip }}</strong>
               <div v-else @click="selectRepository(chip)">{{ chip }}</div>
@@ -558,12 +558,11 @@
 /*eslint no-unused-vars: ["error", { "argsIgnorePattern": "^_plugin$" }]*/
 import Vue from 'vue';
 import { saveAs } from 'file-saver';
-import {
-  NATIVE_PYTHON_PLUGIN_TEMPLATE,
-  WEB_WORKER_PLUGIN_TEMPLATE,
-  WEB_PYTHON_PLUGIN_TEMPLATE,
-  WINDOW_PLUGIN_TEMPLATE,
-} from '../api.js'
+
+import WEB_WORKER_PLUGIN_TEMPLATE from '../plugins/webWorkerTemplate.imjoy.html';
+import NATIVE_PYTHON_PLUGIN_TEMPLATE from '../plugins/nativePythonTemplate.imjoy.html';
+import WEB_PYTHON_PLUGIN_TEMPLATE from '../plugins/webPythonTemplate.imjoy.html';
+import WINDOW_PLUGIN_TEMPLATE from '../plugins/windowTemplate.imjoy.html';
 
 import {
   randId,
@@ -673,7 +672,7 @@ export default {
       getFileUrl: this.getFileUrl,
       getFilePath: this.getFilePath,
       exportFile: this.exportFile,
-      utils: {$forceUpdate: this.$forceUpdate, openUrl: this.openUrl, sleep: this.sleep},
+      utils: {$forceUpdate: this.$forceUpdate, openUrl: this.openUrl, sleep: this.sleep, assert: assert},
     }
 
     // bind this to api functions
@@ -991,7 +990,7 @@ export default {
     },
     connectPlugin(plugin){
       if(plugin._disconnected){
-        if(plugin.type === 'native-python' && !this.em.engine_connected){
+        if(plugin.type === 'native-python' && !this.em.connected){
           this.em.connectEngine(this.engine_url, this.connection_token)
         }
         else{
@@ -1155,11 +1154,20 @@ export default {
         saveAs(file, filename);
       }
     },
+    installPlugin(plugin4install, tag4install){
+      this.pm.installPlugin(plugin4install, tag4install).then((template)=>{
+        this.showAddPluginDialog = false
+        this.clearPluginUrl()
+        this.pm.reloadPlugin(template)
+      })
+    },
     updatePlugin(pid){
       const plugin = this.pm.plugins[pid]
       const pconfig = plugin.config
       if(pconfig.origin){
-        this.pm.installPlugin(pconfig.origin)
+        this.pm.installPlugin(pconfig.origin).then((template)=>{
+          this.pm.reloadPlugin(template)
+        })
       }
       else{
         alert('Origin not found for this plugin.')
@@ -1330,7 +1338,7 @@ export default {
     },
     showFileDialog(_plugin, options){
       assert(typeof options === 'object')
-      if(!this.em.engine_connected){
+      if(!this.em.connected){
         this.showMessage('File Dialog requires the plugin engine, please connect to the plugin engine.')
         throw "Please connect to the Plugin Engine 🚀."
       }
@@ -1355,7 +1363,7 @@ export default {
     },
     getFileUrl(_plugin, path){
       return new Promise((resolve, reject) => {
-        if(!this.em.engine_connected){
+        if(!this.em.connected){
           reject("Please connect to the Plugin Engine 🚀.")
           this.showMessage("Please connect to the Plugin Engine 🚀.")
           return
@@ -1405,7 +1413,7 @@ export default {
     },
     getFilePath(_plugin, url){
       return new Promise((resolve, reject) => {
-        if(!this.em.engine_connected){
+        if(!this.em.connected){
           reject("Please connect to the Plugin Engine 🚀.")
           this.showMessage("Please connect to the Plugin Engine 🚀.")
           return

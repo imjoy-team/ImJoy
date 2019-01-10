@@ -1,0 +1,34 @@
+<docs lang="markdown">
+[TODO: write documentation for this plugin.]
+</docs>
+
+<config lang="json">
+{
+  "name": "Untitled Plugin",
+  "type": "web-python",
+  "version": "0.1.0",
+  "api_version": "0.1.2",
+  "description": "[TODO: describe this plugin with one sentense.]",
+  "tags": [],
+  "ui": "UI for this plugin",
+  "inputs": null,
+  "outputs": null,
+  "flags": [],
+  "icon": "extension",
+  "env": "",
+  "requirements": [],
+  "dependencies": []
+}
+</config>
+
+<script lang="python">
+
+class ImJoyPlugin():
+    def setup(self):
+        print('setup in python')
+
+    def run(self, my):
+        print('hello world.')
+
+api.export(ImJoyPlugin())
+</script>

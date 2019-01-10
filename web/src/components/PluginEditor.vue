@@ -116,10 +116,10 @@ export default {
     // this.editor.addCommand( window.monaco.KeyMod.CtrlCmd |  window.monaco.KeyCode.KEY_R, ()=>{
     //   this.reload()
     // });
-    assert(this.window.plugin_manager)
   },
   methods: {
     save(){
+      assert(this.window.plugin_manager)
       this.$emit('input', this.codeValue)
       this.window.plugin_manager.savePlugin({pluginId: this.pluginId, code: this.codeValue, tag: this.window.plugin && this.window.plugin.tag}).then((config)=>{
         // this.window.data._id = config._id
@@ -139,6 +139,7 @@ export default {
 
     },
     remove(){
+      assert(this.window.plugin_manager)
       this.$emit('input', this.codeValue)
       this.window.data._id = null
       this.window.plugin_manager.removePlugin(this.window.plugin).then(()=>{
@@ -146,6 +147,7 @@ export default {
       })
     },
     reload(){
+      assert(this.window.plugin_manager)
       return new Promise((resolve, reject) => {
         if(this.codeValue){
           this.$emit('input', this.codeValue)

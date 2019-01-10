@@ -38,6 +38,14 @@ module.exports = {
       })
     ]
   },
+  chainWebpack: config => {
+    config.module
+      .rule('imjoy')
+      .oneOf('vue')
+      .test(/\.imjoy.html$/)
+      .use('raw-loader')
+      .loader('raw-loader')
+  },
   pluginOptions: {
     karma: {
       karmaConfig: {

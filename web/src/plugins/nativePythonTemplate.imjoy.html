@@ -1,0 +1,35 @@
+<docs lang="markdown">
+[TODO: write documentation for this plugin.]
+</docs>
+
+<config lang="json">
+{
+  "name": "Untitled Plugin",
+  "type": "native-python",
+  "version": "0.1.0",
+  "api_version": "0.1.2",
+  "description": "[TODO: describe this plugin with one sentense.]",
+  "tags": [],
+  "ui": "",
+  "inputs": null,
+  "outputs": null,
+  "flags": [],
+  "icon": "extension",
+  "env": "",
+  "requirements": [],
+  "dependencies": []
+}
+</config>
+
+<script lang="python">
+import numpy as np
+class ImJoyPlugin():
+    def setup(self):
+        print('setup in python')
+
+    def run(self, my):
+        print('hello world.')
+        return my
+
+api.export(ImJoyPlugin())
+</script>

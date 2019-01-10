@@ -383,6 +383,7 @@ export default {
         const p = this.pm.installPlugin(pconfig, t)
         if(p){
           p.then(()=>{
+            this.pm.reloadPlugin(p)
             this.$forceUpdate()
           }).catch((e)=>{
             this.$emit('message', e)
