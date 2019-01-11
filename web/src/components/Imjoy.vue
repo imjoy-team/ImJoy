@@ -1152,18 +1152,18 @@ export default {
       }
     },
     installPlugin(plugin4install, tag4install){
-      this.pm.installPlugin(plugin4install, tag4install).then((template)=>{
+      this.pm.installPlugin(plugin4install, tag4install).then(()=>{
         this.showAddPluginDialog = false
         this.clearPluginUrl()
-        this.pm.reloadPlugin(template)
+        this.$forceUpdate()
       })
     },
     updatePlugin(pid){
       const plugin = this.pm.plugins[pid]
       const pconfig = plugin.config
       if(pconfig.origin){
-        this.pm.installPlugin(pconfig.origin).then((template)=>{
-          this.pm.reloadPlugin(template)
+        this.pm.installPlugin(pconfig.origin).then(()=>{
+          this.$forceUpdate()
         })
       }
       else{

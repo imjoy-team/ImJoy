@@ -380,16 +380,12 @@ export default {
     },
     install(pconfig, t){
       if(this.pm && this.pm.installPlugin){
-        const p = this.pm.installPlugin(pconfig, t)
-        if(p){
-          p.then((template)=>{
-            this.pm.reloadPlugin(template)
-            this.$forceUpdate()
-          }).catch((e)=>{
-            this.$emit('message', e)
-            this.$forceUpdate()
-          })
-        }
+        this.pm.installPlugin(pconfig, t).then(()=>{
+          this.$forceUpdate()
+        }).catch((e)=>{
+          this.$emit('message', e)
+          this.$forceUpdate()
+        })
       }
 
     },

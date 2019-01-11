@@ -54,7 +54,7 @@ describe('ImJoy.vue', async () => {
 
   it('should load a repository and install plugin from it', async () => {
     await pm.reloadRepository({url: 'oeway/ImJoy-project-template'})
-    await pm.installPlugin({uri: 'oeway/ImJoy-project-template:Template plugin'})
+    await pm.installPlugin({uri: 'oeway/ImJoy-project-template:Template plugin'}, null, true)
     const ps = pm.installed_plugins.filter((p) => {
       return p.name === 'Template plugin'
     })

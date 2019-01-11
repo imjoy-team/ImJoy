@@ -612,7 +612,7 @@ export class PluginManager {
     return config
   }
 
-  installPlugin(pconfig, tag){
+  installPlugin(pconfig, tag, do_not_load){
     return new Promise((resolve, reject) => {
       let uri = typeof pconfig === 'string' ? pconfig : pconfig.uri
       let scoped_plugins = this.available_plugins
@@ -654,7 +654,7 @@ export class PluginManager {
         config.dependencies = config.dependencies || []
         const _deps = []
         for (let i = 0; i < config.dependencies.length; i++) {
-            _deps.push(this.installPlugin({uri: config.dependencies[i], scoped_plugins: config.scoped_plugins || scoped_plugins}))
+            _deps.push(this.installPlugin({uri: config.dependencies[i], scoped_plugins: config.scoped_plugins || scoped_plugins}, null, do_not_load))
         }
         Promise.all(_deps).then(()=>{
           this.savePlugin(config).then((template)=>{
@@ -666,6 +666,7 @@ export class PluginManager {
             }
             this.showMessage(`Plugin "${template.name}" has been successfully installed.`)
             resolve(template)
+            if(!do_not_load) this.reloadPlugin(template)
           }).catch(()=>{
             reject(`Failed to save the plugin ${config.name}`)
           })
@@ -700,9 +701,9 @@ export class PluginManager {
               p.tag = null
             }
         }
-        this.unloadPlugin(plugin, true)
-        this.showMessage(`"${plugin.name}" has been removed.`)
         resolve()
+        this.showMessage(`"${plugin.name}" has been removed.`)
+        this.unloadPlugin(plugin, true)
       }).catch((err) => {
         this.showMessage( err.toString() || "Error occured.")
         console.error('error occured when removing ', plugin, err)
