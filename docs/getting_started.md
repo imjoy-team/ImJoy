@@ -27,7 +27,7 @@ the section **Development**, and we provide a detailed description of the entire
 
 This interface provides all functionality needed to process data.
 
-<img src="./assets/imjoy-interface.png" width="800px"></img>
+![imjoy-interface](assets/imjoy-interface.png ':size=800')
 
 
 ## ImJoy App and Plugin Engine
@@ -46,8 +46,7 @@ You can then connect to the engine either from the Imjoy Web App or Desktop App.
 Click the 🚀 button located on the upper-right corner.
 In the displayed window, you will find instructions on how to set up the engine.
 
-<img src="./assets/imjoy-app-start-screen.png" width="400px"></img>
-
+![imjoy-app-start-screen](assets/imjoy-app-start-screen.png ':size=400')
 
 ### Plugins
 
@@ -100,7 +99,7 @@ files have to be downloaded first. Two options exist:
 ## ImJoy for plugin developers
 
 As mentioned above, Imjoy consists of **two main components**
-<img src="./assets/imjoy-architecture.png" width="800px"></img>
+<img src="assets/imjoy-architecture.png" width="800px"></img>
 
 1.  The **ImJoy Web App**. The app can run alone, and plugins can be developed in
     JavaScript or in Python by using [pyodide](https://github.com/iodide-project/pyodide).
@@ -134,4 +133,3 @@ for particular applications
 3. **Plugin engine on a remote computer**. You can then connect to the engine either
   from the web or desktop app. This allows to process data on a dedicated processing
   workstation or a cluster.
-

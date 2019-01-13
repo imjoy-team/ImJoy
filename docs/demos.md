@@ -6,18 +6,18 @@ An important part of ImJoy is to provide a flexible way to interact with the use
 
 **User input**
 
-1. In the simplest case, you can define how the GUI of the plugin is rendered in the plugin dialog. You can ask for general user-input in the [**`<config>` block**](https://imjoy.io/docs/#/development?id=ltconfiggt-block) or specify specific input for the different [**plugin operations**](https://imjoy.io/docs/#/api?id=api-register-).
-2. The ImJoy API provides several functions to ask for user input, e.g. [file dialog](https://imjoy.io/docs/#/api?id=api-showfiledialog-), or a [general dialog](https://imjoy.io/docs/#/api?id=api-showdialog-).
+1. In the simplest case, you can define how the GUI of the plugin is rendered in the plugin dialog. You can ask for general user-input in the [**`<config>` block**](development?id=ltconfiggt-block) or specify specific input for the different [**plugin operations**](api?id=apiregister).
+2. The ImJoy API provides several functions to ask for user input, e.g. [file dialog](api?id=apishowfiledialog), or a [general dialog](api?id=apishowdialog).
 
 **Provide results**
 
-1. The ImJoy API provides several functions to show results, e.g. indicate [progress](https://imjoy.io/docs/#/api?id=api-showprogress-), update the [ImJoy status](https://imjoy.io/docs/#/api?id=api-showstatus-),
-2. The ImJoy API also provides a function to [create a window](https://imjoy.io/docs/#/api?id=api-createwindow-). Different window types exist, you can either directly
+1. The ImJoy API provides several functions to show results, e.g. indicate [progress](api?id=apishowprogress), update the [ImJoy status](api?id=api-showstatus),
+2. The ImJoy API also provides a function to [create a window](api?id=apicreatewindow). Different window types exist, you can either directly
 show an results image (type `imjoy/image`). Or create your own window, where you can use JavaScript visualization libraries' to render your results. We provide
 examples for the different approaches below.
 
 **Dedicated user interface**
-For more advanced purposes, you can use define a user interface with the [**window plugin**](https://imjoy.io/docs/#/development?id=ltconfiggt-block). Such an interface is designed with web technology (HTML, JavaScript and CSS) and thus provides maximum flexibility. Further, such an interface can communicate with another plugin, e.g. a Python worker that performs the actual analysis. For more details, have a look at the dedicated demo below.
+For more advanced purposes, you can use define a user interface with the [**window plugin**](development?id=ltconfiggt-block). Such an interface is designed with web technology (HTML, JavaScript and CSS) and thus provides maximum flexibility. Further, such an interface can communicate with another plugin, e.g. a Python worker that performs the actual analysis. For more details, have a look at the dedicated demo below.
 
 ### Python plugin displays a chart in a window plugin
 In this demo, we show how data generated in a **Python plugin** can be displayed in a window plugin. The plugin interface you can slightly change the data that is generated (you can change the number of data-points) and how the graph is actually displayed: either it is rendered with one of three JavaScript libraries, or the plot is generated with Matplotlib and saved as png and then shown.
@@ -41,7 +41,7 @@ The Python plugin will send to this plugin the calculated data, specifications o
 
 The **main steps** are described below and basic data flow is illustrated by dashed errors in the image above.
 
-<img src="./assets/imjoy-demo-python-to-js.png" width="800px"></img>
+![imjoy-demo-python-to-js](assets/imjoy-demo-python-to-js.png ':size=800')
 
 1. User defines how many data points should be calculated, some text that will be displayed in the window plugin, and which JavaScript library will be used to plot the data.
 2. Upon execution of the Python plugin, the damped cosine curve will be computed. Then a dictionary `data` containing these values, as well as the text and the name of the desired JS library is created. The necessary content of this dictionary is specified by the window plugin. This will then be added to another dictionary `data_plot` that contains specifications for the window plugin: `type` to specify which window plugin should be called, `name` to specify the window title, `w` and `h` the specify the size. The dictionary `data_plot` will be used with the ImJoy API function `api.createWindow` to call the window plugin.
@@ -78,7 +78,7 @@ You can install this plugin from this
 <a href="http://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:GUI w3&w=demo-GUI" target="_blank">**link**</a>.
 This will install the actual interface plugin (GUI w3.css) and automatically the Python plugin (GUI PyWorker) performing the calculations. The purpose of this plugin is self-explanatory, you can open the GUI by double clicking on the plugin title. Just play around.
 
-<img src="./assets/imjoy-demo-gui-screenshot.png" width="600px"></img>
+![imjoy-demo-gui-screenshot](assets/imjoy-demo-gui-screenshot.png ':size=800')
 
 This demo illustrates a number of different important concepts, which we describe briefly below.
 
@@ -132,7 +132,7 @@ a button to showing the plot. The main steps are the following (and detailed mor
 2. In this function, user input from the window plugin is retrieved, and the Python plugin is called.
 2. Calculations are performed, results stored in Python plugin and shown in main interface.
 
-<img src="./assets/imjoy-demo-gui-code.png" width="800px"></img>
+![imjoy-demo-gui-code](assets/imjoy-demo-gui-code.png ':size=800')
 
 **Determine behavior of HTML elements**
 
@@ -140,7 +140,7 @@ HTML elements can respond to user interaction. The corresponding action is defin
 
 **Communication between window and Python plugin**
 
-Communication between the window and Python plugin is achieved by the ImJoy API [**api.call()**](https://imjoy.io/docs/#/api?id=api-call-) and so-called **callback functions**. Simply put such a callback is a function that will be executed after another function has finished its execution. The function `calc_plot()` from above will use `api.call()` to call the function `calc_results` from the `Python worker` plugin. It will pass two parameters obtained from the user-interface and a callback function . The callback function allows the Python plugin to plot data in the window plugin.
+Communication between the window and Python plugin is achieved by the ImJoy API [**api.call()**](api?id=apicall) and so-called **callback functions**. Simply put such a callback is a function that will be executed after another function has finished its execution. The function `calc_plot()` from above will use `api.call()` to call the function `calc_results` from the `Python worker` plugin. It will pass two parameters obtained from the user-interface and a callback function . The callback function allows the Python plugin to plot data in the window plugin.
 
 **Python calculations, storage and callback**
 

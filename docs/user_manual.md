@@ -9,18 +9,16 @@ The plugin engine will then check for updates at each launch.
 
 If you use `native-python` plugins, you will need to **launch** the Plugin Engine before you can use them. You will get an error message if you try to run those plugins.
 
-You need to frist start the Plugin Engine from the ImJoy Desktop App or in a terminal. 
+You need to frist start the Plugin Engine from the ImJoy Desktop App or in a terminal.
 
 Then go to the ImJoy Web App and click the 🚀 symbol located at the top-right corner. This will open a dialog and ask you for the `Plugin Engine URL` and `Connection token`.
-<img
-  src="./assets/imjoy-install-engine.png" width="600px"></img>
+
+![imjoy-install-engine](assets/imjoy-install-engine.png ':size=600')
 
 You can keep the default `Plugin Engine URL`(`http://127.0.0.1:8080`), and go to
 your Plugin Engine dialog or terminal window to get the `Connection token`.
 
-<img
-  src="./assets/imjoy-connection-token.png" width="600px"></img>
-
+![imjoy-connection-token](assets/imjoy-connection-token.png ':size=600')
 
 Please note, that the connection token will be saved in the browser and you will
 not need to enter it anymore to connect to this Plugin Engine.
@@ -142,9 +140,6 @@ This depends whether it's a conda-compatible distribution or not. Try to type `c
 
 ### Using ImJoy with Python 2.7 or version <3.6
 Yes, if you the conda environment exists. You will be able to install and run ImJoy with Python version lower thant 3.6 (e.g.: Anaconda/Miniconda Python2.7). However, in this case, it will bootstrapping itself by creating a Python 3 environment (named `imjoy`) in order to run the actual plugin engine code. Therefore, Anaconda/Miniconda (Python3.6+ version) is still recommended if you have the choice.
-
-### Difference between [Anaconda](https://www.anaconda.com/download/) and [Miniconda](https://conda.io/miniconda.html)
-Miniconda is just a reduced version of Anaconda. Since ImJoy only relies on `conda` which is included by both, you can choose either of them. If you like minimal installation, choose Miniconda. If you want all those packages which will be used for scientific computing(such as numpy, scipy, scikit-image etc.), choose Anaconda.
 
 ### Can't connect to plugin engine running on a remote computer
 
