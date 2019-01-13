@@ -27,8 +27,13 @@ export default {
       document.addEventListener("orientationchange", window.onresize = updateSize)
 
       // hide animation
-      const element = document.getElementById('loading-imjoy-app')
-      element.parentNode.removeChild(element);
+      const element = document.getElementById('welcome-page')
+      if(element) element.parentNode.removeChild(element);
+
+      const element2 = document.getElementById('loading-imjoy-section')
+      if(element2) element2.parentNode.removeChild(element2);
+
+
     })
   },
   methods: {
@@ -55,7 +60,7 @@ export default {
 html, body
 {
     height: 100%;
-    overflow-y: auto;
+    overflow-y: hidden;
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
     -webkit-transform: translate3d(0,0,0);

@@ -207,12 +207,12 @@ In some cases, the ui might only contain a brief description of the op. This can
 To define **longer forms with multiple lines**, we support additional definitions of the `ui` string.
 
 * an array of strings. For example:
-       ```javascript
-       "ui": [
-           "option1: {id: 'option1', type: 'choose', options: ['cat', 'dog'], placeholder: 'cat'}",
-           "option2: {id: 'option2', type: 'number', placeholder: 3}"
-          ],
-        ```
+```javascript
+"ui": [
+   "option1: {id: 'option1', type: 'choose', options: ['cat', 'dog'], placeholder: 'cat'}",
+   "option2: {id: 'option2', type: 'number', placeholder: 3}"
+  ],
+```
 *   an array with keys and values. Here, you have to use `" "` for the keys and
     the strings. Definitions can also be mixed.
 
