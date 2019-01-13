@@ -39,7 +39,7 @@ Getting started and documentations for the development: [ImJoy Docs](https://imj
    - Support ndarrays from Numpy for data exchange
    - Support Tensorflow.js and native Tensorflow for deep learning
 
-# Documentation
+## Documentation
 
 Please refer to: [ImJoy Docs](https://imjoy.io/docs/)
 
@@ -60,7 +60,7 @@ Imjoy consists of **three parts**, each part can be extended with plugins:
 
 1. the **Native Computational Backend**. This is supported with the installation of an additional Python module called ["ImJoy Plugin Engine"](https://github.com/oeway/ImJoy-Engine). This allows to access the entire Python ecosystem which covers most of the scientific computing applications. With [Conda](https://conda.io), ImJoy plugin engine handles the requirements of plugins automatically and provide isolate processes and virtual environments for different Python plugins. It provides maximum flexibility and has full access to the file system, GPU and other local or remote resources. The plugin engine can be launched either on the local machine, or remotely on a cloud server or a cluster to perform computationally intensive tasks, e.g. with institutional computing cluster, Amazon Cloud, or Google Compute.
 
-# Repositories
+## Repositories
 
 Currently, ImJoy consists of the following repositories:
  - [ImJoy Web App (core)](https://github.com/oeway/ImJoy/) (this repository)
@@ -86,7 +86,7 @@ Currently, ImJoy consists of the following repositories:
  We thank all the authors for offering these excellent work to the open-source community.
 
 
-# Support ImJoy
+## Support ImJoy
 
 Please star the ImJoy repo to support ImJoy.
 
