@@ -10,17 +10,19 @@ export const router_config = {
   // mode: 'history',
   base: window.location.pathName,
   routes: [{
-      path: '/',
+      path: '/home',
       name: 'Home',
       component: Home
     },
     {
-      path: '/home',
-      redirect: '/',
+      path: '/',
+      name: 'Welcome',
+      component: Imjoy,
+      props: { welcome: true }
     },
     {
       path: '/app',
-      name: 'app',
+      name: 'App',
       component: Imjoy
     },
     {

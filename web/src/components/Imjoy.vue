@@ -161,7 +161,7 @@
         </div>
       </div>
       <br>
-      <md-card v-if="pm">
+      <md-card v-if="pm && show_workflow">
         <md-card-header>
           <div class="md-layout md-gutter md-alignment-center-space-between">
             <div class="md-layout-item md-size-70">
@@ -344,6 +344,8 @@
       <whiteboard ref="whiteboard" :mode="wm.window_mode" :window-manager="wm"></whiteboard>
     </md-app-content>
   </md-app>
+
+  <welcome-dialog :show.sync="showWelcomeDialog" @start="startImJoy()"/>
 
   <md-dialog-confirm :md-active.sync="showRemoveConfirmation" md-title="Removing Plugin" md-content="Do you really want to <strong>delete</strong> this plugin" md-confirm-text="Yes" md-cancel-text="Cancel" @md-cancel="showRemoveConfirmation=false" @md-confirm="pm.removePlugin(plugin2_remove);plugin2_remove=null;showRemoveConfirmation=false"/>
   <!-- </md-card-content> -->
@@ -594,7 +596,12 @@ const ajv = new Ajv()
 
 export default {
   name: 'imjoy',
-  props: ['title'],
+  props: {
+    welcome: {
+      type: Boolean,
+      default: false
+    }
+  },
   data() {
     return {
       pm: null, //plugin_manager
@@ -637,12 +644,14 @@ export default {
       engine_session_id: null,
       showPluginEngineInfo: false,
       showWorkspaceDialog: false,
+      showWelcomeDialog: false,
       show_file_dialog: false,
+      show_workflow: false,
       plugins: null,
       registered: null,
       plugin_api: null,
       plugin_context: null,
-      menuVisible: true,
+      menuVisible: false,
       snackbar_info: '',
       snackbar_duration: 3000,
       show_snackbar: false,
@@ -839,85 +848,13 @@ export default {
       this.engine_url = localStorage.getItem("imjoy_engine_url") || 'http://127.0.0.1:8080'
     }
 
-    this.pm.resetPlugins()
-    this.pm.setInputLoaders(this.getDefaultInputLoaders())
-    this.pm.loadRepositoryList().then((repository_list)=>{
-      this.repository_list = repository_list
-      if(this.$route.query.repo || this.$route.query.r){
-        const ret = this.pm.addRepository(this.$route.query.repo || this.$route.query.r)
-        if(ret){
-          this.pm.selected_repository = ret
-        }
-      }
-      else{
-        this.pm.selected_repository = this.repository_list[0]
-      }
-    })
+    if(this.welcome){
+      this.showWelcomeDialog = true
+    }
+    else {
+      this.startImJoy()
+    }
 
-    this.pm.loadWorkspaceList().then((workspace_list)=>{
-      const selected_workspace = this.$route.query.workspace || this.$route.query.w || workspace_list[0]
-      this.pm.loadWorkspace(selected_workspace).then(()=>{
-        this.em.connectEngine(this.engine_url, this.connection_token, true)
-        this.pm.reloadPlugins().then(()=>{
-          this.plugin_loaded = true
-          this.$forceUpdate()
-          this.event_bus.$emit('plugins_loaded', this.pm.plugins)
-          this.pm.reloadRepository().then((manifest)=>{
-            this.$forceUpdate()
-            this.event_bus.$emit('repositories_loaded', manifest)
-          }).finally(()=>{
-            if(this.$route.query.plugin || this.$route.query.p){
-              const p = (this.$route.query.plugin || this.$route.query.p).trim()
-              if (p.match(url_regex) || (p.includes('/') && p.includes(':'))) {
-                this.plugin_url = p
-                this.init_plugin_search = null
-                this.show_plugin_store = false
-                this.show_plugin_url = false
-                this.getPlugin4Install(p)
-              } else {
-                this.plugin_url = null
-                this.init_plugin_search = p
-                this.show_plugin_store = true
-                this.show_plugin_url = false
-              }
-
-              this.show_plugin_templates = false
-              this.showAddPluginDialog = true
-            }
-
-            if(this.$route.query.workflow){
-              const data = Joy.decodeWorkflow(this.$route.query.workflow)
-              // const query = Object.assign({}, this.$route.query);
-              // delete query.workflow;
-              // this.$router.replace({ query });
-              if(data){
-                this.workflow_joy_config.data = data
-                this.workflow_expand = true
-              }
-              else{
-                console.log('failed to workflow')
-              }
-            }
-
-            if(this.$route.query.load || this.$route.query.l){
-              const w = {
-                name: "Loaded Url",
-                type: 'imjoy/url_list',
-                scroll: true,
-                data: [this.$route.query.load || this.$route.query.l]
-              }
-              this.wm.addWindow(w)
-            }
-            this.$nextTick(() => {
-              this.event_bus.$emit('imjoy_ready')
-            })
-          })
-        })
-      })
-    }).catch((err)=>{
-      this.showMessage(err)
-      this.status_text = err
-    })
   },
   beforeDestroy() {
     // console.log('terminating plugins')
@@ -925,6 +862,89 @@ export default {
     this.em.destroy()
   },
   methods: {
+    startImJoy() {
+      this.pm.resetPlugins()
+      this.pm.setInputLoaders(this.getDefaultInputLoaders())
+      this.pm.loadRepositoryList().then((repository_list)=>{
+        this.repository_list = repository_list
+        if(this.$route.query.repo || this.$route.query.r){
+          const ret = this.pm.addRepository(this.$route.query.repo || this.$route.query.r)
+          if(ret){
+            this.pm.selected_repository = ret
+          }
+        }
+        else{
+          this.pm.selected_repository = this.repository_list[0]
+        }
+      })
+
+      this.pm.loadWorkspaceList().then((workspace_list)=>{
+        this.menuVisible = true
+        const selected_workspace = this.$route.query.workspace || this.$route.query.w || workspace_list[0]
+        this.pm.loadWorkspace(selected_workspace).then(()=>{
+          this.em.connectEngine(this.engine_url, this.connection_token, true)
+          this.pm.reloadPlugins().then(()=>{
+            this.plugin_loaded = true
+            this.$forceUpdate()
+            this.event_bus.$emit('plugins_loaded', this.pm.plugins)
+            this.pm.reloadRepository().then((manifest)=>{
+              this.$forceUpdate()
+              this.event_bus.$emit('repositories_loaded', manifest)
+            }).finally(()=>{
+              if(this.$route.query.plugin || this.$route.query.p){
+                const p = (this.$route.query.plugin || this.$route.query.p).trim()
+                if (p.match(url_regex) || (p.includes('/') && p.includes(':'))) {
+                  this.plugin_url = p
+                  this.init_plugin_search = null
+                  this.show_plugin_store = false
+                  this.show_plugin_url = false
+                  this.getPlugin4Install(p)
+                } else {
+                  this.plugin_url = null
+                  this.init_plugin_search = p
+                  this.show_plugin_store = true
+                  this.show_plugin_url = false
+                }
+
+                this.show_plugin_templates = false
+                this.showAddPluginDialog = true
+              }
+
+              this.show_workflow = true
+              if(this.$route.query.workflow){
+                const data = Joy.decodeWorkflow(this.$route.query.workflow)
+                // const query = Object.assign({}, this.$route.query);
+                // delete query.workflow;
+                // this.$router.replace({ query });
+                if(data){
+                  this.workflow_joy_config.data = data
+                  this.workflow_expand = true
+                }
+                else{
+                  console.log('failed to workflow')
+                }
+              }
+
+              if(this.$route.query.load || this.$route.query.l){
+                const w = {
+                  name: "Loaded Url",
+                  type: 'imjoy/url_list',
+                  scroll: true,
+                  data: [this.$route.query.load || this.$route.query.l]
+                }
+                this.wm.addWindow(w)
+              }
+              this.$nextTick(() => {
+                this.event_bus.$emit('imjoy_ready')
+              })
+            })
+          })
+        })
+      }).catch((err)=>{
+        this.showMessage(err)
+        this.status_text = err
+      })
+    },
     addWindow(w) {
       return new Promise((resolve, reject) => {
         try {

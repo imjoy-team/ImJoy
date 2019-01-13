@@ -16,19 +16,6 @@
     </div>
   </div>
   <br>
-
-  <md-dialog :md-active.sync="showDialog">
-    <md-dialog-title>Getting Started with ImJoy</md-dialog-title>
-    <md-dialog-content>
-      <p>With the ImJoy web app, you process your images within the browser, instantly, no installation.</p>
-      <md-button class="md-raised md-primary" @click="$router.push('/app')">Start</md-button>
-      <p>You can process your data with the Imjoy app locally and anonymously, by default, no data will be transferred to the internet (also depends on the plugin you installed).</p>
-    </md-dialog-content>
-    <md-dialog-actions>
-      <md-button class="md-primary" @click="showDialog=false">OK</md-button>
-    </md-dialog-actions>
-  </md-dialog>
-  <br>
   <plugin-list display="card" config-url="https://raw.githubusercontent.com/oeway/ImJoy-Plugins/master/manifest.imjoy.json" title="Plugins"></plugin-list>
   <br>
   <md-divider></md-divider>
@@ -38,20 +25,7 @@
 
 <script>
 export default {
-  name: 'home',
-  data() {
-    return {
-      showDialog: false,
-    }
-  },
-  created(){
-    this.store = this.$root.$data.store
-  },
-  mounted() {
-    this.$nextTick(() => {})
-  },
-  methods: {
-  }
+  name: 'home'
 }
 </script>
 
@@ -120,47 +94,6 @@ export default {
   max-width: 800px;
   margin: 0 auto;
   text-align: center;
-}
-
-/* .slide-1 {
-
-  background-image: url('/static/img/scaled-movie-4.gif');
-} */
-
-.video-wrapper {
-  position: relative;
-}
-
-.video-wrapper>video {
-  width: 100%;
-  vertical-align: middle;
-}
-
-.video-wrapper>video.has-media-controls-hidden::-webkit-media-controls {
-  display: none;
-}
-
-.video-overlay-play-button {
-  box-sizing: border-box;
-  width: 100%;
-  height: 100%;
-  padding: 10px calc(50% - 50px);
-  position: absolute !important;
-  top: 0 !important;
-  left: 0 !important;
-  display: block;
-  opacity: 0.95;
-  cursor: pointer;
-  /* background-image: linear-gradient(transparent, rgba(10,10,10,0.4)); */
-  transition: opacity 150ms;
-}
-
-.video-overlay-play-button:hover {
-  opacity: 1;
-}
-
-.video-overlay-play-button.is-hidden {
-  display: none;
 }
 
 .lower-button {

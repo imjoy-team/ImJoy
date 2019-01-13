@@ -5,7 +5,13 @@ import router from './router'
 import VueMaterial from 'vue-material'
 import 'vue-material/dist/vue-material.min.css'
 import 'vue-material/dist/theme/default.css' // This line here
+
+import App from './App'
+import VueGridLayout from 'vue-grid-layout'
+import Grid from "vue-js-grid"
+import MonacoEditor from 'vue-monaco'
 import vueSlider from 'vue-slider-component'
+import store from './store.js'
 
 import Navbar from '@/components/Navbar'
 import Imjoy from '@/components/Imjoy'
@@ -17,12 +23,9 @@ import PluginList from '@/components/PluginList'
 import PluginEditor from '@/components/PluginEditor'
 import FileItem from '@/components/FileItem'
 import FileDialog from '@/components/FileDialog'
+import WelcomeDialog from '@/components/WelcomeDialog'
 import Window from '@/components/Window'
-import store from './store.js'
-import App from './App'
-import VueGridLayout from 'vue-grid-layout'
-import Grid from "vue-js-grid"
-import MonacoEditor from 'vue-monaco'
+
 
 Vue.config.productionTip = false
 
@@ -41,6 +44,7 @@ Vue.component('plugin-list', PluginList)
 Vue.component('plugin-editor', PluginEditor)
 Vue.component('file-item', FileItem)
 Vue.component('file-dialog', FileDialog)
+Vue.component('welcome-dialog', WelcomeDialog)
 Vue.component('window', Window)
 Vue.component('grid-layout', VueGridLayout.GridLayout)
 Vue.component('grid-item', VueGridLayout.GridItem)
