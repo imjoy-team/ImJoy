@@ -5,6 +5,7 @@
       <div class="cover-main"><!-- _coverpage.md -->
         <p><img src="/static/img/imjoy-logo-black.svg?sanitize=true" width="380" /></p>
         <h1>Image Processing with Joy :)</h1>
+        <span class="space-holder"></span>
         <p>
           <a href="https://github.com/oeway/ImJoy/" target="_blank">GitHub</a>
           <a href="/docs">Docs</a>
@@ -27,5 +28,7 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-
+.space-holder {
+  height: 40px;
+}
 </style>

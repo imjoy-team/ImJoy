@@ -40,13 +40,12 @@
           <md-icon>cancel</md-icon>
           <md-tooltip>Close all windows</md-tooltip>
         </md-button>
-        <md-button :disabled="true" class="md-icon-button">
-          <md-icon>save</md-icon>
-          <md-tooltip>Save all windows</md-tooltip>
-        </md-button>
-        <!-- <md-button @click="showSettingsDialog=true" class="md-icon-button">
+        <md-button @click="showSettingsDialog=true" :disabled="true" class="md-icon-button">
           <md-icon>settings</md-icon>
-        </md-button> -->
+        </md-button>
+        <md-button @click="showAboutDialog=true" class="md-icon-button">
+          <md-icon>info</md-icon>
+        </md-button>
         <md-button class="md-icon-button" href="/docs/" target="_blank">
           <md-icon>help</md-icon>
           <!-- <md-tooltip>Open help information.</md-tooltip> -->
@@ -440,13 +439,13 @@
     </md-dialog-actions>
   </md-dialog>
 
-  <md-dialog :md-active.sync="showSettingsDialog" :md-click-outside-to-close="false" :md-close-on-esc="false">
-    <md-dialog-title>General Settings</md-dialog-title>
+  <md-dialog style="max-width: 800px; width: 100%; height: 100%;" :md-active.sync="showAboutDialog" :md-click-outside-to-close="false" :md-close-on-esc="false">
+    <md-dialog-title>About ImJoy</md-dialog-title>
     <md-dialog-content>
-      <md-divider></md-divider>
+      <about></about>
     </md-dialog-content>
     <md-dialog-actions>
-      <md-button class="md-primary" @click="showSettingsDialog=false;">OK</md-button>
+      <md-button class="md-primary" @click="showAboutDialog=false;">OK</md-button>
     </md-dialog-actions>
   </md-dialog>
 
@@ -606,6 +605,7 @@ export default {
       selected_files: null,
       showPluginDialog: false,
       showSettingsDialog: false,
+      showAboutDialog: false,
       showAddPluginDialog: false,
       showRemoveConfirmation: false,
       showPermissionConfirmation: false,
@@ -1714,4 +1714,13 @@ button.md-speed-dial-target {
   height: calc( 100vh - 48px );
 }
 
+.normal-text{
+  text-transform: none;
+}
+
+.red{
+  display: inline-block;
+  color: #f44336;
+  transition: .3s;
+}
 </style>
