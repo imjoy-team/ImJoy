@@ -345,8 +345,6 @@
     </md-app-content>
   </md-app>
 
-  <welcome-dialog :show.sync="showWelcomeDialog" @start="startImJoy()"/>
-
   <md-dialog-confirm :md-active.sync="showRemoveConfirmation" md-title="Removing Plugin" md-content="Do you really want to <strong>delete</strong> this plugin" md-confirm-text="Yes" md-cancel-text="Cancel" @md-cancel="showRemoveConfirmation=false" @md-confirm="pm.removePlugin(plugin2_remove);plugin2_remove=null;showRemoveConfirmation=false"/>
   <!-- </md-card-content> -->
   <file-dialog ref="file-dialog" :list-files="listEngineDir" :get-file-url="getFileUrl"></file-dialog>
@@ -596,12 +594,6 @@ const ajv = new Ajv()
 
 export default {
   name: 'imjoy',
-  props: {
-    welcome: {
-      type: Boolean,
-      default: false
-    }
-  },
   data() {
     return {
       pm: null, //plugin_manager

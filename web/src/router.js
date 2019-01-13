@@ -1,6 +1,5 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Home from '@/components/Home'
 import Imjoy from '@/components/Imjoy'
 import About from '@/components/About'
 
@@ -9,21 +8,15 @@ Vue.use(Router)
 export const router_config = {
   // mode: 'history',
   base: window.location.pathName,
-  routes: [{
-      path: '/home',
-      name: 'Home',
-      component: Home
-    },
+  routes: [
     {
       path: '/',
-      name: 'Welcome',
-      component: Imjoy,
-      props: { welcome: true }
+      name: 'App',
+      component: Imjoy
     },
     {
       path: '/app',
-      name: 'App',
-      component: Imjoy
+      redirect: '/'
     },
     {
       path: '/:)',

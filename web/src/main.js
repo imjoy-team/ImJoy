@@ -23,7 +23,6 @@ import PluginList from '@/components/PluginList'
 import PluginEditor from '@/components/PluginEditor'
 import FileItem from '@/components/FileItem'
 import FileDialog from '@/components/FileDialog'
-import WelcomeDialog from '@/components/WelcomeDialog'
 import Window from '@/components/Window'
 
 
@@ -44,7 +43,6 @@ Vue.component('plugin-list', PluginList)
 Vue.component('plugin-editor', PluginEditor)
 Vue.component('file-item', FileItem)
 Vue.component('file-dialog', FileDialog)
-Vue.component('welcome-dialog', WelcomeDialog)
 Vue.component('window', Window)
 Vue.component('grid-layout', VueGridLayout.GridLayout)
 Vue.component('grid-item', VueGridLayout.GridItem)
@@ -62,7 +60,7 @@ Vue.filter('truncate', truncate);
 
 /* eslint-disable no-new */
 new Vue({
-  el: '#app',
+  el: '#imjoy-app',
   router,
   data: {
     store: store,

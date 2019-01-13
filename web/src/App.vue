@@ -23,8 +23,12 @@ export default {
         this.$root.$data.store.event_bus.$emit('resize', {height:window.innerHeight, width:window.innerWidth})
       }
       updateSize()
-      //window.addEventListener('resize', updateSize);
-      document.addEventListener("orientationchange", window.onresize = updateSize);
+      // window.addEventListener('resize', updateSize);
+      document.addEventListener("orientationchange", window.onresize = updateSize)
+
+      // hide animation
+      const element = document.getElementById('loading-imjoy-app')
+      element.parentNode.removeChild(element);
     })
   },
   methods: {
@@ -62,6 +66,7 @@ html, body
 
 .md-app {
   height:100%;
+  margin: 0px;
 }
 
 .md-content {
@@ -131,4 +136,5 @@ html, body
   overflow: auto;
   -webkit-transform: translateZ(0);
 }
+
 </style>
