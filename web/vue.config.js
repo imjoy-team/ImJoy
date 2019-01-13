@@ -18,13 +18,9 @@ module.exports = {
     },
     plugins: [
       new CopyWebpackPlugin([{
-        from: path.join(__dirname, "src/docs"),
+        from: path.join(__dirname, "../docs"),
         to: path.join(__dirname, "dist/docs"),
         toType: "dir"
-      },{
-        from: path.join(__dirname, "public/docs/index.html"),
-        to: path.join(__dirname, "dist/docs/index.html"),
-        toType: "file"
       },{
         from: path.join(__dirname, "src/jailed"),
         to: path.join(__dirname, "dist/static/jailed"),

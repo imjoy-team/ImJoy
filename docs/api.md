@@ -32,7 +32,7 @@ excellent ressources:
 * [Asynchronous I/O module for Python 3+](https://docs.python.org/3/library/asyncio.html).
 
 
-### `async/await` style
+### async/await style
 For Javascript and Python 3+, `async/await` style is natively supported and recommended.
 
 Declare your function with the `async` keyword. Add `await` before the asynchronous function to wait for the result. This essentially allows synchronous style programming without the need to set callbacks. For example:
@@ -74,7 +74,7 @@ Notice that you can **only** use `await` when you add `async` before the
 definition of your function. Don't forget to `import asyncio` if you use `async/await` with Python 3.
 
 
-### `callback` style
+### callback style
 However, for Python 2 or Web Python, `asyncio` is not supported, therefore you need to use `callback` style.
 
 Call the asynchronous function and set its callback with `.then(callback_func)`.
@@ -138,7 +138,7 @@ This call will work only for Python:
 await api.XXXXX(option1=3, option2='hi')
 ```
 
-### API functions
+## API functions
 For each api function we provide a brief code snippet illustrating how this
 function can be used. Below, you will find links **Try yourself >>**. These will
 open a full example in ImJoy, where see the function in action. The examples are
@@ -330,7 +330,7 @@ await api.run(plugin_name)
 ```
 Run another plugin by specifying its name.
 
-You can also pass [`my`](https://imjoy.io/docs/#/development?id=plugin-during-runtime)
+You can also pass [`my`](development?id=plugin-during-runtime)
 to this plugin to transfer data.
 
 **Arguments**
@@ -658,7 +658,7 @@ When calling this api function within a **JavaScript** plugin, you will obtain
 a warning message as the one shown below. It essentially indicates that the
 ImJoy app now requests access to this part of your local file system:
 
-<img src="./assets/imjoy-showFileDialog-warning.png" width="700px"></img>
+![imjoy-showFileDialog-warning](assets/imjoy-showFileDialog-warning.png ':size=700')
 
 Please note that the file-path for a JavaScript plugin is returned as an url, while
 for a Python plugin it will be the absolute file-path. The url format is required for
@@ -805,9 +805,9 @@ You can store any text data such as base64 encoded images, code and json in the 
 content = await api.getAttachment(att_name)
 ```
 
-### api.utils.XXXX
+### api.utils.*
 ``` javascript
-await api.utils.utility_name()
+await api.utils.UTILITY_NAME()
 ```
 
 Call utility function.

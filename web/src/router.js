@@ -1,22 +1,19 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Home from '@/components/Home'
 import Imjoy from '@/components/Imjoy'
 import About from '@/components/About'
+import Home from '@/components/Home'
 
 Vue.use(Router)
 
 export const router_config = {
   // mode: 'history',
   base: window.location.pathName,
-  routes: [{
+  routes: [
+    {
       path: '/',
       name: 'Home',
       component: Home
-    },
-    {
-      path: '/home',
-      redirect: '/',
     },
     {
       path: '/app',

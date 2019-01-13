@@ -1,60 +1,36 @@
-static/static/<template>
+<template>
   <div class="about">
-    <md-app-toolbar class="md-primary">
-      <div class="md-toolbar-row" flex>
-        <navbar/>
-      </div>
-    </md-app-toolbar>
-    <!-- <md-subheader>Options</md-subheader> -->
-    <md-subheader>About ImJoy.io</md-subheader>
-    <md-card>
-      <md-card-header>
-       </md-card-header>
-      <md-card-content class="centered-fixed">
-        <md-icon class="md-size-5x md-small-hide" md-src="static/img/imjoy-icon.svg" />
-        <!-- <h2>Cite ImJoy.io</h2>
-        <p> </p> -->
-        <md-button class="normal-text" href="https://github.com/oeway" target="_blank">Made by Wei OUYANG with <span class="red">❤</span></md-button>
-
-        <h2>Acknowledgements</h2>
-        <p>The ImJoy project is carried out in <a href="https://research.pasteur.fr/en/team/imaging-and-modeling/" target="_blank">Imaging and Modeling Unit</a> at Institut Pasteur.</p>
-        <p>We thank <a href="https://sites.google.com/site/imagingandmodeling/people" target="_blank">all the team members</a> from the Imaging and Modeling Unit and people who have been using, testing, contributing valuable feedbacks and suggestions for improving ImJoy.</p>
-        <p>This project is mainly funded by
-        </p>
-        <p><a href="https://www.pasteur.fr" target="_blank">
-       <img id="ip-img" src="static/img/Institut_Pasteur_logo.svg" alt="Institut Pasteur">
-       </a></p>
-        <br>
-      </md-card-content>
-    </md-card>
+    <img style="width: 300px" src="static/img/imjoy-logo-black.svg" />
     <br>
-    <br>
-    <md-divider v-if="footer"></md-divider>
-    <main-footer v-if="footer"/>
+    <md-button class="normal-text" href="https://github.com/oeway" target="_blank">Version: {{app_version}} <br>  Made by Wei OUYANG with <span class="red">❤</span></md-button>
+    <p>The ImJoy project was originally carried out in <a href="https://research.pasteur.fr/en/team/imaging-and-modeling/" target="_blank">Imaging and Modeling Unit</a> at Institut Pasteur.</p>
+    <p>Ongoing development of ImJoy is mainly supported by the <a href="https://www.scilifelab.se/researchers/emma-lundberg/" target="_blank">Cell Profiling Group</a> headed by Emma Lundberg at <a href="https://www.scilifelab.se/" target="_blank">SciLifeLab</a>.</p>
+    <p>Main Contributors:</p>
+    <ul>
+      <li>Wei OUYANG</li>
+      <li>Florian MUELLER</li>
+      <li>Martin HJELMARE</li>
+    </ul>
+    <p>We also thank <a href="https://sites.google.com/site/imagingandmodeling/people" target="_blank">all the team members</a> from the Imaging and Modeling Unit and people who have been using, testing, contributing valuable feedbacks and suggestions for improving ImJoy.</p>
+    <p>This project is mainly funded by
+    </p>
+    <p>
+      <a href="https://www.pasteur.fr" target="_blank">
+     <img style="width: 150px" src="static/img/Institut_Pasteur_logo.svg" alt="Institut Pasteur">
+     &nbsp;&nbsp;
+     <img style="width: 150px" src="static/img/logga-KAW-300x155.png" />
+     </a>
+   </p>
   </div>
 </template>
 
 <script>
+import {version} from '../../package.json';
+
 export default {
   name: 'about',
-  props: {faq:{
-    type: Boolean,
-    default: true
-  }, footer:{
-    type: Boolean,
-    default: true
-  }},
-  data () {
-    return {
-    }
-  },
-  created(){
-    this.store = this.$root.$data.store
-  },
-  mounted(){
-
-  },
-  methods: {
+  created (){
+    this.app_version = version
   }
 }
 </script>
@@ -62,7 +38,13 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 .about{
+  padding: 40px;
   overflow-y: auto !important;
+  max-width: 800px;
+  position: absolute;
+  left: 50%;
+  margin-right: -50%;
+  transform: translate(-50%, 0%)
 }
 .centered-fixed{
   max-width: 800px;

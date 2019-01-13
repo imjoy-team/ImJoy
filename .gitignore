@@ -2,8 +2,6 @@
 __pycache__
 *.pyc
 node_modules
-/docs/*
-!docs/docs
 docs/.DS_Store
 __websocket_relay__.js
 ./package-lock.json

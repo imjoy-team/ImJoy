@@ -23,8 +23,17 @@ export default {
         this.$root.$data.store.event_bus.$emit('resize', {height:window.innerHeight, width:window.innerWidth})
       }
       updateSize()
-      //window.addEventListener('resize', updateSize);
-      document.addEventListener("orientationchange", window.onresize = updateSize);
+      // window.addEventListener('resize', updateSize);
+      document.addEventListener("orientationchange", window.onresize = updateSize)
+
+      // hide animation
+      const element = document.getElementById('welcome-page')
+      if(element) element.parentNode.removeChild(element);
+
+      const element2 = document.getElementById('loading-imjoy-section')
+      if(element2) element2.parentNode.removeChild(element2);
+
+
     })
   },
   methods: {
@@ -51,7 +60,7 @@ export default {
 html, body
 {
     height: 100%;
-    overflow-y: auto;
+    overflow-y: hidden;
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
     -webkit-transform: translate3d(0,0,0);
@@ -62,6 +71,7 @@ html, body
 
 .md-app {
   height:100%;
+  margin: 0px;
 }
 
 .md-content {
@@ -131,4 +141,5 @@ html, body
   overflow: auto;
   -webkit-transform: translateZ(0);
 }
+
 </style>

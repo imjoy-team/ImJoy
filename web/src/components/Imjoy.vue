@@ -40,13 +40,12 @@
           <md-icon>cancel</md-icon>
           <md-tooltip>Close all windows</md-tooltip>
         </md-button>
-        <md-button :disabled="true" class="md-icon-button">
-          <md-icon>save</md-icon>
-          <md-tooltip>Save all windows</md-tooltip>
-        </md-button>
-        <!-- <md-button @click="showSettingsDialog=true" class="md-icon-button">
+        <md-button @click="showSettingsDialog=true" :disabled="true" class="md-icon-button">
           <md-icon>settings</md-icon>
-        </md-button> -->
+        </md-button>
+        <md-button @click="showAboutDialog=true" class="md-icon-button">
+          <md-icon>info</md-icon>
+        </md-button>
         <md-button class="md-icon-button" href="/docs/" target="_blank">
           <md-icon>help</md-icon>
           <!-- <md-tooltip>Open help information.</md-tooltip> -->
@@ -161,7 +160,7 @@
         </div>
       </div>
       <br>
-      <md-card v-if="pm">
+      <md-card v-if="pm && show_workflow">
         <md-card-header>
           <div class="md-layout md-gutter md-alignment-center-space-between">
             <div class="md-layout-item md-size-70">
@@ -440,13 +439,13 @@
     </md-dialog-actions>
   </md-dialog>
 
-  <md-dialog :md-active.sync="showSettingsDialog" :md-click-outside-to-close="false" :md-close-on-esc="false">
-    <md-dialog-title>General Settings</md-dialog-title>
+  <md-dialog style="max-width: 800px; width: 100%; height: 100%;" :md-active.sync="showAboutDialog" :md-click-outside-to-close="false" :md-close-on-esc="false">
+    <md-dialog-title>About ImJoy</md-dialog-title>
     <md-dialog-content>
-      <md-divider></md-divider>
+      <about></about>
     </md-dialog-content>
     <md-dialog-actions>
-      <md-button class="md-primary" @click="showSettingsDialog=false;">OK</md-button>
+      <md-button class="md-primary" @click="showAboutDialog=false;">OK</md-button>
     </md-dialog-actions>
   </md-dialog>
 
@@ -594,7 +593,6 @@ const ajv = new Ajv()
 
 export default {
   name: 'imjoy',
-  props: ['title'],
   data() {
     return {
       pm: null, //plugin_manager
@@ -607,6 +605,7 @@ export default {
       selected_files: null,
       showPluginDialog: false,
       showSettingsDialog: false,
+      showAboutDialog: false,
       showAddPluginDialog: false,
       showRemoveConfirmation: false,
       showPermissionConfirmation: false,
@@ -637,12 +636,14 @@ export default {
       engine_session_id: null,
       showPluginEngineInfo: false,
       showWorkspaceDialog: false,
+      showWelcomeDialog: false,
       show_file_dialog: false,
+      show_workflow: false,
       plugins: null,
       registered: null,
       plugin_api: null,
       plugin_context: null,
-      menuVisible: true,
+      menuVisible: false,
       snackbar_info: '',
       snackbar_duration: 3000,
       show_snackbar: false,
@@ -839,85 +840,13 @@ export default {
       this.engine_url = localStorage.getItem("imjoy_engine_url") || 'http://127.0.0.1:8080'
     }
 
-    this.pm.resetPlugins()
-    this.pm.setInputLoaders(this.getDefaultInputLoaders())
-    this.pm.loadRepositoryList().then((repository_list)=>{
-      this.repository_list = repository_list
-      if(this.$route.query.repo || this.$route.query.r){
-        const ret = this.pm.addRepository(this.$route.query.repo || this.$route.query.r)
-        if(ret){
-          this.pm.selected_repository = ret
-        }
-      }
-      else{
-        this.pm.selected_repository = this.repository_list[0]
-      }
-    })
+    if(this.welcome){
+      this.showWelcomeDialog = true
+    }
+    else {
+      this.startImJoy()
+    }
 
-    this.pm.loadWorkspaceList().then((workspace_list)=>{
-      const selected_workspace = this.$route.query.workspace || this.$route.query.w || workspace_list[0]
-      this.pm.loadWorkspace(selected_workspace).then(()=>{
-        this.em.connectEngine(this.engine_url, this.connection_token, true)
-        this.pm.reloadPlugins().then(()=>{
-          this.plugin_loaded = true
-          this.$forceUpdate()
-          this.event_bus.$emit('plugins_loaded', this.pm.plugins)
-          this.pm.reloadRepository().then((manifest)=>{
-            this.$forceUpdate()
-            this.event_bus.$emit('repositories_loaded', manifest)
-          }).finally(()=>{
-            if(this.$route.query.plugin || this.$route.query.p){
-              const p = (this.$route.query.plugin || this.$route.query.p).trim()
-              if (p.match(url_regex) || (p.includes('/') && p.includes(':'))) {
-                this.plugin_url = p
-                this.init_plugin_search = null
-                this.show_plugin_store = false
-                this.show_plugin_url = false
-                this.getPlugin4Install(p)
-              } else {
-                this.plugin_url = null
-                this.init_plugin_search = p
-                this.show_plugin_store = true
-                this.show_plugin_url = false
-              }
-
-              this.show_plugin_templates = false
-              this.showAddPluginDialog = true
-            }
-
-            if(this.$route.query.workflow){
-              const data = Joy.decodeWorkflow(this.$route.query.workflow)
-              // const query = Object.assign({}, this.$route.query);
-              // delete query.workflow;
-              // this.$router.replace({ query });
-              if(data){
-                this.workflow_joy_config.data = data
-                this.workflow_expand = true
-              }
-              else{
-                console.log('failed to workflow')
-              }
-            }
-
-            if(this.$route.query.load || this.$route.query.l){
-              const w = {
-                name: "Loaded Url",
-                type: 'imjoy/url_list',
-                scroll: true,
-                data: [this.$route.query.load || this.$route.query.l]
-              }
-              this.wm.addWindow(w)
-            }
-            this.$nextTick(() => {
-              this.event_bus.$emit('imjoy_ready')
-            })
-          })
-        })
-      })
-    }).catch((err)=>{
-      this.showMessage(err)
-      this.status_text = err
-    })
   },
   beforeDestroy() {
     // console.log('terminating plugins')
@@ -925,6 +854,89 @@ export default {
     this.em.destroy()
   },
   methods: {
+    startImJoy() {
+      this.pm.resetPlugins()
+      this.pm.setInputLoaders(this.getDefaultInputLoaders())
+      this.pm.loadRepositoryList().then((repository_list)=>{
+        this.repository_list = repository_list
+        if(this.$route.query.repo || this.$route.query.r){
+          const ret = this.pm.addRepository(this.$route.query.repo || this.$route.query.r)
+          if(ret){
+            this.pm.selected_repository = ret
+          }
+        }
+        else{
+          this.pm.selected_repository = this.repository_list[0]
+        }
+      })
+
+      this.pm.loadWorkspaceList().then((workspace_list)=>{
+        this.menuVisible = true
+        const selected_workspace = this.$route.query.workspace || this.$route.query.w || workspace_list[0]
+        this.pm.loadWorkspace(selected_workspace).then(()=>{
+          this.em.connectEngine(this.engine_url, this.connection_token, true)
+          this.pm.reloadPlugins().then(()=>{
+            this.plugin_loaded = true
+            this.$forceUpdate()
+            this.event_bus.$emit('plugins_loaded', this.pm.plugins)
+            this.pm.reloadRepository().then((manifest)=>{
+              this.$forceUpdate()
+              this.event_bus.$emit('repositories_loaded', manifest)
+            }).finally(()=>{
+              if(this.$route.query.plugin || this.$route.query.p){
+                const p = (this.$route.query.plugin || this.$route.query.p).trim()
+                if (p.match(url_regex) || (p.includes('/') && p.includes(':'))) {
+                  this.plugin_url = p
+                  this.init_plugin_search = null
+                  this.show_plugin_store = false
+                  this.show_plugin_url = false
+                  this.getPlugin4Install(p)
+                } else {
+                  this.plugin_url = null
+                  this.init_plugin_search = p
+                  this.show_plugin_store = true
+                  this.show_plugin_url = false
+                }
+
+                this.show_plugin_templates = false
+                this.showAddPluginDialog = true
+              }
+
+              this.show_workflow = true
+              if(this.$route.query.workflow){
+                const data = Joy.decodeWorkflow(this.$route.query.workflow)
+                // const query = Object.assign({}, this.$route.query);
+                // delete query.workflow;
+                // this.$router.replace({ query });
+                if(data){
+                  this.workflow_joy_config.data = data
+                  this.workflow_expand = true
+                }
+                else{
+                  console.log('failed to workflow')
+                }
+              }
+
+              if(this.$route.query.load || this.$route.query.l){
+                const w = {
+                  name: "Loaded Url",
+                  type: 'imjoy/url_list',
+                  scroll: true,
+                  data: [this.$route.query.load || this.$route.query.l]
+                }
+                this.wm.addWindow(w)
+              }
+              this.$nextTick(() => {
+                this.event_bus.$emit('imjoy_ready')
+              })
+            })
+          })
+        })
+      }).catch((err)=>{
+        this.showMessage(err)
+        this.status_text = err
+      })
+    },
     addWindow(w) {
       return new Promise((resolve, reject) => {
         try {
@@ -1702,4 +1714,13 @@ button.md-speed-dial-target {
   height: calc( 100vh - 48px );
 }
 
+.normal-text{
+  text-transform: none;
+}
+
+.red{
+  display: inline-block;
+  color: #f44336;
+  transition: .3s;
+}
 </style>

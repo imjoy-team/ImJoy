@@ -17,7 +17,7 @@ The following list illustrates key features of the plugin system in ImJoy:
 
 ## ImJoy Plugins
 
-<img src="./assets/imjoy-plugin-development.png" width="800px"></img>
+![imjoy-plugin-development](assets/imjoy-plugin-development.png ':size=800')
 
 There are four types of plugins available for different purposes:
 
@@ -35,7 +35,7 @@ There are four types of plugins available for different purposes:
 Click the **+ PLUGINS** button in `Plugins`, then select `Create a New Plugin`
 with one of the plugin templates. A code editor will open in the workspace, where you can write the code, save it, or install the plugin to the plugin menu. You can then test your plugin by clicking on the plugin name in the Plugins list.
 
-<img src="./assets/imjoy-plugin-types.png" width="800px"></img>
+![imjoy-plugin-types](assets/imjoy-plugin-types.png ':size=800')
 
 ### Web Worker
 These plugins are used to do computation tasks in another thread, using a new element called ["web worker"](https://en.wikipedia.org/wiki/Web_worker). It does not have an interface, it runs in a new thread and won't hang the main thread during running. It is basically a way for JavaScript to achieve multi-threading.
@@ -68,7 +68,7 @@ The **ImJoy app** is build on web technology and is running in the browser. This
 how data can be loaded and saved. For security restrictions, ImJoy or its plugins running in a browser cannot directly
 access your local file system, the user will need to open or drag files into ImJoy, and the result files can only be saved by triggering downloads. On the other hand, the **Plugin Engine** has full access to the local file system, native python plugins can read and write directly from the local file system.
 
-<img src="./assets/imjoy-data-accessibility.png" width="800px"></img>
+![imjoy-data-accessibility](assets/imjoy-data-accessibility.png ':size=800')
 
 Therefore, there are currently several different ways to handle loading/saving files for plugins
 with or without the plugin engine.
@@ -207,12 +207,12 @@ In some cases, the ui might only contain a brief description of the op. This can
 To define **longer forms with multiple lines**, we support additional definitions of the `ui` string.
 
 * an array of strings. For example:
-       ```javascript
-       "ui": [
-           "option1: {id: 'option1', type: 'choose', options: ['cat', 'dog'], placeholder: 'cat'}",
-           "option2: {id: 'option2', type: 'number', placeholder: 3}"
-          ],
-        ```
+```javascript
+"ui": [
+   "option1: {id: 'option1', type: 'choose', options: ['cat', 'dog'], placeholder: 'cat'}",
+   "option2: {id: 'option2', type: 'number', placeholder: 3}"
+  ],
+```
 *   an array with keys and values. Here, you have to use `" "` for the keys and
     the strings. Definitions can also be mixed.
 
@@ -407,7 +407,7 @@ You can control the run-time behavior of a Python plugin process with the `flags
 * **Workspace**: collection of installed ImJoy plugins. For plugins with `tags`, the user choses the appropriate tag. Each Python plugin within a workspace has its own process. Each workspace has a unique name.
 * **ImJoy instance** is a workspace running in one ImJoy interface.
 
-<img src="./assets/imjoy-python-process.png" width="800px"></img>
+![imjoy-python-process](assets/imjoy-python-process.png ':size=800')
 
 Below we describe the three main run-time behavior of python plugins:
 * By **default** (none of the flags is set), each ImJoy instance has its own process on the plugin engine. If you close the interface, you will kill the process.
@@ -606,4 +606,4 @@ If your plugin depends on non-standard libraries and modules, you have to provid
  * for **JavaScript** plugins, you need to create a [gist](https://gist.github.com/) or repository on GitHub named with the plugin name, and upload the plugin file together with other JavaScript files. In the plugin file, you can use `importScripts(url_to_your_js_file)` function to use this libraries. However, due to a restriction of GitHub, you can't use the url of GitHub directly, you need to copy the url of your JavaScript file, and convert it with [jsDelivr](https://www.jsdelivr.com/rawgit).
 
  * for **Python** plugins, you need to create a `setup.py` file to wrap the plugin as a pip module, create a [gist](https://gist.github.com/) or a GitHub repository named with the plugin name, and upload the plugin file together with your python modules. Now add the GitHub link to `requirements` in the `<config>` block of your plugin. The GitHub link should be formatted to something like: `git+https://github.com/oeway/ImJoy-Engine#egg=imjoy`, you can test with the `pip install ...` command to see if you can install your module. Please note that the `#egg=imjoy` syntax can be used to specify a dedicated [GitHub release](https://help.github.com/articles/creating-releases/). This allows to ensure that the correct
- version is installed. As an alternative recommended during development, you can also use Dropbox as explained in this [Demo](http://imjoy.io/docs/#/tutorial?id=distribution-and-deployment-of-codedata-stored-on-dropbox).
+ version is installed. As an alternative recommended during development, you can also use Dropbox as explained in this [Demo](demos?id=distribution-of-codedata-stored-on-dropbox).

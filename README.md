@@ -9,7 +9,7 @@ ImJoy is a modern image processing framework aims to bridge the web and the Pyth
 
 With ImJoy, developing and deploying advanced image processing methods such as deep learning with rich and interactive user interface has never been so easy.
 
-<img src="https://github.com/oeway/ImJoy/raw/master/web/src/docs/assets/imjoy-screenshot.png" width="600px"></img>
+<img src="https://github.com/oeway/ImJoy/raw/master/docs/assets/imjoy-screenshot.png" width="600px"></img>
 
 Getting started and documentations for the development: [ImJoy Docs](https://imjoy.io/docs)
 

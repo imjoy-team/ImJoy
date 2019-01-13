@@ -1,169 +1,34 @@
 <template>
-<div class="home">
-  <md-app-toolbar class="md-primary">
-    <div class="md-toolbar-row" flex>
-      <navbar/>
-    </div>
-  </md-app-toolbar>
+  <div class="home">
+    <a href="https://github.com/oeway/ImJoy" class="github-corner" aria-label="View source on Github"><svg viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+    <section class="cover show" style="background: rgb(209, 220, 239);">
+      <div class="cover-main"><!-- _coverpage.md -->
+        <p><img src="/static/img/imjoy-logo-black.svg?sanitize=true" width="380" /></p>
+        <h1>Image Processing with Joy :)</h1>
+        <span class="space-holder"></span>
+        <p>
+          <a href="https://github.com/oeway/ImJoy/" target="_blank">GitHub</a>
+          <a href="/docs">Docs</a>
+          <a href="/#/app" onclick="removeWelcomePage()" target="_self">Start ImJoy</a>
+        </p><!-- background color -->
 
-  <div class="md-toolbar-row md-layout md-alignment-center-center">
-    <div class="banner-container">
-      <img src="static/img/perspective-hr.jpg" alt="banner" />
-      <div class="subtitle">Image processing with joy!<br>
-        <md-button class="md-raised" @click="$router.push('/app')">Start ImJoy App</md-button>
-        <md-button class="md-raised" href="/docs">Docs</md-button>
       </div>
-    </div>
-  </div>
-  <br>
 
-  <md-dialog :md-active.sync="showDialog">
-    <md-dialog-title>Getting Started with ImJoy</md-dialog-title>
-    <md-dialog-content>
-      <p>With the ImJoy web app, you process your images within the browser, instantly, no installation.</p>
-      <md-button class="md-raised md-primary" @click="$router.push('/app')">Start</md-button>
-      <p>You can process your data with the Imjoy app locally and anonymously, by default, no data will be transferred to the internet (also depends on the plugin you installed).</p>
-    </md-dialog-content>
-    <md-dialog-actions>
-      <md-button class="md-primary" @click="showDialog=false">OK</md-button>
-    </md-dialog-actions>
-  </md-dialog>
-  <br>
-  <plugin-list display="card" config-url="https://raw.githubusercontent.com/oeway/ImJoy-Plugins/master/manifest.imjoy.json" title="Plugins"></plugin-list>
-  <br>
-  <md-divider></md-divider>
-  <main-footer/>
-</div>
+      <div class="mask"></div>
+    </section>
+  </div>
 </template>
 
 <script>
 export default {
   name: 'home',
-  data() {
-    return {
-      showDialog: false,
-    }
-  },
-  created(){
-    this.store = this.$root.$data.store
-  },
-  mounted() {
-    this.$nextTick(() => {})
-  },
-  methods: {
-  }
+
 }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-.subtitle {
-  text-align: center;
-  font-family: 'Source Sans Pro', 'Helvetica Neue', Arial, sans-serif;
-  font-weight: 320;
-  font-size: 4.0em;
-  margin: 0 auto;
-  line-height: 110%;
-  display: block;
-  max-width: 1100px;
-  padding: 50px 40px;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-}
-
-.banner-container {
-  position: relative;
-  text-align: center;
-  color: white;
-}
-
-.floating-centered {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-}
-
-.home-carousel {
-  max-height: 90vh;
-}
-
-.legend {
-  padding-left: 10px;
-}
-
-@media screen and (max-width: 600px) {
-  .subtitle {
-    font-size: 1.3em;
-  }
-}
-
-.carousel-img {
-  min-width: 80%;
-}
-
-.centered-item {
-  margin: 0 auto;
-  text-align: center;
-}
-
-.fixed-content {
-  padding: 3px;
-  max-width: 1000px;
-  text-align: center;
-  margin: 0 auto;
-}
-
-.centered-fixed-card {
-  max-width: 800px;
-  margin: 0 auto;
-  text-align: center;
-}
-
-/* .slide-1 {
-
-  background-image: url('/static/img/scaled-movie-4.gif');
-} */
-
-.video-wrapper {
-  position: relative;
-}
-
-.video-wrapper>video {
-  width: 100%;
-  vertical-align: middle;
-}
-
-.video-wrapper>video.has-media-controls-hidden::-webkit-media-controls {
-  display: none;
-}
-
-.video-overlay-play-button {
-  box-sizing: border-box;
-  width: 100%;
-  height: 100%;
-  padding: 10px calc(50% - 50px);
-  position: absolute !important;
-  top: 0 !important;
-  left: 0 !important;
-  display: block;
-  opacity: 0.95;
-  cursor: pointer;
-  /* background-image: linear-gradient(transparent, rgba(10,10,10,0.4)); */
-  transition: opacity 150ms;
-}
-
-.video-overlay-play-button:hover {
-  opacity: 1;
-}
-
-.video-overlay-play-button.is-hidden {
-  display: none;
-}
-
-.lower-button {
-  text-transform: none;
+.space-holder {
+  height: 40px;
 }
 </style>

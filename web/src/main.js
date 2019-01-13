@@ -5,7 +5,13 @@ import router from './router'
 import VueMaterial from 'vue-material'
 import 'vue-material/dist/vue-material.min.css'
 import 'vue-material/dist/theme/default.css' // This line here
+
+import App from './App'
+import VueGridLayout from 'vue-grid-layout'
+import Grid from "vue-js-grid"
+import MonacoEditor from 'vue-monaco'
 import vueSlider from 'vue-slider-component'
+import store from './store.js'
 
 import Navbar from '@/components/Navbar'
 import Imjoy from '@/components/Imjoy'
@@ -18,11 +24,7 @@ import PluginEditor from '@/components/PluginEditor'
 import FileItem from '@/components/FileItem'
 import FileDialog from '@/components/FileDialog'
 import Window from '@/components/Window'
-import store from './store.js'
-import App from './App'
-import VueGridLayout from 'vue-grid-layout'
-import Grid from "vue-js-grid"
-import MonacoEditor from 'vue-monaco'
+
 
 Vue.config.productionTip = false
 
@@ -58,7 +60,7 @@ Vue.filter('truncate', truncate);
 
 /* eslint-disable no-new */
 new Vue({
-  el: '#app',
+  el: '#imjoy-app',
   router,
   data: {
     store: store,

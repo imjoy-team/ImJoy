@@ -17,7 +17,6 @@
     <div v-for="(plugin, k) in searched_plugins" :key="k">
       <md-list-item>
         <md-avatar>
-          <!-- <img src="https://placeimg.com/40/40/people/1" alt="People"> -->
           <md-icon v-if="plugin.icon">{{plugin.icon}}</md-icon>
           <md-icon v-else>extension</md-icon>
         </md-avatar>
@@ -25,11 +24,7 @@
         <div class="md-list-item-text">
           <span>{{plugin.type === 'native-python'? plugin.name + ' 🚀': plugin.name}}</span>
           <p>{{plugin.description}}</p>
-          <!-- <div>
-              <md-chip v-for="tag in plugin.tags" :key="tag">{{tag}}</md-chip>
-            </div> -->
           <p><span v-for="tag in plugin.tags" :key="tag">{{tag}}, </span></p>
-
         </div>
         <p>
         <md-button  class="md-icon-button md-list-action md-accent" v-if="pm && pm.removePlugin && plugin.installed" @click="plugin2_remove_=plugin;showRemoveConfirmation=true;">
@@ -87,7 +82,6 @@
        <md-card-header>
          <h2><md-icon v-if="props.item.icon">{{props.item.icon}}</md-icon><md-icon v-else>extension</md-icon>
            {{props.item.type === 'native-python'? props.item.name + ' 🚀': props.item.name}}
-
          </h2>
          <p>{{props.item.description}}</p>
          <md-chip v-for="tag in props.item.tags" :key="tag">{{tag}}</md-chip>
@@ -116,8 +110,7 @@
     </grid>
   </div>
   <br>
-  <md-dialog-confirm :md-active.sync="showRemoveConfirmation" md-title="Removing Plugin" md-content="Do you really want to <strong>delete</strong> this plugin" md-confirm-text="Yes" md-cancel-text="Cancel" @md-cancel="showRemoveConfirmation=false" @md-confirm="remove(plugin2_remove_);showRemoveConfirmation=false"
-  />
+  <md-dialog-confirm :md-active.sync="showRemoveConfirmation" md-title="Removing Plugin" md-content="Do you really want to <strong>delete</strong> this plugin" md-confirm-text="Yes" md-cancel-text="Cancel" @md-cancel="showRemoveConfirmation=false" @md-confirm="remove(plugin2_remove_);showRemoveConfirmation=false"/>
 
   <md-dialog class="editor-dialog" :md-active.sync="showEditor">
     <md-dialog-title>{{plugin_name}}</md-dialog-title>
