@@ -9,7 +9,13 @@
       var docName = vm.route.file
 
       if (docName) {
-        var editLink = docEditBase + docName
+        var editLink
+        if(docName === 'https://raw.githubusercontent.com/oeway/ImJoy/master/README.md'){
+          editLink = 'https://github.com/oeway/ImJoy/edit/master/README.md'
+        }
+        else{
+          editLink= docEditBase + docName
+        }
         window.open(editLink)
         event.preventDefault()
         return false
