@@ -50,7 +50,7 @@ interface and perform computational tasks. Plugins can be designed to perform
 simple tasks such as reading tif file, or more complex tasks such as training
 a deep learning model for image segmentation.
 
-<img src="https://github.com/oeway/ImJoy/raw/master/web/src/docs/assets/imjoy-overview.png" width="800px"></img>
+<img src="https://github.com/oeway/ImJoy/raw/master/docs/assets/imjoy-overview.png" width="800px"></img>
 
 Imjoy consists of **three parts**, each part can be extended with plugins:
 
