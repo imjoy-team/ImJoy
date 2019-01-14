@@ -16,9 +16,9 @@
     </p>
     <p>
       <a href="https://www.pasteur.fr" target="_blank">
-     <img style="width: 150px" src="static/img/Institut_Pasteur_logo.svg" alt="Institut Pasteur">
+     <img style="width: 150px; margin: 10px;" src="static/img/Institut_Pasteur_logo.svg" alt="Institut Pasteur">
      &nbsp;&nbsp;
-     <img style="width: 150px" src="static/img/logga-KAW-300x155.png" />
+     <img style="width: 150px; margin: 10px;" src="static/img/logga-KAW-300x155.png" />
      </a>
    </p>
   </div>
