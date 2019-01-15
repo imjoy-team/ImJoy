@@ -23,30 +23,40 @@ There are four types of plugins available for different purposes:
 
 **JavaScript** plugins support these two types:
 
-1. `Window (HTML/CSS/JS)` plugin for building a rich and interactive user interface using HTML5/CSS and JavaScript;
+1. `Window (HTML/CSS/JS)` plugins for building a rich and interactive user interface using HTML5/CSS and JavaScript;
 
-1. `Web Worker (JS)` plugin for performing computational tasks using JavaScript or WebAssembly;
+1. `Web Worker (JS)` plugins for performing computational tasks using JavaScript or WebAssembly;
 
 **Python** plugins support these two types:
 
-1. `Native Python` plugin for performing heavy-duty computational tasks using Python and its libraries, this requires additional installation of plugin engine;
-1. `Web Python` plugin for performing computational tasks using Python with in the browser through WebAssembly and the [pyodide project](https://github.com/iodide-project/pyodide). This is in developmental stage and only selected number of Python libraries are currently supported.
+1. `Native Python` plugins for performing heavy-duty computational tasks using Python and its libraries, this requires additional installation of plugin engine;
+1. `Web Python` plugins for performing computational tasks using Python with in the browser through WebAssembly and the [pyodide project](https://github.com/iodide-project/pyodide). This is in developmental stage and only a selected number of Python libraries are currently supported.
 
 Click the **+ PLUGINS** button in `Plugins`, then select `Create a New Plugin`
-with one of the plugin templates. A code editor will open in the workspace, where you can write the code, save it, or install the plugin to the plugin menu. You can then test your plugin by clicking on the plugin name in the Plugins list.
+with one of the plugin templates. A code editor will open in the ImJoy workspace,
+where you can write the code, save it, or install the plugin to the plugin menu.
+You can then test your plugin by clicking on the plugin name in the Plugins list.
 
 ![imjoy-plugin-types](assets/imjoy-plugin-types.png ':size=800')
 
 ### Web Worker
-These plugins are used to do computation tasks in another thread, using a new element called ["web worker"](https://en.wikipedia.org/wiki/Web_worker). It does not have an interface, it runs in a new thread and won't hang the main thread during running. It is basically a way for JavaScript to achieve multi-threading.
+These plugins are used to do computation tasks in another thread,
+using a new element called [web worker](https://en.wikipedia.org/wiki/Web_worker).
+It does not have an interface, it runs in a new thread and won't hang the main thread during running.
+It is basically a way for JavaScript to achieve multi-threading.
 
-Since it's designed for performing computational tasks, it does not have access to [html dom](https://www.w3schools.com/whatis/whatis_htmldom.asp) but you can use `ImJoy API` to interact with the graphical interface of ImJoy or other plugin which can trigger changes on the user interface.
+Since web workers are designed to perform computational tasks,
+they do not have access to [html dom](https://www.w3schools.com/whatis/whatis_htmldom.asp)
+ but you can use `ImJoy API` to interact with the graphical interface of ImJoy
+ or other plugin which can trigger changes in the user interface.
 
 ### Window
 Window plugins are used to create a new web interface with HTML/CSS and JavaScript.
-They in the `iframe` mode, and it will show up as a window. The `<window>` and `<style>` blocks (see below) can be used to define the actual content of the window.
+They in the `iframe` mode, and it will show up as a window. The `<window>` and `<style>`
+blocks (see below) can be used to define the actual content of the window.
 
-Different from other plugins which will be loaded and initialized when ImJoy is started, a `window` plugin will not be loaded until the actual plugin is created with `api.createWindow` or clicked by a user in the menu. During execution of `api.createWindow`, `setup` and `run` will be called for the first time, and return with an window api object (contains all the api functions of the window, including `setup`, `run` and other functions if defined). You can then use the window api object to access all the functions, for example, update the content of the window by `win_obj.run({'data': ... })`.
+Different from other plugins which will be loaded and initialized when ImJoy is started,
+a `window` plugin will not be loaded until the actual plugin is created with `api.createWindow` or clicked on by a user in the menu. During execution of `api.createWindow`, `setup` and `run` will be called for the first time, and return with an window api object (contains all the api functions of the window, including `setup`, `run` and other functions if defined). You can then use the window api object to access all the functions, for example, update the content of the window by `win_obj.run({'data': ... })`.
 
 ### Native Python
 Used to run Python code. This requires that the **Python Plugin Engine** is installed and started before using the plugin. See the **Developing Python Plugins** for more details.
@@ -138,7 +148,7 @@ It defines the general properties of a plugin and contains several fields.
 Name of the plugin. It **must** be unique to avoid conflicts with other plugins.
 
 #### type
-Plugin type. See dedicated section [ImJoy Plugins](/development#imjoy-plugins] above for more details.
+Plugin type. See dedicated section [ImJoy Plugins](development?id=imjoy-plugins] above for more details.
 
 #### version
 Specifies the version of the plugin.
@@ -156,7 +166,7 @@ Contains a short description about the plugin.
 List of supported tags, which can be used to provide differentiate configureable
 modes and can be accessed at various points in the plugin. If a plugin was defined with
 tags, they will appear  on top of the code editor and during the installation process.
-If you distribute your plugin with an [url](/development#generating-a-plugin-url), you can specify
+If you distribute your plugin with an [url](development?id=generating-a-plugin-url), you can specify
 with which tag the plugin will be installed.
 
 Within the **``<config>``** block, the following fields can be made configurable:

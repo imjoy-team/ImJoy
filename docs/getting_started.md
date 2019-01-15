@@ -36,11 +36,11 @@ ImJoy can be used  directly from your browser (Chrome or Firefox)
 **without any installation** [ImJoy Web App](https://imjoy.io/#/app)
 or as a **standalone** [ImJoy Desktop App](https://github.com/oeway/ImJoy-App/releases).
 Many plugins can be used directly, and you can already get a feeling
-for ImJoy works.
+for how ImJoy works.
 
-For some more advanced processing, the **Python Plugin Engine** is required.
+For more advanced processing, the **Python Plugin Engine** is required.
 Such plugins are highlighted with a 🚀. The plugin engine is included in the ImJoy Desktop App.
-After installing the [ImJoy Desktop App](https://github.com/oeway/ImJoy-App/releases),
+After installing the [Desktop App](https://github.com/oeway/ImJoy-App/releases),
 you can start the engine with the button `START PLUGINE ENGINE`.
 You can then connect to the engine either from the Imjoy Web App or Desktop App.
 Click the 🚀 button located on the upper-right corner.
@@ -51,14 +51,15 @@ In the displayed window, you will find instructions on how to set up the engine.
 ### Plugins
 
 The entire functionality of ImJoy is provided by plugins. To install new plugins
-from the [Plugin Repository](https://github.com/oeway/ImJoy-Plugins), click the **+ PLUGINS**.
+from the [Plugin Repository](https://github.com/oeway/ImJoy-Plugins), click **+ PLUGINS**.
 This will show a window with all available plugins with a short description.
 A longer description can be obtained by pressing on the **...** and **Docs**.
-To install a plugin, press on the cloud button. Plugins requiring the **Python Plugin Engine** have the 🚀 symbol next to their title.
+To install a plugin, press on the cloud button. Plugins requiring the **Python Plugin Engine**
+have the 🚀 symbol next to their title.
 
 Once a plugin is installed, you can open the plugin menu, by pressing on the down
 arrow next to the plugin. This will shows (if applicable) a list of
-**parameters** which determine the behavior of the plugin. You can **execute**
+**parameters** which determine the plugin behavior. You can **execute**
 the plugin by pressing on its title.
 
 To obain more information about an installed plugin, press on the icon next to
@@ -93,7 +94,7 @@ files have to be downloaded first. Two options exist:
 
 2. **Web app**. If you prefer to use ImJoy in the browser, you can download all
   ecessary files via the plugin engine. This requires some simple steps in the
-  terminal as explained [here](/user-manual#using-imjoy-offline)
+  terminal as explained [here](user_manual?id=using-the-plugin-engine-remotely)
 
 
 ## ImJoy for plugin developers
@@ -112,7 +113,7 @@ As mentioned above, Imjoy consists of **two main components**
     entire Python ecosystem.
 
 The Python Plugin Engine is connected with the ImJoy Web App through websockets
-and communicate with a customized remote procedure calls (RPC) based on [socket.io](https://socket.io/).
+and communicate with a customized remote procedure calls (RPC) based on [socket.io](https://github.com/miguelgrinberg/python-socketio).
 
 ### How to choose plugin environment
 ImJoy provides a flexible framework to develop your plugins. Here we provide

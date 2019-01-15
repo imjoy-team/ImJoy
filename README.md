@@ -5,9 +5,11 @@
 
 ## Image Processing with Joy :)
 
-ImJoy is a modern image processing framework aims to bridge the web and the Python ecosystem with plugins.
+ImJoy is a modern image processing framework aiming to bridge the web and the
+Python ecosystem with plugins.
 
-With ImJoy, developing and deploying advanced image processing methods such as deep learning with rich and interactive user interface has never been so easy.
+With ImJoy, developing and deploying advanced image processing methods, such as
+deep learning, has been so easy thanks to rich and interactive user interfaces.
 
 <img src="https://github.com/oeway/ImJoy/raw/master/docs/assets/imjoy-screenshot.png" width="600px"></img>
 
@@ -20,7 +22,7 @@ Getting started and documentations for the development: [ImJoy Docs](https://imj
 
  * Rich and interactive user interface powered by web technologies
    - use any existing web design libraries
-   - Rendering muti-dimentional data in 3D with webGL, Three.js etc.
+   - Rendering multi-dimensional data in 3D with webGL, Three.js etc.
  * Easy-to-use workflow composition
  * Isolated workspaces for grouping plugins
  * Self-contained plugin prototyping and development
@@ -35,7 +37,7 @@ Getting started and documentations for the development: [ImJoy Docs](https://imj
    - Support libraries hosted on Github or CDNs for javascript
    - Easy plugin deployment and sharing through GitHub or Gist
    - Deploying your own plugin repository to Github
-* Native support for n-dimentional arrays and tensors
+* Native support for n-dimensional arrays and tensors
    - Support ndarrays from Numpy for data exchange
    - Support Tensorflow.js and native Tensorflow for deep learning
 
@@ -44,8 +46,8 @@ Getting started and documentations for the development: [ImJoy Docs](https://imj
 Please refer to: [ImJoy Docs](https://imjoy.io/docs/)
 
 ## ImJoy architecture
-By design, ImJoy itself provides very minimal task specific functionality, it
-provides a flexible plugin interface to support plugins to extend the user
+By design, ImJoy itself provides very minimal task specific functionality.
+It provides a flexible plugin interface to support plugins to extend the user
 interface and perform computational tasks. Plugins can be designed to perform
 simple tasks such as reading tif file, or more complex tasks such as training
 a deep learning model for image segmentation.
@@ -54,9 +56,9 @@ a deep learning model for image segmentation.
 
 Imjoy consists of **three parts**, each part can be extended with plugins:
 
-1. **Web User Interface**. ImJoy is a web application, it means that using ImJoy is as easy as opening a web page from [ImJoy.io](https://imjoy.io/#/app). With ubiquitousness of the web, ImJoy provides unified user experience with browsers running on different operating systems, including mobile devices. The user can install plugins, and use them from the web interface. Besides a easy-to-use minimal interface, plugins can create their own window to create rich and interactive web interface by making use of the full power of the entire HTML/CSS/JS frameworks. For example, with [D3.js](https://d3js.org/) or [Three.js](https://threejs.org/), one can easily provide powerful interactive charts or 3D visualization plugins. For developers, the web interface is also used for writing and testing code. A stand-alone desktop application (desktopApp) is also provided.
+1. **Web User Interface**. ImJoy is a web application. This means that using ImJoy is as easy as opening a web page from [ImJoy.io](https://imjoy.io/#/app). With ubiquitousness of the web, ImJoy provides unified user experience with browsers running on different operating systems, including mobile devices. The user can install plugins, and use them from the web interface. Besides a easy-to-use minimal interface, plugins can create their own window to create rich and interactive web interface by making use of the full power of the entire HTML/CSS/JS frameworks. For example, with [D3.js](https://d3js.org/) or [Three.js](https://threejs.org/), one can easily provide powerful interactive charts or 3D visualization plugins. For developers, the web interface is also used for writing and testing code. A stand-alone desktop application (desktopApp) is also provided.
 
-1. **Web Computational Backend**. Computational tasks can be execution in web browsers directly. Browsers nowadays are highly optimized such that JavaScript engines such as Google Chrome V8 and Firefox Quantum can be used to perform computational tasks. The performance of JavaScript Engines are close or even better than native languages such as Java and Python ([Benchmarks](https://benchmarksgame-team.pages.debian.net/benchmarksgame/faster/node-python3.html)). With HTML5/WebGL, browser can access to GPUs, allowing transparent GPU computing with libraries such as [Tensorflow.js](https://js.tensorflow.org/). With a new web standard called [WebAssembly](https://webassembly.org/), software/libraries written in high-level languages like C/C++/Rust can be ported to run in the browser. ImJoy uses ["Pyodide"](https://github.com/iodide-project/pyodide) to run Python plugins directly in the browser. The advantage of using the web computational backend is it requires almost zero setup and can run on mobile devices. Importantly, browser provides a unified, secured and sandboxed environment with maximized security and stability.
+1. **Web Computational Backend**. Computational tasks can be execution directly in the web browsers. Browsers are highly optimized and  JavaScript engines such as Google Chrome V8 and Firefox Quantum can be used to perform computational tasks. The performance of JavaScript Engines are close or even better than native languages such as Java and Python ([Benchmarks](https://benchmarksgame-team.pages.debian.net/benchmarksgame/faster/node-python3.html)). With HTML5/WebGL, browser can access to GPUs, allowing transparent GPU computing with libraries such as [Tensorflow.js](https://js.tensorflow.org/). With a new web standard called [WebAssembly](https://webassembly.org/), software/libraries written in high-level languages like C/C++/Rust can be ported to run in the browser. ImJoy uses ["Pyodide"](https://github.com/iodide-project/pyodide) to run Python plugins directly in the browser. The advantage of using the web computational backend is it requires almost zero setup and can run on mobile devices. Importantly, browser provides a unified, secured and sandboxed environment with maximized security and stability.
 
 1. **Native Computational Backend**. This is supported with the installation of an additional Python module called ["ImJoy Plugin Engine"](https://github.com/oeway/ImJoy-Engine). This allows to access the entire Python ecosystem which covers most of the scientific computing applications. With [Conda](https://conda.io), ImJoy plugin engine handles the requirements of plugins automatically and provide isolate processes and virtual environments for different Python plugins. It provides maximum flexibility and has full access to the file system, GPU and other local or remote resources. The plugin engine can be launched either on the local machine, or remotely on a cloud server or a cluster to perform computationally intensive tasks, e.g. with institutional computing cluster, Amazon Cloud, or Google Compute.
 
@@ -81,7 +83,8 @@ Currently, ImJoy consists of the following repositories:
  -   [vue-grid-layout](https://github.com/jbaysolutions/vue-grid-layout) (For window management)
  -   [python-socketio](https://github.com/miguelgrinberg/python-socketio) (This how the plugin engine talk with the ImJoy app)
  -   [pyodide](https://github.com/iodide-project/pyodide) (Enables web python mode with WebAssembly)
- -   [conda](https://conda.io/) (The plugin engine uses Conda for managing virtual env. and pacakges)
+ -   [conda](https://conda.io/) (The plugin engine uses Conda for managing virtual env. and packages)
+ -   [docsify](https://github.com/docsifyjs/docsify/) (The ImJoy documentation is created with docsify)
 
  We thank all the authors for offering these excellent work to the open-source community.
 

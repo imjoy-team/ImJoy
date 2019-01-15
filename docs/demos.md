@@ -6,7 +6,7 @@ An important part of ImJoy is to provide a flexible way to interact with the use
 
 **User input**
 
-1. In the simplest case, you can define how the GUI of the plugin is rendered in the plugin dialog. You can ask for general user-input in the [**`<config>` block**](development?id=ltconfiggt-block) or specify specific input for the different [**plugin operations**](api?id=apiregister).
+1. In the simplest case, you can define how the GUI of the plugin is rendered in the plugin dialog. You can ask for general user-input in the **`<config>`** [**block**](development?id=ltconfiggt-block) or specify specific input for the different [**plugin operations**](api?id=apiregister).
 2. The ImJoy API provides several functions to ask for user input, e.g. [file dialog](api?id=apishowfiledialog), or a [general dialog](api?id=apishowdialog).
 
 **Provide results**
