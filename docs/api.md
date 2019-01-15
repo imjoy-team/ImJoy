@@ -37,25 +37,27 @@ For Javascript and Python 3+, `async/await` style is natively supported and reco
 
 Declare your function with the `async` keyword. Add `await` before the asynchronous function to wait for the result. This essentially allows synchronous style programming without the need to set callbacks. For example:
 
- ```javascript
- // JavaScript
- class ImJoyPlugin(){
-   async setup(){
-   }
-   async run(my){
-     try{
-       result = await api.XXXXX()
-       console.log(result)
-     }
-     catch(e){
-       console.error(e)
-     }
-   }
- }
- ```
+<!-- tabs:start -->
 
+#### ** JavaScript **
+```javascript
+ class ImJoyPlugin(){
+  async setup(){
+  }
+  async run(my){
+    try{
+      result = await api.XXXXX()
+      console.log(result)
+    }
+    catch(e){
+      console.error(e)
+    }
+  }
+}
+```
+
+#### ** Python **
 ```python
-# Python
 import asyncio
 
 class ImJoyPlugin():
@@ -69,9 +71,12 @@ class ImJoyPlugin():
         except Exception as e:
             print(e)
  ```
+<!-- tabs:end -->
+
 
 Notice that you can **only** use `await` when you add `async` before the
-definition of your function. Don't forget to `import asyncio` if you use `async/await` with Python 3.
+definition of your function. Don't forget to `import asyncio` if you use
+`async/await` with Python 3.
 
 
 ### callback style
@@ -82,8 +87,10 @@ For JavaScript plugins, a native JavaScript `Promise` will be returned ([More ab
 
 Below examples for an api name `XXXXX`:
 
+<!-- tabs:start -->
+#### ** JavaScript **
+
 ```javascript
-// JavaScript
 class ImJoyPlugin(){
   setup(){
   }
@@ -103,8 +110,8 @@ class ImJoyPlugin(){
 }
 ```
 
+#### ** Python **
 ```python
-# Python
 class ImJoyPlugin():
     def setup(self):
         pass
@@ -120,6 +127,7 @@ class ImJoyPlugin():
      def callback(result):
         print(result)
 ```
+<!-- tabs:end -->
 
 
 ## Input arguments
@@ -164,7 +172,7 @@ await api.alert('hello world')
 
 
 ### api.call
-```JavaScript
+```javascript
 result = await api.call(plugin_name,plugin_op,data)
 ```
 
@@ -195,12 +203,11 @@ await api.call("PluginX", "funcX", 1)
 
 
 ### api.getPlugin
-```JavaScript
+```javascript
 plugin = await api.getPlugin(plugin_name)
 ```
 
 Gets the API object of another plugin.
-
 
 **Note 1:** If the plugin is terminated and you try to call its function, you will get an error. One solution to this is to use `try ... catch `(JavaScript) or `try: ... except: ...`(Python) statement to capture the error. <!--(TODO: this does not work for `native-python` plugin yet.)-->
 
@@ -233,15 +240,21 @@ await pluginX.funcX()
 
 
 ### api.export
+
+<!-- tabs:start -->
+
+#### ** JavaScript **
 ```javascript
-// JavaScript
 api.export(new ImJoyPlugin())
 ```
-or
-``` python
-# Python
+
+#### ** Python **
+```python
 api.export(ImJoyPlugin())
 ```
+<!-- tabs:end -->
+
+
 Exports the plugin class or an object/dict as `Plugin API`.
 
 This call is mandatory for every ImJoy plugin (typically as the last line of the plugin script). Every member of the `ImJoyPlugin` instance will be exported as `Plugin API`, which means those exported functions or variables can be called or used by the ImJoy app or another plugin. This then allows other plugins to use `api.run` or `api.call` to call the plugin or its functions.
@@ -465,11 +478,24 @@ api.createWindow({name: 'new window', type: 'Image Window', w:7, h:7, data: {ima
 ```
 
 Use the returned object to update the window, or use `onclose` to set a callback
-function which will be called hen the window is being closed.
+function which will be called when the window is closed.
 
-For Python:
+<!-- tabs:start -->
+
+#### ** JavaScript **
+```javascript
+// win is the object retured from api.createWindow
+await win.run({'data': {'image': ...}})
+
+// set `onclose` callback
+win.onclose(()=>{
+  console.log('closing window.')
+})
+```
+
+#### ** Python **
 ```python
-# win is the object retured from api.createWindow
+# win is the object returned from api.createWindow
 # pass as a dictionary
 await win.run({'data': {'image': ...}})
 
@@ -482,17 +508,8 @@ def close_callback():
 
 win.onclose(close_callback)
 ```
+<!-- tabs:end -->
 
-For Javascript:
-```javascript
-// win is the object retured from api.createWindow
-await win.run({'data': {'image': ...}})
-
-// set `onclose` callback
-win.onclose(()=>{
-  console.log('closing window.')
-})
-```
 
 ### api.showDialog
 ```javascript
@@ -725,14 +742,14 @@ Either behavior can be changed.
 
 **Examples**
 
-Simple example
+Obtain file with default settings
 
 ``` javascript
 api.getFileUrl('~/data/output.png')
 // will return something like `http://127.0.0.1:8080/file/1ba89354-ae98-457c-a53b-39a4bdd14941?name=output.png`.
 ```
 
-Specify password
+Specify password to access file
 ``` javascript
 api.getFileUrl('~/data/output.png', password='SECRET_PASSWORD').
 ```
@@ -776,7 +793,6 @@ Trigger a download for a file object from the browser.
 **Examples**
 
 ```javascript
-// JavaScript
 var blob = new Blob(["Hello, world!"], {type: "text/plain;charset=utf-8"});
 api.exportFile(blob, 'hello.txt')
 ```

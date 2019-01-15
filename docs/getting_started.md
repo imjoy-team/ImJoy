@@ -112,7 +112,7 @@ As mentioned above, Imjoy consists of **two main components**
     entire Python ecosystem.
 
 The Python Plugin Engine is connected with the ImJoy Web App through websockets
-and communicate with a customized remote procedure calls (RPC) based on `socket.io`.
+and communicate with a customized remote procedure calls (RPC) based on [socket.io](https://socket.io/).
 
 ### How to choose plugin environment
 ImJoy provides a flexible framework to develop your plugins. Here we provide

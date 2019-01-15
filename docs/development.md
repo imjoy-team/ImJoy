@@ -285,6 +285,28 @@ Used to contain documentation for the plugin, it need to be written in `Markdown
 ### `<window>` block
 Define the HTML code for displaying in the plugin window.
 
+ImJoy uses vue. to to parse plugin files, which enforces
+only root element in the template. This means in the window block you have to use
+a division to wrap all nodes:
+
+```html
+<window>
+  <div>
+    <p> line 1</p>
+    <p> line 2</p>
+  </div>
+</window>
+```
+
+The following won't work:
+```html
+<window>
+  <p> line 1</p>
+  <p> line 2</p>
+</window>
+```
+
+
 ### `<style>` block
 Define the CSS code for displaying in the plugin window.
 
@@ -539,7 +561,7 @@ social networks. We detail below how this link can be created and which options 
 In last option, which we typically don't recommend, you can send an url pointing
 to the plugin file. This url can then be used to install the plugin in ImJoy:
  press the `+ Plugins` button and add the url in the field  `Install plugin from url`.
-However, this option provides less control about how the plugin should be installed.  
+However, this option provides less control about how the plugin should be installed.
 
 
 ### Generating a plugin url
