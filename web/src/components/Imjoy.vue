@@ -259,14 +259,22 @@
               </md-menu>
 
               <md-button class="joy-run-button" :class="plugin.running?'md-accent':(plugin._disconnected && plugin.type === 'native-python'? 'disconnected-plugin': 'md-primary')" :disabled="plugin._disconnected && plugin.type != 'native-python'" @click="plugin._disconnected?connectPlugin(plugin):runOp(plugin.ops[plugin.name])">
-                {{plugin.type === 'native-python'? plugin.name + ' 🚀': plugin.name}}
+                {{plugin.type === 'native-python'? plugin.name + ' 🚀': ( plugin.type === 'web-python' ? plugin.name + ' 🐍': plugin.name) }}
               </md-button>
+
+              <md-button v-if="plugin._error || plugin._log" class="md-icon-button md-xsmall-hide" @click="plugin._error? plugin._error='' : plugin._log=''">
+                <md-icon v-if="plugin._error" class="red">error</md-icon>
+                <md-icon v-else>info</md-icon>
+                <md-tooltip>{{plugin._error || plugin._log}}</md-tooltip>
+              </md-button>
+              <md-button v-else class="md-icon-button md-xsmall-hide" disabled>
+              </md-button>
+
               <md-button v-if="!plugin._disconnected" class="md-icon-button" @click="plugin.panel_expanded=!plugin.panel_expanded; $forceUpdate()">
                 <md-icon v-if="!plugin.panel_expanded">expand_more</md-icon>
                 <md-icon v-else>expand_less</md-icon>
               </md-button>
-              <md-progress-bar md-mode="determinate" v-if="plugin.running&&plugin.progress" :md-value="plugin.progress"></md-progress-bar>
-              <p v-if="plugin.running&&plugin.status_text">{{plugin.status_text}}</p>
+              <md-progress-bar md-mode="determinate" v-if="plugin.running&&plugin._progress" :md-value="plugin._progress"></md-progress-bar>
               <div v-for="(op) in plugin.ops" :key="op.plugin_id + op.name">
                 <md-button class="md-icon-button" v-show="plugin.panel_expanded && op.name != plugin.name" :disabled="true">
                   <md-icon>chevron_right</md-icon>
@@ -664,13 +672,14 @@ export default {
       showDialog: this.showDialog,
       showProgress: this.showProgress,
       showStatus: this.showStatus,
-      showPluginProgress: this.showPluginProgress,
-      showPluginStatus: this.showPluginStatus,
       showFileDialog: this.showFileDialog,
       showSnackbar: this.showSnackbar,
       getFileUrl: this.getFileUrl,
       getFilePath: this.getFilePath,
       exportFile: this.exportFile,
+      log: (plugin, text) => { plugin.log(text); this.$forceUpdate() },
+      error: (plugin, text) => { plugin.error(text); this.$forceUpdate() },
+      progress: (plugin, text) => { plugin.progress(text); this.$forceUpdate() },
       utils: {$forceUpdate: this.$forceUpdate, openUrl: this.openUrl, sleep: this.sleep, assert: assert},
     }
 
@@ -697,9 +706,9 @@ export default {
     this.plugin_templates = [
       {name: "Web Worker (JS)", code: WEB_WORKER_PLUGIN_TEMPLATE},
       {name: "Window (HTML/CSS/JS)", code: WINDOW_PLUGIN_TEMPLATE},
-      {name: "Native Python", code: NATIVE_PYTHON_PLUGIN_TEMPLATE},
+      {name: "Native Python 🚀", code: NATIVE_PYTHON_PLUGIN_TEMPLATE},
       // {name: "Iframe(Javascript)", code: IFRAME_PLUGIN_TEMPLATE},
-      {name: "Web Python (experimental)", code: WEB_PYTHON_PLUGIN_TEMPLATE}
+      {name: "Web Python 🐍", code: WEB_PYTHON_PLUGIN_TEMPLATE}
     ]
     this.new_workspace_name = ''
     this.workflow_joy_config = {
@@ -1456,25 +1465,6 @@ export default {
       this.status_text = s
       // this.$forceUpdate()
     },
-    showPluginProgress(_plugin, p){
-      if(_plugin && _plugin.id){
-        const source_plugin = this.pm.plugins[_plugin.id]
-        if(source_plugin){
-          if (p < 1) source_plugin.progress = p * 100
-          else source_plugin.progress = p
-          this.$forceUpdate()
-        }
-      }
-    },
-    showPluginStatus(_plugin, s){
-      if(_plugin && _plugin.id){
-        const source_plugin = this.pm.plugins[_plugin.id]
-        if(source_plugin){
-          source_plugin.status_text = s
-          this.$forceUpdate()
-        }
-      }
-    },
     showDialog(_plugin, config) {
       assert(config)
       return new Promise((resolve, reject) => {
@@ -1720,7 +1710,7 @@ button.md-speed-dial-target {
 
 .red{
   display: inline-block;
-  color: #f44336;
+  color: #f44336!important;
   transition: .3s;
 }
 </style>

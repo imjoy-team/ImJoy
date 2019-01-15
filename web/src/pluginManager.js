@@ -1058,6 +1058,7 @@ export class PluginManager {
         }
       });
       plugin.whenFailed((e) => {
+        plugin.error(e)
         if(e){
           this.showMessage(`<${template.name}>: ${e}`)
         }
@@ -1131,7 +1132,7 @@ export class PluginManager {
           if(plugin.config.runnable && !plugin.api.run){
             const error_text = 'You must define a `run` function for '+plugin.name+' or set its `runnable` field to false.'
             reject(error_text)
-            plugin.set_status({type: 'error', text: error_text})
+            plugin.error(error_text)
             return
           }
           if(plugin.api.run){
@@ -1144,7 +1145,7 @@ export class PluginManager {
               resolve(plugin.api)
             }).catch((e) => {
               console.error('Error in the run function of plugin ' + plugin.name, e)
-              plugin.set_status({type: 'error', text: `<${plugin.name}>: (e.toString() || "Error.")`})
+              plugin.error(`<${plugin.name}>: (e.toString() || "Error.")`)
               reject(e)
             })
           }
@@ -1153,14 +1154,14 @@ export class PluginManager {
           }
         }).catch((e) => {
           console.error('Error occured when loading the window plugin ' + pconfig.name + ": ", e)
-          plugin.set_status({type: 'error', text: `Error occured when loading the window plugin ${pconfig.name}: ${e.toString()}`})
+          plugin.error(`Error occured when loading the window plugin ${pconfig.name}: ${e.toString()}`)
           plugin.terminate().then(()=>{this.update_ui_callback()})
           reject(e)
         })
       });
       plugin.whenFailed((e) => {
         console.error('error occured when loading ' + pconfig.name + ":", e)
-        plugin.set_status({type: 'error', text:`Error occured when loading ${pconfig.name}: ${e}.`})
+        plugin.error(`Error occured when loading ${pconfig.name}: ${e}.`)
         plugin.terminate().then(()=>{this.update_ui_callback()})
         reject(e)
       });
@@ -1359,13 +1360,18 @@ export class PluginManager {
       if (!plugin || !run) {
         console.log("WARNING: no run function found in the config, this op won't be able to do anything: " + config.name)
         config.onexecute = () => {
-          console.log("WARNING: no run function defined.")
+          plugin.log("WARNING: no run function defined.")
         }
       } else {
         const onexecute = async (my) => {
           // my.target._workflow_id = null;
-          const result = await run(this.joy2plugin(my))
-          return this.plugin2joy(result)
+          try {
+            const result = await run(this.joy2plugin(my))
+            return this.plugin2joy(result)
+          } catch (e) {
+            plugin.error(e.toString())
+            throw e
+          }
         }
         config.onexecute = onexecute
       }

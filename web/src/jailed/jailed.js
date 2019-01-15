@@ -771,6 +771,8 @@ var Plugin = function( config, _interface) {
     this._disconnected = true
     this.initializing = false;
     this.running = false;
+    this._error = ''
+    this._log = ''
     this._bindInterface(_interface);
     this._connect();
 };
@@ -798,6 +800,8 @@ var DynamicPlugin = function(config, _interface) {
     this.initializing = false;
     this.running = false;
     this._disconnected = true;
+    this._error = ''
+    this._log = ''
     this._bindInterface(_interface);
     this._connect();
 };
@@ -864,10 +868,10 @@ DynamicPlugin.prototype._connect =
       me._connection.onDisconnect(function (details){
         if(details){
           if(details.success){
-            me.set_status({type: 'info', text: details.message})
+            me.log(details.message)
           }
           else{
-            me.set_status({type: 'error', text: details.message})
+            me.error(details.message)
           }
         }
         if(me._connection._platformConnection._frame){
@@ -906,10 +910,10 @@ DynamicPlugin.prototype._init =
         me._disconnect.emit();
         if(details){
           if(details.success){
-            me.set_status({type: 'info', text: details.message})
+            me.log(details.message)
           }
           else{
-            me.set_status({type: 'error', text: details.message})
+            me.error(details.message)
           }
         }
         me._set_disconnected()
@@ -1131,15 +1135,22 @@ DynamicPlugin.prototype.terminate =
     })
 }
 
-DynamicPlugin.prototype.set_status =
-       Plugin.prototype.set_status = function(status) {
-    this.status = status
-    if(status.type === 'error'){
-      console.error(`Error in Plugin ${this.id}: ${status.text}`)
-    }
-    else{
-      console.log(`Plugin${this.id} Status updated: ${status.text}`)
-    }
+DynamicPlugin.prototype.log =
+       Plugin.prototype.log = function(msg) {
+    this._log = msg
+    console.log(`Plugin ${this.id}: ${msg}`)
+}
+
+DynamicPlugin.prototype.error =
+       Plugin.prototype.error = function(msg) {
+    this._error = msg
+    console.error(`Error in Plugin ${this.id}: ${msg}`)
+}
+
+DynamicPlugin.prototype.progress =
+       Plugin.prototype.progress = function(p) {
+   if (p < 1) this._progress = p * 100
+   else this._progress = p
 }
 
 export { DynamicPlugin, Plugin }
