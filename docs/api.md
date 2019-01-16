@@ -4,14 +4,14 @@ Every plugin runs in its own sandbox-like container environment (web worker or
 iframe for JavaScript, process for Python). This avoids interference with other
 plugins and makes the ImJoy App more secure.
 
-Interactions between plugins or between a plugin with the main ImJoy app is carried
+Interactions between plugins or between a plugin with the main ImJoy app are carried
 out through a set of API functions (`ImJoy API`). All plugins have access
 to a special object called `api`. With this object plugins can, for example,
 show a dialog, send results to the main app, or call another plugin with
 parameters and data.
 
 To make the interaction more efficient and concurrently, we chose a
-programing pattern called [asynchronous programming](http://cs.brown.edu/courses/cs168/s12/handouts/async.pdf)
+programming pattern called [asynchronous programming](http://cs.brown.edu/courses/cs168/s12/handouts/async.pdf)
 for these API functions.
 
 ## Asynchronous programming
@@ -607,19 +607,27 @@ api.showStatus('processing...')
 [Try yourself >>](https://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:showStatus&w=examples)
 
 
-### api.showPluginProgress
+### api.progress
 update the progress bar of the current plugin (in the plugin menu).
 
 ```javascript
-api.showPluginProgress(85)
+api.progress(85)
 ```
 
-### api.showPluginStatus
+### api.log
 Updates the status text of the current plugin (in the plugin menu).
 
 ``` javascript
-api.showPluginStatus('processing...')
+api.log('processing...')
 ```
+
+### api.error
+Shows an error message in the status text of the current plugin (in the plugin menu).
+
+``` javascript
+api.error('Error occured during processing.')
+```
+
 
 ### api.setConfig
 ``` javascript
