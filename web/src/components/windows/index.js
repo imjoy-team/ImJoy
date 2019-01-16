@@ -1,0 +1,6 @@
+export { default as GenericWindow } from './GenericWindow.vue'
+export { default as ImageWindow } from './ImageWindow.vue'
+export { default as ImageListWindow } from './ImageListWindow.vue'
+export { default as PanelWindow } from './PanelWindow.vue'
+export { default as MarkdownWindow } from './MarkdownWindow.vue'
+export { default as PluginEditorWindow } from './PluginEditorWindow.vue'
