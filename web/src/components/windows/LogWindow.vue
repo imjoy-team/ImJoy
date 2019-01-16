@@ -5,6 +5,12 @@
         <p :class="t.type==='error'?'error': 'info'">{{t.value || t}}</p>
       </li>
     </ul>
+    <md-button class="md-mini" v-if="w.data && w.data.log_history && w.data.log_history.length>0" @click="clear">
+        <md-icon>clear</md-icon>Clear
+    </md-button>
+    <p v-else>
+      No log available.
+    </p>
   </div>
 </template>
 
@@ -19,6 +25,13 @@ export default {
       default: function() {
         return null
       }
+    }
+  },
+  methods: {
+    clear(){
+      this.w.data.log_history.splice(0, this.w.data.log_history.length)
+      this.w.data.log_history._error = ''
+      this.w.data.log_history._info = ''
     }
   }
 }

@@ -262,10 +262,10 @@
                 {{plugin.type === 'native-python'? plugin.name + ' 🚀': ( plugin.type === 'web-python' ? plugin.name + ' 🐍': plugin.name) }}
               </md-button>
 
-              <md-button v-if="plugin._error || plugin._log" class="md-icon-button md-xsmall-hide" @click="showLog(plugin)">
-                <md-icon v-if="plugin._error" class="red">error</md-icon>
+              <md-button v-if="plugin._log_history && plugin._log_history._error || plugin._log_history._info" class="md-icon-button md-xsmall-hide" @click="showLog(plugin)">
+                <md-icon v-if="plugin._log_history._error" class="red">error</md-icon>
                 <md-icon v-else>info</md-icon>
-                <md-tooltip>{{plugin._error || plugin._log}}</md-tooltip>
+                <md-tooltip>{{plugin._log_history._error || plugin._log_history._info}}</md-tooltip>
               </md-button>
               <md-button v-else class="md-icon-button md-xsmall-hide" disabled>
               </md-button>
@@ -1486,12 +1486,6 @@ export default {
         }
       }
       this.pm.createWindow(null, w)
-      if(_plugin._error){
-        _plugin._error = ''
-      }
-      else{
-        _plugin._log = ''
-      }
     },
     openUrl(_plugin, url){
       assert(url)
