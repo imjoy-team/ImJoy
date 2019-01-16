@@ -1187,9 +1187,15 @@ DynamicPlugin.prototype.onClose =
 
 DynamicPlugin.prototype.log =
        Plugin.prototype.log = function(msg) {
-    this._log_history._info = msg
-    this._log_history.push({type: 'info', value: msg})
-    console.log(`Plugin ${this.id}: ${msg}`)
+    if(typeof msg === 'object'){
+      this._log_history.push(msg)
+      console.log(`Plugin ${this.id}:`, msg)
+    }
+    else{
+      this._log_history._info = msg
+      this._log_history.push({type: 'info', value: msg})
+      console.log(`Plugin ${this.id}: ${msg}`)
+    }
 }
 
 DynamicPlugin.prototype.error =

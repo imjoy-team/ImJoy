@@ -2,7 +2,8 @@
   <div class="log-content">
     <ul>
       <li v-for="(t, k) in w.data.log_history" :key="k">
-        <p :class="t.type==='error'?'error': 'info'">{{t.value || t}}</p>
+        <img v-if="t.type==='image'" :src="t.value"></img>
+        <p v-else :class="t.type==='error'?'error': 'info'">{{t.value || t}}</p>
       </li>
     </ul>
     <md-button class="md-mini" v-if="w.data && w.data.log_history && w.data.log_history.length>0" @click="clearLog()">
@@ -40,7 +41,7 @@ export default {
       const filename = this.w.name+'_log.txt'
       let content = ''
       for(let c of this.w.data.log_history){
-        content = content + c.value + '\n'
+        content = c.type + ':' + content + c.value + '\n'
       }
       const file = new Blob([content], {type: "text/plain;charset=utf-8"})
       saveAs(file, filename);
@@ -54,6 +55,7 @@ export default {
 <style scoped>
 .log-content {
   overflow: auto;
+  width: 100%;
 }
 
 .log-content p{
