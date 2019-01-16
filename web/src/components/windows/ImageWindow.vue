@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="fill-container">
     <img style="height: 100%; width: 100%; object-fit: contain;" :src="w.data.src" v-if="w.data && w.data.src" />
     <p v-else> No image available for display.</p>
   </div>
@@ -24,5 +24,8 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-
+.fill-container{
+  width: 100%;
+  height: 100%;
+}
 </style>

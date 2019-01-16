@@ -26,6 +26,8 @@ export default {
 .log-content {
   overflow: auto;
 }
+
+
 .log-content p{
   padding-left: 10px;
   padding-right: 10px;

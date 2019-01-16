@@ -1,6 +1,6 @@
 <template>
 
-  <md-list>
+  <md-list class="allow-scroll">
     <md-list-item class="md-primary" v-if="loaders&&w.loaders&&Object.keys(w.loaders).length > 0" @click="loaders[w.loaders[Object.keys(w.loaders)[0]]](w.data)">
       <span class="md-list-item-text md-primary">Open with "{{Object.keys(w.loaders)[0]}}"</span>
       <md-tooltip>click to open with "{{Object.keys(w.loaders)[0]}}".</md-tooltip>
@@ -66,5 +66,9 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+
+.allow-scroll {
+  overflow: auto !important;
+}
 
 </style>

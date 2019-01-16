@@ -52,8 +52,12 @@
     </md-card-expand-content>
   </md-card-expand>
   <md-card-content :class="w.scroll?'plugin-iframe-container allow-scroll':'plugin-iframe-container'">
-    <component v-if="componentNames[w.type]" :is="componentNames[w.type]" :w="w" :loaders="loaders" />
-    <md-empty-state v-else md-icon="hourglass_empty" md-label="IMJOY.IO" md-description="" />
+    <component v-if="componentNames[w.type] && w.type.startsWith('imjoy/')" :is="componentNames[w.type]" :w="w" :loaders="loaders" />
+    <md-empty-state v-else-if="w.type.startsWith('imjoy/')" md-icon="hourglass_empty" md-label="IMJOY.IO" md-description="" />
+    <div v-else class="plugin-iframe">
+      <div :id="w.iframe_container" class="plugin-iframe">
+      </div>
+    </div>
   </md-card-content>
 </md-card>
 
@@ -184,10 +188,7 @@ export default {
   background-color: #ddd !important;
   height: 30px!important;
 }
-.fill-container{
-  width: 100%;
-  height: 100%;
-}
+
 
 .window-title {
   font-size: 1.2em;
@@ -208,10 +209,6 @@ export default {
 
 .allow-scroll {
   overflow: auto !important;
-}
-
-.generic-plugin-window {
-  overflow: auto;
 }
 
 .iframe-load-button {
