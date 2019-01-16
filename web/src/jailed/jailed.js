@@ -786,6 +786,7 @@ var Plugin = function( config, _interface, is_proxy) {
     this.running = false;
     this._error = ''
     this._log = ''
+    this._log_history = []
     this._onclose_callbacks = []
     if(is_proxy){
       this._disconnected = false;
@@ -821,6 +822,7 @@ var DynamicPlugin = function(config, _interface, is_proxy) {
     this.running = false;
     this._error = ''
     this._log = ''
+    this._log_history = []
     this._onclose_callbacks = []
     this._is_proxy = is_proxy
 
@@ -1190,12 +1192,14 @@ DynamicPlugin.prototype.onClose =
 DynamicPlugin.prototype.log =
        Plugin.prototype.log = function(msg) {
     this._log = msg
+    this._log_history.push({type: 'info', value: msg})
     console.log(`Plugin ${this.id}: ${msg}`)
 }
 
 DynamicPlugin.prototype.error =
        Plugin.prototype.error = function(msg) {
     this._error = msg
+    this._log_history.push({type: 'error', value: msg})
     console.error(`Error in Plugin ${this.id}: ${msg}`)
 }
 

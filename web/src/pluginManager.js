@@ -964,7 +964,7 @@ export class PluginManager {
       }
       const tconfig = _.assign({}, template, config)
       const _interface = _.assign({TAG: tconfig.tag, WORKSPACE: this.selected_workspace}, this.imjoy_api)
-  
+
       // create a proxy plugin
       const plugin = new DynamicPlugin(tconfig, _interface, true)
 
@@ -1634,8 +1634,8 @@ export class PluginManager {
     }
   }
 
-  onClose(plugin, cb){
-    plugin.onClose(cb)
+  onClose(_plugin, cb){
+    _plugin.onClose(cb)
   }
 
 }

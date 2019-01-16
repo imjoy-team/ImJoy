@@ -262,7 +262,7 @@
                 {{plugin.type === 'native-python'? plugin.name + ' 🚀': ( plugin.type === 'web-python' ? plugin.name + ' 🐍': plugin.name) }}
               </md-button>
 
-              <md-button v-if="plugin._error || plugin._log" class="md-icon-button md-xsmall-hide" @click="plugin._error? plugin._error='' : plugin._log=''">
+              <md-button v-if="plugin._error || plugin._log" class="md-icon-button md-xsmall-hide" @click="showLog(plugin)">
                 <md-icon v-if="plugin._error" class="red">error</md-icon>
                 <md-icon v-else>info</md-icon>
                 <md-tooltip>{{plugin._error || plugin._log}}</md-tooltip>
@@ -1476,6 +1476,22 @@ export default {
     showAlert(_plugin, text){
       console.log('alert: ', text)
       alert(text)
+    },
+    showLog(_plugin){
+      const w = {
+        name: `Log (${_plugin.name})`,
+        type: 'imjoy/log',
+        data: {
+          log_history: _plugin._log_history
+        }
+      }
+      this.pm.createWindow(null, w)
+      if(_plugin._error){
+        _plugin._error = ''
+      }
+      else{
+        _plugin._log = ''
+      }
     },
     openUrl(_plugin, url){
       assert(url)
