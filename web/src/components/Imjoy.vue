@@ -274,7 +274,7 @@
                 <md-icon v-if="!plugin.panel_expanded">expand_more</md-icon>
                 <md-icon v-else>expand_less</md-icon>
               </md-button>
-              <md-progress-bar md-mode="determinate" v-if="plugin.running&&plugin._progress" :md-value="plugin._progress"></md-progress-bar>
+              <md-progress-bar md-mode="determinate" v-if="(plugin.running || plugin.initializing)&&plugin._progress" :md-value="plugin._progress"></md-progress-bar>
               <div v-for="(op) in plugin.ops" :key="op.plugin_id + op.name">
                 <md-button class="md-icon-button" v-show="plugin.panel_expanded && op.name != plugin.name" :disabled="true">
                   <md-icon>chevron_right</md-icon>

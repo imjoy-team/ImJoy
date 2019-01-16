@@ -91,6 +91,7 @@ export class PluginManager {
       setConfig: this.setPluginConfig,
       getConfig: this.getPluginConfig,
       getAttachment: this.getAttachment,
+      onClose: this.onClose,
       utils: {}
     }
     // bind this to api functions
@@ -940,13 +941,15 @@ export class PluginManager {
 
   preLoadPlugin(template, rplugin) {
     const config = {
+      _id: template._id,
       name: template.name,
       type: template.type,
       ui: template.ui,
       tag: template.tag,
       inputs: template.inputs,
       outputs: template.outputs,
-      _id: template._id
+      docs: template.docs,
+      attachments: template.attachments,
     }
     this.validatePluginConfig(config)
     //generate a random id for the plugin
@@ -960,24 +963,29 @@ export class PluginManager {
         config.initialized = true
       }
       const tconfig = _.assign({}, template, config)
-      const plugin = {
-        _id: config._id,
-        id: config.id,
-        name: config.name,
-        type: config.type,
-        config: tconfig,
-        docs: template.docs,
-        tag: template.tag,
-        attachments: template.attachments,
-        terminate: () => {
-          return new Promise((resolve)=>{
-            this._disconnected = true;
-            this.running = false
-            this.initializing = false
-            resolve()
-          })
-        }
-      }
+      const _interface = _.assign({TAG: tconfig.tag, WORKSPACE: this.selected_workspace}, this.imjoy_api)
+      const plugin = new DynamicPlugin(tconfig, _interface, true)
+      // {
+      //   _id: config._id,
+      //   id: config.id,
+      //   name: config.name,
+      //   type: config.type,
+      //   config: tconfig,
+      //   docs: template.docs,
+      //   tag: template.tag,
+      //   attachments: template.attachments,
+      //   log: DynamicPlugin.prototype.log,
+      //   error: DynamicPlugin.prototype.error,
+      //   progress: DynamicPlugin.prototype.progress,
+      //   terminate: () => {
+      //     return new Promise((resolve)=>{
+      //       this._disconnected = true;
+      //       this.running = false
+      //       this.initializing = false
+      //       resolve()
+      //     })
+      //   }
+      // }
       this.plugins[plugin.id] = plugin
       this.plugin_names[plugin.name] = plugin
       plugin.api = {
@@ -1026,7 +1034,8 @@ export class PluginManager {
       }
       const tconfig = _.assign({}, template, config)
       tconfig.workspace = this.selected_workspace
-      const plugin = new DynamicPlugin(tconfig, _.assign({TAG: tconfig.tag, WORKSPACE: this.selected_workspace}, this.imjoy_api))
+      const _interface = _.assign({TAG: tconfig.tag, WORKSPACE: this.selected_workspace}, this.imjoy_api)
+      const plugin = new DynamicPlugin(tconfig, _interface)
       plugin.whenConnected(() => {
         if (!plugin.api) {
           console.error('Error occured when loading plugin.')
@@ -1114,7 +1123,8 @@ export class PluginManager {
     return new Promise((resolve, reject) => {
       const tconfig = _.assign({}, pconfig.plugin, pconfig)
       tconfig.workspace = this.selected_workspace
-      const plugin = new DynamicPlugin(tconfig, _.assign({TAG: pconfig.tag, WORKSPACE: this.selected_workspace}, this.imjoy_api))
+      const _interface = _.assign({TAG: tconfig.tag, WORKSPACE: this.selected_workspace}, this.imjoy_api)
+      const plugin = new DynamicPlugin(tconfig, _interface)
       plugin.whenConnected(() => {
         if (!plugin.api) {
           console.error('the window plugin seems not ready.')
@@ -1640,6 +1650,10 @@ export class PluginManager {
     else{
       return null
     }
+  }
+
+  onClose(plugin, cb){
+    plugin.onClose(cb)
   }
 
 }

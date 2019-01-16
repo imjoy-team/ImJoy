@@ -51,7 +51,6 @@
         this._interface = {};
         this._plugin_interfaces = {};
         this._remote = null;
-        this._onclose_callbacks = [];
         this._remoteUpdateHandler = function(){};
         this._getInterfaceHandler = function(){};
         this._interfaceSetAsRemoteHandler = function(){};
@@ -63,9 +62,6 @@
         this._connection.onMessage(
             function(data){ me._processMessage(data); }
         );
-        this._onclose = (cb)=>{
-          this._onclose_callbacks.push(cb)
-        }
         this._connection.onDisconnect(
             function(m){
                 me._disconnectHandler(m);
@@ -136,7 +132,9 @@
      * @param {Object} _interface to set
      */
     JailedSite.prototype.setInterface = function(_interface) {
-        _interface.onclose = this._onclose;
+        _interface.onclose = (cb)=>{
+          this._remote.onClose(cb)
+        };
         this._interface = _interface;
         this._sendInterface();
     }
@@ -280,13 +278,6 @@
              this._interfaceSetAsRemoteHandler();
              break;
          case 'disconnect':
-             for(let cb of this._onclose_callbacks){
-               try {
-                 if(cb) cb()
-               } catch (e) {
-                 console.error('error in onclose callback.', e)
-               }
-             }
              this._disconnectHandler();
              this._connection.disconnect();
              break;
@@ -440,6 +431,7 @@
             }
           }
           this._plugin_interfaces[aObject['__id__']] = encoded_interface
+
           if(aObject.onclose){
             aObject.onclose(()=>{
               delete this._plugin_interfaces[aObject['__id__']]

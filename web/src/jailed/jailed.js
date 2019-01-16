@@ -447,6 +447,7 @@ var SocketioConnectionWeb = function() {
           throw('connection is not established.')
         }
         this._disconnectHandler = ()=>{}
+        this._loggingHandler = ()=>{}
         platformInit.whenEmitted(() =>{
           if (!this._disconnected && this.context && this.context.socket) {
             const config_ = {api_version: config.api_version, flags: config.flags, tag: config.tag, workspace: config.workspace, env: config.env, requirements: config.requirements, cmd: config.cmd, name: config.name, type: config.type, inputs: config.inputs, outputs: config.outputs}
@@ -463,6 +464,9 @@ var SocketioConnectionWeb = function() {
                     if (data.type == 'initialized') {
                         this.dedicatedThread = data.dedicatedThread;
                         this._init.emit();
+                    }
+                    else if (data.type == 'logging'){
+                      this._loggingHandler(data.details)
                     }
                     else if (data.type == 'disconnected'){
                       this._disconnectHandler(data.details)
@@ -539,6 +543,15 @@ var SocketioConnectionWeb = function() {
       this._disconnectHandler = handler;
     };
 
+    /**
+     * Adds a handler for the event of plugin logging
+     * (not used in case of Worker)
+     *
+     * @param {Function} handler to call upon event logging
+     */
+    SocketioConnection.prototype.onLogging = function(handler){
+      this._loggingHandler = handler;
+    };
 
     /**
      * Disconnects the plugin (= kills the frame)
@@ -758,7 +771,7 @@ Connection.prototype.disconnect = function() {
  * @param {String} url of a plugin source
  * @param {Object} _interface to provide for the plugin
  */
-var Plugin = function( config, _interface) {
+var Plugin = function( config, _interface, is_proxy) {
     this.config = config
     this.id = config.id || randId();
     this._id = config._id;
@@ -773,8 +786,15 @@ var Plugin = function( config, _interface) {
     this.running = false;
     this._error = ''
     this._log = ''
-    this._bindInterface(_interface);
-    this._connect();
+    this._onclose_callbacks = []
+    if(is_proxy){
+      this._disconnected = false;
+    }
+    else{
+      this._disconnected = true;
+      this._bindInterface(_interface);
+      this._connect();
+    }
 };
 
 
@@ -785,7 +805,7 @@ var Plugin = function( config, _interface) {
  * @param {String} code of the plugin
  * @param {Object} _interface to provide to the plugin
  */
-var DynamicPlugin = function(config, _interface) {
+var DynamicPlugin = function(config, _interface, is_proxy) {
     this.config = config
     if(!this.config.script){
       throw "you must specify the script for the plugin to run."
@@ -799,11 +819,18 @@ var DynamicPlugin = function(config, _interface) {
     this.type = config.type || 'web-worker';
     this.initializing = false;
     this.running = false;
-    this._disconnected = true;
     this._error = ''
     this._log = ''
-    this._bindInterface(_interface);
-    this._connect();
+    this._onclose_callbacks = []
+
+    if(is_proxy){
+      this._disconnected = false;
+    }
+    else{
+      this._disconnected = true;
+      this._bindInterface(_interface);
+      this._connect();
+    }
 };
 
 /**
@@ -865,6 +892,22 @@ DynamicPlugin.prototype._connect =
       me._connection.whenInit(function(){
           me._init();
       });
+      if(this.type == 'native-python'){
+        me._connection._platformConnection.onLogging(function(details){
+          if(details.type === 'error'){
+            me.error(details.value)
+          }
+          else if(details.type === 'progress'){
+            me.progress(details.value)
+          }
+          else if(details.type === 'info'){
+            me.log(details.value)
+          }
+          else{
+            console.log(details.value)
+          }
+        })
+      }
       me._connection.onDisconnect(function (details){
         if(details){
           if(details.success){
@@ -1107,33 +1150,41 @@ DynamicPlugin.prototype._set_disconnected =
     this._disconnected = true
     this.running = false
     this.initializing = false
-
 }
 
 DynamicPlugin.prototype.terminate =
-       Plugin.prototype.terminate = function() {
-    return new Promise((resolve)=>{
-      if(this._disconnected){
-        this._set_disconnected()
-        resolve()
-        return
-      }
+       Plugin.prototype.terminate = async function() {
+    if(this._disconnected){
+      this._set_disconnected()
+      return
+    }
 
-      try {
-        if(this.api && this.api.exit && typeof this.api.exit == 'function'){
-          this.api.exit()
-        }
-      } catch (e) {
-        console.error('error occured when terminating the plugin',e)
+    try {
+      await Promise.all(this._onclose_callbacks.map(item => item()))
+    } catch (e) {
+      console.error(e)
+    }
+
+    try {
+      if(this.api && this.api.exit && typeof this.api.exit == 'function'){
+        await this.api.exit()
       }
-      finally{
-        this._set_disconnected()
-        if(this._site) {this._site.disconnect(); this._site = null }
-        if(this._connection) {this._connection.disconnect(); this._connection = null }
-        resolve()
-      }
-    })
+    } catch (e) {
+      console.error('error occured when terminating the plugin',e)
+    }
+    finally{
+      this._set_disconnected()
+      if(this._site) {this._site.disconnect(); this._site = null }
+      if(this._connection) {this._connection.disconnect(); this._connection = null }
+    }
+
 }
+
+DynamicPlugin.prototype.onClose =
+       Plugin.prototype.onClose = function(cb) {
+    this._onclose_callbacks.push(cb)
+}
+
 
 DynamicPlugin.prototype.log =
        Plugin.prototype.log = function(msg) {
