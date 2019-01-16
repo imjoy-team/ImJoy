@@ -132,13 +132,19 @@ export default {
         this.active_windows[ai].selected = false
         this.active_windows[ai].refresh()
         this.active_windows.splice(ai, 1)
-        console.log('activate window: ', this.active_windows)
         this.wm.active_windows = this.active_windows
         this.$emit('select', this.active_windows, null)
       }
-      this.wm.closeWindow(w)
-      if(w.plugin && w.plugin.terminate) w.plugin.terminate()
-      this.$emit('close', w)
+      if(w.plugin && w.plugin.terminate){
+        w.plugin.terminate().finally(()=>{
+          this.wm.closeWindow(w)
+          this.$emit('close', w)
+        })
+      }
+      else{
+        this.wm.closeWindow(w)
+        this.$emit('close', w)
+      }
     },
     isTypedArray(obj)
     {
@@ -179,7 +185,6 @@ export default {
             this.active_windows[i].refresh()
         }
         this.active_windows = []
-        console.log('activate window: ', this.active_windows)
         this.wm.active_windows = this.active_windows
         this.$emit('select', this.active_windows, null)
         this.$forceUpdate()
@@ -201,7 +206,6 @@ export default {
         } else {
           this.active_windows = [w]
         }
-        console.log('activate window: ', this.active_windows)
         this.wm.active_windows = this.active_windows
         this.$emit('select', this.active_windows, w)
 

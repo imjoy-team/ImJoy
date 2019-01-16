@@ -79,7 +79,7 @@ export class EngineManager {
             this.connection_token = token
             localStorage.setItem("imjoy_connection_token", token);
             localStorage.setItem("imjoy_engine_url", url)
-            this.showMessage('Plugin Engine is connected.')
+            this.showMessage(`Successfully connected to the Plugin Engine 🚀 (${url}).`)
             // console.log('plugin engine connected.')
             this.event_bus.$emit('engine_connected', d)
             this.update_ui_callback()

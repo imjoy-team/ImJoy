@@ -91,6 +91,7 @@ export class PluginManager {
       setConfig: this.setPluginConfig,
       getConfig: this.getPluginConfig,
       getAttachment: this.getAttachment,
+      onClose: this.onClose,
       utils: {}
     }
     // bind this to api functions
@@ -940,13 +941,15 @@ export class PluginManager {
 
   preLoadPlugin(template, rplugin) {
     const config = {
+      _id: template._id,
       name: template.name,
       type: template.type,
       ui: template.ui,
       tag: template.tag,
       inputs: template.inputs,
       outputs: template.outputs,
-      _id: template._id
+      docs: template.docs,
+      attachments: template.attachments,
     }
     this.validatePluginConfig(config)
     //generate a random id for the plugin
@@ -960,24 +963,11 @@ export class PluginManager {
         config.initialized = true
       }
       const tconfig = _.assign({}, template, config)
-      const plugin = {
-        _id: config._id,
-        id: config.id,
-        name: config.name,
-        type: config.type,
-        config: tconfig,
-        docs: template.docs,
-        tag: template.tag,
-        attachments: template.attachments,
-        terminate: () => {
-          return new Promise((resolve)=>{
-            this._disconnected = true;
-            this.running = false
-            this.initializing = false
-            resolve()
-          })
-        }
-      }
+      const _interface = _.assign({TAG: tconfig.tag, WORKSPACE: this.selected_workspace}, this.imjoy_api)
+
+      // create a proxy plugin
+      const plugin = new DynamicPlugin(tconfig, _interface, true)
+
       this.plugins[plugin.id] = plugin
       this.plugin_names[plugin.name] = plugin
       plugin.api = {
@@ -1026,7 +1016,8 @@ export class PluginManager {
       }
       const tconfig = _.assign({}, template, config)
       tconfig.workspace = this.selected_workspace
-      const plugin = new DynamicPlugin(tconfig, _.assign({TAG: tconfig.tag, WORKSPACE: this.selected_workspace}, this.imjoy_api))
+      const _interface = _.assign({TAG: tconfig.tag, WORKSPACE: this.selected_workspace}, this.imjoy_api)
+      const plugin = new DynamicPlugin(tconfig, _interface)
       plugin.whenConnected(() => {
         if (!plugin.api) {
           console.error('Error occured when loading plugin.')
@@ -1058,6 +1049,7 @@ export class PluginManager {
         }
       });
       plugin.whenFailed((e) => {
+        plugin.error(e)
         if(e){
           this.showMessage(`<${template.name}>: ${e}`)
         }
@@ -1113,7 +1105,8 @@ export class PluginManager {
     return new Promise((resolve, reject) => {
       const tconfig = _.assign({}, pconfig.plugin, pconfig)
       tconfig.workspace = this.selected_workspace
-      const plugin = new DynamicPlugin(tconfig, _.assign({TAG: pconfig.tag, WORKSPACE: this.selected_workspace}, this.imjoy_api))
+      const _interface = _.assign({TAG: tconfig.tag, WORKSPACE: this.selected_workspace}, this.imjoy_api)
+      const plugin = new DynamicPlugin(tconfig, _interface)
       plugin.whenConnected(() => {
         if (!plugin.api) {
           console.error('the window plugin seems not ready.')
@@ -1131,7 +1124,7 @@ export class PluginManager {
           if(plugin.config.runnable && !plugin.api.run){
             const error_text = 'You must define a `run` function for '+plugin.name+' or set its `runnable` field to false.'
             reject(error_text)
-            plugin.set_status({type: 'error', text: error_text})
+            plugin.error(error_text)
             return
           }
           if(plugin.api.run){
@@ -1144,7 +1137,7 @@ export class PluginManager {
               resolve(plugin.api)
             }).catch((e) => {
               console.error('Error in the run function of plugin ' + plugin.name, e)
-              plugin.set_status({type: 'error', text: `<${plugin.name}>: (e.toString() || "Error.")`})
+              plugin.error(`<${plugin.name}>: (e.toString() || "Error.")`)
               reject(e)
             })
           }
@@ -1153,14 +1146,14 @@ export class PluginManager {
           }
         }).catch((e) => {
           console.error('Error occured when loading the window plugin ' + pconfig.name + ": ", e)
-          plugin.set_status({type: 'error', text: `Error occured when loading the window plugin ${pconfig.name}: ${e.toString()}`})
+          plugin.error(`Error occured when loading the window plugin ${pconfig.name}: ${e.toString()}`)
           plugin.terminate().then(()=>{this.update_ui_callback()})
           reject(e)
         })
       });
       plugin.whenFailed((e) => {
         console.error('error occured when loading ' + pconfig.name + ":", e)
-        plugin.set_status({type: 'error', text:`Error occured when loading ${pconfig.name}: ${e}.`})
+        plugin.error(`Error occured when loading ${pconfig.name}: ${e}.`)
         plugin.terminate().then(()=>{this.update_ui_callback()})
         reject(e)
       });
@@ -1359,13 +1352,18 @@ export class PluginManager {
       if (!plugin || !run) {
         console.log("WARNING: no run function found in the config, this op won't be able to do anything: " + config.name)
         config.onexecute = () => {
-          console.log("WARNING: no run function defined.")
+          plugin.log("WARNING: no run function defined.")
         }
       } else {
         const onexecute = async (my) => {
           // my.target._workflow_id = null;
-          const result = await run(this.joy2plugin(my))
-          return this.plugin2joy(result)
+          try {
+            const result = await run(this.joy2plugin(my))
+            return this.plugin2joy(result)
+          } catch (e) {
+            plugin.error(e.toString())
+            throw e
+          }
         }
         config.onexecute = onexecute
       }
@@ -1634,6 +1632,10 @@ export class PluginManager {
     else{
       return null
     }
+  }
+
+  onClose(_plugin, cb){
+    _plugin.onClose(cb)
   }
 
 }

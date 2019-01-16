@@ -52,77 +52,12 @@
     </md-card-expand-content>
   </md-card-expand>
   <md-card-content :class="w.scroll?'plugin-iframe-container allow-scroll':'plugin-iframe-container'">
-  <md-empty-state v-if="w.type==='empty'" md-icon="hourglass_empty" md-label="IMJOY.IO" md-description="">
-  </md-empty-state>
-  <div v-if="w.type==='imjoy/files'" class="generic-plugin-window">
-    <md-list>
-      <md-list-item v-for="(f, i) in w.data" :key="f.name+f.relativePath">
-        <md-radio v-model="w.select" :value="i" />
-        <span class="md-list-item-text" style="cursor: pointer;" @click="loaders && f.loaders&&Object.keys(f.loaders).length > 0 && loaders[f.loaders[Object.keys(f.loaders)[0]]](f)">{{f.name}}</span>
-        <md-menu md-size="big" md-direction="bottom-end" v-if="f.loaders && Object.keys(f.loaders).length > 0">
-          <md-button class="md-icon-button" md-menu-trigger>
-            <md-icon>more_horiz</md-icon>
-          </md-button>
-          <md-menu-content>
-            <md-menu-item v-for="(loader, name) in f.loaders" :key="name" @click="loaders && loaders[loader](f)">
-              <span>{{name}}</span>
-              <md-icon>play_arrow</md-icon>
-            </md-menu-item>
-          </md-menu-content>
-        </md-menu>
-      </md-list-item>
-
-    </md-list>
-  </div>
-  <div v-else-if="w.type==='imjoy/url_list'">
-    <ul v-if="w.data.length && w.data.length>0">
-      <li v-for="u in w.data" :key="u.href || u">
-        <a :href="u.href || u" target="_blank">{{u.text || u}}</a>
-      </li>
-    </ul>
-    <p v-else> No url.</p>
-  </div>
-  <div v-else-if="w.type==='imjoy/image'" class="fill-container">
-    <img style="height: 100%; width: 100%; object-fit: contain;" :src="w.data.src" v-if="w.data.src" />
-    <p v-else> No image available for display.</p>
-  </div>
-  <div v-else-if="w.type==='imjoy/images'" class="allow-scroll fill-container">
-    <img style="height: 100%; width: 100%; object-fit: contain;" :src="img" v-for="(img, i) in w.data.images" :key="i" />
-    <p v-if="!w.data.images||w.data.images.length == 0"> No image available for display.</p>
-  </div>
-  <div v-else-if="w.type==='imjoy/panel'">
-    <joy :config="w.config"></joy>
-  </div>
-  <div v-else-if="w.type==='imjoy/markdown'">
-    <div style="padding-left: 10px; padding-right: 5px; overflow: auto" v-if="w.data.source && w.data.source.trim() !='' " v-html="marked(w.data.source, { sanitize: true })"></div>
-    <h3 v-else> Oops, this plugin has no documentation!</h3>
-  </div>
-  <div v-else-if="w.type==='imjoy/generic'" class="generic-plugin-window">
-    <!-- <p>generic data</p> -->
-    <md-list>
-      <md-list-item class="md-primary" v-if="loaders&&w.loaders&&Object.keys(w.loaders).length > 0" @click="loaders[w.loaders[Object.keys(w.loaders)[0]]](w.data)">
-        <span class="md-list-item-text md-primary">Open with "{{Object.keys(w.loaders)[0]}}"</span>
-        <md-tooltip>click to open with "{{Object.keys(w.loaders)[0]}}".</md-tooltip>
-      </md-list-item>
-      <md-list-item v-else>
-        <span class="md-list-item-text">{{dataSummary(w)}}</span>
-      </md-list-item>
-      <md-list-item v-for="(v, k) in w.data" v-show=" !isTypedArray(w.data) && (!k.startsWith || !k.startsWith('_')) && w.data && (!w.data.length) || ((w.data.length||w.data.byteLength) && (w.data.length||w.data.byteLength) > 0 && k <= 20)" :key="k">
-        <md-icon>insert_drive_file</md-icon>
-        <span class="md-list-item-text" @click="printObject(k, v)">{{k}}</span>
-      </md-list-item>
-      <md-list-item v-if="w.data && (w.data.length||w.data.byteLength) && (w.data.length||w.data.byteLength) > 20"  @click="printObject(w.data)">
-        <md-icon>insert_drive_file</md-icon>
-        <span class="md-list-item-text">...</span>
-        <md-tooltip>click to print the data in your console.</md-tooltip>
-      </md-list-item>
-    </md-list>
-  </div>
-  <plugin-editor v-else-if="w.type==='imjoy/plugin-editor'" class="no-drag fill-container" :pluginId="w.data.id" :window="w" v-model="w.data.code" :editorId="'editor_'+w.data.id"></plugin-editor>
-  <div v-else class="plugin-iframe">
-    <div :id="w.iframe_container" class="plugin-iframe">
+    <component v-if="componentNames[w.type] && w.type.startsWith('imjoy/')" :is="componentNames[w.type]" :w="w" :loaders="loaders" />
+    <md-empty-state v-else-if="w.type.startsWith('imjoy/')" md-icon="hourglass_empty" md-label="IMJOY.IO" md-description="" />
+    <div v-else class="plugin-iframe">
+      <div :id="w.iframe_container" class="plugin-iframe">
+      </div>
     </div>
-  </div>
   </md-card-content>
 </md-card>
 
@@ -130,8 +65,16 @@
 
 <script>
 import marked from 'marked';
+import  * as windowComponents from './windows'
+
+const components = {}
+for(let c in windowComponents){
+  components[windowComponents[c].name] = windowComponents[c]
+}
+
 export default {
   name: 'window',
+  components,
   props: {
     w: {
       type: Object,
@@ -154,6 +97,7 @@ export default {
   },
   data() {
     return {
+      componentNames:{}
     }
   },
   created(){
@@ -167,6 +111,10 @@ export default {
         renderer: renderer
     });
     this.marked = marked
+
+    for(let c in components){
+      this.componentNames[components[c].type] = components[c].name
+    }
   },
   mounted() {
     this.w.refresh = this.refresh
@@ -199,21 +147,6 @@ export default {
     },
     printObject(name, obj, obj2){
       console.log(name, obj, obj2)
-    },
-    dataSummary(w){
-
-      if(Array.isArray(w.data)){
-        return `${w.type}, ${typeof w.data}, length: ${w.data.length}`
-      }
-      else if(w.data.buffer && Object.prototype.toString.call(w.data.buffer) === "[object ArrayBuffer]"){
-        return `${w.type}, typedarray, length: ${w.data.length}`
-      }
-      else if(typeof w.data === 'object'){
-        return `${w.type}, ${typeof w.data}, length: ${Object.keys(w.data).length}`
-      }
-      else{
-        return `${w.type}`
-      }
     }
   }
 }
@@ -255,10 +188,7 @@ export default {
   background-color: #ddd !important;
   height: 30px!important;
 }
-.fill-container{
-  width: 100%;
-  height: 100%;
-}
+
 
 .window-title {
   font-size: 1.2em;
@@ -279,10 +209,6 @@ export default {
 
 .allow-scroll {
   overflow: auto !important;
-}
-
-.generic-plugin-window {
-  overflow: auto;
 }
 
 .iframe-load-button {
