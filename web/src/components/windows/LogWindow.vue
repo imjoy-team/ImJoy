@@ -1,6 +1,10 @@
 <template>
   <div class="log-content">
-    <p v-for="(t, k) in w.data.log_history" :key="k">{{t.value || t}}</p>
+    <ul>
+      <li v-for="(t, k) in w.data.log_history" :key="k">
+        <p :class="t.type==='error'?'error': 'info'">{{t.value || t}}</p>
+      </li>
+    </ul>
   </div>
 </template>
 
@@ -27,10 +31,19 @@ export default {
   overflow: auto;
 }
 
-
 .log-content p{
   padding-left: 10px;
   padding-right: 10px;
   margin: 1px;
+}
+
+.info {
+  color: #4286f4;
+  transition: .3s;
+}
+
+.error {
+  color: #f44336;
+  transition: .3s;
 }
 </style>
