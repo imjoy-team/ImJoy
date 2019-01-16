@@ -84,7 +84,7 @@
     /**
      * Set a handler to be called when received a responce from the
      * remote site reporting that the previously provided interface
-     * has been succesfully set as remote for that site
+     * has been successfully set as remote for that site
      *
      * @param {Function} handler
      */
