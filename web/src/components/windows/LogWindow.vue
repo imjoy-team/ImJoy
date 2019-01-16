@@ -1,6 +1,6 @@
 <template>
   <div class="log-content">
-    <p v-for="t in w.data.log_history">{{t.value || t}}</p>
+    <p v-for="(t, k) in w.data.log_history" :key="k">{{t.value || t}}</p>
   </div>
 </template>
 
