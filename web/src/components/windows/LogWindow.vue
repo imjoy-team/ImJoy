@@ -2,7 +2,7 @@
   <div class="log-content">
     <ul>
       <li v-for="(t, k) in w.data.log_history" :key="k">
-        <img v-if="t.type==='image'" :src="t.value"></img>
+        <img v-if="t.type==='image'" :src="t.value" />
         <p v-else :class="t.type==='error'?'error': 'info'">{{t.value || t}}</p>
       </li>
     </ul>
