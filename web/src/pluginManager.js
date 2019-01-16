@@ -964,28 +964,10 @@ export class PluginManager {
       }
       const tconfig = _.assign({}, template, config)
       const _interface = _.assign({TAG: tconfig.tag, WORKSPACE: this.selected_workspace}, this.imjoy_api)
+  
+      // create a proxy plugin
       const plugin = new DynamicPlugin(tconfig, _interface, true)
-      // {
-      //   _id: config._id,
-      //   id: config.id,
-      //   name: config.name,
-      //   type: config.type,
-      //   config: tconfig,
-      //   docs: template.docs,
-      //   tag: template.tag,
-      //   attachments: template.attachments,
-      //   log: DynamicPlugin.prototype.log,
-      //   error: DynamicPlugin.prototype.error,
-      //   progress: DynamicPlugin.prototype.progress,
-      //   terminate: () => {
-      //     return new Promise((resolve)=>{
-      //       this._disconnected = true;
-      //       this.running = false
-      //       this.initializing = false
-      //       resolve()
-      //     })
-      //   }
-      // }
+
       this.plugins[plugin.id] = plugin
       this.plugin_names[plugin.name] = plugin
       plugin.api = {

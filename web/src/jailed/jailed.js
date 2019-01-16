@@ -822,6 +822,7 @@ var DynamicPlugin = function(config, _interface, is_proxy) {
     this._error = ''
     this._log = ''
     this._onclose_callbacks = []
+    this._is_proxy = is_proxy
 
     if(is_proxy){
       this._disconnected = false;
