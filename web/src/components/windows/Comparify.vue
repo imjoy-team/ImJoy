@@ -7,7 +7,6 @@
          <slot name="first"></slot>
        </div>
 
-       <resize-observer @notify="handleResize"></resize-observer>
        <div class="handle-wrap" :style="{left:`calc(${compareWidth + '%'} - var(--handle-line-width) / 2 `}">
          <div class="handle">
            <svg class="handle__arrow handle__arrow--l feather feather-chevron-left" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><polyline points="15 18 9 12 15 6"/></svg>
@@ -47,7 +46,10 @@ export default {
     }
   },
   mounted(){
-    this.handleResize()
+    this.$nextTick(()=>{
+      this.handleResize()
+    })
+
   },
   methods:{
     handleInput(e){
