@@ -46,7 +46,6 @@ Vue.component('window', Window)
 Vue.component('grid-layout', VueGridLayout.GridLayout)
 Vue.component('grid-item', VueGridLayout.GridItem)
 Vue.component('monaco-editor', MonacoEditor)
-Vue.component('resize-observer', ResizeObserver)
 
 const truncate = function(text, length, clamp) {
   clamp = clamp || '...';
