@@ -117,7 +117,6 @@ export class WindowManager {
     }
     this.selected_window = w
     w.selected = true
-    console.log('activate window: ', [w])
     this.active_windows = [w]
     // w.refresh()
   }
