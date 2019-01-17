@@ -4,7 +4,8 @@ import Vue from 'vue'
 import router from './router'
 import VueMaterial from 'vue-material'
 import 'vue-material/dist/vue-material.min.css'
-import 'vue-material/dist/theme/default.css' // This line here
+import 'vue-material/dist/theme/default.css'
+import { ResizeObserver } from 'vue-resize'
 
 import App from './App'
 import VueGridLayout from 'vue-grid-layout'
@@ -24,7 +25,6 @@ import PluginEditor from '@/components/PluginEditor'
 import FileItem from '@/components/FileItem'
 import FileDialog from '@/components/FileDialog'
 import Window from '@/components/Window'
-
 
 Vue.config.productionTip = false
 
@@ -47,6 +47,7 @@ Vue.component('window', Window)
 Vue.component('grid-layout', VueGridLayout.GridLayout)
 Vue.component('grid-item', VueGridLayout.GridItem)
 Vue.component('monaco-editor', MonacoEditor)
+Vue.component('resize-observer', ResizeObserver)
 
 const truncate = function(text, length, clamp) {
   clamp = clamp || '...';

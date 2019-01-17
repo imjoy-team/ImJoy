@@ -1287,14 +1287,12 @@ export default {
       mw.target._workflow_id = mw.target._workflow_id || "workflow_"+randId()
       joy.workflow.execute(mw.target).then((my) => {
         const w = this.pm.joy2plugin(my)
-
         if(w && w.data && Object.keys(w.data).length>2){
           // console.log('result', w)
           w.name = w.name || 'result'
           w.type = w.type || 'imjoy/generic'
           this.pm.createWindow(null, w)
         }
-
         this.progress = 100
       }).catch((e) => {
         console.error(e)

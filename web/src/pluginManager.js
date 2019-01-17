@@ -1135,7 +1135,7 @@ export class PluginManager {
                   pconfig[k] = result[k]
                 }
               }
-              resolve(plugin.api)
+              resolve(plugin)
             }).catch((e) => {
               console.error('Error in the run function of plugin ' + plugin.name, e)
               plugin.error(`<${plugin.name}>: (e.toString() || "Error.")`)
@@ -1143,7 +1143,7 @@ export class PluginManager {
             })
           }
           else{
-            resolve(plugin.api)
+            resolve(plugin)
           }
         }).catch((e) => {
           console.error('Error occured when loading the window plugin ' + pconfig.name + ": ", e)
@@ -1553,14 +1553,18 @@ export class PluginManager {
         pconfig.plugin = window_config
         pconfig.context = this.getPluginContext()
 
+
         if (!WINDOW_SCHEMA(pconfig)) {
           const error = WINDOW_SCHEMA.errors
           console.error("Error occured during creating window ", pconfig, error)
           throw error
         }
         this.wm.addWindow(pconfig).then(()=>{
-          this.renderWindow(pconfig).then((plugin_api)=>{
-            resolve(plugin_api)
+          this.renderWindow(pconfig).then((wplugin)=>{
+            pconfig.onclose = ()=>{
+              return wplugin.terminate()
+            }
+            resolve(wplugin.api)
           }).catch(reject)
         })
       }

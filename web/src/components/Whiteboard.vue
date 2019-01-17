@@ -135,16 +135,8 @@ export default {
         this.wm.active_windows = this.active_windows
         this.$emit('select', this.active_windows, null)
       }
-      if(w.plugin && w.plugin.terminate){
-        w.plugin.terminate().finally(()=>{
-          this.wm.closeWindow(w)
-          this.$emit('close', w)
-        })
-      }
-      else{
-        this.wm.closeWindow(w)
-        this.$emit('close', w)
-      }
+      this.wm.closeWindow(w)
+      this.$emit('close', w)
     },
     isTypedArray(obj)
     {

@@ -1,7 +1,8 @@
 <template>
   <md-list class="files-window">
     <md-list-item v-for="(f, i) in w.data" :key="f.name+f.relativePath">
-      <md-radio v-model="w.data.select" :value="i" />
+      <md-radio v-model="w.data.select" v-if="w.data && w.data.length>1" :value="i" />
+      <md-icon v-else>insert_drive_file</md-icon>
       <span class="md-list-item-text" style="cursor: pointer;" @click="loaders && f.loaders&&Object.keys(f.loaders).length > 0 && loaders[f.loaders[Object.keys(f.loaders)[0]]](f)">{{f.name}}</span>
       <md-menu md-size="big" md-direction="bottom-end" v-if="f.loaders && Object.keys(f.loaders).length > 0">
         <md-button class="md-icon-button" md-menu-trigger>

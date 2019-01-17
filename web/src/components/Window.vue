@@ -127,11 +127,13 @@ export default {
       this.$forceUpdate()
     },
     close(w) {
-      this.$emit('close', w)
-    },
-    isTypedArray(obj)
-    {
-      return !!obj && obj.byteLength !== undefined;
+      try {
+        Promise.resolve(w.onclose()).finally(()=>{
+            this.$emit('close', w)
+        })
+      } catch (e) {
+        this.$emit('close', w)
+      }
     },
     fullScreen(w) {
       this.$emit('fullscreen', w)

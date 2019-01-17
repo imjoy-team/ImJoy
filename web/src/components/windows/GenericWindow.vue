@@ -58,6 +58,10 @@ export default {
     },
     printObject(name, obj, obj2){
       console.log(name, obj, obj2)
+    },
+    isTypedArray(obj)
+    {
+      return !!obj && obj.byteLength !== undefined;
     }
   }
 }

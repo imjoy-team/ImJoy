@@ -33,6 +33,7 @@
     "vue-js-grid": "github:euvl/vue-js-grid",
     "vue-material": "^1.0.0-beta-10.2",
     "vue-monaco": "^0.2.0",
+    "vue-resize": "^0.4.5",
     "vue-router": "^3.0.1",
     "vue-slider-component": "^2.6.2",
     "webpack-cli": "^3.1.0"
