@@ -47,7 +47,7 @@ export default {
     }
   },
   mounted(){
-    this.width = this.getContainerWidth();
+    this.handleResize()
   },
   methods:{
     handleInput(e){
@@ -63,7 +63,7 @@ export default {
     },
     getContainerWidth(){
       return window.getComputedStyle(this.$el,null).getPropertyValue('width')
-    },
+    }
   }
 }
 
