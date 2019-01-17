@@ -46,12 +46,20 @@ export const REGISTER_SCHEMA= ajv.compile({
   }
 })
 
+export const JOY_SCHEMA= ajv.compile({
+  properties: {
+    name: {type: 'string'},
+    type: {type: 'string'},
+    init: {type: ['null', 'string', 'array', 'object']}
+  }
+})
+
 export const WINDOW_SCHEMA= ajv.compile({
   properties: {
     name: {type: 'string'},
     type: {type: 'string'},
     config: {type: ['null', 'object']},
-    data: {type: ['null', 'object']}, //attachments: {}
+    data: {type: ['null', 'number', 'string', 'array', 'object']}, //attachments: {}
     panel: {type: ['null', 'object']}
   }
 })

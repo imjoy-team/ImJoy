@@ -15,6 +15,12 @@ export default {
       default: function() {
         return null
       }
+    },
+    loaders: {
+      type: Object,
+      default: function() {
+        return null
+      }
     }
   }
 }

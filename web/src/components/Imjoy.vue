@@ -262,7 +262,7 @@
                 {{plugin.type === 'native-python'? plugin.name + ' 🚀': ( plugin.type === 'web-python' ? plugin.name + ' 🐍': plugin.name) }}
               </md-button>
 
-              <md-button v-if="plugin._log_history && plugin._log_history._error || plugin._log_history._info" class="md-icon-button md-xsmall-hide" @click="showLog(plugin)">
+              <md-button v-if="plugin._log_history && plugin._log_history.length>0" class="md-icon-button md-xsmall-hide" @click="showLog(plugin)">
                 <md-icon v-if="plugin._log_history._error" class="red">error</md-icon>
                 <md-icon v-else>info</md-icon>
                 <md-tooltip>{{plugin._log_history._error || plugin._log_history._info}}</md-tooltip>
@@ -677,6 +677,7 @@ export default {
       getFileUrl: this.getFileUrl,
       getFilePath: this.getFilePath,
       exportFile: this.exportFile,
+      showMessage: (plugin, info, duration) => {this.showMessage(info, duration)},
       log: (plugin, text) => { plugin.log(text); this.$forceUpdate() },
       error: (plugin, text) => { plugin.error(text); this.$forceUpdate() },
       progress: (plugin, text) => { plugin.progress(text); this.$forceUpdate() },
@@ -1094,6 +1095,9 @@ export default {
     },
     showMessage(info, duration) {
       this.snackbar_info = info
+      if(duration){
+        duration = duration * 1000
+      }
       this.snackbar_duration = duration || 10000
       this.show_snackbar = true
       this.status_text = info
@@ -1272,11 +1276,10 @@ export default {
       this.$refs.workflow.setupJoy(true)
     },
     runWorkflow(joy) {
-      // console.log('run workflow.', this.wm.active_windows)
-      const w = this.wm.active_windows[this.wm.active_windows.length - 1] || {}
       this.status_text = ''
       this.progress = 0
-      const mw = this.pm.plugin2joy(w.data) || {}
+      const w = this.wm.active_windows[this.wm.active_windows.length - 1] || {}
+      const mw = this.pm.plugin2joy(w) || {}
       mw.target = mw.target || {}
       mw.target._op = 'workflow'
       mw.target._source_op = null
@@ -1296,7 +1299,7 @@ export default {
       }).catch((e) => {
         console.error(e)
         this.status_text = e.toString() || "Error."
-        this.showMessage(e || "Error." , 12000)
+        this.showMessage(e || "Error." , 12)
       })
     },
 
@@ -1310,7 +1313,6 @@ export default {
       this.showShareUrl = true
     },
     runOp(op) {
-      // console.log('run op.', this.wm.active_windows)
       this.status_text = ''
       this.progress = 0
       const w = this.wm.active_windows[this.wm.active_windows.length - 1] || {}
@@ -1331,7 +1333,7 @@ export default {
       }).catch((e) => {
         console.error(e)
         this.status_text = '<' +op.name + '>' + (e.toString() || "Error.")
-        this.showMessage(this.status_text, 15000)
+        this.showMessage(this.status_text, 15)
       })
     },
     selectFileChanged(event) {

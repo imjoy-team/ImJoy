@@ -23,6 +23,7 @@ import {
 
 import {
   REGISTER_SCHEMA,
+  JOY_SCHEMA,
   WINDOW_SCHEMA,
   PLUGIN_SCHEMA,
   CONFIGURABLE_FIELDS,
@@ -678,7 +679,7 @@ export class PluginManager {
 
       }).catch((e)=>{
         console.error(e)
-        this.showMessage('Failed to download, if you download from github, please use the url to the raw file', 6000)
+        this.showMessage('Failed to download, if you download from github, please use the url to the raw file', 10)
         reject(e)
       })
     })
@@ -786,7 +787,7 @@ export class PluginManager {
           reject(e)
         })
       } catch (e) {
-        this.showMessage(e || "Error.", 15000)
+        this.showMessage(e || "Error.", 15)
         reject(e)
       }
     })
@@ -814,7 +815,7 @@ export class PluginManager {
             resolve(template)
             this.showMessage(`${template.name } has been successfully saved.`)
           }).catch((err) => {
-            this.showMessage('Failed to save the plugin.', 15000)
+            this.showMessage('Failed to save the plugin.', 15)
             console.error(err)
             reject('failed to save')
           })
@@ -828,7 +829,7 @@ export class PluginManager {
           addPlugin()
         });
       } catch (e) {
-        this.showMessage( e || "Error.", 15000)
+        this.showMessage( e || "Error.", 15)
         reject(e)
       }
     })
@@ -1038,7 +1039,7 @@ export class PluginManager {
             resolve(plugin)
           }).catch((e) => {
             console.error('error occured when loading plugin ' + template.name + ": ", e)
-            this.showMessage(`<${template.name}>: ${e}`, 15000)
+            this.showMessage(`<${template.name}>: ${e}`, 15)
             reject(e)
             plugin.terminate().then(()=>{this.update_ui_callback()})
           })
@@ -1312,34 +1313,38 @@ export class PluginManager {
       if(plugin.name === config.name){
         config.ui = config.ui || plugin.config.description
       }
-      config.tags = ["op", "plugin"]
       config.inputs = config.inputs || null
       config.outputs = config.outputs || null
-      const plugin_name = plugin.name
-      const op_name = config.name
-      const op_key = op_name === plugin_name ? plugin_name : plugin_name+'/'+op_name
-      // save type to tags
-      if(config.type === 'window'){
-        config.tags.push('window')
-      }
-      else if(config.type === 'native-python'){
-        config.tags.push('python')
-      }
-      else if(config.type === 'web-worker'){
-        config.tags.push('web-worker')
-      }
-      else if(config.type === 'web-python'){
-        config.tags.push('web-python')
-      }
-      else if(config.type === 'iframe'){
-        config.tags.push('iframe')
-      }
-      // use its name for type
-      config.type = config.name
       if (!REGISTER_SCHEMA(config)) {
         const error = REGISTER_SCHEMA.errors
         console.error("Error occured during registering " + config.name, error)
         throw error
+      }
+
+      const plugin_name = plugin.name
+      const op_name = config.name
+      const op_key = op_name === plugin_name ? plugin_name : plugin_name+'/'+op_name
+      const joy_template = {
+        name: config.name,
+        tags: ["op", "plugin"],
+        type: op_key,
+        init: config.ui
+      }
+      // save type to tags
+      if(config.type === 'window'){
+        joy_template.tags.push('window')
+      }
+      else if(config.type === 'native-python'){
+        joy_template.tags.push('python')
+      }
+      else if(config.type === 'web-worker'){
+        joy_template.tags.push('web-worker')
+      }
+      else if(config.type === 'web-python'){
+        joy_template.tags.push('web-python')
+      }
+      else if(config.type === 'iframe'){
+        joy_template.tags.push('iframe')
       }
       let run = null
       if(config.run && typeof config.run === 'function'){
@@ -1348,10 +1353,9 @@ export class PluginManager {
       else{
         run = plugin && plugin.api && plugin.api.run
       }
-
       if (!plugin || !run) {
         console.log("WARNING: no run function found in the config, this op won't be able to do anything: " + config.name)
-        config.onexecute = () => {
+        joy_template.onexecute = () => {
           plugin.log("WARNING: no run function defined.")
         }
       } else {
@@ -1365,7 +1369,7 @@ export class PluginManager {
             throw e
           }
         }
-        config.onexecute = onexecute
+        joy_template.onexecute = onexecute
       }
 
       if(config.update && typeof config.update === 'function'){
@@ -1374,7 +1378,7 @@ export class PluginManager {
           const result = await config.update(this.joy2plugin(my))
           return this.plugin2joy(result)
         }
-        config.onupdate = debounce(onupdate, 300)
+        joy_template.onupdate = debounce(onupdate, 300)
       }
       else if(plugin && plugin.api && plugin.api.update){
         const onupdate = async (my) => {
@@ -1382,18 +1386,21 @@ export class PluginManager {
           const result = await plugin.api.update(this.joy2plugin(my))
           return this.plugin2joy(result)
         }
-        config.onupdate = debounce(onupdate, 300)
+        joy_template.onupdate = debounce(onupdate, 300)
       }
-      const joy_template = config
 
-      joy_template.init = joy_template.ui
+      if (!JOY_SCHEMA(joy_template)) {
+        const error = JOY_SCHEMA.errors
+        console.error("Error occured during registering op to joy " + joy_template.name, error)
+        throw error
+      }
       Joy.add(joy_template);
 
       const op_config = {
         plugin_id: plugin.id,
-        name: config.name,
-        ui: "{id: '__op__', type: '" + config.type + "'}",
-        onexecute: config.onexecute
+        name: joy_template.name,
+        ui: "{id: '__op__', type: '" + joy_template.type + "'}",
+        onexecute: joy_template.onexecute
       }
       plugin.ops = plugin.ops || {}
       plugin.ops[config.name] = op_config
@@ -1466,10 +1473,8 @@ export class PluginManager {
       }
 
       this.registered.ops[op_key] = op_config
-      this.event_bus.$emit('op_registered', op_config)
-
       this.registered.windows[config.name] = plugin.config
-
+      this.event_bus.$emit('op_registered', op_config)
       return true
     } catch (e) {
       console.error(e)
@@ -1510,7 +1515,7 @@ export class PluginManager {
       wconfig.panel = wconfig.panel || null
       if (!WINDOW_SCHEMA(wconfig)) {
         const error = WINDOW_SCHEMA.errors
-        console.error("Error occured during creating window " + wconfig.name, error)
+        console.error("Error occured during creating window ", wconfig, error)
         throw error
       }
       if (wconfig.type && wconfig.type.startsWith('imjoy')) {
@@ -1538,7 +1543,7 @@ export class PluginManager {
         const pconfig = wconfig
         //generate a new window id
         pconfig.type = window_config.type
-        pconfig.id = window_config.id + '_' + randId()//window_config.name.trim().replace(/ /g, '_') + '_' + randId()
+        pconfig.id = window_config.id + '_' + randId()
         if (pconfig.type != 'window') {
           throw 'Window plugin must be with type "window"'
         }
@@ -1550,7 +1555,7 @@ export class PluginManager {
 
         if (!WINDOW_SCHEMA(pconfig)) {
           const error = WINDOW_SCHEMA.errors
-          console.error("Error occured during creating window " + pconfig.name, error)
+          console.error("Error occured during creating window ", pconfig, error)
           throw error
         }
         this.wm.addWindow(pconfig).then(()=>{

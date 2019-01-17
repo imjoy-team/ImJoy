@@ -49,7 +49,6 @@ export default {
       if(!reset && this.joy){
         this.config.data = this.joy.top.data
       }
-
       this.$refs.editor.innerHTML = ''
       const joy_config = {
         // Where the Joy editor goes:
