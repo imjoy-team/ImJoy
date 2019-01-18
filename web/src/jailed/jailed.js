@@ -786,6 +786,7 @@ var Plugin = function( config, _interface, is_proxy) {
     this.running = false;
     this._log_history = []
     this._onclose_callbacks = []
+    this._updateUI = _interface && _interface.utils && _interface.utils.$forceUpdate || function(){}
     if(is_proxy){
       this._disconnected = false;
     }
@@ -821,7 +822,7 @@ var DynamicPlugin = function(config, _interface, is_proxy) {
     this._log_history = []
     this._onclose_callbacks = []
     this._is_proxy = is_proxy
-
+    this._updateUI = _interface && _interface.utils && _interface.utils.$forceUpdate || function(){}
     if(is_proxy){
       this._disconnected = false;
     }
@@ -830,6 +831,7 @@ var DynamicPlugin = function(config, _interface, is_proxy) {
       this._bindInterface(_interface);
       this._connect();
     }
+    this._updateUI()
 };
 
 /**
@@ -880,6 +882,7 @@ DynamicPlugin.prototype._connect =
         me._fail.emit(error);
         me.disconnect();
         me.initializing = false;
+        me._updateUI()
     }
     if(this.type == 'native-python' && (!this.config.context || !this.config.context.socket)){
       me._fail.emit('Please connect to the Plugin Engine 🚀.');
@@ -888,6 +891,7 @@ DynamicPlugin.prototype._connect =
     else{
       me._connection = new Connection(me.id, me.type, me.config);
       me.initializing = true;
+      me._updateUI()
       me._connection.whenInit(function(){
           me._init();
       });
@@ -962,12 +966,17 @@ DynamicPlugin.prototype._init =
     });
 
     this._site.onRemoteReady(function() {
+      if(me.running){
         me.running = false;
+        me._updateUI()
+      }
     });
 
     this._site.onRemoteBusy(function() {
-        if(!me._disconnected)
+        if(!me._disconnected && !me.running){
           me.running = true;
+          me._updateUI()
+        }
     });
 
     this.getRemoteCallStack = this._site.getRemoteCallStack;
@@ -1080,6 +1089,7 @@ DynamicPlugin.prototype._requestRemote =
         me.api.__id__ = me.id;
         me._disconnected = false
         me.initializing = false
+        me._updateUI()
         me._connect.emit();
     });
 
@@ -1149,6 +1159,7 @@ DynamicPlugin.prototype._set_disconnected =
     this._disconnected = true
     this.running = false
     this.initializing = false
+    this._updateUI()
 }
 
 DynamicPlugin.prototype.terminate =
