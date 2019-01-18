@@ -54,6 +54,7 @@
         --docsifytabs-border-color: #ededed;
         --docsifytabs-tab-highlight-color: #448aff;
         --docsifytabs-content-padding: 0.05rem 0.05rem;
+        --docsifytabs-tab-padding: 0.5em 0.8em;
       }
 
       body {
@@ -170,8 +171,15 @@
         padding: 30px 30px 40px;
       }
 
+      @media screen and (max-width: 768px) {
+        .markdown-section {
+          padding: 20px 20px 25px;
+        }
+      }
+
       .markdown-section pre>code {
         padding: 10px;
+        min-width: 512px!important;
       }
 
       .markdown-section code {
@@ -258,6 +266,10 @@
       button:focus,
       select:focus {
         outline: none;
+      }
+
+      .docsify-tabs__tab button{
+        font-size: 18px;
       }
 
     </style>
