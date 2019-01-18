@@ -22,7 +22,7 @@
         </md-avatar>
 
         <div class="md-list-item-text">
-          <span>{{plugin.type === 'native-python'? plugin.name + ' 🚀': plugin.name}}</span>
+          <span>{{plugin.type === 'native-python'? plugin.name + ' 🚀': ( plugin.type === 'web-python' ? plugin.name + ' 🐍': plugin.name) }}</span>
           <p>{{plugin.description}}</p>
           <p><span v-for="tag in plugin.tags" :key="tag">{{tag}}, </span></p>
         </div>
@@ -81,7 +81,7 @@
      <md-card>
        <md-card-header>
          <h2><md-icon v-if="props.item.icon">{{props.item.icon}}</md-icon><md-icon v-else>extension</md-icon>
-           {{props.item.type === 'native-python'? props.item.name + ' 🚀': props.item.name}}
+           {{props.item.type === 'native-python'? props.item.name + ' 🚀': ( props.item.type === 'web-python' ? props.item.name + ' 🐍': plugin.name) }}
          </h2>
          <p>{{props.item.description}}</p>
          <md-chip v-for="tag in props.item.tags" :key="tag">{{tag}}</md-chip>

@@ -259,14 +259,22 @@
               </md-menu>
 
               <md-button class="joy-run-button" :class="plugin.running?'md-accent':(plugin._disconnected && plugin.type === 'native-python'? 'disconnected-plugin': 'md-primary')" :disabled="plugin._disconnected && plugin.type != 'native-python'" @click="plugin._disconnected?connectPlugin(plugin):runOp(plugin.ops[plugin.name])">
-                {{plugin.type === 'native-python'? plugin.name + ' 🚀': plugin.name}}
+                {{plugin.type === 'native-python'? plugin.name + ' 🚀': ( plugin.type === 'web-python' ? plugin.name + ' 🐍': plugin.name) }}
               </md-button>
+
+              <md-button v-if="plugin._log_history && plugin._log_history.length>0" class="md-icon-button md-xsmall-hide" @click="showLog(plugin)">
+                <md-icon v-if="plugin._log_history._error" class="red">error</md-icon>
+                <md-icon v-else>info</md-icon>
+                <md-tooltip>{{plugin._log_history._error || plugin._log_history._info}}</md-tooltip>
+              </md-button>
+              <md-button v-else class="md-icon-button md-xsmall-hide" disabled>
+              </md-button>
+
               <md-button v-if="!plugin._disconnected" class="md-icon-button" @click="plugin.panel_expanded=!plugin.panel_expanded; $forceUpdate()">
                 <md-icon v-if="!plugin.panel_expanded">expand_more</md-icon>
                 <md-icon v-else>expand_less</md-icon>
               </md-button>
-              <md-progress-bar md-mode="determinate" v-if="plugin.running&&plugin.progress" :md-value="plugin.progress"></md-progress-bar>
-              <p v-if="plugin.running&&plugin.status_text">{{plugin.status_text}}</p>
+              <md-progress-bar md-mode="determinate" v-if="(plugin.running || plugin.initializing)&&plugin._progress" :md-value="plugin._progress"></md-progress-bar>
               <div v-for="(op) in plugin.ops" :key="op.plugin_id + op.name">
                 <md-button class="md-icon-button" v-show="plugin.panel_expanded && op.name != plugin.name" :disabled="true">
                   <md-icon>chevron_right</md-icon>
@@ -664,13 +672,15 @@ export default {
       showDialog: this.showDialog,
       showProgress: this.showProgress,
       showStatus: this.showStatus,
-      showPluginProgress: this.showPluginProgress,
-      showPluginStatus: this.showPluginStatus,
       showFileDialog: this.showFileDialog,
       showSnackbar: this.showSnackbar,
       getFileUrl: this.getFileUrl,
       getFilePath: this.getFilePath,
       exportFile: this.exportFile,
+      showMessage: (plugin, info, duration) => {this.showMessage(info, duration)},
+      log: (plugin, text) => { plugin.log(text); this.$forceUpdate() },
+      error: (plugin, text) => { plugin.error(text); this.$forceUpdate() },
+      progress: (plugin, text) => { plugin.progress(text); this.$forceUpdate() },
       utils: {$forceUpdate: this.$forceUpdate, openUrl: this.openUrl, sleep: this.sleep, assert: assert},
     }
 
@@ -697,9 +707,9 @@ export default {
     this.plugin_templates = [
       {name: "Web Worker (JS)", code: WEB_WORKER_PLUGIN_TEMPLATE},
       {name: "Window (HTML/CSS/JS)", code: WINDOW_PLUGIN_TEMPLATE},
-      {name: "Native Python", code: NATIVE_PYTHON_PLUGIN_TEMPLATE},
+      {name: "Native Python 🚀", code: NATIVE_PYTHON_PLUGIN_TEMPLATE},
       // {name: "Iframe(Javascript)", code: IFRAME_PLUGIN_TEMPLATE},
-      {name: "Web Python (experimental)", code: WEB_PYTHON_PLUGIN_TEMPLATE}
+      {name: "Web Python 🐍", code: WEB_PYTHON_PLUGIN_TEMPLATE}
     ]
     this.new_workspace_name = ''
     this.workflow_joy_config = {
@@ -1085,6 +1095,9 @@ export default {
     },
     showMessage(info, duration) {
       this.snackbar_info = info
+      if(duration){
+        duration = duration * 1000
+      }
       this.snackbar_duration = duration || 10000
       this.show_snackbar = true
       this.status_text = info
@@ -1263,11 +1276,10 @@ export default {
       this.$refs.workflow.setupJoy(true)
     },
     runWorkflow(joy) {
-      // console.log('run workflow.', this.wm.active_windows)
-      const w = this.wm.active_windows[this.wm.active_windows.length - 1] || {}
       this.status_text = ''
       this.progress = 0
-      const mw = this.pm.plugin2joy(w.data) || {}
+      const w = this.wm.active_windows[this.wm.active_windows.length - 1] || {}
+      const mw = this.pm.plugin2joy(w) || {}
       mw.target = mw.target || {}
       mw.target._op = 'workflow'
       mw.target._source_op = null
@@ -1275,19 +1287,17 @@ export default {
       mw.target._workflow_id = mw.target._workflow_id || "workflow_"+randId()
       joy.workflow.execute(mw.target).then((my) => {
         const w = this.pm.joy2plugin(my)
-
         if(w && w.data && Object.keys(w.data).length>2){
           // console.log('result', w)
           w.name = w.name || 'result'
           w.type = w.type || 'imjoy/generic'
           this.pm.createWindow(null, w)
         }
-
         this.progress = 100
       }).catch((e) => {
         console.error(e)
         this.status_text = e.toString() || "Error."
-        this.showMessage(e || "Error." , 12000)
+        this.showMessage(e || "Error." , 12)
       })
     },
 
@@ -1301,7 +1311,6 @@ export default {
       this.showShareUrl = true
     },
     runOp(op) {
-      // console.log('run op.', this.wm.active_windows)
       this.status_text = ''
       this.progress = 0
       const w = this.wm.active_windows[this.wm.active_windows.length - 1] || {}
@@ -1322,7 +1331,7 @@ export default {
       }).catch((e) => {
         console.error(e)
         this.status_text = '<' +op.name + '>' + (e.toString() || "Error.")
-        this.showMessage(this.status_text, 15000)
+        this.showMessage(this.status_text, 15)
       })
     },
     selectFileChanged(event) {
@@ -1456,25 +1465,6 @@ export default {
       this.status_text = s
       // this.$forceUpdate()
     },
-    showPluginProgress(_plugin, p){
-      if(_plugin && _plugin.id){
-        const source_plugin = this.pm.plugins[_plugin.id]
-        if(source_plugin){
-          if (p < 1) source_plugin.progress = p * 100
-          else source_plugin.progress = p
-          this.$forceUpdate()
-        }
-      }
-    },
-    showPluginStatus(_plugin, s){
-      if(_plugin && _plugin.id){
-        const source_plugin = this.pm.plugins[_plugin.id]
-        if(source_plugin){
-          source_plugin.status_text = s
-          this.$forceUpdate()
-        }
-      }
-    },
     showDialog(_plugin, config) {
       assert(config)
       return new Promise((resolve, reject) => {
@@ -1486,6 +1476,16 @@ export default {
     showAlert(_plugin, text){
       console.log('alert: ', text)
       alert(text)
+    },
+    showLog(_plugin){
+      const w = {
+        name: `Log (${_plugin.name})`,
+        type: 'imjoy/log',
+        data: {
+          log_history: _plugin._log_history
+        }
+      }
+      this.pm.createWindow(null, w)
     },
     openUrl(_plugin, url){
       assert(url)
@@ -1720,7 +1720,7 @@ button.md-speed-dial-target {
 
 .red{
   display: inline-block;
-  color: #f44336;
+  color: #f44336!important;
   transition: .3s;
 }
 </style>
