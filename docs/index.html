@@ -53,6 +53,7 @@
 
         --docsifytabs-border-color: #ededed;
         --docsifytabs-tab-highlight-color: #448aff;
+        --docsifytabs-content-padding: 0.05rem 0.05rem;
       }
 
       body {
@@ -160,14 +161,29 @@
       }
 
       /****** Markdown General ******/
+      .markdown-section pre{
+        margin: 3px;
+        padding: 3px;
+      }
+
       .markdown-section {
         padding: 30px 30px 40px;
       }
 
+      .markdown-section pre>code {
+        padding: 10px;
+      }
+
       .markdown-section code {
-          overflow-wrap: break-word;
-          color: #7d8092!important;
-          font-weight: bold!important;
+        overflow-wrap: break-word;
+        padding: 1px 1px;
+        margin: 0px 0px;
+        color: #262a4e!important;
+        background-color: #efeeee!important;
+      }
+
+      .markdown-section code:after, .markdown-section code:before {
+        letter-spacing: 0.01rem!important;
       }
 
       .markdown-section a {
@@ -236,6 +252,12 @@
 
       a > span > code {
         font-size: inherit !important;
+      }
+
+      /* no outline for non-keyboard-inputs elements */
+      button:focus,
+      select:focus {
+        outline: none;
       }
 
     </style>
