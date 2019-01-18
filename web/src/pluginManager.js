@@ -193,10 +193,10 @@ export class PluginManager {
       this.reloadRepository(repo).then((manifest)=>{
         repo.name = manifest.name || repo.name
         repo.description = manifest.description || repo.description
-        const normalizedUrl = repo.url.replace('https://github.com/', '').replace('http://github.com/', '')
+        const normalizedUrl = repo.url && repo.url.replace('https://github.com/', '').replace('http://github.com/', '')
         //remove existing repo if same url already exists
         for(let r of this.repository_list){
-          if(r.url.replace('https://github.com/', '').replace('http://github.com/', '') === normalizedUrl){
+          if(r.url && r.url.replace('https://github.com/', '').replace('http://github.com/', '') === normalizedUrl){
             // remove it if already exists
             this.repository_list.splice( this.repository_list.indexOf(r), 1 )
             this.showMessage("Repository with the same url already exists.")

@@ -885,24 +885,25 @@ export default {
               this.$forceUpdate()
               this.event_bus.$emit('repositories_loaded', manifest)
             }).finally(()=>{
-              const r = (this.$route.query.repo || this.$route.query.r).trim()
-              this.show_plugin_templates = false
+              const r = (this.$route.query.repo || this.$route.query.r || '').trim()
               if(r){
                 this.plugin_url = null
                 this.init_plugin_search = null
                 this.show_plugin_store = true
                 this.show_plugin_url = false
                 this.downloading_plugin = true
-                this.pm.addRepository(this.$route.query.repo || this.$route.query.r).then((repo)=>{
+                this.pm.addRepository(r).then((repo)=>{
                   this.pm.selected_repository = repo
                   this.downloading_plugin = false
                 }).catch((e)=>{
                   this.downloading_plugin = false
                   this.downloading_error = "Sorry, the repository URL is invalid: " + e.toString()
                 })
+                this.show_plugin_templates = false
                 this.showAddPluginDialog = true
               }
-              const p = (this.$route.query.plugin || this.$route.query.p).trim()
+
+              const p = (this.$route.query.plugin || this.$route.query.p  || '').trim()
               if(p){
                 if (p.match(url_regex) || (p.includes('/') && p.includes(':'))) {
                   this.plugin_url = p
@@ -917,6 +918,7 @@ export default {
                   this.show_plugin_store = true
                   this.show_plugin_url = false
                 }
+                this.show_plugin_templates = false
                 this.showAddPluginDialog = true
               }
 
@@ -944,6 +946,7 @@ export default {
                 }
                 this.wm.addWindow(w)
               }
+
               this.$nextTick(() => {
                 this.event_bus.$emit('imjoy_ready')
               })
