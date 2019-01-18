@@ -9,7 +9,7 @@ the section **Development**, and we provide a detailed description of the entire
 
 
 ## Launching ImJoy and its interface
-ImJoy can be used directly in your browser. When you launch ImJoy (https://imjoy.io/#/),
+ImJoy can be used directly in your browser. When you launch ImJoy (https://imjoy.io),
 you will see a welcome screen where you can start the actual ImJoy app with the
 button `Start ImJoy`. This will open the app and you will see an interface with
 all the functionality needed to process data.
