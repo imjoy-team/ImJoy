@@ -9,6 +9,7 @@ import {
   debounce,
   url_regex,
   githubImJoyManifest,
+  githubRepo,
   githubUrlRaw,
   assert
 } from './utils.js'
@@ -1258,7 +1259,7 @@ export class PluginManager {
       }
       else if(url.includes('github.com')){
         repository_url = githubImJoyManifest(url)
-        repo_origin = repository_url
+        repo_origin = githubRepo(url)
       }
       else{
         repository_url = url

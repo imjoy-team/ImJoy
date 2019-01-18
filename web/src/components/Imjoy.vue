@@ -1175,7 +1175,8 @@ export default {
       const plugin = this.pm.plugins[pid]
       const pconfig = plugin.config
       if(pconfig.origin){
-        this.share_url_message = `<h2>Sharing "${plugin.name}"</h2> <br> <a href="https://imjoy.io/#/app?p=${pconfig.origin}" target="_blank">https://imjoy.io/#/app?p=${pconfig.origin}</a> <br> (Right click on the link and select "Copy Link Address")`
+        const url = 'https://imjoy.io/#/app?p=' + pconfig.origin
+        this.share_url_message = `<h2>Sharing "${plugin.name}"</h2> <br> <a href="${encodeURI(url)}" target="_blank">${url}</a> <br> (Right click on the link and select "Copy Link Address")`
         this.showShareUrl = true
         const query = Object.assign({}, this.$route.query);
         query.p = pconfig.origin;
