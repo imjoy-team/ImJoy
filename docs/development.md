@@ -562,7 +562,7 @@ the typical case  during development.
 ### Deployment through your own ImJoy Plugin Repository
 You can easily create a ImJoy plugin repository in a GitHub project. For this,
 you save your ImJoy plugins in a dedicated folder, and you add a manifest json file
-named `manifest.imjoy.json` to the root folder. A template project can be found [here]((https://github.com/oeway/ImJoy-project-template).
+named `manifest.imjoy.json` to the root folder. A template project can be found [here](https://github.com/oeway/ImJoy-project-template).
 
 The manifest specifies which plugins are in your repository,
 and where they can be found. A skeleton looks is shown below, and a full template
