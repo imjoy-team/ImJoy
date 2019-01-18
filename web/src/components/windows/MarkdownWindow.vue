@@ -4,7 +4,7 @@
 </template>
 
 <script>
-
+import marked from 'marked';
 export default {
   name: 'markdown-window',
   type: 'imjoy/markdown',
@@ -21,7 +21,10 @@ export default {
         return null
       }
     }
-  }
+  },
+  created(){
+    this.marked = marked
+  },
 }
 
 </script>
