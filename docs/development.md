@@ -15,7 +15,48 @@ The following list illustrates key features of the plugin system in ImJoy:
  * Rendering multi-dimensional data in 3D with webGL, Three.js etc.
  * Deploying your own plugin with GitHub
 
-## ImJoy Plugins
+
+ ## Main components of ImJoy
+
+![imjoy-plugin-development](assets/imjoy-architecture.png ':size=800')
+
+ 1.  The **ImJoy Web App**. The app can run alone, and plugins can be developed in
+     JavaScript or in Python by using [pyodide](https://github.com/iodide-project/pyodide).
+
+ 2.  Complex computional tasks can be implemented in plugins, which run in the
+     **Plugin Engine**. The latest release of the plugin engine is available
+     together with installation  instructions on [GitHub](https://github.com/oeway/ImJoy-App/releases).
+     The plugin engine will try to upgrade itself from GitHub when it starts.
+     Packages are managed by `conda` and `pip` which provides access to the
+     entire Python ecosystem.
+
+Imjoy consists of **two main components**
+
+ The Python Plugin Engine is connected with the ImJoy Web App through websockets
+ and communicates with a customized remote procedure calls (RPC) based on [socket.io](https://github.com/miguelgrinberg/python-socketio).
+
+ ### How to choose a plugin environment
+ ImJoy provides a flexible framework to develop your plugins. Here we provide
+ some typical examples for how ImJoy can be used. Please not that these are only
+ some suggestions, other combinations are of course possible and be interesting
+ for particular applications
+
+ 1. **ImJoy Web App with JavaScript or Web Python plugins**. Such a framework runs without
+  any installation on different operation systems. It can provide effortless user
+  experience and ideal for distributing demos. Limitations are that Web Python is (currently)
+  slower than native Python and that it doesn't support the entire Python ecosystem.
+
+ 2. **Desktop App**. Here you can all plugins types (JavaScript included). Further,
+   you have access to the entire python ecosystem thanks to the integrated plugin engine.
+   Ideal for heavy computations or when Python modules that are not available for webPY are used.
+   However, the app has to be installed.
+
+ 3. **Plugin engine on a remote computer**. You can then connect to the engine either
+   from the web or desktop app. This allows to process data on a dedicated processing
+   workstation or a cluster.
+
+
+## ImJoy plugins
 
 ![imjoy-plugin-development](assets/imjoy-plugin-development.png ':size=800')
 
@@ -23,30 +64,40 @@ There are four types of plugins available for different purposes:
 
 **JavaScript** plugins support these two types:
 
-1. `Window (HTML/CSS/JS)` plugin for building a rich and interactive user interface using HTML5/CSS and JavaScript;
+1. `Window (HTML/CSS/JS)` plugins for building a rich and interactive user interface using HTML5/CSS and JavaScript;
 
-1. `Web Worker (JS)` plugin for performing computational tasks using JavaScript or WebAssembly;
+1. `Web Worker (JS)` plugins for performing computational tasks using JavaScript or WebAssembly;
 
 **Python** plugins support these two types:
 
-1. `Native Python` plugin for performing heavy-duty computational tasks using Python and its libraries, this requires additional installation of plugin engine;
-1. `Web Python` plugin for performing computational tasks using Python with in the browser through WebAssembly and the [pyodide project](https://github.com/iodide-project/pyodide). This is in developmental stage and only selected number of Python libraries are currently supported.
+1. `Native Python` plugins for performing heavy-duty computational tasks using Python and its libraries, this requires additional installation of plugin engine;
+1. `Web Python` plugins for performing computational tasks using Python with in the browser through WebAssembly and the [pyodide project](https://github.com/iodide-project/pyodide). This is in developmental stage and only a selected number of Python libraries are currently supported.
 
 Click the **+ PLUGINS** button in `Plugins`, then select `Create a New Plugin`
-with one of the plugin templates. A code editor will open in the workspace, where you can write the code, save it, or install the plugin to the plugin menu. You can then test your plugin by clicking on the plugin name in the Plugins list.
+with one of the plugin templates. A code editor will open in the ImJoy workspace,
+where you can write the code, save it, or install the plugin to the plugin menu.
+You can then test your plugin by clicking on the plugin name in the Plugins list.
 
 ![imjoy-plugin-types](assets/imjoy-plugin-types.png ':size=800')
 
 ### Web Worker
-These plugins are used to do computation tasks in another thread, using a new element called ["web worker"](https://en.wikipedia.org/wiki/Web_worker). It does not have an interface, it runs in a new thread and won't hang the main thread during running. It is basically a way for JavaScript to achieve multi-threading.
+These plugins are used to do computation tasks in another thread,
+using a new element called [web worker](https://en.wikipedia.org/wiki/Web_worker).
+It does not have an interface, it runs in a new thread and won't hang the main thread during running.
+It is basically a way for JavaScript to achieve multi-threading.
 
-Since it's designed for performing computational tasks, it does not have access to [html dom](https://www.w3schools.com/whatis/whatis_htmldom.asp) but you can use `ImJoy API` to interact with the graphical interface of ImJoy or other plugin which can trigger changes on the user interface.
+Since web workers are designed to perform computational tasks,
+they do not have access to [html dom](https://www.w3schools.com/whatis/whatis_htmldom.asp)
+ but you can use `ImJoy API` to interact with the graphical interface of ImJoy
+ or other plugin which can trigger changes in the user interface.
 
 ### Window
 Window plugins are used to create a new web interface with HTML/CSS and JavaScript.
-They in the `iframe` mode, and it will show up as a window. The `<window>` and `<style>` blocks (see below) can be used to define the actual content of the window.
+They in the `iframe` mode, and it will show up as a window. The `<window>` and `<style>`
+blocks (see below) can be used to define the actual content of the window.
 
-Different from other plugins which will be loaded and initialized when ImJoy is started, a `window` plugin will not be loaded until the actual plugin is created with `api.createWindow` or clicked by a user in the menu. During execution of `api.createWindow`, `setup` and `run` will be called for the first time, and return with an window api object (contains all the api functions of the window, including `setup`, `run` and other functions if defined). You can then use the window api object to access all the functions, for example, update the content of the window by `win_obj.run({'data': ... })`.
+Different from other plugins which will be loaded and initialized when ImJoy is started,
+a `window` plugin will not be loaded until the actual plugin is created with `api.createWindow` or clicked on by a user in the menu. During execution of `api.createWindow`, `setup` and `run` will be called for the first time, and return with an window api object (contains all the api functions of the window, including `setup`, `run` and other functions if defined). You can then use the window api object to access all the functions, for example, update the content of the window by `win_obj.run({'data': ... })`.
 
 ### Native Python
 Used to run Python code. This requires that the **Python Plugin Engine** is installed and started before using the plugin. See the **Developing Python Plugins** for more details.
@@ -138,7 +189,7 @@ It defines the general properties of a plugin and contains several fields.
 Name of the plugin. It **must** be unique to avoid conflicts with other plugins.
 
 #### type
-Plugin type. See dedicated section [ImJoy Plugins](/development#imjoy-plugins] above for more details.
+Plugin type. See dedicated section [ImJoy Plugins](development?id=imjoy-plugins] above for more details.
 
 #### version
 Specifies the version of the plugin.
@@ -156,7 +207,7 @@ Contains a short description about the plugin.
 List of supported tags, which can be used to provide differentiate configureable
 modes and can be accessed at various points in the plugin. If a plugin was defined with
 tags, they will appear  on top of the code editor and during the installation process.
-If you distribute your plugin with an [url](/development#generating-a-plugin-url), you can specify
+If you distribute your plugin with an [url](development?id=generating-a-plugin-url), you can specify
 with which tag the plugin will be installed.
 
 Within the **``<config>``** block, the following fields can be made configurable:
@@ -284,6 +335,28 @@ Used to contain documentation for the plugin, it need to be written in `Markdown
 
 ### `<window>` block
 Define the HTML code for displaying in the plugin window.
+
+ImJoy uses vue. to to parse plugin files, which enforces
+only root element in the template. This means in the window block you have to use
+a division to wrap all nodes:
+
+```html
+<window>
+  <div>
+    <p> line 1</p>
+    <p> line 2</p>
+  </div>
+</window>
+```
+
+The following won't work:
+```html
+<window>
+  <p> line 1</p>
+  <p> line 2</p>
+</window>
+```
+
 
 ### `<style>` block
 Define the CSS code for displaying in the plugin window.
@@ -509,9 +582,15 @@ You can then update this manifest either automatically or manually.
 
 For an automatic update, we provide a [node script](https://github.com/oeway/ImJoy-project-template/blob/master/update_manifest.js).  This script requires node.js to be executed.
 Then run it  with the command `node update_manifest.js` in the root folder
-containing `manifest.imjoy.json`. It will then automatically search for ImJoy plugins and generate the manifest.
+containing `manifest.imjoy.json`. It will then automatically search for ImJoy plugins and
+generate the manifest.
 
-Alternatively, you can manually update the manifest:
+You can then create You a simple url that will open ImJoy and render
+a list of all plugins in this repository. This link has the general form
+`http://imjoy.io/#/app?plugin=GITHUB_USER_NAME/REPO_NAME`, where `GITHUB_USER_NAME`
+is the user name, and `REPO_NAME` the name of the GitHub repository containing
+the ImJoy plugin store. For more details on how to construct this url, we refer to
+the dedicated section below.
 
 1. Place all the plugin files in a folder in your GitHub repository, for example, a folder called [imjoy-plugins](https://github.com/oeway/ImJoy-project-template/tree/master/imjoy-plugins).
 1. Set `uri_root` to the name/path of your plugin folder, for example: `"uri_root": "/imjoy-plugins"`.
@@ -521,9 +600,12 @@ Alternatively, you can manually update the manifest:
 
 
 ### Deployment through the official ImJoy plugin repository
-The plugin repository shown on the ImJoy.IO is served with GitHub through the [ImJoy-Plugins repository](https://github.com/oeway/ImJoy-Plugins).
+The plugin repository shown on the ImJoy.IO is served with GitHub through
+the [ImJoy-Plugins repository](https://github.com/oeway/ImJoy-Plugins).
 
-In order to deploy your plugin to the plugin repository, you can fork the repository, add your plugin and then send a pull request to [ImJoy-Plugins](https://github.com/oeway/ImJoy-Plugins). Once the pull request being accepted, the user will be able to install your plugin from the plugin repository.
+In order to deploy your plugin to the plugin repository, you can fork the repository,
+ add your plugin and then send a pull request to [ImJoy-Plugins](https://github.com/oeway/ImJoy-Plugins).
+ Once the pull request being accepted, the user will be able to install your plugin from the plugin repository.
 
 
 ## Distribute plugins
@@ -539,7 +621,7 @@ social networks. We detail below how this link can be created and which options 
 In last option, which we typically don't recommend, you can send an url pointing
 to the plugin file. This url can then be used to install the plugin in ImJoy:
  press the `+ Plugins` button and add the url in the field  `Install plugin from url`.
-However, this option provides less control about how the plugin should be installed.  
+However, this option provides less control about how the plugin should be installed.
 
 
 ### Generating a plugin url

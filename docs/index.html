@@ -40,6 +40,7 @@
     <meta name="msapplication-TileImage" content="static/icons/ms-icon-144x144.png">
     <meta name="theme-color" content="#ffffff">
     <link rel="stylesheet" href="/docs/static/vue.css" />
+    <link rel="stylesheet" href="/docs/static/prism-github.css" />
     <style>
       /****CSS adapted from https://github.com/Netflix/pollyjs ***/
       :root {
@@ -49,6 +50,9 @@
         --text-color-base: #2E2E46;
         --text-color-secondary: #646473;
         --text-color-tertiary: #81818E;
+
+        --docsifytabs-border-color: #ededed;
+        --docsifytabs-tab-highlight-color: #448aff;
       }
 
       body {
@@ -160,6 +164,12 @@
         padding: 30px 30px 40px;
       }
 
+      .markdown-section code {
+          overflow-wrap: break-word;
+          color: #7d8092!important;
+          font-weight: bold!important;
+      }
+
       .markdown-section a {
         text-decoration: none;
         border-bottom: 0.1rem solid var(--theme-color);
@@ -224,21 +234,6 @@
         color: var(--text-color-tertiary);
       }
 
-      /****** CODE HIGHLIGHTING ******/
-      .token.string {
-        color: #42b983;
-      }
-
-      .token.boolean,
-      .token.number {
-        color: var(--theme-color);
-      }
-
-      .lang-bash .token.function,
-      .lang-json .token.property {
-        color: #e96900;
-      }
-
       a > span > code {
         font-size: inherit !important;
       }
@@ -272,15 +267,25 @@
           EditOnGithubPlugin.create(
             'https://github.com/oeway/ImJoy/blob/master/docs/'
           )
-        ]
+        ],
+        tabs: {
+            persist    : true,      // default
+            sync       : true,      // default
+            theme      : 'classic', // default
+            tabComments: true,      // default
+            tabHeadings: true       // default
+          }
       };
     </script>
     <script src="/docs/static/docsify.min.js"></script>
     <script src="/docs/static/prism-bash.min.js"></script>
     <script src="/docs/static/prism-json.min.js"></script>
+    <script src="/docs/static/prism-python.min.js"></script>
     <script src="/docs/static/search.min.js"></script>
     <script src="/docs/static/external-script.min.js"></script>
     <script src="/docs/static/docsify-copy-code.min.js"></script>
     <script src="/docs/static/docsify-pagination.min.js"></script>
+    <script src="/docs/static/docsify-tabs@1.js"></script>
+    <script src="/docs/static/zoom-image.min.js"></script>
   </body>
 </html>
