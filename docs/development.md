@@ -15,7 +15,48 @@ The following list illustrates key features of the plugin system in ImJoy:
  * Rendering multi-dimensional data in 3D with webGL, Three.js etc.
  * Deploying your own plugin with GitHub
 
-## ImJoy Plugins
+
+ ## Main components of ImJoy
+
+![imjoy-plugin-development](assets/imjoy-architecture.png ':size=800')
+
+ 1.  The **ImJoy Web App**. The app can run alone, and plugins can be developed in
+     JavaScript or in Python by using [pyodide](https://github.com/iodide-project/pyodide).
+
+ 2.  Complex computional tasks can be implemented in plugins, which run in the
+     **Plugin Engine**. The latest release of the plugin engine is available
+     together with installation  instructions on [GitHub](https://github.com/oeway/ImJoy-App/releases).
+     The plugin engine will try to upgrade itself from GitHub when it starts.
+     Packages are managed by `conda` and `pip` which provides access to the
+     entire Python ecosystem.
+
+Imjoy consists of **two main components**
+
+ The Python Plugin Engine is connected with the ImJoy Web App through websockets
+ and communicates with a customized remote procedure calls (RPC) based on [socket.io](https://github.com/miguelgrinberg/python-socketio).
+
+ ### How to choose a plugin environment
+ ImJoy provides a flexible framework to develop your plugins. Here we provide
+ some typical examples for how ImJoy can be used. Please not that these are only
+ some suggestions, other combinations are of course possible and be interesting
+ for particular applications
+
+ 1. **ImJoy Web App with JavaScript or Web Python plugins**. Such a framework runs without
+  any installation on different operation systems. It can provide effortless user
+  experience and ideal for distributing demos. Limitations are that Web Python is (currently)
+  slower than native Python and that it doesn't support the entire Python ecosystem.
+
+ 2. **Desktop App**. Here you can all plugins types (JavaScript included). Further,
+   you have access to the entire python ecosystem thanks to the integrated plugin engine.
+   Ideal for heavy computations or when Python modules that are not available for webPY are used.
+   However, the app has to be installed.
+
+ 3. **Plugin engine on a remote computer**. You can then connect to the engine either
+   from the web or desktop app. This allows to process data on a dedicated processing
+   workstation or a cluster.
+
+
+## ImJoy plugins
 
 ![imjoy-plugin-development](assets/imjoy-plugin-development.png ':size=800')
 
@@ -541,9 +582,15 @@ You can then update this manifest either automatically or manually.
 
 For an automatic update, we provide a [node script](https://github.com/oeway/ImJoy-project-template/blob/master/update_manifest.js).  This script requires node.js to be executed.
 Then run it  with the command `node update_manifest.js` in the root folder
-containing `manifest.imjoy.json`. It will then automatically search for ImJoy plugins and generate the manifest.
+containing `manifest.imjoy.json`. It will then automatically search for ImJoy plugins and
+generate the manifest.
 
-Alternatively, you can manually update the manifest:
+You can then create You a simple url that will open ImJoy and render
+a list of all plugins in this repository. This link has the general form
+`http://imjoy.io/#/app?plugin=GITHUB_USER_NAME/REPO_NAME`, where `GITHUB_USER_NAME`
+is the user name, and `REPO_NAME` the name of the GitHub repository containing
+the ImJoy plugin store. For more details on how to construct this url, we refer to
+the dedicated section below.
 
 1. Place all the plugin files in a folder in your GitHub repository, for example, a folder called [imjoy-plugins](https://github.com/oeway/ImJoy-project-template/tree/master/imjoy-plugins).
 1. Set `uri_root` to the name/path of your plugin folder, for example: `"uri_root": "/imjoy-plugins"`.
@@ -553,9 +600,12 @@ Alternatively, you can manually update the manifest:
 
 
 ### Deployment through the official ImJoy plugin repository
-The plugin repository shown on the ImJoy.IO is served with GitHub through the [ImJoy-Plugins repository](https://github.com/oeway/ImJoy-Plugins).
+The plugin repository shown on the ImJoy.IO is served with GitHub through
+the [ImJoy-Plugins repository](https://github.com/oeway/ImJoy-Plugins).
 
-In order to deploy your plugin to the plugin repository, you can fork the repository, add your plugin and then send a pull request to [ImJoy-Plugins](https://github.com/oeway/ImJoy-Plugins). Once the pull request being accepted, the user will be able to install your plugin from the plugin repository.
+In order to deploy your plugin to the plugin repository, you can fork the repository,
+ add your plugin and then send a pull request to [ImJoy-Plugins](https://github.com/oeway/ImJoy-Plugins).
+ Once the pull request being accepted, the user will be able to install your plugin from the plugin repository.
 
 
 ## Distribute plugins

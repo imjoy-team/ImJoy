@@ -1,17 +1,45 @@
 # User Manual
 
-## Plugin Engine
-The Plugin Engine allows to run native Python plugins. You need to **install**
-either the [ImJoy Desktop App](](https://github.com/oeway/ImJoy-App/releases))
-or the [command line script](https://github.com/oeway/ImJoy-engine).
+Here we describe in more detail the main concepts of ImJoy and how it can
+be used. 
 
-The plugin engine will then check for updates at each launch.
+## Glossary
 
-If you use `native-python` plugins, you will need to **launch** the Plugin Engine before you can use them. You will get an error message if you try to run those plugins.
+-   **ImJoy app** - Interface running either in the browser or as a standalone app
+    allowing to control ImJoy.
+-   **Plugin** - Added functionality to ImJoy to either enhance the user interface
+    or perform computational tasks. Plugins developed in Python require the Plugin Engine.
+-   **Plugin Engine** - Python program to execute plugins in the background for heavy
+    computations.
+-   **Operators [ops]** - One plugin can allow to perform tasks with a set of
+    operators ("ops"). These ops can be used in a workflow or accessed from the plugin menu.
+-   **Workspace** - Isolated work environments with a distinct set of plugins.
+    Allows to perform independent calculations.
 
-You need to frist start the Plugin Engine from the ImJoy Desktop App or in a terminal.
+## ImJoy App and Plugin Engine
 
-Then go to the ImJoy Web App and click the 🚀 symbol located at the top-right corner. This will open a dialog and ask you for the `Plugin Engine URL` and `Connection token`.
+ImJoy can be used  directly from your browser (Chrome or Firefox)
+**without any installation** as the [ImJoy Web App](https://imjoy.io/#/app)
+or as a **standalone** [ImJoy Desktop App](https://github.com/oeway/ImJoy-App/releases).
+Many plugins can be used directly, and you can already get a feeling
+for how ImJoy works.
+
+For more advanced processing, the **Python Plugin Engine** is required. The Plugin
+Engine allows to run native Python (`native-python`) plugins. We provide two ways
+to obtain this engine:
+
+1.  The plugin engine is included in the ImJoy Desktop App. After installing the
+    [Desktop App](https://github.com/oeway/ImJoy-App/releases), you can start the engine
+    with the button `START PLUGINE ENGINE`.
+    ![imjoy-app-start-screen](assets/imjoy-app-start-screen.png ':size=400')
+
+2. You can download and install it with a command line script as described [here](https://github.com/oeway/ImJoy-engine).
+
+Once you start the engine, it will automatically check for updates.
+
+You can then connect to the engine either from the Imjoy Web App or Desktop App.
+Click the 🚀 symbol located at the top-right corner. This will open a dialog and
+ask you for the `Plugin Engine URL` and `Connection token`.
 
 ![imjoy-install-engine](assets/imjoy-install-engine.png ':size=600')
 
@@ -23,6 +51,43 @@ your Plugin Engine dialog or terminal window to get the `Connection token`.
 Please note, that the connection token will be saved in the browser and you will
 not need to enter it anymore to connect to this Plugin Engine.
 **KEEP THIS TOKEN PRIVATE!!!!**
+
+## Using ImJoy offline
+
+The ImJoy app (web or desktop) requires by default internet access. It relies on
+different small libraries that are downloaded at each launch. You can also use the ImJoy app in
+an offline mode. In this case, all necessary files have to be downloaded first.
+
+Note that even though ImJoy can run without internet, depending on particular
+plugin implementations, some might be unusable when offline.
+
+Two options for offline usage exist:
+
+1. **Desktop app**. On the start-up screen you can choose `RUN IMJOY OFFLINE`. If
+  you press this button, the app will download all necessary files required
+  for offline use. After the initial download, you can then use ImJoy offline.
+
+2. **Web app**. If you prefer to use ImJoy in the browser, you can download all
+  necessary files via the plugin engine. For this, you need to install the latest
+  version of the [**ImJoy App**](https://github.com/oeway/ImJoy-Engine/releases).
+  You can then serve the static ImJoy web app. This requires some simple steps in
+  the  terminal:
+
+  1. Update the `$PATH` settings as also [below](#access-the-plugin-engine-from-a-command-line-interface).
+      ``` bash
+      # linux and mac
+      # export PATH=~/ImJoyApp/bin:$PATH
+
+      # windows
+      # $env:Path = '%systemdrive%%homepath%\ImJoyApp;%systemdrive%%homepath%\ImJoyApp\Scripts;' + $env:Path;
+      ```
+  0. Execute the following command in the terminal. This will download all files
+     necessary for offline access.
+      ``` bash
+      python -m imjoy --serve
+      ```
+  0. You now have your locally available ImJoy web app that your can access in your browser
+     with this url [(http://127.0.0.1:8080)](http://127.0.0.1:8080).
 
 
 ## Access the Plugin Engine from a command line interface
@@ -54,28 +119,7 @@ python -m imjoy
 ```
 
 
-## Using ImJoy offline
-You can also use ImJoy without being connected to the internet. For this, you
-need to install the latest version of the [**ImJoy App**](https://github.com/oeway/ImJoy-Engine/releases).
-You can then serve the static ImJoy web app. Note that even though ImJoy can run
-without internet, depending on the implementation of the plugin, some might be
-unusable when offline.
 
-You have to
-1. Update the `$PATH` settings as explained [above](#access-the-plugin-engine-from-a-command-line-interface).
-    ```
-    # linux and mac
-    # export PATH=~/ImJoyApp/bin:$PATH
-
-    # windows
-    # $env:Path = '%systemdrive%%homepath%\ImJoyApp;%systemdrive%%homepath%\ImJoyApp\Scripts;' + $env:Path;
-    ```
-1. Execute the following command in the terminal. This will download all files necessary for offline access.
-    ```
-    python -m imjoy --serve
-    ```
-2. You now have your locally available ImJoy web app that your can access in your browser
-   with this url[(http://127.0.0.1:8080)](http://127.0.0.1:8080).
 
 
 ## Using the Plugin Engine remotely
