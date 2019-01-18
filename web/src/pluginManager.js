@@ -739,8 +739,8 @@ export class PluginManager {
     })
   }
 
-  unloadPlugin(plugin, temp_remove){
-    const name = plugin.name
+  unloadPlugin(_plugin, temp_remove){
+    const name = _plugin.name
     for (let k in this.plugins) {
       if (this.plugins.hasOwnProperty(k)) {
         const plugin = this.plugins[k]
@@ -750,6 +750,7 @@ export class PluginManager {
                 delete this.plugins[k]
                 delete this.plugin_names[name]
               }
+              this.unregister(plugin)
               if (typeof plugin.terminate === 'function') {
                 plugin.terminate().then(()=>{this.update_ui_callback()})
               }
@@ -759,7 +760,10 @@ export class PluginManager {
         }
       }
     }
-    this.unregister(plugin)
+    this.unregister(_plugin)
+    if (typeof _plugin.terminate === 'function') {
+      _plugin.terminate().then(()=>{this.update_ui_callback()})
+    }
   }
 
   reloadPlugin(pconfig) {
