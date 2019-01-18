@@ -869,15 +869,7 @@ export default {
       this.pm.setInputLoaders(this.getDefaultInputLoaders())
       this.pm.loadRepositoryList().then((repository_list)=>{
         this.repository_list = repository_list
-        if(this.$route.query.repo || this.$route.query.r){
-          const ret = this.pm.addRepository(this.$route.query.repo || this.$route.query.r)
-          if(ret){
-            this.pm.selected_repository = ret
-          }
-        }
-        else{
-          this.pm.selected_repository = this.repository_list[0]
-        }
+        this.pm.selected_repository = this.repository_list[0]
       })
 
       this.pm.loadWorkspaceList().then((workspace_list)=>{
@@ -893,22 +885,38 @@ export default {
               this.$forceUpdate()
               this.event_bus.$emit('repositories_loaded', manifest)
             }).finally(()=>{
-              if(this.$route.query.plugin || this.$route.query.p){
-                const p = (this.$route.query.plugin || this.$route.query.p).trim()
+              const r = (this.$route.query.repo || this.$route.query.r).trim()
+              this.show_plugin_templates = false
+              if(r){
+                this.plugin_url = null
+                this.init_plugin_search = null
+                this.show_plugin_store = true
+                this.show_plugin_url = false
+                this.downloading_plugin = true
+                this.pm.addRepository(this.$route.query.repo || this.$route.query.r).then((repo)=>{
+                  this.pm.selected_repository = repo
+                  this.downloading_plugin = false
+                }).catch((e)=>{
+                  this.downloading_plugin = false
+                  this.downloading_error = "Sorry, the repository URL is invalid: " + e.toString()
+                })
+                this.showAddPluginDialog = true
+              }
+              const p = (this.$route.query.plugin || this.$route.query.p).trim()
+              if(p){
                 if (p.match(url_regex) || (p.includes('/') && p.includes(':'))) {
                   this.plugin_url = p
                   this.init_plugin_search = null
                   this.show_plugin_store = false
                   this.show_plugin_url = false
                   this.getPlugin4Install(p)
-                } else {
+                }
+                else {
                   this.plugin_url = null
                   this.init_plugin_search = p
                   this.show_plugin_store = true
                   this.show_plugin_url = false
                 }
-
-                this.show_plugin_templates = false
                 this.showAddPluginDialog = true
               }
 

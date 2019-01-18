@@ -193,19 +193,19 @@ export class PluginManager {
       this.reloadRepository(repo).then((manifest)=>{
         repo.name = manifest.name || repo.name
         repo.description = manifest.description || repo.description
-        // use repo url if name exists
-        for(let r of this.repository_list){
-          if(r.name === repo.name){
-            repo.name = repo.url.replace('https://github.com/', '').replace('http://github.com/', '')
-            break
-          }
-        }
+        const normalizedUrl = repo.url.replace('https://github.com/', '').replace('http://github.com/', '')
         //remove existing repo if same url already exists
         for(let r of this.repository_list){
-          if(r.url === repo.url){
+          if(r.url.replace('https://github.com/', '').replace('http://github.com/', '') === normalizedUrl){
             // remove it if already exists
             this.repository_list.splice( this.repository_list.indexOf(r), 1 )
             this.showMessage("Repository with the same url already exists.")
+          }
+        }
+        // use repo url if name exists
+        for(let r of this.repository_list){
+          if(r.name === repo.name){
+            repo.name = normalizedUrl
             break
           }
         }
@@ -223,7 +223,9 @@ export class PluginManager {
             _id: doc._id,
             _rev: doc._rev,
             list: this.repository_list,
-          }).then(resolve).catch(reject)
+          }).then(()=>{
+            resolve(repo)
+          }).catch(reject)
         }).catch((err) => {
           this.showMessage("Failed to save repository, database Error:" + err.toString())
           reject("Failed to save repository, database Error:" + err.toString())
@@ -1254,7 +1256,7 @@ export class PluginManager {
         }
         repository_url = githubImJoyManifest('https://github.com/'+url)
       }
-      else if(url.includes('github') && url.includes('/blob/')){
+      else if(url.includes('github.com')){
         repository_url = githubImJoyManifest(url)
         repo_origin = repository_url
       }
