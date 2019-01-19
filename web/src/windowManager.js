@@ -21,8 +21,8 @@ export class WindowManager {
       i: 0,
       x: 0,
       y: 0,
-      w: 10,
-      h: 7
+      w: 20,
+      h: 10
     }
   }
 
