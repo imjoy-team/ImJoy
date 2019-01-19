@@ -1680,12 +1680,12 @@ button.md-speed-dial-target {
 
 
 #plugin-menu{
-  max-height: calc( 100vh - 100px );
+  max-height: calc( 100vh - 95px );
   padding: 10px;
 }
 
 #plugin-menu > .md-card-content{
-  max-height: calc( 100vh - 100px - 68px );
+  max-height: calc( 100vh - 95px - 86px );
   overflow: auto;
 }
 
