@@ -88,9 +88,22 @@ html, body
   padding: 0px;
 }
 
+.md-list-item-content{
+  justify-content: flex-start !important;
+}
+
+.joy-run-button .md-ripple{
+  justify-content: flex-start !important;
+}
+
 .md-menu-content{
+  z-index: 9998;
+}
+
+.md-tooltip{
   z-index: 9999;
 }
+
 .md-subheader {
   font-size: 22px;
   font-weight: 300;

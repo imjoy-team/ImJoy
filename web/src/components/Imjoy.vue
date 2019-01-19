@@ -11,10 +11,11 @@
           <!-- <md-tooltip>show sidebar</md-tooltip> -->
         </md-button>
         <md-button @click="$router.push('/')" v-if="!menuVisible" class="md-small-hide site-title">
-          <img class="site-title" src="static/img/imjoy-logo-black.svg" alt="ImJoy"><span class="superscript md-small-hide">beta</span>
+          <img class="site-title" src="static/img/imjoy-logo-black.svg" alt="ImJoy">
           <!-- <div class="site-title">ImJoy.io<span class="superscript md-small-hide">beta</span></div> -->
           <md-tooltip>ImJoy home</md-tooltip>
         </md-button>
+        <!-- <span v-if="!menuVisible" class="superscript md-small-hide">beta</span> -->
         <md-menu v-if="wm.window_mode==='single' && wm.windows.length > 0">
           <md-button class="md-icon-button md-primary" md-menu-trigger>
             <md-icon>picture_in_picture</md-icon>
@@ -109,7 +110,7 @@
     </md-app-toolbar>
     <md-app-drawer :md-active.sync="menuVisible" md-persistent="full">
       <!-- <md-app-toolbar class="md-primary md-dense"> -->
-      <md-speed-dial class="md-top-left speed-dial" md-event="hover" md-effect="scale" md-direction="bottom">
+      <!-- <md-speed-dial class="md-top-left speed-dial" md-event="hover" md-effect="scale" md-direction="bottom">
         <md-speed-dial-target class="md-primary">
           <md-icon class="speed-dial-icon">add</md-icon>
         </md-speed-dial-target>
@@ -127,13 +128,14 @@
             <md-tooltip>Open a folder</md-tooltip>
           </md-button>
         </md-speed-dial-content>
-      </md-speed-dial>
+      </md-speed-dial> -->
       <div class="md-toolbar-row">
         <div class="md-toolbar-section-start">
           <md-button class="site-button site-title" @click="$router.push('/')">
-            <img class="site-title" src="static/img/imjoy-logo-black.svg" alt="ImJoy"><span class="superscript">beta</span>
+            <img class="site-title" src="static/img/imjoy-logo-black.svg" alt="ImJoy">
             <!-- <div class="site-title">ImJoy.io<span class="superscript">alpha</span></div> -->
           </md-button>
+          <span class="superscript md-small-hide">beta</span>
         </div>
         <div class="md-toolbar-section-end" v-if="pm">
           <md-menu>
@@ -160,72 +162,158 @@
         </div>
       </div>
       <br>
-      <md-card v-if="pm && show_workflow">
+      <md-card id="plugin-menu" v-show="plugin_loaded" v-if="pm">
         <md-card-header>
-          <div class="md-layout md-gutter md-alignment-center-space-between">
-            <div class="md-layout-item md-size-70">
-              <md-button @click="workflow_expand=!workflow_expand" :class="workflow_expand?'': 'md-primary'"><span class="md-subheading"><md-icon>format_list_bulleted</md-icon>Workflow</span></md-button>
-            </div>
-            <div v-show="workflow_expand" class="md-layout-item">
-              <md-button @click="clearWorkflow()" class="md-icon-button">
-                <md-icon>clear</md-icon>
+            <!-- <span class="md-subheading">Plugins</span> -->
+            <md-button ref="add_plugin_button" :class="pm.installed_plugins.length>0?'md-raised':'md-raised md-primary'" @click="showPluginManagement()">
+              <md-icon>add</md-icon>Plugins
+            </md-button>
+
+            <!-- <span class="md-subheading">Plugins</span> -->
+
+
+          <!-- <div class="md-layout-item">
+            <md-button @click="pm.reloadPlugins()" class="md-icon-button md-small-hide">
+              <md-icon>autorenew</md-icon>
+              <md-tooltip>Reload/restart all the plugins</md-tooltip>
+            </md-button>
+          </div> -->
+
+            <md-menu md-size="big">
+              <md-button :class="screenWidth>600?'':'md-icon-button'" md-menu-trigger>
+                <md-icon>format_list_bulleted</md-icon><span class="md-xsmall-hide">Workflow</span>
+              </md-button>
+              <md-menu-content>
+                <md-menu-item @click="clearWorkflow(); workflow_expand=true;">
+                  <md-icon>playlist_add</md-icon>New Workflow
+                  <md-tooltip>Create new workflow</md-tooltip>
+                </md-menu-item>
+                <md-menu-item @click="workflow_expand=true; loadWorkflow(w)" v-for="w in pm.workflow_list" :key="w.name">
+                  <span>{{w.name}}</span>
+                  <md-button @click.stop="shareWorkflow(w)" class="md-icon-button">
+                    <md-icon>share</md-icon>
+                  </md-button>
+                  <md-button @click.stop="pm.removeWorkflow(w)" class="md-icon-button md-accent">
+                    <md-icon>clear</md-icon>
+                  </md-button>
+                </md-menu-item>
+              </md-menu-content>
+            </md-menu>
+
+            <md-menu md-size="medium">
+              <md-button :class="screenWidth>600?'':'md-icon-button'" md-menu-trigger>
+                <md-icon>folder_open</md-icon><span class="md-xsmall-hide">Files</span>
+              </md-button>
+              <md-menu-content>
+                <md-menu-item v-if="em.connected" @click="showEngineFileDialog(); files_expand=false" class="md-button">
+                  <md-icon>add_to_queue</md-icon>Engine
+                  <md-tooltip>Load files through the Plugin Engine</md-tooltip>
+                </md-menu-item>
+                <md-menu-item @click="$refs.file_form.reset();$refs.file_select.click(); files_expand=false" class="md-button">
+                  <md-icon>insert_drive_file</md-icon>File
+                  <md-tooltip>Open a file</md-tooltip>
+                </md-menu-item>
+                <md-menu-item @click="$refs.folder_form.reset();$refs.folder_select.click(); files_expand=false" class="md-button">
+                  <md-icon>folder_open</md-icon>Folder
+                  <md-tooltip>Open a folder</md-tooltip>
+                </md-menu-item>
+              </md-menu-content>
+            </md-menu>
+        </md-card-header>
+         <md-card-content>
+          <div id="workflow-panel" v-show="workflow_expand" v-if="pm && show_workflow">
+            <!-- <p>WORKFLOW</p> -->
+            <joy :config="workflow_joy_config" ref="workflow" v-if="plugin_loaded"></joy>
+            <p>
+              <md-button class="md-button" v-if="plugin_loaded" @click="runWorkflow(workflow_joy_config.joy)">
+                <md-icon>play_arrow</md-icon>Run
+                <md-tooltip>run the workflow</md-tooltip>
+              </md-button>
+              <md-button class="md-button" v-if="plugin_loaded" @click="pm.saveWorkflow(workflow_joy_config.joy)">
+                <md-icon>save</md-icon>Save
+                <md-tooltip>save the workflow</md-tooltip>
+              </md-button>
+              <md-button @click="clearWorkflow()" class="md-accent">
+                <md-icon>clear</md-icon>Clear
                 <md-tooltip>Clear workflow</md-tooltip>
               </md-button>
+            </p>
+          </div>
+          <div v-for="plugin in sortedRunnablePlugins()" :key="plugin.name">
+            <md-divider></md-divider>
+            <md-menu md-size="medium">
+              <md-button class="md-icon-button" :class="plugin.running?'md-accent':''" md-menu-trigger>
+                <md-progress-spinner v-if="plugin.initializing" class="md-accent" :md-diameter="20" md-mode="indeterminate"></md-progress-spinner>
+                <md-icon v-else-if="plugin.config.icon">{{plugin.config.icon}}</md-icon>
+                <md-icon v-else>extension</md-icon>
+                <md-tooltip>{{plugin.config.description}}</md-tooltip>
+              </md-button>
+              <md-menu-content>
+                <md-menu-item @click="showDoc(plugin.id)">
+                  <md-icon>description</md-icon>Docs
+                </md-menu-item>
+                <md-menu-item @click="sharePlugin(plugin.id)">
+                  <md-icon>share</md-icon>Share
+                </md-menu-item>
+                <md-menu-item @click="editPlugin(plugin.id)">
+                  <md-icon>edit</md-icon>Edit
+                </md-menu-item>
+                <md-menu-item @click="pm.reloadPlugin(plugin.config)">
+                  <md-icon>autorenew</md-icon>Reload
+                </md-menu-item>
+                <md-menu-item @click="pm.unloadPlugin(plugin)">
+                  <md-icon>clear</md-icon>Terminate
+                </md-menu-item>
+                <md-menu-item v-if="plugin.config.origin" @click="updatePlugin(plugin.id)">
+                  <md-icon>cloud_download</md-icon>Update
+                </md-menu-item>
+                <md-menu-item class="md-accent" @click="plugin2_remove=plugin;showRemoveConfirmation=true">
+                  <md-icon>delete_forever</md-icon>Remove
+                </md-menu-item>
+              </md-menu-content>
+            </md-menu>
+
+            <md-button class="joy-run-button" :class="plugin.running?'md-accent':(plugin._disconnected && plugin.type === 'native-python'? 'disconnected-plugin': 'md-primary')" :disabled="plugin._disconnected && plugin.type != 'native-python'" @click="plugin._disconnected?connectPlugin(plugin):runOp(plugin.ops[plugin.name])">
+              {{plugin.type === 'native-python'? plugin.name + ' 🚀': ( plugin.type === 'web-python' ? plugin.name + ' 🐍': plugin.name) }}
+            </md-button>
+
+            <md-button v-if="plugin._log_history && plugin._log_history.length>0" class="md-icon-button md-xsmall-hide" @click="showLog(plugin)">
+              <md-icon v-if="plugin._log_history._error" class="red">error</md-icon>
+              <md-icon v-else>info</md-icon>
+              <md-tooltip>{{plugin._log_history._error || plugin._log_history._info}}</md-tooltip>
+            </md-button>
+            <md-button v-else class="md-icon-button md-xsmall-hide" disabled>
+            </md-button>
+
+            <md-button v-if="!plugin._disconnected" class="md-icon-button" @click="plugin.panel_expanded=!plugin.panel_expanded; $forceUpdate()">
+              <md-icon v-if="!plugin.panel_expanded">expand_more</md-icon>
+              <md-icon v-else>expand_less</md-icon>
+            </md-button>
+            <md-progress-bar md-mode="determinate" v-if="(plugin.running || plugin.initializing)&&plugin._progress" :md-value="plugin._progress"></md-progress-bar>
+            <div v-for="(op) in plugin.ops" :key="op.plugin_id + op.name">
+              <md-button class="md-icon-button" v-show="plugin.panel_expanded && op.name != plugin.name" :disabled="true">
+                <md-icon>chevron_right</md-icon>
+              </md-button>
+              <md-button class="joy-run-button md-primary op-button" :class="plugin.running?'md-accent':'md-primary'" :disabled="plugin._disconnected" v-show="plugin.panel_expanded && op.name != plugin.name" @click="runOp(op)">
+                  {{op.name}}
+              </md-button>
+
+              <!-- <md-button class="md-icon-button" v-show="plugin.panel_expanded &&  op.name != plugin.name" @click="op.panel_expanded=!op.panel_expanded; $forceUpdate()"> -->
+                <!-- <md-icon v-if="!op.panel_expanded">expand_more</md-icon>
+                <md-icon v-else>expand_less</md-icon> -->
+              <!-- </md-button> -->
+
+              <joy :config="op" :show="(plugin.panel_expanded || false)"></joy>
+              <md-divider></md-divider>
             </div>
           </div>
-        </md-card-header>
-        <md-card-content v-show="workflow_expand">
-          <joy :config="workflow_joy_config" ref="workflow" v-if="plugin_loaded"></joy>
-          <md-button class="md-button md-primary" v-if="plugin_loaded" @click="runWorkflow(workflow_joy_config.joy)">
-            <md-icon>play_arrow</md-icon>Run
-            <md-tooltip>run the workflow</md-tooltip>
-          </md-button>
-
-          <md-button class="md-button md-primary" v-if="plugin_loaded" @click="pm.saveWorkflow(workflow_joy_config.joy)">
-            <md-icon>save</md-icon>Save
-            <md-tooltip>save the workflow</md-tooltip>
-          </md-button>
-
-          <md-menu md-size="big">
-            <md-button class="md-button md-primary" :disabled="pm.workflow_list.length===0" md-menu-trigger>
-              <md-icon>more_horiz</md-icon> Load
-              <md-tooltip>load a workflow</md-tooltip>
-            </md-button>
-            <md-menu-content>
-              <md-menu-item @click="loadWorkflow(w)" v-for="w in pm.workflow_list" :key="w.name">
-                <span>{{w.name}}</span>
-                <md-button @click.stop="shareWorkflow(w)" class="md-icon-button">
-                  <md-icon>share</md-icon>
-                </md-button>
-                <md-button @click.stop="pm.removeWorkflow(w)" class="md-icon-button md-accent">
-                  <md-icon>clear</md-icon>
-                </md-button>
-              </md-menu-item>
-            </md-menu-content>
-          </md-menu>
-        </md-card-content>
-      </md-card>
-      <div v-show="plugin_loaded" v-if="pm">
-        <md-card>
-          <md-card-header>
-            <div class="md-layout md-gutter md-alignment-center-space-between">
-              <div class="md-layout-item md-size-70">
-                <!-- <span class="md-subheading">Plugins</span> -->
-                <md-button ref="add_plugin_button" class="md-raised" :class="pm.installed_plugins.length>0?'':'md-primary'" @click="showPluginManagement()">
-                  <md-icon>add</md-icon>Plugins
-                </md-button>
-              </div>
-              <div class="md-layout-item">
-                <md-button @click="pm.reloadPlugins()" class="md-icon-button">
-                  <md-icon>autorenew</md-icon>
-                  <md-tooltip>Reload/restart all the plugins</md-tooltip>
-                </md-button>
-              </div>
-            </div>
-          </md-card-header>
-          <md-card-content>
-            <div v-for="plugin in sortedRunnablePlugins()" :key="plugin.name">
-              <md-divider></md-divider>
+          <md-divider></md-divider>
+          <div>
+            <!-- <md-button class="md-icon-button" @click="non_runnable_panel_expanded=!non_runnable_panel_expanded; $forceUpdate()">
+              <md-icon v-if="!non_runnable_panel_expanded">add</md-icon>
+              <md-icon v-else>remove</md-icon>
+            </md-button> -->
+            <div v-for="plugin in sortedNonRunnablePlugins()" :key="plugin.name">
               <md-menu md-size="medium">
                 <md-button class="md-icon-button" :class="plugin.running?'md-accent':''" md-menu-trigger>
                   <md-progress-spinner v-if="plugin.initializing" class="md-accent" :md-diameter="20" md-mode="indeterminate"></md-progress-spinner>
@@ -258,93 +346,19 @@
                 </md-menu-content>
               </md-menu>
 
-              <md-button class="joy-run-button" :class="plugin.running?'md-accent':(plugin._disconnected && plugin.type === 'native-python'? 'disconnected-plugin': 'md-primary')" :disabled="plugin._disconnected && plugin.type != 'native-python'" @click="plugin._disconnected?connectPlugin(plugin):runOp(plugin.ops[plugin.name])">
-                {{plugin.type === 'native-python'? plugin.name + ' 🚀': ( plugin.type === 'web-python' ? plugin.name + ' 🐍': plugin.name) }}
+              <md-button class="joy-run-button" :class="plugin.running?'md-accent':(plugin._disconnected && plugin.type === 'native-python'? 'disconnected-plugin': '')" :disabled="plugin.type != 'native-python' || !plugin._disconnected" @click="connectPlugin(plugin)">
+                {{plugin.type === 'native-python'? plugin.name + ' 🚀': plugin.name}}
               </md-button>
-
-              <md-button v-if="plugin._log_history && plugin._log_history.length>0" class="md-icon-button md-xsmall-hide" @click="showLog(plugin)">
-                <md-icon v-if="plugin._log_history._error" class="red">error</md-icon>
-                <md-icon v-else>info</md-icon>
-                <md-tooltip>{{plugin._log_history._error || plugin._log_history._info}}</md-tooltip>
+              <md-button class="md-icon-button" :disabled="true">
+                <md-icon>visibility_off</md-icon>
               </md-button>
-              <md-button v-else class="md-icon-button md-xsmall-hide" disabled>
-              </md-button>
-
-              <md-button v-if="!plugin._disconnected" class="md-icon-button" @click="plugin.panel_expanded=!plugin.panel_expanded; $forceUpdate()">
-                <md-icon v-if="!plugin.panel_expanded">expand_more</md-icon>
-                <md-icon v-else>expand_less</md-icon>
-              </md-button>
-              <md-progress-bar md-mode="determinate" v-if="(plugin.running || plugin.initializing)&&plugin._progress" :md-value="plugin._progress"></md-progress-bar>
-              <div v-for="(op) in plugin.ops" :key="op.plugin_id + op.name">
-                <md-button class="md-icon-button" v-show="plugin.panel_expanded && op.name != plugin.name" :disabled="true">
-                  <md-icon>chevron_right</md-icon>
-                </md-button>
-                <md-button class="joy-run-button md-primary op-button" :class="plugin.running?'md-accent':'md-primary'" :disabled="plugin._disconnected" v-show="plugin.panel_expanded && op.name != plugin.name" @click="runOp(op)">
-                    {{op.name}}
-                </md-button>
-
-                <!-- <md-button class="md-icon-button" v-show="plugin.panel_expanded &&  op.name != plugin.name" @click="op.panel_expanded=!op.panel_expanded; $forceUpdate()"> -->
-                  <!-- <md-icon v-if="!op.panel_expanded">expand_more</md-icon>
-                  <md-icon v-else>expand_less</md-icon> -->
-                <!-- </md-button> -->
-
-                <joy :config="op" :show="(plugin.panel_expanded || false)"></joy>
-                <md-divider></md-divider>
-              </div>
+              <md-divider></md-divider>
             </div>
-            <md-divider></md-divider>
-            <div>
-              <!-- <md-button class="md-icon-button" @click="non_runnable_panel_expanded=!non_runnable_panel_expanded; $forceUpdate()">
-                <md-icon v-if="!non_runnable_panel_expanded">add</md-icon>
-                <md-icon v-else>remove</md-icon>
-              </md-button> -->
-              <div v-for="plugin in sortedNonRunnablePlugins()" :key="plugin.name">
-                <md-menu md-size="medium">
-                  <md-button class="md-icon-button" :class="plugin.running?'md-accent':''" md-menu-trigger>
-                    <md-progress-spinner v-if="plugin.initializing" class="md-accent" :md-diameter="20" md-mode="indeterminate"></md-progress-spinner>
-                    <md-icon v-else-if="plugin.config.icon">{{plugin.config.icon}}</md-icon>
-                    <md-icon v-else>extension</md-icon>
-                    <md-tooltip>{{plugin.config.description}}</md-tooltip>
-                  </md-button>
-                  <md-menu-content>
-                    <md-menu-item @click="showDoc(plugin.id)">
-                      <md-icon>description</md-icon>Docs
-                    </md-menu-item>
-                    <md-menu-item @click="sharePlugin(plugin.id)">
-                      <md-icon>share</md-icon>Share
-                    </md-menu-item>
-                    <md-menu-item @click="editPlugin(plugin.id)">
-                      <md-icon>edit</md-icon>Edit
-                    </md-menu-item>
-                    <md-menu-item @click="pm.reloadPlugin(plugin.config)">
-                      <md-icon>autorenew</md-icon>Reload
-                    </md-menu-item>
-                    <md-menu-item @click="pm.unloadPlugin(plugin)">
-                      <md-icon>clear</md-icon>Terminate
-                    </md-menu-item>
-                    <md-menu-item v-if="plugin.config.origin" @click="updatePlugin(plugin.id)">
-                      <md-icon>cloud_download</md-icon>Update
-                    </md-menu-item>
-                    <md-menu-item class="md-accent" @click="plugin2_remove=plugin;showRemoveConfirmation=true">
-                      <md-icon>delete_forever</md-icon>Remove
-                    </md-menu-item>
-                  </md-menu-content>
-                </md-menu>
-
-                <md-button class="joy-run-button" :class="plugin.running?'md-accent':(plugin._disconnected && plugin.type === 'native-python'? 'disconnected-plugin': '')" :disabled="plugin.type != 'native-python' || !plugin._disconnected" @click="connectPlugin(plugin)">
-                  {{plugin.type === 'native-python'? plugin.name + ' 🚀': plugin.name}}
-                </md-button>
-                <md-button class="md-icon-button" :disabled="true">
-                  <md-icon>visibility_off</md-icon>
-                </md-button>
-                <md-divider></md-divider>
-              </div>
-            </div>
-            <md-divider></md-divider>
-            <p v-if="pm.installed_plugins.length<=0">&nbsp;No plugin installed.</p>
-          </md-card-content>
-        </md-card>
-      </div>
+          </div>
+          <md-divider></md-divider>
+          <p v-if="pm.installed_plugins.length<=0">&nbsp;No plugin installed.</p>
+        </md-card-content>
+      </md-card>
     </md-app-drawer>
     <md-app-content class="whiteboard-content">
       <md-progress-bar md-mode="determinate" :md-value="progress"></md-progress-bar>
@@ -1516,14 +1530,14 @@ export default {
 .site-title {
   font-size: 35px;
   font-weight: 300;
-  height: 48px;
+  height: 60px;
+  width: 200px;
 }
 
 @media screen and (max-width: 600px) {
   .site-title {
     font-size: 26px;
     font-weight: 250;
-    height: 40px;
   }
 }
 
@@ -1531,7 +1545,7 @@ export default {
   .site-title {
     font-size: 22px;
     font-weight: 220;
-      height: 36px;
+    height: 40px;
   }
 }
 
@@ -1664,7 +1678,7 @@ button.md-speed-dial-target {
 }
 
 .site-button {
-  left: 80px;
+  left: 10px;
   top: 6px;
 }
 
@@ -1705,6 +1719,35 @@ button.md-speed-dial-target {
   width: 36px;
   min-width: 36px;
   height: 36px;
+}
+
+.md-drawer{
+  overflow: hidden;
+}
+
+
+#plugin-menu{
+  max-height: calc( 100vh - 100px );
+  padding: 10px;
+}
+
+#plugin-menu > .md-card-content{
+  max-height: calc( 100vh - 100px - 68px );
+  overflow: auto;
+}
+
+#plugin-menu > .md-button{
+  padding: 2px;
+}
+
+#workflow-panel{
+  margin-bottom: 2px;
+}
+
+#workflow-panel > p{
+  text-align: center;
+  margin-top: 10px;
+  margin: 5px;
 }
 
 @media screen and (max-height: 600px) {
