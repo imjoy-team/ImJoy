@@ -1121,7 +1121,7 @@ export default {
       const w = {
         name: "About " + pconfig.name,
         type: 'imjoy/markdown',
-        w: 7,
+        w: 20,
         h: 10,
         scroll: true,
         data: {
@@ -1183,7 +1183,7 @@ export default {
         config: {},
         plugin: plugin,
         plugin_manager: this.pm,
-        w: 10,
+        w: 20,
         h: 10,
         data: {
           name: pconfig.name,
@@ -1199,7 +1199,7 @@ export default {
         type: 'imjoy/plugin-editor',
         config: {},
         plugin_manager: this.pm,
-        w: 10,
+        w: 20,
         h: 10,
         plugin: {},
         data: {
