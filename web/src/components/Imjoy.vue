@@ -8,14 +8,11 @@
       <div class="md-toolbar-section-start">
         <md-button v-if="!menuVisible" class="md-primary md-icon-button" @click="menuVisible=true">
           <md-icon>menu</md-icon>
-          <!-- <md-tooltip>show sidebar</md-tooltip> -->
         </md-button>
         <md-button @click="$router.push('/')" v-if="!menuVisible" class="md-small-hide site-title">
           <img class="site-title" src="static/img/imjoy-logo-black.svg" alt="ImJoy">
-          <!-- <div class="site-title">ImJoy.io<span class="superscript md-small-hide">beta</span></div> -->
           <md-tooltip>ImJoy home</md-tooltip>
         </md-button>
-        <!-- <span v-if="!menuVisible" class="superscript md-small-hide">beta</span> -->
         <md-menu v-if="wm.window_mode==='single' && wm.windows.length > 0">
           <md-button class="md-icon-button md-primary" md-menu-trigger>
             <md-icon>picture_in_picture</md-icon>
@@ -49,7 +46,6 @@
         </md-button>
         <md-button class="md-icon-button" href="/docs/" target="_blank">
           <md-icon>help</md-icon>
-          <!-- <md-tooltip>Open help information.</md-tooltip> -->
         </md-button>
         <md-button v-if="!em.connected" @click="showPluginEngineInfo = true" class="md-icon-button md-accent">
           <md-icon>🚀</md-icon>
@@ -64,10 +60,6 @@
             <md-menu-item :disabled="true">
               <span>🚀{{em.engine_status.connection}}</span>
             </md-menu-item>
-            <!-- <md-menu-item @click="em.connectEngine(engine_url, connection_token)">
-              <span>Connect</span>
-              <md-icon>settings_ethernet</md-icon>
-            </md-menu-item> -->
             <md-menu-item @click="em.disconnectEngine()">
               <span>Disconnect</span>
               <md-icon>clear</md-icon>
@@ -109,31 +101,10 @@
       </form>
     </md-app-toolbar>
     <md-app-drawer :md-active.sync="menuVisible" md-persistent="full">
-      <!-- <md-app-toolbar class="md-primary md-dense"> -->
-      <!-- <md-speed-dial class="md-top-left speed-dial" md-event="hover" md-effect="scale" md-direction="bottom">
-        <md-speed-dial-target class="md-primary">
-          <md-icon class="speed-dial-icon">add</md-icon>
-        </md-speed-dial-target>
-        <md-speed-dial-content>
-          <md-button v-if="em.connected" @click="showEngineFileDialog()" class="md-icon-button md-primary">
-            <md-icon>add_to_queue</md-icon>
-            <md-tooltip>Load files through the Python Plugin Engine</md-tooltip>
-          </md-button>
-          <md-button @click="$refs.file_form.reset();$refs.file_select.click()" class="md-icon-button md-primary">
-            <md-icon>insert_drive_file</md-icon>
-            <md-tooltip>Open a file</md-tooltip>
-          </md-button>
-          <md-button @click="$refs.folder_form.reset();$refs.folder_select.click()" class="md-icon-button md-primary">
-            <md-icon>folder_open</md-icon>
-            <md-tooltip>Open a folder</md-tooltip>
-          </md-button>
-        </md-speed-dial-content>
-      </md-speed-dial> -->
       <div class="md-toolbar-row">
         <div class="md-toolbar-section-start">
           <md-button class="site-button site-title" @click="$router.push('/')">
             <img class="site-title" src="static/img/imjoy-logo-black.svg" alt="ImJoy">
-            <!-- <div class="site-title">ImJoy.io<span class="superscript">alpha</span></div> -->
           </md-button>
           <span class="superscript md-small-hide">beta</span>
         </div>
@@ -157,7 +128,6 @@
 
           <md-button class="md-icon-button md-dense md-raised" @click="menuVisible = !menuVisible">
             <md-icon>keyboard_arrow_left</md-icon>
-            <!-- <md-tooltip>Hide sidebar</md-tooltip> -->
           </md-button>
         </div>
       </div>
@@ -211,7 +181,6 @@
         </md-card-header>
          <md-card-content>
           <div id="workflow-panel" v-show="workflow_expand" v-if="pm && show_workflow">
-            <!-- <p>WORKFLOW</p> -->
             <joy :config="workflow_joy_config" ref="workflow" v-if="plugin_loaded"></joy>
             <p>
               <md-button class="md-button" v-if="plugin_loaded" @click="runWorkflow(workflow_joy_config.joy)">
@@ -279,11 +248,11 @@
               <md-icon v-else>expand_less</md-icon>
             </md-button>
             <md-progress-bar md-mode="determinate" v-if="(plugin.running || plugin.initializing)&&plugin._progress" :md-value="plugin._progress"></md-progress-bar>
-            <div v-for="(op) in plugin.ops" :key="op.plugin_id + op.name">
-              <md-button class="md-icon-button" v-show="plugin.panel_expanded && op.name != plugin.name" :disabled="true">
+            <div v-for="(op) in plugin.ops" :key="op.plugin_id + op.name" v-show="plugin.panel_expanded">
+              <md-button v-if="op.name != plugin.name" class="md-icon-button" :disabled="true">
                 <md-icon>chevron_right</md-icon>
               </md-button>
-              <md-button class="joy-run-button md-primary op-button" :class="plugin.running?'md-accent':'md-primary'" :disabled="plugin._disconnected" v-show="plugin.panel_expanded && op.name != plugin.name" @click="runOp(op)">
+              <md-button v-if="op.name != plugin.name" class="joy-run-button md-primary op-button" :class="plugin.running?'md-accent':'md-primary'" :disabled="plugin._disconnected" @click="runOp(op)">
                   {{op.name}}
               </md-button>
 
@@ -298,10 +267,6 @@
           </div>
           <md-divider></md-divider>
           <div>
-            <!-- <md-button class="md-icon-button" @click="non_runnable_panel_expanded=!non_runnable_panel_expanded; $forceUpdate()">
-              <md-icon v-if="!non_runnable_panel_expanded">add</md-icon>
-              <md-icon v-else>remove</md-icon>
-            </md-button> -->
             <div v-for="plugin in sortedNonRunnablePlugins()" :key="plugin.name">
               <md-menu md-size="medium">
                 <md-button class="md-icon-button" :class="plugin.running?'md-accent':''" md-menu-trigger>
@@ -356,7 +321,6 @@
   </md-app>
 
   <md-dialog-confirm :md-active.sync="showRemoveConfirmation" md-title="Removing Plugin" md-content="Do you really want to <strong>delete</strong> this plugin" md-confirm-text="Yes" md-cancel-text="Cancel" @md-cancel="showRemoveConfirmation=false" @md-confirm="pm.removePlugin(plugin2_remove);plugin2_remove=null;showRemoveConfirmation=false"/>
-  <!-- </md-card-content> -->
   <file-dialog ref="file-dialog" :list-files="listEngineDir" :get-file-url="getFileUrl"></file-dialog>
   <md-dialog :md-active.sync="showPluginDialog" :md-click-outside-to-close="false" :md-close-on-esc="false">
     <md-dialog-content>
@@ -1723,6 +1687,11 @@ button.md-speed-dial-target {
 #plugin-menu > .md-card-content{
   max-height: calc( 100vh - 100px - 68px );
   overflow: auto;
+}
+
+#plugin-menu > .md-card-header {
+  justify-content: space-between;
+  display: flex;
 }
 
 #plugin-menu > .md-button{
