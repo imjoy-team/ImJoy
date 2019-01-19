@@ -134,21 +134,21 @@
       <br>
       <md-card id="plugin-menu" v-show="plugin_loaded" v-if="pm">
         <md-card-header>
-          <md-menu md-size="medium">
+          <md-menu md-size="big">
             <md-button :class="screenWidth>600?'':'md-icon-button'" md-menu-trigger>
               <md-icon>folder_open</md-icon><span class="md-xsmall-hide">Files</span>
             </md-button>
             <md-menu-content>
               <md-menu-item v-if="em.connected" @click="showEngineFileDialog(); files_expand=false" class="md-button">
-                <md-icon>add_to_queue</md-icon>Engine
+                <md-icon>add_to_queue</md-icon>Open Engine File
                 <md-tooltip>Load files through the Plugin Engine</md-tooltip>
               </md-menu-item>
               <md-menu-item @click="$refs.file_form.reset();$refs.file_select.click(); files_expand=false" class="md-button">
-                <md-icon>insert_drive_file</md-icon>File
+                <md-icon>insert_drive_file</md-icon>Open File
                 <md-tooltip>Open a file</md-tooltip>
               </md-menu-item>
               <md-menu-item @click="$refs.folder_form.reset();$refs.folder_select.click(); files_expand=false" class="md-button">
-                <md-icon>folder_open</md-icon>Folder
+                <md-icon>folder_open</md-icon>Open Folder
                 <md-tooltip>Open a folder</md-tooltip>
               </md-menu-item>
             </md-menu-content>
@@ -1708,7 +1708,7 @@ button.md-speed-dial-target {
   margin: 5px;
 }
 
-@media screen and (max-height: 600px) {
+@media screen and (max-width: 600px) {
   .md-icon-button{
     width: 32px;
     min-width: 32px;
