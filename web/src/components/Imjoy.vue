@@ -556,6 +556,11 @@ import {
   EngineManager
 } from '../engineManager.js'
 
+import {
+  FileSystemManager
+} from '../fileSystemManager.js'
+
+
 import _ from 'lodash'
 
 import {
@@ -623,7 +628,8 @@ export default {
       snackbar_duration: 3000,
       show_snackbar: false,
       screenWidth: 1024,
-      plugin_loaded: false
+      plugin_loaded: false,
+      new_workspace_name: ''
     }
   },
   watch: {
@@ -666,6 +672,7 @@ export default {
     this.em = new EngineManager({ event_bus: this.event_bus, show_message_callback: this.showMessage, show_engine_callback: this.showEngineConnection.bind(this)})
     this.wm = new WindowManager({ event_bus: this.event_bus, show_message_callback: this.showMessage, add_window_callback: this.addWindow})
     this.pm = new PluginManager({ event_bus: this.event_bus, engine_manager: this.em, window_manager:this.wm, imjoy_api: imjoy_api, show_message_callback: this.showMessage, update_ui_callback: ()=>{this.$forceUpdate()}})
+    this.fm = new FileSystemManager()
 
     this.client_id = null
     this.IMJOY_PLUGIN = {
@@ -678,7 +685,6 @@ export default {
       // {name: "Iframe(Javascript)", code: IFRAME_PLUGIN_TEMPLATE},
       {name: "Web Python 🐍", code: WEB_PYTHON_PLUGIN_TEMPLATE}
     ]
-    this.new_workspace_name = ''
     this.workflow_joy_config = {
       expanded: true,
       name: "Workflow",
