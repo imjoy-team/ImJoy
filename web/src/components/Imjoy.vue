@@ -164,61 +164,50 @@
       <br>
       <md-card id="plugin-menu" v-show="plugin_loaded" v-if="pm">
         <md-card-header>
-            <!-- <span class="md-subheading">Plugins</span> -->
-            <md-button ref="add_plugin_button" :class="pm.installed_plugins.length>0?'md-raised':'md-raised md-primary'" @click="showPluginManagement()">
-              <md-icon>add</md-icon>Plugins
+          <md-menu md-size="medium">
+            <md-button :class="screenWidth>600?'':'md-icon-button'" md-menu-trigger>
+              <md-icon>folder_open</md-icon><span class="md-xsmall-hide">Files</span>
             </md-button>
+            <md-menu-content>
+              <md-menu-item v-if="em.connected" @click="showEngineFileDialog(); files_expand=false" class="md-button">
+                <md-icon>add_to_queue</md-icon>Engine
+                <md-tooltip>Load files through the Plugin Engine</md-tooltip>
+              </md-menu-item>
+              <md-menu-item @click="$refs.file_form.reset();$refs.file_select.click(); files_expand=false" class="md-button">
+                <md-icon>insert_drive_file</md-icon>File
+                <md-tooltip>Open a file</md-tooltip>
+              </md-menu-item>
+              <md-menu-item @click="$refs.folder_form.reset();$refs.folder_select.click(); files_expand=false" class="md-button">
+                <md-icon>folder_open</md-icon>Folder
+                <md-tooltip>Open a folder</md-tooltip>
+              </md-menu-item>
+            </md-menu-content>
+          </md-menu>
 
-            <!-- <span class="md-subheading">Plugins</span> -->
-
-
-          <!-- <div class="md-layout-item">
-            <md-button @click="pm.reloadPlugins()" class="md-icon-button md-small-hide">
-              <md-icon>autorenew</md-icon>
-              <md-tooltip>Reload/restart all the plugins</md-tooltip>
+          <md-menu md-size="big">
+            <md-button :class="screenWidth>600?'':'md-icon-button'" md-menu-trigger>
+              <md-icon>format_list_bulleted</md-icon><span class="md-xsmall-hide">Workflow</span>
             </md-button>
-          </div> -->
+            <md-menu-content>
+              <md-menu-item @click="clearWorkflow(); workflow_expand=true;">
+                <md-icon>playlist_add</md-icon>New Workflow
+                <md-tooltip>Create new workflow</md-tooltip>
+              </md-menu-item>
+              <md-menu-item @click="workflow_expand=true; loadWorkflow(w)" v-for="w in pm.workflow_list" :key="w.name">
+                <span>{{w.name}}</span>
+                <md-button @click.stop="shareWorkflow(w)" class="md-icon-button">
+                  <md-icon>share</md-icon>
+                </md-button>
+                <md-button @click.stop="pm.removeWorkflow(w)" class="md-icon-button md-accent">
+                  <md-icon>clear</md-icon>
+                </md-button>
+              </md-menu-item>
+            </md-menu-content>
+          </md-menu>
 
-            <md-menu md-size="big">
-              <md-button :class="screenWidth>600?'':'md-icon-button'" md-menu-trigger>
-                <md-icon>format_list_bulleted</md-icon><span class="md-xsmall-hide">Workflow</span>
-              </md-button>
-              <md-menu-content>
-                <md-menu-item @click="clearWorkflow(); workflow_expand=true;">
-                  <md-icon>playlist_add</md-icon>New Workflow
-                  <md-tooltip>Create new workflow</md-tooltip>
-                </md-menu-item>
-                <md-menu-item @click="workflow_expand=true; loadWorkflow(w)" v-for="w in pm.workflow_list" :key="w.name">
-                  <span>{{w.name}}</span>
-                  <md-button @click.stop="shareWorkflow(w)" class="md-icon-button">
-                    <md-icon>share</md-icon>
-                  </md-button>
-                  <md-button @click.stop="pm.removeWorkflow(w)" class="md-icon-button md-accent">
-                    <md-icon>clear</md-icon>
-                  </md-button>
-                </md-menu-item>
-              </md-menu-content>
-            </md-menu>
-
-            <md-menu md-size="medium">
-              <md-button :class="screenWidth>600?'':'md-icon-button'" md-menu-trigger>
-                <md-icon>folder_open</md-icon><span class="md-xsmall-hide">Files</span>
-              </md-button>
-              <md-menu-content>
-                <md-menu-item v-if="em.connected" @click="showEngineFileDialog(); files_expand=false" class="md-button">
-                  <md-icon>add_to_queue</md-icon>Engine
-                  <md-tooltip>Load files through the Plugin Engine</md-tooltip>
-                </md-menu-item>
-                <md-menu-item @click="$refs.file_form.reset();$refs.file_select.click(); files_expand=false" class="md-button">
-                  <md-icon>insert_drive_file</md-icon>File
-                  <md-tooltip>Open a file</md-tooltip>
-                </md-menu-item>
-                <md-menu-item @click="$refs.folder_form.reset();$refs.folder_select.click(); files_expand=false" class="md-button">
-                  <md-icon>folder_open</md-icon>Folder
-                  <md-tooltip>Open a folder</md-tooltip>
-                </md-menu-item>
-              </md-menu-content>
-            </md-menu>
+          <md-button ref="add_plugin_button" :class="pm.installed_plugins.length>0?'':'md-primary'" @click="showPluginManagement()">
+            <md-icon>add</md-icon>Plugins
+          </md-button>
         </md-card-header>
          <md-card-content>
           <div id="workflow-panel" v-show="workflow_expand" v-if="pm && show_workflow">
