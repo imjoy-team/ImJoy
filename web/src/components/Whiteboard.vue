@@ -1,7 +1,7 @@
 <template>
 <div class="whiteboard noselect" ref="whiteboard" @mouseup="show_overlay=false"  @click="unselectWindows()">
   <div @mousemove="overlayMousemove" class="overlay" @click="show_overlay=false" v-if="show_overlay"></div>
-  <grid-layout v-if="mode==='grid'" :layout="windows" :col-num="col_num" :is-mirrored="false" :auto-size="true" :row-height="row_height" :col-width="column_width" :is-responsive="true" :is-draggable="true" :is-resizable="true" :vertical-compact="true" :margin="[3, 3]" :use-css-transforms="true">
+  <grid-layout v-if="mode==='grid'" :layout="windows" :col-num="col_num" :is-mirrored="false" :auto-size="true" :row-height="row_height" :is-responsive="true" :is-draggable="true" :is-resizable="true" :vertical-compact="true" :margin="[3, 3]" :use-css-transforms="true">
     <grid-item v-for="w in windows" drag-allow-from=".drag-handle" drag-ignore-from=".no-drag" :x="w.x" :y="w.y" :w="w.w" :h="w.h" :i="w.i" @resize="viewChanging(w)" @move="viewChanging(w)" @resized="show_overlay=false;w.resize&&w.resize();focusWindow(w)" @moved="show_overlay=false;w.move&&w.move();focusWindow(w)" :key="w.id">
       <window :w="w" :withDragHandle="true" @duplicate="duplicate" @select="selectWindow" :loaders="wm.registered_loaders" @close="close" @fullscreen="fullScreen" @normalsize="normalSize"></window>
     </grid-item>
@@ -70,12 +70,11 @@ export default {
         renderer: renderer
     });
     this.marked = marked
-    this.screenWidth = window.innerWidth
-    // this.column_width = parseInt(this.screenWidth/60)
-    this.col_num = parseInt(this.screenWidth/80)
   },
   mounted() {
     this.event_bus.$on('close_window', ()=>{ this.$forceUpdate() })
+    this.screenWidth = window.innerWidth
+    this.col_num = parseInt(this.$refs.whiteboard.clientWidth/this.column_width)
   },
   beforeDestroy() {
     this.event_bus.$off('add_window', this.onWindowAdd)
@@ -120,7 +119,7 @@ export default {
     updateSize(e){
       this.screenWidth = e.width
       // this.column_width = parseInt(this.screenWidth/60)
-      this.col_num = parseInt(this.screenWidth/80)
+      this.col_num = parseInt(this.$refs.whiteboard.clientWidth/this.column_width)
     },
     onWindowAdd(w) {
       this.selectWindow(w, {})
@@ -143,8 +142,8 @@ export default {
       return !!obj && obj.byteLength !== undefined;
     },
     fullScreen(w) {
-      const fh = parseInt(this.$refs.whiteboard.clientHeight/this.row_height) -10
-      const fw = parseInt(this.$refs.whiteboard.clientWidth/this.column_width) -1
+      const fh = parseInt((this.$refs.whiteboard.clientHeight-70)/this.row_height)
+      const fw = parseInt(this.$refs.whiteboard.clientWidth/this.column_width)
       w._h = w.h
       w._w = w.w
       w.h = fh

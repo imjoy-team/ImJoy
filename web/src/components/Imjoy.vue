@@ -1724,7 +1724,7 @@ button.md-speed-dial-target {
 }
 
 .md-app-content {
-  height: calc( 100vh - 48px );
+  height: calc( 100vh - 65px );
 }
 
 .normal-text{
