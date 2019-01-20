@@ -420,7 +420,11 @@ api.exportFile(blob, 'hello.txt')
 api.fs.XXXXX(...)
 ```
 
-Access the in-browser filesystem with the [Node JS filesystem API](https://nodejs.org/api/fs.html).
+Access the in-browser filesystem with the [Node JS filesystem API](https://nodejs.org/api/fs.html). More details about the underlying implemetation, see [BrowserFS](https://github.com/jvilk/BrowserFS), the default file system in ImJoy support the following nodes:
+
+ * `/tmp`: `InMemory`, data is stored in browser memory, cleared when ImJoy is closed.
+
+ * `/home`: `IndexedDB`, data is stored in the browser IndexedDB database, can be used as persistent storage.
 
 **Examples**
 <!-- tabs:start -->
