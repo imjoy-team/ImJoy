@@ -771,7 +771,7 @@ Connection.prototype.disconnect = function() {
  * @param {String} url of a plugin source
  * @param {Object} _interface to provide for the plugin
  */
-var Plugin = function( config, _interface, is_proxy) {
+var Plugin = function( config, _interface, _fs, is_proxy) {
     this.config = config
     this.id = config.id || randId();
     this._id = config._id;
@@ -793,6 +793,7 @@ var Plugin = function( config, _interface, is_proxy) {
     else{
       this._disconnected = true;
       this._bindInterface(_interface);
+      this._initialInterface.fs = _fs;
       this._connect();
     }
 };
@@ -805,7 +806,7 @@ var Plugin = function( config, _interface, is_proxy) {
  * @param {String} code of the plugin
  * @param {Object} _interface to provide to the plugin
  */
-var DynamicPlugin = function(config, _interface, is_proxy) {
+var DynamicPlugin = function(config, _interface, _fs, is_proxy) {
     this.config = config
     if(!this.config.script){
       throw "you must specify the script for the plugin to run."
@@ -829,6 +830,7 @@ var DynamicPlugin = function(config, _interface, is_proxy) {
     else{
       this._disconnected = true;
       this._bindInterface(_interface);
+      this._initialInterface.fs = _fs;
       this._connect();
     }
     this._updateUI()
@@ -849,7 +851,9 @@ DynamicPlugin.prototype._bindInterface =
      else if(typeof _interface[k] === 'object'){
        var utils = {}
        for(var u in _interface[k]){
-         utils[u] = _interface[k][u].bind(null, this)
+         if(typeof _interface[k][u] === 'function'){
+           utils[u] = _interface[k][u].bind(null, this)
+         }
        }
        this._initialInterface[k] = utils
      }

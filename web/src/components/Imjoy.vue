@@ -671,8 +671,8 @@ export default {
 
     this.em = new EngineManager({ event_bus: this.event_bus, show_message_callback: this.showMessage, show_engine_callback: this.showEngineConnection.bind(this)})
     this.wm = new WindowManager({ event_bus: this.event_bus, show_message_callback: this.showMessage, add_window_callback: this.addWindow})
-    this.pm = new PluginManager({ event_bus: this.event_bus, engine_manager: this.em, window_manager:this.wm, imjoy_api: imjoy_api, show_message_callback: this.showMessage, update_ui_callback: ()=>{this.$forceUpdate()}})
     this.fm = new FileSystemManager()
+    this.pm = new PluginManager({ event_bus: this.event_bus, engine_manager: this.em, window_manager:this.wm, file_system_manager: this.fm, imjoy_api: imjoy_api, show_message_callback: this.showMessage, update_ui_callback: ()=>{this.$forceUpdate()}})
 
     this.client_id = null
     this.IMJOY_PLUGIN = {
@@ -837,99 +837,105 @@ export default {
     this.em.destroy()
   },
   methods: {
-    startImJoy() {
-      this.pm.resetPlugins()
+    async startImJoy() {
+      try{
+        await this.fm.init()
+        console.log('Successfully initialized the file system.', this.fm.fs)
+      }
+      catch(e){
+        console.error(e)
+        this.showMessage('Failed to initialize file system: ' + e.toString())
+      }
+      this.pm.init()
       this.pm.setInputLoaders(this.getDefaultInputLoaders())
-      this.pm.loadRepositoryList().then((repository_list)=>{
-        this.repository_list = repository_list
-        this.pm.selected_repository = this.repository_list[0]
-      })
-
-      this.pm.loadWorkspaceList().then((workspace_list)=>{
+      this.repository_list = await this.pm.loadRepositoryList()
+      this.pm.selected_repository = this.repository_list[0]
+      try {
+        const workspace_list = await this.pm.loadWorkspaceList()
         this.menuVisible = true
         const selected_workspace = this.$route.query.workspace || this.$route.query.w || workspace_list[0]
-        this.pm.loadWorkspace(selected_workspace).then(()=>{
-          this.em.connectEngine(this.engine_url, this.connection_token, true)
-          this.pm.reloadPlugins().then(()=>{
-            this.plugin_loaded = true
-            this.$forceUpdate()
-            this.event_bus.$emit('plugins_loaded', this.pm.plugins)
-            this.pm.reloadRepository().then((manifest)=>{
-              this.$forceUpdate()
-              this.event_bus.$emit('repositories_loaded', manifest)
-            }).finally(()=>{
-              const r = (this.$route.query.repo || this.$route.query.r || '').trim()
-              if(r){
-                this.plugin_url = null
-                this.init_plugin_search = null
-                this.show_plugin_store = true
-                this.show_plugin_url = false
-                this.downloading_plugin = true
-                this.pm.addRepository(r).then((repo)=>{
-                  this.pm.selected_repository = repo
-                  this.downloading_plugin = false
-                }).catch((e)=>{
-                  this.downloading_plugin = false
-                  this.downloading_error = "Sorry, the repository URL is invalid: " + e.toString()
-                })
-                this.show_plugin_templates = false
-                this.showAddPluginDialog = true
-              }
-
-              const p = (this.$route.query.plugin || this.$route.query.p  || '').trim()
-              if(p){
-                if (p.match(url_regex) || (p.includes('/') && p.includes(':'))) {
-                  this.plugin_url = p
-                  this.init_plugin_search = null
-                  this.show_plugin_store = false
-                  this.show_plugin_url = false
-                  this.getPlugin4Install(p)
-                }
-                else {
-                  this.plugin_url = null
-                  this.init_plugin_search = p
-                  this.show_plugin_store = true
-                  this.show_plugin_url = false
-                }
-                this.show_plugin_templates = false
-                this.showAddPluginDialog = true
-              }
-
-              this.show_workflow = true
-              if(this.$route.query.workflow){
-                const data = Joy.decodeWorkflow(this.$route.query.workflow)
-                // const query = Object.assign({}, this.$route.query);
-                // delete query.workflow;
-                // this.$router.replace({ query });
-                if(data){
-                  this.workflow_joy_config.data = data
-                  this.workflow_expand = true
-                }
-                else{
-                  console.log('failed to workflow')
-                }
-              }
-
-              if(this.$route.query.load || this.$route.query.l){
-                const w = {
-                  name: "Loaded Url",
-                  type: 'imjoy/url_list',
-                  scroll: true,
-                  data: [this.$route.query.load || this.$route.query.l]
-                }
-                this.wm.addWindow(w)
-              }
-
-              this.$nextTick(() => {
-                this.event_bus.$emit('imjoy_ready')
-              })
+        await this.pm.loadWorkspace(selected_workspace)
+        this.em.connectEngine(this.engine_url, this.connection_token, true)
+        await this.pm.reloadPlugins()
+        this.plugin_loaded = true
+        this.$forceUpdate()
+        this.event_bus.$emit('plugins_loaded', this.pm.plugins)
+        try {
+          const manifest = this.pm.reloadRepository()
+          this.$forceUpdate()
+          this.event_bus.$emit('repositories_loaded', manifest)
+        }
+        finally {
+          const r = (this.$route.query.repo || this.$route.query.r || '').trim()
+          if(r){
+            this.plugin_url = null
+            this.init_plugin_search = null
+            this.show_plugin_store = true
+            this.show_plugin_url = false
+            this.downloading_plugin = true
+            this.pm.addRepository(r).then((repo)=>{
+              this.pm.selected_repository = repo
+              this.downloading_plugin = false
+            }).catch((e)=>{
+              this.downloading_plugin = false
+              this.downloading_error = "Sorry, the repository URL is invalid: " + e.toString()
             })
+            this.show_plugin_templates = false
+            this.showAddPluginDialog = true
+          }
+
+          const p = (this.$route.query.plugin || this.$route.query.p  || '').trim()
+          if(p){
+            if (p.match(url_regex) || (p.includes('/') && p.includes(':'))) {
+              this.plugin_url = p
+              this.init_plugin_search = null
+              this.show_plugin_store = false
+              this.show_plugin_url = false
+              this.getPlugin4Install(p)
+            }
+            else {
+              this.plugin_url = null
+              this.init_plugin_search = p
+              this.show_plugin_store = true
+              this.show_plugin_url = false
+            }
+            this.show_plugin_templates = false
+            this.showAddPluginDialog = true
+          }
+
+          this.show_workflow = true
+          if(this.$route.query.workflow){
+            const data = Joy.decodeWorkflow(this.$route.query.workflow)
+            // const query = Object.assign({}, this.$route.query);
+            // delete query.workflow;
+            // this.$router.replace({ query });
+            if(data){
+              this.workflow_joy_config.data = data
+              this.workflow_expand = true
+            }
+            else{
+              console.log('failed to workflow')
+            }
+          }
+
+          if(this.$route.query.load || this.$route.query.l){
+            const w = {
+              name: "Loaded Url",
+              type: 'imjoy/url_list',
+              scroll: true,
+              data: [this.$route.query.load || this.$route.query.l]
+            }
+            this.wm.addWindow(w)
+          }
+
+          this.$nextTick(() => {
+            this.event_bus.$emit('imjoy_ready')
           })
-        })
-      }).catch((err)=>{
-        this.showMessage(err)
-        this.status_text = err
-      })
+        }
+      }
+      catch(e){
+        this.showMessage(e.toString())
+      }
     },
     addWindow(w) {
       return new Promise((resolve, reject) => {
@@ -1073,8 +1079,7 @@ export default {
           })
         }
       }).catch((e)=>{
-        this.showMessage(e)
-        this.status_text = e
+        this.showMessage(e.toString())
       })
     },
     showMessage(info, duration) {
@@ -1281,8 +1286,7 @@ export default {
         this.progress = 100
       }).catch((e) => {
         console.error(e)
-        this.status_text = e.toString() || "Error."
-        this.showMessage(e || "Error." , 12)
+        this.showMessage(e.toString() || "Error." , 12)
       })
     },
 
@@ -1315,8 +1319,7 @@ export default {
         this.progress = 100
       }).catch((e) => {
         console.error(e)
-        this.status_text = '<' +op.name + '>' + (e.toString() || "Error.")
-        this.showMessage(this.status_text, 15)
+        this.showMessage('<' +op.name + '>' + (e.toString() || "Error."), 15)
       })
     },
     selectFileChanged(event) {
@@ -1334,10 +1337,13 @@ export default {
 
     //#################ImJoy API functions##################
     showSnackbar(_plugin, msg, duration){
+      this.snackbar_info = msg
       if(duration){
         duration = duration * 1000
       }
-      this.showMessage(msg, duration)
+      this.snackbar_duration = duration || 10000
+      this.show_snackbar = true
+      this.$forceUpdate()
     },
     showFileDialog(_plugin, options){
       assert(typeof options === 'object')

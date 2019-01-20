@@ -415,6 +415,50 @@ var blob = new Blob(["Hello, world!"], {type: "text/plain;charset=utf-8"});
 api.exportFile(blob, 'hello.txt')
 ```
 
+### api.fs
+```javascript
+api.fs.XXXXX(...)
+```
+
+Access the in-browser filesystem with the [Node JS filesystem API](https://nodejs.org/api/fs.html).
+
+**Examples**
+<!-- tabs:start -->
+
+```javascript
+api.fs.writeFile('/tmp/temp.txt', 'hello world', function(err, data){
+    if (err) {
+        console.log(err);
+        return
+    }
+    console.log("Successfully Written to File.");
+    api.fs.readFile('/tmp/temp.txt', 'utf8', function (err, data) {
+        if (err) {
+            console.log(err);
+            return
+        }
+        console.log('Reald from file', data)
+    });
+});
+```
+
+```python
+def read(err, data=None):
+    if err:
+        print(err)
+        return
+
+    def cb(err, data=None):
+        if err:
+            print(err)
+            return
+        api.log(data)
+    api.fs.readFile('/tmp/temp.txt', 'utf8', cb)
+
+api.fs.writeFile('/tmp/temp.txt', 'hello world', read)
+
+```
+<!-- tabs:end -->
 
 ### api.getAttachment
 ```javascript

@@ -9,17 +9,21 @@ export class FileSystemManager {
       BrowserFS.configure({
         fs: "MountableFileSystem",
         options: {
-          '/tmp': { fs: "InMemory" },
-          '/home': { fs: "IndexedDB" },
-          '/mnt/h5': { fs: "HTML5FS" }
+          '/tmp': { fs: "InMemory", options: {storeName: 'tmp'} },
+          '/home': { fs: "IndexedDB", options: {storeName: 'home'} },
+          // '/mnt/h5': { fs: "HTML5FS", options: {} }
         }
-      }, function(e) {
+      }, (e) => {
         if (e) {
           reject(e)
+          return
         }
-        const fs = BrowserFS.BFSRequire('fs');
-        resolve(fs)
+        this.fs = BrowserFS.BFSRequire('fs')
+        resolve(this.fs)
       });
     })
+  }
+  destroy(){
+
   }
 }

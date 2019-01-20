@@ -41,10 +41,12 @@ import Ajv from 'ajv'
 const ajv = new Ajv()
 
 export class PluginManager {
-  constructor({event_bus=null, engine_manager=null, window_manager=null, imjoy_api={}, show_message_callback=null, update_ui_callback=null}){
+  constructor({event_bus=null, engine_manager=null, window_manager=null, file_system_manager=null, imjoy_api={}, show_message_callback=null, update_ui_callback=null}){
     this.event_bus = event_bus
     this.em = engine_manager
     this.wm = window_manager
+    this.fm = file_system_manager
+
     assert(this.event_bus, 'event bus is not available')
     assert(this.em, 'engine manager is not available')
     assert(this.wm, 'window manager is not available')
@@ -126,7 +128,7 @@ export class PluginManager {
     }
   }
 
-  resetPlugins(){
+  init(){
     this.plugins = {}
     this.plugin_names = {}
     this.registered = {
@@ -520,7 +522,7 @@ export class PluginManager {
           }
         }
       }
-      this.resetPlugins()
+      this.init()
       this.reloadDB().then(()=>{
         this.db.allDocs({
           include_docs: true,
@@ -974,7 +976,7 @@ export class PluginManager {
       const _interface = _.assign({TAG: tconfig.tag, WORKSPACE: this.selected_workspace}, this.imjoy_api)
 
       // create a proxy plugin
-      const plugin = new DynamicPlugin(tconfig, _interface, true)
+      const plugin = new DynamicPlugin(tconfig, _interface, this.fm.fs, true)
 
       this.plugins[plugin.id] = plugin
       this.plugin_names[plugin.name] = plugin
@@ -1025,7 +1027,7 @@ export class PluginManager {
       const tconfig = _.assign({}, template, config)
       tconfig.workspace = this.selected_workspace
       const _interface = _.assign({TAG: tconfig.tag, WORKSPACE: this.selected_workspace}, this.imjoy_api)
-      const plugin = new DynamicPlugin(tconfig, _interface)
+      const plugin = new DynamicPlugin(tconfig, _interface, this.fm.fs)
       plugin.whenConnected(() => {
         if (!plugin.api) {
           console.error('Error occured when loading plugin.')
@@ -1114,7 +1116,7 @@ export class PluginManager {
       const tconfig = _.assign({}, pconfig.plugin, pconfig)
       tconfig.workspace = this.selected_workspace
       const _interface = _.assign({TAG: tconfig.tag, WORKSPACE: this.selected_workspace}, this.imjoy_api)
-      const plugin = new DynamicPlugin(tconfig, _interface)
+      const plugin = new DynamicPlugin(tconfig, _interface, this.fm.fs)
       plugin.whenConnected(() => {
         if (!plugin.api) {
           console.error('the window plugin seems not ready.')
