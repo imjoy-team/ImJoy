@@ -415,7 +415,7 @@ var blob = new Blob(["Hello, world!"], {type: "text/plain;charset=utf-8"});
 api.exportFile(blob, 'hello.txt')
 ```
 
-### api.fs
+### api.fs.* [experimental]
 ```javascript
 api.fs.XXXXX(...)
 ```
