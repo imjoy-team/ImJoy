@@ -509,6 +509,7 @@
               bObject[k] = {__jailed_type__: 'ndarray', __value__ : v.selection.data, __shape__: v.shape, __dtype__: dtype}
             }
             else if( v instanceof Error){
+              console.error(v)
               bObject[k] = {__jailed_type__: 'error', __value__ : v.toString()}
             }
             else if(v instanceof File){
