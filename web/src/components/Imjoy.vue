@@ -1519,7 +1519,6 @@ export default {
   .site-title {
     font-size: 22px;
     font-weight: 220;
-    height: 40px;
   }
 }
 
