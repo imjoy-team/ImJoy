@@ -5,7 +5,6 @@ import router from './router'
 import VueMaterial from 'vue-material'
 import 'vue-material/dist/vue-material.min.css'
 import 'vue-material/dist/theme/default.css'
-import { ResizeObserver } from 'vue-resize'
 
 import App from './App'
 import VueGridLayout from 'vue-grid-layout'
@@ -47,7 +46,6 @@ Vue.component('window', Window)
 Vue.component('grid-layout', VueGridLayout.GridLayout)
 Vue.component('grid-item', VueGridLayout.GridItem)
 Vue.component('monaco-editor', MonacoEditor)
-Vue.component('resize-observer', ResizeObserver)
 
 const truncate = function(text, length, clamp) {
   clamp = clamp || '...';

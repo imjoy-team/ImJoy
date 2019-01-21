@@ -106,7 +106,7 @@ function write_manifest(plugin_configs, collection_configs){
     }
     repo_manifest.name = repo_manifest.name || default_repo_name
     repo_manifest.description = repo_manifest.description || default_repo_description
-    repo_manifest.uri_root = repo_manifest.uri_root || default_uri_root
+    repo_manifest.uri_root = default_uri_root
     repo_manifest.version = repo_version
     repo_manifest.plugins = plugin_configs || []
     repo_manifest.collections = collection_configs || []

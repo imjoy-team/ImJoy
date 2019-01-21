@@ -9,6 +9,7 @@ import {
   debounce,
   url_regex,
   githubImJoyManifest,
+  githubRepo,
   githubUrlRaw,
   assert
 } from './utils.js'
@@ -193,19 +194,19 @@ export class PluginManager {
       this.reloadRepository(repo).then((manifest)=>{
         repo.name = manifest.name || repo.name
         repo.description = manifest.description || repo.description
-        // use repo url if name exists
-        for(let r of this.repository_list){
-          if(r.name === repo.name){
-            repo.name = repo.url.replace('https://github.com/', '').replace('http://github.com/', '')
-            break
-          }
-        }
+        const normalizedUrl = repo.url && repo.url.replace('https://github.com/', '').replace('http://github.com/', '')
         //remove existing repo if same url already exists
         for(let r of this.repository_list){
-          if(r.url === repo.url){
+          if(r.url && r.url.replace('https://github.com/', '').replace('http://github.com/', '') === normalizedUrl){
             // remove it if already exists
             this.repository_list.splice( this.repository_list.indexOf(r), 1 )
             this.showMessage("Repository with the same url already exists.")
+          }
+        }
+        // use repo url if name exists
+        for(let r of this.repository_list){
+          if(r.name === repo.name){
+            repo.name = normalizedUrl
             break
           }
         }
@@ -223,7 +224,9 @@ export class PluginManager {
             _id: doc._id,
             _rev: doc._rev,
             list: this.repository_list,
-          }).then(resolve).catch(reject)
+          }).then(()=>{
+            resolve(repo)
+          }).catch(reject)
         }).catch((err) => {
           this.showMessage("Failed to save repository, database Error:" + err.toString())
           reject("Failed to save repository, database Error:" + err.toString())
@@ -736,8 +739,8 @@ export class PluginManager {
     })
   }
 
-  unloadPlugin(plugin, temp_remove){
-    const name = plugin.name
+  unloadPlugin(_plugin, temp_remove){
+    const name = _plugin.name
     for (let k in this.plugins) {
       if (this.plugins.hasOwnProperty(k)) {
         const plugin = this.plugins[k]
@@ -747,6 +750,7 @@ export class PluginManager {
                 delete this.plugins[k]
                 delete this.plugin_names[name]
               }
+              this.unregister(plugin)
               if (typeof plugin.terminate === 'function') {
                 plugin.terminate().then(()=>{this.update_ui_callback()})
               }
@@ -756,7 +760,10 @@ export class PluginManager {
         }
       }
     }
-    this.unregister(plugin)
+    this.unregister(_plugin)
+    if (typeof _plugin.terminate === 'function') {
+      _plugin.terminate().then(()=>{this.update_ui_callback()})
+    }
   }
 
   reloadPlugin(pconfig) {
@@ -1254,9 +1261,9 @@ export class PluginManager {
         }
         repository_url = githubImJoyManifest('https://github.com/'+url)
       }
-      else if(url.includes('github') && url.includes('/blob/')){
+      else if(url.includes('github.com')){
         repository_url = githubImJoyManifest(url)
-        repo_origin = repository_url
+        repo_origin = githubRepo(url)
       }
       else{
         repository_url = url
@@ -1577,7 +1584,7 @@ export class PluginManager {
       if(!target_plugin.api[function_name]){
         throw `function "${function_name}" of ${plugin_name} is not available.`
       }
-      return await target_plugin.api[function_name].apply(null, Array.prototype.slice.call(arguments, 2, arguments.length-1))
+      await target_plugin.api[function_name].apply(null, Array.prototype.slice.call(arguments, 3, arguments.length))
     }
     else{
       throw `plugin with type ${plugin_name} not found.`

@@ -1,7 +1,11 @@
 # User Manual
 
 Here we describe in more detail the main concepts of ImJoy and how it can
+<<<<<<< HEAD
 be used. 
+=======
+be used.
+>>>>>>> upstream/master
 
 ## Glossary
 
@@ -96,7 +100,7 @@ located in `~/ImJoyApp`. You can access this Miniconda environment from the
 command line interface.
 
 For **Linux or MacOS**, you need to add `~/ImJoyApp/bin` to your `$PATH`:
-```
+```bash
 export PATH=~/ImJoyApp/bin:$PATH
 
 # now you can use `conda`, `pip`, `python` provided from ~/ImJoyApp
@@ -108,7 +112,7 @@ python -m imjoy
 ```
 
 For **Windows**, you can use a powershell and add the ImJoyApp to `$env.Path`:
-```
+```bash
 $env:Path = '%systemdrive%%homepath%\ImJoyApp;%systemdrive%%homepath%\ImJoyApp\Scripts;' + $env:Path;
 
 # now you can use `conda`, `pip`, `python` provided from ~/ImJoyApp
@@ -174,7 +178,7 @@ you might need to contact your IT department.
 When the plugin engine doesn't start, performing an ImJoy upgrade often resolves this
 problem. For this, you can run the following command in your terminal:
 
-```python
+```bash
 export PATH=~/ImJoyApp/bin:$PATH
 pip install -U git+https://github.com/oeway/ImJoy-Engine#egg=imjoy
 ```

@@ -343,6 +343,11 @@ export function githubImJoyManifest(url) {
 	return "https://raw.githubusercontent.com/" + githubUser + "/" + githubRepo + "/" + githubBranch + "/manifest.imjoy.json";
 }
 
+export function githubRepo(url) {
+	var ghObj = githubUrlToObject(url);
+	return ghObj.user + "/" + ghObj.repo;
+}
+
 export const hot_lut = [
   [10, 0, 0],
 [13, 0, 0],

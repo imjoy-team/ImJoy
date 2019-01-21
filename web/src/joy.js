@@ -1467,6 +1467,11 @@ var modal = {};
 Joy.modal = modal;
 
 modal.init = function(master){
+	//remove existing model dialog
+	var elements = document.querySelectorAll("#joy-modal");
+	for(var i=0; i<elements.length; i++) {
+	   elements[i].parentNode.removeChild(elements[i]);
+	}
 
 	// The main modal container
 	modal.dom = document.createElement("div");

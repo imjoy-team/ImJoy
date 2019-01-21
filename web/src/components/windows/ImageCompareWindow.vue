@@ -1,5 +1,5 @@
 <template>
-    <comparify v-if="w.data && w.data.first && w.data.second" :value="w.data.offset || 50" class="bg-white h-64 w-full">
+    <comparify ref="compare" v-if="w.data && w.data.first && w.data.second" :value="w.data.offset || 50" class="bg-white h-64 w-full">
       <img slot="first" class="h-64 object-fit-first h-full w-full" :src="w.data.first" alt="">
       <img slot="second" class="object-fit-second h-full w-full" :src="w.data.second" alt="">
     </comparify>
@@ -27,6 +27,11 @@ export default {
       default: function() {
         return null
       }
+    }
+  },
+  mounted(){
+    this.w.resize = ()=>{
+      this.$refs.compare.handleResize()
     }
   }
 }
