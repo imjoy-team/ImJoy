@@ -129,12 +129,12 @@ describe('ImJoy.vue', async () => {
           if (err){
             console.error(err);
           }
-          expect(err).to.be.null
+          expect(err).to.be.undefined
           fs.readFile('/tmp/test.txt', 'utf8', function (err, data) {
             if (err){
               console.error(err);
             }
-            expect(err).to.be.null
+            expect(err).to.be.undefined
             expect(data).to.equal(c)
             done()
           });
