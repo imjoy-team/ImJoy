@@ -1361,25 +1361,21 @@ export default {
       this.$forceUpdate()
     },
     showFileDialog(_plugin, options){
-      assert(typeof options === 'object')
+      options = options || {}
       if(!this.em.connected){
         this.showMessage('File Dialog requires the plugin engine, please connect to the plugin engine.')
         throw "Please connect to the Plugin Engine 🚀."
       }
       if(_plugin && _plugin.id){
-        const source_plugin = this.pm.plugins[_plugin.id]
-        if(source_plugin || _plugin === this.IMJOY_PLUGIN){
-          if(source_plugin){
-            options.root = options.root || (source_plugin.config && source_plugin.config.work_dir)
-          }
-          if(source_plugin && source_plugin.type != 'native-python'){
-            options.uri_type = options.uri_type || 'url'
-          }
-          else{
-            options.uri_type = options.uri_type || 'path'
-          }
-          return this.$refs['file-dialog'].showDialog(_plugin, options)
+        options.root = options.root || (_plugin.config && _plugin.config.work_dir)
+
+        if(_plugin.type != 'native-python'){
+          options.uri_type = options.uri_type || 'url'
         }
+        else{
+          options.uri_type = options.uri_type || 'path'
+        }
+        return this.$refs['file-dialog'].showDialog(_plugin, options)
       }
       else{
         return this.$refs['file-dialog'].showDialog(_plugin, options)
@@ -1396,9 +1392,7 @@ export default {
           reject("Plugin not found.")
           return
         }
-        const source_plugin = this.pm.plugins[_plugin.id]
-        const plugin_name = source_plugin && source_plugin.name
-        if(_plugin !== this.IMJOY_PLUGIN && !plugin_name){
+        if(_plugin !== this.IMJOY_PLUGIN && !_plugin.name){
           reject("Plugin name not found.")
           return
         }
@@ -1424,7 +1418,7 @@ export default {
             resolve_permission()
           }
           else{
-            this.permission_message = `Plugin <strong>"${plugin_name}"</strong> would like to access your local file at <strong>"${config.path}"</strong><br>This means files and folders under "${config.path}" will be exposed as an url which can be accessed with the url.<br><strong>Please make sure this file path do not contain any confidential or sensitive data.</strong><br>Do you trust this plugin and allow this operation?`
+            this.permission_message = `Plugin <strong>"${_plugin.name}"</strong> would like to access your local file at <strong>"${config.path}"</strong><br>This means files and folders under "${config.path}" will be exposed as an url which can be accessed with the url.<br><strong>Please make sure this file path do not contain any confidential or sensitive data.</strong><br>Do you trust this plugin and allow this operation?`
             this.resolve_permission = resolve_permission
             this.reject_permission = reject
             this.showPermissionConfirmation = true
