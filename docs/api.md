@@ -427,8 +427,9 @@ Access the in-browser filesystem with the [Node JS filesystem API](https://nodej
  * `/home`: `IndexedDB`, data is stored in the browser IndexedDB database, can be used as persistent storage.
 
 **Examples**
-<!-- tabs:start -->
 
+<!-- tabs:start -->
+#### ** JavaScript **
 ```javascript
 api.fs.writeFile('/tmp/temp.txt', 'hello world', function(err, data){
     if (err) {
@@ -445,7 +446,7 @@ api.fs.writeFile('/tmp/temp.txt', 'hello world', function(err, data){
     });
 });
 ```
-
+#### ** Python **
 ```python
 def read(err, data=None):
     if err:
