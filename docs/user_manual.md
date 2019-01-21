@@ -119,9 +119,6 @@ python -m imjoy
 ```
 
 
-
-
-
 ## Using the Plugin Engine remotely
 To perform computational intensive calculations you can launch the Plugin Engine
 remotely, e.g. on dedicated processing workstations, computational clusters, or

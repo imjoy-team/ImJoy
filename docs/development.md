@@ -631,6 +631,10 @@ social networks. We detail below how this link can be created and which options 
 1. You can **directly send** the plugin file (extension `*.imjoy.html`). This file can then
 be dragged into the ImJoy workspace, where it will be automatically recognized as a plugin.
 
+
+In the last section, we describe how plugins **depending on custom libraries** can be
+distributed.
+
 <!-- THIS MIGHT BE CONFUSING.
 In last option, which we typically don't recommend, you can send an url pointing
 to the plugin file. This url can then be used to install the plugin in ImJoy:
@@ -745,9 +749,8 @@ If your plugin depends on non-standard libraries and modules, you have to provid
 them with your plugin. You can upload those libraries and modules to a GitHub repository,
 GitHub Gist, or other data-sharing platforms such as Dropbox and link them in the plugin code.
 
- *  For **JavaScript** plugins, you need to create a Gist or GitHub repository with
-    the same name as the plugin. Upload the plugin (ending with `.imjoy.html`) file
-    together with the other JavaScript files.
+ *  For **JavaScript** plugins, you need to create a Gist or GitHub.
+    Upload the plugin (ending with `.imjoy.html`) file together with the other JavaScript files.
 
     In the plugin file, you can then use `importScripts(url_to_your_js_file)`
     to import this libraries. However, due GitHub restrictions, you can't use
