@@ -756,15 +756,20 @@ GitHub Gist, or other data-sharing platforms such as Dropbox and link them in th
     to import this libraries. However, due GitHub restrictions, you can't use
     the GitHub url directly, but you convert the url with [jsDelivr](https://www.jsdelivr.com/rawgit).
 
- *  For **Python** plugins, we recommend to wrap your library as a pip module.
+ *  For **Python** plugins, we recommend to package your library as a pip module.
     Several excellent ressources, such as [this one](https://packaging.python.org/tutorials/packaging-projects/),
-    explaining this step exist.
+    explaining this step exist. Please note that it is not necessary that you up-load your package to the
+    Package Index. The crucial part is that you provide the `setup.py`.
+
     Create a [gist](https://gist.github.com/) or a GitHub repository, and obtain
     the link to this repository. You can use the terminal command `pip install ...`
     to check if you can install your module.
 
     You can then add the GitHub link to `requirements` in the `<config>` block of your plugin.
-    The GitHub link should be formatted to something like: `git+https://github.com/oeway/ImJoy-Engine#egg=imjoy`,
+
+    1. If your package is not indexed, then you can specify the requiremen in this formatted
+       `pip install -U git+https://github.com/oeway/ImJoy-Engine#egg=imjoy`.
+    2. If your package is indexed, you can format the requirement like this:`git+https://github.com/oeway/ImJoy-Engine#egg=imjoy`,
 
     We recommend specifying the [GitHub release](https://help.github.com/articles/creating-releases/)
     of your library with `#egg=imjoy`. This ensures that the correct
