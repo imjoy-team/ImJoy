@@ -549,11 +549,11 @@ Examples:
 
 
 ## Hosting and deploying your plugins
-Here, we provide detailed information for the different available deployment
-options, ranging from a single file to setup your own ImJoy plugin repository.
-In either case, you can then distribute your plugin either directly as files or
+Here, we provide detailed information for how to host and deploy ImJoy plugins.
+
+Hosting options range from storing single file to setting up your own ImJoy
+plugin repository. The plugins can then be deployed directly as files or
 with a dedicated url syntax, which allows an automatic installation.
-These distribution options are detailed in the following section.
 
 ### Hosting on the web
 You can host the plugin code on the web, e.g. GitHub, Gist, or Dropbox. This is
@@ -600,12 +600,11 @@ the dedicated section below.
 
 
 ### Deployment through the official ImJoy plugin repository
-The plugin repository shown on the ImJoy.IO is served with GitHub through
-the [ImJoy-Plugins repository](https://github.com/oeway/ImJoy-Plugins).
+The ImJoy plugin repository shown on `ImJoy.io` is served through [GitHub](https://github.com/oeway/ImJoy-Plugins).
 
-In order to deploy your plugin to the plugin repository, you can fork the repository,
- add your plugin and then send a pull request to [ImJoy-Plugins](https://github.com/oeway/ImJoy-Plugins).
- Once the pull request being accepted, the user will be able to install your plugin from the plugin repository.
+In order to deploy your plugin to the [plugin repository](https://github.com/oeway/ImJoy-Plugins), you can fork the repository,
+add your plugin and send a pull request. Once the pull request is accepted,
+the user will be able to install your plugin from the plugin repository.
 
 
 ## Distribute plugins

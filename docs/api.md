@@ -867,7 +867,7 @@ If duration is not specified, snackbar will be shown for 10s.
 **Arguments**
 
 * **message**: String. Message to be displayed.
-* **duration** (optional): Integer. Duration in seconds message will be shown.
+* **duration** (optional): Integer. Duration in seconds for message to be shown.
 
 **Examples**
 
@@ -884,7 +884,7 @@ Updates the progress bar on the Imjoy GUI.
 
 **Arguments**
 
-* **progress**: Float or Integer. Progress in percentage. Allowed range from 0 to 100 for Integer, or 0 to 1 for float.
+* **progress**: Float or Integer. Progress in percentage. Allowed range from 0 to 100 for integer, or 0 to 1 for float.
 
 **Examples**
 ``` javascript
