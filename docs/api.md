@@ -464,6 +464,61 @@ api.fs.writeFile('/tmp/temp.txt', 'hello world', read)
 ```
 <!-- tabs:end -->
 
+
+Reading large files chunk-by-chunk in JavaScript:
+```javascript
+function generate_random_data(size){
+    var chars = 'abcdefghijklmnopqrstuvwxyz'.split('');
+    var len = chars.length;
+    var random_data = [];
+
+    while (size--) {
+        random_data.push(chars[Math.random()*len | 0]);
+    }
+
+    return random_data.join('');
+}
+
+const fs = api.fs
+fs.writeFile('/tmp/test.txt', generate_random_data(100000), function(err){
+if (err){
+    console.error(err);
+}
+fs.open('/tmp/test.txt', 'r', function(err, fd) {
+    fs.fstat(fd, function(err, stats) {
+      if(err){
+          reject(err)
+          return
+      }
+      var bufferSize = stats.size,
+          chunkSize = 512,
+          buffer = new Uint8Array(new ArrayBuffer(chunkSize)),
+          bytesRead = 0;
+
+      var stopReadding = false
+      var readCallback = function(err, bytesRead, read_buffer){
+          if(err){
+              console.log('err : ' +  err);
+              stopReadding = true
+              reject(err)
+          }
+          const bytes = read_buffer.slice(0, bytesRead)
+          console.log('new chunk:', bytes)
+      };
+      while (bytesRead < bufferSize && !stopReadding) {
+          if ((bytesRead + chunkSize) > bufferSize) {
+              chunkSize = (bufferSize - bytesRead);
+          }
+          fs.read(fd, buffer, 0, chunkSize, bytesRead, readCallback);
+          bytesRead += chunkSize;
+      }
+      fs.close(fd);
+      resolve()
+    });
+  });
+})
+```
+
 ### api.getAttachment
 ```javascript
 content = await api.getAttachment(att_name)

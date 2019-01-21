@@ -137,7 +137,7 @@ describe('ImJoy.vue', async () => {
             expect(err).to.be.undefined
             expect(data).to.equal(c)
             done()
-          });
+          });  
       });
     })
   })

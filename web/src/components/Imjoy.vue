@@ -145,11 +145,9 @@
               </md-menu-item>
               <md-menu-item @click="$refs.file_form.reset();$refs.file_select.click(); files_expand=false" class="md-button">
                 <md-icon>insert_drive_file</md-icon>Open File
-                <md-tooltip>Open a file</md-tooltip>
               </md-menu-item>
               <md-menu-item @click="$refs.folder_form.reset();$refs.folder_select.click(); files_expand=false" class="md-button">
                 <md-icon>folder_open</md-icon>Open Folder
-                <md-tooltip>Open a folder</md-tooltip>
               </md-menu-item>
             </md-menu-content>
           </md-menu>
@@ -161,7 +159,6 @@
             <md-menu-content>
               <md-menu-item @click="clearWorkflow(); workflow_expand=true;">
                 <md-icon>playlist_add</md-icon>New Workflow
-                <md-tooltip>Create new workflow</md-tooltip>
               </md-menu-item>
               <md-menu-item @click="workflow_expand=true; loadWorkflow(w)" v-for="w in pm.workflow_list" :key="w.name">
                 <span>{{w.name}}</span>
@@ -847,7 +844,9 @@ export default {
         this.showMessage('Failed to initialize file system: ' + e.toString())
       }
       this.pm.init()
-      this.pm.setInputLoaders(this.getDefaultInputLoaders())
+      for(let inputs of this.getDefaultInputLoaders()){
+        this.wm.registerInputLoader(inputs.loader_key, inputs, inputs.loader)
+      }
       this.repository_list = await this.pm.loadRepositoryList()
       this.pm.selected_repository = this.repository_list[0]
       try {
@@ -951,6 +950,18 @@ export default {
       })
     },
     getDefaultInputLoaders(){
+      const image_loader = (file)=>{
+        const reader = new FileReader();
+        reader.onload =  () => {
+          this.pm.createWindow(null, {
+            name: file.name,
+            type: 'imjoy/image',
+            data: {src: reader.result, _file: file}
+          })
+        }
+        reader.readAsDataURL(file);
+      }
+
       const code_loader = (file)=>{
         const reader = new FileReader();
         reader.onload = ()=>{
@@ -959,7 +970,8 @@ export default {
         reader.readAsText(file);
       }
       return [
-        {loader_key: 'Code Editor', schema: ajv.compile({properties: {name: {type:"string", "pattern": ".*\\.imjoy.html|\\.html|\\.txt|\\.xml"}, size: {type: 'number'}}, required: ["name", "size"], loader: code_loader})},
+        {loader_key: 'Code Editor', schema: ajv.compile({properties: {name: {type:"string", "pattern": ".*\\.imjoy.html$"}, size: {type: 'number'}}, required: ["name", "size"]}), loader: code_loader},
+        {loader_key:'Image',  schema: ajv.compile({properties: {type: {type:"string", "enum": ['image/jpeg', 'image/png', 'image/gif']}, size: {type: 'number'}}, required: ["type", "size"]}), loader: image_loader}
       ]
     },
     updateSize(e){
@@ -1232,10 +1244,13 @@ export default {
       this.plugin_dialog_promise = null
     },
     loadFiles(selected_files) {
+      console.log(selected_files)
       if(selected_files.length === 1){
+
         const file = selected_files[0]
         const loaders = this.wm.getDataLoaders(file)
         const keys = Object.keys(loaders)
+        console.log(selected_files, loaders, keys)
         if(keys.length === 1){
           try {
             return this.wm.registered_loaders[loaders[keys[0]]](file)

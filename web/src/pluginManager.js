@@ -140,7 +140,6 @@ export class PluginManager {
       outputs: {},
       loaders: {}
     }
-    this.setInputLoaders(this.getDefaultInputLoaders())
   }
 
   loadRepositoryList(){
@@ -484,24 +483,6 @@ export class PluginManager {
     for(let inputs of input_loaders){
       this.wm.registerInputLoader(inputs.loader_key, inputs, inputs.loader)
     }
-  }
-
-  getDefaultInputLoaders(){
-    const image_loader = (file)=>{
-      const reader = new FileReader();
-      reader.onload =  () => {
-        this.createWindow(null, {
-          name: file.name,
-          type: 'imjoy/image',
-          data: {src: reader.result, _file: file}
-        })
-      }
-      reader.readAsDataURL(file);
-    }
-
-    return [
-      {loader_key:'Image',  schema: ajv.compile({properties: {type: {type:"string", "enum": ['image/jpeg', 'image/png', 'image/gif']}, size: {type: 'number'}}, required: ["type", "size"]}), loader: image_loader},
-    ]
   }
 
   reloadPlugins() {
