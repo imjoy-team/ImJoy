@@ -407,7 +407,7 @@ export class PluginManager {
       force: true
     }).then(() => {
       this.workflow_list.push(data)
-      this.showMessage(name + ' has been successfully saved.')
+      this.showMessage( `Workflow "${name}" has been successfully saved.`)
     }).catch((err) => {
       this.showMessage('Failed to save the workflow.')
       console.error(err)
@@ -422,7 +422,7 @@ export class PluginManager {
       if (index > -1) {
         this.workflow_list.splice(index, 1);
       }
-      this.showMessage(name + ' has been successfully removed.')
+      this.showMessage(`Workflow "${w.name}" has been successfully removed.`)
     }).catch((err) => {
       this.showMessage('Failed to remove the workflow.')
       console.error(err)
@@ -447,7 +447,7 @@ export class PluginManager {
                 }
               })
           } catch (e) {
-            console.error('failed to reload database: ', e)
+            console.error('Failed to reload database: ', e)
             this.db = new PouchDB(this.selected_workspace + '_workspace', {
               revs_limit: 2,
               auto_compaction: true
