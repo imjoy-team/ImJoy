@@ -137,7 +137,7 @@ describe('ImJoy.vue', async () => {
             expect(err).to.be.undefined
             expect(data).to.equal(c)
             done()
-          });  
+          });
       });
     })
   })
@@ -209,6 +209,10 @@ describe('ImJoy.vue', async () => {
 
     it('should get attachment', async () => {
       expect(await plugin1.api.test_get_attachment()).to.be.true
+    })
+
+    it('should read and write with fs', async () => {
+      expect(await plugin1.api.test_fs()).to.be.true
     })
 
   })
