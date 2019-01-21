@@ -757,7 +757,8 @@ GitHub Gist, or other data-sharing platforms such as Dropbox and link them in th
     the GitHub url directly, but you convert the url with [jsDelivr](https://www.jsdelivr.com/rawgit).
 
  *  For **Python** plugins, we recommend to wrap your library as a pip module.
-    Several excellent ressources exist, such as [this one](https://packaging.python.org/tutorials/packaging-projects/)
+    Several excellent ressources, such as [this one](https://packaging.python.org/tutorials/packaging-projects/),
+    explaining this step exist.
     Create a [gist](https://gist.github.com/) or a GitHub repository, and obtain
     the link to this repository. You can use the terminal command `pip install ...`
     to check if you can install your module.
