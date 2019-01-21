@@ -1361,7 +1361,7 @@ export default {
       this.$forceUpdate()
     },
     showFileDialog(_plugin, options){
-      assert(typeof options === 'object')
+      options = options || {}
       if(!this.em.connected){
         this.showMessage('File Dialog requires the plugin engine, please connect to the plugin engine.')
         throw "Please connect to the Plugin Engine 🚀."
