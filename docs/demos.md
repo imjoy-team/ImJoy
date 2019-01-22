@@ -158,13 +158,24 @@ examples for some of them.
 - [**vtk.js**](https://kitware.github.io/vtk-js/index.html)
     > VTK.js is a JavaScript library available for scientific visualization in your browser.
 
-    ![imjoy-demo-gui-code](assets/imjoy-demo-3d-vtk.png ':size=400')
-
-
 - [**sponza by Babylon.js**](https://www.babylonjs.com/demos/sponza/)
     > Babylon.js is a real time 3D engine using a JavaScript library for displaying 3D graphics in a web browser via HTML5.
 
+![imjoy-demo-gui-code](assets/imjoy-demo-3d-vtk.png ':size=500')
+
 <a href="http://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:3D visualization&w=demo-js" target="_blank">**Try me >>**</a>
+
+
+### blockly
+From [https://developers.google.com/blockly/](https://developers.google.com/blockly/)
+
+> A JavaScript library for building visual programming editors. The Blockly library
+  adds an editor to your app that represents coding concepts as interlocking blocks.
+  It outputs syntactically correct code in the programming language of your choice.
+
+![imjoy-demo-gui-code](assets/imjoy-demo-blockly.png ':size=600')
+
+<a href="http://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:Fixed-Blockly&w=demo-js" target="_blank">**Try me >>**</a>
 
 
 ### handlebars.js
