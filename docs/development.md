@@ -1,5 +1,7 @@
 # Developing Plugins for ImJoy
 
+## Overview
+
 Developing plugins for ImJoy is easy and fast with the built-in code editor which runs directly in the web app, no additional IDE or compiler is needed for development.
 
 The following list illustrates key features of the plugin system in ImJoy:
@@ -16,9 +18,8 @@ The following list illustrates key features of the plugin system in ImJoy:
  * Deploying your own plugin with GitHub
 
 
- ## Main components of ImJoy
-
-![imjoy-plugin-development](assets/imjoy-architecture.png ':size=800')
+### ImJoy architecture
+Imjoy consists of **two main components**
 
  1.  The **ImJoy Web App**. The app can run alone, and plugins can be developed in
      JavaScript or in Python by using [pyodide](https://github.com/iodide-project/pyodide).
@@ -30,12 +31,12 @@ The following list illustrates key features of the plugin system in ImJoy:
      Packages are managed by `conda` and `pip` which provides access to the
      entire Python ecosystem.
 
-Imjoy consists of **two main components**
+![imjoy-plugin-development](assets/imjoy-architecture.png ':size=800')
 
  The Python Plugin Engine is connected with the ImJoy Web App through websockets
  and communicates with a customized remote procedure calls (RPC) based on [socket.io](https://github.com/miguelgrinberg/python-socketio).
 
- ### How to choose a plugin environment
+ ### Choose a plugin environment
  ImJoy provides a flexible framework to develop your plugins. Here we provide
  some typical examples for how ImJoy can be used. Please not that these are only
  some suggestions, other combinations are of course possible and be interesting
@@ -115,20 +116,6 @@ Similary to Web Worker plugins, Native Python plugins do not have access to the 
 *   **JavaScript plugins**: this concerns either Web Worker (`web-worker`) or Window (`window`) plugins. With the ImJoy code editor, you can write your code. For testing you can click save on the toolbar in the code editor, and it will automatically load your plugin to the plugin menu shown on the left side. By right click on in the workspace, you use the [chrome development tool](https://developers.google.com/web/tools/chrome-devtools) to see the console and debug your code.
 
 * **Python plugins**: Similarly, you can create Python plugins from the `native-python` template in the **+ PLUGINS** dialog. If your plugin engine is running, you can save and run(Ctrl+S, or through the toolbar) with your code directly in the ImJoy code editor. For larger project with many Python files, the recommended way is to wrap your Python files as standard Python modules, write and test the Python module using your code editor/IDE of choice (Atom, Spyder, PyCharm,...). Then create an ImJoy plugin with the ImJoy code editor, by inserting the module path to `sys.path` (e.g. `sys.insert(0, '~/my_python_module')`), you can then import the module to the ImJoy plugin and test it.
-
-## Loading / saving data
-The **ImJoy app** is build on web technology and is running in the browser. This influences
-how data can be loaded and saved. For security restrictions, ImJoy or its plugins running in a browser cannot directly
-access your local file system, the user will need to open or drag files into ImJoy, and the result files can only be saved by triggering downloads. On the other hand, the **Plugin Engine** has full access to the local file system, native python plugins can read and write directly from the local file system.
-
-![imjoy-data-accessibility](assets/imjoy-data-accessibility.png ':size=800')
-
-Therefore, there are currently several different ways to handle loading/saving files for plugins
-with or without the plugin engine.
-
- * If the **Plugin Engine** is running, there are three api functions for **all** types of plugins to access the local file system: `api.showFileDialog`, `api.getFileUrl`, `api.getFilePath`. Specifically for **Python plugins** running on the plugin engine, files can be directly loaded and written to the file system with standard python file operations.
-
- * If the **Plugin Engine** is not running, the only way for **JavaScript or Web Python plugins** to access files is ask the user to drag a file, a set of files or a folder directly into the ImJoy workspace. This will render a window with the file/folder content. These data can then be accessed by the plugins and be processed. For exporting result files, `api.exportFile` function can be used to trigger a download.
 
 ## Plugin file format
 The ImJoy plugin file format (shared by all Plugin types)  is built up on html format with customized blocks (inspired by the `.vue` format). It consists of two mandatory blocks `<config>` and `<script>`, and other optional blocks including `<docs>`, `<window>`,`<attachment>`,`<link>` and `<style>`.  For `<style>`, you can also set the `src` attribute.
@@ -388,29 +375,69 @@ The `lang` property of the `<script>` block is used to specify the used programm
 
 ## Plugin properties
 
-### Plugin operators (ops)
-For a plugin, you can define independent operators (or **ops**) with the Plugin API (see **api.register** for details). Each of these **ops** is defined in a similar fashion as
-the `<config>` block and has it's own set of parameters defined via a GUI and can have its dedicated run function. The different ops are displayed when you press on the barrow down button in the Plugin list. Each op can also be added to the workflow separately.
+### Loading/saving data
+The **ImJoy app** is build on web technology and is running in the browser. This influences
+how data can be loaded and saved. For security restrictions, ImJoy or its plugins running in a browser cannot directly
+access your local file system, the user will need to open or drag files into ImJoy, and the result files can only be saved by triggering downloads. On the other hand, the **Plugin Engine** has full access to the local file system, native python plugins can read and write directly from the local file system.
 
-### Transfer of functions and data
-The plugin system of ImJoy is built on remote procedure calls, and an encoding and decoding scheme is used by ImJoy to transfer data and functions between plugins. We expose a set of API functions from both the main app and the plugins.
+![imjoy-data-accessibility](assets/imjoy-data-accessibility.png ':size=800')
+
+Therefore, we provide several different ways to handle loading/saving files for plugins
+with or without the plugin engine.
+
+ * If the **Plugin Engine** is running, there are three api functions for **all** types of plugins to access the local file system: `api.showFileDialog`, `api.getFileUrl`, `api.getFilePath`. Specifically for **Python plugins** running on the plugin engine, files can be directly loaded and written to the file system with standard python file operations.
+
+ * If the **Plugin Engine** is not running, the only way for **JavaScript or Web Python plugins** to access files is ask the user to drag a file, a set of files or a folder directly into the ImJoy workspace. This will render a window with the file/folder content. These data can then be accessed by the plugins and be processed. For exporting result files, `api.exportFile` function can be used to trigger a download.
+
+
+### Plugin operators (ops)
+You can define for a plugin independent operators (or **ops**) with the Plugin
+API (see **api.register** for details). Each of these **ops** is defined in a similar fashion as
+the `<config>` block: you can define an interface to set parameters, and it can have a dedicated run function.
+The different ops are displayed when you press on the arrow down button in the plugin list.
+
+
+### Transfer functions and data
+The plugin system of ImJoy is built on remote procedure calls.
+An encoding and decoding scheme is used by ImJoy to transfer data and functions
+between plugins. We expose a set of API functions from both the main app and the plugins.
 
 #### Interacting with ImJoy app and other plugins
-The plugin can call ImJoy API functions to interact with the main ImJoy user interface
-and other plugins via a predefined object called `api`. For the list of the API functions their usage, we refer to the [ImJoy API functions](/api).
+The plugin can use a predefined object called `api` to call different ImJoy API
+functions, which allow interaction with the main ImJoy user interface and other plugins.
+We refer to the section [ImJoy API functions](/api) for a complete list of the available
+API functions.
 
-#### Exposing Plugin functions
-By using the ImJoy API function `api.export` at the end of the plugin code, a set of plugin functions can be exported as `Plugin APIs`. `setup` and `run` as described before are two mandatory `Plugin API` functions which need to be defined and exported. In addition to that, other functions can be also exported as `Plugin APIs`. These can then be called with `api.call` or `api.run` by other plugins.
+#### Exposing plugin functions
+Plugin functions can be exported as `Plugin APIs` by using the ImJoy
+API function `api.export` at the end of the plugin code.
+`setup` and `run` are two mandatory functions which need to be defined and exported.
+
+When exporting ImJoyPlugin class is exported with the `api.export` as proposed
+in the plugin templates, these functions (and all other functions of the ImJoy plugin class)
+will be exported. Other plugin functions can be also exported and can then be
+called **repeatedly** by other plugins with `api.call` or `api.run` .
 
 #### Callback functions
-Besides the `Plugin API` functions, when a plugin is executed, you can return an object which includes functions which will be called by other plugins or ImJoy.
+Plugin functions that were not exported as `Plugin API` functions, can be sent
+as an object to another plugin or ImJoy. These function will be will be
+treated as a `callback` function and can be only called once.
 
-However, if the function has never been exported as a `Plugin API` before, it will be treated as a `callback` function and can be only called once. Otherwise, if the function has been exported as `Plugin API`, it won't be treated as `callback` function and can be called repeatedly.
+A typical case example is a notification function that can be used be the called
+plugin to inform the calling plugin that a computation is finished. Such a function
+has to be called only once.
 
 ### Data exchange
-When a window in the ImJoy workspace is selected, the contained data (e.g. an image) will be transferred to the Python plugin. The plugin can then process the data with the `run` function, results will be send back to the ImJoy workspace and displayed as a new window. Natively, ImJoy supports the conversion and transmission of Numpy arrays and Tensorflow tensors, so plugin developers could just use those data types and exchange them between plugins, no matter if they are in Python or JavaScript.
+A window in ImJoy can contain data, e.g. an image. When selecting such a window
+and executing a plugin, the contained data will be transferred to the Python plugin.
+A plugin can then process the data within the `run` function, by accessing `my.data`.
+The results will be sent back to the ImJoy workspace and displayed as a new window.
 
-#### Small data
+Natively, ImJoy supports the conversion and transmission of Numpy arrays and
+Tensorflow tensors. Plugin developers could just use those data types and exchange
+them between plugins, no matter if they are in Python or JavaScript.
+
+#### Small data volumes
 
 You can directly pass the data as parameters of api functions which will be send to the frontend.
 Small numpy arrays, strings, bytes (less 10MB for example) can be directly send through the builtin websocket between the Plugin Engine and the web app.
@@ -425,7 +452,7 @@ with open("output.png", "rb") as f:
     api.createWindow(name='unet prediction', type = 'imjoy/image', w=7, h=7, data= {"src": imgurl})
 ```
 
-#### Large data
+#### Large data volumes
 Potentially, you can send large files in smaller chunks but this is not optimal and
 may block normal communication between the engine and the ImJoy app. We recommend to store the data on the disk (in the workspace directory for example), then use `api.getFileUrl` to generate an url to access the file. The generated url can then be send to the web App and accessed with a download link or using JavaScript libraries such as `axios`. Many libraries such as Three.js, Vega etc. can load files through url directly.
 
@@ -453,8 +480,7 @@ In the example below, the image from an url will be displayed in a image window 
    return { "type": "imjoy/image", "data": {"src": "https://imjoy.io/static/img/imjoy-icon.png"} }
 ```
 
-
-ImJoy use postMessage to exchange data between plugins. This means that for JavaScript
+ImJoy uses postMessage to exchange data between plugins. This means that for JavaScript
 plugins, objects are cloned during the transfer. If large objects are exchanged,
 if the created objects are not directly transferred. To enable that, you can
 add `_transfer=true` to your object when you return it. In the above
@@ -478,7 +504,7 @@ We provide additional fields in `my` that allow to track, maintain and reconstru
 
  Importantly, `_workflow_id`, `_variables`, `_op` and `_source_op` can be used to implement interactivity between plugins, meaning if the user changed a state in one of the result window, the downstream workflow will be updated automatically.
 
-### Controlling run-time behavior of Native Python plugins
+### Controlling run-time behavior of native Python plugins
 You can control the run-time behavior of a Python plugin process with the `flags` field in the `<config>` block. Next we provide next nomenclature and additional explanations to explain the different options you have to control how the Python processes running on the plugin engine interact with the ImJoy interface.
 
 * **Interface**: web interface of ImJoy. You can have ImJoy running on multiple browser windows, i.e. multiple interfaces.

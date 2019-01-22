@@ -1,7 +1,9 @@
 # Demos
-Here we provide several demos illustrating important concepts of ImJoy. You can inspect the code of the provided plugins by clicking on the symbol left of the plugin name and selecting `Edit`.
+Here we provide several demos illustrating important concepts of ImJoy.
+Once you installed the plugins, you can inspect the code of the provided plugins
+by clicking on the symbol left of the plugin name and selecting `Edit`.
 
-## User interaction
+## How to interact with the user
 An important part of ImJoy is to provide a flexible way to interact with the user, to either specify input information or provide results.
 
 **User input**
