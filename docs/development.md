@@ -226,7 +226,6 @@ You can set different `requirements` accordingly: `"requirements": {"gpu": ["ten
 The user will be asked to choose one of the tags during the installation, which will then install
 the specified requirements.
 
-
 Besides the **``<config>``**, you can also configure the **`<script>`** block, and you can
 select which script block will be executed. For this, you have to add the `tag` property
 to the `<script>` block. Notice also that you will still need the `lang` property.
