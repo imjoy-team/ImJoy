@@ -261,6 +261,7 @@ In some cases, the ui might only contain a brief description of the op. This can
 For better rendering of the interface, we support **certain html tags** in the ui string. currently allowed
 tags are: `a`, `img`, `p`, `div`, `span`, `br`, `b`, `i`, `u`,`hr`.
 Further, the following **css specification** are allowed: `border`, `margin`, `padding`.
+These restriction are imposed to prevent XSS attacks.
 
 
 To define **longer forms with multiple lines**, we support additional definitions of the `ui` string.
