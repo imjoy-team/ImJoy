@@ -70,8 +70,10 @@ There are four types of plugins available for different purposes:
 
 **Python** plugins support these two types:
 
-1. `Native Python` plugins for performing heavy-duty computational tasks using Python and its libraries, this requires additional installation of plugin engine;
-1. `Web Python` plugins for performing computational tasks using Python with in the browser through WebAssembly and the [pyodide project](https://github.com/iodide-project/pyodide). This is in developmental stage and only a selected number of Python libraries are currently supported.
+1. `Native Python` plugins for performing heavy-duty computational tasks using Python and its libraries, this requires additional installation of plugin engine.
+   These plugins are indicated with a rocket 🚀;
+1. `Web Python` plugins for performing computational tasks using Python with in the browser through WebAssembly and the [pyodide project](https://github.com/iodide-project/pyodide).
+   Such plugins are indicated with a little snack 🐍. This is in developmental stage and only a selected number of Python libraries are currently supported.
 
 Click the **+ PLUGINS** button in `Plugins`, then select `Create a New Plugin`
 with one of the plugin templates. A code editor will open in the ImJoy workspace,
@@ -237,7 +239,8 @@ the plugin, it will be loaded with this tag.
 
 
 #### ui
-String specifying the GUI that will be displayed to the user. The following elements can be used to render an input form:
+String specifying the plugin GUI that will be displayed just below the plugin.
+The following elements can be used to render an input form:
 
 * `type: 'choose', options: ['cat', 'dog'], placeholder: 'cat'`
 * `type: 'number', min: 0, max: 10, placeholder:2`
@@ -255,6 +258,11 @@ For example, to render a form with a selection use `"ui": "select an option: {id
 
 In some cases, the ui might only contain a brief description of the op. This can either be plain text, or you can also specify a           **link**    with `"ui": " <a href='https://imjoy.io' target='_blank'> ImJoy</a>"`. The `target='_blank'` will open this page in a new     tab.
 
+For better rendering of the interface, we support **certain html tags** in the ui string. currently allowed
+tags are: `a`, `img`, `p`, `div`, `span`, `br`, `b`, `i`, `u`,`hr`.
+Further, the following **css specification** are allowed: `border`, `margin`, `padding`.
+
+
 To define **longer forms with multiple lines**, we support additional definitions of the `ui` string.
 
 * an array of strings. For example:
@@ -267,7 +275,7 @@ To define **longer forms with multiple lines**, we support additional definition
 *   an array with keys and values. Here, you have to use `" "` for the keys and
     the strings. Definitions can also be mixed.
 
-In the   example below, we use a string as above for `option1` and an array with keys and values for `option2`. Note how for `option2` each key and value is defined as an individual string.
+In the  example below, we use a string as above for `option1` and an array with keys and values for `option2`. Note how for `option2` each key and value is defined as an individual string.
 
  ```json
  "ui": [
