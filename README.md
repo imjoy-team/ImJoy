@@ -5,15 +5,41 @@
 
 ## Image Processing with Joy :)
 
-ImJoy is a modern image processing framework aiming to bridge the web and the
+ImJoy is a modern image processing framework bridging the web and the
 Python ecosystem with plugins.
 
 With ImJoy, developing and deploying advanced image processing methods, such as
-deep learning, has been so easy thanks to rich and interactive user interfaces.
+deep learning, is simple and easy thanks to rich and interactive user interfaces.
 
 <img src="https://github.com/oeway/ImJoy/raw/master/docs/assets/imjoy-screenshot.png" width="600px"></img>
 
-Getting started and documentations for the development: [ImJoy Docs](https://imjoy.io/docs)
+Checkout the documentation for how to get started and more details
+for how to develop ImJoy plugins: [ImJoy Docs](https://imjoy.io/docs)
+
+## Quick Start
+
+The easiest way to try ImJoy is to start with a plugin running directly in the browser.
+
+For example, you can install our `Image Recongnition` plugin with [this link](https://imjoy.io/#/app?plugin=oeway/ImJoy-Plugins:Image%20Recognition&workspace=getting-started).
+Clicking the link will open the ImJoy Web App and show a dialog to confirm the
+installation of the plugin. Once installed, you can launch the plugin by clicking
+the button `Image Recognition` in the plugin menu on the left. The demo plugin
+will run a trained deep neural network model (MobileNet) to perform image
+classification (e.g. identifying an elephant in an image).
+
+![imjoy-interface](assets/imjoy-predict-elephant.png ':size=300')
+
+This plugin uses your browser as its computational backend, so all
+computation is done locally, no data will be sent to a remote server.
+
+Besides running plugins in the browser, ImJoy provides the flexibility to keep
+the GUI locally in your browser, and perform compuational tasks with Python.
+These computations can be performed on your computer utilizing the full power
+of the local GPU/CPU. The computional backend can also be launched on remote servers
+including cloud servers on Amazon, Google Compute, or an institutional computing cluster.
+
+To learn more details about ImJoy, please go to [ImJoy Docs](https://imjoy.io/docs/).
+
 
 ## Key Features of ImJoy
  * Minimal and flexible plugin powered web application
@@ -41,9 +67,6 @@ Getting started and documentations for the development: [ImJoy Docs](https://imj
    - Support ndarrays from Numpy for data exchange
    - Support Tensorflow.js and native Tensorflow for deep learning
 
-## Documentation
-
-Please refer to: [ImJoy Docs](https://imjoy.io/docs/)
 
 ## ImJoy architecture
 By design, ImJoy itself provides very minimal task specific functionality.
@@ -88,12 +111,18 @@ Currently, ImJoy consists of the following repositories:
 
  We thank all the authors for offering these excellent work to the open-source community.
 
+ ## Documentation
+
+ Please refer to: [ImJoy Docs](https://imjoy.io/docs/)
 
 ## Support ImJoy
 
-Please star the ImJoy repo to support ImJoy.
+Please star the ImJoy GitHub repository to support ImJoy.
 
-We would like ImJoy to be a community driven framework, everyone is welcome to contribute your idea, feedback, plugins and code to the project. We don't have a guidline for that yet, for now please feel free to use the [issues](https://github.com/oeway/ImJoy/issues) and fork the project.
+We would like ImJoy to be a community driven framework, everyone is welcome to
+contribute your idea, feedback, plugins and code to the project.
+
+We don't have a guidline for that yet, for now please feel free to use the [issues](https://github.com/oeway/ImJoy/issues) and fork the project.
 
 
  ## License
