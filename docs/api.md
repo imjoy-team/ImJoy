@@ -390,7 +390,7 @@ Exports the plugin class or an object/dict as `Plugin API`.
 This call is mandatory for every ImJoy plugin (typically as the last line of the plugin script).
 Every member of the `ImJoyPlugin` instance will be exported as `Plugin API`, which means those exported functions
 or variables can be called or used by the ImJoy app or another plugin.
-This then allows other plugins to use `api.run` or `api.call` to call the plugin or its functions.
+This then allows other plugins to use `api.run` or `api.call` to call functions of the plugin.
 
 Only functions and variables with primitive types can be exported (number, string, boolean).
 And if a variable or function has a name start with `_`, it means that's an internal variable or function, will not be exported.
