@@ -38,7 +38,9 @@ usually developed for advanced image processing. To execute them,
 [**Python Plugin Engine**](user_manual?id=imjoy-app-and-plugin-engine) needs
 to be installed.
 
-## Example - image recognition
+## Example
+
+### Image recognition
 Here, we describe how to install and use a ImJoy plugin to perform image recognition
 with a pre-trained neural network. The plugin is ported from [mobilenet](https://github.com/tensorflow/tfjs-models/tree/master/mobilenet).
 
@@ -59,8 +61,7 @@ the window itself.
 You can run this plugin even on your **mobile phone**. Here, rather than uploading
 and image, you will be able to snap an image and perform a prediction.
 
-
-## Example - digit classification
+### Digit classification
 Here, we describe how to install and use an ImJoy plugin to perform digit classification
 with TensorFlow.js. This plugin runs directly in the browser. You can train a
 convoluation neural network (CNN) to recognize digits. Once the network is trained,
@@ -76,7 +77,7 @@ Once the plugin is install, it will appear in the plugin dialog on the left.
 You can start the plugin by pressing on its name. This will open a window with
 the different controls, where you can perform training, inspect training progress
 and the final results, and perform prediction. The usual workflow consists of a few steps
-illustrated in the screen shots and the text below: 
+illustrated in the screen shots and the text below:
 
 ![imjoy-interface](assets/imjoy-MNIST-training.png ':size=800')
 

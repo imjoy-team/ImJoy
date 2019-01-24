@@ -178,7 +178,9 @@ It defines the general properties of a plugin and contains several fields.
 Name of the plugin. It **must** be unique to avoid conflicts with other plugins.
 
 #### type
-Plugin type. See dedicated section [ImJoy Plugins](development?id=imjoy-plugins] above for more details.
+Plugin type. Allowed are : `web-worker`, `window`, `native-python` and `web-python`.
+
+See dedicated section [ImJoy Plugins](development?id=imjoy-plugins) for more details.
 
 #### version
 Specifies the version of the plugin.
