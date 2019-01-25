@@ -733,12 +733,12 @@ The following url parameters are currently supported:
      detailed in the section above.
  *   `workspace` or `w`: name of workspace. ImJoy will swithc to the specified
      workspace if it exist, or create a new one. For example, `https://imjoy.io/#/app?workspace=test`
- *   `engine` or `e`: define the url of the plugin engine. For example: `http://imjoy.io/#/app?engine=http://127.0.0.1:8080`.
+ *   `engine` or `e`: define the url of the plugin engine. For example: `http://imjoy.io/#/app?engine=http://127.0.0.1:9527`.
      Note that if you want to connect to a remote machine through a http (not https) connection,
      you can only do it by using `http://imjoy.io` and not `https://imjoy.io`.
 
      This restriction also exist if you use localhost with some browsers (e.g. Firefox).
-     To avoid it, you need to use `http://127.0.0.1:8080` rather than `http://localhost:8080`,
+     To avoid it, you need to use `http://127.0.0.1:9527` rather than `http://localhost:9527`,
      because most browser will consider `127.0.0.1` is a secured connection, but not `localhost`.
      However, there is an exception, on Safari, using `127.0.0.1` does not work due to
      [this](https://bugs.webkit.org/show_bug.cgi?id=171934), if you still want to use Safari, you have to switch to `http://imjoy.io`.
