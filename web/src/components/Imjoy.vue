@@ -608,7 +608,7 @@ export default {
       show_installed_plugins: false,
       progress: 0,
       status_text: '',
-      engine_url: 'http://127.0.0.1:8080',
+      engine_url: 'http://127.0.0.1:9527',
       connection_token: null,
       engine_session_id: null,
       showPluginEngineInfo: false,
@@ -817,7 +817,7 @@ export default {
       this.engine_url = (this.$route.query.engine || this.$route.query.e).trim()
     }
     else{
-      this.engine_url = localStorage.getItem("imjoy_engine_url") || 'http://127.0.0.1:8080'
+      this.engine_url = localStorage.getItem("imjoy_engine_url") || 'http://127.0.0.1:9527'
     }
 
     if(this.welcome){
