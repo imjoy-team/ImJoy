@@ -402,6 +402,7 @@ export function HtmlWhitelistedSanitizer(escape, tags, css, urls) {
           'src': url_sanitizer,
           'width': unconstrainted
         }),
+      'hr': globalAttributes,
       'p': globalAttributes,
       'div': globalAttributes,
       'span': globalAttributes,
