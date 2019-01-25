@@ -61,6 +61,9 @@ export class EngineManager {
         this.engine_status.connection = 'Plugin Engine is not connected.'
         if(!auto) this.showMessage('Failed to connect, please make sure you have started the plugin engine.')
         if(auto) socket.disconnect()
+        if(url.endsWith(':8080')){
+          alert('It seems you are using a legacy port (8080), you may want to change the engine url to: ' + url.replace(':8080', ':9527'))
+        }
       }
     }, 2500)
 
