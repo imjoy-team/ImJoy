@@ -43,7 +43,7 @@ ask you for the `Plugin Engine URL` and `Connection token`.
 
 ![imjoy-install-engine](assets/imjoy-install-engine.png ':size=600')
 
-You can keep the default `Plugin Engine URL`(`http://127.0.0.1:8080`), and go to
+You can keep the default `Plugin Engine URL`(`http://127.0.0.1:9527`), and go to
 your Plugin Engine dialog or terminal window to get the `Connection token`.
 
 ![imjoy-connection-token](assets/imjoy-connection-token.png ':size=600')
@@ -87,7 +87,7 @@ Two options for offline usage exist:
       python -m imjoy --serve
       ```
   0. You now have your locally available ImJoy web app that your can access in your browser
-     with this url [(http://127.0.0.1:8080)](http://127.0.0.1:8080).
+     with this url [(http://127.0.0.1:9527)](http://127.0.0.1:9527).
 
 
 ## Access the Plugin Engine from a command line interface
@@ -119,9 +119,6 @@ python -m imjoy
 ```
 
 
-
-
-
 ## Using the Plugin Engine remotely
 To perform computational intensive calculations you can launch the Plugin Engine
 remotely, e.g. on dedicated processing workstations, computational clusters, or
@@ -149,13 +146,13 @@ you might need to contact your IT department.
 0. Launch Python plugin engine on remote computer and allow access. We recommend
   to login the remote server with SSH, start the plugin engine with `python -m imjoy --serve --host=0.0.0.0`.
   By default, the host is to `127.0.0.1`, which allows only local connections. For remote access, the host is set to `0.0.0.0`.
-  The plugin engine will be launched and serve a copy of the ImJoy app through `http://YOUR_REMOTE_IP:8080`.
+  The plugin engine will be launched and serve a copy of the ImJoy app through `http://YOUR_REMOTE_IP:9527`.
   At the end of the initialization process, it will display the **connection token**.
   Copy it from the terminal, since you will need it in the next step. **KEEP THIS TOKEN PRIVATE!!!!**
 
 0. On your local machine, use your web browser to access the ImJoy app on the remote machine
-  with `http://YOUR_REMOTE_IP:8080` (instead of `https://imjoy.io` ). Then connect
-  to the plugin engine by using `http://YOUR_REMOTE_IP:8080` as host and
+  with `http://YOUR_REMOTE_IP:9527` (instead of `https://imjoy.io` ). Then connect
+  to the plugin engine by using `http://YOUR_REMOTE_IP:9527` as host and
   the **connection token** you get when you start the engine.
 
 
@@ -197,19 +194,19 @@ secured website. So, you will have to switch to the offline version.
 Currently, the recommended way to use ImJoy on a remote computer:
  1. Login the remote server with SSH, start the plugin engine with
     `python -m imjoy --serve --host=0.0.0.0`. The plugin engine will
-    download a copy of ImJoy app and serve it through `http://YOUR_REMOTE_IP:8080`.
+    download a copy of ImJoy app and serve it through `http://YOUR_REMOTE_IP:9527`.
     In the meantime, it will give your a **connection token**, copy it from the
     terminal and you will need it in the next step.
 
- 2. Use your web browser to access `http://YOUR_REMOTE_IP:8080`
+ 2. Use your web browser to access `http://YOUR_REMOTE_IP:9527`
     (instead of `https://imjoy.io` ), then you can connect to the plugin engine
-    by using `http://YOUR_REMOTE_IP:8080` as host and the **connection token** you
+    by using `http://YOUR_REMOTE_IP:9527` as host and the **connection token** you
     get when you start the engine.
 
 Also notice that, the ImJoy web app served from your plugin engine are completely isolated from the one from https://imjoy.io, meaning that the installed plugins, data are not shared.
 
 ### Plugin engine error "address already in use"
-If you see something like this: `OSError: [Errno 48] error while attempting to bind on address ('127.0.0.1', 8080): address already in use`, It means you have another instance running which uses the port needed by the Plugin Engine. You need to find this instance  and kill that task if you don't known which one. For example, for port `8080`, you can run `lsof -n -i :8080 | grep LISTEN` in a terminal. This will list all process listening to the `8080` port, e.g. `+python3.6 1095 fmueller    7u  IPv4 0xb4b82ae29cbba843      0t0  TCP 127.0.0.1:http-alt (LISTEN)`. The process ID can be found directly after `python3.6`, in this case `1095`, you can then kill this process with `kill 1095`.
+If you see something like this: `OSError: [Errno 48] error while attempting to bind on address ('127.0.0.1', 9527): address already in use`, It means you have another instance running which uses the port needed by the Plugin Engine. You need to find this instance  and kill that task if you don't known which one. For example, for port `9527`, you can run `lsof -n -i :9527 | grep LISTEN` in a terminal. This will list all process listening to the `9527` port, e.g. `+python3.6 1095 fmueller    7u  IPv4 0xb4b82ae29cbba843      0t0  TCP 127.0.0.1:http-alt (LISTEN)`. The process ID can be found directly after `python3.6`, in this case `1095`, you can then kill this process with `kill 1095`.
 
 ### CommandNotFoundError with 'conda activate'
 By default, ImJoy uses `conda activate` to activate conda environments if it's available. However, you may need to setup `conda activate` according to here: https://github.com/conda/conda/releases/tag/4.4.0

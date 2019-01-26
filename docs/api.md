@@ -387,9 +387,13 @@ api.export(ImJoyPlugin())
 
 Exports the plugin class or an object/dict as `Plugin API`.
 
-This call is mandatory for every ImJoy plugin (typically as the last line of the plugin script). Every member of the `ImJoyPlugin` instance will be exported as `Plugin API`, which means those exported functions or variables can be called or used by the ImJoy app or another plugin. This then allows other plugins to use `api.run` or `api.call` to call the plugin or its functions.
+This call is mandatory for every ImJoy plugin (typically as the last line of the plugin script).
+Every member of the `ImJoyPlugin` instance will be exported as `Plugin API`, which means those exported functions
+or variables can be called or used by the ImJoy app or another plugin.
+This then allows other plugins to use `api.run` or `api.call` to call functions of the plugin.
 
-Only functions and variables with primitive types can be exported (number, string, boolean). And if a variable or function has a name start with `_`, it means that's an internal variable or function, will not be exported.
+Only functions and variables with primitive types can be exported (number, string, boolean).
+And if a variable or function has a name start with `_`, it means that's an internal variable or function, will not be exported.
 
 **Note** that in JavaScript, the `new` keyword is necessary to create an
 instance of a class, while in Python there is no `new` keyword.
@@ -427,8 +431,9 @@ Access the in-browser filesystem with the [Node JS filesystem API](https://nodej
  * `/home`: `IndexedDB`, data is stored in the browser IndexedDB database, can be used as persistent storage.
 
 **Examples**
-<!-- tabs:start -->
 
+<!-- tabs:start -->
+#### ** JavaScript **
 ```javascript
 api.fs.writeFile('/tmp/temp.txt', 'hello world', function(err, data){
     if (err) {
@@ -445,7 +450,7 @@ api.fs.writeFile('/tmp/temp.txt', 'hello world', function(err, data){
     });
 });
 ```
-
+#### ** Python **
 ```python
 def read(err, data=None):
     if err:
@@ -615,7 +620,7 @@ Obtain file with default settings
 
 ``` javascript
 api.getFileUrl('~/data/output.png')
-// will return something like `http://127.0.0.1:8080/file/1ba89354-ae98-457c-a53b-39a4bdd14941?name=output.png`.
+// will return something like `http://127.0.0.1:9527/file/1ba89354-ae98-457c-a53b-39a4bdd14941?name=output.png`.
 ```
 
 Specify password to access file
@@ -735,10 +740,10 @@ api.progress(85)
 
 ### api.register
 ```javascript
-await api.register(op)
+await api.register(config)
 ```
 
-Register a new operator (**op**) to perform a specific task.
+Register a new plugin operator (**op**) to perform a specific task.
 
 An op can have its own GUI defined by the `ui` string.
 
@@ -746,14 +751,15 @@ By default, all ops of a plugin will call the `run` function of the plugin.
 You can use `my.config.type` in the `run` function to differentiate which op was called.
 
 Alternatively, you can define another `Plugin API` function in the `run` field.
-The function must be a member of the plugin class or being exported (with `api.export`) as a `Plugin API` function. This is because a arbitrary function transferred by ImJoy will be treated as `callback` function, thus only allowed to run once.
+The function must be a member of the plugin class or being exported (with `api.export`)
+as a `Plugin API` function. This is because a arbitrary function transferred by ImJoy will be treated as `callback` function, thus only allowed to run once.
 
 If you want to change your interface dynamically, you can run `api.register`
 multiple times to overwrite the previous version. `api.register` can also be used to overwrite the default ui string of the plugin defined in `<config>`, just set the plugin name as the op name (or without setting a name).
 
 **Arguments**
 
-* **op**: Object (JavaScript) or dictionary (Python). Describes the plugin operation.
+* **config**: Object (JavaScript) or dictionary (Python). Describes the plugin operation.
    Several fields are allowed:
     - `name`: String. Name of op.
     - `ui`: Object (JavaScript) or dictionary (Python). Rendered interface. Defined
@@ -855,7 +861,7 @@ result2 = await api.run("name of plugin 2")
 
 ### api.showDialog
 ```javascript
-answer = await api.showDialog(dialog)
+answer = await api.showDialog(config)
 ```
 
 Show a dialog with customized GUI.
@@ -863,7 +869,7 @@ Show a dialog with customized GUI.
 The answer is stored in the returned object, and can be retrieved with the specified `id`. To consider the case when the user presses `cancel`, you can use the `try catch` (JavaScript) or `try except` (Python) syntax.
 
 **Arguments**
-* **dialog**. Object (JavaScript) or dictionary (Python). Specifies the dialog.
+* **config**. Object (JavaScript) or dictionary (Python). Specifies the dialog.
     Contains following fields:
     - `name`: String. Title of dialog.
     - `ui`: String. Specifies appearance of GUI. Defined with the same rule as the `ui` field in `<config>`. Defined name in `id` is used to retrieve answer.
@@ -907,17 +913,20 @@ api.setConfig('sigma', 928)
 
 ### api.showFileDialog
 ```javascript
-file_path = await api.showFileDialog()
+file_path = await api.showFileDialog(config)
 ```
 
 Shows a file dialog to select files or directories.
 
+The function will return a promise from which you can get the file path string.
+
 Importantly, this api function **works only** if the Python plugin engine is connected,
-even if you are using it in JavaScript. The function will return a promise from which you
-can get the file path string.
+even if you are using it in JavaScript. The default root directory will be
+the current workspace for python plugins, and the home folder for all other plugin
+types.
 
 The file handling is different for the ImJoy app and the plugin engine. We recommend
-reading the dedicated section in the [**TO DO** user manual]() to understand the difference.
+reading the dedicated section in the [user manual](development?id=loading-saving-data) to understand the difference.
 When calling this api function within a **JavaScript** plugin, you will obtain
 a warning message as the one shown below. It essentially indicates that the
 ImJoy app now requests access to this part of your local file system:
@@ -931,8 +940,10 @@ a JavaScript plugin to be able to open a file. You can change this behavior with
 for a JavaScript plugin. However, you can not use this path to open the file in
 JavaScript, but you can pass it to another Python plugin for processing.
 
-
 **Arguments**
+
+The following arguments can be set, please consult this [section](api?id=input-arguments)
+for how argument pairs can be set.
 
 * **type**: String. Supported modes of file dialog:
     - `file` (default): select one or multiple files;
@@ -953,10 +964,20 @@ JavaScript, but you can pass it to another Python plugin for processing.
 * **file_path**: String. Contains file-path as specified by `uri_type`.
 
 **Examples**
+
+Example will show either the specified file-name or an error message that the
+user canceled or that the plugin engine was not running.
+
 ```javascript
-file_path = await api.showFileDialog()
+try{
+  const file_path = await api.showFileDialog({root: '~'})
+  await api.alert("Selected file " + file_path)
+}
+catch(e){
+  await api.alert("Error: "+e.toString())
+};
 ```
-[Try yourself >>](https://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:showStatus&w=examples)
+[Try yourself >>](https://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:showFileDialog&w=examples)
 
 
 ### api.showMessage
@@ -970,7 +991,7 @@ If duration is not specified, snackbar will be shown for 10s.
 **Arguments**
 
 * **message**: String. Message to be displayed.
-* **duration** (optional): Integer. Duration in seconds message will be shown.
+* **duration** (optional): Integer. Duration in seconds for message to be shown.
 
 **Examples**
 
@@ -987,7 +1008,7 @@ Updates the progress bar on the Imjoy GUI.
 
 **Arguments**
 
-* **progress**: Float or Integer. Progress in percentage. Allowed range from 0 to 100 for Integer, or 0 to 1 for float.
+* **progress**: Float or Integer. Progress in percentage. Allowed range from 0 to 100 for integer, or 0 to 1 for float.
 
 **Examples**
 ``` javascript
