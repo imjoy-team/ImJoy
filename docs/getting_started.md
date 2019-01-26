@@ -79,7 +79,7 @@ the different controls, where you can perform training, inspect training progres
 and the final results, and perform prediction. The usual workflow consists of a few steps
 illustrated in the screen shots and the text below:
 
-![imjoy-interface](assets/imjoy-MNIST-training.png ':size=800')
+![imjoy-MNIST-training](assets/imjoy-MNIST-training.png ':size=800')
 
 1.  Adding training data with the button `Add Training Data`. Each time you press on the
     button more data is added. Adding more data increases the accuracy of the trained model.
@@ -89,7 +89,7 @@ illustrated in the screen shots and the text below:
 0.  You can perform predictions on hand drawn digits. For this, select the panel `Prediction` and draw
     a digit. Once you release the mouse button, the network will predict the digit. Press clear to
 
-    ![imjoy-interface](assets/Imjoy-MNIST-prediction.png ':size=400')
+    ![imjoy-MNIST-prediction](assets/imjoy-MNIST-prediction.png ':size=400')
 
 Note that you retrain you model by adding more training data. This allows to appreciate
 improved performance when adding more training data.
