@@ -293,13 +293,14 @@
         auto2top: true,
         autoHeader: false,
         subMaxLevel: 3,
-        maxLevel: 4,
+        maxLevel: 5,
         repo: 'https://github.com/oeway/ImJoy',
         homepage: 'https://raw.githubusercontent.com/oeway/ImJoy/master/README.md',
         search: {
           paths: 'auto',
           placeholder: 'Search',
-          noData: 'No Results.'
+          noData: 'No Results.',
+          depth: 2
         },
         plugins: [
           EditOnGithubPlugin.create(
@@ -325,5 +326,6 @@
     <script src="/docs/static/docsify-pagination.min.js"></script>
     <script src="/docs/static/docsify-tabs@1.js"></script>
     <script src="/docs/static/zoom-image.min.js"></script>
+    <script src="/docs/static/docsify-sidebar-collapse.min.js"></script>
   </body>
 </html>
