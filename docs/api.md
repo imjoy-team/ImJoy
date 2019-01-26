@@ -167,7 +167,7 @@ in JavaScript, but the api functions are called in similar fashion in Python.
 
 ### api.alert
 
-``` javascript
+```javascript
 await api.alert(message)
 ```
 
@@ -178,7 +178,7 @@ Shows an alert dialog with a message.
 * **message**: String. Contains the message to be displayed.
 
 **Example**
-``` javascript
+```javascript
 await api.alert('hello world')
 ```
 [Try yourself >>](https://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:alert&w=examples)
@@ -209,7 +209,7 @@ If you want to call frequently functions of another plugin, we recommend using `
 
 To call a function `funcX` defined in the plugin  `PluginX` with the argument `1`, use
 
-``` javascript
+```javascript
 await api.call("PluginX", "funcX", 1)
 ```
 [Try yourself >>](https://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:call&w=examples)
@@ -217,7 +217,7 @@ await api.call("PluginX", "funcX", 1)
 
 ### api.createWindow
 ```javascript
-win = await api.createWindow({name: window_name, type: window_type, w:w, h:h, data: data, config:config})
+win = await api.createWindow(config)
 ```
 Creates a new window in the ImJoy workspace.
 
@@ -252,8 +252,11 @@ If you run `win.run({'data': ...})` for 10 times, the same window instance will 
 
 **Arguments**
 
-* **window_name**: String. Specifies the name of new window.
-* **window_type**: String. Specifies the window type. This can be either the name of
+* **config**. Object (JavaScript) or dictionary (Python). Options for creating window.
+It contains the following fields:
+
+  - **name**: String. Specifies the name of new window.
+  - **type**: String. Specifies the window type. This can be either the name of
    window plugin or an internal ImJoy window type. The following types are
    supported:
 
@@ -266,10 +269,10 @@ If you run `win.run({'data': ...})` for 10 times, the same window instance will 
     - `imjoy/generic`. Will show all objects in `data`. For instance, the window that you obtain with `return.my`
     - `imjoy/plugin-editor`. Opens the source code editors. `data.id` is a unique string (preferable random) specifying the window id, `data.code` contains the source code
 
-* **w**: Integer. Window width in grid columns (1 column = 30 pixels).
-* **h**: Integer. Window height in grid rows (1 row = 30 pixels).
-* **data**: Object (JavaScript) or dictionary (Python). Contains data to be transferred to the window.
-* **config**: Object (JavaScript) or dictionary (Python).
+  - **w**: Integer. Window width in grid columns (1 column = 30 pixels).
+  - **h**: Integer. Window height in grid rows (1 row = 30 pixels).
+  - **data**: Object (JavaScript) or dictionary (Python). Contains data to be transferred to the window.
+  - **config**: Object (JavaScript) or dictionary (Python).
 
 **Returns**
 
@@ -349,7 +352,7 @@ win.onclose(close_callback)
 
 ### api.error
 
-``` javascript
+```javascript
 api.error(message)
 ```
 
@@ -364,7 +367,7 @@ the plugin name. Pressing on this icon will open a window showing the log histor
 
 **Examples**
 
-``` javascript
+```javascript
 api.error('Error occured during processing.')
 ```
 
@@ -541,7 +544,7 @@ You can store any text data such as base64 encoded images, code and json in the 
 
 **Examples**
 
-``` html
+```html
 <attachment name="att_name"></attachment>
 ```
 ```javascript
@@ -549,7 +552,7 @@ content = await api.getAttachment(att_name)
 ```
 
 ### api.getConfig
-``` javascript
+```javascript
 config_value = await api.getConfig(config_name)
 ```
 Retrieves configurations for plugin.
@@ -567,7 +570,7 @@ Retrieves configurations for plugin.
 
 **Examples**
 
-``` javascript
+```javascript
 sigma = await api.getConfig('sigma')
 ```
 [Try yourself in the setConfig example >>](https://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:setConfig&w=examples)
@@ -618,23 +621,23 @@ Either behavior can be changed.
 
 Obtain file with default settings
 
-``` javascript
+```javascript
 api.getFileUrl('~/data/output.png')
 // will return something like `http://127.0.0.1:9527/file/1ba89354-ae98-457c-a53b-39a4bdd14941?name=output.png`.
 ```
 
 Specify password to access file
-``` javascript
+```javascript
 api.getFileUrl('~/data/output.png', password='SECRET_PASSWORD').
 ```
 
 Specify header to create downloadable link
-``` javascript
+```javascript
 headers={'Content-disposition': 'attachment; filename="XXXXXXXXX.XXX"'}
 ```
 
 Specify header for specific content type
-``` javascript
+```javascript
 headers={'Content-disposition': 'inline; filename="XXXXXXXXX.XXX"', 'Content-Type': 'image/png'}
 ```
 
@@ -665,7 +668,7 @@ plugin occasionally, you can also use `api.call`
 
 Get the API of the plugin `PluginX`, and access its functions:
 
-``` javascript
+```javascript
 pluginX = await api.getPlugin("PluginX")
 result = await pluginX.run()
 
@@ -677,7 +680,7 @@ await pluginX.funcX()
 
 ### api.log
 
-``` javascript
+```javascript
 api.log(message)
 ```
 
@@ -697,17 +700,17 @@ an automated log, for example, to log the training of a neural network.
 **Examples**
 
 Create a simple text message:
-``` javascript
+```javascript
 api.log('Processing data ...')
 ```
 
 Log a an image file.
-``` javascript
+```javascript
 api.log({type: 'image', value: 'https://imjoy.io/static/img/imjoy-icon.png' })
 ```
 
 ### api.onClose
-``` javascript
+```javascript
 api.onClose(callback_func)
 ```
 
@@ -719,7 +722,7 @@ Set a callback function to the current plugin which will be called when terminat
 
 
 ### api.progress
-``` javascript
+```javascript
 api.progress(progress)
 ```
 Updates the progress bar of the current plugin.
@@ -732,7 +735,7 @@ This progress bar will be displayed in the plugin menu itself. Please use
 * **progress**: Float or Integer. Progress in percentage. Allowed range from 0 to 100 for Integer, or 0 to 1 for float.
 
 **Examples**
-``` javascript
+```javascript
 api.progress(85)
 ```
 [Try yourself >>](https://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:progress&w=examples)
@@ -761,15 +764,17 @@ multiple times to overwrite the previous version. `api.register` can also be use
 
 * **config**: Object (JavaScript) or dictionary (Python). Describes the plugin operation.
    Several fields are allowed:
-    - `name`: String. Name of op.
-    - `ui`: Object (JavaScript) or dictionary (Python). Rendered interface. Defined
+  - `name`: String. Name of op.
+  - `ui`: Object (JavaScript) or dictionary (Python). Rendered interface. Defined
        with the same rule as the `ui` field in `<config>`.
-    - `run`: String, optional. Specifies the `Plugin API` function that will run when
+  - `run`: String, optional. Specifies the `Plugin API` function that will run when
       the op is executed. If not specified, the `run` function of the plugin will be executed.
-    - `update`: String, optional. Specifies another `Plugin API` function that will run
+  - `update`: String, optional. Specifies another `Plugin API` function that will run
       whenever any option in the `ui` is changed.
-    - `inputs`: Object, optional. A [JSON Schema](https://json-schema.org/) which defines the inputs of this op.
-    - `outputs`: Object, optional. A [JSON Schema](https://json-schema.org/) which defines the outputs of this op.
+  - `inputs`: Object, optional. A [JSON Schema](https://json-schema.org/) which defines the inputs of this op.
+  - `outputs`: Object, optional. A [JSON Schema](https://json-schema.org/) which defines the outputs of this op.
+
+(Please also consult [this section](api?id=input-arguments) for how arguments can be set.)
 
 **Examples**
 
@@ -802,7 +807,7 @@ update_lut(my) {
 
 
 ### api.run
-``` javascript
+```javascript
 await api.run(plugin_name)
 ```
 Run another plugin by specifying its name.
@@ -819,7 +824,7 @@ to this plugin to transfer data.
 
 Example to call one plugin:
 
-``` python
+```python
 await api.run("Python Demo Plugin")
 ```
 [**Try yourself >>**](https://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:run&w=examples)
@@ -873,6 +878,9 @@ The answer is stored in the returned object, and can be retrieved with the speci
     Contains following fields:
     - `name`: String. Title of dialog.
     - `ui`: String. Specifies appearance of GUI. Defined with the same rule as the `ui` field in `<config>`. Defined name in `id` is used to retrieve answer.
+
+(Please also consult [this section](api?id=input-arguments) for how arguments can be set.)
+
 **Returns**
 * **answer**. Object (JavaScript) or dictionary (Python). Contains provided answer as field `answer[id]`.
 
@@ -887,7 +895,7 @@ result = await api.showDialog({
 
 
 ### api.setConfig
-``` javascript
+```javascript
 api.setConfig(config_name, config_value)
 ```
 Store plugin data in its configuration.
@@ -904,7 +912,7 @@ any of the field name of the `<config>` block.
 * **config_value**: Number or String. Neither objects/arrays (JS) nor dict/list (Python). Please note that numbers are stored as strings.
 
 **Examples**
-``` javascript
+```javascript
 api.setConfig('sigma', 928)
 ```
 [Try yourself >>](https://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:setConfig&w=examples)
@@ -942,23 +950,25 @@ JavaScript, but you can pass it to another Python plugin for processing.
 
 **Arguments**
 
-The following arguments can be set, please consult this [section](api?id=input-arguments)
-for how argument pairs can be set.
+* **config**. Object (JavaScript) or dictionary (Python). Options for showing the file dialog.
+It contains the following fields:
 
-* **type**: String. Supported modes of file dialog:
+  - **type**: String. Supported modes of file dialog:
     - `file` (default): select one or multiple files;
     - `directory`:  select one or multiple directories. For Python plugins, if you don't specify the type, both file or directory can be selected.
-* **title**: String. Title of the dialog.
-* **root**: String. Initial path for the dialog to show. Note: for Python plugins on Windows,
+  - **title**: String. Title of the dialog.
+  - **root**: String. Initial path for the dialog to show. Note: for Python plugins on Windows,
    you may want to define the path string as raw string using `r"xxxxxx"` syntax,
    we have encountered unrecognized path issue with normal strings.
-* **mode**: String. Modes for file selection. By default, the user can select a single or multiple file (with the `shift` key pressed)
+  - **mode**: String. Modes for file selection. By default, the user can select a single or multiple file (with the `shift` key pressed)
     - `single`: only a single file or directory can be selected. <!--**[TODO]** what's returned here?-->
     - `multiple`: multiple files or directories are selected and are returned in an array or list.
     - `single|multiple` (default): both single and multiple selection are allowed. <!--**[TODO]** why this additional option?-->
-* **uri_type**: String. Format of returned file path.
+  - **uri_type**: String. Format of returned file path.
     - `url` (default for JavaScript plugins): <!--**[TODO]**-->
     - `path` (default for Python plugins): <!--**[TODO]**-->
+
+(Please also consult [this section](api?id=input-arguments) for how arguments can be set.)
 
 **Returns**
 * **file_path**: String. Contains file-path as specified by `uri_type`.
@@ -981,7 +991,7 @@ catch(e){
 
 
 ### api.showMessage
-``` javascript
+```javascript
 api.showMessage(message,duration)
 ```
 Updates the status text on the status bar of ImJoy and displays the message with a snackbar.
@@ -995,13 +1005,13 @@ If duration is not specified, snackbar will be shown for 10s.
 
 **Examples**
 
-``` javascript
+```javascript
 api.showMessage('Processing...', 5)
 ```
 
 
 ### api.showProgress
-``` javascript
+```javascript
 api.showProgress(progress)
 ```
 Updates the progress bar on the Imjoy GUI.
@@ -1011,13 +1021,13 @@ Updates the progress bar on the Imjoy GUI.
 * **progress**: Float or Integer. Progress in percentage. Allowed range from 0 to 100 for integer, or 0 to 1 for float.
 
 **Examples**
-``` javascript
+```javascript
 api.showProgress(85)
 ```
 [Try yourself >>](https://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:showProgress&w=examples)
 
 ### api.showSnackbar
-``` javascript
+```javascript
 api.showSnackbar(message, duration)
 ```
 Shows a popup message with a snackbar, and disappear in a specific amount of time.
@@ -1029,14 +1039,14 @@ Shows a popup message with a snackbar, and disappear in a specific amount of tim
 
 **Examples**
 
-``` javascript
+```javascript
 api.showSnackbar('processing...', 5)
 ```
 
 [Try yourself >>](https://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:showSnackbar&w=examples)
 
 ### api.showStatus
-``` javascript
+```javascript
 api.showStatus(status)
 ```
 Updates the status text on the Imjoy GUI.
@@ -1047,7 +1057,7 @@ Updates the status text on the Imjoy GUI.
 
 **Examples**
 
-``` javascript
+```javascript
 api.showStatus('processing...')
 ```
 
@@ -1072,7 +1082,7 @@ Unregister an existing operator (**op**).
 
 
 ### api.utils.*
-``` javascript
+```javascript
 await api.utils.UTILITY_NAME()
 ```
 
