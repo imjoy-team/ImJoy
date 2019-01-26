@@ -76,10 +76,10 @@ Two options for offline usage exist:
   1. Update the `$PATH` settings as also [below](#access-the-plugin-engine-from-a-command-line-interface).
       ```bash
       # linux and mac
-      # export PATH=~/ImJoyApp/bin:$PATH
+      export PATH=~/ImJoyApp/bin:$PATH
 
       # windows
-      # $env:Path = '%systemdrive%%homepath%\ImJoyApp;%systemdrive%%homepath%\ImJoyApp\Scripts;' + $env:Path;
+      $env:Path = '%systemdrive%%homepath%\ImJoyApp;%systemdrive%%homepath%\ImJoyApp\Scripts;' + $env:Path;
       ```
   0. Execute the following command in the terminal. This will download all files
      necessary for offline access.
