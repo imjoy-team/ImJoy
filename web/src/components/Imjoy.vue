@@ -60,13 +60,17 @@
             <md-menu-item :disabled="true">
               <span>🚀{{em.engine_status.connection}}</span>
             </md-menu-item>
-            <md-menu-item @click="em.disconnectEngine()">
-              <span>Disconnect</span>
-              <md-icon>clear</md-icon>
-            </md-menu-item>
             <md-menu-item @click="showPluginEngineInfo=true">
-              <span>About Plugin Engine</span>
               <md-icon>info</md-icon>
+              <span>About Plugin Engine</span>
+            </md-menu-item>
+            <md-menu-item>
+              <md-icon>autorenew</md-icon>
+              <a :href="em.engine_status.url" target="_blank">{{em.engine_status.url}}</a>
+            </md-menu-item>
+            <md-menu-item @click="em.disconnectEngine()">
+              <md-icon>clear</md-icon>
+              <span>Disconnect</span>
             </md-menu-item>
             <md-divider></md-divider>
             <md-menu-item :disabled="true">
@@ -390,13 +394,12 @@
           If this is your first time to use ImJoy Plugin Engine, please <a href="https://github.com/oeway/ImJoy-App/releases" target="_blank">click here</a> to download the ImJoy Desktop App.
           <br> If you have it already, please start the Plugin Engine, and connect to it.<br>
         </p>
-        <md-field>
+        <md-autocomplete v-model="engine_url" :md-options="engine_url_list" @keyup.enter="em.connectEngine(engine_url, connection_token)" name="engine_url">
           <label for="engine_url">Plugin Engine URL</label>
-          <md-input type="text" v-model="engine_url" @keyup.enter="em.connectEngine(engine_url, connection_token)" name="engine_url"></md-input>
-        </md-field>
+        </md-autocomplete>
         <md-field>
           <label for="connection_token">Connection Token</label>
-          <md-input type="text" v-model="connection_token" @keyup.enter="em.connectEngine(engine_url, connection_token)" name="connection_token"></md-input>
+          <md-input type="password" v-model="connection_token" @keyup.enter="em.connectEngine(engine_url, connection_token)" name="connection_token"></md-input>
         </md-field>
         <p>&nbsp;{{em.engine_status.connection}}</p>
         <p>
@@ -421,7 +424,7 @@
     </md-dialog-actions>
   </md-dialog>
 
-  <md-dialog :md-active.sync="showAddPluginDialog" :md-click-outside-to-close="false">
+  <md-dialog class="plugin-dialog" :md-active.sync="showAddPluginDialog" :md-click-outside-to-close="false">
     <md-dialog-title>ImJoy Plugin Management</md-dialog-title>
     <md-dialog-content>
       <md-card v-if="show_plugin_templates">
@@ -609,6 +612,7 @@ export default {
       progress: 0,
       status_text: '',
       engine_url: 'http://127.0.0.1:9527',
+      engine_url_list: ['http://127.0.0.1:9527'],
       connection_token: null,
       engine_session_id: null,
       showPluginEngineInfo: false,
@@ -935,6 +939,7 @@ export default {
       catch(e){
         this.showMessage(e.toString())
       }
+      this.$forceUpdate()
     },
     addWindow(w) {
       return new Promise((resolve, reject) => {
@@ -1554,15 +1559,24 @@ export default {
   height: 100%;
 }
 
-/* .md-dialog {
+.plugin-dialog {
   width: 80%;
-  max-width: 700px;
-} */
+  height: 90%;
+  max-width: 800px;
+  max-height: 2000px;
+}
 
-@media screen and (max-width: 700px) {
+@media screen and (max-width: 800px) {
   .md-dialog {
     width: 100%;
-    max-width: 100%;
+    max-width: 800px;
+  }
+}
+
+@media screen and (max-height: 900px) {
+  .plugin-dialog {
+    height: 100%;
+    max-height: 2000px;
   }
 }
 

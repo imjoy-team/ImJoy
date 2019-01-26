@@ -61,9 +61,6 @@ export class PluginManager {
       revs_limit: 2,
       auto_compaction: true
     })
-    this.default_repository_list = [{name: 'ImJoy Repository', url: "oeway/ImJoy-Plugins", description: 'The official plugin repository provided by ImJoy.io.'},
-                                    {name: 'ImJoy Demos', url: 'oeway/ImJoy-Demo-Plugins', description: 'A set of demo plugins provided by ImJoy.io'}
-    ]
     this.repository_list = []
     this.repository_names = []
     this.available_plugins = []
@@ -171,6 +168,10 @@ export class PluginManager {
           console.log('Failed to load repository list', err)
         }
         this.repository_list = this.default_repository_list
+        this.repository_names = []
+        for(let r of this.repository_list){
+          this.repository_names.push(r.name)
+        }
         this.config_db.put({
           _id: 'repository_list',
           list: this.repository_list

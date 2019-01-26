@@ -61,8 +61,8 @@ export class EngineManager {
         this.engine_status.connection = 'Plugin Engine is not connected.'
         if(!auto) this.showMessage('Failed to connect, please make sure you have started the plugin engine.')
         if(auto) socket.disconnect()
-        if(url.endsWith(':8080')){
-          alert('It seems you are using a legacy port (8080), you may want to change the engine url to: ' + url.replace(':8080', ':9527'))
+        if(url.endsWith(':8080') && !auto){
+          alert('It seems you are using the legacy plugin engine port (8080), you may want to change the engine url to: ' + url.replace(':8080', ':9527'))
         }
       }
     }, 2500)
@@ -78,7 +78,7 @@ export class EngineManager {
             this.connected = true
             this.connected_url_token_ = url + token
             this.show_engine_callback(false)
-            this.engine_status.connection = 'Connected.'
+            this.engine_status.connection = 'Plugin Engine Connected.'
             this.connection_token = token
             localStorage.setItem("imjoy_connection_token", token);
             localStorage.setItem("imjoy_engine_url", url)
