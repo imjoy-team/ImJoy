@@ -74,7 +74,7 @@ Two options for offline usage exist:
   the  terminal:
 
   1. Update the `$PATH` settings as also [below](#access-the-plugin-engine-from-a-command-line-interface).
-      ``` bash
+      ```bash
       # linux and mac
       # export PATH=~/ImJoyApp/bin:$PATH
 
@@ -83,7 +83,7 @@ Two options for offline usage exist:
       ```
   0. Execute the following command in the terminal. This will download all files
      necessary for offline access.
-      ``` bash
+      ```bash
       python -m imjoy --serve
       ```
   0. You now have your locally available ImJoy web app that your can access in your browser

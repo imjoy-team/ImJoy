@@ -65,7 +65,7 @@ In practice, this can be done with a few line of code. You essentially need to s
 your plot, and convert it to base64, and send this to the provided window type `imjoy/image` with the api function `api.createWindow`. This window will then use the function
 `api.getFileUrl()` to decode the image and display it.
 
-``` Python
+```python
 with open(name_plot, 'rb') as f:
     data = f.read()
     result = base64.b64encode(data).decode('ascii')
@@ -95,7 +95,7 @@ only a fast overview of these languages. An excellent resource to get started wi
 HTML5/CSS and JavaScript control the three relevant aspects of an interface. In ImJoy, these three elements are defined in one [single file](https://github.com/oeway/ImJoy-Demo-Plugins/blob/master/repository/GUI.imjoy.html), and specified in dedicated code blocks.
 
 * **HTML**: structure of the page. The HTML code is in the code block delignated as shown below. Please note the `<div>` element, which is required. Currently, window plugins can only have one root element.
-    ``` html
+    ```html
     <window lang="html">
        <div>
         ...
@@ -103,7 +103,7 @@ HTML5/CSS and JavaScript control the three relevant aspects of an interface. In 
     </window>
     ```
 * **JavaScript**: behavior of the interface.
-    ``` html
+    ```html
     <script lang="javascript">
        ...
     </script>
@@ -111,7 +111,7 @@ HTML5/CSS and JavaScript control the three relevant aspects of an interface. In 
 
 * **CSS**: visual appearance of the interface. Many different CSS frameworks exist, but we recommend [W3.css](https://www.w3schools.com/w3css/default.asp). It provides most needed elements, and has an outstanding documentation with interactive examples for
 all options. This framework can be imported in the plugin requirements
-    ``` html
+    ```html
    "requirements": ["https://www.w3schools.com/w3css/4/w3.css",
                     "https://www.w3schools.com/lib/w3-theme-indigo.css",
                     "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"],
