@@ -150,8 +150,8 @@ export class WindowManager {
       i: 0,
       x: 0,
       y: 0,
-      w: 5,
-      h: 5
+      w: 20,
+      h: 10
     }
     this.status_text = ''
 

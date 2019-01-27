@@ -319,11 +319,12 @@ you can construct an url with `https://static.imjoy.io` + `RelativePathInDocs`. 
 
 There are two basic format of defining requirements:
  - using a list of requirements. A prefix need to be used to mark the requirement type:
-    - use `conda:` for conda packages, and they will be installed to the current virtual env via `conda install -y`. E.g.: `"requirements": ["conda:numpy", "conda:scipy==1.0"]` or `"requirements": ["conda:numpy scipy==1.0"]`.
-    - use `pip:` for pip packages, and they will be installed to the current virtual env via `pip install`. E.g.: `"requirements": ["pip:numpy", "pip:scipy==1.0"]` or `"requirements": ["pip:numpy scipy==1.0"]`. Notice that `pip` also support installing pacakges directly from a git url. For example, if your git repo contains `setup.py` file, you can use `"pip:git+https://github.com/myUserName/myRepo#egg=myRepo"` as requirement.
-    - use `repo:` for obtaining a git repo (via `git clone` or `git pull`) to the current plugin workspace. E.g.: `"requirements": ["repo:https://github.com/oeway/ImJoy-Project-Template"]`.
-    - if no prefix is used, the will be recognized as `pip` libraries. E.g.: `"requirements": ["numpy", "scipy==1.0"]`
-    - all the above requirement types can be combined into one `requirements` list. `"requirements": ["conda:numpy", "pip:scipy==1.0", "repo:https://github.com/oeway/ImJoy-Project-Template"]`
+    - use `conda:` for conda packages, and they will be installed to the current virtual env via `conda install -y`. E.g.: `"requirements": ["conda:numpy", "conda:scipy==1.0"]` or `"requirements": ["conda:numpy scipy==1.0"]`;
+    - use `pip:` for pip packages, and they will be installed to the current virtual env via `pip install`. E.g.: `"requirements": ["pip:numpy", "pip:scipy==1.0"]` or `"requirements": ["pip:numpy scipy==1.0"]`. Notice that `pip` also support installing pacakges directly from a git url. For example, if your git repo contains `setup.py` file, you can use `"pip:git+https://github.com/myUserName/myRepo#egg=myRepo"` as requirement;
+    - use `repo:` for obtaining a git repo (via `git clone` or `git pull`) to the current plugin workspace. E.g.: `"requirements": ["repo:https://github.com/oeway/ImJoy-Project-Template"]`;
+    - use `cmd:` for any other command. For example,`"requirements": ["cmd:pip install -r myRepo/requirements.txt"]`. Please be aware that many command can have compatibility issue across different operating systems, you may want to verify them before deploying your plugin;
+    - if no prefix is used, the will be recognized as `pip` libraries. E.g.: `"requirements": ["numpy", "scipy==1.0"]`;
+    - all the above requirement types can be combined into one `requirements` list. `"requirements": ["conda:numpy", "pip:scipy==1.0", "repo:https://github.com/oeway/ImJoy-Project-Template"]`.
 
  - using a command string. For example,`"pip install numpy scipy==1.0"`. To use conda, you can set the string to `"conda install numpy scipy==1.0"`.
 
