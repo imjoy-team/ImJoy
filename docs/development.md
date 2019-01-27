@@ -315,20 +315,17 @@ The format is the same as for `inputs`.
 * For `web-worker` plugins written in JavaScript, it can be a array of JavaScript urls. They will be imported using `importScripts`. ImJoy provides a dedicated [GitHub repository](https://github.com/oeway/static.imjoy.io) hosting commonly used and tested libraries. You can refer to all files contained in the `docs` folder, for this
 you can construct an url with `https://static.imjoy.io` + `RelativePathInDocs`. For instance, the file `FileSaver.js` in the folder `static.imjoy.io/docs/js/` can be referenced as `https://static.imjoy.io/js/FileSaver.js`.
 * For `window` plugin, it can be either a list of JavaScript url or CSS url (needs to be end with `.css`). Same considerations as for `web-worker` apply for import and static hosting.
-* For `native-python` plugins, different types of requirements including `conda`, `pip` and `repo` can be defined. A `native-python` plugin may depends on a set of conda or pip, you can just define them in the `requirements`. In the meantime, you can also add external git repository as requirement which will be obtained (via git clone or pull) locally into the plugin workspace.
-
-There are two basic format of defining requirements:
- - using a list of requirements. A prefix need to be used to mark the requirement type:
+* For `native-python` plugins, different types of requirements including `conda`, `pip` and `repo` can be defined. A `native-python` plugin may depends on a set of conda or pip, you can just define them in the `requirements`. In the meantime, you can also add external git repository as requirement which will be obtained (via git clone or pull) locally into the plugin workspace. `requirements` are defined as a list of strings, different prefix are used for different types of requirements:
     - use `conda:` for conda packages, and they will be installed to the current virtual env via `conda install -y`. E.g.: `"requirements": ["conda:numpy", "conda:scipy==1.0"]` or `"requirements": ["conda:numpy scipy==1.0"]`;
     - use `pip:` for pip packages, and they will be installed to the current virtual env via `pip install`. E.g.: `"requirements": ["pip:numpy", "pip:scipy==1.0"]` or `"requirements": ["pip:numpy scipy==1.0"]`. Notice that `pip` also support installing pacakges directly from a git url. For example, if your git repo contains `setup.py` file, you can use `"pip:git+https://github.com/myUserName/myRepo#egg=myRepo"` as requirement;
     - use `repo:` for obtaining a git repo (via `git clone` or `git pull`) to the current plugin workspace. E.g.: `"requirements": ["repo:https://github.com/oeway/ImJoy-Project-Template"]`;
     - use `cmd:` for any other command. For example,`"requirements": ["cmd:pip install -r myRepo/requirements.txt"]`. Please be aware that many command can have compatibility issue across different operating systems, you may want to verify them before deploying your plugin;
     - if no prefix is used, the will be recognized as `pip` libraries. E.g.: `"requirements": ["numpy", "scipy==1.0"]`;
-    - all the above requirement types can be combined into one `requirements` list. `"requirements": ["conda:numpy", "pip:scipy==1.0", "repo:https://github.com/oeway/ImJoy-Project-Template"]`.
+    - all the above requirement types can be combined into one `requirements` list. `"requirements": ["scikit-image", "conda:numpy", "pip:scipy==1.0", "repo:https://github.com/oeway/ImJoy-Project-Template"]`.
 
- - using a command string. For example,`"pip install numpy scipy==1.0"`. To use conda, you can set the string to `"conda install numpy scipy==1.0"`.
+  Notice that, if virtual environment are used by setting `env`, all the `pip` `conda` packages will be installed to the virtual environment. For more information see the dedicate section **Using virtual environments**.
 
-Notice that, if virtual environment are used by setting `env`, all the `pip` `conda` packages will be installed to the virtual environment. For more information see the dedicate section **Using virtual environments**.
+  `requirements` with a single command string is **DEPRECATED**, new plugins should use the above format with a list.
 
 * For `web-python` plugins, you can set it as a list of python modules e.g. `["numpy", "matplotlib"]`. Please also notice that `web-python` has a limited number of python modules supported.
 
