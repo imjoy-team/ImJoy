@@ -153,7 +153,7 @@ order of these blocks does not matter, so you can shuffle the blocks.
 
 
 ### `<config>` block
-It defines the general properties of a plugin and contains several fields.
+Defines the general properties of a plugin with several fields.
 
 ```json
 {
@@ -178,8 +178,9 @@ It defines the general properties of a plugin and contains several fields.
 Name of the plugin. It **must** be unique to avoid conflicts with other plugins.
 
 #### type
-Plugin type. Allowed are : `web-worker`, `window`, `native-python` and `web-python`.
+Plugin type.
 
+Allowed are : `web-worker`, `window`, `native-python` and `web-python`.
 See dedicated section [ImJoy Plugins](development?id=imjoy-plugins) for more details.
 
 #### version
@@ -189,15 +190,17 @@ Specifies the version of the plugin.
 Specifies the api version of ImJoy the plugin is written for.
 
 #### url
-Points to current file, and is used to download the plugin  when a user installs it from the plugin repository.
+Points to current file. It is used to download the plugin when a user installs it from the plugin repository.
 
 #### description
-Contains a short description about the plugin.
+Contains a short description of the plugin.
 
 #### tags
-List of supported tags, which can be used to provide differentiate configureable
-modes and can be accessed at various points in the plugin. If a plugin was defined with
-tags, they will appear  on top of the code editor and during the installation process.
+List of supported tags.
+
+Such tags provide configureable modes for plugin execution,
+e.g. if a plugin is run on a CPU or GPU. Tags can be accessed at various points in the plugin.
+If a plugin was defined with tags, they will appear  on top of the code editor and during the installation process.
 If you distribute your plugin with an [url](development?id=generating-a-plugin-url), you can specify
 with which tag the plugin will be installed.
 
@@ -209,7 +212,7 @@ Within the **``<config>``** block, the following fields can be made configurable
 - `ui`
 - `type`
 
-**Example 1**. a python plugin should install different requirements depending if it will
+**Example 1**: a python plugin should install different requirements depending if it will
 be executed on GPU or CPU. You can then defined two tags: `"tags" : ["GPU", "CPU"]`.
 You can set different `requirements` accordingly: `"requirements": {"gpu": ["tensorflow-gpu", "keras"], "cpu": ["tensorflow", "keras"]}`.
 The user will be asked to choose one of the tags during the installation, which will then install
@@ -228,7 +231,8 @@ the plugin, it will be loaded with this tag.
 
 #### ui
 String specifying the plugin GUI that will be displayed just below the plugin.
-The following elements can be used to render an input form:
+
+**Input form**: the following elements can be used to render an input form:
 
 * `type: 'choose', options: ['cat', 'dog'], placeholder: 'cat'`
 * `type: 'number', min: 0, max: 10, placeholder:2`
@@ -244,15 +248,16 @@ the value of this element in the plugin** with `my.config.id`.
 
 For example, to render a form with a selection use `"ui": "select an option: {id: 'option1', type: 'choose', options: ['cat', 'dog'],     placeholder: 'cat'}"`. In the plugin, the selection can then be accessed with `my.config.option1`.
 
-In some cases, the ui might only contain a brief description of the op. This can either be plain text, or you can also specify a           **link**    with `"ui": " <a href='https://imjoy.io' target='_blank'> ImJoy</a>"`. The `target='_blank'` will open this page in a new     tab.
+In some cases, the ui might only contain a brief description of the op.
+This can either be plain text, or you can also specify a **link**    with `"ui": " <a href='https://imjoy.io' target='_blank'> ImJoy</a>"`. The `target='_blank'` will open this page in a new tab.
 
-For better rendering of the interface, we support **certain html tags** in the ui string. currently allowed
-tags are: `a`, `img`, `p`, `div`, `span`, `br`, `b`, `i`, `u`,`hr`.
+
+**HTML and CSS**: for better rendering of the interface, we support **certain html tags** in the ui string.
+Currently allowed tags are: `a`, `img`, `p`, `div`, `span`, `br`, `b`, `i`, `u`,`hr`.
 Further, the following **css specification** are allowed: `border`, `margin`, `padding`.
 These restriction are imposed to prevent XSS attacks.
 
-
-To define **longer forms with multiple lines**, we support additional definitions of the `ui` string.
+**Longer forms**: to define forms with multiple lines, we support additional definitions of the `ui` string.
 
 * an array of strings. For example:
 ```javascript
@@ -275,7 +280,11 @@ In the  example below, we use a string as above for `option1` and an array with 
   ```
 
 #### flags
-Defines an array of flags which will be used by ImJoy to control the behavior of the plugin. Currently, we support these `flags` for run-time control. These flags allow to specify how ImJoy instances are handled by the Interface and the Plugin engine. For more information we refer to the section **TODO**.
+Defines an array of flags which will be used by ImJoy to control the behavior of the plugin.
+
+Currently, we support these `flags` for run-time control.
+These flags allow to specify how ImJoy instances are handled by the Interface and the Plugin engine.
+For more information we refer to the dedicated section on [plugin run time behavior](development?id=controlling-run-time-behavior-of-native-python-plugins).
 
 * `single-instance` (**for python plugins only**). Python engine will only run a single plugin process even if
   plugin is called from multiple BUT identical workspaces. In this case, the different ImJoy instances will share
@@ -293,59 +302,104 @@ This may cause conflicts, we therefore recommend to (1) keep the interface-relat
 
 
 #### icon
-Defines the icon used in the plugin menu. You can find different icons here https://material.io/tools/icons/ and used the specified name. Or, you can directly copy and paste Emoji, for example from [here](https://getemoji.com/).
+Defines the icon used in the plugin menu.
+
+You can find different icons here https://material.io/tools/icons/ and used the specified name. Or, you can directly copy and paste Emoji, for example from [here](https://getemoji.com/).
 
 #### inputs
-Defines the inputs with json-schema syntax (http://json-schema.org/) .
+Defines the inputs with json-schema syntax (http://json-schema.org/).
+
 For example, to define that the plugin uses png files, you can specify `"inputs": {"properties": {"type": {"enum": ["image/png"]}}, "type": "object"}` . You can also use the simplified format which assumes the inputs is an object and use json schema to describe the properties: `"inputs": {"type": {"enum": ["image/png"]}}`.
 
 #### outputs
 Defines the outputs with json-schema syntax (http://json-schema.org/).
 The format is the same as for `inputs`.
 
-#### env
-(**for python plugins only**) the virtual environment or docker image command used to create an environment to run the plugin.
-
 #### cmd
 (**for python plugins only**) the command used to run the plugin. By default, it will be run with `python`. Depending on the installation it could also be something like `python3` or `python27` etc.
 
+#### env
+(**for python plugins only**) the virtual environment or docker image command used to create an environment to run the plugin.
+
 
 #### requirements
+Defines the plugin requirements.
 
-* For `web-worker` plugins written in JavaScript, it can be a array of JavaScript urls. They will be imported using `importScripts`. ImJoy provides a dedicated [GitHub repository](https://github.com/oeway/static.imjoy.io) hosting commonly used and tested libraries. You can refer to all files contained in the `docs` folder, for this
-you can construct an url with `https://static.imjoy.io` + `RelativePathInDocs`. For instance, the file `FileSaver.js` in the folder `static.imjoy.io/docs/js/` can be referenced as `https://static.imjoy.io/js/FileSaver.js`.
-* For `window` plugin, it can be either a list of JavaScript url or CSS url (needs to be end with `.css`). Same considerations as for `web-worker` apply for import and static hosting.
-* For `native-python` plugins, different types of requirements including `conda`, `pip` and `repo` can be defined. A `native-python` plugin may depends on a set of conda or pip, you can just define them in the `requirements`. In the meantime, you can also add external git repository as requirement which will be obtained (via git clone or pull) locally into the plugin workspace. `requirements` are defined as a list of strings, different prefix are used for different types of requirements:
-    - use `conda:` for conda packages, and they will be installed to the current virtual env via `conda install -y`. E.g.: `"requirements": ["conda:numpy", "conda:scipy==1.0"]` or `"requirements": ["conda:numpy scipy==1.0"]`;
-    - use `pip:` for pip packages, and they will be installed to the current virtual env via `pip install`. E.g.: `"requirements": ["pip:numpy", "pip:scipy==1.0"]` or `"requirements": ["pip:numpy scipy==1.0"]`. Notice that `pip` also support installing pacakges directly from a git url. For example, if your git repo contains `setup.py` file, you can use `"pip:git+https://github.com/myUserName/myRepo#egg=myRepo"` as requirement;
-    - use `repo:` for obtaining a git repo (via `git clone` or `git pull`) to the current plugin workspace. E.g.: `"requirements": ["repo:https://github.com/oeway/ImJoy-Project-Template"]`;
-    - use `cmd:` for any other command. For example,`"requirements": ["cmd:pip install -r myRepo/requirements.txt"]`. Please be aware that many command can have compatibility issue across different operating systems, you may want to verify them before deploying your plugin;
-    - if no prefix is used, the will be recognized as `pip` libraries. E.g.: `"requirements": ["numpy", "scipy==1.0"]`;
-    - all the above requirement types can be combined into one `requirements` list. `"requirements": ["scikit-image", "conda:numpy", "pip:scipy==1.0", "repo:https://github.com/oeway/ImJoy-Project-Template"]`.
+*   **web-worker** plugins: array of JavaScript urls, which will be imported using `importScripts`.
+    ImJoy provides a dedicated [GitHub repository](https://github.com/oeway/static.imjoy.io)
+    hosting commonly used and tested libraries. You can refer to all files contained in the `docs`
+    folder with a simple url: `https://static.imjoy.io` + `RelativePathInDocs`.
+    For instance, the file `FileSaver.js` in the folder `static.imjoy.io/docs/js/`
+    can be referenced as `https://static.imjoy.io/js/FileSaver.js`.
 
-  Notice that, if virtual environment are used by setting `env`, all the `pip` `conda` packages will be installed to the virtual environment. For more information see the dedicate section **Using virtual environments**.
+*   **window** plugin: either a list of JavaScript url or CSS url (needs to be end with `.css`).
+    Same considerations as for `web-worker` apply for import and static hosting.
+
+*   **native-python plugins**: supported requirements types including `conda`, `pip` and `repo`.
+
+    The requirements are defined as a list of strings. A prefix is used to specify the requirement type.
+    If no prefix is used, requirements will be treated as `pip` libraries, e.g.: `"requirements": ["numpy", "scipy==1.0"]`;
+
+    Notice that, if a **virtual environment** are used by setting `env`, all `pip` and `conda`
+    packages will be installed to this environment. For more information see the
+    dedicated [section](development?id=virtual-environments).
+
+    -  **`conda:`** for conda packages, which will be installed with `conda install -y`.
+
+       Example: `"requirements": ["conda:numpy", "conda:scipy==1.0"]` or `"requirements": ["conda:numpy scipy==1.0"]`.
+
+    -  **`pip:`** for pip packages, which will be installed with `pip install`.
+
+       Example: `"requirements": ["pip:numpy", "pip:scipy==1.0"]` or `"requirements": ["pip:numpy scipy==1.0"]`.
+
+       `pip` also supports installation directly from a git url.
+
+       Example: if your git repo contains `setup.py`, you can use `"pip:git+https://github.com/myUserName/myRepo#egg=myRepo"` as a requirement;
+
+    -  **`repo:`** to obtain a git repo (via `git clone` or `git pull`) in the current
+       plugin workspace.
+
+       Example: `"requirements": ["repo:https://github.com/oeway/ImJoy-Project-Template"]`
+
+    -  **`cmd:`** for any other command. Please be aware that many command can have
+       compatibility issue across different operating systems, you may want to verify
+       them before deploying your plugin;
+
+       For example,`"requirements": ["cmd:pip install -r myRepo/requirements.txt"]`.
+
+    -  Requirement types can be combined into one list.
+
+       Example: `"requirements": ["scikit-image", "conda:numpy", "pip:scipy==1.0", "repo:https://github.com/oeway/ImJoy-Project-Template"]`.
+
+
 
   `requirements` with a single command string is **DEPRECATED**, new plugins should use the above format with a list.
 
-* For `web-python` plugins, you can set it as a list of python modules e.g. `["numpy", "matplotlib"]`. Please also notice that `web-python` has a limited number of python modules supported.
+*   **web-python**: list of python modules, e.g. `["numpy", "matplotlib"]`.
+    Please also note that `web-python` only supports a a limited number of python modules.
+
 
 #### dependencies
-Array with names of other ImJoy plugins which the current plugin depends on. They will be installed automatically during installation. To define a dependency use the following format: 1) for dependencies without tag `REPOSITORY:PLUGIN_NAME` or `PLUGIN_URL`, e.g.: `oeway/ImJoy-Plugins:Image Window`; 2) or with specified tag: `REPOSITORY:PLUGIN_NAME@TAG` or `PLUGIN_URL@TAG`, e.g.: `oeway/ImJoy-Plugins:Unet Segmentation@GPU`. In this case, a hash tag `GPU` is used to specify the tag for the plugin named `Unet Segmentation` hosted on GitHub repository `oeway/ImJoy-Plugin` (https://github.com/oeway/ImJoy-Plugins). If the plugin is not hosted on GitHub or the GitHub repository is not formatted as a ImJoy plugin repository (meaning there is no `manifest.imjoy.json` file defined in the root of the repository), you can use the url directly, e.g.: `https://github.com/oeway/ImJoy-Demo-Plugins/blob/master/repository/3dDemos.imjoy.html` (tags can be added with `@TAG`).
+Array with names of other ImJoy plugins which the current plugin depends on.
+
+They will be installed automatically during installation. To define a dependency use the following format: 1) for dependencies without tag `REPOSITORY:PLUGIN_NAME` or `PLUGIN_URL`, e.g.: `oeway/ImJoy-Plugins:Image Window`; 2) or with specified tag: `REPOSITORY:PLUGIN_NAME@TAG` or `PLUGIN_URL@TAG`, e.g.: `oeway/ImJoy-Plugins:Unet Segmentation@GPU`. In this case, a hash tag `GPU` is used to specify the tag for the plugin named `Unet Segmentation` hosted on GitHub repository `oeway/ImJoy-Plugin` (https://github.com/oeway/ImJoy-Plugins). If the plugin is not hosted on GitHub or the GitHub repository is not formatted as a ImJoy plugin repository (meaning there is no `manifest.imjoy.json` file defined in the root of the repository), you can use the url directly, e.g.: `https://github.com/oeway/ImJoy-Demo-Plugins/blob/master/repository/3dDemos.imjoy.html` (tags can be added with `@TAG`).
 
 #### defaults
-(**for window plugin only**) define an object of default values, for example you can specify the default window size by setting `"defaults": {"w": 10, "h": 7}`.
+(**for window plugin only:**) defines an object of default values, for example you can specify the default window size by setting `"defaults": {"w": 10, "h": 7}`.
 
 #### runnable
 Defines whether the plugin can be executed by clicking on the plugin menu (By default, all plugins are `runnable`). For helper plugins which do not run by themselves, (e.g. a `native-python` plugin can be called by a `window` plugin and do not necessarily executed by the user directly), setting `"runnable": false` would move down the plugin to the bottom of the plugin menu and made non-clickable.
 
 ### `<docs>` block
-Used to contain documentation for the plugin, it need to be written in `Markdown` language. Here is a document about how to write document in `Markdown`: [Mastering Markdown](https://guides.github.com/features/mastering-markdown/). Please note that if you provide links that these will be opened in another tab, leaving the ImJoy instance running.
+Contains the documentation of the plugin and is written in Markdown language.
+Please consulte this document for an introduction to [Markdown](https://guides.github.com/features/mastering-markdown/).
+Please note that if you provide links that these will be opened in another tab, leaving the ImJoy instance running.
 
 ### `<window>` block
-Define the HTML code for displaying in the plugin window.
+Defines the HTML code for the display in the plugin window.
 
-ImJoy uses vue. to to parse plugin files, which enforces
-only root element in the template. This means in the window block you have to use
+ImJoy uses vue.js to to parse plugin files, which enforces that only
+root element exists in the template. This means in the window block you have to use
 a division to wrap all nodes:
 
 ```html
@@ -367,9 +421,10 @@ The following won't work:
 
 
 ### `<style>` block
-Define the CSS code for displaying in the plugin window.
+Defines the CSS code for displaying in the plugin window.
 
 ### `<script>` block
+Contains the actual plugin code.
 
 Plugins can be written in JavaScript or Python, a minimal plugin needs to implement two functions: `setup()` and `run()`. Exceptions are helper plugins (specified with `"runnable": false`), which don't need the `run()` function. Optionally, the function `exit` will be called when the plugin is killed.
 
@@ -382,9 +437,7 @@ The `lang` property of the `<script>` block is used to specify the used programm
  * for Javascript, use `<script lang="javascript"> ... </script>`
  * for Python, use `<script lang="python"> ... </script>`
 
-`<script>` also supports `tags`. For more information, see the dedicated section **Plugins and tags**.
-
-
+`<script>` also supports `tags`. For more information, see the dedicated section for [`tags`](development?id=tags).
 
 ## Plugin properties
 

@@ -66,7 +66,7 @@ To learn more details about ImJoy, please go to [ImJoy Docs](https://imjoy.io/do
 * Native support for n-dimensional arrays and tensors
    - Support ndarrays from Numpy for data exchange
    - Support Tensorflow.js and native Tensorflow for deep learning
-
+  
 
 ## ImJoy architecture
 By design, ImJoy itself provides very minimal task specific functionality.
@@ -96,7 +96,15 @@ Currently, ImJoy consists of the following repositories:
  - [ImJoy Demo Plugins](https://github.com/oeway/ImJoy-Demo-Plugins/)
  - [ImJoy Project Template](https://github.com/oeway/ImJoy-project-template)
 
- ## Acknowledgements
+## Documentation and questions
+
+1. We provide a detailed [ImJoy Docs](https://imjoy.io/docs/). This includes
+   a section with frequently asked question.
+2. To report issues with ImJoy, we invite you to file a GitHub code issue.
+3. For help and questions that don't fit a GitHub code issue, we ask you to post in https://forum.image.sc/
+
+
+## Acknowledgements
 
  This is a non-exhaustive list of the open-source tools and libraries we used in ImJoy:
 
@@ -111,9 +119,6 @@ Currently, ImJoy consists of the following repositories:
 
  We thank all the authors for offering these excellent work to the open-source community.
 
- ## Documentation
-
- Please refer to: [ImJoy Docs](https://imjoy.io/docs/)
 
 ## Support ImJoy
 
@@ -125,6 +130,6 @@ contribute your idea, feedback, plugins and code to the project.
 We don't have a guidline for that yet, for now please feel free to use the [issues](https://github.com/oeway/ImJoy/issues) and fork the project.
 
 
- ## License
+## License
 
  [MIT License](https://github.com/oeway/ImJoy/blob/master/LICENSE)
