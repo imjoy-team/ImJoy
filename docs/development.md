@@ -319,8 +319,10 @@ The format is the same as for `inputs`.
 (**for python plugins only**) the command used to run the plugin. By default, it will be run with `python`. Depending on the installation it could also be something like `python3` or `python27` etc.
 
 #### env
-(**for python plugins only**) the virtual environment or docker image command used to create an environment to run the plugin.
+(**for python plugins only**) the virtual environment or docker image command
+used to create an environment to run the plugin.
 
+For more details see the dedicated [section](development?id=virtual-environments)
 
 #### requirements
 Defines the plugin requirements.
@@ -352,9 +354,13 @@ Defines the plugin requirements.
 
        Example: `"requirements": ["pip:numpy", "pip:scipy==1.0"]` or `"requirements": ["pip:numpy scipy==1.0"]`.
 
-       `pip` also supports installation directly from a git url.
+       `pip` also supports installation directly from a git url. We recommend
+       specifying the [GitHub release](https://help.github.com/articles/creating-releases/)
+       of your library, e.g. with `#egg=myRepo`. This ensures that the correct
+       version is installed.
 
-       Example: if your git repo contains `setup.py`, you can use `"pip:git+https://github.com/myUserName/myRepo#egg=myRepo"` as a requirement;
+       Example: if your git repo contains `setup.py`, you can use `"pip:git+https://github.com/myUserName/myRepo#egg=myRepo"` as a requirement.
+
 
     -  **`repo:`** to obtain a git repo (via `git clone` or `git pull`) in the current
        plugin workspace.
@@ -367,11 +373,7 @@ Defines the plugin requirements.
 
        For example,`"requirements": ["cmd:pip install -r myRepo/requirements.txt"]`.
 
-    -  Requirement types can be combined into one list.
-
-       Example: `"requirements": ["scikit-image", "conda:numpy", "pip:scipy==1.0", "repo:https://github.com/oeway/ImJoy-Project-Template"]`.
-
-
+  Requirement types can be combined into one list. Example: `"requirements": ["scikit-image", "conda:numpy", "pip:scipy==1.0", "repo:https://github.com/oeway/ImJoy-Project-Template"]`.
 
   `requirements` with a single command string is **DEPRECATED**, new plugins should use the above format with a list.
 
@@ -419,7 +421,6 @@ The following won't work:
 </window>
 ```
 
-
 ### `<style>` block
 Defines the CSS code for displaying in the plugin window.
 
@@ -438,6 +439,30 @@ The `lang` property of the `<script>` block is used to specify the used programm
  * for Python, use `<script lang="python"> ... </script>`
 
 `<script>` also supports `tags`. For more information, see the dedicated section for [`tags`](development?id=tags).
+
+## Use custom libraries
+You can specify plugin requirements of ImJoy in the dedicated field in
+its `config` [block](http://localhost:8000/docs#/development?id=requirements)
+
+This allows you include public libraries with `pip` or `conda`, but also your own
+libraries. Below we describe some of the most commonly encountered scenarios.
+
+1.  Your python module is deployed to as a pip repository (`pip.pypa.io`). You can
+    then add its pip name to `requirements`.
+0.  You host the source code and `setup.py` on GitHub. Several excellent ressources,
+    such as [this one](https://packaging.python.org/tutorials/packaging-projects/), explain
+    how to specify this file. You can add  `"pip:git+https://github.com/myUserName/myRepo#egg=myRepo"` to `requirements`.
+    Note that the `#egg=myRepo` allows to determine the [GitHub release](https://help.github.com/articles/creating-releases/)
+    of your library, controlling which version is installed.
+0.  You host your source code and a `requirements.txt` on GitHub.
+    Add to `requirements`: `repo: https://github.com/XXXX` and `cmd: pip install -r XXXXX/requirements.txt`
+0.  You host the source code and a `environment.yml` defining the virtual env with conda and pip
+    dependencies. You can add the repo with `repo: https://github.com/XXXX` and install the
+    environment with `"env": "conda env create -f XXXX/environment.yml"` imjoy cannot use `environment.yml` directly, need to convert to imjoy `requirements`.
+0.  You could also host your code on dropbox and install it from there with
+    a https request. See our dedicated [demo](demos?id=distribution-of-codedata-stored-on-dropbox)
+    for more details.
+
 
 ## Plugin properties
 
@@ -556,7 +581,7 @@ ndarrays produced by Python), and after transferring, you won't be able to acces
 
 (**Note**: in Python, the data type of `my` is a dictionary, ImJoy added the interface for allowing dot notation, just like in JavaScript. If you prefer, you can also use `[]` in both languages to access dictionary or object.)
 
-## Advanced options
+<!-- ## Advanced options -->
 
 ### Workflow management
 We provide additional fields in `my` that allow to track, maintain and reconstruct an entire analysis workflow.
@@ -618,6 +643,11 @@ By default, python plugins from ImJoy will be executed in the default conda envi
 
 `env` can be a string or an array. When connecting multiple command in a line please use `&&` or `||` which supported on different operating systems. If you have several command which are independent from each other, please use array to store the commands. For example: `"env": ["git clone https://github.com/oeway/XXXXXX.git", "conda create -n XXXXX python=3.7"]`, this setting will first clone the source code on GitHub, then create an environment with conda. Notice that the git clone command will fail if the folder already exist, in that case, the second command will also been executed.
 
+You can also create an environment directly from a `environment.yml` file, e.g.
+`"env": "conda env create -f ANNA-PALM/environment.yml"`. This requires
+that the repository is defined as a repo in the [plugin requirements](development?id=requirements). For more information,
+consult the dedicated [conda help page](https://conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#creating-an-environment-from-an-environment-yml-file).
+
 It is also important to specify the pip packages required by the plugin, this can be done with the `requirements` field in `<config>`.
 
 Examples:
@@ -656,18 +686,20 @@ your own ImJoy plugin repository. The plugins can then be distributed directly a
 with a dedicated url syntax, which allows an automatic installation.
 
 The **default and recommended** way for ImJoy plugin is to deploy on GitHub (either
-as an individual file or in a plugin repository) and then distribute them with the plugin url.
+as an individual file or in a plugin repository) and then distribute with a plugin url.
 We recommend GitHub since it provides stability and version control, which guarantees
 reproducibility and traceability.
 
 ### Hosting individual plugin files
-This is the typical case  during development. The plugin code can be hosted
-on the web, e.g. GitHub, Gist, or Dropbox.
+This is the typical case during development.
 
-### Deployment through your own ImJoy Plugin Repository
+The plugin code can be hosted on the web, e.g. GitHub, Gist, or Dropbox.
+
+### Own ImJoy plugin repository
 You can easily create a ImJoy plugin repository for an existing GitHub project.
+
 A template project can be found [here](https://github.com/oeway/ImJoy-project-template).
-For this, you save your ImJoy plugins in a dedicated folder, and you add a
+For this, you save your ImJoy plugins in a dedicated folder, and add a
 manifest json file `manifest.imjoy.json` to the GitHub root folder.
 
 This manifest specifies which plugins are in your repository,
@@ -685,7 +717,7 @@ and a full template can be found [here](https://github.com/oeway/ImJoy-project-t
 }
 ```
 
-You can then update this manifest either **automatically or manually**:
+You can then update this manifest either **automatically** or **manually**:
 
 1.  For an **automatic update**, we provide a [node script](https://github.com/oeway/ImJoy-project-template/blob/master/update_manifest.js).
     This script requires node.js to be executed. Then run it  with the command `node update_manifest.js` in the root folder
@@ -707,12 +739,12 @@ You can then update this manifest either **automatically or manually**:
 In ImJoy, you can then **render a list of all plugins** in the repository with a
 simple url with the form `http://imjoy.io/#/app?repo=GITHUB_USER_NAME/REPO_NAME`,
 where `GITHUB_USER_NAME` is the user name, and `REPO_NAME` the name of the GitHub
-repository containing the ImJoy plugin store. The user can then install the
+repository containing the ImJoy plugin repository. The user can then install the
 plugins from this list. For more details on how to generate this url and see how
 specific plugins can be installed see the dedicated section below.
 
 
-### Deployment through the official ImJoy plugin repository
+### Official ImJoy plugin repository
 The ImJoy plugin repository shown on `ImJoy.io` is served through
 [GitHub](https://github.com/oeway/ImJoy-Plugins).
 
@@ -731,7 +763,6 @@ social networks. We detail below how this link can be created and which options 
 1. You can **directly send** the plugin file (extension `*.imjoy.html`). This file can then
 be dragged into the ImJoy workspace, where it will be automatically recognized as a plugin.
 
-
 In the last section, we describe how plugins **depending on custom libraries** can be
 distributed.
 
@@ -743,7 +774,8 @@ However, this option provides less control about how the plugin should be instal
 -->
 
 ### Generating a plugin url
-The easiest way to distribute plugins is by creating a url, which can be easily shared.
+The easiest way to distribute plugins is by creating a url, which can be shared.
+
 The basic format is `http://imjoy.io/#/app?plugin=PLUGIN_URI`. You will need to
 replace `PLUGIN_URI` with your actuall **plugin URI** (Uniform Resource Identifier).
 For example: [http://imjoy.io/#/app?plugin=https://github.com/oeway/ImJoy-Plugins/blob/master/repository/imageWindow.imjoy.html](http://imjoy.io/#/app?plugin=https://github.com/oeway/ImJoy-Plugins/blob/master/repository/imageWindow.imjoy.html). When the user click this link,
@@ -771,15 +803,29 @@ There are **two types of URI**, depending on how your plugin is deployed:
 
 2.  Alternatively, you can use an **url pointing to the plugin** hosted on any
     websites including your own project site, blog, GitHub, Gist or Dropbox.
-    Notice that, the plugin file needs to end with `.imjoy.html`.
-    In that case, the url of this file is the plugin URI. Please consult the
-    dedicated [section](development?id=distribute-plugins-without-dependencies)
-    for how to obtain this url for different hosting platforms.
+    Notice that, the plugin file needs to end with `.imjoy.html`. Below we describe
+    how to obtain this url for different hosting platforms:
 
-    In case you want to specify the plugin tag, you can just append `@TAG` to the
-    file url, right after `.imjoy.html`. For example: `https://raw.githubusercontent.com/oeway/DRFNS-Lite/master/DRFNS-Lite.imjoy.html@GPU`.
+    1. For files on **GitHub**, you just need to copy the link to the file.
+       For example: `https://github.com/oeway/DRFNS-Lite/blob/master/DRFNS-Lite.imjoy.html`.
 
-To test if your plugin URI works, you can paste it to the `+ PLUGINS` dialog
+    1.  For **Gist** or other Git providers such as (GitLab), you need to obtain the `raw`
+        link of the plugin file. For example, to create a Gist link
+
+        1. Go to Gist on your GitHub account [https://gist.github.com/](https://gist.github.com/)
+        0. Create new Gst, specify the plugin name followed by `.imjoy.html`, and copy & paste the code of your plugin.
+        0. Create either a public or secret Gist.
+        0. Link to Gist can be obtained from the `Raw` button (this links to the unprocessed versions of the file).
+           The link will looks like this: `https://gist.githubusercontent.com/oeway/aad257cd9aaab448766c6dc287cb8614/raw/909d0a86e45a9640c0e108adea5ecd7e78b81301/chartJSDemo.imjoy.html`
+        0. Please note that this url will change when you update your file.
+
+    0. For **Dropbox** you need to modify the sharable url as follows:
+         1. Replace `dl=0` to `dl=1`;
+         2. Replace `https://www.dropbox.com/` to `https://dl.dropboxusercontent.com/`.
+
+    To specify the plugin tag, you can just append `@TAG` right after `.imjoy.html`. For example: `https://raw.githubusercontent.com/oeway/DRFNS-Lite/master/DRFNS-Lite.imjoy.html@GPU`.
+
+You can test in ImJoy if your plugin url works: paste it in the `+ PLUGINS` dialog
 (`Install from URL`) and press `Enter`. If everything works, you should be able
 to see a card rendered with your plugins which you can click `INSTALL`.
 
@@ -820,30 +866,6 @@ The following url parameters are currently supported:
      to ImJoy, for example, by defining a `open with imjoy` button.
 
 
-### Distribute plugins without custom libraries
-This is the case for a plugin that does not depend on libraries or modules written
-by yourself, and you want to quickly share it with others. Here, you create an
-url for this plugin (extension: `*.imjoy.html`). This file can be hosted on GitHub, Gist or Dropbox etc.
-
-1. For files on **GitHub**, you just need to copy the link to the file.
-   For example: `https://github.com/oeway/DRFNS-Lite/blob/master/DRFNS-Lite.imjoy.html`.
-
-1.  For **Gist** or other Git providers such as (GitLab), you need to obtain the `raw`
-    link of the plugin file. For example, to create a Gist link
-
-    1. Go to Gist on your GitHub account [https://gist.github.com/](https://gist.github.com/)
-    0. Create new Gst, specify the plugin name followed by `.imjoy.html`, and copy & paste the code of your plugin.
-    0. Create either a public or secret Gist.
-    0. Link to Gist can be obtained from the `Raw` button (this links to the unprocessed versions of the file).
-       The link will looks like this: `https://gist.githubusercontent.com/oeway/aad257cd9aaab448766c6dc287cb8614/raw/909d0a86e45a9640c0e108adea5ecd7e78b81301/chartJSDemo.imjoy.html`
-    0. Please note that this url will change when you update your file.
-
-0. For **Dropbox** you need to modify the sharable url as follows:
-     1. Replace `dl=0` to `dl=1`;
-     2. Replace `https://www.dropbox.com/` to `https://dl.dropboxusercontent.com/`.
-     <!--[ToDo]: example-->
-
-
 ### Distribute plugins with custom libraries
 If your plugin depends on non-standard libraries and modules, you have to provide
 them with your plugin. You can upload those libraries and modules to a GitHub repository,
@@ -858,22 +880,11 @@ GitHub Gist, or other data-sharing platforms such as Dropbox and link them in th
 
  *  For **Python** plugins, we recommend to package your library as a pip module.
     Several excellent ressources, such as [this one](https://packaging.python.org/tutorials/packaging-projects/),
-    explaining this step exist. Please note that it is not necessary that you up-load your package to the
-    Package Index. The crucial part is that you provide the `setup.py`.
+    explaining this step exist. Please note that it is not necessary that you up-load
+    your package to the Package Index. The crucial part is that you provide the `setup.py`.
 
     Create a [gist](https://gist.github.com/) or a GitHub repository, and obtain
     the link to this repository. You can use the terminal command `pip install ...`
     to check if you can install your module.
 
-    You can then add the GitHub link to `requirements` in the `<config>` block of your plugin.
-
-    1. If your package is not indexed, then you can specify the requiremen in this formatted
-       `pip install -U git+https://github.com/oeway/ImJoy-Engine#egg=imjoy`.
-    2. If your package is indexed, you can format the requirement like this:`git+https://github.com/oeway/ImJoy-Engine#egg=imjoy`,
-
-    We recommend specifying the [GitHub release](https://help.github.com/articles/creating-releases/)
-    of your library with `#egg=imjoy`. This ensures that the correct
-    version is installed.
-
-    As an alternative - especially during development - you can use Dropbox as explained
-    in this [Demo](demos?id=distribution-of-codedata-stored-on-dropbox).
+    You can then add the GitHub link to [`requirements`](development?id=requirements) in the `<config>` block of your plugin.
