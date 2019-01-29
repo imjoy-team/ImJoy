@@ -361,9 +361,9 @@ Defines the plugin requirements.
 
        Example: if your git repo contains `setup.py`, you can use `"pip:git+https://github.com/myUserName/myRepo#egg=myRepo"` as a requirement.
 
-
-    -  **`repo:`** to obtain a git repo (via `git clone` or `git pull`) in the current
-       plugin workspace.
+    -  **`repo:`** to obtain a git repository in the current
+       plugin workspace (`git clone` for a not existing
+       repository or `git pull` for an existing repository)
 
        Example: `"requirements": ["repo:https://github.com/oeway/ImJoy-Project-Template"]`
 
@@ -372,6 +372,7 @@ Defines the plugin requirements.
        them before deploying your plugin;
 
        For example,`"requirements": ["cmd:pip install -r myRepo/requirements.txt"]`.
+
 
   Requirement types can be combined into one list. Example: `"requirements": ["scikit-image", "conda:numpy", "pip:scipy==1.0", "repo:https://github.com/oeway/ImJoy-Project-Template"]`.
 

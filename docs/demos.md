@@ -21,7 +21,7 @@ examples for the different approaches below.
 **Dedicated user interface**
 For more advanced purposes, you can use define a user interface with the [**window plugin**](development?id=ltconfiggt-block). Such an interface is designed with web technology (HTML, JavaScript and CSS) and thus provides maximum flexibility. Further, such an interface can communicate with another plugin, e.g. a Python worker that performs the actual analysis. For more details, have a look at the dedicated demo below.
 
-### Python plugin displays a chart in a window plugin
+### Python plugin displaying a chart
 In this demo, we show how data generated in a **Python plugin** can be displayed in a window plugin. The plugin interface you can slightly change the data that is generated (you can change the number of data-points) and how the graph is actually displayed: either it is rendered with one of three JavaScript libraries, or the plot is generated with Matplotlib and saved as png and then shown.
 
 
@@ -50,7 +50,7 @@ The **main steps** are described below and basic data flow is illustrated by das
 3. In the window plugin the transferred data are available as `my.data` and are used to create the JavaScript plot and also populate the HTML text field.
 4. The `api.createWindow` returns an identifier for the window. When plotting again, the Python plugin attempts to plot into this window. Please note that here on the actual data are passed as an input and not the larger dictionary containing the specifications of the window. For the plugin running in the Python engine, we added a  `try ... except` statement to catch error arises when the window has been closed.
 
-#### Opening a chart saved as png in a window
+#### Opening a chart saved as png
 Rather then sending the data, you can directly show an image in a window plugin with this
 <a href="https://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:Charts PNG&w=demo-charts" target="_blank">**demo**</a>.
 
@@ -73,7 +73,7 @@ with open(name_plot, 'rb') as f:
     api.createWindow('type':'imjoy/image','w':12, 'h':15,data = {"src": imgurl})
 ```
 
-### User interface communicating with Python worker
+### User interface calling Python worker
 In this demo, we show how to use a **window** plugin to defined a user interface, and how this interface can interact with a **Python worker** plugin to perform calculations.
 
 You can install this plugin from this
@@ -88,7 +88,7 @@ This demo illustrates a number of different important concepts, which we describ
 2. How to communicate between the user interface and the Python worker.
 3. How to store data in the Python worker for further calculations.
 
-#### Web-design for an ImJoy user interface
+#### Web-design for an ImJoy interface
 The window plugins are developed with HTML5/CSS and JavaScript. Here we provide
 only a fast overview of these languages. An excellent resource to get started with HTML, CSS and JavaScript is  [www.w3schools.com/](https://www.w3schools.com/). Other coding platforms exist to test and develop code ([playcode.io/](https://playcode.io/) or [codepen.io](https://codepen.io/)), but you can essentially use ImJoy to test your code as well.
 
