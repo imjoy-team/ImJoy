@@ -991,4 +991,4 @@ GitHub Gist, or other data-sharing platforms such as Dropbox and link them in th
     the link to this repository. You can use the terminal command `pip install ...`
     to check if you can install your module.
 
-    You can then add the GitHub link to [`requirements`](development?id=requirements) in the `<config>` block of your plugin.
+    You can then add the GitHub link as a [pip requirement](id=native-python-plugins) in the `<config>` block of your plugin.
