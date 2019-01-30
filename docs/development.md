@@ -492,11 +492,11 @@ The general syntax is shown below with parameters indicated in `{}`:
  *   `reponame`: name of the GitHub repository.
  *   `tagname`:  allows passing of tag. This can be a commit hash tag, a
      [Git tag](https://git-scm.com/book/en/v2/Git-Basics-Tagging), or a
-     [GitHub release](https://help.github.com/articles/creating-releases/),
+     [GitHub release](https://help.github.com/articles/creating-releases/), or
      a commit hash tag. This provides precise control
      which version of the repository is installed and used.
- *   `eggname`: this is usually the name of your repository and required for
-     proper functioning of the install.
+ *   `eggname`: this is usually the name of your repository. This is recommended
+     for an install of a Git repository, and tells pip what to call the repository for dependency checks.
 
 For a complete description please consult the [pip documentation](https://pip.pypa.io/en/latest/reference/pip_install/#git).
 
@@ -535,9 +535,7 @@ For example, to add `scipy` with version 1.0, you can specify
 
 #### repo with `setup.py`
 The `pip` command can install a package and its dependencies from a GitHub repository,
-when the `setup.py` is present. Several excellent ressources, such as
-[this one](https://packaging.python.org/tutorials/packaging-projects/),
-explain how to specify this file.
+when the `setup.py` is present.
 
 Example: the GitHub repository `myRepo` is hosted on the account `mUsername` and
 the latest Git tag is `v0.1.1`. You can then add this repository
@@ -554,9 +552,7 @@ We would like to highlight three important aspects:
     [GitHub release](https://help.github.com/articles/creating-releases/),
     This provides precise control which version of the repository is installed and used.
 
-0.  The string `#egg=myRepo` is recommended for an install of a Git repository, and
-    tells pip what to call the repository for dependency checks.
-
+For more informations, consult the dedicate section [here](development?id=install-package-from-github).
 
 #### repo with `requirements.txt`
 The file `requirements.txt` contains a list of all packages and their version that
@@ -1014,5 +1010,4 @@ GitHub Gist, or other data-sharing platforms such as Dropbox and link them in th
     but you have to convert it with [combinatronics.com](https://combinatronics.com/).
 
  *  For **Python** plugins, we recommend to package your library as a pip module
-    on GitHub. We refer to a dedicated [section](http://localhost:8000/docs#/development?id=install-package-from-github)
-    explaining how this can be done.
+    on GitHub. For more information, consult the dedicated section [here](development?id=install-package-from-github).
