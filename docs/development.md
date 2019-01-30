@@ -498,6 +498,9 @@ The general syntax is shown below with parameters indicated in `{}`:
  *   `eggname`: this is usually the name of your repository. This is recommended
      for an install of a Git repository, and tells pip what to call the repository for dependency checks.
 
+Please note that once a package is installed, it will not be **upgraded** unless you 
+specify a new tag.
+
 For a complete description please consult the [pip documentation](https://pip.pypa.io/en/latest/reference/pip_install/#git).
 
 In order to test your module, you can use the `pip` terminal command with the
