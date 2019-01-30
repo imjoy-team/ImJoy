@@ -3,7 +3,7 @@
 <a href="https://imjoy.io" target="_blank"><img src="https://raw.githubusercontent.com/oeway/ImJoy/master/web/public/static/img/imjoy-logo-black.svg?sanitize=true" width="380"></img>
 </a>
 
-## Image Processing with Joy :)
+## ImJoy - a plugin powered hybrid computing platform for deep learning
 
 ImJoy is a modern image processing framework bridging the web and the
 Python ecosystem with plugins.
@@ -15,31 +15,6 @@ deep learning, is simple and easy thanks to rich and interactive user interfaces
 
 Checkout the documentation for how to get started and more details
 for how to develop ImJoy plugins: [ImJoy Docs](https://imjoy.io/docs)
-
-## Quick Start
-
-The easiest way to try ImJoy is to start with a plugin running directly in the browser.
-
-For example, you can install our `Image Recongnition` plugin with [this link](https://imjoy.io/#/app?plugin=oeway/ImJoy-Plugins:Image%20Recognition&workspace=getting-started).
-Clicking the link will open the ImJoy Web App and show a dialog to confirm the
-installation of the plugin. Once installed, you can launch the plugin by clicking
-the button `Image Recognition` in the plugin menu on the left. The demo plugin
-will run a trained deep neural network model (MobileNet) to perform image
-classification (e.g. identifying an elephant in an image).
-
-![imjoy-interface](assets/imjoy-predict-elephant.png ':size=300')
-
-This plugin uses your browser as its computational backend, so all
-computation is done locally, no data will be sent to a remote server.
-
-Besides running plugins in the browser, ImJoy provides the flexibility to keep
-the GUI locally in your browser, and perform compuational tasks with Python.
-These computations can be performed on your computer utilizing the full power
-of the local GPU/CPU. The computional backend can also be launched on remote servers
-including cloud servers on Amazon, Google Compute, or an institutional computing cluster.
-
-To learn more details about ImJoy, please go to [ImJoy Docs](https://imjoy.io/docs/).
-
 
 ## Key Features of ImJoy
  * Minimal and flexible plugin powered web application
@@ -66,6 +41,31 @@ To learn more details about ImJoy, please go to [ImJoy Docs](https://imjoy.io/do
 * Native support for n-dimensional arrays and tensors
    - Support ndarrays from Numpy for data exchange
    - Support Tensorflow.js and native Tensorflow for deep learning
+
+
+## Quick Start
+
+The easiest way to try ImJoy is to start with a plugin running directly in the browser.
+
+For example, you can install our `Image Recongnition` plugin with [this link](https://imjoy.io/#/app?plugin=oeway/ImJoy-Plugins:Image%20Recognition&workspace=getting-started).
+Clicking the link will open the ImJoy Web App and show a dialog to confirm the
+installation of the plugin. Once installed, you can launch the plugin by clicking
+the button `Image Recognition` in the plugin menu on the left. The demo plugin
+will run a trained deep neural network model (MobileNet) to perform image
+classification (e.g. identifying an elephant in an image).
+
+<img src="https://github.com/oeway/ImJoy/raw/master/docs/assets/imjoy-predict-elephant.png" width="300px"></img>
+
+This plugin uses your browser as its computational backend, so all
+computation is done locally, no data will be sent to a remote server.
+
+Besides running plugins in the browser, ImJoy provides the flexibility to keep
+the GUI locally in your browser, and perform compuational tasks with Python.
+These computations can be performed on your computer utilizing the full power
+of the local GPU/CPU. The computional backend can also be launched on remote servers
+including cloud servers on Amazon, Google Compute, or an institutional computing cluster.
+
+To learn more details about ImJoy, please go to [ImJoy Docs](https://imjoy.io/docs/).
 
 
 ## ImJoy architecture
@@ -106,7 +106,7 @@ Currently, ImJoy consists of the following repositories:
 
 ## Acknowledgements
 
- This is a non-exhaustive list of the open-source tools and libraries we used in ImJoy:
+This is a non-exhaustive list of the open-source tools and libraries we used in ImJoy:
 
  -   [Joy.js](https://github.com/ncase/joy) (This is where the name `ImJoy` comes from!)
  -   [Jailed](https://github.com/asvd/jailed) (This helps ImJoy to isolate plugins)
@@ -117,7 +117,7 @@ Currently, ImJoy consists of the following repositories:
  -   [conda](https://conda.io/) (The plugin engine uses Conda for managing virtual env. and packages)
  -   [docsify](https://github.com/docsifyjs/docsify/) (The ImJoy documentation is created with docsify)
 
- We thank all the authors for offering these excellent work to the open-source community.
+We thank all the authors for offering these excellent work to the open-source community.
 
 
 ## Support ImJoy
@@ -132,4 +132,4 @@ We don't have a guidline for that yet, for now please feel free to use the [issu
 
 ## License
 
- [MIT License](https://github.com/oeway/ImJoy/blob/master/LICENSE)
+[MIT License](https://github.com/oeway/ImJoy/blob/master/LICENSE)

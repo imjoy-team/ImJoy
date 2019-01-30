@@ -437,12 +437,12 @@ The general syntax is `"requirements": ["prefix:requirementToInstall"]`. The tab
 lists all supported requirements, the actual command being executed by ImJoy and
 an example.
 
-Prefix   | Command            | Example
----------|--------------------|----------------------------------------
-`conda` | `conda install -y` | `"conda:scipy==1.0"`
-`pip`   | `pip install`      | `"pip:scipy==1.0"`
-`repo`  | `git clone` (new repo)  <br> `git pull` (existing repo)|  `"repo:https://github.com/userName/myRepo"`
-`cmd`  | Any other command  |  `"cmd:pip install -r myRepo/requirements.txt"`
+Prefix  | Command                                                 | Example
+--------|---------------------------------------------------------|-----------------------------------------------
+`conda` | `conda install -y`                                      | `"conda:scipy==1.0"`
+`pip`   | `pip install`                                           | `"pip:scipy==1.0"`
+`repo`  | `git clone` (new repo)  <br> `git pull` (existing repo) | `"repo:https://github.com/userName/myRepo"`
+`cmd`   | Any other command                                       | `"cmd:pip install -r myRepo/requirements.txt"`
 
 
 Some **important considerations**:
@@ -471,15 +471,42 @@ Some **important considerations**:
     "requirements": ["conda:numpy", "pip:scipy==1.0", "repo:https://github.com/userName/myRepo"]
     ```
 
-*  `pip` also supports installation directly from a git url, assuming that the
-   repository contains `setup.py`. In this case, we recommend
-   specifying the [GitHub release](https://help.github.com/articles/creating-releases/)
-   of your library, e.g. with `#egg=myRepo`. This ensures that the correct
-   version is installed.
+#### Install package from GitHub
+`pip` is Git-aware and can install packages. This means that you can installation
+directly from a Git url. Several excellent ressources exist to explain this step,
+such as [this one](https://packaging.python.org/tutorials/packaging-projects/).
+Please note that it is not necessary that you up-load
+your package to the Package Index. The crucial part is that you provide the `setup.py`.
 
-   ``` json
-   "requirements": "pip:git+https://github.com/myUserName/myRepo#egg=myRepo"
-   ```
+The general syntax is shown below with parameters indicated in `{}`:
+ ```json
+ "requirements": ["pip:git+https://github.com/{username}/{reponame}@{tagname}#egg={reponame}"]
+ ```
+
+ The syntax `"pip:git+https..."` is translated by ImJoy into the command `pip install git+https...`.
+ This command allows a [pip install from GIT](https://pip.pypa.io/en/stable/reference/pip_install/#vcs-support).
+
+ The following parameters have to be specified:
+
+ *   `username`: name of the GitHub account.
+ *   `reponame`: name of the GitHub repository.
+ *   `tagname`:  allows passing of tag. This can be a commit hash tag, a
+     [Git tag](https://git-scm.com/book/en/v2/Git-Basics-Tagging), or a
+     [GitHub release](https://help.github.com/articles/creating-releases/),
+     a commit hash tag. This provides precise control
+     which version of the repository is installed and used.
+ *   `eggname`: this is usually the name of your repository and required for
+     proper functioning of the install.
+
+For a complete description please consult the [pip documentation](https://pip.pypa.io/en/latest/reference/pip_install/#git).
+
+In order to test your module, you can use the `pip` terminal command with the
+parameters specified above
+```bash
+pip install git+https://github.com/{username}/{reponame}@{tagname}#egg={reponame}
+```
+
+For an example, we refer [here](http://localhost:8000/docs#/development?id=repo-with-setuppy).
 
 ### Web Python
 Requirements are specified as a list of strings specifying the required python modules. For instance,
@@ -507,25 +534,29 @@ For example, to add `scipy` with version 1.0, you can specify
 ```
 
 #### repo with `setup.py`
-The python file `setup.py` allows to install a package and its dependencies.
-Several excellent ressources, such as [this one](https://packaging.python.org/tutorials/packaging-projects/), explain
-how to specify this file.
+The `pip` command can install a package and its dependencies from a GitHub repository,
+when the `setup.py` is present. Several excellent ressources, such as
+[this one](https://packaging.python.org/tutorials/packaging-projects/),
+explain how to specify this file.
 
-Example, the GitHub repository `myRepo` is hosted on the account `mUsername`. You
-can then add ou can add
+Example: the GitHub repository `myRepo` is hosted on the account `mUsername` and
+the latest Git tag is `v0.1.1`. You can then add this repository
 ```json
-"requirements": "pip:git+https://github.com/myUserName/myRepo#egg=myRepo"
+"requirements": "pip:git+https://github.com/myUserName/myRepo@v0.1.1#egg=myRepo"
 ```
 
-We would like to emphasize two important aspects in this example:
+We would like to highlight three important aspects:
 
-1.  The syntax `"pip:git+https..."` is translated by
-    ImJoy into the command `pip install git+https...`. This commamnd allows a
-    [pip install from GIT](https://pip.pypa.io/en/stable/reference/pip_install/#vcs-support).
+1.  The syntax `"pip:git+https..."` is translated by ImJoy into the command
+    `pip install git+https...` and allows a [pip install from GIT](https://pip.pypa.io/en/stable/reference/pip_install/#vcs-support).
 
-2.  The string `#egg=myRepo` allows to determine the [GitHub release](https://help.github.com/articles/creating-releases/)
-    of the repository. This allows to controll which version is installed, and thus
-    guarantess that updates are properly considered.
+0.  The string `@v0.1.1` is used to specify the [Git tag](https://git-scm.com/book/en/v2/Git-Basics-Tagging),
+    [GitHub release](https://help.github.com/articles/creating-releases/),
+    This provides precise control which version of the repository is installed and used.
+
+0.  The string `#egg=myRepo` is recommended for an install of a Git repository, and
+    tells pip what to call the repository for dependency checks.
+
 
 #### repo with `requirements.txt`
 The file `requirements.txt` contains a list of all packages and their version that
@@ -978,17 +1009,10 @@ GitHub Gist, or other data-sharing platforms such as Dropbox and link them in th
  *  For **JavaScript** plugins, you need to create a Gist or GitHub.
     Upload the plugin (ending with `.imjoy.html`) file together with the other JavaScript files.
 
-    In the plugin file, you can then use `importScripts(url_to_your_js_file)`
-    to import this libraries. However, due GitHub restrictions, you can't use
-    the GitHub url directly, but you convert the url with [jsDelivr](https://www.jsdelivr.com/rawgit).
+    In the plugin file, you can then add the url to the plugin `requirements`.
+    However, due to GitHub restrictions, you can't use the GitHub url directly,
+    but you have to convert it with [combinatronics.com](https://combinatronics.com/).
 
- *  For **Python** plugins, we recommend to package your library as a pip module.
-    Several excellent ressources, such as [this one](https://packaging.python.org/tutorials/packaging-projects/),
-    explaining this step exist. Please note that it is not necessary that you up-load
-    your package to the Package Index. The crucial part is that you provide the `setup.py`.
-
-    Create a [gist](https://gist.github.com/) or a GitHub repository, and obtain
-    the link to this repository. You can use the terminal command `pip install ...`
-    to check if you can install your module.
-
-    You can then add the GitHub link as a [pip requirement](id=native-python-plugins) in the `<config>` block of your plugin.
+ *  For **Python** plugins, we recommend to package your library as a pip module
+    on GitHub. We refer to a dedicated [section](http://localhost:8000/docs#/development?id=install-package-from-github)
+    explaining how this can be done.
