@@ -327,59 +327,12 @@ For more details see the dedicated [section](development?id=virtual-environments
 #### requirements
 Defines the plugin requirements.
 
-*   **web-worker** plugins: array of JavaScript urls, which will be imported using `importScripts`.
-    ImJoy provides a dedicated [GitHub repository](https://github.com/oeway/static.imjoy.io)
-    hosting commonly used and tested libraries. You can refer to all files contained in the `docs`
-    folder with a simple url: `https://static.imjoy.io` + `RelativePathInDocs`.
-    For instance, the file `FileSaver.js` in the folder `static.imjoy.io/docs/js/`
-    can be referenced as `https://static.imjoy.io/js/FileSaver.js`.
+ImJoy provides a large number of options to specify these requirements for public
+or private repositories, including `importScripts` for JavaScript, `pip` for Python,
+conda environment specified by `environment.yml`, and others.
 
-*   **window** plugin: either a list of JavaScript url or CSS url (needs to be end with `.css`).
-    Same considerations as for `web-worker` apply for import and static hosting.
-
-*   **native-python plugins**: supported requirements types including `conda`, `pip` and `repo`.
-
-    The requirements are defined as a list of strings. A prefix is used to specify the requirement type.
-    If no prefix is used, requirements will be treated as `pip` libraries, e.g.: `"requirements": ["numpy", "scipy==1.0"]`;
-
-    Notice that, if a **virtual environment** are used by setting `env`, all `pip` and `conda`
-    packages will be installed to this environment. For more information see the
-    dedicated [section](development?id=virtual-environments).
-
-    -  **`conda:`** for conda packages, which will be installed with `conda install -y`.
-
-       Example: `"requirements": ["conda:numpy", "conda:scipy==1.0"]` or `"requirements": ["conda:numpy scipy==1.0"]`.
-
-    -  **`pip:`** for pip packages, which will be installed with `pip install`.
-
-       Example: `"requirements": ["pip:numpy", "pip:scipy==1.0"]` or `"requirements": ["pip:numpy scipy==1.0"]`.
-
-       `pip` also supports installation directly from a git url. We recommend
-       specifying the [GitHub release](https://help.github.com/articles/creating-releases/)
-       of your library, e.g. with `#egg=myRepo`. This ensures that the correct
-       version is installed.
-
-       Example: if your git repo contains `setup.py`, you can use `"pip:git+https://github.com/myUserName/myRepo#egg=myRepo"` as a requirement.
-
-    -  **`repo:`** to obtain a git repository in the current
-       plugin workspace (`git clone` for a not existing
-       repository or `git pull` for an existing repository)
-
-       Example: `"requirements": ["repo:https://github.com/oeway/ImJoy-Project-Template"]`
-
-    -  **`cmd:`** for any other command. Please be aware that many command can have
-       compatibility issue across different operating systems, you may want to verify
-       them before deploying your plugin;
-
-       For example,`"requirements": ["cmd:pip install -r myRepo/requirements.txt"]`.
-
-
-  Requirement types can be combined into one list. Example: `"requirements": ["scikit-image", "conda:numpy", "pip:scipy==1.0", "repo:https://github.com/oeway/ImJoy-Project-Template"]`.
-
-  `requirements` with a single command string is **DEPRECATED**, new plugins should use the above format with a list.
-
-*   **web-python**: list of python modules, e.g. `["numpy", "matplotlib"]`.
-    Please also note that `web-python` only supports a a limited number of python modules.
+We refer to the dedicate [section](development?id=specifying-requirements)
+for a detailed description.
 
 
 #### dependencies
@@ -441,28 +394,178 @@ The `lang` property of the `<script>` block is used to specify the used programm
 
 `<script>` also supports `tags`. For more information, see the dedicated section for [`tags`](development?id=tags).
 
-## Use custom libraries
-You can specify plugin requirements of ImJoy in the dedicated field in
-its `config` [block](http://localhost:8000/docs#/development?id=requirements)
+## Specifying requirements
+
+The plugin requirements are specified in the dedicated field [`requirements`](http://localhost:8000/docs#/development?id=requirements)
+in its `config` block.
+
+Depending on the plugin type, requirements can be specified differently.
+
+### Web Worker and Window plugins
+Requirments are specified as an array of JavaScript urls. These libraries will then be
+imported using `importScripts`.
+
+For example, to specify the latest [plotly.js](https://plot.ly/javascript/) library you can
+use
+```json
+"requirements": ["https://cdn.plot.ly/plotly-latest.min.js"]
+```
+
+For window plugins, you can also specify **CSS urls**, these need to end with `.css`.
+
+For example, to use the [W3.CSS framework](https://www.w3schools.com/w3css/), you can specify
+```json
+"requirements": ["https://www.w3schools.com/w3css/4/w3.css"]
+```
+
+ImJoy hosts **commonly used and tested libraries** in a dedicated [GitHub repository](https://github.com/oeway/static.imjoy.io).
+You can refer to all files contained in the `docs` folder with a simple url: `https://static.imjoy.io` + `RelativePathInDocs`.
+
+For example, the file `FileSaver.js` in the folder `static.imjoy.io/docs/js/`
+can be referenced as
+```json
+"requirements": ["https://static.imjoy.io/js/FileSaver.js"]
+```
+
+### Native Python plugins
+
+Requirements are defined as a list of strings.
+A prefix is used to specify the supported requirement types: `conda:`, `pip:` and `repo:`.
+
+The general syntax is `"requirements": ["prefix:requirementToInstall"]`. The table below
+lists all supported requirements, the actual command being executed by ImJoy and
+an example.
+
+Prefix   | Command            | Example
+---------|--------------------|----------------------------------------
+`conda` | `conda install -y` | `"conda:scipy==1.0"`
+`pip`   | `pip install`      | `"pip:scipy==1.0"`
+`repo`  | `git clone` (new repo)  <br> `git pull` (existing repo)|  `"repo:https://github.com/userName/myRepo"`
+`cmd`  | Any other command  |  `"cmd:pip install -r myRepo/requirements.txt"`
+
+
+Some **important considerations**:
+
+*  If **no prefix is used**, requirements will be treated as `pip` libraries.
+   ```json
+   "requirements": ["numpy", "scipy==1.0"]
+   ```
+
+*  If a **virtual environment** is defined by setting `env`, all `pip` and `conda`
+   packages will be installed to this environment. For more information see the
+   dedicated section on [virtual environments](development?id=virtual-environments).
+
+*  You can list multiple requirements either directly as one string after a prefix:
+   ```json
+   "requirements": ["conda:numpy scipy==1.0"]
+   ```
+   or as separate strings in one list:
+
+   ```json
+   "requirements": ["conda:numpy", "conda:scipy==1.0"]
+   ```
+*  Different requirement types can be combined into one list.
+
+   ```json
+    "requirements": ["conda:numpy", "pip:scipy==1.0", "repo:https://github.com/userName/myRepo"]
+    ```
+
+*  `pip` also supports installation directly from a git url, assuming that the
+   repository contains `setup.py`. In this case, we recommend
+   specifying the [GitHub release](https://help.github.com/articles/creating-releases/)
+   of your library, e.g. with `#egg=myRepo`. This ensures that the correct
+   version is installed.
+
+   ``` json
+   "requirements": "pip:git+https://github.com/myUserName/myRepo#egg=myRepo"
+   ```
+
+### Web Python
+Requirements are specified as a list of strings specifying the required python modules. For instance,
+
+```json
+"requirements": ["numpy", "matplotlib"]
+```
+
+Please note that `web-python` plugins are based on [pyodide](https://github.com/iodide-project/pyodide/)
+and only a limited number of python modules is currently supported.
+
+
+### Typical scenarios
 
 This allows you include public libraries with `pip` or `conda`, but also your own
 libraries. Below we describe some of the most commonly encountered scenarios.
 
-1.  Your python module is deployed to as a pip repository (`pip.pypa.io`). You can
-    then add its pip name to `requirements`.
-0.  You host the source code and `setup.py` on GitHub. Several excellent ressources,
-    such as [this one](https://packaging.python.org/tutorials/packaging-projects/), explain
-    how to specify this file. You can add  `"pip:git+https://github.com/myUserName/myRepo#egg=myRepo"` to `requirements`.
-    Note that the `#egg=myRepo` allows to determine the [GitHub release](https://help.github.com/articles/creating-releases/)
-    of your library, controlling which version is installed.
-0.  You host your source code and a `requirements.txt` on GitHub.
-    Add to `requirements`: `repo: https://github.com/XXXX` and `cmd: pip install -r XXXXX/requirements.txt`
-0.  You host the source code and a `environment.yml` defining the virtual env with conda and pip
-    dependencies. You can add the repo with `repo: https://github.com/XXXX` and install the
-    environment with `"env": "conda env create -f XXXX/environment.yml"` imjoy cannot use `environment.yml` directly, need to convert to imjoy `requirements`.
-0.  You could also host your code on dropbox and install it from there with
-    a https request. See our dedicated [demo](demos?id=distribution-of-codedata-stored-on-dropbox)
-    for more details.
+#### pip repositories
+Your python module is deployed to as a pip repository (`pip.pypa.io`). You can
+then add its pip name to `requirements` including the version number.
+
+For example, to add `scipy` with version 1.0, you can specify
+
+```json
+"requirements": ["pip:scipy==1.0"]
+```
+
+#### repo with `setup.py`
+The python file `setup.py` allows to install a package and its dependencies.
+Several excellent ressources, such as [this one](https://packaging.python.org/tutorials/packaging-projects/), explain
+how to specify this file.
+
+Example, the GitHub repository `myRepo` is hosted on the account `mUsername`. You
+can then add ou can add
+```json
+"requirements": "pip:git+https://github.com/myUserName/myRepo#egg=myRepo"
+```
+
+We would like to emphasize two important aspects in this example:
+
+1.  The syntax `"pip:git+https..."` is translated by
+    ImJoy into the command `pip install git+https...`. This commamnd allows a
+    [pip install from GIT](https://pip.pypa.io/en/stable/reference/pip_install/#vcs-support).
+
+2.  The string `#egg=myRepo` allows to determine the [GitHub release](https://help.github.com/articles/creating-releases/)
+    of the repository. This allows to controll which version is installed, and thus
+    guarantess that updates are properly considered.
+
+#### repo with `requirements.txt`
+The file `requirements.txt` contains a list of all packages and their version that
+are required by the package. For more details see [here](https://pip.pypa.io/en/stable/user_guide/#requirements-files).
+
+Usually, you will add this repository to your workspace. You can then install
+the requirements, and also directly import the project directly from a folder.
+
+Example, the GitHub repository `myRepo` is hosted on the account `mUsername`.
+To add this repository to the plugin workspace, and install the requirements:
+ ```json
+ "requirements": ["repo:https://github.com/myUserName/myRepo", "cmd: pip install -r myRepo/requirements.txt"]
+ ```
+
+In your pyton plugn, you can then add the local copy to the Python system path, and
+import libraries from it
+```python
+sys.path.insert(0, './myRepo')
+from  ... import ...
+```
+
+#### repo with `environment.yml`
+The yaml file `environment.yml` defines a virtual environment with conda and pip
+dependencies. A detailed description file format can be found [here](https://conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#create-env-file-manually).
+
+Example, the GitHub repository `myRepo` is hosted on the account `mUsername`.
+You can add the repo with
+```json
+"requirements": ["repo:https://github.com/myUserName/myRepo"]
+```
+
+and install the environment with
+```json
+"env": []"conda env create -f myRepo/environment.yml"]
+```
+
+#### repo hosted on Dropbox
+You could also host your code (and also data) on dropbox and install it from there with
+a https request. See our dedicated [demo](demos?id=distribution-of-codedata-stored-on-dropbox)
+for more details.
 
 
 ## Plugin properties
