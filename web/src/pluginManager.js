@@ -1622,10 +1622,10 @@ export class PluginManager {
   }
 
   getAttachment(plugin, name){
-    if(plugin.attachments){
-      for (let i = 0; i < plugin.attachments.length; i++) {
-        if (plugin.attachments[i].attrs.name === name) {
-          return plugin.attachments[i].content
+    if(plugin.config.attachments){
+      for (let i = 0; i < plugin.config.attachments.length; i++) {
+        if (plugin.config.attachments[i].attrs.name === name) {
+          return plugin.config.attachments[i].content
         }
       }
     }
