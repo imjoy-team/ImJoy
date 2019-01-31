@@ -1561,9 +1561,8 @@ export default {
 
 .plugin-dialog {
   width: 80%;
-  height: 90%;
   max-width: 800px;
-  max-height: 2000px;
+  max-height: 90%;
 }
 
 @media screen and (max-width: 800px) {
@@ -1575,8 +1574,7 @@ export default {
 
 @media screen and (max-height: 900px) {
   .plugin-dialog {
-    height: 100%;
-    max-height: 2000px;
+    max-height: 100%;
   }
 }
 
