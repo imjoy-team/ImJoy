@@ -498,7 +498,7 @@ The general syntax is shown below with parameters indicated in `{}`:
  *   `eggname`: this is usually the name of your repository. This is recommended
      for an install of a Git repository, and tells pip what to call the repository for dependency checks.
 
-Please note that once a package is installed, it will not be **upgraded** unless you 
+Please note that once a package is installed, it will not be **upgraded** unless you
 specify a new tag.
 
 For a complete description please consult the [pip documentation](https://pip.pypa.io/en/latest/reference/pip_install/#git).
@@ -773,16 +773,20 @@ The above `<config>` block will create a plugin with two tags(`Single` and `Mult
 Python plugins for ImJoy can have different conda environments, which provides a way to isolate plugins. You can therefore run python plugins with different versions of Python, or use different pip packages. However, we recommend to limit the number of virtual environments, since each
 takes up considerable disk space.
 
-By default, python plugins from ImJoy will be executed in the default conda environment (e.g. Python 3.6). If you want to run a plugin in a different conda environment, you can specify it by setting the `env` field in the `<config>` section of the plugin.
+By default, python plugins from ImJoy will be executed in the default conda environment (e.g. Python 3.6).
+If you want to run a plugin in a different conda environment, you can specify it by setting the `env`
+field in the `<config>` section of the plugin.
 
-`env` can be a string or an array. When connecting multiple command in a line please use `&&` or `||` which supported on different operating systems. If you have several command which are independent from each other, please use array to store the commands. For example: `"env": ["git clone https://github.com/oeway/XXXXXX.git", "conda create -n XXXXX python=3.7"]`, this setting will first clone the source code on GitHub, then create an environment with conda. Notice that the git clone command will fail if the folder already exist, in that case, the second command will also been executed.
+`env` can be a string or an array. When connecting multiple command in a line please use `&&` or `||` which are supported on different operating systems. If you have several command which are independent from each other, please use an array to store the commands.
+For example: `"env": ["export CUDA_VISIBLE_DEVICES=1", "conda create -n XXXXX python=3.7"]`.
 
 You can also create an environment directly from a `environment.yml` file, e.g.
 `"env": "conda env create -f ANNA-PALM/environment.yml"`. This requires
-that the repository is defined as a repo in the [plugin requirements](development?id=requirements). For more information,
-consult the dedicated [conda help page](https://conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#creating-an-environment-from-an-environment-yml-file).
+that the repository is defined as a repo in the [plugin requirements](development?id=requirements).
+For more information, consult the dedicated [conda help page](https://conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#creating-an-environment-from-an-environment-yml-file).
 
-It is also important to specify the pip packages required by the plugin, this can be done with the `requirements` field in `<config>`.
+It is also important to specify the pip packages required by the plugin, this can be done
+with the `requirements` field in `<config>`.
 
 Examples:
 
@@ -807,9 +811,11 @@ Examples:
     ...
   </config>
   ```
-  **Note 1**: in `requirements`, you can also specify the version number, for example `numpy==1.15.0`. If you want to install conda modules or you want to run pip with other parameters, you can set `requirements` as a command string instead of a list, for example: you can do `requirements: "conda install opencv-python && pip install numpy"`.
 
-  **Note 2**: in the `env` field, you need to use `-n XXXX` to name your environment, otherwise, it will use the plugin name to name the environment.
+  **Note 1**: in `requirements`, you can also specify the version number, for example `numpy==1.15.0`.
+
+  **Note 2**: in the `env` field, you need to use `-n XXXX` to name your environment,
+  otherwise, it will use the plugin name to name the environment.
 
 
 ## Hosting and deploying plugins
@@ -912,7 +918,7 @@ The easiest way to distribute plugins is by creating a url, which can be shared.
 
 The basic format is `http://imjoy.io/#/app?plugin=PLUGIN_URI`. You will need to
 replace `PLUGIN_URI` with your actuall **plugin URI** (Uniform Resource Identifier).
-For example: [http://imjoy.io/#/app?plugin=https://github.com/oeway/ImJoy-Plugins/blob/master/repository/imageWindow.imjoy.html](http://imjoy.io/#/app?plugin=https://github.com/oeway/ImJoy-Plugins/blob/master/repository/imageWindow.imjoy.html). When the user click this link,
+For example: [https://imjoy.io/#/app?plugin=https://github.com/oeway/ImJoy-Plugins/blob/master/repository/imageWindow.imjoy.html](https://imjoy.io/#/app?plugin=https://github.com/oeway/ImJoy-Plugins/blob/master/repository/imageWindow.imjoy.html). When the user click this link,
 a plugin installation dialog will be shown which proposes to install the specified plugin.
 The user has to simply confirm by clicking `Install`.
 
@@ -941,9 +947,9 @@ There are **two types of URI**, depending on how your plugin is deployed:
     how to obtain this url for different hosting platforms:
 
     1. For files on **GitHub**, you just need to copy the link to the file.
-       For example: `https://github.com/oeway/DRFNS-Lite/blob/master/DRFNS-Lite.imjoy.html`.
+       For example: `https://github.com/oeway/ImJoy-Plugins/blob/master/repository/imageRecognition.imjoy.html`.
 
-    1.  For **Gist** or other Git providers such as (GitLab), you need to obtain the `raw`
+    0.  For **Gist** or other Git providers such as (GitLab), you need to obtain the `raw`
         link of the plugin file. For example, to create a Gist link
 
         1. Go to Gist on your GitHub account [https://gist.github.com/](https://gist.github.com/)
@@ -985,7 +991,8 @@ The following url parameters are currently supported:
      To avoid it, you need to use `http://127.0.0.1:9527` rather than `http://localhost:9527`,
      because most browser will consider `127.0.0.1` is a secured connection, but not `localhost`.
      However, there is an exception, on Safari, using `127.0.0.1` does not work due to
-     [this](https://bugs.webkit.org/show_bug.cgi?id=171934), if you still want to use Safari, you have to switch to `http://imjoy.io`.
+     [this restriction](https://bugs.webkit.org/show_bug.cgi?id=171934),  please use
+     Firefox or Chrome instead.
 
  *   `token` or `t`: define the connection token. For example: `http://imjoy.io/#/app?token=2760239c-c0a7-4a53-a01e-d6da48b949bc`
  *   `repo` or `r`: specify a ImJoy manifest file pointing to a ImJoy plugin repository (see above).
