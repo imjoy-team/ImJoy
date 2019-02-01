@@ -18,11 +18,11 @@ export class WindowManager {
     this.registered_inputs = {}
     this.registered_loaders = {}
     this.default_window_pos = {
-      i: 0,
       x: 0,
       y: 0,
       w: 20,
-      h: 10
+      h: 10,
+      index: 0
     }
   }
 
@@ -36,7 +36,8 @@ export class WindowManager {
   }
 
   generateGridPosition(config) {
-    config.i = this.default_window_pos.i.toString()
+    config.i = randId()
+    config.index = this.default_window_pos.index
     config.w = config.w || this.default_window_pos.w
     config.h = config.h || this.default_window_pos.h
     config.x = this.default_window_pos.x
@@ -46,7 +47,7 @@ export class WindowManager {
       this.default_window_pos.x = 0
       this.default_window_pos.y = this.default_window_pos.y + this.default_window_pos.h
     }
-    this.default_window_pos.i = this.default_window_pos.i + 1
+    this.default_window_pos.index = this.default_window_pos.index + 1
   }
 
   registerInputLoader(op_key, inputs, loader){
@@ -146,12 +147,14 @@ export class WindowManager {
   }
 
   closeAll() {
+    const current_index = this.default_window_pos && this.default_window_pos.index || 0
     this.default_window_pos = {
       i: 0,
       x: 0,
       y: 0,
       w: 20,
-      h: 10
+      h: 10,
+      index: current_index
     }
     this.status_text = ''
 
@@ -161,6 +164,9 @@ export class WindowManager {
           // this.windows.splice(i, 1);
           this.closeWindow(this.windows[i])
       }
+    }
+    if(this.windows.length === 0){
+      this.default_window_pos.index = 0
     }
     //this.event_bus.$emit('close_window')
   }

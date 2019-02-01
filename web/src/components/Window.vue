@@ -10,7 +10,7 @@
       <md-button class="md-icon-button md-accent" @click="close(w)" >
         <md-icon>close</md-icon>
       </md-button>
-      <div class="window-title noselect" @dblclick="w._h && w._w?normalSize(w):fullScreen(w)">{{w.name.slice(0, 30)+'(#'+w.i+')'}}</div>
+      <div class="window-title noselect" @dblclick="w._h && w._w?normalSize(w):fullScreen(w)">{{w.name.slice(0, 30)+'(#'+w.index+')'}}</div>
       <div>
         <md-menu md-size="big" md-direction="bottom-end">
           <md-button class="md-icon-button" md-menu-trigger>
