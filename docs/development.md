@@ -74,7 +74,7 @@ There are four types of plugins available for different purposes:
 1. `Native Python` plugins for performing heavy-duty computational tasks using Python and its libraries, this requires additional installation of plugin engine.
    These plugins are indicated with a rocket 🚀;
 1. `Web Python` plugins for performing computational tasks using Python with in the browser through WebAssembly and the [pyodide project](https://github.com/iodide-project/pyodide).
-   Such plugins are indicated with a little snack 🐍. This is in developmental stage and only a selected number of Python libraries are currently supported.
+   Such plugins are indicated with a little snake 🐍. This is in developmental stage and only a selected number of Python libraries are currently supported.
 
 Click the **+ PLUGINS** button in `Plugins`, then select `Create a New Plugin`
 with one of the plugin templates. A code editor will open in the ImJoy workspace,
