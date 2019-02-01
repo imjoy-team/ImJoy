@@ -90,7 +90,7 @@ Two options for offline usage exist:
      with this url [(http://127.0.0.1:9527)](http://127.0.0.1:9527).
 
 
-## Access the Plugin Engine from a command line interface
+## Access Plugin Engine from command line
 The installation of the Plugin Engine will setup an **Miniconda environment**
 located in `~/ImJoyApp`. You can access this Miniconda environment from the
 command line interface.
