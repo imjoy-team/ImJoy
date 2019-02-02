@@ -3,6 +3,8 @@ const path = require('path')
 const webpack = require('webpack')
 const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
+const CnameWebpackPlugin = require('cname-webpack-plugin')
+
 module.exports = {
   runtimeCompiler: true,
   outputDir: './dist',
@@ -17,6 +19,9 @@ module.exports = {
       exprContextCritical: false
     },
     plugins: [
+      new CnameWebpackPlugin({
+        domain: process.env.DEPLOY_MODE === 'dev' ? 'dev.imjoy.io' : 'imjoy.io',
+      }),
       new CopyWebpackPlugin([{
         from: path.join(__dirname, "../docs"),
         to: path.join(__dirname, "dist/docs"),
