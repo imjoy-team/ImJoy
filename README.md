@@ -1,15 +1,17 @@
 [![Build Status](https://travis-ci.com/oeway/ImJoy.svg?branch=master)](https://travis-ci.com/oeway/ImJoy)
 
-<a href="https://imjoy.io" target="_blank"><img src="https://raw.githubusercontent.com/oeway/ImJoy/master/web/public/static/img/imjoy-logo-black.svg?sanitize=true" width="380"></img>
+<a href="https://imjoy.io" target="_blank" ><img src="https://raw.githubusercontent.com/oeway/ImJoy/master/web/public/static/img/imjoy-logo-black.svg?sanitize=true" width="380"></img>
 </a>
 
-## ImJoy - a plugin powered hybrid computing platform for deep learning
+## ImJoy - Deploying Deep Learning Made Easy!
 
-ImJoy is a modern image processing framework bridging the web and the
-Python ecosystem with plugins.
+ImJoy is a plugin powered hybrid computing platform for deploying deep learning applications such as advanced image analysis tools.
 
-With ImJoy, developing and deploying advanced image processing methods, such as
-deep learning, is simple and easy thanks to rich and interactive user interfaces.
+ImJoy runs on mobile and desktop environment cross different operating systems, plugins can run in the browser, localhost, remote and cloud servers.
+
+With ImJoy, delivering Deep Learning tools to the end users is simple and easy thanks to
+its flexible plugin system and sharable plugin URL. Developer can easily add rich and interactive web interfaces to existing Python code.
+
 
 <img src="https://github.com/oeway/ImJoy/raw/master/docs/assets/imjoy-screenshot.png" width="600px"></img>
 

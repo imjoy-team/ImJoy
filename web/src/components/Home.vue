@@ -4,7 +4,7 @@
     <section class="cover show" style="background: rgb(209, 220, 239);">
       <div class="cover-main"><!-- _coverpage.md -->
         <p><img src="/static/img/imjoy-logo-black.svg?sanitize=true" width="380" /></p>
-        <h1>Image Processing with Joy :)</h1>
+        <h1>Deploying Deep Learning Made Easy!</h1>
         <span class="space-holder"></span>
         <p>
           <a href="https://github.com/oeway/ImJoy/" target="_blank">GitHub</a>

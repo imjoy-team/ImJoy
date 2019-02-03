@@ -26,7 +26,7 @@
         <md-button v-if="status_text&&status_text.length" class="status-text md-small-hide" @click="showAlert(null, status_text)" :class="status_text.includes('rror')?'error-message':''">
           {{status_text.slice(0,80)+(status_text.length>80?'...':'')}}
         </md-button>
-        <span class="subheader-title md-medium-hide" style="flex: 1" v-else>Image Processing with Joy!</span>
+        <span class="subheader-title md-medium-hide" style="flex: 1" v-else>Deploying Deep Learning Made Easy!</span>
       </div>
 
       <div class="md-toolbar-section-end">
