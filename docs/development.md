@@ -881,6 +881,9 @@ You can then update this manifest either **automatically** or **manually**:
     containing `manifest.imjoy.json`. It will then automatically search for ImJoy plugins and
     generate the manifest.
 
+    Please note that when you use this node script for the first time, you have to manually change
+    the name of the plugin repository `name`. For subsequent updates, the name will remain.
+
 2.  For a **manual update**, follow these steps:
     1. Place all plugin files in a folder in your GitHub repository.
        For example, a folder called [imjoy-plugins](https://github.com/oeway/ImJoy-project-template/tree/master/imjoy-plugins).

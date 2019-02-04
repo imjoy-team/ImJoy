@@ -25,10 +25,10 @@ To install a plugin, press on the cloud button, no further confirmation is requi
 
 Once a plugin is installed, you can open a **plugin specific menu**, by
 pressing on the down arrow right to plugin name. This will shows (if applicable)
-a list of parameters which determine the plugin behavior. You can **execute**
+a list of parameters which determine the plugin behaviour. You can **execute**
 the plugin by pressing on its title.
 
-To obain more information about an installed plugin, press on the icon left of they
+To obtain more information about an installed plugin, press on the icon left of they
 plugin name and select **Docs**. This will show a new window with a detailed
 description of how the plugin works. Other options to remove, terminate, or share
 the plugin with and url are provided as well.
@@ -64,9 +64,9 @@ and image, you will be able to snap an image and perform a prediction.
 ### Digit classification
 Here, we describe how to install and use an ImJoy plugin to perform digit classification
 with TensorFlow.js. This plugin runs directly in the browser. You can train a
-convoluation neural network (CNN) to recognize digits. Once the network is trained,
-you can classifiy hand drawn numbers. It is based on [tfjs-vis](https://github.com/tensorflow/tfjs-vis)
-- a small library for in browser visualization for use with TensorFlow.js.
+convolution neural network (CNN) to recognise digits. Once the network is trained,
+you can classify hand drawn numbers. It is based on [tfjs-vis](https://github.com/tensorflow/tfjs-vis)
+- a small library for in browser visualisation for use with TensorFlow.js.
 
 This plugin can be obtained by installing the plugin `MNIST-CNN` from
 the ImJoy plugin repository. Alternatively, you can also use this
