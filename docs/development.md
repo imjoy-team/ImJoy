@@ -24,7 +24,7 @@ Imjoy consists of **two main components**
  1.  The **ImJoy Web App**. The app can run alone, and plugins can be developed in
      JavaScript or in Python by using [pyodide](https://github.com/iodide-project/pyodide).
 
- 2.  Complex computional tasks can be implemented in plugins, which run in the
+ 2.  Complex computational tasks can be implemented in plugins, which run in the
      **Plugin Engine**. The latest release of the plugin engine is available
      together with installation  instructions on [GitHub](https://github.com/oeway/ImJoy-App/releases).
      The plugin engine will try to upgrade itself from GitHub when it starts.
@@ -34,7 +34,7 @@ Imjoy consists of **two main components**
 ![imjoy-plugin-development](assets/imjoy-architecture.png ':size=800')
 
  The Python Plugin Engine is connected with the ImJoy Web App through websockets
- and communicates with a customized remote procedure calls (RPC) based on [socket.io](https://github.com/miguelgrinberg/python-socketio).
+ and communicates with a customised remote procedure calls (RPC) based on [socket.io](https://github.com/miguelgrinberg/python-socketio).
 
  ### Choose a plugin environment
  ImJoy provides a flexible framework to develop your plugins. Here we provide
@@ -99,13 +99,13 @@ Window plugins are used to create a new web interface with HTML/CSS and JavaScri
 They in the `iframe` mode, and it will show up as a window. The `<window>` and `<style>`
 blocks (see below) can be used to define the actual content of the window.
 
-Different from other plugins which will be loaded and initialized when ImJoy is started,
+Different from other plugins which will be loaded and initialised when ImJoy is started,
 a `window` plugin will not be loaded until the actual plugin is created with `api.createWindow` or clicked on by a user in the menu. During execution of `api.createWindow`, `setup` and `run` will be called for the first time, and return with an window api object (contains all the api functions of the window, including `setup`, `run` and other functions if defined). You can then use the window api object to access all the functions, for example, update the content of the window by `win_obj.run({'data': ... })`.
 
 ### Native Python
 Used to run Python code. This requires that the **Python Plugin Engine** is installed and started before using the plugin. See the **Developing Python Plugins** for more details.
 
-Similary to Web Worker plugins, Native Python plugins do not have access to the html dom, but you can use `ImJoy API` to interact with the graphical interface of ImJoy or other plugin which can trigger changes on the user interface.
+Similarly to Web Worker plugins, Native Python plugins do not have access to the html dom, but you can use `ImJoy API` to interact with the graphical interface of ImJoy or other plugin which can trigger changes on the user interface.
 
 
 ### Web Python
@@ -118,7 +118,7 @@ Similary to Web Worker plugins, Native Python plugins do not have access to the 
 * **Python plugins**: Similarly, you can create Python plugins from the `native-python` template in the **+ PLUGINS** dialog. If your plugin engine is running, you can save and run(Ctrl+S, or through the toolbar) with your code directly in the ImJoy code editor. For larger project with many Python files, the recommended way is to wrap your Python files as standard Python modules, write and test the Python module using your code editor/IDE of choice (Atom, Spyder, PyCharm,...). Then create an ImJoy plugin with the ImJoy code editor, by inserting the module path to `sys.path` (e.g. `sys.insert(0, '~/my_python_module')`), you can then import the module to the ImJoy plugin and test it.
 
 ## Plugin file format
-The ImJoy plugin file format (shared by all Plugin types)  is built up on html format with customized blocks (inspired by the `.vue` format). It consists of two mandatory blocks `<config>` and `<script>`, and other optional blocks including `<docs>`, `<window>`,`<attachment>`,`<link>` and `<style>`.  For `<style>`, you can also set the `src` attribute.
+The ImJoy plugin file format (shared by all Plugin types)  is built up on html format with customised blocks (inspired by the `.vue` format). It consists of two mandatory blocks `<config>` and `<script>`, and other optional blocks including `<docs>`, `<window>`,`<attachment>`,`<link>` and `<style>`.  For `<style>`, you can also set the `src` attribute.
 
 Here is an a typical outline of such a plugin file. Note that the
 order of these blocks does not matter, so you can shuffle the blocks.
@@ -129,7 +129,7 @@ order of these blocks does not matter, so you can shuffle the blocks.
 </config>
 
 <script lang="javascript">
-   ** A code block in Javascrit or Python format**
+   ** A code block in JavaScript or Python format**
 </script>
 
 <window lang="html">
@@ -143,7 +143,7 @@ order of these blocks does not matter, so you can shuffle the blocks.
 </style lang="json">
 
 <docs lang="markdown">
-   ** A recommanded code block in Markdown format with the documentation of the plugin **
+   ** A recommended code block in Markdown format with the documentation of the plugin **
 </docs>
 
 <attachment name="XXXXX">
@@ -280,18 +280,28 @@ In the  example below, we use a string as above for `option1` and an array with 
   ```
 
 #### flags
-Defines an array of flags which will be used by ImJoy to control the behavior of the plugin.
+Defines an array of flags which will be used by ImJoy to control the behaviour of the plugin.
 
 One important flag is **`functional`**:
 
-* The **`functional`** flag means all the api functions exposed by this plugin are [pure functions](https://www.sitepoint.com/functional-programming-pure-functions/) which means the output of the plugin api function will only depends on the current inputs passed to the function, nothing else. Pure functions means no side effect to the plugin after calling any of the plugin api functions, thus you should avoid modifying global variables in the plugin functions with one exception which is the `setup()` function. Making a plugin `functional` will make it much easier to debug and reproducible, other plugins or workflows which calling only `functional` plugins will strictly reproducible. Functional plugins are crucial for ImJoy to perform parallelization and batch processing in the near future.
+*  The **`functional`** flag indicates that all api functions exposed by the plugin
+   are [pure functions](https://www.sitepoint.com/functional-programming-pure-functions/).
+   This means that their output will only depend on the current inputs passed to the
+   function, nothing else. Pure functions thus guarantee no side effect to the plugin
+   after calling any of the plugin api functions. This means that you should avoid
+   modifying global variables in the plugin functions with one exception which is the `setup()` function.
+   Making a plugin `functional` makes debugging easier, and importantly other plugins or workflows calling
+   only `functional` plugins will be strictly reproducible.
+   Functional plugins are crucial for ImJoy to perform parallelisation and batch processing in the near future.
 
-We don't have a real measure to verify whether a plugin is functional yet, but please add the `functional` flag only when you are sure your plugin contains only pure functions.   
+   We don't have a real test to verify whether a plugin is functional yet, so please
+   add the `functional` flag only when you are sure your plugin contains only pure functions.
 
-Besides that, we support other `flags` for run-time control.
+
+Further, we support `flags` for run-time control.
 
 These flags allow to specify how ImJoy instances are handled by the Interface and the Plugin engine.
-For more information we refer to the dedicated section on [plugin run time behavior](development?id=controlling-run-time-behavior-of-native-python-plugins).
+For more information we refer to the dedicated section on [plugin run time behaviour](development?id=controlling-run-time-behaviour-of-native-python-plugins).
 
 * `single-instance` (**for python plugins only**). Python engine will only run a single plugin process even if
   plugin is called from multiple BUT identical workspaces. In this case, the different ImJoy instances will share
@@ -390,7 +400,7 @@ Contains the actual plugin code.
 
 Plugins can be written in JavaScript or Python, a minimal plugin needs to implement two functions: `setup()` and `run()`. Exceptions are helper plugins (specified with `"runnable": false`), which don't need the `run()` function. Optionally, the function `exit` will be called when the plugin is killed.
 
-  * **`setup()` function**: executed when a plugin is loaded and initializes
+  * **`setup()` function**: executed when a plugin is loaded and initialises
       it.
   * **`run()` function**: will be called each time a plugin is executed. When executed, an object (for Javascript) or a dictionary (for Python) called `my` will be passed into the function. The returned result will be displayed as a new window or passed to the next `op` in a workflow. More in the section **Plugin during runtime ** below.
   * optional: **`update()` function**: will be called when any setting of the op is changed.
@@ -480,7 +490,7 @@ Some **important considerations**:
 
 #### Install package from GitHub
 `pip` is Git-aware and can install packages. This means that you can installation
-directly from a Git url. Several excellent ressources exist to explain this step,
+directly from a Git url. Several excellent resources exist to explain this step,
 such as [this one](https://packaging.python.org/tutorials/packaging-projects/).
 Please note that it is not necessary that you up-load
 your package to the Package Index. The crucial part is that you provide the `setup.py`.
@@ -577,7 +587,7 @@ To add this repository to the plugin workspace, and install the requirements:
  "requirements": ["repo:https://github.com/myUserName/myRepo", "cmd: pip install -r myRepo/requirements.txt"]
  ```
 
-In your pyton plugn, you can then add the local copy to the Python system path, and
+In your Python plugin, you can then add the local copy to the Python system path, and
 import libraries from it
 ```python
 sys.path.insert(0, './myRepo')
@@ -736,8 +746,8 @@ We provide additional fields in `my` that allow to track, maintain and reconstru
 
  Importantly, `_workflow_id`, `_variables`, `_op` and `_source_op` can be used to implement interactivity between plugins, meaning if the user changed a state in one of the result window, the downstream workflow will be updated automatically.
 
-### Run-time behavior of native Python plugins
-You can control the run-time behavior of a Python plugin process with the `flags` field in the `<config>` block. Next we provide next nomenclature and additional explanations to explain the different options you have to control how the Python processes running on the plugin engine interact with the ImJoy interface.
+### Run-time behaviour of native Python plugins
+You can control the run-time behaviour of a Python plugin process with the `flags` field in the `<config>` block. Next we provide next nomenclature and additional explanations to explain the different options you have to control how the Python processes running on the plugin engine interact with the ImJoy interface.
 
 * **Interface**: web interface of ImJoy. You can have ImJoy running on multiple browser windows, i.e. multiple interfaces.
 * **Plugin Engine**: running in the background to execute Python code from different Python plugins.
@@ -748,7 +758,7 @@ You can control the run-time behavior of a Python plugin process with the `flags
 
 ![imjoy-python-process](assets/imjoy-python-process.png ':size=800')
 
-Below we describe the three main run-time behavior of python plugins:
+Below we describe the three main run-time behaviour of python plugins:
 * By **default** (none of the flags is set), each ImJoy instance has its own process on the plugin engine. If you close the interface, you will kill the process.
 * The **`single-instance`** flag will allow only one process to run for a given workspace. A workspace is defined by its name, all installed plugins, and the selected `tags`. If two ImJoy instances run the exact same workspace, then the `single-instance` means that they access the same process. Only closing last instance will  kill the process.
 * The **`allow-detach`** flag means that the process is not killed when its ImJoy instance is closed. For instance, this allows to perform long computational tasks in the background which don't require additional user feedback and which terminate autonomously. Can also be used to protect a long computational tasks again browser instabilities. If you want to be able to attach to a detached process, the plugin has additionally have the `single-instance` flag.
@@ -908,7 +918,7 @@ and install the plugin. This link that can be shared directly through email or
 social networks. We detail below how this link can be created and which options are supported.
 
 1. You can **directly send** the plugin file (extension `*.imjoy.html`). This file can then
-be dragged into the ImJoy workspace, where it will be automatically recognized as a plugin.
+be dragged into the ImJoy workspace, where it will be automatically recognised as a plugin.
 
 In the last section, we describe how plugins **depending on custom libraries** can be
 distributed.
@@ -924,7 +934,7 @@ However, this option provides less control about how the plugin should be instal
 The easiest way to distribute plugins is by creating a url, which can be shared.
 
 The basic format is `http://imjoy.io/#/app?plugin=PLUGIN_URI`. You will need to
-replace `PLUGIN_URI` with your actuall **plugin URI** (Uniform Resource Identifier).
+replace `PLUGIN_URI` with your actual **plugin URI** (Uniform Resource Identifier).
 For example: [https://imjoy.io/#/app?plugin=https://github.com/oeway/ImJoy-Plugins/blob/master/repository/imageWindow.imjoy.html](https://imjoy.io/#/app?plugin=https://github.com/oeway/ImJoy-Plugins/blob/master/repository/imageWindow.imjoy.html). When the user click this link,
 a plugin installation dialog will be shown which proposes to install the specified plugin.
 The user has to simply confirm by clicking `Install`.
@@ -960,7 +970,7 @@ There are **two types of URI**, depending on how your plugin is deployed:
         link of the plugin file. For example, to create a Gist link
 
         1. Go to Gist on your GitHub account [https://gist.github.com/](https://gist.github.com/)
-        0. Create new Gst, specify the plugin name followed by `.imjoy.html`, and copy & paste the code of your plugin.
+        0. Create new Gist, specify the plugin name followed by `.imjoy.html`, and copy & paste the code of your plugin.
         0. Create either a public or secret Gist.
         0. Link to Gist can be obtained from the `Raw` button (this links to the unprocessed versions of the file).
            The link will looks like this: `https://gist.githubusercontent.com/oeway/aad257cd9aaab448766c6dc287cb8614/raw/909d0a86e45a9640c0e108adea5ecd7e78b81301/chartJSDemo.imjoy.html`
@@ -977,7 +987,7 @@ You can test in ImJoy if your plugin url works: paste it in the `+ PLUGINS` dial
 to see a card rendered with your plugins which you can click `INSTALL`.
 
 ### Supported url parameters
-You can construct the ImJoy url with customized functionality for facilitated installation.
+You can construct the ImJoy url with customised functionality for facilitated installation.
 These url parameters can be used after `https://imjoy.io/#/app?`, using a `PARAM=VALUE` syntax.
 
 These parameters are independent from each other and multiple parameters
@@ -988,7 +998,7 @@ The following url parameters are currently supported:
 
  *  `plugin` or `p`: show the specified plugin in the plugin management dialog as
      detailed in the section above.
- *   `workspace` or `w`: name of workspace. ImJoy will swithc to the specified
+ *   `workspace` or `w`: name of workspace. ImJoy will switch to the specified
      workspace if it exist, or create a new one. For example, `https://imjoy.io/#/app?workspace=test`
  *   `engine` or `e`: define the url of the plugin engine. For example: `http://imjoy.io/#/app?engine=http://127.0.0.1:9527`.
      Note that if you want to connect to a remote machine through a http (not https) connection,
