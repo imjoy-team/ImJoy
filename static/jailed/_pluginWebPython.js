@@ -191,7 +191,6 @@ var conn = {
 window.connection = conn;
 window.languagePluginUrl = 'https://static.imjoy.io/pyodide/';
 
-// console.log('loading pyodide.js...')
 importScripts('https://static.imjoy.io/pyodide/pyodide.js').then(()=>{
   languagePluginLoader.then(() => {
       // pyodide is now ready to use...
