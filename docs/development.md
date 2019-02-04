@@ -402,7 +402,7 @@ Plugins can be written in JavaScript or Python, a minimal plugin needs to implem
 
   * **`setup()` function**: executed when a plugin is loaded and initialises
       it.
-  * **`run()` function**: will be called each time a plugin is executed. When executed, an object (for Javascript) or a dictionary (for Python) called `my` will be passed into the function. The returned result will be displayed as a new window or passed to the next `op` in a workflow. More in the section **Plugin during runtime ** below.
+  * **`run()` function**: will be called each time a plugin is executed. When executed, an object (for Javascript) or a dictionary (for Python) called `my` will be passed into the function. The returned result will be displayed as a new window or passed to the next `op` in a workflow. More in the section [Plugin during runtime](development?id=plugin-during-runtime) below.
   * optional: **`update()` function**: will be called when any setting of the op is changed.
 
 The `lang` property of the `<script>` block is used to specify the used programming language:
