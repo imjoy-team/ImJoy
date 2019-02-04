@@ -282,7 +282,14 @@ In the  example below, we use a string as above for `option1` and an array with 
 #### flags
 Defines an array of flags which will be used by ImJoy to control the behavior of the plugin.
 
-Currently, we support these `flags` for run-time control.
+One important flag is **`functional`**:
+
+* The **`functional`** flag means all the api functions exposed by this plugin are [pure functions](https://www.sitepoint.com/functional-programming-pure-functions/) which means the output of the plugin api function will only depends on the current inputs passed to the function, nothing else. Pure functions means no side effect to the plugin after calling any of the plugin api functions, thus you should avoid modifying global variables in the plugin functions with one exception which is the `setup()` function. Making a plugin `functional` will make it much easier to debug and reproducible, other plugins or workflows which calling only `functional` plugins will strictly reproducible. Functional plugins are crucial for ImJoy to perform parallelization and batch processing in the near future.
+
+We don't have a real measure to verify whether a plugin is functional yet, but please add the `functional` flag only when you are sure your plugin contains only pure functions.   
+
+Besides that, we support other `flags` for run-time control.
+
 These flags allow to specify how ImJoy instances are handled by the Interface and the Plugin engine.
 For more information we refer to the dedicated section on [plugin run time behavior](development?id=controlling-run-time-behavior-of-native-python-plugins).
 
