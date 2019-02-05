@@ -12,6 +12,8 @@ export class EngineManager {
     this.show_message_callback = show_message_callback
     this.update_ui_callback = update_ui_callback || function (){}
     this.show_engine_callback = show_engine_callback || function(){}
+    this.disconnecting = false
+    this.connection_lost_timer = null
   }
   getFileUrl(config) {
     return new Promise((resolve, reject)=>{
@@ -54,13 +56,17 @@ export class EngineManager {
     this.connected = false
     this.engine_status.connection = 'Connecting...'
     this.engine_status.url = url
+    this.disconnecting = false
     if(!auto) this.showMessage('Trying to connect to the plugin engine...')
     const socket = io(url);
     const timer = setTimeout(() => {
       if (!this.connected) {
         this.engine_status.connection = 'Plugin Engine is not connected.'
         if(!auto) this.showMessage('Failed to connect, please make sure you have started the plugin engine.')
-        if(auto) socket.disconnect()
+        if(auto) {
+          this.disconnecting = true
+          socket.disconnect()
+        }
         if(url.endsWith(':8080') && !auto){
           alert('It seems you are using the legacy plugin engine port (8080), you may want to change the engine url to: ' + url.replace(':8080', ':9527'))
         }
@@ -71,6 +77,9 @@ export class EngineManager {
 
     socket.on('connect', (d) => {
       clearTimeout(timer)
+      if(this.connection_lost_timer){
+        clearTimeout(this.connection_lost_timer)
+      }
       socket.emit('register_client', {id: this.client_id, token: token, session_id: this.engine_session_id}, (ret)=>{
         if(ret.success){
           const connect_client = ()=>{
@@ -90,6 +99,7 @@ export class EngineManager {
 
           if(ret.message && ret.confirmation){
             this.show_engine_callback(true, ret.message, connect_client,  ()=>{
+              this.disconnecting = true
               socket.disconnect()
               console.log('you canceled the connection.')
             })
@@ -110,6 +120,7 @@ export class EngineManager {
             if(ret.reason) this.showMessage('Failed to connect: ' + ret.reason)
             console.error('Failed to connect to the plugin engine.', ret.reason)
           }
+          this.disconnecting = true
           socket.disconnect()
         }
       })
@@ -129,9 +140,22 @@ export class EngineManager {
       }
 
       this.engine_status.connection = 'Disconnected.'
-      this.socket = null
-      this.connected = false
-      this.event_bus.$emit('engine_disconnected')
+
+      if(this.disconnecting){
+        //disconnect immediately
+        this.socket = null
+        this.connected = false
+        this.event_bus.$emit('engine_disconnected')
+      }
+      else{
+        //wait for 10s to see if it recovers
+        this.connection_lost_timer = setTimeout(() => {
+          this.showMessage('Timeout, connection failed to recover.')
+          this.socket = null
+          this.connected = false
+          this.event_bus.$emit('engine_disconnected')
+        }, 10000)
+      }
     });
   }
 
@@ -168,6 +192,7 @@ export class EngineManager {
 
   disconnectEngine() {
     if (this.socket) {
+      this.disconnecting = true
       this.socket.disconnect()
     }
   }
