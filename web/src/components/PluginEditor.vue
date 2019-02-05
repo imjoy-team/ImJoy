@@ -90,6 +90,9 @@ export default {
     // }
   },
   mounted() {
+    this.$el.addEventListener('touchmove', function (ev) {
+      ev.preventDefault();
+    });
     this.codeValue = this.value
     this.editor = this.$refs.monaco_editor.getMonaco()
     this.editor.layout();
