@@ -778,7 +778,6 @@ export default {
     }
   },
   mounted() {
-
     this.event_bus.$on('resize', this.updateSize)
     this.event_bus.$on('plugin_loaded', ()=>{
       //update the joy workflow if new template added, TODO: preserve settings during reload
