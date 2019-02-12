@@ -1,4 +1,5 @@
-[![Build Status](https://travis-ci.com/oeway/ImJoy.svg?branch=master)](https://travis-ci.com/oeway/ImJoy)
+[![DOI](https://zenodo.org/badge/137741898.svg)](https://zenodo.org/badge/latestdoi/137741898) [![Build Status](https://travis-ci.com/oeway/ImJoy.svg?branch=master)](https://travis-ci.com/oeway/ImJoy) 
+
 
 <a href="https://imjoy.io" target="_blank" ><img src="https://raw.githubusercontent.com/oeway/ImJoy/master/web/public/static/img/imjoy-logo-black.svg?sanitize=true" width="380"></img>
 </a>
