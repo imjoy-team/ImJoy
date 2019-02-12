@@ -864,6 +864,31 @@ result2 = await api.run("name of plugin 2")
 ```
 
 
+
+### api.setConfig
+```javascript
+api.setConfig(config_name, config_value)
+```
+Store plugin data in its configuration.
+
+These values can be retrieved when ImJoy is restarted. This function is ideally suited to store and reload settings. However, the  function  is designed for storing small amounts of data, not large objects. The current implementation uses `localStorage` for storage.
+Most browsers only allow 5MB data storage shared by all the plugins and
+the ImJoy app itself.
+
+To remove a parameter, set its value to `null` (JavaScript) or `None` (Python).
+
+**Arguments**
+* **config_name**: String. Name of parameter. Don't use names starting with an `_` followed by
+any of the field name of the `<config>` block.
+* **config_value**: Number or String. Neither objects/arrays (JS) nor dict/list (Python). Please note that numbers are stored as strings.
+
+**Examples**
+```javascript
+api.setConfig('sigma', 928)
+```
+[Try yourself >>](https://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:setConfig&w=examples)
+
+
 ### api.showDialog
 ```javascript
 answer = await api.showDialog(config)
@@ -892,31 +917,6 @@ result = await api.showDialog({
 })
 ```
 [Try yourself >>](https://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:showDialog&w=examples)
-
-
-### api.setConfig
-```javascript
-api.setConfig(config_name, config_value)
-```
-Store plugin data in its configuration.
-
-These values can be retrieved when ImJoy is restarted. This function is ideally suited to store and reload settings. However, the  function  is designed for storing small amounts of data, not large objects. The current implementation uses `localStorage` for storage.
-Most browsers only allow 5MB data storage shared by all the plugins and
-the ImJoy app itself.
-
-To remove a parameter, set its value to `null` (JavaScript) or `None` (Python).
-
-**Arguments**
-* **config_name**: String. Name of parameter. Don't use names starting with an `_` followed by
-any of the field name of the `<config>` block.
-* **config_value**: Number or String. Neither objects/arrays (JS) nor dict/list (Python). Please note that numbers are stored as strings.
-
-**Examples**
-```javascript
-api.setConfig('sigma', 928)
-```
-[Try yourself >>](https://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:setConfig&w=examples)
-
 
 
 ### api.showFileDialog
