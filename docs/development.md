@@ -987,7 +987,8 @@ the corresponding url would be `https://imjoy.io/#/app?par1=99&par2=hello`.
 The following url parameters are currently supported:
 
  *  `plugin` or `p`: show the specified plugin in the plugin management dialog as
-     detailed in the section above.
+     detailed in the section above. If the plugin with the same name and version exists, the dialog will not shown.
+     If needed, add `upgrade=1` to force show the plugin dialog. For example: `https://imjoy.io/#/app?p=oeway/ImJoy-Demo-Plugins:alert&upgrade=1`.
  *   `workspace` or `w`: name of workspace. ImJoy will swithc to the specified
      workspace if it exist, or create a new one. For example, `https://imjoy.io/#/app?workspace=test`
  *   `engine` or `e`: define the url of the plugin engine. For example: `http://imjoy.io/#/app?engine=http://127.0.0.1:9527`.
@@ -1009,9 +1010,10 @@ The following url parameters are currently supported:
       If you are hosting your repo from a non-GitHub website (e.g. GitLab), please
       use the `raw` link to the `manifest.imjoy.json` file.
 
- *   `load` or `l` define a customized url which contains data (e.g. a tif image)
-     loaded automatically into the ImJoy workspace. This can be used to link data
-     to ImJoy, for example, by defining a `open with imjoy` button.
+ *   `load` or `l` define a string (some values or url) which will be passed as data to the plugin specified
+      with `plugin` or `p`. For example: `https://imjoy.io/#/app?p=oeway/ImJoy-Demo-Plugins:alert&upgrade=1&load=123`.
+      By default, it will pass the string directly to the plugin as `my.data` to the `run(my)` function.
+      In case there is an URL set for `load` or `l`, you can add `get=1` to use http GET method to fetch data before passing to the plugin.
 
 
 ### Distribute plugins with custom libraries
