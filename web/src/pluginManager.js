@@ -1510,7 +1510,7 @@ export class PluginManager {
         console.error("Error occured during creating window ", wconfig, error)
         throw error
       }
-      if (wconfig.type && wconfig.type.startsWith('imjoy')) {
+      if (wconfig.type && wconfig.type.startsWith('imjoy/')) {
         wconfig.id = 'imjoy_'+randId()
         wconfig.name = wconfig.name || 'untitled window'
         this.wm.addWindow(wconfig).then((wid)=>{

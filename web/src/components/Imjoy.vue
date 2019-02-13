@@ -935,52 +935,59 @@ export default {
             }
           }
 
-          if(this.$route.query.load || this.$route.query.l){
-            let load_data = this.$route.query.load || this.$route.query.l
-            if(this.$route.query.get){
-              try {
-                const response = await axios.get(load_data)
-                load_data = response.data
-              } catch (e) {
-                console.error(e)
-                this.showMessage('Failed to load data from:' + load_data+ ' Error:'+e.toString())
-                load_data = null
-              }
+
+          if(this.$route.query.start || this.$route.query.s){
+            const pname = this.$route.query.start || this.$route.query.s
+            const ps = this.pm.installed_plugins.filter((p) => {
+              return p.name === p.name
+            })
+            if(ps.length<=0){
+              alert(`Plugin "${pname}" cannot be started, please install it.`)
             }
-            const pname = this.$route.query.to
-            if(pname){
-              //load data
-              if(this.pm.registered.windows[pname]){
+            else{
+              const data = _clone(this.$route.query)
+              const load_data = this.$route.query.load || this.$route.query.l
+              if(load_data){
                 try {
-                  const template = this.pm.registered.windows[pname]
+                  const response = await axios.get(load_data)
+                  data.loaded = response.data
+                } catch (e) {
+                  console.error(e)
+                  this.showMessage('Failed to load data from:' + load_data+ ' Error:'+e.toString())
+                  data.loaded = null
+                }
+              }
+              //load data
+              if(this.pm.registered.windows[pname] || pname.startsWith('imjoy/')){
+                try {
+                  const template = this.pm.registered.windows[pname] || {}
                   const c = _clone(template.defaults) || {}
-                  c.type = template.name
-                  c.name = template.name
+                  c.type = pname
+                  c.name = pname
+                  c.w = c.w || this.$route.query.w
+                  c.h = c.h || this.$route.query.h
                   c.tag = template.tag
                   // c.op = my.op
-                  c.data = {load: load_data, args: this.$route.query}
+                  c.data = data
                   c.config = {}
                   await this.pm.createWindow(null, c)
                 } catch (e) {
-                  console.error(`Plugin ${pname} failed to load data.`, load_data, e, this.pm.plugin_names[pname])
+                  console.error(`Plugin ${pname} failed to load data.`, e)
                 }
               }
               else{
                 const plugin_loaded_handler = (plugin)=>{
                   if(plugin.name === pname){
                     try {
-                      plugin.api.run({data: {load: load_data, args: this.$route.query}})
+                      plugin.api.run({data: data, config: {} })
                     } catch (e) {
-                      console.error(`Plugin ${pname} failed to load data.`, load_data, e)
+                      console.error(`Plugin ${pname} failed to load data.`, e)
                     }
                     this.event_bus.$off('plugin_loaded', plugin_loaded_handler)
                   }
                 }
                 this.event_bus.$on('plugin_loaded', plugin_loaded_handler)
               }
-            }
-            else{
-              this.showMessage('Please specify a target plugin for loading data with `to=PLUGIN_NAME`')
             }
           }
 
