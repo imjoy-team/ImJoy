@@ -522,9 +522,7 @@ export class PluginManager {
               this.installed_plugins.push(config)
               this.reloadPlugin(config).catch((e)=>{
                 console.error(config, e)
-                if(!e.toString().includes('Please connect to the Plugin Engine 🚀.')){
-                    this.showMessage(`<${config.name}>: ${e.toString()}`)
-                }
+                this.showMessage(`<${config.name}>: ${e.toString()}`)
               })
             }
           }
