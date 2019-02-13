@@ -954,7 +954,7 @@ export default {
                 const plugin_loaded_handler = (plugin)=>{
                   if(plugin === p){
                     try {
-                      p.api.run({data: {load: load_data}})
+                      p.api.run({data: {load: load_data, args: this.$route.query}})
                     } catch (e) {
                       console.error(`Plugin ${template.name} failed to load data.`, load_data, e)
                     }
