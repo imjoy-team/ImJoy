@@ -936,44 +936,34 @@ export default {
 
           if(this.$route.query.load || this.$route.query.l){
             let load_data = this.$route.query.load || this.$route.query.l
-
-            this.after_installation = async (template)=>{
-              if(this.$route.query.get){
-                try {
-                  const response = await axios.get(load_data)
-                  load_data = response.data
-                } catch (e) {
-                  console.error(e)
-                  this.showMessage('Failed to load data from:' + load_data+ ' Error:'+e.toString())
-                  load_data = null
-                }
+            if(this.$route.query.get){
+              try {
+                const response = await axios.get(load_data)
+                load_data = response.data
+              } catch (e) {
+                console.error(e)
+                this.showMessage('Failed to load data from:' + load_data+ ' Error:'+e.toString())
+                load_data = null
               }
+            }
+            const pname = this.$route.query.to
+            if(pname){
               //load data
-              if(this.pm.plugin_names[template.name]){
-                const p = this.pm.plugin_names[template.name]
-                const plugin_loaded_handler = (plugin)=>{
-                  if(plugin === p){
-                    try {
-                      p.api.run({data: {load: load_data, args: this.$route.query}})
-                    } catch (e) {
-                      console.error(`Plugin ${template.name} failed to load data.`, load_data, e)
-                    }
-                    this.event_bus.$off('plugin_loaded', plugin_loaded_handler)
+              const plugin_loaded_handler = (plugin)=>{
+                if(plugin.name === pname){
+                  try {
+                    plugin.api.run({data: {load: load_data, args: this.$route.query}})
+                  } catch (e) {
+                    console.error(`Plugin ${pname} failed to load data.`, load_data, e)
                   }
+                  this.event_bus.$off('plugin_loaded', plugin_loaded_handler)
                 }
-                this.event_bus.$on('plugin_loaded', plugin_loaded_handler)
               }
-              else{
-                this.showMessage(`Failed to load data, plugin ${template.name} is not found.`)
-              }
-              this.clearPluginUrl()
+              this.event_bus.$on('plugin_loaded', plugin_loaded_handler)
             }
-            if(!this.showAddPluginDialog && plugin_config){
-              this.after_installation(plugin_config)
+            else{
+              this.showMessage('Please specify a target plugin for loading data with `to=PLUGIN_NAME`')
             }
-          }
-          else{
-            this.after_installation = this.clearPluginUrl
           }
 
           this.$nextTick(() => {
@@ -1235,7 +1225,7 @@ export default {
     installPlugin(plugin4install, tag4install){
       this.pm.installPlugin(plugin4install, tag4install).then((template)=>{
         this.showAddPluginDialog = false
-        if(this.after_installation) this.after_installation(template)
+        this.clearPluginUrl(template)
         this.$forceUpdate()
       })
     },
