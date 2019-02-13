@@ -1010,10 +1010,10 @@ The following url parameters are currently supported:
       If you are hosting your repo from a non-GitHub website (e.g. GitLab), please
       use the `raw` link to the `manifest.imjoy.json` file.
 
- *   `load` or `l` define a string (some values or url) which will be passed as data to the plugin specified
-      with `to=PLUGIN_NAME`. For example: `https://imjoy.io/#/app?load=123&to=AwesomePlugin`.
-      By default, it will pass the string directly to the plugin as `my.data.load` to the `run(my)` function. In the meantime, all the other url parameters will be passed as `my.data.args`. This allows you to add customized arguments and use them in `run(my)`. For example, a plugin can load an image automatically with `load=URL` and set the width and height of the image with, for example, `width=1024&height=2048`.
-      In case there is an URL set for `load` or `l`, you can add `get=1` to use http GET method to fetch data before passing to the plugin.
+ *   `start` or `s`: define a startup plugin name which will be started automatically after ImJoy web app loaded.
+      All the url parameters will be passed to the plugin as `my.config` to the `run(my)` function. This allows you to add customized arguments and use them in `run(my)`. For example, a plugin can load an image automatically with `load=URL` and set the width and height of the image with, for example, `width=1024&height=2048`. For example, pass `123` to the `run` function of the plugin as `my.data.x`: `https://imjoy.io/#/app?x=123&start=AwesomePlugin`.
+
+ *   `load` or `l`: define an URL for making a http GET request, this parameter should only used when you defined a startup plugin with `start` or `s`. The data fetched from the URL will be passed to the startup plugin `run(my)` function as `my.data.loaded`.
 
 
 ### Distribute plugins with custom libraries
