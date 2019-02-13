@@ -796,6 +796,7 @@ var Plugin = function( config, _interface, _fs, is_proxy) {
       this._initialInterface.fs = _fs;
       this._connect();
     }
+    this._updateUI()
 };
 
 
@@ -861,9 +862,6 @@ DynamicPlugin.prototype._bindInterface =
        this._initialInterface[k] = _interface[k]
      }
    }
-
-
-
 
 }
 /**

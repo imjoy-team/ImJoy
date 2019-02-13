@@ -542,7 +542,8 @@ import WINDOW_PLUGIN_TEMPLATE from '../plugins/windowTemplate.imjoy.html';
 import {
   randId,
   url_regex,
-  assert
+  assert,
+  _clone,
 } from '../utils.js'
 
 import {
@@ -949,17 +950,34 @@ export default {
             const pname = this.$route.query.to
             if(pname){
               //load data
-              const plugin_loaded_handler = (plugin)=>{
-                if(plugin.name === pname){
-                  try {
-                    plugin.api.run({data: {load: load_data, args: this.$route.query}})
-                  } catch (e) {
-                    console.error(`Plugin ${pname} failed to load data.`, load_data, e)
-                  }
-                  this.event_bus.$off('plugin_loaded', plugin_loaded_handler)
+              if(this.pm.registered.windows[pname]){
+                try {
+                  const template = this.pm.registered.windows[pname]
+                  const c = _clone(template.defaults) || {}
+                  c.type = template.name
+                  c.name = template.name
+                  c.tag = template.tag
+                  // c.op = my.op
+                  c.data = {load: load_data, args: this.$route.query}
+                  c.config = {}
+                  await this.pm.createWindow(null, c)
+                } catch (e) {
+                  console.error(`Plugin ${pname} failed to load data.`, load_data, e, this.pm.plugin_names[pname])
                 }
               }
-              this.event_bus.$on('plugin_loaded', plugin_loaded_handler)
+              else{
+                const plugin_loaded_handler = (plugin)=>{
+                  if(plugin.name === pname){
+                    try {
+                      plugin.api.run({data: {load: load_data, args: this.$route.query}})
+                    } catch (e) {
+                      console.error(`Plugin ${pname} failed to load data.`, load_data, e)
+                    }
+                    this.event_bus.$off('plugin_loaded', plugin_loaded_handler)
+                  }
+                }
+                this.event_bus.$on('plugin_loaded', plugin_loaded_handler)
+              }
             }
             else{
               this.showMessage('Please specify a target plugin for loading data with `to=PLUGIN_NAME`')
