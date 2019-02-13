@@ -1012,7 +1012,7 @@ The following url parameters are currently supported:
 
  *   `load` or `l` define a string (some values or url) which will be passed as data to the plugin specified
       with `plugin` or `p`. For example: `https://imjoy.io/#/app?p=oeway/ImJoy-Demo-Plugins:alert&upgrade=1&load=123`.
-      By default, it will pass the string directly to the plugin as `my.data` to the `run(my)` function.
+      By default, it will pass the string directly to the plugin as `my.data.load` to the `run(my)` function.
       In case there is an URL set for `load` or `l`, you can add `get=1` to use http GET method to fetch data before passing to the plugin.
 
 
