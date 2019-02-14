@@ -94,7 +94,7 @@ only a fast overview of these languages. An excellent resource to get started wi
 
 HTML5/CSS and JavaScript control the three relevant aspects of an interface. In ImJoy, these three elements are defined in one [single file](https://github.com/oeway/ImJoy-Demo-Plugins/blob/master/repository/GUI.imjoy.html), and specified in dedicated code blocks.
 
-* **HTML**: structure of the page. The HTML code is in the code block delignated as shown below. Please note the `<div>` element, which is required. Currently, window plugins can only have one root element.
+* **HTML**: structure of the page. The HTML code is in the code block designated as shown below. Please note the `<div>` element, which is required. Currently, window plugins can only have one root element.
     ```html
     <window lang="html">
        <div>
@@ -146,7 +146,7 @@ Communication between the window and Python plugin is achieved by the ImJoy API 
 
 **Python calculations, storage and callback**
 
-Let's have a look at the Python function `calc_results`. It receives the JavaScript dictionary, extracts all necessary parameters and perform the desired calculation. Then it stores the data wiht `self.x_values = x`. Lastly, invokes the callback function to print in the main window with `callback_fun(...)`. Here the parameters are again passed as a dictionary. Please note, the **numpy** arrays are not supported, and the data has therefore be transformed to a list.
+Let's have a look at the Python function `calc_results`. It receives the JavaScript dictionary, extracts all necessary parameters and perform the desired calculation. Then it stores the data with `self.x_values = x`. Lastly, invokes the callback function to print in the main window with `callback_fun(...)`. Here the parameters are again passed as a dictionary. Please note, the **numpy** arrays are not supported, and the data has therefore be transformed to a list.
 
 ## Using JavaScript libraries in ImJoy
 You can readily use existing JavaScript libraries in ImJoy. Here we provide some

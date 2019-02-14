@@ -147,7 +147,7 @@ you might need to contact your IT department.
   to login the remote server with SSH, start the plugin engine with `python -m imjoy --serve --host=0.0.0.0`.
   By default, the host is to `127.0.0.1`, which allows only local connections. For remote access, the host is set to `0.0.0.0`.
   The plugin engine will be launched and serve a copy of the ImJoy app through `http://YOUR_REMOTE_IP:9527`.
-  At the end of the initialization process, it will display the **connection token**.
+  At the end of the initialisation process, it will display the **connection token**.
   Copy it from the terminal, since you will need it in the next step. **KEEP THIS TOKEN PRIVATE!!!!**
 
 0. On your local machine, use your web browser to access the ImJoy app on the remote machine
@@ -180,7 +180,7 @@ pip install -U git+https://github.com/oeway/ImJoy-Engine#egg=imjoy
 This depends whether it's a conda-compatible distribution or not. Try to type `conda -V` command, if you see a version number(e.g:`conda 4.3.30`), it means you can skip the Anaconda/Miniconda installation, and install ImJoy directly with your existing Python.
 
 ### Using ImJoy with Python 2.7 or version <3.6
-Yes, if you the conda environment exists. You will be able to install and run ImJoy with Python version lower thant 3.6 (e.g.: Anaconda/Miniconda Python2.7). However, in this case, it will bootstrapping itself by creating a Python 3 environment (named `imjoy`) in order to run the actual plugin engine code. Therefore, Anaconda/Miniconda (Python3.6+ version) is still recommended if you have the choice.
+Yes, if you the conda environment exists. You will be able to install and run ImJoy with Python version lower than 3.6 (e.g.: Anaconda/Miniconda Python2.7). However, in this case, it will bootstrapping itself by creating a Python 3 environment (named `imjoy`) in order to run the actual plugin engine code. Therefore, Anaconda/Miniconda (Python3.6+ version) is still recommended if you have the choice.
 
 ### Can't connect to plugin engine running on a remote computer
 
