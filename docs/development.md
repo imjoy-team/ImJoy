@@ -1011,7 +1011,7 @@ The following url parameters are currently supported:
  *  `plugin` or `p`: show the specified plugin in the plugin management dialog as
      detailed in the section above. If the plugin with the same name and version exists, the dialog will not shown.
      If needed, add `upgrade=1` to force show the plugin dialog. For example: `https://imjoy.io/#/app?p=oeway/ImJoy-Demo-Plugins:alert&upgrade=1`.
- *   `workspace` or `w`: name of workspace. ImJoy will swithc to the specified
+ *   `workspace` or `w`: name of workspace. ImJoy will switch to the specified
      workspace if it exist, or create a new one. For example, `https://imjoy.io/#/app?workspace=test`
  *   `engine` or `e`: define the url of the plugin engine. For example: `http://imjoy.io/#/app?engine=http://127.0.0.1:9527`.
      Note that if you want to connect to a remote machine through a http (not https) connection,
