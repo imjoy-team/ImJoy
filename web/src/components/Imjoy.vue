@@ -532,6 +532,7 @@
 /*eslint no-unused-vars: ["error", { "argsIgnorePattern": "^_plugin$" }]*/
 import Vue from 'vue';
 import { saveAs } from 'file-saver';
+import axios from 'axios';
 
 import WEB_WORKER_PLUGIN_TEMPLATE from '../plugins/webWorkerTemplate.imjoy.html';
 import NATIVE_PYTHON_PLUGIN_TEMPLATE from '../plugins/nativePythonTemplate.imjoy.html';
@@ -541,7 +542,8 @@ import WINDOW_PLUGIN_TEMPLATE from '../plugins/windowTemplate.imjoy.html';
 import {
   randId,
   url_regex,
-  assert
+  assert,
+  _clone,
 } from '../utils.js'
 
 import {
@@ -716,7 +718,7 @@ export default {
         // https://gist.github.com/tiff/3076863
          const traverseFileTree = (item, path, getDataLoaders, end) => {
            path = path || "";
-           if (item.isFile) {
+           if (item && item.isFile) {
              // Get file
              item.file((file)=>{
                file.relativePath = path + file.name
@@ -724,7 +726,7 @@ export default {
                filelist.push(file);
                if(end) resolve(filelist)
              });
-           } else if (item.isDirectory) {
+           } else if (item && item.isDirectory) {
              // Get folder contents
              var dirReader = item.createReader();
              dirReader.readEntries((entries)=>{
@@ -887,22 +889,35 @@ export default {
           }
 
           const p = (this.$route.query.plugin || this.$route.query.p  || '').trim()
+          let plugin_config = null
           if(p){
             if (p.match(url_regex) || (p.includes('/') && p.includes(':'))) {
               this.plugin_url = p
               this.init_plugin_search = null
               this.show_plugin_store = false
               this.show_plugin_url = false
-              this.getPlugin4Install(p)
+              try {
+                plugin_config = await this.getPlugin4Install(p)
+                //check if the same plugin is already installed
+                if(!this.pm.plugin_names[plugin_config.name] || this.$route.query.upgrade || plugin_config.version !== this.pm.plugin_names[plugin_config.name].config.version){
+                  this.show_plugin_templates = false
+                  this.showAddPluginDialog = true
+                }
+                else{
+                  this.showMessage(`Plugin "${plugin_config.name}" is already installed.`)
+                }
+              } catch (e) {
+                console.error(e)
+              }
             }
             else {
               this.plugin_url = null
               this.init_plugin_search = p
               this.show_plugin_store = true
               this.show_plugin_url = false
+              this.show_plugin_templates = false
+              this.showAddPluginDialog = true
             }
-            this.show_plugin_templates = false
-            this.showAddPluginDialog = true
           }
 
           this.show_workflow = true
@@ -920,14 +935,60 @@ export default {
             }
           }
 
-          if(this.$route.query.load || this.$route.query.l){
-            const w = {
-              name: "Loaded Url",
-              type: 'imjoy/url_list',
-              scroll: true,
-              data: [this.$route.query.load || this.$route.query.l]
+
+          if(this.$route.query.start || this.$route.query.s){
+            const pname = this.$route.query.start || this.$route.query.s
+            const ps = this.pm.installed_plugins.filter((p) => {
+              return p.name === p.name
+            })
+            if(ps.length<=0){
+              alert(`Plugin "${pname}" cannot be started, please install it.`)
             }
-            this.wm.addWindow(w)
+            else{
+              const data = _clone(this.$route.query)
+              const load_data = this.$route.query.load || this.$route.query.l
+              if(load_data){
+                try {
+                  const response = await axios.get(load_data)
+                  data.loaded = response.data
+                } catch (e) {
+                  console.error(e)
+                  this.showMessage('Failed to load data from:' + load_data+ ' Error:'+e.toString())
+                  data.loaded = null
+                }
+              }
+              //load data
+              if(this.pm.registered.windows[pname] || pname.startsWith('imjoy/')){
+                try {
+                  const template = this.pm.registered.windows[pname] || {}
+                  const c = _clone(template.defaults) || {}
+                  c.type = pname
+                  c.name = pname
+                  c.w = c.w || this.$route.query.w
+                  c.h = c.h || this.$route.query.h
+                  c.tag = template.tag
+                  // c.op = my.op
+                  c.data = data
+                  c.config = {}
+                  await this.pm.createWindow(null, c)
+                } catch (e) {
+                  console.error(`Plugin ${pname} failed to load data.`, e)
+                }
+              }
+              else{
+                const plugin_loaded_handler = (plugin)=>{
+                  if(plugin.name === pname){
+                    try {
+                      plugin.api.run({data: data, config: {} })
+                    } catch (e) {
+                      console.error(`Plugin ${pname} failed to load data.`, e)
+                    }
+                    this.event_bus.$off('plugin_loaded', plugin_loaded_handler)
+                  }
+                }
+                this.event_bus.$on('plugin_loaded', plugin_loaded_handler)
+              }
+            }
           }
 
           this.$nextTick(() => {
@@ -1023,19 +1084,22 @@ export default {
         }
       }
     },
-    getPlugin4Install(plugin_url){
+    async getPlugin4Install(plugin_url){
       this.plugin4install = null
       this.downloading_error = ""
       this.downloading_plugin = true
-      this.pm.getPluginFromUrl(plugin_url).then((config)=>{
+      try {
+        const config = await this.pm.getPluginFromUrl(plugin_url)
         this.plugin4install = config
         this.tag4install = config.tag
         this.downloading_plugin = false
-      }).catch((e)=>{
+        return config
+      } catch (e) {
         this.downloading_plugin = false
         this.downloading_error = "Sorry, the plugin URL is invalid: " + e.toString()
         this.showMessage("Sorry, the plugin URL is invalid: " + e.toString())
-      })
+        throw e
+      }
     },
     showPluginManagement(){
       this.plugin4install=null
@@ -1161,8 +1225,9 @@ export default {
     },
     clearPluginUrl(){
       const query = Object.assign({}, this.$route.query);
-      delete query.p;
-      delete query.plugin;
+      // delete query.p;
+      // delete query.plugin;
+      delete query.upgrade;
       this.$router.replace({ query });
     },
     sharePlugin(pid){
@@ -1183,9 +1248,9 @@ export default {
       }
     },
     installPlugin(plugin4install, tag4install){
-      this.pm.installPlugin(plugin4install, tag4install).then(()=>{
+      this.pm.installPlugin(plugin4install, tag4install).then((template)=>{
         this.showAddPluginDialog = false
-        this.clearPluginUrl()
+        this.clearPluginUrl(template)
         this.$forceUpdate()
       })
     },

@@ -522,9 +522,7 @@ export class PluginManager {
               this.installed_plugins.push(config)
               this.reloadPlugin(config).catch((e)=>{
                 console.error(config, e)
-                if(!e.toString().includes('Please connect to the Plugin Engine 🚀.')){
-                    this.showMessage(`<${config.name}>: ${e.toString()}`)
-                }
+                this.showMessage(`<${config.name}>: ${e.toString()}`)
               })
             }
           }
@@ -772,6 +770,7 @@ export class PluginManager {
           pconfig.name = plugin.name
           pconfig.type = plugin.type
           pconfig.plugin = plugin
+          this.update_ui_callback()
           resolve(plugin)
         }).catch((e) => {
           pconfig.plugin = null
@@ -959,12 +958,11 @@ export class PluginManager {
 
       // create a proxy plugin
       const plugin = new DynamicPlugin(tconfig, _interface, this.fm.fs, true)
-
-      this.plugins[plugin.id] = plugin
-      this.plugin_names[plugin.name] = plugin
       plugin.api = {
         __jailed_type__: 'plugin_api',
         __id__: plugin.id,
+        setup: async () => {
+        },
         run: async (my) => {
           const c = _clone(template.defaults) || {}
           c.type = template.name
@@ -978,6 +976,9 @@ export class PluginManager {
       }
       try {
         this.register(plugin, config)
+        this.plugins[plugin.id] = plugin
+        this.plugin_names[plugin.name] = plugin
+        this.event_bus.$emit('plugin_loaded', plugin)
         resolve(plugin)
       } catch (e) {
         reject(e)
@@ -1509,7 +1510,7 @@ export class PluginManager {
         console.error("Error occured during creating window ", wconfig, error)
         throw error
       }
-      if (wconfig.type && wconfig.type.startsWith('imjoy')) {
+      if (wconfig.type && wconfig.type.startsWith('imjoy/')) {
         wconfig.id = 'imjoy_'+randId()
         wconfig.name = wconfig.name || 'untitled window'
         this.wm.addWindow(wconfig).then((wid)=>{

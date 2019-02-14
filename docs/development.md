@@ -1009,8 +1009,9 @@ the corresponding url would be `https://imjoy.io/#/app?par1=99&par2=hello`.
 The following url parameters are currently supported:
 
  *  `plugin` or `p`: show the specified plugin in the plugin management dialog as
-     detailed in the section above.
- *   `workspace` or `w`: name of workspace. ImJoy will switch to the specified
+     detailed in the section above. If the plugin with the same name and version exists, the dialog will not shown.
+     If needed, add `upgrade=1` to force show the plugin dialog. For example: `https://imjoy.io/#/app?p=oeway/ImJoy-Demo-Plugins:alert&upgrade=1`.
+ *   `workspace` or `w`: name of workspace. ImJoy will swithc to the specified
      workspace if it exist, or create a new one. For example, `https://imjoy.io/#/app?workspace=test`
  *   `engine` or `e`: define the url of the plugin engine. For example: `http://imjoy.io/#/app?engine=http://127.0.0.1:9527`.
      Note that if you want to connect to a remote machine through a http (not https) connection,
@@ -1031,9 +1032,10 @@ The following url parameters are currently supported:
       If you are hosting your repo from a non-GitHub website (e.g. GitLab), please
       use the `raw` link to the `manifest.imjoy.json` file.
 
- *   `load` or `l` define a customized url which contains data (e.g. a tif image)
-     loaded automatically into the ImJoy workspace. This can be used to link data
-     to ImJoy, for example, by defining a `open with imjoy` button.
+ *   `start` or `s`: define a startup plugin name which will be started automatically after ImJoy web app loaded.
+      All the url parameters will be passed to the plugin as `my.config` to the `run(my)` function. This allows you to add customized arguments and use them in `run(my)`. For example, a plugin can load an image automatically with `load=URL` and set the width and height of the image with, for example, `width=1024&height=2048`. For example, pass `123` to the `run` function of the plugin as `my.data.x`: `https://imjoy.io/#/app?x=123&start=AwesomePlugin`.
+
+ *   `load` or `l`: define an URL for making a http GET request, this parameter should only used when you defined a startup plugin with `start` or `s`. The data fetched from the URL will be passed to the startup plugin `run(my)` function as `my.data.loaded`.
 
 
 ### Distribute plugins with custom libraries
