@@ -65,15 +65,15 @@ There are four types of plugins available for different purposes:
 
 **JavaScript** plugins support these two types:
 
-1. `Window (HTML/CSS/JS)` plugins for building a rich and interactive user interface using HTML5/CSS and JavaScript;
+1. **Window (HTML/CSS/JS)**(type=`window`) plugins for building a rich and interactive user interface using HTML5/CSS and JavaScript;
 
-1. `Web Worker (JS)` plugins for performing computational tasks using JavaScript or WebAssembly;
+1. **Web Worker (JS)**(type=`web-worker`) plugins for performing computational tasks using JavaScript or WebAssembly;
 
 **Python** plugins support these two types:
 
-1. `Native Python` plugins for performing heavy-duty computational tasks using Python and its libraries, this requires additional installation of plugin engine.
+1. **Native Python**(type=`native-python`) plugins for performing heavy-duty computational tasks using Python and its libraries, this requires additional installation of plugin engine.
    These plugins are indicated with a rocket 🚀;
-1. `Web Python` plugins for performing computational tasks using Python with in the browser through WebAssembly and the [pyodide project](https://github.com/iodide-project/pyodide).
+1. **Web Python**(type=`web-python`) plugins for performing computational tasks using Python with in the browser through WebAssembly and the [pyodide project](https://github.com/iodide-project/pyodide).
    Such plugins are indicated with a little snake 🐍. This is in developmental stage and only a selected number of Python libraries are currently supported.
 
 Click the **+ PLUGINS** button in `Plugins`, then select `Create a New Plugin`
@@ -429,11 +429,16 @@ use
 "requirements": ["https://cdn.plot.ly/plotly-latest.min.js"]
 ```
 
-For window plugins, you can also specify **CSS urls**, these need to end with `.css`.
+For window plugins, you can also specify **CSS urls**, these need to end with `.css`, otherwise, you need to add a prefix `css:` to the url.
 
 For example, to use the [W3.CSS framework](https://www.w3schools.com/w3css/), you can specify
 ```json
 "requirements": ["https://www.w3schools.com/w3css/4/w3.css"]
+```
+
+If the url does not end with `.css`, you need to add `css:` before it, for example:
+```json
+"requirements": ["css:https://fonts.googleapis.com/icon?family=Material+Icons"]
 ```
 
 ImJoy hosts **commonly used and tested libraries** in a dedicated [GitHub repository](https://github.com/oeway/static.imjoy.io).
@@ -443,6 +448,11 @@ For example, the file `FileSaver.js` in the folder `static.imjoy.io/docs/js/`
 can be referenced as
 ```json
 "requirements": ["https://static.imjoy.io/js/FileSaver.js"]
+```
+
+If the url does not end with `.js`, you need to add `js:` before it, for example:
+```json
+"requirements": ["js:https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@0.11.2"]
 ```
 
 ### Native Python plugins

@@ -110,7 +110,10 @@ var execute = async function(code) {
                   var link_node;
                   if(Array.isArray(code.requirements)){
                     for(var i=0;i<code.requirements.length;i++){
-                      if(code.requirements[i].toLowerCase().endsWith('.css')){
+                      if(code.requirements[i].toLowerCase().endsWith('.css') || code.requirements[i].startsWith('css:')){
+                        if(code.requirements[i].startsWith('css:')){
+                          code.requirements[i] = code.requirements[i].slice(4)
+                        }
                         link_node = document.createElement('link');
                         link_node.rel = 'stylesheet'
                         link_node.href = code.requirements[i]
@@ -122,7 +125,10 @@ var execute = async function(code) {
                     }
                   }
                   else{
-                    if(code.requirements.toLowerCase().endsWith('.css')){
+                    if(code.requirements.toLowerCase().endsWith('.css') || code.requirements.startsWith('css:')){
+                      if(code.requirements.startsWith('css:')){
+                        code.requirements = code.requirements.slice(4)
+                      }
                       link_node = document.createElement('link');
                       link_node.rel = 'stylesheet'
                       link_node.href = code.requirements
