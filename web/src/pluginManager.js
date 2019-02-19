@@ -1569,7 +1569,7 @@ export class PluginManager {
       if(!target_plugin.api[function_name]){
         throw `function "${function_name}" of ${plugin_name} is not available.`
       }
-      await target_plugin.api[function_name].apply(null, Array.prototype.slice.call(arguments, 3, arguments.length))
+      return await target_plugin.api[function_name].apply(null, Array.prototype.slice.call(arguments, 3, arguments.length))
     }
     else{
       throw `plugin with type ${plugin_name} not found.`
