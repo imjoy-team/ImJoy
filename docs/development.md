@@ -616,7 +616,7 @@ You can add the repo with
 
 and install the environment with
 ```json
-"env": []"conda env create -f myRepo/environment.yml"]
+"env": ["conda env create -f myRepo/environment.yml"]
 ```
 
 #### repo hosted on Dropbox
