@@ -493,6 +493,7 @@
           </md-toolbar>
         </md-card-header>
         <md-card-content>
+          <p>version:{{plugin4install.version}}</p>
           <p>{{plugin4install.description}}</p>
           <md-chip v-for="tag in plugin4install.tags" @click="tag4install=tag" :class="tag4install===tag? 'md-primary':''" :key="tag">{{tag}}</md-chip>
           <!-- <md-button class="md-button md-primary" @click="showCode(plugin4install)">
@@ -941,13 +942,12 @@ export default {
             }
           }
 
-
           if(this.$route.query.start || this.$route.query.s){
             const pname = this.$route.query.start || this.$route.query.s
             const ps = this.pm.installed_plugins.filter((p) => {
-              return p.name === p.name
+              return p.name === pname
             })
-            if(ps.length<=0){
+            if(!this.showAddPluginDialog  && ps.length<=0){
               alert(`Plugin "${pname}" cannot be started, please install it.`)
             }
             else{
