@@ -829,7 +829,13 @@ export default {
       this.showWelcomeDialog = true
     }
     else {
-      this.startImJoy()
+      this.startImJoy().then(()=>{
+        /* global gtag window */
+        if(gtag){
+          // CAREFUL: DO NOT SEND ANY QUERY STRING, ONLY LOCATION AND PATH
+          gtag('config', 'UA-134837258-1', {'page_location': location.href.split('#')[0], 'page_path': '/#/app'})
+        }
+      })
     }
 
   },

@@ -70,8 +70,3 @@ new Vue({
     App
   }
 })
-
-/* global gtag */
-router.afterEach(( to ) => {
-  gtag('config', 'UA-134837258-1', {'page_path': '/#' + to.path});
-});
