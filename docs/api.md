@@ -623,12 +623,13 @@ Obtain file with default settings
 
 ```javascript
 api.getFileUrl('~/data/output.png')
-// will return something like `http://127.0.0.1:9527/file/1ba89354-ae98-457c-a53b-39a4bdd14941?name=output.png`.
+// will return something like `http://127.0.0.1:9527/file/1ba89354-ae98-457c-a53b-39a4bdd14941/output.png`.
 ```
 
 Specify password to access file
 ```javascript
 api.getFileUrl('~/data/output.png', password='SECRET_PASSWORD').
+// will return something like `http://127.0.0.1:9527/file/1ba89354-ae98-457c-a53b-39a4bdd14941/SECRET_PASSWORD/output.png`.
 ```
 
 Specify header to create downloadable link
