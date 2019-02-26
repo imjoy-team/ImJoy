@@ -599,6 +599,9 @@ Generates an url to access a local file or directory path.
 When this function is called, a confirmation dialog will be displayed to obtain the
 user's permission. This means a JavaScript plugin cannot access the user's file system without notifying the user.
 
+If a directory is selected, it can be used to access all the files or subfolders contained in the folder.
+While this can be used to serve the entire folder, please *BE CAREFUL** when using this feature -- if the root folder or disk is selected, the entire file system will be exposed through the url. If you are running the plugin engine on a public server,  anyone knows the url will be able to access your files.
+
 The optional argument `header` describes how the url will be served. If no header
 is specified, the url is specified to be rendered in the browser, and the
 `Content-Type` will be guessed from the file name by Python library
@@ -629,7 +632,7 @@ api.getFileUrl('~/data/output.png')
 Specify password to access file
 ```javascript
 api.getFileUrl('~/data/output.png', password='SECRET_PASSWORD').
-// will return something like `http://127.0.0.1:9527/file/1ba89354-ae98-457c-a53b-39a4bdd14941/SECRET_PASSWORD/output.png`.
+// will return something like `http://127.0.0.1:9527/file/1ba89354-ae98-457c-a53b-39a4bdd14941@SECRET_PASSWORD/output.png`.
 ```
 
 Specify header to create downloadable link
