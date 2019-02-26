@@ -150,10 +150,12 @@ you might need to contact your IT department.
   At the end of the initialisation process, it will display the **connection token**.
   Copy it from the terminal, since you will need it in the next step. **KEEP THIS TOKEN PRIVATE!!!!**
 
+0. If you have a domain name or host name configured to your host, you can specify it by using `--base_url=YOUR_REMOTE_HOST`. For example:  `python -m imjoy --serve --host=0.0.0.0 --base_url=https://hello-imjoy.com`. With this approach, you can also configure a `https` proxy with [nginx for example](https://docs.nginx.com/nginx/admin-guide/security-controls/securing-http-traffic-upstream/), and then your will be able to use your server with `https://imjoy.io`.
+
 0. On your local machine, use your web browser to access the ImJoy app on the remote machine
   with `http://YOUR_REMOTE_IP:9527` (instead of `https://imjoy.io` ). Then connect
   to the plugin engine by using `http://YOUR_REMOTE_IP:9527` as host and
-  the **connection token** you get when you start the engine.
+  the **connection token** you get when you start the engine. If you have `base_url` configured, please replace `YOUR_REMOTE_IP` to your actual domain name or host name.
 
 
 
