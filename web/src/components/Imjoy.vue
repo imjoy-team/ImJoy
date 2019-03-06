@@ -964,7 +964,7 @@ export default {
                 }
               }
               //load data
-              if(this.pm.registered.windows[pname] || pname.startsWith('imjoy/')){
+              if(!this.showAddPluginDialog && (this.pm.registered.windows[pname] || pname.startsWith('imjoy/'))){
                 try {
                   const template = this.pm.registered.windows[pname] || {}
                   const c = _clone(template.defaults) || {}
