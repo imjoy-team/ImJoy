@@ -470,14 +470,14 @@
             </div>
             <div v-if="tag4install" class="md-toolbar-section-end">
               <md-button class="md-button md-primary" @click="installPlugin(plugin4install, tag4install)">
-                <md-icon>cloud_download</md-icon>Install
+                <md-icon>cloud_download</md-icon>{{plugin4install._installation_text || 'Install'}}
                 <md-tooltip>Install {{plugin4install.name}} (tag=`{{tag4install}}`)</md-tooltip>
               </md-button>
             </div>
             <div v-else class="md-toolbar-section-end">
               <md-menu v-if="plugin4install.tags && plugin4install.tags.length>0">
                 <md-button class="md-button md-primary" md-menu-trigger>
-                  <md-icon>cloud_download</md-icon>Install
+                  <md-icon>cloud_download</md-icon>{{plugin4install._installation_text || 'Install'}}
                   <md-tooltip>Choose a tag to install {{plugin4install.name}}</md-tooltip>
                 </md-button>
                 <md-menu-content>
@@ -487,7 +487,7 @@
                 </md-menu-content>
               </md-menu>
               <md-button v-else  class="md-button md-primary" @click="installPlugin(plugin4install)">
-                <md-icon>cloud_download</md-icon>Install
+                <md-icon>cloud_download</md-icon>{{plugin4install._installation_text || 'Install'}}
               </md-button>
             </div>
           </md-toolbar>
@@ -545,6 +545,7 @@ import {
   url_regex,
   assert,
   _clone,
+  compareVersions
 } from '../utils.js'
 
 import {
@@ -1096,6 +1097,14 @@ export default {
       this.downloading_plugin = true
       try {
         const config = await this.pm.getPluginFromUrl(plugin_url)
+        if(this.pm.plugin_names[config.name]){
+          if(compareVersions(config.version, ">", this.pm.plugin_names[config.name].config.version)){
+            config._installation_text = 'Upgrade'
+          }
+          else if(compareVersions(config.version, "<", this.pm.plugin_names[config.name].config.version)){
+            config._installation_text = 'Downgrade'
+          }
+        }
         this.plugin4install = config
         this.tag4install = config.tag
         this.downloading_plugin = false
