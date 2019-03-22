@@ -3,8 +3,9 @@
   <md-dialog :md-active.sync="show_" :md-click-outside-to-close="false" :md-close-on-esc="false">
     <md-dialog-title>{{this.options.title || 'ImJoy File Dialog'}}</md-dialog-title>
     <md-dialog-content>
-      <ul v-if="file_tree">
-        <file-item :model="file_tree" :root="root" :selected="file_tree_selection" @load="loadFile" @select="fileTreeSelected" @select_append="fileTreeSelectedAppend">
+      <md-button v-show="engine.connected" :key="engine.id" v-for="engine in engines" :class="selected_engine===engine?'md-primary md-raised':'md-raised'" @click="selectEngine(engine)">{{engine.name}}</md-button>
+      <ul v-if="selected_engine && file_tree">
+        <file-item :model="file_tree" :engine="selected_engine" :root="root" :selected="file_tree_selection" @load="loadFile" @select="fileTreeSelected" @select_append="fileTreeSelectedAppend">
         </file-item>
       </ul>
     </md-dialog-content>
@@ -24,6 +25,7 @@ export default {
      getFileUrl: Function,
      listFiles: Function,
      mode: String,
+     engines: Array
    },
    data: function () {
      return {
@@ -34,6 +36,7 @@ export default {
        file_tree: null,
        resolve: null,
        reject: null,
+       selected_engine: null
      }
    },
    mounted(){
@@ -61,7 +64,7 @@ export default {
          // if(f.path === this.root){
          //   f.path = f.path+'/../'
          // }
-         this.listFiles(f.path, this.options.type, this.options.recursive).then((tree)=>{
+         this.listFiles(this.selected_engine, f.path, this.options.type, this.options.recursive).then((tree)=>{
            this.root = tree.path
            this.file_tree = tree
            this.$forceUpdate()
@@ -103,12 +106,12 @@ export default {
            this.reject = reject
            this.resolve = (paths)=>{
               if(typeof paths === 'string'){
-                this.getFileUrl(_plugin, paths).then(resolve).catch(reject)
+                this.getFileUrl(_plugin, {path: paths, engine: this.selected_engine}).then(resolve).catch(reject)
               }
               else{
                   const ps = []
                   for(let path of paths){
-                    ps.push(this.getFileUrl(_plugin, path))
+                    ps.push(this.getFileUrl(_plugin, {path: path, engine: this.selected_engine}))
                   }
                   Promise.all(ps).then(resolve).catch(reject)
               }
@@ -118,11 +121,24 @@ export default {
            reject("unsupported uri_type: " + this.options.uri_type)
          }
          this.root = this.options.root
-         this.listFiles(options.root, options.type, options.recursive).then((tree)=>{
+         for(let e of this.engines){
+           if(e.connected){
+             this.selectEngine(e)
+             break
+           }
+         }
+       })
+     },
+     selectEngine(engine){
+       return new Promise((resolve, reject) => {
+         this.selected_engine = engine
+         this.file_tree = null
+         this.listFiles(this.selected_engine, this.options.root, this.options.type, this.options.recursive).then((tree)=>{
            this.root = tree.path
            this.file_tree = tree
            this.$forceUpdate()
-         })
+           resolve()
+         }).catch(reject)
        })
      }
    }

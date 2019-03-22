@@ -172,6 +172,6 @@ export class WindowManager {
   }
 
   destroy(){
-    this.disconnectEngine()
+    this.disconnect()
   }
 }

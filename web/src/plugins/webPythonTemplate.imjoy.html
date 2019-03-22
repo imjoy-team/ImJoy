@@ -7,7 +7,7 @@
   "name": "Untitled Plugin",
   "type": "web-python",
   "version": "0.1.0",
-  "api_version": "0.1.2",
+  "api_version": "0.1.3",
   "description": "[TODO: describe this plugin with one sentence.]",
   "tags": [],
   "ui": "UI for this plugin",
@@ -25,10 +25,10 @@
 
 class ImJoyPlugin():
     def setup(self):
-        print('setup in python')
+        api.log('initialized')
 
     def run(self, my):
-        print('hello world.')
+        api.alert('hello world.')
 
 api.export(ImJoyPlugin())
 </script>

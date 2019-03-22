@@ -24,6 +24,7 @@ import PluginEditor from '@/components/PluginEditor'
 import FileItem from '@/components/FileItem'
 import FileDialog from '@/components/FileDialog'
 import Window from '@/components/Window'
+import EngineControlPanel from '@/components/EngineControlPanel'
 
 Vue.config.productionTip = false
 
@@ -46,6 +47,7 @@ Vue.component('window', Window)
 Vue.component('grid-layout', VueGridLayout.GridLayout)
 Vue.component('grid-item', VueGridLayout.GridItem)
 Vue.component('monaco-editor', MonacoEditor)
+Vue.component('engine-control-panel', EngineControlPanel)
 
 const truncate = function(text, length, clamp) {
   clamp = clamp || '...';

@@ -1,15 +1,15 @@
 {
   "name": "ImJoy.io",
-  "version": "0.9.8",
+  "version": "0.9.9",
   "private": true,
   "description": "ImJoy -- deploying deep learning made easy.",
   "author": "Wei OUYANG <wei.ouyang@cri-paris.org>",
   "scripts": {
-    "serve": "vue-cli-service serve",
+    "serve": "vue-cli-service serve --host localhost",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
     "test": "vue-cli-service test:unit",
-    "deploy": "DEPLOY_MODE=dev vue-cli-service build && node ../utils/scripts/deploy-dev.js"
+    "deploy": "DEPLOY_MODE=dev vue-cli-service build && node ./deploy-dev.js"
   },
   "dependencies": {
     "ajv": "^6.6.1",

@@ -33,6 +33,7 @@ export default {
      model: Object,
      selected: [String,Array],
      root: {type: String, default: '.'},
+     engine: Object
    },
    data: function () {
      return {
@@ -52,7 +53,7 @@ export default {
        this.$emit('load', m || {target: this.model, path: this.root+'/../'})
      },
      load(m){
-       this.$emit('load', m || {target: this.model, path: this.root})
+       this.$emit('load', m || {target: this.model, path: this.root, engine: this.engine})
      },
      select(m, append){
        // this.model.selected = !this.model.selected
