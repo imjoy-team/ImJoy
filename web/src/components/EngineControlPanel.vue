@@ -7,7 +7,7 @@
     <md-menu v-else md-size="big" md-direction="top-start" >
       <md-button class="md-icon-button md-primary" md-menu-trigger>
         <md-icon>🚀</md-icon>
-        <md-tooltip>Connection to the Plugin Engine</md-tooltip>
+        <md-tooltip>ImJoy Plugin Engines</md-tooltip>
       </md-button>
       <md-menu-content class="engine-panel">
         <md-menu-item @click="showEngineDialog()">
