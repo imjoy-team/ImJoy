@@ -334,9 +334,11 @@ export class EngineManager {
 
   connectAll(auto){
     //this.engines[0].connect(this.engine_url, this.connection_token, true)
+    const ps = []
     for(let c of this.engines){
-      c.connect(auto)
+      ps.push(c.connect(auto))
     }
+    return Promise.all(ps)
   }
 
   loadPluginEngineList(){
@@ -373,11 +375,13 @@ export class EngineManager {
           _id: doc._id,
           _rev: doc._rev,
           engines: this.config.engines
+        }, {
+          force: true
         }).then(resolve).catch((e)=>{
-          reject(`Failed to save workspace, database Error: ${e.toString()}`)
+          reject(`Failed to plugin engine list, database error: ${e.toString()}`)
         })
       }).catch((err) => {
-        reject(`Failed to save workspaces, database Error: ${err.toString()}`)
+        reject(`Failed to plugin engine list, database error: ${err.toString()}`)
       })
     })
   }

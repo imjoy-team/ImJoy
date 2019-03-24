@@ -800,7 +800,11 @@ export default {
         this.menuVisible = true
         const selected_workspace = this.$route.query.workspace || this.$route.query.w || workspace_list[0]
         await this.pm.loadWorkspace(selected_workspace)
-        this.em.connectAll(true)
+        try {
+          await this.em.connectAll(true)
+        } catch (e) {
+          console.error(e)
+        }
         await this.pm.reloadPlugins()
         this.plugin_loaded = true
         this.$forceUpdate()
