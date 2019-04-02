@@ -47,7 +47,7 @@ The **main steps** are described below and basic data flow is illustrated by das
 
 1. User defines how many data points should be calculated, some text that will be displayed in the window plugin, and which JavaScript library will be used to plot the data.
 2. Upon execution of the Python plugin, the damped cosine curve will be computed. Then a dictionary `data` containing these values, as well as the text and the name of the desired JS library is created. The necessary content of this dictionary is specified by the window plugin. This will then be added to another dictionary `data_plot` that contains specifications for the window plugin: `type` to specify which window plugin should be called, `name` to specify the window title, `w` and `h` the specify the size. The dictionary `data_plot` will be used with the ImJoy API function `api.createWindow` to call the window plugin.
-3. In the window plugin the transferred data are available as `my.data` and are used to create the JavaScript plot and also populate the HTML text field.
+3. In the window plugin the transferred data are available as `ctx.data` and are used to create the JavaScript plot and also populate the HTML text field.
 4. The `api.createWindow` returns an identifier for the window. When plotting again, the Python plugin attempts to plot into this window. Please note that here on the actual data are passed as an input and not the larger dictionary containing the specifications of the window. For the plugin running in the Python engine, we added a  `try ... except` statement to catch error arises when the window has been closed.
 
 #### Opening a chart saved as png

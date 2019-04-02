@@ -58,7 +58,7 @@ don't forget to `import asyncio`.
  class ImJoyPlugin(){
   async setup(){
   }
-  async run(my){
+  async run(ctx){
     try{
       result = await api.XXXXX()
       console.log(result)
@@ -78,7 +78,7 @@ class ImJoyPlugin():
     async def setup(self):
         pass
 
-    async def run(self, my):
+    async def run(self, ctx):
         try:
             result = await api.XXXXX()
             print(result)
@@ -106,7 +106,7 @@ Below examples for an api function named `XXXXX`:
 class ImJoyPlugin(){
   setup(){
   }
-  run(my){
+  run(ctx){
       api.XXXXX().then(this.callback)
 
       // optionally, you can catch error
@@ -128,7 +128,7 @@ class ImJoyPlugin():
     def setup(self):
         pass
 
-    def run(self, my):
+    def run(self, ctx):
         api.XXXXX().then(self.callback)
 
         # optionally, you can catch an error
@@ -266,7 +266,7 @@ It contains the following fields:
     - `imjoy/url_list`. Display a list of url rendered with HTML tag `<a> </a>`. `data` is an array of urls.
     - `imjoy/panel`. Render the `ui` string in a `<config>` block. <!--****[TODO] what can you do with this?**-->
     - `imjoy/markdown`. Render some markdown text provided in `data.source`.
-    - `imjoy/generic`. Will show all objects in `data`. For instance, the window that you obtain with `return.my`
+    - `imjoy/generic`. Will show all objects in `data`.
     - `imjoy/plugin-editor`. Opens the source code editors. `data.id` is a unique string (preferable random) specifying the window id, `data.code` contains the source code
 
   - **w**: Integer. Window width in grid columns (1 column = 30 pixels).
@@ -771,7 +771,7 @@ Register a new plugin operator (**op**) to perform a specific task.
 An op can have its own GUI defined by the `ui` string.
 
 By default, all ops of a plugin will call the `run` function of the plugin.
-You can use `my.config.type` in the `run` function to differentiate which op was called.
+You can use `ctx.config.type` in the `run` function to differentiate which op was called.
 
 Alternatively, you can define another `Plugin API` function in the `run` field.
 The function must be a member of the plugin class or being exported (with `api.export`)
@@ -814,11 +814,11 @@ await api.register({
       "update": this.update_lut
 });
 
-apply_lut(my) {
+apply_lut(ctx) {
     ...
  };
 
-update_lut(my) {
+update_lut(ctx) {
      ...
 };
 
@@ -832,7 +832,7 @@ await api.run(plugin_name)
 ```
 Run another plugin by specifying its name.
 
-You can also pass [`my`](development?id=plugin-during-runtime)
+You can also pass [`ctx`](development?id=plugin-during-runtime)
 to this plugin to transfer data.
 
 **Arguments**
