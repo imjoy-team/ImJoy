@@ -981,7 +981,8 @@ export class PluginManager {
           // c.op = my.op
           c.data = my && my.data
           c.config = my && my.config
-          await this.createWindow(null, c)
+          c.id = my && my.id
+          return await this.createWindow(null, c)
         }
       }
       try {
@@ -1117,6 +1118,16 @@ export class PluginManager {
           console.error('the window plugin seems not ready.')
           reject('the window plugin seems not ready.')
           return
+        }
+        plugin.api.close = ()=>{
+          const w = this.wm.window_ids[plugin.id]
+          try {
+            Promise.resolve(w.onclose()).finally(()=>{
+              this.wm.closeWindow(w)
+            })
+          } catch (e) {
+            this.wm.closeWindow(w)
+          }
         }
         plugin.api.setup().then(() => {
           //asuming the data._op is passed from last op
@@ -1543,7 +1554,7 @@ export class PluginManager {
         const pconfig = wconfig
         //generate a new window id
         pconfig.type = window_config.type
-        pconfig.id = window_config.id + '_' + randId()
+        pconfig.id = pconfig.id || window_config.id + '_' + randId()
         if (pconfig.type != 'window') {
           throw 'Window plugin must be with type "window"'
         }

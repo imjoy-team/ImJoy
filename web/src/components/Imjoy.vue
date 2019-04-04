@@ -615,7 +615,7 @@ export default {
       auto_compaction: true
     })
     this.em = new EngineManager({ event_bus: this.event_bus, config_db: config_db, show_message_callback: this.showMessage, show_engine_callback: this.showEngineConnection.bind(this)})
-    this.wm = new WindowManager({ event_bus: this.event_bus, show_message_callback: this.showMessage, add_window_callback: this.addWindow})
+    this.wm = new WindowManager({ event_bus: this.event_bus, show_message_callback: this.showMessage, add_window_callback: this.addWindowCallback})
     this.fm = new FileSystemManager()
     this.pm = new PluginManager({ event_bus: this.event_bus, config_db: config_db, engine_manager: this.em, window_manager:this.wm, file_system_manager: this.fm, imjoy_api: imjoy_api, show_message_callback: this.showMessage, update_ui_callback: ()=>{this.$forceUpdate()}})
 
@@ -949,7 +949,7 @@ export default {
       }
       this.$forceUpdate()
     },
-    addWindow(w) {
+    addWindowCallback(w) {
       return new Promise((resolve, reject) => {
         try {
           w.refresh = ()=>{ this.$forceUpdate() }

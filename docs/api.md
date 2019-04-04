@@ -248,6 +248,7 @@ for 10 times, 10 windows will be created.
 When `api.createWindow` is used, it will return an instance of the window plugin,
 e.g. `win = await api.createWindow({'name': 'new window', 'type': 'Image Window', 'data': {...}})`).
 If you run `win.run({'data': ...})` for 10 times, the same window instance will be updated.
+Run `win.close()` will close the window.
 
 
 **Arguments**
@@ -304,6 +305,8 @@ api.createWindow({name: 'new window', type: 'Image Window', w:7, h:7, data: {ima
 
 Use the returned object to update the window, or use `onclose` to set a callback
 function which will be called when the window is closed.
+
+To close the created window, call `win.close()`.
 
 <!-- tabs:start -->
 
