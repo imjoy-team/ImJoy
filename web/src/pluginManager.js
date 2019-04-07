@@ -39,6 +39,7 @@ import {
 
 import Ajv from 'ajv'
 const ajv = new Ajv()
+import Vue from 'vue'
 
 export class PluginManager {
   constructor({event_bus=null, config_db=null, engine_manager=null, window_manager=null, file_system_manager=null, imjoy_api={}, show_message_callback=null, update_ui_callback=null}){
@@ -1180,7 +1181,7 @@ export class PluginManager {
     if(!my) return null
     //conver config--> data  data-->target
     const res = {}
-
+    res.__jailed_type__ = my.__jailed_type__
     if(my.type && my.data){
       res.data = my.config
       res.target = my.data
@@ -1233,6 +1234,7 @@ export class PluginManager {
     if(!my) return null;
     my.target = my.target || {}
     const ret = {
+      __jailed_type__: my.__jailed_type__,
       _variables: my.target._variables || null,
       _op: my.target._op,
       _source_op: my.target._source_op,
@@ -1554,12 +1556,13 @@ export class PluginManager {
         const pconfig = wconfig
         //generate a new window id
         pconfig.type = window_config.type
+
         pconfig.id = pconfig.id || window_config.id + '_' + randId()
         if (pconfig.type != 'window') {
           throw 'Window plugin must be with type "window"'
         }
         // this is a unique id for the iframe to attach
-        pconfig.iframe_container = 'plugin_window_' + pconfig.id + randId()
+        pconfig.iframe_container = pconfig.window_container || 'plugin_window_' + pconfig.id + randId()
         pconfig.iframe_window = null
         pconfig.plugin = window_config
 
@@ -1568,14 +1571,26 @@ export class PluginManager {
           console.error("Error occured during creating window ", pconfig, error)
           throw error
         }
-        this.wm.addWindow(pconfig).then(()=>{
-          this.renderWindow(pconfig).then((wplugin)=>{
-            pconfig.onclose = ()=>{
-              return wplugin.terminate()
-            }
-            resolve(wplugin.api)
-          }).catch(reject)
-        })
+        if(pconfig.window_container){
+          Vue.nextTick(()=>{
+            this.renderWindow(pconfig).then((wplugin)=>{
+              pconfig.onclose = ()=>{
+                return wplugin.terminate()
+              }
+              resolve(wplugin.api)
+            }).catch(reject)
+          })
+        }
+        else{
+          this.wm.addWindow(pconfig).then(()=>{
+            this.renderWindow(pconfig).then((wplugin)=>{
+              pconfig.onclose = ()=>{
+                return wplugin.terminate()
+              }
+              resolve(wplugin.api)
+            }).catch(reject)
+          })
+        }
       }
     })
   }

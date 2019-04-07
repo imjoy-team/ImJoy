@@ -289,11 +289,12 @@
 
   <md-dialog-confirm :md-active.sync="showRemoveConfirmation" md-title="Removing Plugin" md-content="Do you really want to <strong>delete</strong> this plugin" md-confirm-text="Yes" md-cancel-text="Cancel" @md-cancel="showRemoveConfirmation=false" @md-confirm="pm.removePlugin(plugin2_remove);plugin2_remove=null;showRemoveConfirmation=false"/>
   <file-dialog ref="file-dialog" :engines="em.engines" :list-files="listFiles" :get-file-url="getFileUrl"></file-dialog>
-  <md-dialog :md-active.sync="showPluginDialog" :md-click-outside-to-close="false" :md-close-on-esc="false">
+  <md-dialog :class="plugin_dialog_config && plugin_dialog_config.ui?'':'window-dialog'" :md-active.sync="showPluginDialog" :md-click-outside-to-close="false" :md-close-on-esc="false">
     <md-dialog-content>
-      <div v-if="plugin_dialog_config">
+      <div v-if="plugin_dialog_config && plugin_dialog_config.ui">
         <joy :config="plugin_dialog_config" :showHeader="false" :controlButtons="false" ref="plugin_dialog_joy"></joy>
       </div>
+      <div v-else id="window_dialog_container" class="plugin-iframe" />
     </md-dialog-content>
     <md-dialog-actions>
       <md-button class="md-primary" @click="closePluginDialog(true)">OK</md-button>
@@ -1324,16 +1325,7 @@ export default {
       mw.target._source_op = null
       // mw.target._transfer = true
       mw.target._workflow_id = mw.target._workflow_id || "workflow_"+randId()
-      joy.workflow.execute(mw.target).then((my) => {
-        const w = this.pm.joy2plugin(my)
-        if(w && w.data && Object.keys(w.data).length>2){
-          // console.log('result', w)
-          w.name = w.name || 'result'
-          w.type = w.type || 'imjoy/generic'
-          this.pm.createWindow(null, w)
-        }
-        this.progress = 100
-      }).catch((e) => {
+      joy.workflow.execute(mw.target).catch((e) => {
         console.error(e)
         this.showMessage(e.toString() || "Error." , 12)
       })
@@ -1363,7 +1355,7 @@ export default {
       mw.target._workflow_id = mw.target._workflow_id || "op_"+op.name.trim().replace(/ /g, '_')+randId()
       op.joy.__op__.execute(mw.target).then((my) => {
         const w = this.pm.joy2plugin(my)
-        if (w) {
+        if (w && !my.__jailed_type__) {
           w.name = w.name || 'result'
           w.type = w.type || 'imjoy/generic'
           this.pm.createWindow(null, w)
@@ -1511,9 +1503,20 @@ export default {
     showDialog(_plugin, config) {
       assert(config)
       return new Promise((resolve, reject) => {
-        this.plugin_dialog_config = config
-        this.showPluginDialog = true
-        this.plugin_dialog_promise = [resolve, reject]
+        if(config.ui){
+          this.plugin_dialog_config = config
+          this.showPluginDialog = true
+          this.plugin_dialog_promise = [resolve, reject]
+        }
+        else if(config.type){
+          config.window_container = 'window_dialog_container'
+          this.showPluginDialog = true
+          this.plugin_dialog_promise = [resolve, reject]
+          this.pm.createWindow(null, config)
+        }
+        else{
+          this.showMessage('Unsupported dialog type.')
+        }
       })
     },
     showAlert(_plugin, text){
@@ -1616,6 +1619,17 @@ export default {
   }
 }
 
+.window-dialog {
+  width: 95%;
+  height: 95%;
+  max-width: 1000px;
+  max-height: 900px;
+}
+
+#window_dialog_container{
+  height: 100%;
+  width: 100%;
+}
 .md-card {
   /* width: 100%; */
   /* height: 300px; */
