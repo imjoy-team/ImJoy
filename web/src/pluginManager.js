@@ -1120,16 +1120,6 @@ export class PluginManager {
           reject('the window plugin seems not ready.')
           return
         }
-        plugin.api.close = ()=>{
-          const w = this.wm.window_ids[plugin.id]
-          try {
-            Promise.resolve(w.onclose()).finally(()=>{
-              this.wm.closeWindow(w)
-            })
-          } catch (e) {
-            this.wm.closeWindow(w)
-          }
-        }
         plugin.api.setup().then(() => {
           //asuming the data._op is passed from last op
           pconfig.data = pconfig.data || {}
@@ -1577,6 +1567,9 @@ export class PluginManager {
               pconfig.onclose = ()=>{
                 return wplugin.terminate()
               }
+              wplugin.api.close = ()=>{
+                return pconfig.onclose()
+              }
               resolve(wplugin.api)
             }).catch(reject)
           })
@@ -1586,6 +1579,14 @@ export class PluginManager {
             this.renderWindow(pconfig).then((wplugin)=>{
               pconfig.onclose = ()=>{
                 return wplugin.terminate()
+              }
+              wplugin.api.close = async ()=>{
+                const w = this.wm.window_ids[wplugin.id]
+                try {
+                  await pconfig.onclose()
+                } finally {
+                  this.wm.closeWindow(w)
+                }
               }
               resolve(wplugin.api)
             }).catch(reject)

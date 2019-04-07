@@ -1517,7 +1517,14 @@ export default {
           config.window_container = 'window_dialog_container'
           this.plugin_dialog_promise = null
           this.showPluginDialog = true
-          this.pm.createWindow(null, config).then(resolve).catch(reject)
+          this.pm.createWindow(null, config).then((api)=>{
+            const _close = api.close
+            api.close = async ()=>{
+              await _close()
+              this.showPluginDialog = false
+            }
+            resolve(api)
+          }).catch(reject)
         }
         else{
           this.showMessage('Unsupported dialog type.')
