@@ -290,15 +290,18 @@
   <md-dialog-confirm :md-active.sync="showRemoveConfirmation" md-title="Removing Plugin" md-content="Do you really want to <strong>delete</strong> this plugin" md-confirm-text="Yes" md-cancel-text="Cancel" @md-cancel="showRemoveConfirmation=false" @md-confirm="pm.removePlugin(plugin2_remove);plugin2_remove=null;showRemoveConfirmation=false"/>
   <file-dialog ref="file-dialog" :engines="em.engines" :list-files="listFiles" :get-file-url="getFileUrl"></file-dialog>
   <md-dialog :class="plugin_dialog_config && plugin_dialog_config.ui?'':'window-dialog'" :md-active.sync="showPluginDialog" :md-click-outside-to-close="false" :md-close-on-esc="false">
+    <md-dialog-actions v-if="!plugin_dialog_config || !plugin_dialog_config.ui">
+      <md-button class="md-accent" @click="closePluginDialog(true)"><md-icon>clear</md-icon></md-button>
+    </md-dialog-actions>
     <md-dialog-content>
       <div v-if="plugin_dialog_config && plugin_dialog_config.ui">
         <joy :config="plugin_dialog_config" :showHeader="false" :controlButtons="false" ref="plugin_dialog_joy"></joy>
       </div>
       <div v-else id="window_dialog_container" class="plugin-iframe" />
     </md-dialog-content>
-    <md-dialog-actions>
+    <md-dialog-actions v-if="plugin_dialog_config && plugin_dialog_config.ui">
       <md-button class="md-primary" @click="closePluginDialog(true)">OK</md-button>
-      <md-button v-if="plugin_dialog_config && plugin_dialog_config.ui" class="md-primary" @click="closePluginDialog(false)">Cancel</md-button>
+      <md-button class="md-primary" @click="closePluginDialog(false)">Cancel</md-button>
     </md-dialog-actions>
   </md-dialog>
 
