@@ -127,7 +127,7 @@ export default {
   methods: {
     save(){
       assert(this.window.plugin_manager)
-      return new Promise((resolve, reject) => {
+      return new Promise((resolve) => {
         this.$emit('input', this.codeValue)
         this.window.plugin_manager.savePlugin({pluginId: this.pluginId, code: this.codeValue, tag: this.window.plugin && this.window.plugin.tag}).then((config)=>{
           // this.window.data._id = config._id
