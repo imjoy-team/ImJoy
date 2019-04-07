@@ -980,8 +980,8 @@ export class PluginManager {
           c.name = template.name
           c.tag = template.tag
           // c.op = my.op
-          c.data = my && my.data
-          c.config = my && my.config
+          c.data = my && my.data || {}
+          c.config = my && my.config || {}
           c.id = my && my.id
           return await this.createWindow(null, c)
         }
@@ -1452,8 +1452,8 @@ export class PluginManager {
                   const w = {}
                   w.name = res.name || 'result'
                   w.type = res.type || 'imjoy/generic'
-                  w.config = res.data
-                  w.data = res.target
+                  w.config = res.data || {}
+                  w.data = res.target || {}
                   await this.createWindow(plugin, w)
                 }
               }
