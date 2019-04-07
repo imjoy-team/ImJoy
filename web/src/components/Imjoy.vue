@@ -1623,6 +1623,10 @@ export default {
     width: 100%;
     max-width: 800px;
   }
+  .window-dialog {
+    width: 100%!important;
+    max-width: 800px;
+  }
 }
 
 @media screen and (max-height: 900px) {
@@ -1631,7 +1635,17 @@ export default {
   }
 }
 
+@media screen and (max-height: 700px) {
+  .window-dialog {
+    height: 100%!important;
+    min-height: 100%;
+  }
+}
+
 .window-dialog {
+  margin: 0px;
+  min-width: 400px;
+  min-height: 500px;
   width: 95%;
   height: 95%;
   max-width: 1000px;
