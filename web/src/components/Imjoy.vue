@@ -298,7 +298,7 @@
     </md-dialog-content>
     <md-dialog-actions>
       <md-button class="md-primary" @click="closePluginDialog(true)">OK</md-button>
-      <md-button class="md-primary" @click="closePluginDialog(false)">Cancel</md-button>
+      <md-button v-if="plugin_dialog_config && plugin_dialog_config.ui" class="md-primary" @click="closePluginDialog(false)">Cancel</md-button>
     </md-dialog-actions>
   </md-dialog>
 
@@ -1270,13 +1270,15 @@ export default {
     },
     closePluginDialog(ok) {
       this.showPluginDialog = false
-      let [resolve, reject] = this.plugin_dialog_promise
-      if (ok) {
-        resolve(this.$refs.plugin_dialog_joy.joy.get_config())
-      } else {
-        reject()
+      if(this.plugin_dialog_promise){
+        let [resolve, reject] = this.plugin_dialog_promise
+        if (ok) {
+          resolve(this.$refs.plugin_dialog_joy.joy.get_config())
+        } else {
+          reject()
+        }
+        this.plugin_dialog_promise = null
       }
-      this.plugin_dialog_promise = null
     },
     loadFiles(selected_files) {
       console.log(selected_files)
@@ -1510,9 +1512,9 @@ export default {
         }
         else if(config.type){
           config.window_container = 'window_dialog_container'
+          this.plugin_dialog_promise = null
           this.showPluginDialog = true
-          this.plugin_dialog_promise = [resolve, reject]
-          this.pm.createWindow(null, config)
+          this.pm.createWindow(null, config).then(resolve).catch(reject)
         }
         else{
           this.showMessage('Unsupported dialog type.')
