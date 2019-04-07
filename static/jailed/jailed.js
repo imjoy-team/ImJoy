@@ -442,24 +442,24 @@ var SocketioConnectionWeb = function() {
         this._init = new Whenable;
         this._disconnected = false;
         this.id = id;
-        this.context = config.context
-        if(!this.context){
+        this.engine = config.engine
+        if(!this.engine){
           throw('connection is not established.')
         }
         this._disconnectHandler = ()=>{}
         this._loggingHandler = ()=>{}
         platformInit.whenEmitted(() =>{
-          if (!this._disconnected && this.context && this.context.socket) {
+          if (!this._disconnected && this.engine && this.engine.socket) {
             const config_ = {api_version: config.api_version, flags: config.flags, tag: config.tag, workspace: config.workspace, env: config.env, requirements: config.requirements, cmd: config.cmd, name: config.name, type: config.type, inputs: config.inputs, outputs: config.outputs}
             // create a plugin here
-            this.context.socket.emit('init_plugin', {id: id, type: type, config: config_}, (result) => {
+            this.engine.socket.emit('init_plugin', {id: id, type: type, config: config_}, (result) => {
               // console.log('init_plugin: ', result)
               this.initializing = false;
               if(result.success){
                 this._disconnected = false;
                 this.secret = result.secret
                 config.work_dir = result.work_dir
-                this.context.socket.on('message_from_plugin_'+this.secret,  (data)=>{
+                this.engine.socket.on('message_from_plugin_'+this.secret,  (data)=>{
                     // console.log('message_from_plugin_'+this.id, data)
                     if (data.type == 'initialized') {
                         this.dedicatedThread = data.dedicatedThread;
@@ -516,10 +516,16 @@ var SocketioConnectionWeb = function() {
      * @param {Object} data to send
      */
     SocketioConnection.prototype.send = function(data) {
-        this.context.socket.emit('message_to_plugin_'+this.secret,
+      if(this.engine && this.engine.socket){
+        this.engine.socket.emit('message_to_plugin_'+this.secret,
             {type: 'message', data: data}
         );
         // console.log('message_to_plugin_'+this.id, {type: 'message', data: data})
+      }
+      else{
+        console.error('socketio disconnected.')
+      }
+
     }
 
 
@@ -560,8 +566,8 @@ var SocketioConnectionWeb = function() {
         if (!this._disconnected) {
             this._disconnected = true;
         }
-        if(this.context && this.context.socket){
-          this.context.socket.emit('kill_plugin',
+        if(this.engine && this.engine.socket){
+          this.engine.socket.emit('kill_plugin',
              {id: this.id}
           );
           // console.log('kill plugin '+this.id)
@@ -779,7 +785,7 @@ var Plugin = function( config, _interface, _fs, is_proxy) {
     this.type = config.type;
     this.tag = config.tag;
     this.tags = config.tags;
-    this.type = config.type || 'web-worker'
+    this.type = config.type || 'web-worker';
     this._path = config.url;
     this._disconnected = true
     this.initializing = false;
@@ -836,7 +842,13 @@ var DynamicPlugin = function(config, _interface, _fs, is_proxy) {
     }
     this._updateUI()
 };
-
+/**
+ * Set the plugin engine
+ */
+DynamicPlugin.prototype.setEngine =
+       Plugin.prototype.setEngine = function(engine) {
+    this.config.engine = engine;
+}
 /**
  * Bind the first argument of all the interface functions to this plugin
  */
@@ -886,7 +898,7 @@ DynamicPlugin.prototype._connect =
         me.initializing = false;
         me._updateUI()
     }
-    if(this.type == 'native-python' && (!this.config.context || !this.config.context.socket)){
+    if(this.type == 'native-python' && (!this.config.engine || !this.config.engine.socket)){
       me._fail.emit('Please connect to the Plugin Engine 🚀.');
       me._connection = null
     }

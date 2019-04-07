@@ -244,9 +244,9 @@ String specifying the plugin GUI that will be displayed just below the plugin.
 * ...
 
 For each element, you need to define a unique `id`, which can then be used to **access
-the value of this element in the plugin** with `my.config.id`.
+the value of this element in the plugin** with `ctx.config.id`.
 
-For example, to render a form with a selection use `"ui": "select an option: {id: 'option1', type: 'choose', options: ['cat', 'dog'],     placeholder: 'cat'}"`. In the plugin, the selection can then be accessed with `my.config.option1`.
+For example, to render a form with a selection use `"ui": "select an option: {id: 'option1', type: 'choose', options: ['cat', 'dog'],     placeholder: 'cat'}"`. In the plugin, the selection can then be accessed with `ctx.config.option1`.
 
 In some cases, the ui might only contain a brief description of the op.
 This can either be plain text, or you can also specify a **link**    with `"ui": " <a href='https://imjoy.io' target='_blank'> ImJoy</a>"`. The `target='_blank'` will open this page in a new tab.
@@ -402,7 +402,7 @@ Plugins can be written in JavaScript or Python, a minimal plugin needs to implem
 
   * **`setup()` function**: executed when a plugin is loaded and initialises
       it.
-  * **`run()` function**: will be called each time a plugin is executed. When executed, an object (for Javascript) or a dictionary (for Python) called `my` will be passed into the function. The returned result will be displayed as a new window or passed to the next `op` in a workflow. More in the section [Plugin during runtime](development?id=plugin-during-runtime) below.
+  * **`run()` function**: will be called each time a plugin is executed. When executed, an object (for Javascript) or a dictionary (for Python) with context (named `ctx`) will be passed into the function. The returned result will be displayed as a new window or passed to the next `op` in a workflow. More in the section [Plugin during runtime](development?id=plugin-during-runtime) below.
   * optional: **`update()` function**: will be called when any setting of the op is changed.
 
 The `lang` property of the `<script>` block is used to specify the used programming language:
@@ -691,7 +691,7 @@ has to be called only once.
 ### Data exchange
 A window in ImJoy can contain data, e.g. an image. When selecting such a window
 and executing a plugin, the contained data will be transferred to the Python plugin.
-A plugin can then process the data within the `run` function, by accessing `my.data`.
+A plugin can then process the data within the `run` function, by accessing `ctx.data`.
 The results will be sent back to the ImJoy workspace and displayed as a new window.
 
 Natively, ImJoy supports the conversion and transmission of Numpy arrays and
@@ -718,17 +718,17 @@ Potentially, you can send large files in smaller chunks but this is not optimal 
 may block normal communication between the engine and the ImJoy app. We recommend to store the data on the disk (in the workspace directory for example), then use `api.getFileUrl` to generate an url to access the file. The generated url can then be send to the web App and accessed with a download link or using JavaScript libraries such as `axios`. Many libraries such as Three.js, Vega etc. can load files through url directly.
 
 ### Plugin during runtime
-When executing a plugin, it can access different fields from `my`:
+When executing a plugin, it can access different fields from `ctx`:
 
- * `my.config`
+ * `ctx.config`
     The config values from the GUI defined with the `ui` string (from the plugin `<config>` block
-    or from a separate operation `api.register`, more below). For example, if you defined an ui string (e.g. `"ui": "option {id: 'opt1', type: 'number'}"`) in the plugin `<config>`, you can access it through `my.config.opt1`.
+    or from a separate operation `api.register`, more below). For example, if you defined an ui string (e.g. `"ui": "option {id: 'opt1', type: 'number'}"`) in the plugin `<config>`, you can access it through `ctx.config.opt1`.
 
- * `my.data`
+ * `ctx.data`
      It stores the data from current active window and state for running the plugin.
 
- * `my._variables`
-     When the plugin is executed in a workflow, variables will be set in the workflow will be passed as `my._variables`. It will be set to the actual variable value if the user used ops such as `Set [number]`.
+ * `ctx._variables`
+     When the plugin is executed in a workflow, variables will be set in the workflow will be passed as `ctx._variables`. It will be set to the actual variable value if the user used ops such as `Set [number]`.
 
 You can directly return your result and they will show as a generic result window.
 
@@ -745,22 +745,22 @@ ImJoy uses postMessage to exchange data between plugins. This means that for Jav
 plugins, objects are cloned during the transfer. If large objects are exchanged,
 if the created objects are not directly transferred. To enable that, you can
 add `_transfer=true` to your object when you return it. In the above
-example, you can set `my._transfer = true` when you return `my`. However, it will
+example, you can set `ctx._transfer = true` when you return `ctx`. However, it will
 only speed up the transferring of `ArrayBuffers` or `ArrayBufferViews` (and also
 ndarrays produced by Python), and after transferring, you won't be able to access it.
 
-(**Note**: in Python, the data type of `my` is a dictionary, ImJoy added the interface for allowing dot notation, just like in JavaScript. If you prefer, you can also use `[]` in both languages to access dictionary or object.)
+(**Note**: in Python, the data type of `ctx` is a dictionary, ImJoy added the interface for allowing dot notation, just like in JavaScript. If you prefer, you can also use `[]` in both languages to access dictionary or object.)
 
 <!-- ## Advanced options -->
 
 ### Workflow management
-We provide additional fields in `my` that allow to track, maintain and reconstruct an entire analysis workflow.
+We provide additional fields in `ctx` that allow to track, maintain and reconstruct an entire analysis workflow.
 
-* `my._op`
-    Give the name of the op which is being executing. When a plugin registered for multiple ops and no callback function was specified for the op, the `run` function will be called, and you can use `my._op` to determine which op is being executing.
-* `my._source_op`
+* `ctx._op`
+    Give the name of the op which is being executing. When a plugin registered for multiple ops and no callback function was specified for the op, the `run` function will be called, and you can use `ctx._op` to determine which op is being executing.
+* `ctx._source_op`
     Give the name of the op which initiated current execution.
-* `my._workflow_id`
+* `ctx._workflow_id`
     When the plugin is executed in a workflow, its id will be passed here. When the plugin is executed from the plugin menu, ImJoy will try to reuse the workflow id in the current active window, if no window is active, a new workflow id will be assigned. All the data window with the same `_workflow_id` is virtually connected in a pipeline or computational graph. By combining `_workflow_id` with `_op` and `_source_op`,
 
  Importantly, `_workflow_id`, `_variables`, `_op` and `_source_op` can be used to implement interactivity between plugins, meaning if the user changed a state in one of the result window, the downstream workflow will be updated automatically.
@@ -1043,9 +1043,9 @@ The following url parameters are currently supported:
       use the `raw` link to the `manifest.imjoy.json` file.
 
  *   `start` or `s`: define a startup plugin name which will be started automatically after ImJoy web app loaded.
-      All the url parameters will be passed to the plugin as `my.config` to the `run(my)` function. This allows you to add customized arguments and use them in `run(my)`. For example, a plugin can load an image automatically with `load=URL` and set the width and height of the image with, for example, `width=1024&height=2048`. For example, pass `123` to the `run` function of the plugin as `my.data.x`: `https://imjoy.io/#/app?x=123&start=AwesomePlugin`.
+      All the url parameters will be passed to the plugin as `ctx.config` to the `run(ctx)` function. This allows you to add customized arguments and use them in `run(ctx)`. For example, a plugin can load an image automatically with `load=URL` and set the width and height of the image with, for example, `width=1024&height=2048`. For example, pass `123` to the `run` function of the plugin as `ctx.data.x`: `https://imjoy.io/#/app?x=123&start=AwesomePlugin`.
 
- *   `load` or `l`: define an URL for making a http GET request, this parameter should only used when you defined a startup plugin with `start` or `s`. The data fetched from the URL will be passed to the startup plugin `run(my)` function as `my.data.loaded`.
+ *   `load` or `l`: define an URL for making a http GET request, this parameter should only used when you defined a startup plugin with `start` or `s`. The data fetched from the URL will be passed to the startup plugin `run(ctx)` function as `ctx.data.loaded`.
 
 
 ### Distribute plugins with custom libraries
