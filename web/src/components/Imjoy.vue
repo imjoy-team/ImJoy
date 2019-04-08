@@ -1519,9 +1519,11 @@ export default {
           this.showPluginDialog = true
           this.pm.createWindow(null, config).then((api)=>{
             const _close = api.close
+            this.plugin_dialog_promise = [api.close, api.close]
             api.close = async ()=>{
               await _close()
               this.showPluginDialog = false
+              this.plugin_dialog_promise = null
             }
             resolve(api)
           }).catch(reject)
