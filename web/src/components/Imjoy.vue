@@ -808,12 +808,14 @@ export default {
         this.menuVisible = true
         const selected_workspace = this.$route.query.workspace || this.$route.query.w || workspace_list[0]
         await this.pm.loadWorkspace(selected_workspace)
+        const plugin_loading = this.pm.reloadPlugins(true)
         try {
           await this.em.connectAll(true)
         } catch (e) {
           console.error(e)
         }
-        await this.pm.reloadPlugins()
+        await plugin_loading
+
         this.plugin_loaded = true
         this.$forceUpdate()
         this.event_bus.$emit('plugins_loaded', this.pm.plugins)

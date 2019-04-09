@@ -485,7 +485,7 @@ export class PluginManager {
     }
   }
 
-  reloadPlugins() {
+  reloadPlugins(skip_python_plugins) {
     return new Promise((resolve, reject) => {
       if (this.plugins) {
         for (let k in this.plugins) {
@@ -519,10 +519,12 @@ export class PluginManager {
             } else {
               config.installed = true
               this.installed_plugins.push(config)
-              this.reloadPlugin(config).catch((e)=>{
-                console.error(config, e)
-                this.showMessage(`<${config.name}>: ${e.toString()}`)
-              })
+              if(skip_python_plugins && config.type === 'native-python'){
+                this.reloadPlugin(config).catch((e)=>{
+                  console.error(config, e)
+                  this.showMessage(`<${config.name}>: ${e.toString()}`)
+                })
+              }
             }
           }
           resolve()
@@ -829,11 +831,12 @@ export class PluginManager {
   }
 
   reloadPythonPlugins(engine){
+
     for(let p of this.installed_plugins){
       if(p.type === 'native-python' && p.engine_mode === engine.id){
         this.reloadPlugin(p)
       }
-      else if(p.type === 'native-python' && p.engine_mode === 'auto' && (!p.plugin || p.plugin._unloaded)){
+      else if(p.type === 'native-python' && (!p.engine_mode || p.engine_mode === 'auto') && (!p.plugin || p.plugin._unloaded)){
         this.reloadPlugin(p)
       }
     }
