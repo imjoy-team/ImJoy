@@ -485,7 +485,7 @@ export class PluginManager {
     }
   }
 
-  reloadPlugins(skip_python_plugins) {
+  reloadPlugins() {
     return new Promise((resolve, reject) => {
       if (this.plugins) {
         for (let k in this.plugins) {
@@ -519,12 +519,10 @@ export class PluginManager {
             } else {
               config.installed = true
               this.installed_plugins.push(config)
-              if(config.type !== 'native-python' || !skip_python_plugins){
-                this.reloadPlugin(config).catch((e)=>{
-                  console.error(config, e)
-                  this.showMessage(`<${config.name}>: ${e.toString()}`)
-                })
-              }
+              this.reloadPlugin(config).catch((e)=>{
+                console.error(config, e)
+                this.showMessage(`<${config.name}>: ${e.toString()}`)
+              })
             }
           }
           resolve()
