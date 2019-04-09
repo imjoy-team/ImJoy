@@ -519,7 +519,7 @@ export class PluginManager {
             } else {
               config.installed = true
               this.installed_plugins.push(config)
-              if(skip_python_plugins && config.type === 'native-python'){
+              if(config.type !== 'native-python' || !skip_python_plugins){
                 this.reloadPlugin(config).catch((e)=>{
                   console.error(config, e)
                   this.showMessage(`<${config.name}>: ${e.toString()}`)
