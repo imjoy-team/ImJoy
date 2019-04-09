@@ -917,15 +917,19 @@ api.setConfig('sigma', 928)
 answer = await api.showDialog(config)
 ```
 
-Show a dialog with customized GUI.
+Show a window or customized GUI as a dialog.
 
-The answer is stored in the returned object, and can be retrieved with the specified `id`. To consider the case when the user presses `cancel`, you can use the `try catch` (JavaScript) or `try except` (Python) syntax.
+Similar to `api.createWindow`, you can pass an object `{"type": "WINDOW_PLUGIN_NAME", "name": "new dialog", "config": {...}, "data": {...}}`. This will show the window plugin instance as a dialog. The dialog can be closed programmatically with `win.close()` or by the user with the close button.
+
+For a simple dialog with joy ui, you can pass `{"type": "joy", "name": "new dialog", "config": {...}, "data": {...}}`. The answer is stored in the returned object, and can be retrieved with the specified `id`. To consider the case when the user presses `cancel`, you can use the `try catch` (JavaScript) or `try except` (Python) syntax.
 
 **Arguments**
 * **config**. Object (JavaScript) or dictionary (Python). Specifies the dialog.
     Contains following fields:
     - `name`: String. Title of dialog.
-    - `ui`: String. Specifies appearance of GUI. Defined with the same rule as the `ui` field in `<config>`. Defined name in `id` is used to retrieve answer.
+    - `type`: String. Type of the dialog (use the window plugin name or `joy`).
+
+If `type="joy"`, you need to provide `ui` which is defined with the same rule as the `ui` field in `<config>`. Otherwise, you need to provide `config` and `data` as `api.createWindow`.
 
 (Please also consult [this section](api?id=input-arguments) for how arguments can be set.)
 
