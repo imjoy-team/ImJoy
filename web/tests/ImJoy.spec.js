@@ -37,7 +37,7 @@ describe('ImJoy.vue', async () => {
   })
 
   it('should include "Deploying Deep Learning Made Easy!"', async () => {
-    expect(wrapper.text()).to.include('Python Plugin Engine')
+    expect(wrapper.text()).to.include('Deploying Deep Learning Made Easy!')
   })
 
   it('should load default repositories', async () => {

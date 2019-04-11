@@ -47,55 +47,9 @@
         <md-button class="md-icon-button" href="/docs/" target="_blank">
           <md-icon>help</md-icon>
         </md-button>
-        <md-button v-if="!em.connected" @click="showPluginEngineInfo = true" class="md-icon-button md-accent">
-          <md-icon>🚀</md-icon>
-          <md-tooltip>Connect to the Plugin Engine</md-tooltip>
-        </md-button>
-        <md-menu v-else md-size="big" md-direction="bottom-end">
-          <md-button class="md-icon-button" :class="em.connected?'md-primary':'md-accent'" md-menu-trigger @click="em.updateEngineStatus()">
-            <md-icon>{{em.connected?'sync':'sync_disabled'}}</md-icon>
-            <md-tooltip>Connection to the Plugin Engine</md-tooltip>
-          </md-button>
-          <md-menu-content>
-            <md-menu-item :disabled="true">
-              <span>🚀{{em.engine_status.connection}}</span>
-            </md-menu-item>
-            <md-menu-item @click="showPluginEngineInfo=true">
-              <md-icon>info</md-icon>
-              <span>About Plugin Engine</span>
-            </md-menu-item>
-            <md-menu-item>
-              <md-icon>autorenew</md-icon>
-              <a :href="em.engine_status.url" target="_blank">{{em.engine_status.url}}</a>
-            </md-menu-item>
-            <md-menu-item @click="em.disconnectEngine()">
-              <md-icon>clear</md-icon>
-              <span>Disconnect</span>
-            </md-menu-item>
-            <md-divider></md-divider>
-            <md-menu-item :disabled="true">
-              <span>Plugin Engine Processes</span>
-              <md-button @click.stop="em.updateEngineStatus()" class="md-icon-button md-primary">
-                <md-icon>autorenew</md-icon>
-              </md-button>
-            </md-menu-item>
-            <md-menu-item v-for="p in em.engine_status.plugin_processes" :key="p.pid">
-              <md-button @click.stop="em.killPluginProcess(p)" class="md-icon-button md-accent">
-                <md-icon>clear</md-icon>
-              </md-button>
-              {{p.name}} (#{{p.pid}})
-            </md-menu-item>
-            <md-menu-item :disabled="true" v-if="em.engine_status.plugin_num>1">
-              <span>{{em.engine_status.plugin_num}} Running Plugins</span>
-              <md-button @click.stop="em.killPluginProcess()" class="md-icon-button md-accent">
-                <md-icon>clear</md-icon>
-              </md-button>
-            </md-menu-item>
-            <md-menu-item :disabled="true" v-if="em.engine_status.plugin_num===0">
-              <span> No plugin process is running</span>
-            </md-menu-item>
-          </md-menu-content>
-        </md-menu>
+
+        <engine-control-panel :engine-manager="em" :show-dialog.sync="showPluginEngineInfo" />
+
       </div>
       <form v-show="false" ref="folder_form">
         <input class="md-file" type="file" @change="selectFileChanged" ref="folder_select" webkitdirectory mozdirectory msdirectory odirectory directory multiple />
@@ -143,9 +97,9 @@
               <md-icon>folder_open</md-icon><span class="md-xsmall-hide">Files</span>
             </md-button>
             <md-menu-content>
-              <md-menu-item v-if="em.connected" @click="showEngineFileDialog(); files_expand=false" class="md-button">
+              <md-menu-item @click="showEngineFileDialog(); files_expand=false" class="md-button">
                 <md-icon>add_to_queue</md-icon>Open Engine File
-                <md-tooltip>Load files through the Plugin Engine</md-tooltip>
+                <md-tooltip>Load files through Plugin Engine</md-tooltip>
               </md-menu-item>
               <md-menu-item @click="$refs.file_form.reset();$refs.file_select.click(); files_expand=false" class="md-button">
                 <md-icon>insert_drive_file</md-icon>Open File
@@ -229,12 +183,24 @@
                 <md-menu-item class="md-accent" @click="plugin2_remove=plugin;showRemoveConfirmation=true">
                   <md-icon>delete_forever</md-icon>Remove
                 </md-menu-item>
+                <md-divider></md-divider>
+                <md-menu-item @click="switchEngine(plugin)">
+                  <span v-if="plugin.config.engine_mode==='auto'">✅</span><span v-else>🚀</span><span :class="plugin.config.engine_mode==='auto'? 'bold':''">Auto</span>
+                </md-menu-item>
+                <md-menu-item v-for="engine in em.engines" :key="engine.id" @click="switchEngine(plugin, engine)">
+                  <span v-if="plugin.config.engine_mode===engine.id">✅</span><span v-else>🚀</span><span :class="plugin.config.engine&&plugin.config.engine.id===engine.id? 'bold':''">{{engine.name}}</span>
+                </md-menu-item>
+                <md-divider></md-divider>
+                <md-menu-item v-for="tag in plugin.config.tags" :key="tag" @click="switchTag(plugin, tag)">
+                  <span v-if="plugin.config.tag===tag">✅</span><span v-else>🔖</span><span :class="plugin.config.tag===tag? 'bold':''">Tag: {{tag}}</span>
+                </md-menu-item>
               </md-menu-content>
             </md-menu>
 
             <md-button class="joy-run-button" :class="plugin.running?'md-accent':(plugin._disconnected && plugin.type === 'native-python'? 'disconnected-plugin': 'md-primary')" :disabled="plugin._disconnected && plugin.type != 'native-python'" @click="plugin._disconnected?connectPlugin(plugin):runOp(plugin.ops[plugin.name])">
               {{plugin.type === 'native-python'? plugin.name + ' 🚀': ( plugin.type === 'web-python' ? plugin.name + ' 🐍': plugin.name) }}
             </md-button>
+
 
             <md-button v-if="plugin._log_history && plugin._log_history.length>0" class="md-icon-button md-xsmall-hide" @click="showLog(plugin)">
               <md-icon v-if="plugin._log_history._error" class="red">error</md-icon>
@@ -322,14 +288,18 @@
   </md-app>
 
   <md-dialog-confirm :md-active.sync="showRemoveConfirmation" md-title="Removing Plugin" md-content="Do you really want to <strong>delete</strong> this plugin" md-confirm-text="Yes" md-cancel-text="Cancel" @md-cancel="showRemoveConfirmation=false" @md-confirm="pm.removePlugin(plugin2_remove);plugin2_remove=null;showRemoveConfirmation=false"/>
-  <file-dialog ref="file-dialog" :list-files="listEngineDir" :get-file-url="getFileUrl"></file-dialog>
-  <md-dialog :md-active.sync="showPluginDialog" :md-click-outside-to-close="false" :md-close-on-esc="false">
+  <file-dialog ref="file-dialog" :engines="em.engines" :list-files="listFiles" :get-file-url="getFileUrl"></file-dialog>
+  <md-dialog :class="plugin_dialog_config && plugin_dialog_config.ui?'':'window-dialog'" :md-active.sync="showPluginDialog" :md-click-outside-to-close="false" :md-close-on-esc="false">
+    <md-dialog-actions v-if="!plugin_dialog_config || !plugin_dialog_config.ui">
+      <md-button class="md-accent" @click="closePluginDialog(true)"><md-icon>clear</md-icon></md-button>
+    </md-dialog-actions>
     <md-dialog-content>
-      <div v-if="plugin_dialog_config">
+      <div v-if="plugin_dialog_config && plugin_dialog_config.ui">
         <joy :config="plugin_dialog_config" :showHeader="false" :controlButtons="false" ref="plugin_dialog_joy"></joy>
       </div>
+      <div v-else id="window_dialog_container" class="plugin-iframe" />
     </md-dialog-content>
-    <md-dialog-actions>
+    <md-dialog-actions v-if="plugin_dialog_config && plugin_dialog_config.ui">
       <md-button class="md-primary" @click="closePluginDialog(true)">OK</md-button>
       <md-button class="md-primary" @click="closePluginDialog(false)">Cancel</md-button>
     </md-dialog-actions>
@@ -386,34 +356,6 @@
       :md-content="share_url_message"
       md-confirm-text="Close" />
 
-  <md-dialog :md-active.sync="showPluginEngineInfo" :md-click-outside-to-close="false" :md-close-on-esc="false">
-    <md-dialog-title>Using the Python Plugin Engine</md-dialog-title>
-    <md-dialog-content>
-        <p>
-          Python plugins are supported by ImJoy with the Python Plugin Engine. <br><br>
-          If this is your first time to use ImJoy Plugin Engine, please <a href="https://github.com/oeway/ImJoy-App/releases" target="_blank">click here</a> to download the ImJoy Desktop App.
-          <br> If you have it already, please start the Plugin Engine, and connect to it.<br>
-        </p>
-        <md-autocomplete v-model="engine_url" :md-options="engine_url_list" @keyup.enter="em.connectEngine(engine_url, connection_token)" name="engine_url">
-          <label for="engine_url">Plugin Engine URL</label>
-        </md-autocomplete>
-        <md-field>
-          <label for="connection_token">Connection Token</label>
-          <md-input type="password" v-model="connection_token" @keyup.enter="em.connectEngine(engine_url, connection_token)" name="connection_token"></md-input>
-        </md-field>
-        <p>&nbsp;{{em.engine_status.connection}}</p>
-        <p>
-          If you failed to install or start the Plugin Engine, please consult <a href="https://github.com/oeway/ImJoy-Engine" target="_blank">here</a>, and choose the alternative solution.<br>
-        </p>
-        <!-- <p v-if="is_https_mode">Please notice that, browsers such as Safari do not allow the connection form a `https` website to the Plugin Engine, in that case please <a href="http://imjoy.io/#/app" target="_blank">Switch to HTTP version</a> of ImJoy. </p> -->
-        <!-- <p v-if="is_https_mode">Also notice that data and settings of ImJoy in the HTTP version and HTTPS version are not shared.</p> -->
-    </md-dialog-content>
-    <md-dialog-actions>
-      <md-button class="md-primary" @click="showPluginEngineInfo=false;">Cancel</md-button>
-      <md-button class="md-primary" @click="showPluginEngineInfo=false; em.connectEngine(engine_url, connection_token)">Connect</md-button>
-    </md-dialog-actions>
-  </md-dialog>
-
   <md-dialog style="max-width: 800px; width: 100%; height: 100%;" :md-active.sync="showAboutDialog" :md-click-outside-to-close="false" :md-close-on-esc="false">
     <md-dialog-title>About ImJoy</md-dialog-title>
     <md-dialog-content>
@@ -443,7 +385,7 @@
           <div class="md-title">Installed Plugins</div>
         </md-card-header>
         <md-card-content>
-          <plugin-list display="list" name="Installed Plugins" description="" :plugin-manager="pm" @message="showMessage" :plugins="pm.installed_plugins" :workspace="pm.selected_workspace"></plugin-list>
+          <plugin-list display="list" name="Installed Plugins" description="" v-if="pm" :plugin-manager="pm" @message="showMessage" :plugins="pm.installed_plugins" :workspace="pm.selected_workspace"></plugin-list>
         </md-card-content>
       </md-card>
       <md-card  v-if="show_plugin_url">
@@ -470,14 +412,14 @@
             </div>
             <div v-if="tag4install" class="md-toolbar-section-end">
               <md-button class="md-button md-primary" @click="installPlugin(plugin4install, tag4install)">
-                <md-icon>cloud_download</md-icon>Install
+                <md-icon>cloud_download</md-icon>{{plugin4install._installation_text || 'Install'}}
                 <md-tooltip>Install {{plugin4install.name}} (tag=`{{tag4install}}`)</md-tooltip>
               </md-button>
             </div>
             <div v-else class="md-toolbar-section-end">
               <md-menu v-if="plugin4install.tags && plugin4install.tags.length>0">
                 <md-button class="md-button md-primary" md-menu-trigger>
-                  <md-icon>cloud_download</md-icon>Install
+                  <md-icon>cloud_download</md-icon>{{plugin4install._installation_text || 'Install'}}
                   <md-tooltip>Choose a tag to install {{plugin4install.name}}</md-tooltip>
                 </md-button>
                 <md-menu-content>
@@ -487,7 +429,7 @@
                 </md-menu-content>
               </md-menu>
               <md-button v-else  class="md-button md-primary" @click="installPlugin(plugin4install)">
-                <md-icon>cloud_download</md-icon>Install
+                <md-icon>cloud_download</md-icon>{{plugin4install._installation_text || 'Install'}}
               </md-button>
             </div>
           </md-toolbar>
@@ -518,7 +460,7 @@
           </md-chips>
         </md-card-header>
         <md-card-content>
-          <plugin-list @message="showMessage" :plugin-manager="pm" :init-search="init_plugin_search" display="list" :plugins="pm.available_plugins" :workspace="pm.selected_workspace"></plugin-list>
+          <plugin-list @message="showMessage" v-if="pm" :plugin-manager="pm" :init-search="init_plugin_search" display="list" :plugins="pm.available_plugins" :workspace="pm.selected_workspace"></plugin-list>
         </md-card-content>
       </md-card>
     </md-dialog-content>
@@ -534,6 +476,7 @@
 import Vue from 'vue';
 import { saveAs } from 'file-saver';
 import axios from 'axios';
+import PouchDB from 'pouchdb-browser';
 
 import WEB_WORKER_PLUGIN_TEMPLATE from '../plugins/webWorkerTemplate.imjoy.html';
 import NATIVE_PYTHON_PLUGIN_TEMPLATE from '../plugins/nativePythonTemplate.imjoy.html';
@@ -545,6 +488,7 @@ import {
   url_regex,
   assert,
   _clone,
+  compareVersions
 } from '../utils.js'
 
 import {
@@ -556,6 +500,7 @@ import {
 } from '../windowManager.js'
 
 import {
+  Engine,
   EngineManager
 } from '../engineManager.js'
 
@@ -614,10 +559,6 @@ export default {
       show_installed_plugins: false,
       progress: 0,
       status_text: '',
-      engine_url: 'http://127.0.0.1:9527',
-      engine_url_list: ['http://127.0.0.1:9527'],
-      connection_token: null,
-      engine_session_id: null,
       showPluginEngineInfo: false,
       showWorkspaceDialog: false,
       showWelcomeDialog: false,
@@ -673,10 +614,14 @@ export default {
       }
     }
 
-    this.em = new EngineManager({ event_bus: this.event_bus, show_message_callback: this.showMessage, show_engine_callback: this.showEngineConnection.bind(this)})
-    this.wm = new WindowManager({ event_bus: this.event_bus, show_message_callback: this.showMessage, add_window_callback: this.addWindow})
+    const config_db = new PouchDB('imjoy_config', {
+      revs_limit: 2,
+      auto_compaction: true
+    })
+    this.em = new EngineManager({ event_bus: this.event_bus, config_db: config_db, show_message_callback: this.showMessage, show_engine_callback: this.showEngineConnection.bind(this)})
+    this.wm = new WindowManager({ event_bus: this.event_bus, show_message_callback: this.showMessage, add_window_callback: this.addWindowCallback})
     this.fm = new FileSystemManager()
-    this.pm = new PluginManager({ event_bus: this.event_bus, engine_manager: this.em, window_manager:this.wm, file_system_manager: this.fm, imjoy_api: imjoy_api, show_message_callback: this.showMessage, update_ui_callback: ()=>{this.$forceUpdate()}})
+    this.pm = new PluginManager({ event_bus: this.event_bus, config_db: config_db, engine_manager: this.em, window_manager:this.wm, file_system_manager: this.fm, imjoy_api: imjoy_api, show_message_callback: this.showMessage, update_ui_callback: ()=>{this.$forceUpdate()}})
 
     this.client_id = null
     this.IMJOY_PLUGIN = {
@@ -790,11 +735,12 @@ export default {
       //update the joy workflow if new template added, TODO: preserve settings during reload
       if (this.$refs.workflow && this.$refs.workflow.setupJoy) this.$refs.workflow.setupJoy()
     })
-    this.event_bus.$on('engine_connected', ()=>{
-      this.pm.reloadPythonPlugins()
+    this.event_bus.$on('engine_connected', (engine)=>{
+      if(this.pm)
+      this.pm.reloadPythonPlugins(engine)
     })
-    this.event_bus.$on('engine_disconnected', ()=>{
-      this.pm.unloadPythonPlugins()
+    this.event_bus.$on('engine_disconnected', (engine)=>{
+      if(this.pm) this.pm.unloadPythonPlugins(engine)
     })
 
     this.updateSize({width: window.innerWidth})
@@ -807,23 +753,19 @@ export default {
       this.client_id = 'imjoy_web_'+randId()
       localStorage.setItem("imjoy_client_id", this.client_id);
     }
-    this.engine_session_id = randId()
+
+    let connection_token = null
     if(this.$route.query.token || this.$route.query.t){
-      this.connection_token = (this.$route.query.token || this.$route.query.t).trim()
+      connection_token = (this.$route.query.token || this.$route.query.t).trim()
       const query = Object.assign({}, this.$route.query);
       delete query.token;
       delete query.t;
       this.$router.replace({ query });
     }
-    else{
-      this.connection_token = localStorage.getItem("imjoy_connection_token")
-    }
 
     if(this.$route.query.engine || this.$route.query.e){
-      this.engine_url = (this.$route.query.engine || this.$route.query.e).trim()
-    }
-    else{
-      this.engine_url = localStorage.getItem("imjoy_engine_url") || 'http://127.0.0.1:9527'
+      const engine_url = (this.$route.query.engine || this.$route.query.e).trim()
+      this.em.addEngine({type: 'default', url: engine_url, token: connection_token})
     }
 
     if(this.welcome){
@@ -866,8 +808,13 @@ export default {
         this.menuVisible = true
         const selected_workspace = this.$route.query.workspace || this.$route.query.w || workspace_list[0]
         await this.pm.loadWorkspace(selected_workspace)
-        this.em.connectEngine(this.engine_url, this.connection_token, true)
+        const connections = this.em.connectAll(true)
         await this.pm.reloadPlugins()
+        try {
+          await connections
+        } catch (e) {
+          console.error(e)
+        }
         this.plugin_loaded = true
         this.$forceUpdate()
         this.event_bus.$emit('plugins_loaded', this.pm.plugins)
@@ -964,7 +911,7 @@ export default {
                 }
               }
               //load data
-              if(this.pm.registered.windows[pname] || pname.startsWith('imjoy/')){
+              if(!this.showAddPluginDialog && (this.pm.registered.windows[pname] || pname.startsWith('imjoy/'))){
                 try {
                   const template = this.pm.registered.windows[pname] || {}
                   const c = _clone(template.defaults) || {}
@@ -1007,7 +954,7 @@ export default {
       }
       this.$forceUpdate()
     },
-    addWindow(w) {
+    addWindowCallback(w) {
       return new Promise((resolve, reject) => {
         try {
           w.refresh = ()=>{ this.$forceUpdate() }
@@ -1080,10 +1027,22 @@ export default {
         }
       }
     },
+    switchEngine(plugin, engine){
+      plugin.config.engine_mode = (engine && engine.id) || 'auto';
+      this.pm.savePlugin(plugin.config).then((p)=>{this.pm.reloadPlugin(p)}).catch((e)=>{
+        this.showMessage('Failed to save settings: '+e.toString())
+      })
+    },
+    switchTag(plugin, tag){
+      plugin.config.tag = tag;
+      this.pm.savePlugin(plugin.config).then((p)=>{this.pm.reloadPlugin(p)}).catch((e)=>{
+        this.showMessage('Failed to save settings: '+e.toString())
+      })
+    },
     connectPlugin(plugin){
       if(plugin._disconnected){
-        if(plugin.type === 'native-python' && !this.em.connected){
-          this.em.connectEngine(this.engine_url, this.connection_token)
+        if(plugin.type === 'native-python' && plugin.config.engine && !plugin.config.engine.connected){
+          plugin.config.engine.connect()
         }
         else{
           this.pm.reloadPlugin(plugin.config)
@@ -1096,6 +1055,14 @@ export default {
       this.downloading_plugin = true
       try {
         const config = await this.pm.getPluginFromUrl(plugin_url)
+        if(this.pm.plugin_names[config.name]){
+          if(compareVersions(config.version, ">", this.pm.plugin_names[config.name].config.version)){
+            config._installation_text = 'Upgrade'
+          }
+          else if(compareVersions(config.version, "<", this.pm.plugin_names[config.name].config.version)){
+            config._installation_text = 'Downgrade'
+          }
+        }
         this.plugin4install = config
         this.tag4install = config.tag
         this.downloading_plugin = false
@@ -1209,9 +1176,6 @@ export default {
         console.error('permission handler not found.')
       }
     },
-    listEngineDir(path, type, recursive){
-      return this.em.listEngineDir(path, type, recursive)
-    },
     showDoc(pid) {
       const plugin = this.pm.plugins[pid]
       const pconfig = plugin.config
@@ -1310,13 +1274,15 @@ export default {
     },
     closePluginDialog(ok) {
       this.showPluginDialog = false
-      let [resolve, reject] = this.plugin_dialog_promise
-      if (ok) {
-        resolve(this.$refs.plugin_dialog_joy.joy.get_config())
-      } else {
-        reject()
+      if(this.plugin_dialog_promise){
+        let [resolve, reject] = this.plugin_dialog_promise
+        if (ok) {
+          resolve(this.$refs.plugin_dialog_joy.joy.get_config())
+        } else {
+          reject()
+        }
+        this.plugin_dialog_promise = null
       }
-      this.plugin_dialog_promise = null
     },
     loadFiles(selected_files) {
       console.log(selected_files)
@@ -1365,16 +1331,7 @@ export default {
       mw.target._source_op = null
       // mw.target._transfer = true
       mw.target._workflow_id = mw.target._workflow_id || "workflow_"+randId()
-      joy.workflow.execute(mw.target).then((my) => {
-        const w = this.pm.joy2plugin(my)
-        if(w && w.data && Object.keys(w.data).length>2){
-          // console.log('result', w)
-          w.name = w.name || 'result'
-          w.type = w.type || 'imjoy/generic'
-          this.pm.createWindow(null, w)
-        }
-        this.progress = 100
-      }).catch((e) => {
+      joy.workflow.execute(mw.target).catch((e) => {
         console.error(e)
         this.showMessage(e.toString() || "Error." , 12)
       })
@@ -1390,6 +1347,9 @@ export default {
       this.showShareUrl = true
     },
     runOp(op) {
+      if(!op || !op.name){
+        throw "op not found."
+      }
       this.status_text = ''
       this.progress = 0
       const w = this.wm.active_windows[this.wm.active_windows.length - 1] || {}
@@ -1401,7 +1361,7 @@ export default {
       mw.target._workflow_id = mw.target._workflow_id || "op_"+op.name.trim().replace(/ /g, '_')+randId()
       op.joy.__op__.execute(mw.target).then((my) => {
         const w = this.pm.joy2plugin(my)
-        if (w) {
+        if (w && !my.__jailed_type__) {
           w.name = w.name || 'result'
           w.type = w.type || 'imjoy/generic'
           this.pm.createWindow(null, w)
@@ -1435,12 +1395,16 @@ export default {
       this.show_snackbar = true
       this.$forceUpdate()
     },
+    listFiles(engine, path, type, recursive){
+      if(engine){
+        return engine.listFiles(path, type, recursive)
+      }
+      else{
+        throw "No plugin engine selected."
+      }
+    },
     showFileDialog(_plugin, options){
       options = options || {}
-      if(!this.em.connected){
-        this.showMessage('File Dialog requires the plugin engine, please connect to the plugin engine.')
-        throw "Please connect to the Plugin Engine 🚀."
-      }
       if(_plugin && _plugin.id){
         options.root = options.root || (_plugin.config && _plugin.config.work_dir)
 
@@ -1456,9 +1420,14 @@ export default {
         return this.$refs['file-dialog'].showDialog(_plugin, options)
       }
     },
-    getFileUrl(_plugin, path){
+    getFileUrl(_plugin, config){
+      if(typeof config === 'string'){
+        throw "You must pass an object contains keys named `path` and `engine`"
+      }
+      config.engine = config.engine instanceof Engine ? config.engine: this.em.engines[config.engine]
+      const engine = config.engine || this.em.engines[0]
       return new Promise((resolve, reject) => {
-        if(!this.em.connected){
+        if(!engine.connected){
           reject("Please connect to the Plugin Engine 🚀.")
           this.showMessage("Please connect to the Plugin Engine 🚀.")
           return
@@ -1472,12 +1441,8 @@ export default {
           return
         }
         if(!this.showPermissionConfirmation){
-          let config = path
-          if(typeof path === 'string'){
-            config = {path: path}
-          }
           const resolve_permission = ()=>{
-            this.em.getFileUrl(config).then((ret)=>{
+            engine.getFileUrl(config).then((ret)=>{
               if(ret.success){
                 resolve(ret.url)
                 this.$forceUpdate()
@@ -1504,18 +1469,19 @@ export default {
         }
       })
     },
-    getFilePath(_plugin, url){
+    getFilePath(_plugin, config){
+      if(typeof config === 'string'){
+        throw "You must pass an object contains keys named `url` and `engine`"
+      }
+      config.engine = config.engine instanceof Engine ? config.engine: this.em.engines[config.engine]
+      const engine = config.engine || this.em.engines[0]
       return new Promise((resolve, reject) => {
-        if(!this.em.connected){
+        if(!engine.connected){
           reject("Please connect to the Plugin Engine 🚀.")
           this.showMessage("Please connect to the Plugin Engine 🚀.")
           return
         }
-        let config = url
-        if(typeof url === 'string'){
-          config = {url: url}
-        }
-        this.em.getFilePath(config).then((ret)=>{
+        engine.getFilePath(config).then((ret)=>{
           if(ret.success){
             resolve(ret.path)
             this.$forceUpdate()
@@ -1543,9 +1509,29 @@ export default {
     showDialog(_plugin, config) {
       assert(config)
       return new Promise((resolve, reject) => {
-        this.plugin_dialog_config = config
-        this.showPluginDialog = true
-        this.plugin_dialog_promise = [resolve, reject]
+        if(config.ui){
+          this.plugin_dialog_config = config
+          this.showPluginDialog = true
+          this.plugin_dialog_promise = [resolve, reject]
+        }
+        else if(config.type){
+          config.window_container = 'window_dialog_container'
+          this.plugin_dialog_promise = null
+          this.showPluginDialog = true
+          this.pm.createWindow(null, config).then((api)=>{
+            const _close = api.close
+            this.plugin_dialog_promise = [api.close, api.close]
+            api.close = async ()=>{
+              await _close()
+              this.showPluginDialog = false
+              this.plugin_dialog_promise = null
+            }
+            resolve(api)
+          }).catch(reject)
+        }
+        else{
+          this.showMessage('Unsupported dialog type.')
+        }
       })
     },
     showAlert(_plugin, text){
@@ -1640,6 +1626,10 @@ export default {
     width: 100%;
     max-width: 800px;
   }
+  .window-dialog {
+    width: 100%!important;
+    max-width: 800px;
+  }
 }
 
 @media screen and (max-height: 900px) {
@@ -1648,6 +1638,27 @@ export default {
   }
 }
 
+@media screen and (max-height: 700px) {
+  .window-dialog {
+    height: 100%!important;
+    min-height: 100%;
+  }
+}
+
+.window-dialog {
+  margin: 0px;
+  min-width: 400px;
+  min-height: 500px;
+  width: 95%;
+  height: 95%;
+  max-width: 1000px;
+  max-height: 900px;
+}
+
+#window_dialog_container{
+  height: 100%;
+  width: 100%;
+}
 .md-card {
   /* width: 100%; */
   /* height: 300px; */
@@ -1837,5 +1848,9 @@ button.md-speed-dial-target {
   display: inline-block;
   color: #f44336!important;
   transition: .3s;
+}
+
+.bold{
+  font-weight: bold;
 }
 </style>

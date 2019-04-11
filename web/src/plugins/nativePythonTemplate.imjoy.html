@@ -7,7 +7,7 @@
   "name": "Untitled Plugin",
   "type": "native-python",
   "version": "0.1.0",
-  "api_version": "0.1.2",
+  "api_version": "0.1.3",
   "description": "[TODO: describe this plugin with one sentence.]",
   "tags": [],
   "ui": "",
@@ -25,10 +25,10 @@
 import numpy as np
 class ImJoyPlugin():
     def setup(self):
-        print('setup in python')
+        api.log('initialized')
 
-    def run(self, my):
-        print('hello world.')
+    def run(self, ctx):
+        api.alert('hello world.')
 
 api.export(ImJoyPlugin())
 </script>

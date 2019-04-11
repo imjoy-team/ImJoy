@@ -30,6 +30,10 @@ module.exports = {
         from: path.join(__dirname, "src/jailed"),
         to: path.join(__dirname, "dist/static/jailed"),
         toType: "dir"
+      },{
+        from: path.join(__dirname, "public/.nojekyll"),
+        to: path.join(__dirname, "dist"),
+        toType: "dir"
       }]),
       new MonacoWebpackPlugin({output: 'static/vs'}),
       new webpack.DefinePlugin({

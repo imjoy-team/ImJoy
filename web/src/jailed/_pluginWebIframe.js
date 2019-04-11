@@ -120,6 +120,9 @@ var execute = async function(code) {
                         document.head.appendChild(link_node)
                       }
                       else{
+                        if(code.requirements[i].startsWith('js:')){
+                          code.requirements[i] = code.requirements[i].slice(3)
+                        }
                         await importScripts(code.requirements[i])
                       }
                     }
@@ -135,6 +138,9 @@ var execute = async function(code) {
                       document.head.appendChild(link_node)
                     }
                     else{
+                      if(code.requirements.startsWith('js:')){
+                        code.requirements = code.requirements.slice(3)
+                      }
                       await importScripts(code.requirements)
                     }
                   }

@@ -2,6 +2,10 @@
 <div class="plugin-editor">
     <md-toolbar  v-if="window" class="md-dense editor-toolbar md-layout" md-elevation="1">
       <div class="md-toolbar-section-start">
+        <md-button @click="run()" class="md-icon-button">
+          <md-icon>play_arrow</md-icon>
+          <md-tooltip>Run this plugin</md-tooltip>
+        </md-button>
         <md-button @click="save()" class="md-icon-button">
           <md-icon>save</md-icon>
           <md-tooltip>Save this plugin</md-tooltip>
@@ -123,23 +127,52 @@ export default {
   methods: {
     save(){
       assert(this.window.plugin_manager)
-      this.$emit('input', this.codeValue)
-      this.window.plugin_manager.savePlugin({pluginId: this.pluginId, code: this.codeValue, tag: this.window.plugin && this.window.plugin.tag}).then((config)=>{
-        // this.window.data._id = config._id
-        // this.window.plugin._id = config._id
-        // this.window.plugin.config._id= config._id
-        this.window.data.config = config
+      return new Promise((resolve) => {
+        this.$emit('input', this.codeValue)
+        this.window.plugin_manager.savePlugin({pluginId: this.pluginId, code: this.codeValue, tag: this.window.plugin && this.window.plugin.tag}).then((config)=>{
+          // this.window.data._id = config._id
+          // this.window.plugin._id = config._id
+          // this.window.plugin.config._id= config._id
+          this.window.data.config = config
 
-        this.reload().finally(()=>{
-          this.window.data._id = config._id
-          this.window.plugin = config
-          this.window.name = config.name
-          this.window.data._name = config.name
-          this.$forceUpdate()
+          this.reload().catch(()=>{
+            this.window.plugin = {config: config}
+          }).finally(()=>{
+            this.window.data._id = config._id
+            this.window.name = config.name
+            this.window.data._name = config.name
+            this.$forceUpdate()
+            resolve()
+          })
+
         })
-
       })
 
+    },
+    async run(){
+      assert(this.window.plugin_manager)
+      await this.save()
+      let config = {}
+      const plugin = this.window.plugin
+      if(this.window_plugin_id && !this.window.plugin_manager.wm.window_ids[this.window_plugin_id]){
+        this.window_plugin_id = null
+      }
+
+      if(!this.window_plugin_id && plugin.config && plugin.config.ui) {
+        config = await this.window.plugin_manager.imjoy_api.showDialog(plugin, plugin.config)
+      }
+      else{
+        config = this.window_plugin_config
+      }
+      if(this.window_plugin_id){
+        const node = document.getElementById('iframe_' + this.window_plugin_id)
+        node.parentNode.removeChild(node);
+      }
+      const w = await plugin.api.run({id: this.window_plugin_id, config: config, data: {}})
+      if(plugin.config && plugin.config.type === 'window'){
+        this.window_plugin_id = w.__id__
+        this.window_plugin_config = config
+      }
     },
     remove(){
       assert(this.window.plugin_manager)

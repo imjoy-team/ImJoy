@@ -39,17 +39,19 @@ import {
 
 import Ajv from 'ajv'
 const ajv = new Ajv()
+import Vue from 'vue'
 
 export class PluginManager {
-  constructor({event_bus=null, engine_manager=null, window_manager=null, file_system_manager=null, imjoy_api={}, show_message_callback=null, update_ui_callback=null}){
+  constructor({event_bus=null, config_db=null, engine_manager=null, window_manager=null, file_system_manager=null, imjoy_api={}, show_message_callback=null, update_ui_callback=null}){
     this.event_bus = event_bus
     this.em = engine_manager
     this.wm = window_manager
     this.fm = file_system_manager
-
+    this.config_db = config_db
     assert(this.event_bus, 'event bus is not available')
     assert(this.em, 'engine manager is not available')
     assert(this.wm, 'window manager is not available')
+    assert(this.config_db, 'config database is not available')
 
     this.show_message_callback = show_message_callback
     this.update_ui_callback = update_ui_callback || function (){}
@@ -57,10 +59,7 @@ export class PluginManager {
     this.default_repository_list = [{name: 'ImJoy Repository', url: "oeway/ImJoy-Plugins", description: 'The official plugin repository provided by ImJoy.io.'},
                                     {name: 'ImJoy Demos', url: 'oeway/ImJoy-Demo-Plugins', description: 'A set of demo plugins provided by ImJoy.io'}
     ]
-    this.config_db = new PouchDB('imjoy_config', {
-      revs_limit: 2,
-      auto_compaction: true
-    })
+
     this.repository_list = []
     this.repository_names = []
     this.available_plugins = []
@@ -325,7 +324,7 @@ export class PluginManager {
           this.selected_workspace = this.workspace_list[0]
           resolve(this.workspace_list)
         }).catch(()=>{
-          reject("Database Error:" + err.toString())
+          reject("Failed to load Plugin Engine list, database Error:" + err.toString())
         })
       })
     })
@@ -335,34 +334,46 @@ export class PluginManager {
     return new Promise((resolve, reject)=>{
       selected_workspace = selected_workspace || this.selected_workspace
       const load_ = ()=>{
-        this.event_bus.$emit('workspace_list_updated', this.workspace_list)
-        this.db = new PouchDB(selected_workspace + '_workspace', {
-          revs_limit: 2,
-          auto_compaction: true
-        })
-        this.selected_workspace = selected_workspace
-        resolve()
+        try {
+          this.event_bus.$emit('workspace_list_updated', this.workspace_list)
+          this.db = new PouchDB(selected_workspace + '_workspace', {
+            revs_limit: 2,
+            auto_compaction: true
+          })
+          this.selected_workspace = selected_workspace
+          resolve()
+        } catch (e) {
+          reject(e)
+        }
       }
       if (!this.workspace_list.includes(selected_workspace)) {
         if (!this.workspace_list.includes(selected_workspace)) {
           this.workspace_list.push(selected_workspace)
         }
-        this.config_db.get('workspace_list').then((doc) => {
-          this.config_db.put({
-            _id: doc._id,
-            _rev: doc._rev,
-            list: this.workspace_list,
-            default: 'default'
-          }).then(load_).catch((e)=>{
-            reject("Database Error:" + e.toString())
-          })
-        }).catch((err) => {
-          reject("Database Error:" + err.toString())
-        })
+        this.saveWorkspaceList().then(()=>{
+          load_()
+        }).catch(reject)
       }
       else{
         load_()
       }
+    })
+  }
+
+  saveWorkspaceList(){
+    return new Promise((resolve, reject)=>{
+      this.config_db.get('workspace_list').then((doc) => {
+        this.config_db.put({
+          _id: doc._id,
+          _rev: doc._rev,
+          list: this.workspace_list,
+          default: 'default'
+        }).then(resolve).catch((e)=>{
+          reject(`Failed to save workspace, database Error: ${e.toString()}`)
+        })
+      }).catch((err) => {
+        reject(`Failed to save workspaces, database Error: ${err.toString()}`)
+      })
     })
   }
 
@@ -371,24 +382,12 @@ export class PluginManager {
       if (this.workspace_list.includes(w)) {
         const index = this.workspace_list.indexOf(w)
         this.workspace_list.splice(index, 1)
-        this.config_db.get('workspace_list').then((doc) => {
-          this.config_db.put({
-            _id: doc._id,
-            _rev: doc._rev,
-            list: this.workspace_list,
-            default: 'default'
-          }).then(()=>{
-            resolve()
-            if(this.selected_workspace === w.name){
-              this.selected_workspace = null
-            }
-          }).catch((e)=>{
-            reject(`Error occured when removing workspace ${w}: ${e.toString()}`)
-          })
-        })
-        .catch((err) => {
-          reject(`Failed to save workspace ${w} database Error: ${err.toString()}`)
-        })
+        this.saveWorkspaceList().then(()=>{
+          resolve()
+          if(this.selected_workspace === w.name){
+            this.selected_workspace = null
+          }
+        }).catch(reject)
       }
     })
   }
@@ -732,6 +731,7 @@ export class PluginManager {
                 delete this.plugins[k]
                 delete this.plugin_names[name]
               }
+              plugin._unloaded = true
               this.unregister(plugin)
               if (typeof plugin.terminate === 'function') {
                 plugin.terminate().then(()=>{this.update_ui_callback()})
@@ -754,6 +754,8 @@ export class PluginManager {
         this.unloadPlugin(pconfig, true)
         const template = this.parsePluginCode(pconfig.code, pconfig)
         template._id = pconfig._id
+        template.engine_mode = pconfig.engine_mode
+
         if(template.type === 'collection'){
           return
         }
@@ -791,6 +793,7 @@ export class PluginManager {
         template.code = code
         template.origin = pconfig.origin
         template._id = template.name.replace(/ /g, '_')
+        template.engine_mode = pconfig.engine_mode
         const addPlugin = () => {
           this.db.put(template, {
             force: true
@@ -825,20 +828,29 @@ export class PluginManager {
     })
   }
 
-  reloadPythonPlugins(){
+  reloadPythonPlugins(engine){
+
     for(let p of this.installed_plugins){
-      if(p.type === 'native-python'){
+      if(p.type === 'native-python' && p.engine_mode === engine.id){
+        this.reloadPlugin(p)
+      }
+      else if(p.type === 'native-python' && (!p.engine_mode || p.engine_mode === 'auto') && (!p.plugin || p.plugin._unloaded)){
         this.reloadPlugin(p)
       }
     }
   }
 
-  unloadPythonPlugins(){
+  unloadPythonPlugins(engine){
     for (let k in this.plugins) {
       if (this.plugins.hasOwnProperty(k)) {
         const plugin = this.plugins[k]
-        if(plugin.type === 'native-python'){
-          this.unloadPlugin(plugin, false)
+        if(plugin.type === 'native-python' && plugin.config.engine === engine){
+          if(plugin.config.engine_mode === 'auto' && plugin._disconnected && plugin.code){
+            this.reloadPlugin(plugin)
+          }
+          else{
+            this.unloadPlugin(plugin, false)
+          }
         }
       }
     }
@@ -969,9 +981,10 @@ export class PluginManager {
           c.name = template.name
           c.tag = template.tag
           // c.op = my.op
-          c.data = my && my.data
-          c.config = my && my.config
-          await this.createWindow(null, c)
+          c.data = my && my.data || {}
+          c.config = my && my.config || {}
+          c.id = my && my.id
+          return await this.createWindow(null, c)
         }
       }
       try {
@@ -1001,9 +1014,11 @@ export class PluginManager {
         config.initialized = true
       }
       config._id = template._id
-      config.context = this.getPluginContext()
+      config.engine_mode = template.engine_mode || 'auto'
+
       if (template.type === 'native-python') {
-        if (!this.em.connected) {
+        config.engine = this.em.getEngine(config.engine_mode)
+        if (!config.engine || !config.engine.connected ) {
           console.error("Please connect to the Plugin Engine 🚀.")
         }
       }
@@ -1153,15 +1168,11 @@ export class PluginManager {
     })
   }
 
-  getPluginContext(){
-    return {socket: this.em && this.em.socket}
-  }
-
   plugin2joy(my){
     if(!my) return null
     //conver config--> data  data-->target
     const res = {}
-
+    res.__jailed_type__ = my.__jailed_type__
     if(my.type && my.data){
       res.data = my.config
       res.target = my.data
@@ -1214,6 +1225,7 @@ export class PluginManager {
     if(!my) return null;
     my.target = my.target || {}
     const ret = {
+      __jailed_type__: my.__jailed_type__,
       _variables: my.target._variables || null,
       _op: my.target._op,
       _source_op: my.target._source_op,
@@ -1431,8 +1443,8 @@ export class PluginManager {
                   const w = {}
                   w.name = res.name || 'result'
                   w.type = res.type || 'imjoy/generic'
-                  w.config = res.data
-                  w.data = res.target
+                  w.config = res.data || {}
+                  w.data = res.target || {}
                   await this.createWindow(plugin, w)
                 }
               }
@@ -1535,30 +1547,52 @@ export class PluginManager {
         const pconfig = wconfig
         //generate a new window id
         pconfig.type = window_config.type
-        pconfig.id = window_config.id + '_' + randId()
+
+        pconfig.id = pconfig.id || window_config.id + '_' + randId()
         if (pconfig.type != 'window') {
           throw 'Window plugin must be with type "window"'
         }
         // this is a unique id for the iframe to attach
-        pconfig.iframe_container = 'plugin_window_' + pconfig.id + randId()
+        pconfig.iframe_container = pconfig.window_container || 'plugin_window_' + pconfig.id + randId()
         pconfig.iframe_window = null
         pconfig.plugin = window_config
-        pconfig.context = this.getPluginContext()
-
 
         if (!WINDOW_SCHEMA(pconfig)) {
           const error = WINDOW_SCHEMA.errors
           console.error("Error occured during creating window ", pconfig, error)
           throw error
         }
-        this.wm.addWindow(pconfig).then(()=>{
-          this.renderWindow(pconfig).then((wplugin)=>{
-            pconfig.onclose = ()=>{
-              return wplugin.terminate()
-            }
-            resolve(wplugin.api)
-          }).catch(reject)
-        })
+        if(pconfig.window_container){
+          Vue.nextTick(()=>{
+            this.renderWindow(pconfig).then((wplugin)=>{
+              pconfig.onclose = ()=>{
+                return wplugin.terminate()
+              }
+              wplugin.api.close = ()=>{
+                return pconfig.onclose()
+              }
+              resolve(wplugin.api)
+            }).catch(reject)
+          })
+        }
+        else{
+          this.wm.addWindow(pconfig).then(()=>{
+            this.renderWindow(pconfig).then((wplugin)=>{
+              pconfig.onclose = ()=>{
+                return wplugin.terminate()
+              }
+              wplugin.api.close = async ()=>{
+                const w = this.wm.window_ids[wplugin.id]
+                try {
+                  await pconfig.onclose()
+                } finally {
+                  this.wm.closeWindow(w)
+                }
+              }
+              resolve(wplugin.api)
+            }).catch(reject)
+          })
+        }
       }
     })
   }
