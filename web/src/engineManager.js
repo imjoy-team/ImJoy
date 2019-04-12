@@ -86,6 +86,7 @@ export class Engine {
           clearTimeout(timer)
           if(this.connection_lost_timer){
             clearTimeout(this.connection_lost_timer)
+            this.connection_lost_timer = null
           }
           socket.emit('register_client', {id: this.client_id, token: token, session_id: this.engine_session_id}, (ret)=>{
             if(ret.success){
@@ -147,13 +148,12 @@ export class Engine {
             }
           }
 
-          this.connection = 'Disconnected.'
-
           if(this.disconnecting){
             //disconnect immediately
             this.socket = null
             this.connected = false
             this.event_bus.$emit('engine_disconnected', this)
+            this.connection = 'Disconnected.'
           }
           else{
             //wait for 10s to see if it recovers
@@ -162,6 +162,7 @@ export class Engine {
               this.socket = null
               this.connected = false
               this.event_bus.$emit('engine_disconnected', this)
+              this.connection = 'Disconnected.'
             }, 10000)
           }
         });

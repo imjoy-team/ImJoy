@@ -1495,6 +1495,9 @@ export default {
       })
     },
     exportFile(_plugin, file, name){
+      if(typeof file === 'string'){
+        file = new Blob([file], {type: "text/plain;charset=utf-8"})
+      }
       saveAs(file, name || file._name || 'file_export');
     },
     showProgress(_plugin, p) {
