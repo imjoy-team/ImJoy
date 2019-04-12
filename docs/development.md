@@ -809,8 +809,7 @@ The above `<config>` block will create a plugin with two tags(`Single` and `Mult
 By default, Python plugins from ImJoy will be executed in the default conda environment
 (e.g. Python 3.6). However, you these plugins can have specific virtual conda environment, which provides a way to isolate plugins. You can therefore run them with different versions of Python, or use different conda or pip packages.
 
-We encourage the use of such virtual environments to guarantee stability. For complex
-dependencies such as deep learning libraries depending on operating systems, we recommend using one environment per plugin and tag. We further recommend specifying the full version numbers (X.X.X) for python, pip and conda package. Like this, conda will try to reuse the packages with same version (and python version) across virtual environments, which reduces the required disk space. As an example, the following two environments will reuse the specified scipy package,
+We encourage the use one virtual environments per plugin and tag to guarantee stability.  We further recommend specifying the full version numbers (X.X.X) for python, pip and conda package. Like this, conda will try to reuse the packages with same version (and python version) across virtual environments, which reduces the required disk space. As an example, the following two environments will reuse the specified scipy package,
 but not the numpy package:
 
 ```
