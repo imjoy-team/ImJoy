@@ -410,10 +410,11 @@ instance of a class, while in Python there is no `new` keyword.
 api.exportFile(file, name)
 ```
 
-Trigger a download for a file object from the browser.
+Trigger a download for a file from the browser.
 
 **Arguments**
-* **file**: File or Blob. The file object to be downloaded.
+* **file**: File, Blob or String. The file object to be downloaded.
+If a string is passed, it will be wrapped as a text file.
 
 **Returns**
 * **name**: String. The file name.
