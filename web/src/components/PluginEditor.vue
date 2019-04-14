@@ -4,11 +4,11 @@
       <div class="md-toolbar-section-start">
         <md-button @click="run()" class="md-icon-button">
           <md-icon>play_arrow</md-icon>
-          <md-tooltip>Run this plugin</md-tooltip>
+          <md-tooltip>Run this plugin (Ctrl+R)</md-tooltip>
         </md-button>
         <md-button @click="save()" class="md-icon-button">
           <md-icon>save</md-icon>
-          <md-tooltip>Save this plugin</md-tooltip>
+          <md-tooltip>Save this plugin (Ctrl+S)</md-tooltip>
         </md-button>
         <md-button @click="saveAs()" class="md-icon-button">
           <md-icon>cloud_download</md-icon>
@@ -28,7 +28,8 @@
         </md-field>
       </div>
     </md-toolbar>
-    <div class="code_editor" :class="window?'editor-with-toolbar':'editor-without-toolbar' " :id="'editor_'+pluginId" style='width="auto";height="auto"'></div>
+    <div class="code_editor" :class="window?'editor-with-toolbar':'editor-without-toolbar' " ref="code_editor" style='width="auto";height="auto"'>
+    </div>
 
 </div>
 </template>
@@ -92,7 +93,7 @@ export default {
       ev.preventDefault();
     });
     this.codeValue = this.value
-    this.editor = monaco.editor.create(document.getElementById('editor_'+this.pluginId), {
+    this.editor = monaco.editor.create(this.$refs.code_editor, {
       value: this.codeValue,
       language: 'html'
     });
