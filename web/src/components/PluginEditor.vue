@@ -126,6 +126,7 @@ export default {
     save(){
       assert(this.window.plugin_manager)
       return new Promise((resolve) => {
+        this.codeValue = this.editor.getValue()
         this.$emit('input', this.codeValue)
         this.window.plugin_manager.savePlugin({pluginId: this.pluginId, code: this.codeValue, tag: this.window.plugin && this.window.plugin.tag}).then((config)=>{
           // this.window.data._id = config._id
@@ -174,6 +175,7 @@ export default {
     },
     remove(){
       assert(this.window.plugin_manager)
+      this.codeValue = this.editor.getValue()
       this.$emit('input', this.codeValue)
       this.window.data._id = null
       this.window.plugin_manager.removePlugin(this.window.plugin).then(()=>{
@@ -183,6 +185,7 @@ export default {
     reload(){
       assert(this.window.plugin_manager)
       return new Promise((resolve, reject) => {
+        this.codeValue = this.editor.getValue()
         if(this.codeValue){
           this.$emit('input', this.codeValue)
           if(this.window.plugin && this.window.plugin.config){
@@ -206,6 +209,7 @@ export default {
       })
     },
     saveAs(){
+      this.codeValue = this.editor.getValue()
       this.$emit('input', this.codeValue)
       const filename = this.window&&this.window.plugin&&this.window.plugin.name?this.window.plugin.name+"_"+randId()+'.imjoy.html':'plugin_'+randId()+'.imjoy.html'
       const file = new Blob([this.codeValue], {type: "text/plain;charset=utf-8"})
