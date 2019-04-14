@@ -9,7 +9,6 @@ import 'vue-material/dist/theme/default.css'
 import App from './App'
 import VueGridLayout from 'vue-grid-layout'
 import Grid from "vue-js-grid"
-import MonacoEditor from 'vue-monaco'
 import vueSlider from 'vue-slider-component'
 import store from './store.js'
 
@@ -46,7 +45,6 @@ Vue.component('file-dialog', FileDialog)
 Vue.component('window', Window)
 Vue.component('grid-layout', VueGridLayout.GridLayout)
 Vue.component('grid-item', VueGridLayout.GridItem)
-Vue.component('monaco-editor', MonacoEditor)
 Vue.component('engine-control-panel', EngineControlPanel)
 
 const truncate = function(text, length, clamp) {

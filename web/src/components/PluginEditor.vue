@@ -28,16 +28,8 @@
         </md-field>
       </div>
     </md-toolbar>
-    <monaco-editor
-      class="code_editor"
-      :class="window?'editor-with-toolbar':'editor-without-toolbar' "
-      v-model="codeValue"
-      language="html"
-      ref="monaco_editor">
-    </monaco-editor>
-    <!-- <div class="editor">
-      <div :id="'editor_'+pluginId" style='width="auto";height="auto"'></div>
-    </div> -->
+    <div class="code_editor" :class="window?'editor-with-toolbar':'editor-without-toolbar' " :id="'editor_'+pluginId" style='width="auto";height="auto"'></div>
+
 </div>
 </template>
 
@@ -47,6 +39,8 @@ import {
   randId,
   assert
 } from '../utils.js'
+
+import * as monaco from 'monaco-editor'
 
 window.MonacoEnvironment = {
   getWorkerUrl: function() {
@@ -98,7 +92,11 @@ export default {
       ev.preventDefault();
     });
     this.codeValue = this.value
-    this.editor = this.$refs.monaco_editor.getMonaco()
+    this.editor = monaco.editor.create(document.getElementById('editor_'+this.pluginId), {
+      value: this.codeValue,
+      language: 'html'
+    });
+
     this.editor.layout();
     if(this.window){
       this.window.resize = ()=>{
@@ -123,9 +121,6 @@ export default {
     this.editor.addCommand( window.monaco.KeyMod.CtrlCmd |  window.monaco.KeyCode.KEY_R, ()=>{
       this.run()
     });
-    // this.editor.addCommand( window.monaco.KeyMod.CtrlCmd |  window.monaco.KeyCode.KEY_R, ()=>{
-    //   this.reload()
-    // });
   },
   methods: {
     save(){
