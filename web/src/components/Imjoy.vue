@@ -805,7 +805,13 @@ export default {
       this.pm.selected_repository = this.repository_list[0]
       try {
         const workspace_list = await this.pm.loadWorkspaceList()
-        this.menuVisible = true
+        if(this.$route.query.start || this.$route.query.s){
+          this.menuVisible = false
+        }
+        else{
+          this.menuVisible = true
+        }
+
         const selected_workspace = this.$route.query.workspace || this.$route.query.w || workspace_list[0]
         await this.pm.loadWorkspace(selected_workspace)
         const connections = this.em.connectAll(true)
