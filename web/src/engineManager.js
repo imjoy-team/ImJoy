@@ -125,7 +125,7 @@ export class Engine {
                 this.showMessage('Failed to connect: ' + ret.reason)
               }
               else{
-                this.show_engine_callback(true)
+                if(!auto) this.show_engine_callback(true)
                 if(ret.reason) this.showMessage('Failed to connect: ' + ret.reason)
                 console.error('Failed to connect to the plugin engine.', ret.reason)
               }
@@ -290,10 +290,10 @@ export class EngineManager {
       }
       if(force_save){
         save_engine()
-        engine.connect()
+        engine.connect(true)
       }
       else{
-        engine.connect().then(()=>{
+        engine.connect(true).then(()=>{
           save_engine()
           this.show_engine_callback(false)
         })
