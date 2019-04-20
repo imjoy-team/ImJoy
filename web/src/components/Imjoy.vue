@@ -19,7 +19,7 @@
           </md-button>
           <md-menu-content>
             <md-menu-item @click="wm.selectWindow(w)" :disabled="wm.selected_window === w" v-for="w in wm.windows" :key="w.id">
-              <span>{{w.name.slice(0, 30)+'(#'+w.i+')'}}</span><md-icon>forward</md-icon>
+              <span>{{w.name.slice(0, 30)+'(#'+w.index+')'}}</span><md-icon>forward</md-icon>
             </md-menu-item>
           </md-menu-content>
         </md-menu>
@@ -1377,6 +1377,10 @@ export default {
         console.error(e)
         this.showMessage('<' +op.name + '>' + (e.toString() || "Error."), 15)
       })
+
+      if(this.screenWidth<=800){
+        this.menuVisible = false
+      }
     },
     selectFileChanged(event) {
       // console.log(event.target.files)
