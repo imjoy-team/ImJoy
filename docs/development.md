@@ -358,7 +358,9 @@ Array with names of other ImJoy plugins which the current plugin depends on.
 They will be installed automatically during installation. To define a dependency use the following format: 1) for dependencies without tag `REPOSITORY:PLUGIN_NAME` or `PLUGIN_URL`, e.g.: `oeway/ImJoy-Plugins:Image Window`; 2) or with specified tag: `REPOSITORY:PLUGIN_NAME@TAG` or `PLUGIN_URL@TAG`, e.g.: `oeway/ImJoy-Plugins:Unet Segmentation@GPU`. In this case, a hash tag `GPU` is used to specify the tag for the plugin named `Unet Segmentation` hosted on GitHub repository `oeway/ImJoy-Plugin` (https://github.com/oeway/ImJoy-Plugins). If the plugin is not hosted on GitHub or the GitHub repository is not formatted as a ImJoy plugin repository (meaning there is no `manifest.imjoy.json` file defined in the root of the repository), you can use the url directly, e.g.: `https://github.com/oeway/ImJoy-Demo-Plugins/blob/master/repository/3dDemos.imjoy.html` (tags can be added with `@TAG`).
 
 #### defaults
-(**for window plugin only:**) defines an object of default values, for example you can specify the default window size by setting `"defaults": {"w": 10, "h": 7}`.
+(**for window plugin only:**) defines an object of default values. For example, you can specify the default window size by setting `"defaults": {"w": 10, "h": 7}`.
+
+To make the window detached by default (as standalone window), you can set `"defaults": {"detached": true}`.
 
 #### runnable
 Defines whether the plugin can be executed by clicking on the plugin menu (By default, all plugins are `runnable`). For helper plugins which do not run by themselves, (e.g. a `native-python` plugin can be called by a `window` plugin and do not necessarily executed by the user directly), setting `"runnable": false` would move down the plugin to the bottom of the plugin menu and made non-clickable.
