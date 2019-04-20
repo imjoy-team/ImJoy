@@ -95,9 +95,8 @@ export class WindowManager {
         }
         this.windows.push(w)
         this.window_ids[w.id] = w
-        if(this.window_mode === 'single'){
-          this.selectWindow(w)
-        }
+        this.selectWindow(w)
+
         if(this.add_window_callback){
           this.add_window_callback(w).then(()=>{
             this.event_bus.$emit('add_window', w)
@@ -117,12 +116,17 @@ export class WindowManager {
   selectWindow(w){
     for (let i = 0; i < this.active_windows.length; i++) {
       this.active_windows[i].selected = false
-      // this.active_windows[i].refresh()
+      if(this.active_windows[i]) this.active_windows[i].refresh()
     }
-    this.selected_window = w
+    if(this.window_mode === 'single' || w.detatched){
+      this.selected_window = w
+    }
+    else{
+      this.selected_window = null
+    }
     w.selected = true
     this.active_windows = [w]
-    // w.refresh()
+    if(w.refresh) w.refresh()
   }
 
   closeWindow(w){

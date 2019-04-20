@@ -13,16 +13,6 @@
           <img class="site-title" src="static/img/imjoy-logo-black.svg" alt="ImJoy">
           <md-tooltip>ImJoy home</md-tooltip>
         </md-button>
-        <md-menu v-if="wm.window_mode==='single' && wm.windows.length > 0">
-          <md-button class="md-icon-button md-primary" md-menu-trigger>
-            <md-icon>picture_in_picture</md-icon>
-          </md-button>
-          <md-menu-content>
-            <md-menu-item @click="wm.selectWindow(w)" :disabled="wm.selected_window === w" v-for="w in wm.windows" :key="w.id">
-              <span>{{w.name.slice(0, 30)+'(#'+w.index+')'}}</span><md-icon>forward</md-icon>
-            </md-menu-item>
-          </md-menu-content>
-        </md-menu>
         <md-button v-if="status_text&&status_text.length" class="status-text md-small-hide" @click="showAlert(null, status_text)" :class="status_text.includes('rror')?'error-message':''">
           {{status_text.slice(0,80)+(status_text.length>80?'...':'')}}
         </md-button>
@@ -34,10 +24,23 @@
          <span>{{snackbar_info}}</span>
          <md-button class="md-accent" @click="show_snackbar=false">close</md-button>
         </md-snackbar>
-        <md-button @click="wm.closeAll()" class="md-icon-button">
-          <md-icon>cancel</md-icon>
-          <md-tooltip>Close all windows</md-tooltip>
-        </md-button>
+        <md-menu v-if="wm.windows.length > 0">
+          <md-button class="md-icon-button md-primary" md-menu-trigger>
+            <md-icon>picture_in_picture</md-icon>
+          </md-button>
+          <md-menu-content>
+            <md-menu-item v-if="wm.window_mode==='grid' && wm.selected_window" @click="wm.selected_window=null" class="md-primary">
+              <md-icon>picture_in_picture</md-icon><span>Dashboard</span>
+            </md-menu-item>
+            <md-menu-item @click="wm.selectWindow(w)" :disabled="wm.selected_window === w" v-for="w in wm.windows" :key="w.id">
+              <span>{{w.name.slice(0, 30)+'(#'+w.index+')'}}</span><md-icon>forward</md-icon>
+            </md-menu-item>
+            <md-menu-item @click="wm.closeAll()" class="md-accent">
+              <md-icon>cancel</md-icon><span>Close All</span>
+              <md-tooltip>Close all windows</md-tooltip>
+            </md-menu-item>
+          </md-menu-content>
+        </md-menu>
         <md-button @click="showSettingsDialog=true" :disabled="true" class="md-icon-button">
           <md-icon>settings</md-icon>
         </md-button>
@@ -1293,7 +1296,6 @@ export default {
     loadFiles(selected_files) {
       console.log(selected_files)
       if(selected_files.length === 1){
-
         const file = selected_files[0]
         const loaders = this.wm.getDataLoaders(file)
         const keys = Object.keys(loaders)
