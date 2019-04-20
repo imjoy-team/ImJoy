@@ -360,7 +360,7 @@ They will be installed automatically during installation. To define a dependency
 #### defaults
 (**for window plugin only:**) defines an object of default values. For example, you can specify the default window size by setting `"defaults": {"w": 10, "h": 7}`.
 
-To make the window detached by default (as standalone window), you can set `"defaults": {"detached": true}`.
+To make the window in full size mode by default (as standalone window), you can set `"defaults": {"fullsize": true}`.
 
 #### runnable
 Defines whether the plugin can be executed by clicking on the plugin menu (By default, all plugins are `runnable`). For helper plugins which do not run by themselves, (e.g. a `native-python` plugin can be called by a `window` plugin and do not necessarily executed by the user directly), setting `"runnable": false` would move down the plugin to the bottom of the plugin menu and made non-clickable.

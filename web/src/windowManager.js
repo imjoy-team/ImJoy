@@ -118,7 +118,7 @@ export class WindowManager {
       this.active_windows[i].selected = false
       if(this.active_windows[i]) this.active_windows[i].refresh()
     }
-    if(this.window_mode === 'single' || w.detatched){
+    if(this.window_mode === 'single' || w.fullsize){
       this.selected_window = w
     }
     else{
