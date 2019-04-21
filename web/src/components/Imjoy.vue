@@ -1256,7 +1256,7 @@ export default {
         plugin_manager: this.pm,
         w: 20,
         h: 10,
-        fullsize: true,
+        fullsize: false,
         data: {
           name: pconfig.name,
           id: plugin.id,
@@ -1273,7 +1273,7 @@ export default {
         plugin_manager: this.pm,
         w: 20,
         h: 10,
-        fullsize: true,
+        fullsize: false,
         plugin: {},
         data: {
           name: 'new plugin',
