@@ -1,5 +1,5 @@
 <template>
-<md-card v-if="render">
+<md-card v-if="w">
   <md-card-expand  @click.native.stop="selectWindow(w, $event)" :class="{'drag-handle': withDragHandle}">
     <md-card-actions md-alignment="space-between" :class="w.selected?'window-selected':'window-header'">
       <md-card-expand-trigger v-if="w.panel">
@@ -123,7 +123,7 @@ export default {
     }
   },
   mounted() {
-    this.w.refresh = this.refresh
+      this.w.refresh = this.refresh
   },
   beforeDestroy() {
 

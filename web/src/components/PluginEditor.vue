@@ -99,21 +99,26 @@ export default {
     });
 
     this.editor.layout();
+    this.window.refresh();
     if(this.window){
       this.window.resize = ()=>{
         setTimeout(()=>{
           this.editor.layout();
+          this.window.refresh();
         }, 200)
         setTimeout(()=>{
           this.editor.layout();
+          this.window.refresh();
         }, 500)
       }
     }
     setTimeout(()=>{
       this.editor.layout();
+      this.window.refresh();
     }, 200)
     setTimeout(()=>{
       this.editor.layout();
+      this.window.refresh();
     }, 500)
 
     this.editor.addCommand( window.monaco.KeyMod.CtrlCmd |  window.monaco.KeyCode.KEY_S, ()=>{
