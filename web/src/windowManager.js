@@ -90,6 +90,10 @@ export class WindowManager {
         w.id = w.id || w.name + randId()
         w.loaders = this.getDataLoaders(w.data)
         this.generateGridPosition(w)
+        if(w.fullsize){
+          w.h = 0
+          w.w = 0
+        }
         if(this.window_ids[w.id]){
           this.windows.splice(this.windows.indexOf(this.window_ids[w.id]), 1)
         }

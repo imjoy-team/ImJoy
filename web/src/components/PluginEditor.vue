@@ -144,7 +144,7 @@ export default {
             this.window.plugin = {config: config}
           }).finally(()=>{
             this.window.data._id = config._id
-            this.window.name = config.name
+            this.window.name = 'Edit-'+config.name
             this.window.data._name = config.name
             this.$forceUpdate()
             resolve()

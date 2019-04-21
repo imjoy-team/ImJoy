@@ -123,7 +123,7 @@ export default {
     }
   },
   mounted() {
-      this.w.refresh = this.refresh
+    if(this.w) this.w.refresh = this.refresh
   },
   beforeDestroy() {
 

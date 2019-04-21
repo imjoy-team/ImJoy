@@ -1249,13 +1249,14 @@ export default {
       const plugin = this.pm.plugins[pid]
       const pconfig = plugin.config
       const w = {
-        name: pconfig.name || 'plugin',
+        name: 'Edit-'+pconfig.name || 'plugin',
         type: 'imjoy/plugin-editor',
         config: {},
         plugin: plugin,
         plugin_manager: this.pm,
         w: 20,
         h: 10,
+        fullsize: true,
         data: {
           name: pconfig.name,
           id: plugin.id,
@@ -1272,6 +1273,7 @@ export default {
         plugin_manager: this.pm,
         w: 20,
         h: 10,
+        fullsize: true,
         plugin: {},
         data: {
           name: 'new plugin',
