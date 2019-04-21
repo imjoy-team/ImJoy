@@ -6,11 +6,11 @@
       <window :w="!w.fullsize?w:null" :withDragHandle="true" @duplicate="duplicate" @select="selectWindow" :loaders="wm.registered_loaders" @close="close" @fullscreen="fullScreen" @normalsize="normalSize"></window>
     </grid-item>
   </grid-layout>
-  <window :w="mode!=='grid' || w.fullsize?w: null" v-for="w in windows" :key="w.id" v-show="wm.selected_window===w" :loaders="wm.registered_loaders" :withDragHandle="false" @duplicate="duplicate" @select="selectWindow" @close="close" @fullscreen="fullScreen" @normalsize="normalSize" ></window>
   <div class="md-layout md-gutter md-alignment-center-center">
     <md-empty-state v-if="!windows || windows.length===0" md-icon="static/img/imjoy-io-icon.svg" md-label="" md-description="">
     </md-empty-state>
   </div>
+  <window :w="mode!=='grid' || w.fullsize?w: null" v-for="w in windows" :key="w.id" v-show="wm.selected_window===w" :loaders="wm.registered_loaders" :withDragHandle="false" @duplicate="duplicate" @select="selectWindow" @close="close" @fullscreen="fullScreen" @normalsize="normalSize" ></window>
 </div>
 </template>
 
@@ -177,7 +177,7 @@ export default {
         }
         this.active_windows = []
         this.wm.active_windows = this.active_windows
-        this.wm.selected_window = null
+        //this.wm.selected_window = null
         this.$emit('select', this.active_windows, null)
         this.$forceUpdate()
       }

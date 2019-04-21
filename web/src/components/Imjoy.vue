@@ -29,8 +29,8 @@
             <md-icon>picture_in_picture</md-icon>
           </md-button>
           <md-menu-content>
-            <md-menu-item v-if="wm.window_mode==='grid' && wm.selected_window" @click="wm.selected_window=null" class="md-primary">
-              <md-icon>picture_in_picture</md-icon><span>Dashboard</span>
+            <md-menu-item :disabled="wm.window_mode==='grid' && !wm.selected_window" @click="wm.selected_window=null" class="md-primary">
+              <md-icon>picture_in_picture</md-icon><span>Workspace</span>
             </md-menu-item>
             <md-menu-item @click="wm.selectWindow(w)" :disabled="wm.selected_window === w" v-for="w in wm.windows" :key="w.id">
               <span>{{w.name.slice(0, 30)+'(#'+w.index+')'}}</span><md-icon>forward</md-icon>

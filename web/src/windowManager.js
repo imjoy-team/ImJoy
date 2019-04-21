@@ -122,12 +122,14 @@ export class WindowManager {
       this.active_windows[i].selected = false
       if(this.active_windows[i]) this.active_windows[i].refresh()
     }
+    
     if(this.window_mode === 'single' || w.fullsize){
       this.selected_window = w
     }
     else{
       this.selected_window = null
     }
+    console.log('==========================', this.window_mode, this.selected_window )
     w.selected = true
     this.active_windows = [w]
     if(w.refresh) w.refresh()
