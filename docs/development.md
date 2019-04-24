@@ -161,6 +161,7 @@ Defines the general properties of a plugin with several fields.
   "type": "web-worker",
   "tags": [],
   "ui": "image processing",
+  "cover": "",
   "version": "0.1.0",
   "api_version": "0.1.2",
   "url": "",
@@ -194,6 +195,16 @@ Points to current file. It is used to download the plugin when a user installs i
 
 #### description
 Contains a short description of the plugin.
+
+#### cover
+An url to a cover image of the plugin, it will shown up in the image installation dialog, and also on top of the plugin documentation.
+
+Example: `"cover":"https://imjoy.io/static/img/imjoy-card-plain.png"`.
+
+The cover image is recommended to have a aspect ratio of 16:9.
+It can be hosted inside the github repo, in that case, a `raw` url to the image should be used.
+
+Multiple images can be used, by set `cover` to an array: `"cover": ["url_to_image1", "url_to_image2", "url_to_image3"]`.
 
 #### tags
 List of supported tags.

@@ -370,7 +370,7 @@
   </md-dialog>
 
   <md-dialog class="plugin-dialog" :md-active.sync="showAddPluginDialog" :md-click-outside-to-close="false">
-    <md-dialog-title>ImJoy Plugin Management</md-dialog-title>
+    <md-dialog-title>{{plugin4install?"Plugin Installation":"ImJoy Plugin Management"}}</md-dialog-title>
     <md-dialog-content>
       <md-card v-if="show_plugin_templates">
         <md-card-header>
@@ -406,6 +406,24 @@
       <md-progress-spinner v-if="downloading_plugin && !plugin4install" class="md-accent" :md-diameter="40" md-mode="indeterminate"></md-progress-spinner>
       <h2 v-if="downloading_error">&nbsp;&nbsp;{{downloading_error}}</h2>
       <md-card  v-if="plugin4install">
+        <md-card-media v-if="plugin4install.cover&&(typeof plugin4install.cover === 'string')" md-ratio="16:9">
+         <img :src="plugin4install.cover" alt="plugin-cover">
+        </md-card-media>
+        <div class="carousel" v-else-if="plugin4install.cover">
+          <!-- carousel locator -->
+          <input class="carousel-locator" v-for="(c, k) in plugin4install.cover" :key="k" :id="'slide-'+k" type="radio" name="carousel-radio" hidden="">
+          <!-- carousel container -->
+          <div class="carousel-container">
+            <!-- carousel item -->
+            <figure class="carousel-item" v-for="(c,k) in plugin4install.cover" :key="k">
+              <img class="img-responsive rounded" :src="c" alt="plugin cover">
+            </figure>
+          </div>
+          <!-- carousel navigation -->
+          <div class="carousel-nav">
+            <label class="nav-item text-hide c-hand" v-for="(c, k) in plugin4install.cover" :key="k" :for="'slide-'+k">{{k}}</label>
+          </div>
+        </div>
         <md-card-header>
           <md-toolbar md-elevation="0">
             <div class="md-toolbar-section-start">
@@ -477,6 +495,7 @@
 <script>
 /*eslint no-unused-vars: ["error", { "argsIgnorePattern": "^_plugin$" }]*/
 import Vue from 'vue';
+
 import { saveAs } from 'file-saver';
 import axios from 'axios';
 import PouchDB from 'pouchdb-browser';
@@ -1197,6 +1216,7 @@ export default {
         data: {
           name: pconfig.name,
           id: plugin.id,
+          plugin_info: pconfig,
           source: pconfig && pconfig.docs[0] && pconfig.docs[0].content
         }
       }
@@ -1847,6 +1867,9 @@ button.md-speed-dial-target {
   .md-drawer{
     width: 320px;
   }
+  .h2, h2 {
+      font-size: 1.0rem;
+  }
 }
 
 .md-app {
@@ -1869,5 +1892,13 @@ button.md-speed-dial-target {
 
 .bold{
   font-weight: bold;
+}
+
+.carousel .carousel-nav .nav-item {
+    color: rgba(165, 162, 162, 0.5)
+}
+
+.carousel .carousel-locator:nth-of-type(1):checked~.carousel-nav .nav-item:nth-of-type(1) {
+    color: #92add0;
 }
 </style>
