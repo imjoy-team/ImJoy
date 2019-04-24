@@ -75,6 +75,16 @@ export default {
     this.event_bus.$on('close_window', ()=>{ this.$forceUpdate() })
     this.screenWidth = window.innerWidth
     this.col_num = parseInt(this.$refs.whiteboard.clientWidth/this.column_width)
+    window.onbeforeunload = function (evt) {
+      var message = 'Are you sure you want to leave?';
+      if (typeof evt == 'undefined') {
+        evt = window.event;
+      }
+      if (evt) {
+        evt.returnValue = message;
+      }
+      return message;
+    }
   },
   beforeDestroy() {
     this.event_bus.$off('add_window', this.onWindowAdd)
