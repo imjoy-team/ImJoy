@@ -426,7 +426,7 @@
         </div>
         <md-card-header>
           <md-toolbar md-elevation="0">
-            <div class="md-toolbar-section-start">
+            <div>
               <h2><md-icon v-if="plugin4install.icon">{{plugin4install.icon}}</md-icon><md-icon v-else>extension</md-icon>
                 {{plugin4install.type === 'native-python'? plugin4install.name + ' 🚀': plugin4install.name}}
               </h2>

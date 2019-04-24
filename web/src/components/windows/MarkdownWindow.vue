@@ -21,7 +21,7 @@
     </div>
     <md-card-header>
       <md-toolbar md-elevation="0">
-        <div class="md-toolbar-section-start">
+        <div>
           <h2><md-icon v-if="plugin_info.icon">{{plugin_info.icon}}</md-icon><md-icon v-else>extension</md-icon>
             {{plugin_info.type === 'native-python'? plugin_info.name + ' 🚀': plugin_info.name}}
           </h2>
