@@ -4,7 +4,7 @@
       <div class="md-toolbar-section-start">
         <md-button @click="run()" class="md-icon-button">
           <md-icon>play_arrow</md-icon>
-          <md-tooltip>Run this plugin (Ctrl+R)</md-tooltip>
+          <md-tooltip>Run this plugin (Ctrl+E)</md-tooltip>
         </md-button>
         <md-button @click="save()" class="md-icon-button">
           <md-icon>save</md-icon>
@@ -124,7 +124,7 @@ export default {
     this.editor.addCommand( window.monaco.KeyMod.CtrlCmd |  window.monaco.KeyCode.KEY_S, ()=>{
       this.save()
     });
-    this.editor.addCommand( window.monaco.KeyMod.CtrlCmd |  window.monaco.KeyCode.KEY_R, ()=>{
+    this.editor.addCommand( window.monaco.KeyMod.CtrlCmd |  window.monaco.KeyCode.KEY_E, ()=>{
       this.run()
     });
   },
@@ -171,7 +171,7 @@ export default {
       }
       if(this.window_plugin_id){
         const node = document.getElementById('iframe_' + this.window_plugin_id)
-        node.parentNode.removeChild(node);
+        if(node)  node.parentNode.removeChild(node);
       }
       const w = await plugin.api.run({id: this.window_plugin_id, config: config, data: {}})
       if(plugin.config && plugin.config.type === 'window'){
