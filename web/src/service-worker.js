@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 if (workbox) {
     console.log(`Workbox is loaded`);
     /**
