@@ -24,6 +24,7 @@ import FileItem from '@/components/FileItem'
 import FileDialog from '@/components/FileDialog'
 import Window from '@/components/Window'
 import EngineControlPanel from '@/components/EngineControlPanel'
+import './registerServiceWorker'
 
 Vue.config.productionTip = false
 

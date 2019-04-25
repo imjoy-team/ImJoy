@@ -7,8 +7,8 @@
   "scripts": {
     "serve": "vue-cli-service serve --host localhost",
     "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint",
     "test": "vue-cli-service test:unit",
+    "lint": "vue-cli-service lint",
     "deploy": "DEPLOY_MODE=dev vue-cli-service build && node ./deploy-dev.js"
   },
   "dependencies": {
@@ -25,6 +25,7 @@
     "monaco-editor": "^0.15.6",
     "monaco-editor-webpack-plugin": "^1.7.0",
     "pouchdb-browser": "^7.0.0",
+    "register-service-worker": "^1.6.2",
     "socket.io-client": "^2.1.1",
     "spectre.css": "^0.5.8",
     "uglify-es": "github:mishoo/UglifyJS2#harmony",
@@ -42,6 +43,7 @@
   "devDependencies": {
     "@vue/cli-plugin-babel": "^3.1.1",
     "@vue/cli-plugin-eslint": "^3.1.5",
+    "@vue/cli-plugin-pwa": "^3.6.0",
     "@vue/cli-plugin-unit-mocha": "^3.1.1",
     "@vue/cli-service": "^3.6.0",
     "@vue/test-utils": "^1.0.0-beta.20",
