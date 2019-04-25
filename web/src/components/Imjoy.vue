@@ -1308,7 +1308,7 @@ export default {
       if(this.plugin_dialog_promise){
         let [resolve, reject] = this.plugin_dialog_promise
         if (ok) {
-          resolve(this.$refs.plugin_dialog_joy.joy.get_config())
+          resolve()
         } else {
           reject()
         }
@@ -1549,7 +1549,14 @@ export default {
         if(config.ui){
           this.plugin_dialog_config = config
           this.showPluginDialog = true
-          this.plugin_dialog_promise = [resolve, reject]
+          this.plugin_dialog_promise = [()=>{
+              if(this.$refs.plugin_dialog_joy.joy){
+                resolve(this.$refs.plugin_dialog_joy.joy.get_config())
+              }
+              else{
+                reject('joy not found.')
+              }
+            }, reject]
         }
         else if(config.type){
           config.window_container = 'window_dialog_container'
