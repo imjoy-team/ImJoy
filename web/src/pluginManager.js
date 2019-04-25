@@ -998,7 +998,7 @@ export class PluginManager {
       const _interface = _.assign({TAG: tconfig.tag, WORKSPACE: this.selected_workspace}, this.imjoy_api)
 
       // create a proxy plugin
-      const plugin = new DynamicPlugin(tconfig, _interface, this.fm.fs, true)
+      const plugin = new DynamicPlugin(tconfig, _interface, this.fm.api, true)
       plugin.api = {
         __jailed_type__: 'plugin_api',
         __id__: plugin.id,
@@ -1054,7 +1054,7 @@ export class PluginManager {
       const tconfig = _.assign({}, template, config)
       tconfig.workspace = this.selected_workspace
       const _interface = _.assign({TAG: tconfig.tag, WORKSPACE: this.selected_workspace}, this.imjoy_api)
-      const plugin = new DynamicPlugin(tconfig, _interface, this.fm.fs)
+      const plugin = new DynamicPlugin(tconfig, _interface, this.fm.api)
       plugin.whenConnected(() => {
         if (!plugin.api) {
           console.error('Error occured when loading plugin.')
@@ -1143,7 +1143,7 @@ export class PluginManager {
       const tconfig = _.assign({}, pconfig.plugin, pconfig)
       tconfig.workspace = this.selected_workspace
       const _interface = _.assign({TAG: tconfig.tag, WORKSPACE: this.selected_workspace}, this.imjoy_api)
-      const plugin = new DynamicPlugin(tconfig, _interface, this.fm.fs)
+      const plugin = new DynamicPlugin(tconfig, _interface, this.fm.api)
       plugin.whenConnected(() => {
         if (!plugin.api) {
           console.error('the window plugin seems not ready.')
