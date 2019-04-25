@@ -777,7 +777,7 @@ Connection.prototype.disconnect = function() {
  * @param {String} url of a plugin source
  * @param {Object} _interface to provide for the plugin
  */
-var Plugin = function( config, _interface, _fs, is_proxy) {
+var Plugin = function( config, _interface, _fs_api, is_proxy) {
     this.config = config
     this.id = config.id || randId();
     this._id = config._id;
@@ -799,7 +799,7 @@ var Plugin = function( config, _interface, _fs, is_proxy) {
     else{
       this._disconnected = true;
       this._bindInterface(_interface);
-      this._initialInterface.fs = _fs;
+      for(let k in _fs_api) this._initialInterface[k] = _fs_api[k];
       this._connect();
     }
     this._updateUI()
@@ -813,7 +813,7 @@ var Plugin = function( config, _interface, _fs, is_proxy) {
  * @param {String} code of the plugin
  * @param {Object} _interface to provide to the plugin
  */
-var DynamicPlugin = function(config, _interface, _fs, is_proxy) {
+var DynamicPlugin = function(config, _interface, _fs_api, is_proxy) {
     this.config = config
     if(!this.config.script){
       throw "you must specify the script for the plugin to run."
@@ -837,7 +837,7 @@ var DynamicPlugin = function(config, _interface, _fs, is_proxy) {
     else{
       this._disconnected = true;
       this._bindInterface(_interface);
-      this._initialInterface.fs = _fs;
+      for(let k in _fs_api) this._initialInterface[k] = _fs_api[k];
       this._connect();
     }
     this._updateUI()
