@@ -1544,8 +1544,10 @@ export default {
       // this.$forceUpdate()
     },
     showDialog(_plugin, config) {
-      assert(config)
+      assert(config, 'Please pass config to showDialog.')
       return new Promise((resolve, reject) => {
+        this.plugin_dialog_config = null
+        this.plugin_dialog_promise = null
         if(config.ui){
           this.plugin_dialog_config = config
           this.showPluginDialog = true
@@ -1560,7 +1562,6 @@ export default {
         }
         else if(config.type){
           config.window_container = 'window_dialog_container'
-          this.plugin_dialog_promise = null
           this.showPluginDialog = true
           this.pm.createWindow(null, config).then((api)=>{
             const _close = api.close
