@@ -1,8 +1,14 @@
 <template>
   <div class="about">
+    <a href="https://zenodo.org/badge/latestdoi/137741898"><img src="https://zenodo.org/badge/137741898.svg" alt="DOI"></a>&nbsp;
+    <a href="https://travis-ci.com/oeway/ImJoy"><img src="https://travis-ci.com/oeway/ImJoy.svg?branch=master" alt="Travis-CI"></a>
+    <br>
+    <br>
     <img style="width: 300px" src="static/img/imjoy-logo-black.svg" />
     <br>
     <md-button class="normal-text" href="https://github.com/oeway" target="_blank">Version: {{app_version}} <br>  Made by Wei OUYANG with <span class="red">❤</span></md-button>
+    <br>
+    <br>
     <p>The ImJoy project was originally carried out in <a href="https://research.pasteur.fr/en/team/imaging-and-modeling/" target="_blank">Imaging and Modeling Unit</a> at Institut Pasteur.</p>
     <p>Ongoing development of ImJoy is mainly supported by the <a href="https://www.scilifelab.se/researchers/emma-lundberg/" target="_blank">Cell Profiling Group</a> headed by Emma Lundberg at <a href="https://www.scilifelab.se/" target="_blank">SciLifeLab</a>.</p>
     <p>Main Contributors:</p>
