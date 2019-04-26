@@ -1,11 +1,11 @@
 self.__precacheManifest = [
   {
-    "revision": "25c094f48ff7a3f6af6f",
-    "url": "/static/css/app.cf124890.css"
+    "revision": "ce3a8b0b5c72a339720d",
+    "url": "/static/css/app.bd08b529.css"
   },
   {
-    "revision": "25c094f48ff7a3f6af6f",
-    "url": "/static/js/app.9cd21779.js"
+    "revision": "ce3a8b0b5c72a339720d",
+    "url": "/static/js/app.1a98d8ed.js"
   },
   {
     "revision": "b8859e2632feade2aed6",
@@ -240,7 +240,7 @@ self.__precacheManifest = [
     "url": "/static/vs/editor.worker.js"
   },
   {
-    "revision": "827756c6ad10906c05656e90b89c24e8",
+    "revision": "caa49cd7ebf6227e9b2ee8f5e8d59d73",
     "url": "/index.html"
   },
   {
@@ -402,6 +402,10 @@ self.__precacheManifest = [
   {
     "revision": "a9d66b8c665a3d6c9dd0332e6420bf7b",
     "url": "/static/img/anna-palm-icon-circle-animation.svg"
+  },
+  {
+    "revision": "5d56cd775d49d9c86bc3c711db1b8717",
+    "url": "/static/img/anna-palm-icon-circle.png"
   },
   {
     "revision": "eba5bde7d6db21d95d41f4a717edf6de",
@@ -626,10 +630,6 @@ self.__precacheManifest = [
   {
     "revision": "83f9d7a8568f0f86fd00bf3c21944ce8",
     "url": "/static/vs/basic-languages/ruby/ruby.js"
-  },
-  {
-    "revision": "5d56cd775d49d9c86bc3c711db1b8717",
-    "url": "/static/img/anna-palm-icon-circle.png"
   },
   {
     "revision": "524db18624629ebed6788b26cbf4820e",
