@@ -8,6 +8,7 @@
         <file-item :model="file_tree" :engine="selected_engine" :root="root" :selected="file_tree_selection" @load="loadFile" @select="fileTreeSelected" @select_append="fileTreeSelectedAppend">
         </file-item>
       </ul>
+      <div class="loading loading-lg" v-else></div>
     </md-dialog-content>
     <md-dialog-actions>
       <md-button class="md-primary" :disabled="!file_tree_selection" @click="show_=false; resolve(file_tree_selection)">OK <md-tooltip v-if="file_tree_selection">Selected: {{file_tree_selection}}</md-tooltip> </md-button>
@@ -90,6 +91,7 @@ export default {
        this.options.root = this.options.root || '~'
        this.options.mode = this.options.mode || 'single|multiple'
        this.options.uri_type = this.options.uri_type|| 'path'
+       this.selectEngine(this.options.engine || this.selected_engine)
        if(this.options.type != 'file' && this.options.root){
          this.file_tree_selection = this.options.root
        }
@@ -133,6 +135,7 @@ export default {
        return new Promise((resolve, reject) => {
          this.selected_engine = engine
          this.file_tree = null
+         this.$forceUpdate()
          this.listFiles(this.selected_engine, this.options.root, this.options.type, this.options.recursive).then((tree)=>{
            this.root = tree.path
            this.file_tree = tree

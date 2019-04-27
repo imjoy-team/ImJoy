@@ -52,9 +52,11 @@
     </md-card-expand-content>
   </md-card-expand>
   <md-card-content :class="w.scroll?'plugin-iframe-container allow-scroll':'plugin-iframe-container'">
+    <div class="loading loading-lg" v-show="w.loading"></div>
     <component v-if="componentNames[w.type] && w.type.startsWith('imjoy/')" :is="componentNames[w.type]" :w="w" :loaders="loaders" />
     <md-empty-state v-else-if="w.type.startsWith('imjoy/')" md-icon="hourglass_empty" md-label="IMJOY.IO" md-description="" />
     <div v-else class="plugin-iframe">
+
       <div :id="w.iframe_container" class="plugin-iframe">
       </div>
     </div>

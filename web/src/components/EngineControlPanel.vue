@@ -26,6 +26,11 @@
             <a :href="engine.url" target="_blank">{{engine.url}}</a>
             <md-button @click.stop="engine.disconnect()" class="md-icon-button md-accent">
               <md-icon>highlight_off</md-icon>
+              <md-tooltip>Disconnect Plugin Engines</md-tooltip>
+            </md-button>
+            <md-button @click.stop="engine.resetEngine()" class="md-icon-button md-accent">
+              <md-icon>restore</md-icon>
+              <md-tooltip>Reset Plugin Engines</md-tooltip>
             </md-button>
           </md-menu-item>
           <md-menu-item v-else @click.stop="engine.connect(false)">
@@ -39,13 +44,17 @@
                 <md-icon>autorenew</md-icon>
               </md-button>
             </md-menu-item> -->
-            <md-menu-item v-for="p in engine.plugin_processes" :key="p.pid">
+            <md-menu-item v-if="engine.plugin_processes" v-for="p in engine.plugin_processes" :key="p.pid">
               &nbsp;&nbsp;
               - {{p.name}} (#{{p.pid}})
               <md-button @click.stop="kill(engine, p)" class="md-icon-button md-accent">
                 <md-icon>clear</md-icon>
               </md-button>
             </md-menu-item>
+            <md-menu-item v-else>
+              <div class="loading loading-lg"></div>
+            </md-menu-item>
+
             <md-menu-item :disabled="true" v-if="engine.plugin_num>1">
               <span>&nbsp;&nbsp;{{engine.plugin_num}} Running Plugins</span>
               <md-button @click.stop="kill(engine)" class="md-icon-button md-accent">
@@ -159,6 +168,8 @@ export default {
       this.$forceUpdate()
     },
     update(engine){
+      engine.plugin_processes = null
+      this.$forceUpdate()
       engine.updateEngineStatus().then(()=>{
         this.$forceUpdate()
       });

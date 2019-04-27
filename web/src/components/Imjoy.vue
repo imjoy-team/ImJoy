@@ -93,6 +93,7 @@
         </div>
       </div>
       <br>
+      <div v-if="!plugin_loaded" class="loading loading-lg"></div>
       <md-card id="plugin-menu" v-show="plugin_loaded" v-if="pm">
         <md-card-header>
           <md-menu md-size="big">
@@ -155,6 +156,7 @@
               </md-button>
             </p>
           </div>
+
           <div v-for="plugin in sortedRunnablePlugins()" :key="plugin.name">
             <md-divider></md-divider>
             <md-menu md-size="medium">
@@ -588,8 +590,6 @@ export default {
       show_workflow: false,
       plugins: null,
       registered: null,
-      plugin_api: null,
-      plugin_context: null,
       menuVisible: false,
       snackbar_info: '',
       snackbar_duration: 3000,
@@ -835,6 +835,7 @@ export default {
         }
 
         const selected_workspace = this.$route.query.workspace || this.$route.query.w || workspace_list[0]
+        this.$forceUpdate()
         await this.pm.loadWorkspace(selected_workspace)
         const connections = this.em.connectAll(true)
         await this.pm.reloadPlugins()
@@ -844,6 +845,7 @@ export default {
           console.error(e)
         }
         this.plugin_loaded = true
+        this.$forceUpdate()
         this.$forceUpdate()
         this.event_bus.$emit('plugins_loaded', this.pm.plugins)
         try {
@@ -1440,8 +1442,9 @@ export default {
     showFileDialog(_plugin, options){
       options = options || {}
       if(_plugin && _plugin.id){
+        options.engine = options.engine || _plugin.config.engine
+        options.engine = options.engine instanceof Engine ? options.engine: this.em.engines[options.engine]
         options.root = options.root || (_plugin.config && _plugin.config.work_dir)
-
         if(_plugin.type != 'native-python'){
           options.uri_type = options.uri_type || 'url'
         }
@@ -1454,10 +1457,83 @@ export default {
         return this.$refs['file-dialog'].showDialog(_plugin, options)
       }
     },
+    requestUploadUrl(_plugin, config){
+      if(typeof config === 'string'){
+        throw "You must pass an object contains keys named `path` and `engine`"
+      }
+      config.engine = config.engine || _plugin.config.engine
+      config.engine = config.engine instanceof Engine ? config.engine: this.em.engines[config.engine]
+      const engine = config.engine || this.em.engines[0]
+      return new Promise((resolve, reject) => {
+        if(!engine.connected){
+          reject("Please connect to the Plugin Engine 🚀.")
+          this.showMessage("Please connect to the Plugin Engine 🚀.")
+          return
+        }
+        if(_plugin !== this.IMJOY_PLUGIN && (!_plugin || !_plugin.id)){
+          reject("Plugin not found.")
+          return
+        }
+        if(_plugin !== this.IMJOY_PLUGIN && !_plugin.name){
+          reject("Plugin name not found.")
+          return
+        }
+
+        engine.requestUploadUrl(config).then((ret)=>{
+          if(ret.success){
+            resolve(ret.url)
+            this.$forceUpdate()
+          }
+          else{
+            this.showMessage(`Failed to request file url for ${config.path} ${ret.error}`)
+            reject(ret.error)
+            this.$forceUpdate()
+          }
+        }).catch(reject)
+
+      })
+    },
+    waitForUpload(_plugin, config){
+      if(typeof config === 'string'){
+        throw "You must pass an object contains keys named `path` and `engine`"
+      }
+      config.engine = config.engine || _plugin.config.engine
+      config.engine = config.engine instanceof Engine ? config.engine: this.em.engines[config.engine]
+      const engine = config.engine || this.em.engines[0]
+      return new Promise((resolve, reject) => {
+        if(!engine.connected){
+          reject("Please connect to the Plugin Engine 🚀.")
+          this.showMessage("Please connect to the Plugin Engine 🚀.")
+          return
+        }
+        if(_plugin !== this.IMJOY_PLUGIN && (!_plugin || !_plugin.id)){
+          reject("Plugin not found.")
+          return
+        }
+        if(_plugin !== this.IMJOY_PLUGIN && !_plugin.name){
+          reject("Plugin name not found.")
+          return
+        }
+
+        engine.waitForUpload(config).then((ret)=>{
+          if(ret.success){
+            resolve(ret.path)
+            this.$forceUpdate()
+          }
+          else{
+            this.showMessage(`Failed to request file url for ${config.path} ${ret.error}`)
+            reject(ret.error)
+            this.$forceUpdate()
+          }
+        }).catch(reject)
+
+      })
+    },
     getFileUrl(_plugin, config){
       if(typeof config === 'string'){
         throw "You must pass an object contains keys named `path` and `engine`"
       }
+      config.engine = config.engine || _plugin.config.engine
       config.engine = config.engine instanceof Engine ? config.engine: this.em.engines[config.engine]
       const engine = config.engine || this.em.engines[0]
       return new Promise((resolve, reject) => {
@@ -1486,7 +1562,7 @@ export default {
                 reject(ret.error)
                 this.$forceUpdate()
               }
-            })
+            }).catch(reject)
           }
           if(_plugin === this.IMJOY_PLUGIN){
             resolve_permission()
@@ -1507,6 +1583,7 @@ export default {
       if(typeof config === 'string'){
         throw "You must pass an object contains keys named `url` and `engine`"
       }
+      config.engine = config.engine || _plugin.config.engine
       config.engine = config.engine instanceof Engine ? config.engine: this.em.engines[config.engine]
       const engine = config.engine || this.em.engines[0]
       return new Promise((resolve, reject) => {
@@ -1525,7 +1602,7 @@ export default {
             reject(ret.error)
             this.$forceUpdate()
           }
-        })
+        }).catch(reject)
       })
     },
     exportFile(_plugin, file, name){

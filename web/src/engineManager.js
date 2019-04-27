@@ -24,6 +24,26 @@ export class Engine {
     this.connection_lost_timer = null
   }
 
+  requestUploadUrl(config) {
+    return new Promise((resolve, reject)=>{
+      try {
+        this.socket.emit('request_upload_url', config, resolve)
+      } catch (e) {
+        reject(e)
+      }
+    })
+  }
+
+  waitForUpload(config) {
+    return new Promise((resolve, reject)=>{
+      try {
+        this.socket.emit('wait_for_upload', config, resolve)
+      } catch (e) {
+        reject(e)
+      }
+    })
+  }
+
   getFileUrl(config) {
     return new Promise((resolve, reject)=>{
       try {
@@ -88,8 +108,8 @@ export class Engine {
             clearTimeout(this.connection_lost_timer)
             this.connection_lost_timer = null
           }
-          socket.emit('register_client', {id: this.client_id, token: token, session_id: this.engine_session_id}, (ret)=>{
-            if(ret.success){
+          socket.emit('register_client', {id: this.client_id, token: token, base_url: url, session_id: this.engine_session_id}, (ret)=>{
+            if(ret && ret.success){
               const connect_client = ()=>{
                 this.socket = socket
                 this.connected = true
@@ -171,8 +191,9 @@ export class Engine {
 
   updateEngineStatus() {
     return new Promise((resolve, reject) => {
+      this.plugin_processes = null
       this.socket.emit('get_engine_status', {}, (ret)=>{
-        if(ret.success){
+        if(ret && ret.success){
           this.plugin_num = ret.plugin_num
           this.plugin_processes = ret.plugin_processes
           resolve(ret)
@@ -188,12 +209,28 @@ export class Engine {
   killPluginProcess(p){
     return new Promise((resolve, reject) => {
       this.socket.emit('kill_plugin_process', {pid: p && p.pid, all: !p}, (ret)=>{
-        if(ret.success){
+        if(ret && ret.success){
           this.updateEngineStatus()
           resolve(ret)
         }
         else{
           this.showMessage(`Failed to get engine status: ${ret.error}`)
+          reject(ret.error)
+        }
+      })
+    })
+  }
+
+  resetEngine(p){
+    return new Promise((resolve, reject) => {
+      this.socket.emit('reset_engine', {}, (ret)=>{
+        if(ret && ret.success){
+          this.updateEngineStatus()
+          this.showMessage('Reset the Plugin Engine successfully')
+          resolve(ret)
+        }
+        else{
+          this.showMessage(`Failed to reset engine: ${ret.error}`)
           reject(ret.error)
         }
       })
@@ -210,7 +247,7 @@ export class Engine {
   listFiles(path, type, recursive){
     return new Promise((resolve, reject) => {
       this.socket.emit('list_dir', {path: path || '~', type: type || 'file', recursive: recursive || false}, (ret)=>{
-        if(ret.success){
+        if(ret && ret.success){
           resolve(ret)
         }
         else{

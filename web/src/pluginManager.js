@@ -1605,7 +1605,9 @@ export class PluginManager {
           })
         }
         else{
-          this.wm.addWindow(pconfig).then(()=>{
+          this.wm.addWindow(pconfig).then((wid)=>{
+            this.wm.window_ids[wid].loading = true
+            this.wm.window_ids[wid].refresh()
             this.renderWindow(pconfig).then((wplugin)=>{
               pconfig.onclose = ()=>{
                 return wplugin.terminate()
@@ -1618,8 +1620,14 @@ export class PluginManager {
                   this.wm.closeWindow(w)
                 }
               }
+              this.wm.window_ids[wid].loading = false
+              this.wm.window_ids[wid].refresh()
               resolve(wplugin.api)
-            }).catch(reject)
+            }).catch((e)=>{
+              this.wm.window_ids[wid].loading = false
+              this.wm.window_ids[wid].refresh()
+              reject(e)
+            })
           })
         }
       }
