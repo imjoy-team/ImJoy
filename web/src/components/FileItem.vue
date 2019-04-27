@@ -99,4 +99,13 @@ ul {
             user-select: none; /* Non-prefixed version, currently
                                   supported by Chrome and Opera */
 }
+
+ul {
+  list-style-position: outside !important;
+  margin: .1rem 0 .1rem 1.2rem;
+}
+
+ol li, ul li {
+  margin-top: 0px;
+}
 </style>
