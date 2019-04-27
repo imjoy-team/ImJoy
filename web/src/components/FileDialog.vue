@@ -3,12 +3,12 @@
   <md-dialog :md-active.sync="show_" :md-click-outside-to-close="false" :md-close-on-esc="false">
     <md-dialog-title>{{this.options.title || 'ImJoy File Dialog'}}</md-dialog-title>
     <md-dialog-content>
-      <md-button v-show="engine.connected" :key="engine.id" v-for="engine in engines" :class="selected_engine===engine?'md-primary md-raised':'md-raised'" @click="selectEngine(engine)">{{engine.name}}</md-button>
+      <md-button v-if="show_all_engines" v-show="engine.connected" :key="engine.id" v-for="engine in engines" :class="selected_engine===engine?'md-primary md-raised':'md-raised'" @click="selectEngine(engine)">{{engine.name}}</md-button>
       <ul v-if="selected_engine && file_tree">
         <file-item :model="file_tree" :engine="selected_engine" :root="root" :selected="file_tree_selection" @load="loadFile" @select="fileTreeSelected" @select_append="fileTreeSelectedAppend">
         </file-item>
       </ul>
-      <div class="loading loading-lg" v-else></div>
+      <div class="loading loading-lg" v-else-if="selected_engine"></div>
     </md-dialog-content>
     <md-dialog-actions>
       <md-button class="md-primary" :disabled="!file_tree_selection" @click="show_=false; resolve(file_tree_selection)">OK <md-tooltip v-if="file_tree_selection">Selected: {{file_tree_selection}}</md-tooltip> </md-button>
@@ -37,7 +37,8 @@ export default {
        file_tree: null,
        resolve: null,
        reject: null,
-       selected_engine: null
+       selected_engine: null,
+       show_all_engines: true
      }
    },
    mounted(){
@@ -91,7 +92,13 @@ export default {
        this.options.root = this.options.root || '~'
        this.options.mode = this.options.mode || 'single|multiple'
        this.options.uri_type = this.options.uri_type|| 'path'
-       this.selectEngine(this.options.engine || this.selected_engine)
+       if(this.options.engine){
+         this.show_all_engines = false
+         this.selected_engine = this.options.engine
+       }
+       else{
+         this.show_all_engines = true
+       }
        if(this.options.type != 'file' && this.options.root){
          this.file_tree_selection = this.options.root
        }
@@ -123,12 +130,18 @@ export default {
            reject("unsupported uri_type: " + this.options.uri_type)
          }
          this.root = this.options.root
-         for(let e of this.engines){
-           if(e.connected){
-             this.selectEngine(e)
-             break
+         if(this.show_all_engines){
+           for(let e of this.engines){
+             if(e.connected){
+               this.selectEngine(e)
+               break
+             }
            }
          }
+         else{
+           this.selectEngine(this.selected_engine)
+         }
+
        })
      },
      selectEngine(engine){

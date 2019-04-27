@@ -384,15 +384,15 @@
           </md-button>
         </md-card-content>
       </md-card>
-      <md-switch v-if="pm.installed_plugins.length>0 && !plugin4install && !downloading_error && !downloading_plugin" v-model="show_installed_plugins">Show Installed Plugins</md-switch>
-      <md-card v-if="show_installed_plugins">
+      <!-- <md-switch v-if="pm.installed_plugins.length>0 && !plugin4install && !downloading_error && !downloading_plugin" v-model="show_installed_plugins">Show Installed Plugins</md-switch> -->
+      <!-- <md-card v-if="show_installed_plugins">
         <md-card-header>
           <div class="md-title">Installed Plugins</div>
         </md-card-header>
         <md-card-content>
           <plugin-list display="list" name="Installed Plugins" description="" v-if="pm" :plugin-manager="pm" @message="showMessage" :plugins="pm.installed_plugins" :workspace="pm.selected_workspace"></plugin-list>
         </md-card-content>
-      </md-card>
+      </md-card> -->
       <md-card  v-if="show_plugin_url">
         <md-card-header>
           <div class="md-title">Install from URL</div>
@@ -1113,6 +1113,12 @@ export default {
       this.show_plugin_store=true
       this.show_plugin_url=true
       this.showAddPluginDialog=true
+      //select ImJoy repo as default
+      for(let repo of this.pm.repository_list){
+        if(repo.name === this.pm.default_repository_list[0].name){
+          this.selectRepository(repo.name)
+        }
+      }
     },
     sortedRunnablePlugins: function() {
         return _.orderBy(this.pm.plugins, 'name').filter((p)=>{return p.config.runnable});
