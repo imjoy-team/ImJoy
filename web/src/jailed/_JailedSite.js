@@ -37,6 +37,10 @@
       tmp.set(new Uint8Array(buffer2), buffer1.byteLength);
       return tmp.buffer;
     };
+
+    function getKeyByValue(object, value) {
+      return Object.keys(object).find(key => object[key] === value);
+    }
     /**
      * JailedSite object represents a single site in the
      * communication protocol between the application and the plugin
@@ -243,11 +247,14 @@
 
              break;
          case 'callback':
-             method = this._store.fetch(data.id)[data.num];
-             args = this._unwrap(data.args, true);
              if(data.promise){
                [resolve, reject] = this._unwrap(data.promise, false);
                try {
+                 method = this._store.fetch(data.num);
+                 args = this._unwrap(data.args, true);
+                 if(!method){
+                   throw "Callback function can only called once, if you want to call a function for multiple times, please make it as a plugin api function. See https://imjoy.io/docs for more details."
+                 }
                  result = method.apply(null, args);
                  if(result instanceof Promise || method.constructor && method.constructor.name === 'AsyncFunction'){
                    result.then(resolve).catch(reject);
@@ -261,6 +268,11 @@
              }
              else{
                try {
+                 method = this._store.fetch(data.num);
+                 args = this._unwrap(data.args, true);
+                 if(!method){
+                   throw "Please notice that callback function can only called once, if you want to call a function for multiple times, please make it as a plugin api function. See https://imjoy.io/docs for more details."
+                 }
                  method.apply(null, args);
                } catch (e) {
                  console.error(e, method, args);
@@ -367,6 +379,9 @@
                 if(id!==null) me._method_refs.fetch(id);
                 return reject.apply(this, arguments);
               };
+
+              wrapped_resolve.__jailed_pairs__ = wrapped_reject
+              wrapped_reject.__jailed_pairs__ = wrapped_resolve
               var args = me._wrap(Array.prototype.slice.call(arguments))
               var transferables = args.args.__transferables__
               if(transferables) delete args.args.__transferables__
@@ -384,7 +399,7 @@
 
           });
         };
-
+        remoteMethod.__remote_method = true
         return remoteMethod;
     }
 
@@ -406,7 +421,7 @@
      *
      * @returns {Array} wrapped arguments
      */
-     JailedSite.prototype._encode = function(aObject, callbacks) {
+     JailedSite.prototype._encode = function(aObject) {
         var transferables = []
         if (!aObject) {
           return aObject;
@@ -465,8 +480,7 @@
                 }
               }
               if(!interfaceFuncName){
-                var id = (Date.now().toString(36) + Math.random().toString(36).substr(2, 5)).toUpperCase()
-                callbacks[id] = v
+                var id = this._store.put(v)
                 bObject[k] = {__jailed_type__: 'callback', __value__ : v.constructor && v.constructor.name || id, num: id}
               }
               else{
@@ -536,7 +550,7 @@
             }
             //TODO: support also Map and Set
             else if(typeof v == "object" || Array.isArray(v)){
-              bObject[k] = this._encode(v, callbacks)
+              bObject[k] = this._encode(v)
               // move transferables to the top level object
               if(bObject[k].__transferables__){
                 for(var t=0; t<bObject[k].__transferables__.length; t++){
@@ -621,12 +635,8 @@
      };
 
     JailedSite.prototype._wrap = function(args) {
-        var callbacks = {};
-        var wrapped = this._encode(args, callbacks)
+        var wrapped = this._encode(args)
         var result = {args: wrapped};
-        if (Object.keys(callbacks).length > 0 && callbacks.constructor === Object) {
-            result.callbackId = this._store.put(callbacks);
-        }
         return result;
     }
 
@@ -685,6 +695,8 @@
             var args = me._wrap(Array.prototype.slice.call(arguments));
             var transferables = args.args.__transferables__
             if(transferables) delete args.args.__transferables__
+            resolve.__jailed_pairs__ = reject
+            reject.__jailed_pairs__ = resolve
             try {
               me._connection.send({
                   type : 'callback',
@@ -861,11 +873,16 @@
      */
     ReferenceStore.prototype.fetch = function(id) {
         var obj = this._store[id];
-        this._store[id] = null;
-        delete this._store[id];
-        this._releaseId(id);
-        if(this._readyHandler&&Object.keys(this._store).length==0){
-          this._readyHandler()
+        if(obj && !obj.__remote_method){
+          delete this._store[id];
+          this._releaseId(id);
+          if(this._readyHandler&&Object.keys(this._store).length==0){
+            this._readyHandler()
+          }
+        }
+        if(obj && obj.__jailed_pairs__){
+          const _id = getKeyByValue(this._store, obj.__jailed_pairs__)
+          this.fetch(_id)
         }
         return obj;
     }
