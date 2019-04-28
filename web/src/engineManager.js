@@ -156,6 +156,7 @@ export class Engine {
           })
         })
         socket.on('disconnect', () => {
+          console.error('Socket io disconnected from ' + this.url)
           if(this.connected){
             this.showMessage('Plugin Engine disconnected.')
           }
@@ -167,13 +168,13 @@ export class Engine {
               this.showMessage('Failed to connect to the plugin engine')
             }
           }
-
           if(this.disconnecting){
             //disconnect immediately
             this.socket = null
             this.connected = false
             this.event_bus.$emit('engine_disconnected', this)
             this.connection = 'Disconnected.'
+            this.update_ui_callback()
           }
           else{
             //wait for 10s to see if it recovers
@@ -183,6 +184,7 @@ export class Engine {
               this.connected = false
               this.event_bus.$emit('engine_disconnected', this)
               this.connection = 'Disconnected.'
+              this.update_ui_callback()
             }, 10000)
           }
         });

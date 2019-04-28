@@ -1185,3 +1185,9 @@ Currently supported functions for **Python plugins** are:
 
 ### api.WORKSPACE constant
 Name of the current workspace.
+
+
+### api.ENGINE_URL constant
+**Only available to native-python plugins**
+
+URL of the current plugin engine.

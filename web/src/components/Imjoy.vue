@@ -1491,15 +1491,16 @@ export default {
           return
         }
 
-        engine.requestUploadUrl({path: config.path}).then((ret)=>{
-          if(ret && ret.success){
+        engine.requestUploadUrl({path: config.path, overwrite: config.overwrite}).then((ret)=>{
+          ret = ret || {}
+          if(ret.success){
             resolve(ret.url)
             this.$forceUpdate()
           }
           else{
-            ret.error = ret.error || ''
-            this.showMessage(`Failed to request file url for ${config.path} ${ret.error}`)
-            reject(ret.error)
+            ret.error = ret.error || 'UNKNOWN'
+            this.showMessage(`Failed to request file url, Error: ${ret.error}`)
+            reject(`Failed to request file url, Error: ${ret.error}`)
             this.$forceUpdate()
           }
         }).catch(reject)
@@ -1533,14 +1534,15 @@ export default {
         }
 
         engine.waitForUpload({url: config.url}).then((ret)=>{
-          if(ret && ret.success){
+          ret = ret || {}
+          if(ret.success){
             resolve(ret)
             this.$forceUpdate()
           }
           else{
-            ret.error = ret.error || ''
-            this.showMessage(`Failed to request file url for ${config.path} ${ret.error}`)
-            reject(ret.error)
+            ret.error = ret.error || 'UNKNOWN'
+            this.showMessage(`Failed to wait for the file upload. Error: ${ret.error}`)
+            reject(`Failed to wait for the file upload. Error: ${ret.error}`)
             this.$forceUpdate()
           }
         }).catch(reject)
@@ -1575,14 +1577,15 @@ export default {
         if(!this.showPermissionConfirmation){
           const resolve_permission = ()=>{
             engine.getFileUrl(config).then((ret)=>{
-              if(ret && ret.success){
+              ret = ret || {}
+              if(ret.success){
                 resolve(ret.url)
                 this.$forceUpdate()
               }
               else{
                 ret.error = ret.error || ''
                 this.showMessage(`Failed to get file url for ${config.path} ${ret.error}`)
-                reject(ret.error)
+                reject(`Failed to get file url for ${config.path} ${ret.error}`)
                 this.$forceUpdate()
               }
             }).catch(reject)
@@ -1620,14 +1623,15 @@ export default {
           return
         }
         engine.getFilePath(config).then((ret)=>{
-          if(ret && ret.success){
+          ret = ret || {}
+          if(ret.success){
             resolve(ret.path)
             this.$forceUpdate()
           }
           else{
             ret.error = ret.error || ''
             this.showMessage(`Failed to get file path for ${config.url} ${ret.error}`)
-            reject(ret.error)
+            reject(`Failed to get file path for ${config.url} ${ret.error}`)
             this.$forceUpdate()
           }
         }).catch(reject)

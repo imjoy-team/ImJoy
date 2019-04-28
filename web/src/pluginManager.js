@@ -1051,9 +1051,12 @@ export class PluginManager {
           console.error("Please connect to the Plugin Engine 🚀.")
         }
       }
+      else{
+        config.engine = null
+      }
       const tconfig = _.assign({}, template, config)
       tconfig.workspace = this.selected_workspace
-      const _interface = _.assign({TAG: tconfig.tag, WORKSPACE: this.selected_workspace}, this.imjoy_api)
+      const _interface = _.assign({TAG: tconfig.tag, WORKSPACE: this.selected_workspace, ENGINE_URL: config.engine && config.engine.url}, this.imjoy_api)
       const plugin = new DynamicPlugin(tconfig, _interface, this.fm.api)
       plugin.whenConnected(() => {
         if (!plugin.api) {
