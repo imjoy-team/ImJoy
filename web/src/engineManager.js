@@ -221,7 +221,7 @@ export class Engine {
     })
   }
 
-  resetEngine(p){
+  resetEngine(){
     return new Promise((resolve, reject) => {
       this.socket.emit('reset_engine', {}, (ret)=>{
         if(ret && ret.success){

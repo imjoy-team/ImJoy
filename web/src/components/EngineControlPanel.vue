@@ -44,14 +44,14 @@
                 <md-icon>autorenew</md-icon>
               </md-button>
             </md-menu-item> -->
-            <md-menu-item v-if="engine.plugin_processes" v-for="p in engine.plugin_processes" :key="p.pid">
+            <md-menu-item v-show="engine.plugin_processes" v-for="p in engine.plugin_processes" :key="p.pid">
               &nbsp;&nbsp;
               - {{p.name}} (#{{p.pid}})
               <md-button @click.stop="kill(engine, p)" class="md-icon-button md-accent">
                 <md-icon>clear</md-icon>
               </md-button>
             </md-menu-item>
-            <md-menu-item v-else>
+            <md-menu-item v-if="!engine.plugin_processes">
               <div class="loading loading-lg"></div>
             </md-menu-item>
 
