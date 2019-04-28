@@ -1,11 +1,11 @@
 self.__precacheManifest = [
   {
-    "revision": "a3755697cba03f4a2cab",
-    "url": "/static/css/app.a7aefdb1.css"
+    "revision": "3adcd25ce2f5d298c559",
+    "url": "/static/css/app.e52e768c.css"
   },
   {
-    "revision": "a3755697cba03f4a2cab",
-    "url": "/static/js/app.385551ab.js"
+    "revision": "3adcd25ce2f5d298c559",
+    "url": "/static/js/app.230220f9.js"
   },
   {
     "revision": "b8859e2632feade2aed6",
@@ -228,19 +228,19 @@ self.__precacheManifest = [
     "url": "/static/js/chunk-vendors.ca0f8304.js"
   },
   {
-    "revision": "2a3e222e6a41b32a7180e6afa3675990",
-    "url": "/static/vs/html.worker.js"
-  },
-  {
     "revision": "b00449080615ce71a2a8a52aee9f658f",
     "url": "/static/vs/css.worker.js"
+  },
+  {
+    "revision": "2a3e222e6a41b32a7180e6afa3675990",
+    "url": "/static/vs/html.worker.js"
   },
   {
     "revision": "493ef474936217113b20a6573247288a",
     "url": "/static/vs/editor.worker.js"
   },
   {
-    "revision": "5aad231f723898684bbe85db5484e797",
+    "revision": "2310d0b971f5a31243d457adf4031d3a",
     "url": "/index.html"
   },
   {
@@ -484,6 +484,10 @@ self.__precacheManifest = [
     "url": "/static/img/twitter.svg"
   },
   {
+    "revision": "774eded82b6697664906101c0f362f9e",
+    "url": "/static/vs/base/worker/workerMain.js"
+  },
+  {
     "revision": "f1db99b3f880c36fa487f96f37fcc7d2",
     "url": "/static/vs/basic-languages/apex/apex.js"
   },
@@ -626,10 +630,6 @@ self.__precacheManifest = [
   {
     "revision": "83f9d7a8568f0f86fd00bf3c21944ce8",
     "url": "/static/vs/basic-languages/ruby/ruby.js"
-  },
-  {
-    "revision": "774eded82b6697664906101c0f362f9e",
-    "url": "/static/vs/base/worker/workerMain.js"
   },
   {
     "revision": "524db18624629ebed6788b26cbf4820e",

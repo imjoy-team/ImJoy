@@ -291,7 +291,7 @@ var basicConnectionNode = function() {
  * web-browser environment
  */
 var basicConnectionWeb = function() {
-    var perm = ['allow-scripts'];
+    var perm = ['allow-scripts', 'allow-forms'];
 
     if (__jailed__path__.substr(0,7).toLowerCase() == 'file://') {
         // local instance requires extra permission
