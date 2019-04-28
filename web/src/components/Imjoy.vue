@@ -1516,28 +1516,26 @@ export default {
       return new Promise((resolve, reject) => {
           const bodyFormData = new FormData();
           bodyFormData.append('file', config.file);
-          const self = this;
+
           let totalLength = null
           axios({
             method: 'post',
             url: config.url,
             data: bodyFormData,
             headers: config.headers || {'Content-Type': 'multipart/form-data'},
-            onUploadProgress: function (progressEvent){
-              if(totalLength === -1){
-                totalLength = totalLength || progressEvent.lengthComputable ? progressEvent.total : progressEvent.target.getResponseHeader('content-length') || progressEvent.target.getResponseHeader('x-decompressed-content-length');
-                if(!totalLength){
-                  totalLength = -1
+            onUploadProgress: (progressEvent)=>{
+              totalLength = totalLength || progressEvent.lengthComputable ? progressEvent.total : progressEvent.target.getResponseHeader('content-length') || progressEvent.target.getResponseHeader('x-decompressed-content-length');
+              if (totalLength !== null) {
+                const p = progressEvent.loaded*100 / totalLength
+                if(parseInt(p)%5 == 0){
+                  this.showProgress(null,  p)
+                  this.$forceUpdate()
                 }
               }
-              if (totalLength !== null && totalLength>0) {
-      					self.showProgress( (progressEvent.loaded * 100) / totalLength )
-                self.$forceUpdate()
-      				}
               if(config.progress){
                 config.progress(progressEvent.loaded, totalLength)
               }
-      			}
+            }
           })
           .then(function (response) {
             if(response.status !== 200){
