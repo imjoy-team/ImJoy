@@ -69,6 +69,26 @@ html, body
     overscroll-behavior-x: none;
 }
 
+.h1, h1 {
+  font-size: 1.3rem!important;
+}
+
+.h2, h2 {
+   font-size: 1.0rem!important;
+}
+
+.h3, h3 {
+   font-size: 0.8rem!important;
+}
+
+.h4, h4 {
+   font-size: 0.75rem!important;
+}
+
+.h5, h5 {
+   font-size: 0.7rem!important;
+}
+
 .md-app {
   height:100%;
   margin: 0px;

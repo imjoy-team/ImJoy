@@ -1495,6 +1495,7 @@ export default {
         engine.requestUploadUrl({path: config.path, overwrite: config.overwrite}).then((ret)=>{
           ret = ret || {}
           if(ret.success){
+            if(_plugin.log) _plugin.log(`Uploaded url created: ${ret.url}`)
             resolve(ret.url)
             this.$forceUpdate()
           }
@@ -1544,6 +1545,7 @@ export default {
               reject(response.statusText)
             }
             else{
+              if(_plugin.log) _plugin.log(`File uploaded to ${config.url}`)
               resolve(response.data)
             }
           })
@@ -1599,35 +1601,21 @@ export default {
           reject("Plugin name not found.")
           return
         }
-        if(!this.showPermissionConfirmation){
-          const resolve_permission = ()=>{
-            engine.getFileUrl(config).then((ret)=>{
-              ret = ret || {}
-              if(ret.success){
-                resolve(ret.url)
-                this.$forceUpdate()
-              }
-              else{
-                ret.error = ret.error || ''
-                this.showMessage(`Failed to get file url for ${config.path} ${ret.error}`)
-                reject(`Failed to get file url for ${config.path} ${ret.error}`)
-                this.$forceUpdate()
-              }
-            }).catch(reject)
-          }
-          if(_plugin === this.IMJOY_PLUGIN){
-            resolve_permission()
+        engine.getFileUrl(config).then((ret)=>{
+          ret = ret || {}
+          if(ret.success){
+            if(_plugin.log) _plugin.log(`File url created ${config.path}: ${ret.url}`)
+            resolve(ret.url)
+            this.$forceUpdate()
           }
           else{
-            this.permission_message = `Plugin <strong>"${_plugin.name}"</strong> would like to access your local file at <strong>"${config.path}"</strong><br>This means files and folders under "${config.path}" will be exposed as an url which can be accessed with the url.<br><strong>Please make sure this file path do not contain any confidential or sensitive data.</strong><br>Do you trust this plugin and allow this operation?`
-            this.resolve_permission = resolve_permission
-            this.reject_permission = reject
-            this.showPermissionConfirmation = true
+            ret.error = ret.error || ''
+            this.showMessage(`Failed to get file url for ${config.path} ${ret.error}`)
+            reject(`Failed to get file url for ${config.path} ${ret.error}`)
+            this.$forceUpdate()
           }
-        }
-        else{
-          reject("There is a pending permission request, please try again later.")
-        }
+        }).catch(reject)
+
       })
     },
     getFilePath(_plugin, config){
