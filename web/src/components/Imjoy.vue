@@ -614,8 +614,9 @@ export default {
       showStatus: this.showStatus,
       showFileDialog: this.showFileDialog,
       requestUploadUrl: this.requestUploadUrl,
-      waitForUpload: this.waitForUpload,
       showSnackbar: this.showSnackbar,
+      uploadFileToUrl: this.uploadFileToUrl,
+      downloadFileFromUrl: this.downloadFileFromUrl,
       getFileUrl: this.getFileUrl,
       getFilePath: this.getFilePath,
       exportFile: this.exportFile,
@@ -1466,7 +1467,7 @@ export default {
       }
     },
     requestUploadUrl(_plugin, config){
-      if(typeof config === 'string'){
+      if(typeof config !== 'object'){
         throw "You must pass an object contains keys named `path` and `engine`"
       }
       config.engine = config.engine===undefined? _plugin.config.engine: config.engine
@@ -1507,50 +1508,74 @@ export default {
 
       })
     },
-    waitForUpload(_plugin, config){
-      if(typeof config === 'string'){
-        throw "You must pass an object contains keys named `url` and `engine`"
+    uploadFileToUrl(_plugin, config){
+      if(typeof config !== 'object' || !config.file || !config.url){
+        throw "You must pass an object contains keys named `file` and `url`"
       }
-      config.engine = config.engine===undefined? _plugin.config.engine: config.engine
-      const engine = config.engine instanceof Engine ? config.engine: this.em.getEngineByUrl(config.engine)
-      delete config.engine
       return new Promise((resolve, reject) => {
-        if(!engine){
-          reject("Please specify an engine")
-          return
-        }
-        if(!engine.connected){
-          reject("Please connect to the Plugin Engine 🚀.")
-          this.showMessage("Please connect to the Plugin Engine 🚀.")
-          return
-        }
-        if(_plugin !== this.IMJOY_PLUGIN && (!_plugin || !_plugin.id)){
-          reject("Plugin not found.")
-          return
-        }
-        if(_plugin !== this.IMJOY_PLUGIN && !_plugin.name){
-          reject("Plugin name not found.")
-          return
-        }
-
-        engine.waitForUpload({url: config.url}).then((ret)=>{
-          ret = ret || {}
-          if(ret.success){
-            resolve(ret)
-            this.$forceUpdate()
-          }
-          else{
-            ret.error = ret.error || 'UNKNOWN'
-            this.showMessage(`Failed to wait for the file upload. Error: ${ret.error}`)
-            reject(`Failed to wait for the file upload. Error: ${ret.error}`)
-            this.$forceUpdate()
-          }
-        }).catch(reject)
-
+          const bodyFormData = new FormData();
+          bodyFormData.append('file', config.file);
+          const self = this;
+          let totalLength = null
+          axios({
+            method: 'post',
+            url: config.url,
+            data: bodyFormData,
+            headers: config.headers || {'Content-Type': 'multipart/form-data'},
+            onUploadProgress: function (progressEvent){
+              if(totalLength === -1){
+                totalLength = totalLength || progressEvent.lengthComputable ? progressEvent.total : progressEvent.target.getResponseHeader('content-length') || progressEvent.target.getResponseHeader('x-decompressed-content-length');
+                if(!totalLength){
+                  totalLength = -1
+                }
+              }
+              if (totalLength !== null && totalLength>0) {
+      					self.showProgress( (progressEvent.loaded * 100) / totalLength )
+                self.$forceUpdate()
+      				}
+              if(config.progress){
+                config.progress(progressEvent.loaded, totalLength)
+              }
+      			}
+          })
+          .then(function (response) {
+            if(response.status !== 200){
+              console.error(response)
+              reject(response.statusText)
+            }
+            else{
+              resolve(response.data)
+            }
+          })
+          .catch(function (response) {
+              console.error(response)
+              reject(response.statusText)
+          });
+      })
+    },
+    downloadFileFromUrl(_plugin, config){
+      if(typeof config !== 'object' || !config.url){
+        throw "You must pass an object contains keys named `url`"
+      }
+      return new Promise((resolve, reject) => {
+          axios.get(config.url)
+          .then(function (response) {
+            if(response.status !== 200){
+              console.error(response)
+              reject(response.statusText)
+            }
+            else{
+              resolve(response.data)
+            }
+          })
+          .catch(function (response) {
+              console.error(response)
+              reject(response.statusText)
+          });
       })
     },
     getFileUrl(_plugin, config){
-      if(typeof config === 'string'){
+      if(typeof config !== 'object' || !config.path){
         throw "You must pass an object contains keys named `path` and `engine`"
       }
       config.engine = config.engine===undefined? _plugin.config.engine: config.engine
@@ -1606,7 +1631,7 @@ export default {
       })
     },
     getFilePath(_plugin, config){
-      if(typeof config === 'string'){
+      if(typeof config !== 'object' || !config.url){
         throw "You must pass an object contains keys named `url` and `engine`"
       }
       config.engine = config.engine===undefined? _plugin.config.engine: config.engine

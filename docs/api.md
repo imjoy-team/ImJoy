@@ -856,34 +856,67 @@ api.requestUploadUrl({'path': 'data/output.png', 'engine': 'http://127.0.0.1:952
 // will return something like `http://127.0.0.1:9527/file/1ba89354-ae98-457c-a53b-39a4bdd14941.
 ```
 
-### api.waitForUpload
+### api.uploadFileToUrl
 ```python
-ret = await api.waitForUpload(config)
+fileInfo = await api.uploadFileToUrl(config)
 ```
 
-Wait until the file upload is finished.
+Upload a file to a upload url.
 
 **Arguments**
 * **config**. Object (JavaScript) or dictionary (Python).
 It contains the following fields:
-  - **url** : String. The upload url to be waited.
+  - **url** : String. The upload url to be uploaded (get from `api.requestUploadUrl`).
 
 **Returns**
-* **ret**. Object (JavaScript) or dictionary (Python).
+* **fileInfo**. Object (JavaScript) or dictionary (Python). Information about the uploaded file.
 It contains the following fields:
   - **path** : the path to where the file was saved
   - **size** : the size (bytes) of the uploaded file
 
 **Examples**
 
-Obtain url with default settings
-
 ```javascript
-const url = await api.requestUploadUrl({'path': 'data/output.png', 'engine': 'http://127.0.0.1:9527'})
-// upload the file
-ret = await waitForUpload(url)
 
-console.log('file uploaded to ', ret.path, ret.size)
+const url = await api.requestUploadUrl({engine: 'http://127.0.0.1:9527', overwrite: true})
+
+const imageFile = document.getElementById('file').files[0]
+
+const fileInfo = await api.uploadFileToUrl({file:imageFile, url: url})
+
+console.log(fileInfo.path)
+```
+
+### api.downloadFileFromUrl
+```python
+file = await api.downloadFileFromUrl(config)
+```
+
+Upload a file to a upload url.
+
+**Arguments**
+* **config**. Object (JavaScript) or dictionary (Python).
+It contains the following fields:
+  - **url** : String. The url to the remote file (get from `api.getFileUrl`).
+
+**Returns**
+* **fileInfo**. Object (JavaScript) or dictionary (Python). The downloaded file.
+
+**Examples**
+
+Download a file on the plugin engine
+```javascript
+
+const path = '/path/to/the/file'
+const url = await api.getFileUrl({engine: 'http://127.0.0.1:9527', path: path })
+
+const file = await api.downloadFileFromUrl({url: url})
+```
+
+You can also use it to download files from other website
+```javascript
+const url = 'https://raw.githubusercontent.com/oeway/ImJoy/master/README.md'
+const file = await api.downloadFileFromUrl({url: url})
 ```
 
 ### api.run

@@ -34,16 +34,6 @@ export class Engine {
     })
   }
 
-  waitForUpload(config) {
-    return new Promise((resolve, reject)=>{
-      try {
-        this.socket.emit('wait_for_upload', config, resolve)
-      } catch (e) {
-        reject(e)
-      }
-    })
-  }
-
   getFileUrl(config) {
     return new Promise((resolve, reject)=>{
       try {
