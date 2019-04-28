@@ -613,6 +613,8 @@ export default {
       showProgress: this.showProgress,
       showStatus: this.showStatus,
       showFileDialog: this.showFileDialog,
+      requestUploadUrl: this.requestUploadUrl,
+      waitForUpload: this.waitForUpload,
       showSnackbar: this.showSnackbar,
       getFileUrl: this.getFileUrl,
       getFilePath: this.getFilePath,
@@ -1445,32 +1447,36 @@ export default {
         throw "No plugin engine selected."
       }
     },
-    showFileDialog(_plugin, options){
-      options = options || {}
+    showFileDialog(_plugin, config){
+      config = config || {}
       if(_plugin && _plugin.id){
-        options.engine = options.engine || _plugin.config.engine
-        options.engine = options.engine instanceof Engine ? options.engine: this.em.engines[options.engine]
-        options.root = options.root || (_plugin.config && _plugin.config.work_dir)
+        config.engine = config.engine===undefined? _plugin.config.engine: config.engine
+        config.engine = config.engine instanceof Engine ? config.engine: this.em.getEngineByUrl(config.engine)
+        config.root = config.root || (_plugin.config && _plugin.config.work_dir)
         if(_plugin.type != 'native-python'){
-          options.uri_type = options.uri_type || 'url'
+          config.uri_type = config.uri_type || 'url'
         }
         else{
-          options.uri_type = options.uri_type || 'path'
+          config.uri_type = config.uri_type || 'path'
         }
-        return this.$refs['file-dialog'].showDialog(_plugin, options)
+        return this.$refs['file-dialog'].showDialog(_plugin, config)
       }
       else{
-        return this.$refs['file-dialog'].showDialog(_plugin, options)
+        return this.$refs['file-dialog'].showDialog(_plugin, config)
       }
     },
     requestUploadUrl(_plugin, config){
       if(typeof config === 'string'){
         throw "You must pass an object contains keys named `path` and `engine`"
       }
-      config.engine = config.engine || _plugin.config.engine
-      config.engine = config.engine instanceof Engine ? config.engine: this.em.engines[config.engine]
-      const engine = config.engine || this.em.engines[0]
+      config.engine = config.engine===undefined? _plugin.config.engine: config.engine
+      const engine = config.engine instanceof Engine ? config.engine: this.em.getEngineByUrl(config.engine)
+      delete config.engine
       return new Promise((resolve, reject) => {
+        if(!engine){
+          reject("Please specify an engine")
+          return
+        }
         if(!engine.connected){
           reject("Please connect to the Plugin Engine 🚀.")
           this.showMessage("Please connect to the Plugin Engine 🚀.")
@@ -1485,12 +1491,13 @@ export default {
           return
         }
 
-        engine.requestUploadUrl(config).then((ret)=>{
-          if(ret.success){
+        engine.requestUploadUrl({path: config.path}).then((ret)=>{
+          if(ret && ret.success){
             resolve(ret.url)
             this.$forceUpdate()
           }
           else{
+            ret.error = ret.error || ''
             this.showMessage(`Failed to request file url for ${config.path} ${ret.error}`)
             reject(ret.error)
             this.$forceUpdate()
@@ -1501,12 +1508,16 @@ export default {
     },
     waitForUpload(_plugin, config){
       if(typeof config === 'string'){
-        throw "You must pass an object contains keys named `path` and `engine`"
+        throw "You must pass an object contains keys named `url` and `engine`"
       }
-      config.engine = config.engine || _plugin.config.engine
-      config.engine = config.engine instanceof Engine ? config.engine: this.em.engines[config.engine]
-      const engine = config.engine || this.em.engines[0]
+      config.engine = config.engine===undefined? _plugin.config.engine: config.engine
+      const engine = config.engine instanceof Engine ? config.engine: this.em.getEngineByUrl(config.engine)
+      delete config.engine
       return new Promise((resolve, reject) => {
+        if(!engine){
+          reject("Please specify an engine")
+          return
+        }
         if(!engine.connected){
           reject("Please connect to the Plugin Engine 🚀.")
           this.showMessage("Please connect to the Plugin Engine 🚀.")
@@ -1521,12 +1532,13 @@ export default {
           return
         }
 
-        engine.waitForUpload(config).then((ret)=>{
-          if(ret.success){
-            resolve(ret.path)
+        engine.waitForUpload({url: config.url}).then((ret)=>{
+          if(ret && ret.success){
+            resolve(ret)
             this.$forceUpdate()
           }
           else{
+            ret.error = ret.error || ''
             this.showMessage(`Failed to request file url for ${config.path} ${ret.error}`)
             reject(ret.error)
             this.$forceUpdate()
@@ -1539,10 +1551,14 @@ export default {
       if(typeof config === 'string'){
         throw "You must pass an object contains keys named `path` and `engine`"
       }
-      config.engine = config.engine || _plugin.config.engine
-      config.engine = config.engine instanceof Engine ? config.engine: this.em.engines[config.engine]
-      const engine = config.engine || this.em.engines[0]
+      config.engine = config.engine===undefined? _plugin.config.engine: config.engine
+      const engine = config.engine instanceof Engine ? config.engine: this.em.getEngineByUrl(config.engine)
+      delete config.engine
       return new Promise((resolve, reject) => {
+        if(!engine){
+          reject("Please specify an engine")
+          return
+        }
         if(!engine.connected){
           reject("Please connect to the Plugin Engine 🚀.")
           this.showMessage("Please connect to the Plugin Engine 🚀.")
@@ -1559,11 +1575,12 @@ export default {
         if(!this.showPermissionConfirmation){
           const resolve_permission = ()=>{
             engine.getFileUrl(config).then((ret)=>{
-              if(ret.success){
+              if(ret && ret.success){
                 resolve(ret.url)
                 this.$forceUpdate()
               }
               else{
+                ret.error = ret.error || ''
                 this.showMessage(`Failed to get file url for ${config.path} ${ret.error}`)
                 reject(ret.error)
                 this.$forceUpdate()
@@ -1589,21 +1606,26 @@ export default {
       if(typeof config === 'string'){
         throw "You must pass an object contains keys named `url` and `engine`"
       }
-      config.engine = config.engine || _plugin.config.engine
-      config.engine = config.engine instanceof Engine ? config.engine: this.em.engines[config.engine]
-      const engine = config.engine || this.em.engines[0]
+      config.engine = config.engine===undefined? _plugin.config.engine: config.engine
+      const engine = config.engine instanceof Engine ? config.engine: this.em.getEngineByUrl(config.engine)
+      delete config.engine
       return new Promise((resolve, reject) => {
+        if(!engine){
+          reject("Please specify an engine")
+          return
+        }
         if(!engine.connected){
           reject("Please connect to the Plugin Engine 🚀.")
           this.showMessage("Please connect to the Plugin Engine 🚀.")
           return
         }
         engine.getFilePath(config).then((ret)=>{
-          if(ret.success){
+          if(ret && ret.success){
             resolve(ret.path)
             this.$forceUpdate()
           }
           else{
+            ret.error = ret.error || ''
             this.showMessage(`Failed to get file path for ${config.url} ${ret.error}`)
             reject(ret.error)
             this.$forceUpdate()

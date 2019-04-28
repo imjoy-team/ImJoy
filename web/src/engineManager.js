@@ -290,6 +290,15 @@ export class EngineManager {
 
   }
 
+  getEngineByUrl(url){
+    for(let e of this.engines){
+      if(e.url === url){
+        return e
+      }
+    }
+    return null
+  }
+
   addEngine(config, force_save){
     if(config.type === 'default'){
       config.id = config.id || '_' + config.name + '_' + config.url
