@@ -52,7 +52,9 @@
               </md-button>
             </md-menu-item>
             <md-menu-item v-if="!engine.plugin_processes">
-              <div class="loading loading-lg"></div>
+              <md-button>
+                <div class="loading loading-lg"></div>
+              </md-button>
             </md-menu-item>
 
             <md-menu-item :disabled="true" v-if="engine.plugin_num>1">
