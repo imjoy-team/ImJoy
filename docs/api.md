@@ -840,7 +840,9 @@ Generates an url for upload a file to the plugin engine
 **Arguments**
 * **config**. Object (JavaScript) or dictionary (Python). Options for generating a url for uploading a file.
 It contains the following fields:
-  - **path** (optional): String. If specified, the file uploaded from the generated url will be saved to the path. Otherwise, the fill will be saved to the current workspace directory. If relative path is used, then it will relative to the current workspace folder.
+  - **dir** (optional): String. If specified, `dir` can be used to define the folder which will be used to contain the uploaded file. If relative path is used, then it will relative to the current workspace folder. If not specified, the default value is the current work folder.
+  - **path** (optional): String. If specified, it will override the file name.
+
   - **engine**: String. The engine url of the plugin engine which the file will be uploaded to. For native-python plugin, if not specified, the plugin's current engine will be used. It is required for other plugin types.
   - **overwrite** (optional): String. If the file exists, whether overwrite it. By default, it will raise error if a file already exists.
 
@@ -849,12 +851,12 @@ It contains the following fields:
 
 **Examples**
 
-Obtain url with default settings
+Obtain url with default settings. It will return something like `http://127.0.0.1:9527/upload/1ba89354-ae98-457c-a53b-39a4bdd14941`.
 
 ```javascript
-api.requestUploadUrl({'path': 'data/output.png', 'engine': 'http://127.0.0.1:9527'})
-// will return something like `http://127.0.0.1:9527/file/1ba89354-ae98-457c-a53b-39a4bdd14941.
+const url = await api.requestUploadUrl({'path': 'data/output.png', 'engine': 'http://127.0.0.1:9527'})
 ```
+
 
 ### api.uploadFileToUrl
 ```python

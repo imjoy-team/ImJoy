@@ -1,11 +1,11 @@
 self.__precacheManifest = [
   {
-    "revision": "37c618f92b1d88de6bb4",
-    "url": "/static/css/app.a9cecd86.css"
+    "revision": "cb32b3a39bc8ae2919e4",
+    "url": "/static/css/app.9fc67af6.css"
   },
   {
-    "revision": "37c618f92b1d88de6bb4",
-    "url": "/static/js/app.8ca4351e.js"
+    "revision": "cb32b3a39bc8ae2919e4",
+    "url": "/static/js/app.4f697335.js"
   },
   {
     "revision": "b8859e2632feade2aed6",
@@ -240,7 +240,7 @@ self.__precacheManifest = [
     "url": "/static/vs/editor.worker.js"
   },
   {
-    "revision": "b6553572c18819cedeff032039747d2f",
+    "revision": "c834e62bc9ac936d95e7a3e51685189f",
     "url": "/index.html"
   },
   {
