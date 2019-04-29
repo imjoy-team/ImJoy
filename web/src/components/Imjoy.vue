@@ -1,8 +1,5 @@
 <template>
 <div class="imjoy noselect">
-  <div style="visibility:hidden; opacity:0" id="dropzone">
-    <div id="textnode">Drop files to add data.</div>
-  </div>
   <md-app>
     <md-app-toolbar class="md-dense" md-elevation="0">
       <div class="md-toolbar-section-start">
@@ -13,7 +10,10 @@
           <img class="site-title" src="static/img/imjoy-logo-black.svg" alt="ImJoy">
           <md-tooltip>ImJoy home</md-tooltip>
         </md-button>
-        <md-button v-if="status_text&&status_text.length" class="status-text md-small-hide" @click="showAlert(null, status_text)" :class="status_text.includes('rror')?'error-message':''">
+        <md-button v-if="workspace_dropping" class="status-text">
+          Drop files to the workspace.
+        </md-button>
+        <md-button v-else-if="status_text&&status_text.length" class="status-text md-small-hide" @click="showAlert(null, status_text)" :class="status_text.includes('rror')?'error-message':''">
           {{status_text.slice(0,80)+(status_text.length>80?'...':'')}}
         </md-button>
         <span class="subheader-title md-medium-hide" style="flex: 1" v-else>Deploying Deep Learning Made Easy!</span>
@@ -286,14 +286,13 @@
         </md-card-content>
       </md-card>
     </md-app-drawer>
-    <md-app-content class="whiteboard-content">
+    <md-app-content :class="workspace_dropping?'file-dropping':''" class="whiteboard-content">
       <md-progress-bar md-mode="determinate" :md-value="progress"></md-progress-bar>
-      <whiteboard ref="whiteboard" :mode="wm.window_mode" :window-manager="wm"></whiteboard>
+      <whiteboard id="whiteboard" :mode="wm.window_mode" :window-manager="wm"></whiteboard>
     </md-app-content>
   </md-app>
-
   <md-dialog-confirm :md-active.sync="showRemoveConfirmation" md-title="Removing Plugin" md-content="Do you really want to <strong>delete</strong> this plugin" md-confirm-text="Yes" md-cancel-text="Cancel" @md-cancel="showRemoveConfirmation=false" @md-confirm="pm.removePlugin(plugin2_remove);plugin2_remove=null;showRemoveConfirmation=false"/>
-  <file-dialog ref="file-dialog" :engines="em.engines" :list-files="listFiles" :get-file-url="getFileUrl"></file-dialog>
+  <file-dialog id="engine-file-dialog" ref="file-dialog" :engines="em.engines" :list-files="listFiles" :get-file-url="getFileUrl" :request-upload-url="requestUploadUrl" :upload-file-to-url="uploadFileToUrl"></file-dialog>
   <md-dialog :class="plugin_dialog_config && plugin_dialog_config.ui?'':'window-dialog'" :md-active.sync="showPluginDialog" :md-click-outside-to-close="false" :md-close-on-esc="false">
     <md-dialog-actions v-if="!plugin_dialog_config || !plugin_dialog_config.ui">
       <md-button class="md-accent" @click="closePluginDialog(true)"><md-icon>clear</md-icon></md-button>
@@ -596,7 +595,8 @@ export default {
       show_snackbar: false,
       screenWidth: 1024,
       plugin_loaded: false,
-      new_workspace_name: ''
+      new_workspace_name: '',
+      workspace_dropping: false
     }
   },
   watch: {
@@ -664,23 +664,48 @@ export default {
       name: "Workflow",
       ui: "{id:'workflow', type:'ops'}"
     }
-    window.addEventListener("dragover", (e) => {
-      e.preventDefault();
-      document.querySelector("#dropzone").style.visibility = "";
-      document.querySelector("#dropzone").style.opacity = 1;
-      document.querySelector("#textnode").style.fontSize = "48px";
+    const insideWhiteboard = (target) => {
+      return target && document.getElementById('whiteboard').contains(target)
+    }
+    const insideFileDialog = (target) =>{
+      return target && document.getElementById('engine-file-dialog').contains(target)
+    }
+    document.addEventListener("dragover", (e) => {
+      e.preventDefault()
+      e.stopPropagation();
+      if(insideWhiteboard(e.target)){
+        if(!this.workspace_dropping){
+          this.workspace_dropping = true;
+          this.$forceUpdate()
+        }
+      }
+      if(insideFileDialog(e.target)){
+        this.event_bus.$emit('drag_upload_enter')
+      }
     });
-    window.addEventListener("dragenter", (e) => {
-      e.preventDefault();
-      document.querySelector("#dropzone").style.visibility = "";
-      document.querySelector("#dropzone").style.opacity = 1;
-      document.querySelector("#textnode").style.fontSize = "48px";
+    document.addEventListener("dragenter", (e) => {
+      e.preventDefault()
+      e.stopPropagation();
+      if(insideWhiteboard(e.target)){
+        this.workspace_dropping = true;
+        this.$forceUpdate()
+      }
+      if(insideFileDialog(e.target)){
+        this.event_bus.$emit('drag_upload_enter')
+      }
     });
-    window.addEventListener("dragleave", (e) => {
+    document.addEventListener("dragleave", (e) => {
       e.preventDefault();
-      document.querySelector("#dropzone").style.visibility = "hidden";
-      document.querySelector("#dropzone").style.opacity = 0;
-      document.querySelector("#textnode").style.fontSize = "42px";
+      e.stopPropagation();
+      if(!insideWhiteboard(e.target)){
+        if(this.workspace_dropping){
+          this.workspace_dropping = false;
+          this.$forceUpdate();
+        }
+      }
+      if(!insideFileDialog(e.target)){
+        this.event_bus.$emit('drag_upload_leave')
+      }
     });
     const parseFiles = (e)=>{
       return new Promise((resolve, reject)=>{
@@ -730,12 +755,19 @@ export default {
         }
       })
     }
-    window.addEventListener("drop", (e) => {
-      e.preventDefault();
-      document.querySelector("#dropzone").style.visibility = "hidden";
-      document.querySelector("#dropzone").style.opacity = 0;
-      document.querySelector("#textnode").style.fontSize = "42px";
-      parseFiles(e).then(this.loadFiles)
+    document.addEventListener("drop", (e) => {
+      e.preventDefault()
+      if(insideWhiteboard(e.target)){
+        parseFiles(e).then(this.loadFiles)
+        this.workspace_dropping = false;
+        this.$forceUpdate();
+      }
+      else if(insideFileDialog(e.target)){
+        this.event_bus.$emit('drag_upload_leave')
+        parseFiles(e).then((files)=>{
+          this.event_bus.$emit('drag_upload', files)
+        })
+      }
     });
   },
   beforeRouteLeave(to, from, next) {
@@ -1468,8 +1500,9 @@ export default {
     },
     requestUploadUrl(_plugin, config){
       if(typeof config !== 'object'){
-        throw "You must pass an object contains keys named `path` and `engine`"
+        throw "You must pass an object contains keys named `engine` and `path` (or `dir`, optionally `overwrite`)"
       }
+      _plugin = _plugin ||  this.IMJOY_PLUGIN
       config.engine = config.engine===undefined? _plugin.config.engine: config.engine
       const engine = config.engine instanceof Engine ? config.engine: this.em.getEngineByUrl(config.engine)
       delete config.engine
@@ -1483,16 +1516,8 @@ export default {
           this.showMessage("Please connect to the Plugin Engine 🚀.")
           return
         }
-        if(_plugin !== this.IMJOY_PLUGIN && (!_plugin || !_plugin.id)){
-          reject("Plugin not found.")
-          return
-        }
-        if(_plugin !== this.IMJOY_PLUGIN && !_plugin.name){
-          reject("Plugin name not found.")
-          return
-        }
 
-        engine.requestUploadUrl({path: config.path, overwrite: config.overwrite}).then((ret)=>{
+        engine.requestUploadUrl({path: config.path, overwrite: config.overwrite, dir: config.dir}).then((ret)=>{
           ret = ret || {}
           if(ret.success){
             if(_plugin.log) _plugin.log(`Uploaded url created: ${ret.url}`)
@@ -1516,7 +1541,7 @@ export default {
       return new Promise((resolve, reject) => {
           const bodyFormData = new FormData();
           bodyFormData.append('file', config.file);
-
+          this.showMessage('Uploading a file to ' + config.url)
           let totalLength = null
           axios({
             method: 'post',
@@ -1543,7 +1568,7 @@ export default {
               reject(response.statusText)
             }
             else{
-              if(_plugin.log) _plugin.log(`File uploaded to ${config.url}`)
+              if(_plugin&&_plugin.log) _plugin.log(`File uploaded to ${config.url}`)
               resolve(response.data)
             }
           })
@@ -1558,7 +1583,23 @@ export default {
         throw "You must pass an object contains keys named `url`"
       }
       return new Promise((resolve, reject) => {
-          axios.get(config.url)
+          this.showMessage('Downloading from ' + config.url)
+          let totalLength = null
+          axios.get(config.url,{
+            onDownloadProgress: (progressEvent)=>{
+              totalLength = totalLength || progressEvent.lengthComputable ? progressEvent.total : progressEvent.target.getResponseHeader('content-length') || progressEvent.target.getResponseHeader('x-decompressed-content-length');
+              if (totalLength !== null) {
+                const p = progressEvent.loaded*100 / totalLength
+                if(parseInt(p)%5 == 0){
+                  this.showProgress(null,  p)
+                  this.$forceUpdate()
+                }
+              }
+              if(config.progress){
+                config.progress(progressEvent.loaded, totalLength)
+              }
+            }
+          })
           .then(function (response) {
             if(response.status !== 200){
               console.error(response)
@@ -1864,29 +1905,6 @@ export default {
   user-select: text;
 }
 
-div#dropzone {
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 9999999999;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  transition: visibility 175ms, opacity 175ms;
-  display: table;
-  text-shadow: 1px 1px 2px #000;
-  color: #fff;
-  background: rgba(0, 0, 0, 0.45);
-  font: bold 42px Oswald, DejaVu Sans, Tahoma, sans-serif;
-}
-
-div#textnode {
-  display: table-cell;
-  text-align: center;
-  vertical-align: middle;
-  transition: font-size 175ms;
-}
-
 .speed-dial {
   top: 8px !important;
   left: 15px !important;
@@ -2028,5 +2046,9 @@ button.md-speed-dial-target {
 
 .carousel .carousel-locator:nth-of-type(1):checked~.carousel-nav .nav-item:nth-of-type(1) {
     color: #92add0;
+}
+
+.file-dropping {
+  background: #cad8ef!important;
 }
 </style>
