@@ -1562,17 +1562,19 @@ export default {
               }
             }
           })
-          .then(function (response) {
+          .then((response)=>{
             if(response.status !== 200){
               console.error(response)
               reject(response.statusText)
             }
             else{
+              this.showMessage(`File uploaded to ${config.url}`)
               if(_plugin&&_plugin.log) _plugin.log(`File uploaded to ${config.url}`)
               resolve(response.data)
             }
           })
-          .catch(function (response) {
+          .catch((response)=>{
+               this.showMessage(`failed to upload files, error: ${response.statusText}`)
               console.error(response)
               reject(response.statusText)
           });
@@ -1600,16 +1602,18 @@ export default {
               }
             }
           })
-          .then(function (response) {
+          .then((response)=>{
             if(response.status !== 200){
               console.error(response)
               reject(response.statusText)
             }
             else{
+              this.showMessage(`File downloaded from ${config.url}`)
               resolve(response.data)
             }
           })
-          .catch(function (response) {
+          .catch((response)=> {
+            this.showMessage(`failed to download files, error: ${response.statusText}`)
               console.error(response)
               reject(response.statusText)
           });

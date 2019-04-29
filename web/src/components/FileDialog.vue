@@ -4,7 +4,7 @@
     <md-dialog-content>
       <md-button v-show="show_all_engines && engine.connected" :key="engine.id" v-for="engine in engines" :class="selected_engine===engine?'md-primary md-raised':'md-raised'" @click="selectEngine(engine)">{{engine.name}}</md-button>
       <div class="uploading-info">
-        <h3 v-if="dropping && current_file">Drop files to upload to {{current_file.path}}</h3>
+        <h3 v-if="dropping">Drop files to upload to {{root}}</h3>
         <md-progress-bar md-mode="determinate" v-if="uploading" :md-value="uploading_progress"></md-progress-bar>
         <p v-if="uploading_text">{{uploading_text}}</p>
       </div>
@@ -14,7 +14,7 @@
       </ul>
       <div class="loading loading-lg" v-else-if="selected_engine"></div>
       <p v-else>
-        No engine available.
+        No plugin engine available.
       </p>
 
     </md-dialog-content>
@@ -50,7 +50,6 @@ export default {
        show_all_engines: true,
        dropping: false,
        uploading: false,
-       current_file: null,
        uploading_text: '(Drag and drop here to upload files)',
        uploading_progress: 0
      }
@@ -77,40 +76,31 @@ export default {
    computed: {
    },
    methods: {
-     async upload(f){
+     async upload(f, progress_text){
        this.uploading_text = 'requesting upload url from the engine...'
        const url = await this.requestUploadUrl(null, {'dir': this.root, 'path': f.relativePath, 'overwrite': true, 'engine': this.selected_engine.url})
        console.log('uploading file to url', url)
-       this.uploading_text = `uploading ${f.relativePath} to ${url}`
+       this.uploading_text = progress_text + ` ${url}`
        const ret = await this.uploadFileToUrl(null, {file: f, url: url, progress: (uploaded, total)=>{
          this.uploading_progress = uploaded*100/total
-         this.uploading_text = `uploading ${f.relativePath} (${this.uploading_progress}%)`
+         this.uploading_text = progress_text + ` ${f.relativePath} (${Math.round(this.uploading_progress)}%)`
          this.$forceUpdate()
        }})
        this.uploading_text = 'file uploaded to ' + ret.path
      },
      async uploadFiles(files){
-       this.uploading_text = 'uploading'
+       this.uploading_text = 'uploading...'
        this.uploading = true
-       if(!this.current_file){
-         alert('please select a target folder for uploading.')
-         return
-       }
-       if(this.current_file.type === 'dir'){
-         for(let f of files){
-           await this.upload(f)
+       try {
+         for(let i=0;i<files.length;i++){
+           await this.upload(files[i], `uploading ${i}/${files.length}: `)
          }
+       } catch (e) {
+         this.uploading_text = 'failed to upload, error:' + e&&e.toString()
+       } finally {
+         this.uploading = false
+         this.refreshList()
        }
-       else{
-         if(files.length>1){
-           alert('Please select a target folder for uploading')
-         }
-         else{
-           await this.upload(files[0])
-         }
-       }
-       this.uploading = false
-       this.refreshList()
      },
      showDropping(){
        this.dropping = true
@@ -124,7 +114,6 @@ export default {
        if(this.options.type === 'file' && f.target.type === 'dir')
        return
        this.file_tree_selection = f.path
-       this.current_file = {path: f.path, type: f.target.type}
        this.$forceUpdate()
      },
      fileTreeSelectedAppend(f){
@@ -137,7 +126,6 @@ export default {
      refreshList(){
        this.listFiles(this.selected_engine, this.root, this.options.type, this.options.recursive).then((tree)=>{
          this.root = tree.path
-         this.current_file = {path: this.root, type: 'dir'}
          this.file_tree = tree
          this.$forceUpdate()
        })
@@ -149,7 +137,6 @@ export default {
          // }
          this.listFiles(this.selected_engine, f.path, this.options.type, this.options.recursive).then((tree)=>{
            this.root = tree.path
-           this.current_file = {path: this.root, type: 'dir'}
            this.file_tree = tree
            this.$forceUpdate()
          })
@@ -187,8 +174,6 @@ export default {
        else{
          this.file_tree_selection = null
        }
-       this.current_file = {path: this.options.root, type: 'dir'}
-
        return new Promise((resolve, reject) => {
          if(this.options.uri_type === 'path'){
            this.resolve = resolve
@@ -224,7 +209,9 @@ export default {
          else{
            this.selectEngine(this.selected_engine)
          }
-
+         this.dropping = false
+         this.uploading_progress = 0
+         this.uploading_text = '(Drag and drop here to upload files)'
        })
      },
      selectEngine(engine){
