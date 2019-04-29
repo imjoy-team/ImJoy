@@ -89,6 +89,12 @@ html, body
    font-size: 0.7rem!important;
 }
 
+
+ul {
+    list-style: circle outside!important;
+    margin-left: 30px!important;
+}
+
 .md-app {
   height:100%;
   margin: 0px;

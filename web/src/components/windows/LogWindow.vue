@@ -62,6 +62,11 @@ export default {
 .log-content {
   overflow: auto;
   width: 100%;
+  user-select: text!important;
+  -webkit-touch-callout: text!important;
+  -webkit-user-select: text!important;
+  -moz-user-select: text!important;
+  -ms-user-select: text!important;
 }
 
 .log-content p{

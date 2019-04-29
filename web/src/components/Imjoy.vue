@@ -1837,6 +1837,11 @@ export default {
     max-width: 800px;
   }
 }
+@media screen and (min-height: 500px ) {
+  #engine-file-dialog{
+    min-height: 400px!important;
+  }
+}
 
 @media screen and (max-height: 900px) {
   .plugin-dialog {

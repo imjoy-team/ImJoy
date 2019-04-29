@@ -3,8 +3,11 @@
     <md-dialog-title>{{this.options.title || 'ImJoy File Dialog'}}</md-dialog-title>
     <md-dialog-content>
       <md-button v-show="show_all_engines && engine.connected" :key="engine.id" v-for="engine in engines" :class="selected_engine===engine?'md-primary md-raised':'md-raised'" @click="selectEngine(engine)">{{engine.name}}</md-button>
-      <h3 v-if="dropping && current_file">Drop files to upload to {{current_file.path}}</h3>
-      <p v-if="uploading">{{uploading_text}}</p>
+      <div class="uploading-info">
+        <h3 v-if="dropping && current_file">Drop files to upload to {{current_file.path}}</h3>
+        <md-progress-bar md-mode="determinate" v-if="uploading" :md-value="uploading_progress"></md-progress-bar>
+        <p v-if="uploading_text">{{uploading_text}}</p>
+      </div>
       <ul :class="dropping?'dropping-files': ''" v-if="selected_engine && file_tree">
         <file-item :model="file_tree" :engine="selected_engine" :root="root" :selected="file_tree_selection" @load="loadFile" @select="fileTreeSelected" @select_append="fileTreeSelectedAppend">
         </file-item>
@@ -48,7 +51,8 @@ export default {
        dropping: false,
        uploading: false,
        current_file: null,
-       uploading_text: ''
+       uploading_text: '(Drag and drop here to upload files)',
+       uploading_progress: 0
      }
    },
    created(){
@@ -56,7 +60,7 @@ export default {
      if(this.event_bus){
        this.event_bus.$on('drag_upload_enter', this.showDropping)
        this.event_bus.$on('drag_upload_leave', this.hideDropping)
-       this.event_bus.$on('drag_upload', this.upload)
+       this.event_bus.$on('drag_upload', this.uploadFiles)
      }
 
    },
@@ -67,13 +71,25 @@ export default {
      if(this.event_bus){
        this.event_bus.$off('drag_upload_enter', this.showDropping)
        this.event_bus.$off('drag_upload_leave', this.hideDropping)
-       this.event_bus.$off('drag_upload', this.upload)
+       this.event_bus.$off('drag_upload', this.uploadFiles)
      }
    },
    computed: {
    },
    methods: {
-     async upload(files){
+     async upload(f){
+       this.uploading_text = 'requesting upload url from the engine...'
+       const url = await this.requestUploadUrl(null, {'dir': this.root, 'path': f.relativePath, 'overwrite': true, 'engine': this.selected_engine.url})
+       console.log('uploading file to url', url)
+       this.uploading_text = `uploading ${f.relativePath} to ${url}`
+       const ret = await this.uploadFileToUrl(null, {file: f, url: url, progress: (uploaded, total)=>{
+         this.uploading_progress = uploaded*100/total
+         this.uploading_text = `uploading ${f.relativePath} (${this.uploading_progress}%)`
+         this.$forceUpdate()
+       }})
+       this.uploading_text = 'file uploaded to ' + ret.path
+     },
+     async uploadFiles(files){
        this.uploading_text = 'uploading'
        this.uploading = true
        if(!this.current_file){
@@ -82,12 +98,7 @@ export default {
        }
        if(this.current_file.type === 'dir'){
          for(let f of files){
-           this.uploading_text = 'requesting url...'
-           const url = await this.requestUploadUrl(null, {'dir': this.root, 'path': f.relativePath, 'overwrite': true, 'engine': this.selected_engine.url})
-           console.log('uploading file to url', url)
-           this.uploading_text = 'uploading file ' + f.relativePath + ' to ' + url
-           const ret = await this.uploadFileToUrl(null, {file: f, url: url})
-           this.uploading_text = 'file uploaded to ' + ret.path
+           await this.upload(f)
          }
        }
        else{
@@ -95,14 +106,10 @@ export default {
            alert('Please select a target folder for uploading')
          }
          else{
-           const f = files[0]
-           const url = await this.requestUploadUrl(null, {'dir': this.root, 'path': f.relativePath, 'overwrite': true, 'engine': this.selected_engine.url})
-           console.log('uploading file to url', url)
-           this.uploading_text = 'uploading file ' + f.relativePath + ' to ' + url
-           const ret = await this.uploadFileToUrl(null, {file: f, url: url})
-           this.uploading_text = 'file uploaded to ' + ret.path
+           await this.upload(files[0])
          }
        }
+       this.uploading = false
        this.refreshList()
      },
      showDropping(){
@@ -242,6 +249,14 @@ export default {
 .md-dialog {
   max-width: 1024px;
   min-width: 50%;
+}
+p{
+  margin-bottom: 2px!important;
+}
+.uploading-info{
+  margin-left: 10px;
+  margin-top:10px;
+  margin-bottom: 10px;
 }
 
 ul {
