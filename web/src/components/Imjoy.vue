@@ -292,7 +292,7 @@
     </md-app-content>
   </md-app>
   <md-dialog-confirm :md-active.sync="showRemoveConfirmation" md-title="Removing Plugin" md-content="Do you really want to <strong>delete</strong> this plugin" md-confirm-text="Yes" md-cancel-text="Cancel" @md-cancel="showRemoveConfirmation=false" @md-confirm="pm.removePlugin(plugin2_remove);plugin2_remove=null;showRemoveConfirmation=false"/>
-  <file-dialog id="engine-file-dialog" ref="file-dialog" :engines="em.engines" :list-files="listFiles" :get-file-url="getFileUrl" :request-upload-url="requestUploadUrl" :upload-file-to-url="uploadFileToUrl"></file-dialog>
+  <file-dialog id="engine-file-dialog" ref="file-dialog" :engines="em.engines" :remove-files="removeFiles" :list-files="listFiles" :get-file-url="getFileUrl" :request-upload-url="requestUploadUrl" :upload-file-to-url="uploadFileToUrl"></file-dialog>
   <md-dialog :class="plugin_dialog_config && plugin_dialog_config.ui?'':'window-dialog'" :md-active.sync="showPluginDialog" :md-click-outside-to-close="false" :md-close-on-esc="false">
     <md-dialog-actions v-if="!plugin_dialog_config || !plugin_dialog_config.ui">
       <md-button class="md-accent" @click="closePluginDialog(true)"><md-icon>clear</md-icon></md-button>
@@ -1217,7 +1217,7 @@ export default {
       this.$forceUpdate()
     },
     showEngineFileDialog(){
-      this.showFileDialog(this.IMJOY_PLUGIN, {uri_type: 'url'}).then((selection)=>{
+      this.showFileDialog(this.IMJOY_PLUGIN, {uri_type: 'url', root: './'}).then((selection)=>{
         if(typeof selection === 'string'){
           selection = [selection]
         }
@@ -1475,6 +1475,14 @@ export default {
     listFiles(engine, path, type, recursive){
       if(engine){
         return engine.listFiles(path, type, recursive)
+      }
+      else{
+        throw "No plugin engine selected."
+      }
+    },
+    removeFiles(engine, path, type, recursive){
+      if(engine){
+        return engine.removeFiles(path, type, recursive)
       }
       else{
         throw "No plugin engine selected."

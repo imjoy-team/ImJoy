@@ -250,6 +250,20 @@ export class Engine {
     })
   }
 
+  removeFiles(path, type, recursive){
+    return new Promise((resolve, reject) => {
+      this.socket.emit('remove_files', {path: path, type: type, recursive: recursive || false}, (ret)=>{
+        if(ret && ret.success){
+          resolve(ret)
+        }
+        else{
+          this.showMessage(`Failed to remove file/directory: ${ret&&ret.error}`)
+          reject(ret.error)
+        }
+      })
+    })
+  }
+
   showMessage(msg, duration){
     if(this.show_message_callback){
       this.show_message_callback(msg, duration)

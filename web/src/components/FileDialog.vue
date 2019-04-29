@@ -19,6 +19,16 @@
 
     </md-dialog-content>
     <md-dialog-actions>
+      <md-menu v-show="file_tree_selection_info">
+        <md-button class="md-button md-primary" md-menu-trigger>
+          options
+        </md-button>
+        <md-menu-content>
+          <md-menu-item class="md-accent" @click="remove()">
+              <md-icon>delete</md-icon> Delete
+          </md-menu-item>
+        </md-menu-content>
+      </md-menu>
       <md-button class="md-primary" :disabled="!file_tree_selection" @click="show_=false; resolve(file_tree_selection)">OK <md-tooltip v-if="file_tree_selection">Selected: {{file_tree_selection}}</md-tooltip> </md-button>
       <md-button class="md-primary" @click="show_=false; reject('file dialog canceled by the user.')">Cancel</md-button>
     </md-dialog-actions>
@@ -32,6 +42,7 @@ export default {
   props: {
      getFileUrl: Function,
      listFiles: Function,
+     removeFiles: Function,
      mode: String,
      engines: Array,
      requestUploadUrl: Function,
@@ -43,6 +54,7 @@ export default {
        options: {},
        show_: false,
        file_tree_selection: null,
+       file_tree_selection_info: null,
        file_tree: null,
        resolve: null,
        reject: null,
@@ -93,7 +105,7 @@ export default {
        this.uploading = true
        try {
          for(let i=0;i<files.length;i++){
-           await this.upload(files[i], `uploading ${i}/${files.length}: `)
+           await this.upload(files[i], `uploading ${i+1}/${files.length}: `)
          }
        } catch (e) {
          this.uploading_text = 'failed to upload, error:' + e&&e.toString()
@@ -114,13 +126,16 @@ export default {
        if(this.options.type === 'file' && f.target.type === 'dir')
        return
        this.file_tree_selection = f.path
+       this.file_tree_selection_info = f
        this.$forceUpdate()
      },
      fileTreeSelectedAppend(f){
        if(!Array.isArray(this.file_tree_selection)){
          this.file_tree_selection = this.file_tree_selection? [this.file_tree_selection]: []
+         this.file_tree_selection_info = this.file_tree_selection_info ? [this.file_tree_selection_info]: []
        }
        this.file_tree_selection.push(f.path)
+       this.file_tree_selection_info.push(f)
        this.$forceUpdate()
      },
      refreshList(){
@@ -158,7 +173,7 @@ export default {
        this.show_ = true
        this.options = options
        this.options.title = this.options.title || 'ImJoy File Dialog'
-       this.options.root = this.options.root || '~'
+       this.options.root = this.options.root || './'
        this.options.mode = this.options.mode || 'single|multiple'
        this.options.uri_type = this.options.uri_type|| 'path'
        if(this.options.engine){
@@ -226,6 +241,22 @@ export default {
            resolve()
          }).catch(reject)
        })
+     },
+     async remove(){
+       let files = []
+       if(!this.file_tree_selection_info){
+         throw 'no file selected'
+       }
+       if(Array.isArray(this.file_tree_selection_info)){
+         files = this.file_tree_selection_info
+       }
+       else{
+         files = [this.file_tree_selection_info]
+       }
+       for(let f of files){
+         await this.removeFiles(this.selected_engine, f.path, f.target.type, this.options.recursive)
+       }
+       this.refreshList()
      }
    }
 }

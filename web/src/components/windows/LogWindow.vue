@@ -75,6 +75,12 @@ export default {
   margin: 1px;
 }
 
+
+ul {
+    list-style: circle outside!important;
+    margin-left: 30px!important;
+}
+
 .info {
   color: #4286f4;
   transition: .3s;
