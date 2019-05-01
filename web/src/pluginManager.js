@@ -652,7 +652,7 @@ export class PluginManager {
       // tag = tag || uri.split('@')[1]
       // uri = uri.split('@')[0]
 
-      this.getPluginFromUrl(uri, scoped_plugins).then((config)=>{
+      this.getPluginFromUrl(uri, scoped_plugins).then(async (config)=>{
         config.origin = pconfig.origin || uri
         if (!config) {
           console.error(`Failed to fetch the plugin from "${uri}".`)
@@ -676,29 +676,25 @@ export class PluginManager {
         }
         config._id = config.name && config.name.replace(/ /g, '_') || randId()
         config.dependencies = config.dependencies || []
-        const _deps = []
-        for (let i = 0; i < config.dependencies.length; i++) {
-            _deps.push(this.installPlugin({uri: config.dependencies[i], scoped_plugins: config.scoped_plugins || scoped_plugins}, null, do_not_load))
-        }
-        Promise.all(_deps).then(()=>{
-          this.savePlugin(config).then((template)=>{
-            for (let p of this.available_plugins) {
-              if(p.name === template.name && !p.installed){
-                p.installed = true
-                p.tag = tag
-              }
+        try{
+          for (let i = 0; i < config.dependencies.length; i++) {
+            await this.installPlugin({uri: config.dependencies[i], scoped_plugins: config.scoped_plugins || scoped_plugins}, null, do_not_load)
+          }
+          const template = await this.savePlugin(config)
+          for (let p of this.available_plugins) {
+            if(p.name === template.name && !p.installed){
+              p.installed = true
+              p.tag = tag
             }
-            this.showMessage(`Plugin "${template.name}" has been successfully installed.`)
-            resolve(template)
-            if(!do_not_load) this.reloadPlugin(template)
-          }).catch(()=>{
-            reject(`Failed to save the plugin ${config.name}`)
-          })
-        }).catch((error)=>{
+          }
+          this.showMessage(`Plugin "${template.name}" has been successfully installed.`)
+          resolve(template)
+          if(!do_not_load) this.reloadPlugin(template)
+        }
+        catch(e){
           alert(`Failed to install dependencies for ${config.name}: ${error}`)
           throw `Failed to install dependencies for ${config.name}: ${error}`
-        })
-
+        }
       }).catch((e)=>{
         console.error(e)
         this.showMessage('Failed to download, if you download from github, please use the url to the raw file', 10)
