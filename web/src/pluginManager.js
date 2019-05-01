@@ -691,7 +691,7 @@ export class PluginManager {
           resolve(template)
           if(!do_not_load) this.reloadPlugin(template)
         }
-        catch(e){
+        catch(error){
           alert(`Failed to install dependencies for ${config.name}: ${error}`)
           throw `Failed to install dependencies for ${config.name}: ${error}`
         }
