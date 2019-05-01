@@ -292,7 +292,7 @@
     </md-app-content>
   </md-app>
   <md-dialog-confirm :md-active.sync="showRemoveConfirmation" md-title="Removing Plugin" md-content="Do you really want to <strong>delete</strong> this plugin" md-confirm-text="Yes" md-cancel-text="Cancel" @md-cancel="showRemoveConfirmation=false" @md-confirm="pm.removePlugin(plugin2_remove);plugin2_remove=null;showRemoveConfirmation=false"/>
-  <file-dialog id="engine-file-dialog" ref="file-dialog" :engines="em.engines" :remove-files="removeFiles" :list-files="listFiles" :get-file-url="getFileUrl" :request-upload-url="requestUploadUrl" :upload-file-to-url="uploadFileToUrl"></file-dialog>
+  <file-dialog id="engine-file-dialog" ref="file-dialog" :engines="em.engines" :remove-files="removeFiles" :list-files="listFiles" :get-file-url="getFileUrl" :request-upload-url="requestUploadUrl" :download-file-from-url="downloadFileFromUrl" :upload-file-to-url="uploadFileToUrl"></file-dialog>
   <md-dialog :class="plugin_dialog_config && plugin_dialog_config.ui?'':'window-dialog'" :md-active.sync="showPluginDialog" :md-click-outside-to-close="false" :md-close-on-esc="false">
     <md-dialog-actions v-if="!plugin_dialog_config || !plugin_dialog_config.ui">
       <md-button class="md-accent" @click="closePluginDialog(true)"><md-icon>clear</md-icon></md-button>
@@ -1546,6 +1546,7 @@ export default {
       if(typeof config !== 'object' || !config.file || !config.url){
         throw "You must pass an object contains keys named `file` and `url`"
       }
+      _plugin = _plugin || {}
       return new Promise((resolve, reject) => {
           const bodyFormData = new FormData();
           bodyFormData.append('file', config.file);
@@ -1577,7 +1578,7 @@ export default {
             }
             else{
               this.showMessage(`File uploaded to ${config.url}`)
-              if(_plugin&&_plugin.log) _plugin.log(`File uploaded to ${config.url}`)
+              if(_plugin.log) _plugin.log(`File uploaded to ${config.url}`)
               resolve(response.data)
             }
           })
@@ -1631,6 +1632,7 @@ export default {
       if(typeof config !== 'object' || !config.path){
         throw "You must pass an object contains keys named `path` and `engine`"
       }
+      _plugin = _plugin || {}
       config.engine = config.engine===undefined? _plugin.config.engine: config.engine
       const engine = config.engine instanceof Engine ? config.engine: this.em.getEngineByUrl(config.engine)
       delete config.engine
@@ -1642,14 +1644,6 @@ export default {
         if(!engine.connected){
           reject("Please connect to the Plugin Engine 🚀.")
           this.showMessage("Please connect to the Plugin Engine 🚀.")
-          return
-        }
-        if(_plugin !== this.IMJOY_PLUGIN && (!_plugin || !_plugin.id)){
-          reject("Plugin not found.")
-          return
-        }
-        if(_plugin !== this.IMJOY_PLUGIN && !_plugin.name){
-          reject("Plugin name not found.")
           return
         }
         engine.getFileUrl(config).then((ret)=>{
@@ -1673,6 +1667,7 @@ export default {
       if(typeof config !== 'object' || !config.url){
         throw "You must pass an object contains keys named `url` and `engine`"
       }
+      _plugin = _plugin || {}
       config.engine = config.engine===undefined? _plugin.config.engine: config.engine
       const engine = config.engine instanceof Engine ? config.engine: this.em.getEngineByUrl(config.engine)
       delete config.engine

@@ -3,10 +3,10 @@
     <md-dialog-title>{{this.options.title || 'ImJoy File Dialog'}}</md-dialog-title>
     <md-dialog-content>
       <md-button v-show="show_all_engines && engine.connected" :key="engine.id" v-for="engine in engines" :class="selected_engine===engine?'md-primary md-raised':'md-raised'" @click="selectEngine(engine)">{{engine.name}}</md-button>
-      <div class="uploading-info">
+      <div class="loading-info">
         <h3 v-if="dropping">Drop files to upload to {{root}}</h3>
-        <md-progress-bar md-mode="determinate" v-if="uploading" :md-value="uploading_progress"></md-progress-bar>
-        <p v-if="uploading_text">{{uploading_text}}</p>
+        <md-progress-bar md-mode="determinate" v-if="loading" :md-value="loading_progress"></md-progress-bar>
+        <p v-if="status_text">{{status_text}}</p>
       </div>
       <ul :class="dropping?'dropping-files': ''" v-if="selected_engine && file_tree">
         <file-item :model="file_tree" :engine="selected_engine" :root="root" :selected="file_tree_selection" @load="loadFile" @select="fileTreeSelected" @select_append="fileTreeSelectedAppend">
@@ -24,6 +24,9 @@
           options
         </md-button>
         <md-menu-content>
+          <md-menu-item class="md-primary" @click="downloadFiles()">
+              <md-icon>cloud_download</md-icon> Download
+          </md-menu-item>
           <md-menu-item class="md-accent" @click="remove()">
               <md-icon>delete</md-icon> Delete
           </md-menu-item>
@@ -46,7 +49,8 @@ export default {
      mode: String,
      engines: Array,
      requestUploadUrl: Function,
-     uploadFileToUrl: Function
+     uploadFileToUrl: Function,
+     downloadFileFromUrl: Function
    },
    data: function () {
      return {
@@ -61,9 +65,9 @@ export default {
        selected_engine: null,
        show_all_engines: true,
        dropping: false,
-       uploading: false,
-       uploading_text: '(Drag and drop here to upload files)',
-       uploading_progress: 0
+       loading: false,
+       status_text: '(Drag and drop here to upload files)',
+       loading_progress: 0
      }
    },
    created(){
@@ -89,28 +93,28 @@ export default {
    },
    methods: {
      async upload(f, progress_text){
-       this.uploading_text = 'requesting upload url from the engine...'
+       this.status_text = 'requesting upload url from the engine...'
        const url = await this.requestUploadUrl(null, {'dir': this.root, 'path': f.relativePath, 'overwrite': true, 'engine': this.selected_engine.url})
-       console.log('uploading file to url', url)
-       this.uploading_text = progress_text + ` ${url}`
+       console.log('loading file to url', url)
+       this.status_text = progress_text + ` ${url}`
        const ret = await this.uploadFileToUrl(null, {file: f, url: url, progress: (uploaded, total)=>{
-         this.uploading_progress = uploaded*100/total
-         this.uploading_text = progress_text + ` ${f.relativePath} (${Math.round(this.uploading_progress)}%)`
+         this.loading_progress = uploaded*100/total
+         this.status_text = progress_text + ` (${Math.round(this.loading_progress)}%)`
          this.$forceUpdate()
        }})
-       this.uploading_text = 'file uploaded to ' + ret.path
+       this.status_text = `file uploaded to ${ret.path}.`
      },
      async uploadFiles(files){
-       this.uploading_text = 'uploading...'
-       this.uploading = true
+       this.status_text = 'uploading...'
+       this.loading = true
        try {
          for(let i=0;i<files.length;i++){
-           await this.upload(files[i], `uploading ${i+1}/${files.length}: `)
+           await this.upload(files[i], `uploading ${i+1}/${files.length}: ${files[i].name}`)
          }
        } catch (e) {
-         this.uploading_text = 'failed to upload, error:' + e&&e.toString()
+         this.status_text = 'failed to upload, error:' + e&&e.toString()
        } finally {
-         this.uploading = false
+         this.loading = false
          this.refreshList()
        }
      },
@@ -225,8 +229,8 @@ export default {
            this.selectEngine(this.selected_engine)
          }
          this.dropping = false
-         this.uploading_progress = 0
-         this.uploading_text = '(Drag and drop here to upload files)'
+         this.loading_progress = 0
+         this.status_text = '(Drag and drop here to upload files)'
        })
      },
      selectEngine(engine){
@@ -257,7 +261,37 @@ export default {
          await this.removeFiles(this.selected_engine, f.path, f.target.type, this.options.recursive)
        }
        this.refreshList()
-     }
+     },
+    async downloadFiles(){
+      let files = []
+      if(!this.file_tree_selection_info){
+        throw 'no file selected'
+      }
+      if(Array.isArray(this.file_tree_selection_info)){
+        files = this.file_tree_selection_info
+      }
+      else{
+        files = [this.file_tree_selection_info]
+      }
+      for(let i=0;i<files.length;i++){
+        if(files[i].target.type === 'file'){
+          this.download(files[i], `downloading ${i+1}/${files.length}: ${files[i].target.name}`)
+        }
+        else{
+          this.status_text = 'Folder cannot be downloaded, please select files.'
+        }
+      }
+    },
+    async download(f, progress_text){
+       this.status_text = 'requesting upload url from the engine...'
+       const url = await this.getFileUrl(null, {path: f.path, engine: this.selected_engine})
+       this.status_text = progress_text
+       const anchor = document.createElement('a');
+        anchor.href = url;
+        anchor.target = '_blank';
+        anchor.download = f.name;
+        anchor.click();
+    }
    }
 }
 </script>
@@ -271,7 +305,7 @@ export default {
 p{
   margin-bottom: 2px!important;
 }
-.uploading-info{
+.loading-info{
   margin-left: 10px;
   margin-top:10px;
   margin-bottom: 10px;
