@@ -52,7 +52,7 @@
     </md-card-expand-content>
   </md-card-expand>
   <md-card-content :class="w.scroll?'plugin-iframe-container allow-scroll':'plugin-iframe-container'">
-    <div class="loading loading-lg" v-if="w.loading"></div>
+    <div class="loading loading-lg floating" v-show="w.loading"></div>
     <component v-if="componentNames[w.type] && w.type.startsWith('imjoy/')" :is="componentNames[w.type]" :w="w" :loaders="loaders" />
     <md-empty-state v-else-if="w.type.startsWith('imjoy/')" md-icon="hourglass_empty" md-label="IMJOY.IO" md-description="" />
     <div v-else class="plugin-iframe">
@@ -243,4 +243,19 @@ export default {
   right: 0;
   top: 0;
 }
+
+.floating{
+  position: absolute!important;
+  left: calc( 50% - 1.5rem )!important;
+  top: calc( 39% - 1.5rem )!important;
+  z-index: 999;
+}
+
+.loading.loading-lg::after {
+  height: 3rem!important;
+  margin-left: -.8rem;
+  margin-top: -.8rem;
+  width: 3rem!important;
+}
+
 </style>

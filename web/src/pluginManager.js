@@ -207,6 +207,30 @@ export class PluginManager {
         }).catch(()=>{
           reject('Failed to load the repository list or save the default repositories.')
         })
+
+        this.saveRepositoryList().then(()=>{
+          resolve(this.repository_list)
+        }).catch(reject)
+
+      })
+    })
+  }
+  saveRepositoryList(){
+    return new Promise((resolve, reject)=>{
+      let _rev = null
+      this.config_db.get('repository_list').then((doc) => {
+        _rev = doc._rev
+      }).finally(()=>{
+        this.config_db.put({
+          _id: 'repository_list',
+          _rev: _rev || undefined,
+          list: this.repository_list,
+        }).then(()=>{
+          resolve(this.repository_list)
+        }).catch((err) => {
+          this.showMessage("Failed to save repository, database Error:" + err.toString())
+          reject("Failed to save repository, database Error:" + err.toString())
+        })
       })
     })
   }
@@ -248,18 +272,10 @@ export class PluginManager {
         for(let r of this.repository_list){
           this.repository_names.push(r.name)
         }
-        this.config_db.get('repository_list').then((doc) => {
-          this.config_db.put({
-            _id: doc._id,
-            _rev: doc._rev,
-            list: this.repository_list,
-          }).then(()=>{
-            resolve(repo)
-          }).catch(reject)
-        }).catch((err) => {
-          this.showMessage("Failed to save repository, database Error:" + err.toString())
-          reject("Failed to save repository, database Error:" + err.toString())
-        })
+        this.saveRepositoryList().then(()=>{
+          resolve(repo)
+        }).catch(reject)
+
       }).catch(()=>{
         if(this.repository_names.indexOf(repo.name)>=0)
           this.repository_names.splice(this.repository_names.indexOf(repo.name), 1)
@@ -288,22 +304,13 @@ export class PluginManager {
         for(let r of this.repository_list){
           this.repository_names.push(r.name)
         }
-        this.config_db.get('repository_list').then((doc) => {
-          this.config_db.put({
-            _id: doc._id,
-            _rev: doc._rev,
-            list: this.repository_list
-          }).then(()=>{
-            this.showMessage(`Repository has been deleted.`)
-            resolve()
-          }).catch(()=>{
-            this.showMessage(`Error occured when removing repository.`)
-            reject(`Error occured when removing repository.`)
-          })
-        })
-        .catch((err) => {
-          this.showMessage("Failed to save repository, database Error:" + err.toString())
-          reject("Failed to save repository, database Error:" + err.toString())
+
+        this.saveRepositoryList().then(()=>{
+          this.showMessage(`Repository has been deleted.`)
+          resolve()
+        }).catch(()=>{
+          this.showMessage(`Error occured when removing repository.`)
+          reject(`Error occured when removing repository.`)
         })
       }
       else{
@@ -431,15 +438,18 @@ export class PluginManager {
     data._id = name + '_workflow'
     // delete data._references
     data.workflow = JSON.stringify(joy.top.data)
-    this.db.put(data, {
-      force: true
-    }).then(() => {
-      this.workflow_list.push(data)
-      this.showMessage( `Workflow "${name}" has been successfully saved.`)
-    }).catch((err) => {
-      this.showMessage('Failed to save the workflow.')
-      console.error(err)
+    this.db.get(data._id).then((doc) => {
+      data._rev = doc._rev
+    }).finally(() => {
+      this.db.put(data).then(() => {
+        this.workflow_list.push(data)
+        this.showMessage( `Workflow "${name}" has been successfully saved.`)
+      }).catch((err) => {
+        this.showMessage('Failed to save the workflow.')
+        console.error(err)
+      })
     })
+    
   }
 
   removeWorkflow(w) {
@@ -822,10 +832,8 @@ export class PluginManager {
         template.origin = pconfig.origin
         template._id = template.name.replace(/ /g, '_')
         template.engine_mode = pconfig.engine_mode
-        const addPlugin = () => {
-          this.db.put(template, {
-            force: true
-          }).then(() => {
+        const addPlugin = (template) => {
+          this.db.put(template).then(() => {
             for (let i = 0; i < this.installed_plugins.length; i++) {
               if(this.installed_plugins[i].name === template.name){
                 this.installed_plugins.splice(i, 1)
@@ -844,11 +852,10 @@ export class PluginManager {
         }
         // remove if exists
         this.db.get(template._id).then((doc) => {
-          return this.db.remove(doc);
-        }).then(() => {
-          addPlugin()
+          template._rev = doc._rev
+          addPlugin(template)
         }).catch(() => {
-          addPlugin()
+          addPlugin(template)
         });
       } catch (e) {
         this.showMessage( e || "Error.", 15)

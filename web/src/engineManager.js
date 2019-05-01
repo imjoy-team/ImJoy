@@ -423,18 +423,19 @@ export class EngineManager {
       for(let e of this.engines){
         this.config.engines.push(e.config)
       }
+      let rev = null
       this.config_db.get('plugin_engine_list').then((doc) => {
+        rev = doc._rev
+      }).finally(()=>{
         this.config_db.put({
-          _id: doc._id,
-          _rev: doc._rev,
+          _id: 'plugin_engine_list',
+          _rev: rev || undefined,
           engines: this.config.engines
-        }, {
-          force: true
-        }).then(resolve).catch((e)=>{
+        }).then(()=>{
+          resolve(this.config.engines)
+        }).catch((e)=>{
           reject(`Failed to plugin engine list, database error: ${e.toString()}`)
         })
-      }).catch((err) => {
-        reject(`Failed to plugin engine list, database error: ${err.toString()}`)
       })
     })
   }
