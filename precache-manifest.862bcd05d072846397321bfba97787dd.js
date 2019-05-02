@@ -1,11 +1,11 @@
 self.__precacheManifest = [
   {
-    "revision": "ba5de5727d43c20a2dfe",
-    "url": "/static/css/app.50b18d97.css"
+    "revision": "62b2bd0bf5437295e361",
+    "url": "/static/css/app.07304106.css"
   },
   {
-    "revision": "ba5de5727d43c20a2dfe",
-    "url": "/static/js/app.ec431334.js"
+    "revision": "62b2bd0bf5437295e361",
+    "url": "/static/js/app.b1cd482a.js"
   },
   {
     "revision": "b8859e2632feade2aed6",
@@ -228,19 +228,19 @@ self.__precacheManifest = [
     "url": "/static/js/chunk-vendors.ca0f8304.js"
   },
   {
-    "revision": "2a3e222e6a41b32a7180e6afa3675990",
-    "url": "/static/vs/html.worker.js"
-  },
-  {
     "revision": "b00449080615ce71a2a8a52aee9f658f",
     "url": "/static/vs/css.worker.js"
+  },
+  {
+    "revision": "2a3e222e6a41b32a7180e6afa3675990",
+    "url": "/static/vs/html.worker.js"
   },
   {
     "revision": "493ef474936217113b20a6573247288a",
     "url": "/static/vs/editor.worker.js"
   },
   {
-    "revision": "f93c4761ef1cb2644c87912e3aae7931",
+    "revision": "5d176c585de1de1fc1d7bba760b2d4e8",
     "url": "/index.html"
   },
   {
@@ -472,12 +472,12 @@ self.__precacheManifest = [
     "url": "/static/img/Institut_Pasteur_logo.svg"
   },
   {
-    "revision": "7de1cb45793d47182017753e49d64cea",
-    "url": "/static/img/logga-KAW-300x155.png"
-  },
-  {
     "revision": "e21b60da0b04ad426fdf5fad1142abd6",
     "url": "/static/img/loader.gif"
+  },
+  {
+    "revision": "7de1cb45793d47182017753e49d64cea",
+    "url": "/static/img/logga-KAW-300x155.png"
   },
   {
     "revision": "2ac2d65c948103772206c3906fe78b11",
@@ -716,10 +716,6 @@ self.__precacheManifest = [
     "url": "/static/vs/editor/editor.main.nls.js"
   },
   {
-    "revision": "09e5a4cc32305727ff958438e4c3fad1",
-    "url": "/static/vs/editor/editor.main.nls.ko.js"
-  },
-  {
     "revision": "a6a8191b3898b9a0ca4ee9d165c32d2e",
     "url": "/static/vs/editor/editor.main.nls.ru.js"
   },
@@ -762,6 +758,10 @@ self.__precacheManifest = [
   {
     "revision": "11a854433bcc74085be053c3ab713b15",
     "url": "/static/vs/language/css/cssWorker.js"
+  },
+  {
+    "revision": "09e5a4cc32305727ff958438e4c3fad1",
+    "url": "/static/vs/editor/editor.main.nls.ko.js"
   },
   {
     "revision": "51880b243dfb4c0a65c406b155e9a716",
