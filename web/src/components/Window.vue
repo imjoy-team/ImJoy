@@ -136,6 +136,13 @@ export default {
   beforeDestroy() {
     this.w.closed = true
   },
+  watch: {
+    w(){
+      this.w.refresh = this.refresh
+      this.w.focus = ()=>{this.$el.scrollIntoView(true)}
+      this.w.focus()
+    }
+  },
   methods: {
     refresh(){
       this.$forceUpdate()
