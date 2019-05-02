@@ -26,6 +26,7 @@
         </md-snackbar>
         <md-button @click="wm.selectWindow(w)" :disabled="wm.selected_window === w" v-for="(w,i) in wm.windows.slice(0, max_window_buttons)" :key="w.id" class="md-icon-button">
           <md-icon>{{'filter_'+(i+1)}}</md-icon>
+          <md-tooltip>{{w.name.slice(0, 30)+'(#'+w.index+')'}}</md-tooltip>
         </md-button>
         <md-menu v-if="wm.windows.length > max_window_buttons">
           <md-button v-if="max_window_buttons>=9" class="md-icon-button md-primary" md-menu-trigger>
@@ -43,6 +44,7 @@
         <md-menu v-if="wm.window_mode==='grid' && wm.windows.length > 0">
           <md-button class="md-icon-button md-primary" md-menu-trigger>
             <md-icon>picture_in_picture</md-icon>
+            <md-tooltip>Workspace</md-tooltip>
           </md-button>
           <md-menu-content>
             <md-menu-item :disabled="!wm.selected_window" @click="wm.selected_window=null" :class="wm.selected_window?'md-primary':''">
