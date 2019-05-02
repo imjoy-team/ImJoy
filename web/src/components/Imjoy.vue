@@ -45,7 +45,7 @@
             <md-icon>picture_in_picture</md-icon>
           </md-button>
           <md-menu-content>
-            <md-menu-item :disabled="!wm.selected_window" @click="wm.selected_window=null" class="md-primary">
+            <md-menu-item :disabled="!wm.selected_window" @click="wm.selected_window=null" :class="wm.selected_window?'md-primary':''">
               <md-icon>picture_in_picture</md-icon><span>Workspace</span>
             </md-menu-item>
             <md-menu-item @click="wm.closeAll()" class="md-accent">
