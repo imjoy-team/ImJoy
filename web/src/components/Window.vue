@@ -17,12 +17,16 @@
             <md-icon>more_vert</md-icon>
           </md-button>
           <md-menu-content>
-            <md-menu-item @click.stop="normalSize(w)" v-if="w.fullscreen">
+            <md-menu-item @click.stop="normalSize(w)" v-if="!w.standalone&&w.fullscreen">
               <span>Normal view</span>
               <md-icon>fullscreen</md-icon>
             </md-menu-item>
-            <md-menu-item @click.stop="fullScreen(w)" v-else>
+            <md-menu-item @click.stop="fullScreen(w)" v-else-if="!w.standalone">
               <span>Fullscreen</span>
+              <md-icon>fullscreen</md-icon>
+            </md-menu-item>
+            <md-menu-item @click.stop="detach(w)" v-if="!w.standalone">
+              <span>Detach</span>
               <md-icon>fullscreen</md-icon>
             </md-menu-item>
             <md-menu-item @click.stop="duplicate(w)">
@@ -130,7 +134,7 @@ export default {
     }
   },
   beforeDestroy() {
-
+    this.w.closed = true
   },
   methods: {
     refresh(){
@@ -147,6 +151,9 @@ export default {
     },
     fullScreen(w) {
       this.$emit('fullscreen', w)
+    },
+    detach(w){
+      this.$emit('detach', w)
     },
     normalSize(w) {
       this.$emit('normalsize', w)

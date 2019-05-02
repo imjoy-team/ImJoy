@@ -3,14 +3,14 @@
   <div @mousemove="overlayMousemove" class="overlay" @click="show_overlay=false" v-if="show_overlay"></div>
   <grid-layout v-if="!wm.selected_window && gridWindows && gridWindows.length>0" style="min-height:100%" :layout="gridWindows" :col-num.sync="col_num" :is-mirrored="false" :auto-size="true" :row-height.sync="row_height" :is-responsive="true" :is-draggable="true" :is-resizable="true" :vertical-compact="true" :margin="[3, 3]" :use-css-transforms="true">
     <grid-item v-for="w in gridWindows" drag-allow-from=".drag-handle" drag-ignore-from=".no-drag" :x="w.x" :y="w.y" :w.sync="w.w" :h.sync="w.h" :i="w.i" @resize="viewChanging(w)" @move="viewChanging(w)" @resized="show_overlay=false;w.resize&&w.resize();focusWindow(w)" @moved="show_overlay=false;w.move&&w.move();focusWindow(w)" :key="w.id">
-      <window :w="w" :withDragHandle="true" @duplicate="duplicate" @select="selectWindow" :loaders="wm.registered_loaders" @close="close" @fullscreen="fullScreen" @normalsize="normalSize"></window>
+      <window :w="w" @detach="detach" :withDragHandle="true" @duplicate="duplicate" @select="selectWindow" :loaders="wm.registered_loaders" @close="close" @fullscreen="fullScreen" @normalsize="normalSize"></window>
     </grid-item>
   </grid-layout>
   <div class="md-layout md-gutter md-alignment-center-center" v-if="!wm.selected_window && (!gridWindows || gridWindows.length===0)">
     <md-empty-state  md-icon="static/img/imjoy-io-icon.svg" md-label="" md-description="">
     </md-empty-state>
   </div>
-  <window :w="w" v-for="w in standaloneWindows" :key="w.id" v-show="wm.selected_window===w" :loaders="wm.registered_loaders" :withDragHandle="false" @duplicate="duplicate" @select="selectWindow" @close="close" @fullscreen="fullScreen" @normalsize="normalSize" ></window>
+  <window :w="w" @detach="detach"  v-for="w in standaloneWindows" :key="w.id" v-show="wm.selected_window===w" :loaders="wm.registered_loaders" :withDragHandle="false" @duplicate="duplicate" @select="selectWindow" @close="close" @fullscreen="fullScreen" @normalsize="normalSize" ></window>
 </div>
 </template>
 
@@ -142,7 +142,9 @@ export default {
       this.gridWindows = this.windows.filter((w)=>{
         return !w.standalone
       })
-      console.log(this.standaloneWindows , this.gridWindows )
+      if(w.fullscreen){
+        this.fullScreen(w)
+      }
       this.selectWindow(w, {})
       this.$forceUpdate()
     },
@@ -155,6 +157,10 @@ export default {
       })
       console.log(this.standaloneWindows , this.gridWindows )
       this.$forceUpdate()
+    },
+    detach(w){
+      this.close(w)
+      this.$emit('create', {name: w.name, type: w.window_type, data: w.data, config: w.config, w:w.w, h:w.h, fullscreen:w.fullscreen, standalone:true})
     },
     close(w) {
       const ai = this.active_windows.indexOf(w)
@@ -193,16 +199,7 @@ export default {
       setTimeout(()=>{w.resize&&w.resize(); w.refresh(); w.focus();}, 500);
     },
     duplicate(w) {
-      const nw = Object.assign({}, w)
-      if (nw.iframe_container)
-        nw.iframe_container = 'plugin_window_' + nw.id + randId()
-      nw.i = nw.i + "_"
-      if (w.renderWindow) {
-        nw.renderWindow = w.renderWindow
-      }
-      nw.id = nw.name + randId()
-      this.wm.windows.push(nw)
-      this.$emit('add', nw)
+      this.$emit('create', {name: w.name+randId(), type: w.window_type, data: w.data, config: w.config, w:w.w, h:w.h, fullscreen:w.fullscreen, standalone:w.standalone})
     },
     unselectWindows(){
       if(this.active_windows && this.active_windows.length>0){

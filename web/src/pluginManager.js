@@ -1582,12 +1582,15 @@ export class PluginManager {
         }
         const pconfig = wconfig
         //generate a new window id
-        pconfig.type = window_config.type
-
         pconfig.id = pconfig.id || window_config.id + '_' + randId()
+
+        pconfig.window_type = pconfig.type
+        //assign plugin type ('window')
+        pconfig.type = window_config.type
         if (pconfig.type != 'window') {
           throw 'Window plugin must be with type "window"'
         }
+
         // this is a unique id for the iframe to attach
         pconfig.iframe_container = pconfig.window_container || 'plugin_window_' + pconfig.id + randId()
         pconfig.iframe_window = null
@@ -1635,6 +1638,7 @@ export class PluginManager {
               this.wm.window_ids[wid].refresh()
               reject(e)
             })
+            
           })
         }
       }
