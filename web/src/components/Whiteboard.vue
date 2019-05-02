@@ -146,7 +146,7 @@ export default {
       this.selectWindow(w, {})
       this.$forceUpdate()
     },
-    onWindowClose(w) {
+    onWindowClose() {
       this.standaloneWindows = this.windows.filter((w)=>{
         return this.mode!=='grid' || w.standalone
       })
