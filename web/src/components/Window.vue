@@ -1,6 +1,6 @@
 <template>
 <md-card v-if="w">
-  <md-card-expand  @click.native.stop="selectWindow(w, $event)" @dblclick.native.stop="w._h && w._w?normalSize(w):fullScreen(w)" :class="{'drag-handle': withDragHandle}">
+  <md-card-expand v-if="!w.standalone"  @click.native.stop="selectWindow(w, $event)" @dblclick.native.stop="w._h && w._w?normalSize(w):fullScreen(w)" :class="{'drag-handle': withDragHandle}">
     <md-card-actions md-alignment="space-between" :class="w.selected?'window-selected':'window-header'">
       <md-card-expand-trigger v-if="w.panel">
         <md-button class="md-icon-button">
@@ -141,13 +141,7 @@ export default {
       this.$forceUpdate()
     },
     close(w) {
-      try {
-        Promise.resolve(w.onclose()).finally(()=>{
-            this.$emit('close', w)
-        })
-      } catch (e) {
-        this.$emit('close', w)
-      }
+      this.$emit('close', w)
     },
     fullScreen(w) {
       this.$emit('fullscreen', w)

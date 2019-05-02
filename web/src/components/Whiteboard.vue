@@ -1,7 +1,7 @@
 <template>
 <div class="whiteboard noselect" ref="whiteboard" @mouseup="show_overlay=false"  @click="unselectWindows()">
   <div @mousemove="overlayMousemove" class="overlay" @click="show_overlay=false" v-if="show_overlay"></div>
-  <grid-layout v-if="!wm.selected_window && gridWindows && gridWindows.length>0" style="min-height:100%" :layout="gridWindows" :col-num.sync="col_num" :is-mirrored="false" :auto-size="true" :row-height.sync="row_height" :is-responsive="true" :is-draggable="true" :is-resizable="true" :vertical-compact="true" :margin="[3, 3]" :use-css-transforms="true">
+  <grid-layout v-show="!wm.selected_window && gridWindows && gridWindows.length>0" style="min-height:100%" :layout="gridWindows" :col-num.sync="col_num" :is-mirrored="false" :auto-size="true" :row-height.sync="row_height" :is-responsive="true" :is-draggable="true" :is-resizable="true" :vertical-compact="true" :margin="[3, 3]" :use-css-transforms="true">
     <grid-item v-for="w in gridWindows" drag-allow-from=".drag-handle" drag-ignore-from=".no-drag" :x="w.x" :y="w.y" :w.sync="w.w" :h.sync="w.h" :i="w.i" @resize="viewChanging(w)" @move="viewChanging(w)" @resized="show_overlay=false;w.resize&&w.resize();focusWindow(w)" @moved="show_overlay=false;w.move&&w.move();focusWindow(w)" :key="w.id">
       <window :w="w" @detach="detach" :withDragHandle="true" @duplicate="duplicate" @select="selectWindow" :loaders="wm.registered_loaders" @close="close" @fullscreen="fullScreen" @normalsize="normalSize"></window>
     </grid-item>
@@ -163,6 +163,7 @@ export default {
       this.$emit('create', {name: w.name, type: w.window_type, data: w.data, config: w.config, w:w.w, h:w.h, fullscreen:w.fullscreen, standalone:true})
     },
     close(w) {
+      w.onclose()
       const ai = this.active_windows.indexOf(w)
       if(ai>=0){
         this.active_windows[ai].selected = false

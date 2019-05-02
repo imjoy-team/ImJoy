@@ -18,12 +18,35 @@
         </md-button>
         <span class="subheader-title md-medium-hide" style="flex: 1" v-else>Deploying Deep Learning Made Easy!</span>
       </div>
-
-      <div class="md-toolbar-section-end">
-        <md-snackbar :md-position="'center'" class="md-accent" :md-active.sync="show_snackbar" :md-duration="snackbar_duration">
+      <md-snackbar :md-position="'center'" class="md-accent" :md-active.sync="show_snackbar" :md-duration="snackbar_duration">
          <span>{{snackbar_info}}</span>
          <md-button class="md-accent" @click="show_snackbar=false">close</md-button>
         </md-snackbar>
+
+      <div class="md-toolbar-section-end">
+        <md-menu v-if="wm.selected_window" md-size="big" md-direction="bottom-end">
+          <md-button class="md-icon-button md-primary" md-menu-trigger>
+            <md-icon>more_vert</md-icon>
+            <md-tooltip>Current window: {{wm.selected_window.name.slice(0, 30)+'(#'+wm.selected_window.index+')'}}</md-tooltip>
+          </md-button>
+          <md-menu-content>
+            <md-menu-item :disabled="true">
+              {{wm.selected_window.name.slice(0, 30)+'(#'+wm.selected_window.index+')'}}
+            </md-menu-item>
+            <!-- <md-menu-item @click.stop="duplicate(wm.selected_window)">
+              <span>Duplicate</span>
+              <md-icon>filter</md-icon>
+            </md-menu-item> -->
+            <md-menu-item v-if="wm.selected_window.type!='main'" @click="wm.selected_window.onclose(); wm.closeWindow(wm.selected_window);">
+              <span>Close</span>
+              <md-icon>close</md-icon>
+            </md-menu-item>
+            <md-menu-item v-for="(loader, name) in wm.selected_window.loaders" :key="name" @click="wm.registered_loaders && wm.registered_loaders[loader](wm.selected_window.data)">
+              <span>{{name}}</span>
+              <md-icon>play_arrow</md-icon>
+            </md-menu-item>
+          </md-menu-content>
+        </md-menu>
         <md-button @click="wm.selectWindow(w)" :disabled="wm.selected_window === w" v-for="(w,i) in wm.windows.slice(0, max_window_buttons)" :key="w.id" class="md-icon-button">
           <md-icon>{{'filter_'+(i+1)}}</md-icon>
           <md-tooltip>{{w.name.slice(0, 30)+'(#'+w.index+')'}}</md-tooltip>
