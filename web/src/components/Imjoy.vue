@@ -62,7 +62,7 @@
             <md-icon>more_horiz</md-icon>
           </md-button>
           <md-menu-content>
-            <md-menu-item @click="showSettingsDialog=true" :disabled="true" class="md-primary">
+            <md-menu-item @click="showSettingsDialog=true" :disabled="true">
               <md-icon>settings</md-icon>Settings
             </md-menu-item>
             <md-menu-item href="/docs/" target="_blank" class="md-primary">
