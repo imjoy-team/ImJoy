@@ -1,16 +1,16 @@
 <template>
 <div class="whiteboard noselect" ref="whiteboard" @mouseup="show_overlay=false"  @click="unselectWindows()">
   <div @mousemove="overlayMousemove" class="overlay" @click="show_overlay=false" v-if="show_overlay"></div>
-  <grid-layout v-show="!wm.selected_window" v-if="mode==='grid'&&windows.length>0" :layout="windows" :col-num="col_num" :is-mirrored="false" :auto-size="true" :row-height="row_height" :is-responsive="true" :is-draggable="true" :is-resizable="true" :vertical-compact="true" :margin="[3, 3]" :use-css-transforms="true">
-    <grid-item v-for="w in windows" v-show="!w.fullsize" drag-allow-from=".drag-handle" drag-ignore-from=".no-drag" :x="w.x" :y="w.y" :w="w.w" :h="w.h" :i="w.i" @resize="viewChanging(w)" @move="viewChanging(w)" @resized="show_overlay=false;w.resize&&w.resize();focusWindow(w)" @moved="show_overlay=false;w.move&&w.move();focusWindow(w)" :key="w.id">
-      <window :w="!w.fullsize?w:null" :withDragHandle="true" @duplicate="duplicate" @select="selectWindow" :loaders="wm.registered_loaders" @close="close" @fullscreen="fullScreen" @normalsize="normalSize"></window>
+  <grid-layout v-if="!wm.selected_window && gridWindows && gridWindows.length>0" :layout="gridWindows" :col-num="col_num" :is-mirrored="false" :auto-size="true" :row-height="row_height" :is-responsive="true" :is-draggable="true" :is-resizable="true" :vertical-compact="true" :margin="[3, 3]" :use-css-transforms="true">
+    <grid-item v-for="w in gridWindows" drag-allow-from=".drag-handle" drag-ignore-from=".no-drag" :x="w.x" :y="w.y" :w="w.w" :h="w.h" :i="w.i" @resize="viewChanging(w)" @move="viewChanging(w)" @resized="show_overlay=false;w.resize&&w.resize();focusWindow(w)" @moved="show_overlay=false;w.move&&w.move();focusWindow(w)" :key="w.id">
+      <window :w="w" :withDragHandle="true" @duplicate="duplicate" @select="selectWindow" :loaders="wm.registered_loaders" @close="close" @fullscreen="fullScreen" @normalsize="normalSize"></window>
     </grid-item>
   </grid-layout>
-  <div class="md-layout md-gutter md-alignment-center-center">
-    <md-empty-state v-if="!windows || windows.length===0" md-icon="static/img/imjoy-io-icon.svg" md-label="" md-description="">
+  <div class="md-layout md-gutter md-alignment-center-center" v-if="!wm.selected_window && (!gridWindows || gridWindows.length===0)">
+    <md-empty-state  md-icon="static/img/imjoy-io-icon.svg" md-label="" md-description="">
     </md-empty-state>
   </div>
-  <window :w="mode!=='grid' || w.fullsize?w: null" v-for="w in windows" :key="w.id" v-show="wm.selected_window===w" :loaders="wm.registered_loaders" :withDragHandle="false" @duplicate="duplicate" @select="selectWindow" @close="close" @fullscreen="fullScreen" @normalsize="normalSize" ></window>
+  <window :w="w" v-for="w in fullSizedWindows" :key="w.id" v-show="wm.selected_window===w" :loaders="wm.registered_loaders" :withDragHandle="false" @duplicate="duplicate" @select="selectWindow" @close="close" @fullscreen="fullScreen" @normalsize="normalSize" ></window>
 </div>
 </template>
 
@@ -49,7 +49,9 @@ export default {
       show_overlay: false,
       scrolling: false,
       scrollClientY: 0,
-      screenWidth: window.innerWidth
+      screenWidth: window.innerWidth,
+      fullSizedWindows: [],
+      gridWindows: [],
     }
   },
   created(){
@@ -58,6 +60,7 @@ export default {
     assert(this.windows)
     this.event_bus = this.wm.event_bus
     this.event_bus.$on('add_window', this.onWindowAdd)
+    this.event_bus.$on('close_window', this.onWindowClose)
     this.event_bus.$on('resize', this.updateSize)
 
     //open link in a new tab
@@ -72,7 +75,7 @@ export default {
     this.marked = marked
   },
   mounted() {
-    this.event_bus.$on('close_window', ()=>{ this.$forceUpdate() })
+    
     this.screenWidth = window.innerWidth
     this.col_num = parseInt(this.$refs.whiteboard.clientWidth/this.column_width)
     window.onbeforeunload = function (evt) {
@@ -88,6 +91,7 @@ export default {
   },
   beforeDestroy() {
     this.event_bus.$off('add_window', this.onWindowAdd)
+    this.event_bus.$off('close_window', this.onWindowClose)
     this.event_bus.$off('resize', this.updateSize)
   },
   methods: {
@@ -132,7 +136,24 @@ export default {
       this.col_num = parseInt(this.$refs.whiteboard.clientWidth/this.column_width)
     },
     onWindowAdd(w) {
+      this.fullSizedWindows = this.windows.filter((w)=>{
+        return this.mode!=='grid' || w.fullsize
+      })
+      this.gridWindows = this.windows.filter((w)=>{
+        return !w.fullsize
+      })
+      console.log(this.fullSizedWindows , this.gridWindows )
       this.selectWindow(w, {})
+      this.$forceUpdate()
+    },
+    onWindowClose(w) {
+      this.fullSizedWindows = this.windows.filter((w)=>{
+        return this.mode!=='grid' || w.fullsize
+      })
+      this.gridWindows = this.windows.filter((w)=>{
+        return !w.fullsize
+      })
+      console.log(this.fullSizedWindows , this.gridWindows )
       this.$forceUpdate()
     },
     close(w) {

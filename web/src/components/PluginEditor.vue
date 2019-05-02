@@ -4,11 +4,11 @@
       <div class="md-toolbar-section-start">
         <md-button @click="run()" class="md-icon-button">
           <md-icon>play_arrow</md-icon>
-          <md-tooltip>Run this plugin (Ctrl+E)</md-tooltip>
+          <md-tooltip class="md-medium-hide">Run this plugin (Ctrl+E)</md-tooltip>
         </md-button>
         <md-button @click="save()" class="md-icon-button">
           <md-icon>save</md-icon>
-          <md-tooltip>Save this plugin (Ctrl+S)</md-tooltip>
+          <md-tooltip class="md-medium-hide">Save this plugin (Ctrl+S)</md-tooltip>
         </md-button>
         <md-button @click="saveAs()" class="md-icon-button">
           <md-icon>cloud_download</md-icon>
