@@ -126,7 +126,7 @@ export default {
   mounted() {
     if(this.w){
       this.w.refresh = this.refresh
-      this.w.element = this.$el
+      this.w.focus = ()=>{this.$el.scrollIntoView(true)}
     }
   },
   beforeDestroy() {

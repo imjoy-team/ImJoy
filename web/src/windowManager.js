@@ -131,9 +131,7 @@ export class WindowManager {
     }
     w.selected = true
     this.active_windows = [w]
-    if(w.element){
-      w.element.scrollIntoView(true);
-    }
+    if(w.focus) w.focus()
     if(w.refresh) w.refresh()
   }
 
