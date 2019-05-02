@@ -27,7 +27,7 @@
             </md-menu-item>
             <md-menu-item @click.stop="detach(w)" v-if="!w.standalone">
               <span>Detach</span>
-              <md-icon>fullscreen</md-icon>
+              <md-icon>launch</md-icon>
             </md-menu-item>
             <md-menu-item @click.stop="duplicate(w)">
               <span>Duplicate</span>

@@ -24,7 +24,11 @@
         </md-snackbar>
 
       <div class="md-toolbar-section-end">
-        <md-menu v-if="wm.selected_window" md-size="big" md-direction="bottom-end">
+        <md-button class="md-icon-button md-accent" v-if="wm.selected_window && wm.selected_window.type!='main'" @click="wm.selected_window.onclose(); wm.closeWindow(wm.selected_window);" >
+          <md-icon>close</md-icon>
+          <md-tooltip>Close window: {{wm.selected_window.name.slice(0, 30)+'(#'+wm.selected_window.index+')'}}</md-tooltip>
+        </md-button>
+        <md-menu v-if="wm.selected_window && wm.selected_window.loaders.length>0" md-size="big" md-direction="bottom-end">
           <md-button class="md-icon-button md-primary" md-menu-trigger>
             <md-icon>more_vert</md-icon>
             <md-tooltip>Current window: {{wm.selected_window.name.slice(0, 30)+'(#'+wm.selected_window.index+')'}}</md-tooltip>
@@ -37,10 +41,10 @@
               <span>Duplicate</span>
               <md-icon>filter</md-icon>
             </md-menu-item> -->
-            <md-menu-item v-if="wm.selected_window.type!='main'" @click="wm.selected_window.onclose(); wm.closeWindow(wm.selected_window);">
+            <!-- <md-menu-item v-if="wm.selected_window.type!='main'" @click="wm.selected_window.onclose(); wm.closeWindow(wm.selected_window);">
               <span>Close</span>
               <md-icon>close</md-icon>
-            </md-menu-item>
+            </md-menu-item> -->
             <md-menu-item v-for="(loader, name) in wm.selected_window.loaders" :key="name" @click="wm.registered_loaders && wm.registered_loaders[loader](wm.selected_window.data)">
               <span>{{name}}</span>
               <md-icon>play_arrow</md-icon>
