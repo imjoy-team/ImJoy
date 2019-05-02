@@ -90,7 +90,7 @@ export class WindowManager {
         w.id = w.id || w.name + randId()
         w.loaders = this.getDataLoaders(w.data)
         this.generateGridPosition(w)
-        if(w.fullsize){
+        if(w.standalone){
           w.h = 0
           w.w = 0
         }
@@ -123,7 +123,7 @@ export class WindowManager {
       if(this.active_windows[i]) this.active_windows[i].refresh()
     }
 
-    if(this.window_mode === 'single' || w.fullsize){
+    if(this.window_mode === 'single' || w.standalone){
       this.selected_window = w
     }
     else{

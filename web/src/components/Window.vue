@@ -17,7 +17,7 @@
             <md-icon>more_vert</md-icon>
           </md-button>
           <md-menu-content>
-            <md-menu-item @click.stop="normalSize(w)" v-if="w._h && w._w">
+            <md-menu-item @click.stop="normalSize(w)" v-if="w.fullscreen">
               <span>Normal view</span>
               <md-icon>fullscreen</md-icon>
             </md-menu-item>
@@ -29,10 +29,10 @@
               <span>Duplicate</span>
               <md-icon>filter</md-icon>
             </md-menu-item>
-            <!-- <md-menu-item v-if="w.type!='main'" @click="close(w)">
+            <md-menu-item v-if="w.type!='main'" @click="close(w)">
               <span>Close</span>
               <md-icon>close</md-icon>
-            </md-menu-item> -->
+            </md-menu-item>
             <md-menu-item @click="printObject(w.type, w.data, w)">
               <span>Console.log</span>
               <md-icon>bug_report</md-icon>

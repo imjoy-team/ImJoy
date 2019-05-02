@@ -1,8 +1,8 @@
 <template>
 <div class="whiteboard noselect" ref="whiteboard" @mouseup="show_overlay=false"  @click="unselectWindows()">
   <div @mousemove="overlayMousemove" class="overlay" @click="show_overlay=false" v-if="show_overlay"></div>
-  <grid-layout v-if="!wm.selected_window && gridWindows && gridWindows.length>0" :layout="gridWindows" :col-num="col_num" :is-mirrored="false" :auto-size="true" :row-height="row_height" :is-responsive="true" :is-draggable="true" :is-resizable="true" :vertical-compact="true" :margin="[3, 3]" :use-css-transforms="true">
-    <grid-item v-for="w in gridWindows" drag-allow-from=".drag-handle" drag-ignore-from=".no-drag" :x="w.x" :y="w.y" :w="w.w" :h="w.h" :i="w.i" @resize="viewChanging(w)" @move="viewChanging(w)" @resized="show_overlay=false;w.resize&&w.resize();focusWindow(w)" @moved="show_overlay=false;w.move&&w.move();focusWindow(w)" :key="w.id">
+  <grid-layout v-if="!wm.selected_window && gridWindows && gridWindows.length>0" style="min-height:100%" :layout="gridWindows" :col-num.sync="col_num" :is-mirrored="false" :auto-size="true" :row-height.sync="row_height" :is-responsive="true" :is-draggable="true" :is-resizable="true" :vertical-compact="true" :margin="[3, 3]" :use-css-transforms="true">
+    <grid-item v-for="w in gridWindows" drag-allow-from=".drag-handle" drag-ignore-from=".no-drag" :x="w.x" :y="w.y" :w.sync="w.w" :h.sync="w.h" :i="w.i" @resize="viewChanging(w)" @move="viewChanging(w)" @resized="show_overlay=false;w.resize&&w.resize();focusWindow(w)" @moved="show_overlay=false;w.move&&w.move();focusWindow(w)" :key="w.id">
       <window :w="w" :withDragHandle="true" @duplicate="duplicate" @select="selectWindow" :loaders="wm.registered_loaders" @close="close" @fullscreen="fullScreen" @normalsize="normalSize"></window>
     </grid-item>
   </grid-layout>
@@ -10,7 +10,7 @@
     <md-empty-state  md-icon="static/img/imjoy-io-icon.svg" md-label="" md-description="">
     </md-empty-state>
   </div>
-  <window :w="w" v-for="w in fullSizedWindows" :key="w.id" v-show="wm.selected_window===w" :loaders="wm.registered_loaders" :withDragHandle="false" @duplicate="duplicate" @select="selectWindow" @close="close" @fullscreen="fullScreen" @normalsize="normalSize" ></window>
+  <window :w="w" v-for="w in standaloneWindows" :key="w.id" v-show="wm.selected_window===w" :loaders="wm.registered_loaders" :withDragHandle="false" @duplicate="duplicate" @select="selectWindow" @close="close" @fullscreen="fullScreen" @normalsize="normalSize" ></window>
 </div>
 </template>
 
@@ -50,7 +50,7 @@ export default {
       scrolling: false,
       scrollClientY: 0,
       screenWidth: window.innerWidth,
-      fullSizedWindows: [],
+      standaloneWindows: [],
       gridWindows: [],
     }
   },
@@ -136,24 +136,24 @@ export default {
       this.col_num = parseInt(this.$refs.whiteboard.clientWidth/this.column_width)
     },
     onWindowAdd(w) {
-      this.fullSizedWindows = this.windows.filter((w)=>{
-        return this.mode!=='grid' || w.fullsize
+      this.standaloneWindows = this.windows.filter((w)=>{
+        return this.mode!=='grid' || w.standalone
       })
       this.gridWindows = this.windows.filter((w)=>{
-        return !w.fullsize
+        return !w.standalone
       })
-      console.log(this.fullSizedWindows , this.gridWindows )
+      console.log(this.standaloneWindows , this.gridWindows )
       this.selectWindow(w, {})
       this.$forceUpdate()
     },
     onWindowClose(w) {
-      this.fullSizedWindows = this.windows.filter((w)=>{
-        return this.mode!=='grid' || w.fullsize
+      this.standaloneWindows = this.windows.filter((w)=>{
+        return this.mode!=='grid' || w.standalone
       })
       this.gridWindows = this.windows.filter((w)=>{
-        return !w.fullsize
+        return !w.standalone
       })
-      console.log(this.fullSizedWindows , this.gridWindows )
+      console.log(this.standaloneWindows , this.gridWindows )
       this.$forceUpdate()
     },
     close(w) {
@@ -173,20 +173,24 @@ export default {
       return !!obj && obj.byteLength !== undefined;
     },
     fullScreen(w) {
-      const fh = parseInt((this.$refs.whiteboard.clientHeight-70)/this.row_height)
-      const fw = parseInt(this.$refs.whiteboard.clientWidth/this.column_width)
+      w.fullscreen = true
+      this.col_num = parseInt(this.$refs.whiteboard.clientWidth/this.column_width)
+      const fh = parseInt((this.$refs.whiteboard.clientHeight-76)/this.row_height)
+      const fw = parseInt(this.$refs.whiteboard.clientWidth/this.column_width) + 1
       w._h = w.h
       w._w = w.w
       w.h = fh
       w.w = fw
-      setTimeout(()=>{w.resize&&w.resize(); w.refresh();}, 1000);
+      setTimeout(()=>{w.resize&&w.resize(); w.refresh(); w.focus();}, 500);
     },
     normalSize(w) {
+      this.col_num = parseInt(this.$refs.whiteboard.clientWidth/this.column_width)
+      w.fullscreen = false
       w.h = w._h || 5
       w.w = w._w || 5
       w._w = null
       w._h = null
-      setTimeout(()=>{w.resize&&w.resize(); w.refresh();}, 1000);
+      setTimeout(()=>{w.resize&&w.resize(); w.refresh(); w.focus();}, 500);
     },
     duplicate(w) {
       const nw = Object.assign({}, w)

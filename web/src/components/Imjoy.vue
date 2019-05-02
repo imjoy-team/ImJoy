@@ -113,7 +113,7 @@
         </div>
       </div>
       <br>
-      <div v-if="!plugin_loaded" class="loading loading-lg"></div>
+      <div v-if="!plugin_loaded" style="top: 10%;" class="loading loading-lg"></div>
       <md-card id="plugin-menu" v-show="plugin_loaded" v-if="pm">
         <md-card-header>
           <md-menu md-size="big">
@@ -1343,7 +1343,7 @@ export default {
         plugin_manager: this.pm,
         w: 20,
         h: 10,
-        fullsize: this.screenWidth<1200,
+        standalone: this.screenWidth<1200,
         data: {
           name: pconfig.name,
           id: plugin.id,
@@ -1360,7 +1360,7 @@ export default {
         plugin_manager: this.pm,
         w: 20,
         h: 10,
-        fullsize: this.screenWidth<1200,
+        standalone: this.screenWidth<1200,
         plugin: {},
         data: {
           name: 'new plugin',
