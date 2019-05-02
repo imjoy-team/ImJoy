@@ -124,7 +124,10 @@ export default {
     }
   },
   mounted() {
-    if(this.w) this.w.refresh = this.refresh
+    if(this.w){
+      this.w.refresh = this.refresh
+      this.w.element = this.$el
+    }
   },
   beforeDestroy() {
 

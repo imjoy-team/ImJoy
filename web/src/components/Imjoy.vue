@@ -24,16 +24,29 @@
          <span>{{snackbar_info}}</span>
          <md-button class="md-accent" @click="show_snackbar=false">close</md-button>
         </md-snackbar>
-        <md-menu v-if="wm.windows.length > 0">
+        <md-button @click="wm.selectWindow(w)" :disabled="wm.selected_window === w" v-for="(w,i) in wm.windows.slice(0, max_window_buttons)" :key="w.id" class="md-icon-button">
+          <md-icon>{{'filter_'+(i+1)}}</md-icon>
+        </md-button>
+        <md-menu v-if="wm.windows.length > max_window_buttons">
+          <md-button v-if="max_window_buttons>=9" class="md-icon-button md-primary" md-menu-trigger>
+            <md-icon>filter_9_plus</md-icon>
+          </md-button>
+          <md-button v-else class="md-icon-button md-primary" md-menu-trigger>
+            <md-icon>filter</md-icon>
+          </md-button>
+          <md-menu-content>
+            <md-menu-item @click="wm.selectWindow(w)" :disabled="wm.selected_window === w" v-for="w in wm.windows.slice(max_window_buttons)" :key="w.id">
+              <span>{{w.name.slice(0, 30)+'(#'+w.index+')'}}</span><md-icon>forward</md-icon>
+            </md-menu-item>
+          </md-menu-content>
+        </md-menu>
+        <md-menu v-if="wm.window_mode==='grid' && wm.windows.length > 0">
           <md-button class="md-icon-button md-primary" md-menu-trigger>
             <md-icon>picture_in_picture</md-icon>
           </md-button>
           <md-menu-content>
-            <md-menu-item :disabled="wm.window_mode==='grid' && !wm.selected_window" @click="wm.selected_window=null" class="md-primary">
+            <md-menu-item :disabled="!wm.selected_window" @click="wm.selected_window=null" class="md-primary">
               <md-icon>picture_in_picture</md-icon><span>Workspace</span>
-            </md-menu-item>
-            <md-menu-item @click="wm.selectWindow(w)" :disabled="wm.selected_window === w" v-for="w in wm.windows" :key="w.id">
-              <span>{{w.name.slice(0, 30)+'(#'+w.index+')'}}</span><md-icon>forward</md-icon>
             </md-menu-item>
             <md-menu-item @click="wm.closeAll()" class="md-accent">
               <md-icon>cancel</md-icon><span>Close All</span>
@@ -41,18 +54,23 @@
             </md-menu-item>
           </md-menu-content>
         </md-menu>
-        <md-button @click="showSettingsDialog=true" :disabled="true" class="md-icon-button">
-          <md-icon>settings</md-icon>
-        </md-button>
-        <md-button @click="showAboutDialog=true" class="md-icon-button">
-          <md-icon>info</md-icon>
-        </md-button>
-        <md-button class="md-icon-button" href="/docs/" target="_blank">
-          <md-icon>help</md-icon>
-        </md-button>
-
         <engine-control-panel :engine-manager="em" :show-dialog.sync="showPluginEngineInfo" />
-
+        <md-menu>
+          <md-button class="md-icon-button md-primary" md-menu-trigger>
+            <md-icon>more_horiz</md-icon>
+          </md-button>
+          <md-menu-content>
+            <md-menu-item @click="showSettingsDialog=true" :disabled="true" class="md-primary">
+              <md-icon>settings</md-icon>Settings
+            </md-menu-item>
+            <md-menu-item href="/docs/" target="_blank" class="md-primary">
+              <md-icon>help</md-icon>Help
+            </md-menu-item>
+            <md-menu-item @click="showAboutDialog=true" class="md-primary">
+              <md-icon>info</md-icon>About
+            </md-menu-item>
+          </md-menu-content>
+        </md-menu>
       </div>
       <form v-show="false" ref="folder_form">
         <input class="md-file" type="file" @change="selectFileChanged" ref="folder_select" webkitdirectory mozdirectory msdirectory odirectory directory multiple />
@@ -596,7 +614,8 @@ export default {
       screenWidth: 1024,
       plugin_loaded: false,
       new_workspace_name: '',
-      workspace_dropping: false
+      workspace_dropping: false,
+      max_window_buttons: 9
     }
   },
   watch: {
@@ -1061,9 +1080,12 @@ export default {
       this.screenWidth = e.width
       if(this.screenWidth > 800){
         this.wm.window_mode = 'grid'
+        this.max_window_buttons = 9
       }
       else{
         this.wm.window_mode = 'single'
+        this.max_window_buttons = parseInt(this.screenWidth/36-4)
+        if(this.max_window_buttons>9) this.max_window_buttons = 9
       }
     },
     showEngineConnection(show, message, resolve, reject){
@@ -1319,7 +1341,7 @@ export default {
         plugin_manager: this.pm,
         w: 20,
         h: 10,
-        fullsize: false,
+        fullsize: this.screenWidth<1200,
         data: {
           name: pconfig.name,
           id: plugin.id,
@@ -1336,7 +1358,7 @@ export default {
         plugin_manager: this.pm,
         w: 20,
         h: 10,
-        fullsize: false,
+        fullsize: this.screenWidth<1200,
         plugin: {},
         data: {
           name: 'new plugin',
