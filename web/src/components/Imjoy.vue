@@ -39,6 +39,11 @@
             <md-menu-item @click="wm.selectWindow(w)" :disabled="wm.selected_window === w" v-for="w in wm.windows.slice(max_window_buttons)" :key="w.id">
               <span>{{w.name.slice(0, 30)+'(#'+w.index+')'}}</span><md-icon>forward</md-icon>
             </md-menu-item>
+            <md-divider></md-divider>
+            <md-menu-item @click="wm.closeAll()" v-if="wm.window_mode!=='grid'" class="md-accent">
+              <md-icon>cancel</md-icon><span>Close All</span>
+              <md-tooltip>Close all windows</md-tooltip>
+            </md-menu-item>
           </md-menu-content>
         </md-menu>
         <md-menu v-if="wm.window_mode==='grid' && wm.windows.length > 0">

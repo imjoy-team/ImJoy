@@ -1,6 +1,6 @@
 <template>
 <md-card v-if="w">
-  <md-card-expand  @click.native.stop="selectWindow(w, $event)" :class="{'drag-handle': withDragHandle}">
+  <md-card-expand  @click.native.stop="selectWindow(w, $event)" @dblclick.native.stop="w._h && w._w?normalSize(w):fullScreen(w)" :class="{'drag-handle': withDragHandle}">
     <md-card-actions md-alignment="space-between" :class="w.selected?'window-selected':'window-header'">
       <md-card-expand-trigger v-if="w.panel">
         <md-button class="md-icon-button">
@@ -10,7 +10,7 @@
       <md-button class="md-icon-button md-accent" @click="close(w)" >
         <md-icon>close</md-icon>
       </md-button>
-      <div class="window-title noselect" @dblclick="w._h && w._w?normalSize(w):fullScreen(w)">{{w.name.slice(0, 30)+'(#'+w.index+')'}}</div>
+      <div class="window-title noselect">{{w.name.slice(0, 30)+'(#'+w.index+')'}}</div>
       <div>
         <md-menu md-size="big" md-direction="bottom-end">
           <md-button class="md-icon-button" md-menu-trigger>
