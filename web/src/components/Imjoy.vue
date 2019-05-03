@@ -98,6 +98,9 @@
               <md-icon>settings</md-icon>Settings
             </md-menu-item>
             <md-menu-item href="/docs/" target="_blank" class="md-primary">
+              <md-icon>library_books</md-icon>Docs
+            </md-menu-item>
+            <md-menu-item href="https://forum.image.sc/tags/imjoy" target="_blank" class="md-primary">
               <md-icon>help</md-icon>Help
             </md-menu-item>
             <md-menu-item @click="showAboutDialog=true" class="md-primary">
