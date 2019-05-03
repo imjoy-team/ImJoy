@@ -2,15 +2,15 @@
 <div class="whiteboard noselect" ref="whiteboard" @mouseup="show_overlay=false"  @click="unselectWindows()">
   <div @mousemove="overlayMousemove" class="overlay" @click="show_overlay=false" v-if="show_overlay"></div>
   <grid-layout v-show="!wm.selected_window && gridWindows && gridWindows.length>0" style="min-height:100%" :layout="gridWindows" :col-num.sync="col_num" :is-mirrored="false" :auto-size="true" :row-height.sync="row_height" :is-responsive="true" :is-draggable="true" :is-resizable="true" :vertical-compact="true" :margin="[3, 3]" :use-css-transforms="true">
-    <grid-item v-for="w in gridWindows" drag-allow-from=".drag-handle" drag-ignore-from=".no-drag" :x="w.x" :y="w.y" :w.sync="w.w" :h.sync="w.h" :i="w.i" @resize="viewChanging(w)" @move="viewChanging(w)" @resized="show_overlay=false;w.resize&&w.resize();focusWindow(w)" @moved="show_overlay=false;w.move&&w.move();focusWindow(w)" :key="w.id">
+    <grid-item :key="w.id" v-for="w in gridWindows" drag-allow-from=".drag-handle" drag-ignore-from=".no-drag" :x="w.x" :y="w.y" :w.sync="w.w" :h.sync="w.h" :i="w.i" @resize="viewChanging(w)" @move="viewChanging(w)" @resized="show_overlay=false;w.resize&&w.resize();focusWindow(w)" @moved="show_overlay=false;w.move&&w.move();focusWindow(w)">
       <window :w="w" @detach="detach" :withDragHandle="true" @duplicate="duplicate" @select="selectWindow" :loaders="wm.registered_loaders" @close="close" @fullscreen="fullScreen" @normalsize="normalSize"></window>
     </grid-item>
   </grid-layout>
-  <div class="md-layout md-gutter md-alignment-center-center" v-if="!wm.selected_window && (!gridWindows || gridWindows.length===0)">
+  <div class="md-layout md-gutter md-alignment-center-center" v-if="!gridWindows || gridWindows.length===0">
     <md-empty-state  md-icon="static/img/imjoy-io-icon.svg" md-label="" md-description="">
     </md-empty-state>
   </div>
-  <window :w="w" @detach="detach"  v-for="w in standaloneWindows" :key="w.id" v-show="wm.selected_window===w" :loaders="wm.registered_loaders" :withDragHandle="false" @duplicate="duplicate" @select="selectWindow" @close="close" @fullscreen="fullScreen" @normalsize="normalSize" ></window>
+  <window :w="w" @detach="detach"  v-for="w in standaloneWindows" :key="w.id+'_standalone'" v-show="wm.selected_window===w" :loaders="wm.registered_loaders" :withDragHandle="false" @duplicate="duplicate" @select="selectWindow" @close="close" @fullscreen="fullScreen" @normalsize="normalSize" ></window>
 </div>
 </template>
 

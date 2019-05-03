@@ -98,12 +98,6 @@ export default {
       default: function() {
         return null
       }
-    },
-    render:{
-      type: Boolean,
-      default: function() {
-        return true
-      }
     }
   },
   data() {
