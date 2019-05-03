@@ -1,11 +1,11 @@
 self.__precacheManifest = [
   {
-    "revision": "21ec61899f1c0e905813",
-    "url": "/static/css/app.838159d6.css"
+    "revision": "18161ab8ef7bf30b5435",
+    "url": "/static/css/app.5aeeaed2.css"
   },
   {
-    "revision": "21ec61899f1c0e905813",
-    "url": "/static/js/app.831553aa.js"
+    "revision": "18161ab8ef7bf30b5435",
+    "url": "/static/js/app.b0583507.js"
   },
   {
     "revision": "b8859e2632feade2aed6",
@@ -228,19 +228,19 @@ self.__precacheManifest = [
     "url": "/static/js/chunk-vendors.5f74ac27.js"
   },
   {
-    "revision": "2a3e222e6a41b32a7180e6afa3675990",
-    "url": "/static/vs/html.worker.js"
+    "revision": "493ef474936217113b20a6573247288a",
+    "url": "/static/vs/editor.worker.js"
   },
   {
     "revision": "b00449080615ce71a2a8a52aee9f658f",
     "url": "/static/vs/css.worker.js"
   },
   {
-    "revision": "493ef474936217113b20a6573247288a",
-    "url": "/static/vs/editor.worker.js"
+    "revision": "2a3e222e6a41b32a7180e6afa3675990",
+    "url": "/static/vs/html.worker.js"
   },
   {
-    "revision": "de208661863ebaa71e09125e13d4c980",
+    "revision": "87bd24db72fc20e87fe39e81ddb5c0de",
     "url": "/index.html"
   },
   {
@@ -404,10 +404,6 @@ self.__precacheManifest = [
     "url": "/static/img/anna-palm-icon-circle-animation.svg"
   },
   {
-    "revision": "5d56cd775d49d9c86bc3c711db1b8717",
-    "url": "/static/img/anna-palm-icon-circle.png"
-  },
-  {
     "revision": "eba5bde7d6db21d95d41f4a717edf6de",
     "url": "/static/img/anna-palm-icon-circle.svg"
   },
@@ -422,6 +418,10 @@ self.__precacheManifest = [
   {
     "revision": "dec21930a1a4f59520b5c55bff21dc6f",
     "url": "/static/img/github-white.svg"
+  },
+  {
+    "revision": "5d56cd775d49d9c86bc3c711db1b8717",
+    "url": "/static/img/anna-palm-icon-circle.png"
   },
   {
     "revision": "f0d21da3f74ffbbcc644dafd7b957e57",
