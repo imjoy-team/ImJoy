@@ -1,11 +1,11 @@
 self.__precacheManifest = [
   {
-    "revision": "97d1990e84cde76575e3",
-    "url": "/static/css/app.115ab330.css"
+    "revision": "6da7a5f3f854939527a8",
+    "url": "/static/css/app.ee23a377.css"
   },
   {
-    "revision": "97d1990e84cde76575e3",
-    "url": "/static/js/app.5a43bde4.js"
+    "revision": "6da7a5f3f854939527a8",
+    "url": "/static/js/app.51026bae.js"
   },
   {
     "revision": "b8859e2632feade2aed6",
@@ -228,19 +228,19 @@ self.__precacheManifest = [
     "url": "/static/js/chunk-vendors.5f74ac27.js"
   },
   {
-    "revision": "b00449080615ce71a2a8a52aee9f658f",
-    "url": "/static/vs/css.worker.js"
+    "revision": "2a3e222e6a41b32a7180e6afa3675990",
+    "url": "/static/vs/html.worker.js"
   },
   {
     "revision": "493ef474936217113b20a6573247288a",
     "url": "/static/vs/editor.worker.js"
   },
   {
-    "revision": "2a3e222e6a41b32a7180e6afa3675990",
-    "url": "/static/vs/html.worker.js"
+    "revision": "b00449080615ce71a2a8a52aee9f658f",
+    "url": "/static/vs/css.worker.js"
   },
   {
-    "revision": "f573f97d827f89446bb0072e431c684c",
+    "revision": "185208117917cd1f8d6a034e8215e90d",
     "url": "/index.html"
   },
   {
@@ -692,6 +692,18 @@ self.__precacheManifest = [
     "url": "/static/vs/editor/editor.main.css"
   },
   {
+    "revision": "2b6ac4494944b92db7dcfa0ce3a605ed",
+    "url": "/static/vs/editor/editor.main.nls.de.js"
+  },
+  {
+    "revision": "65a437a349f6e024e14a84bdae3b94e5",
+    "url": "/static/vs/editor/editor.main.nls.es.js"
+  },
+  {
+    "revision": "a8fb0f322b584b488bd572adf086cdcd",
+    "url": "/static/vs/editor/editor.main.nls.fr.js"
+  },
+  {
     "revision": "6d0cbdd6e06c3e3c3eea8c05cf7918fa",
     "url": "/static/vs/editor/editor.main.nls.it.js"
   },
@@ -750,18 +762,6 @@ self.__precacheManifest = [
   {
     "revision": "11a854433bcc74085be053c3ab713b15",
     "url": "/static/vs/language/css/cssWorker.js"
-  },
-  {
-    "revision": "2b6ac4494944b92db7dcfa0ce3a605ed",
-    "url": "/static/vs/editor/editor.main.nls.de.js"
-  },
-  {
-    "revision": "65a437a349f6e024e14a84bdae3b94e5",
-    "url": "/static/vs/editor/editor.main.nls.es.js"
-  },
-  {
-    "revision": "a8fb0f322b584b488bd572adf086cdcd",
-    "url": "/static/vs/editor/editor.main.nls.fr.js"
   },
   {
     "revision": "51880b243dfb4c0a65c406b155e9a716",
