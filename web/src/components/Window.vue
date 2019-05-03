@@ -55,7 +55,7 @@
       </md-card-content>
     </md-card-expand-content>
   </md-card-expand>
-  <md-card-content :class="w.scroll?'plugin-iframe-container allow-scroll':'plugin-iframe-container'">
+  <md-card-content :class="w.standalone?'taller-container':'shorter-container'" class="plugin-iframe-container allow-scroll">
     <div class="loading loading-lg floating" v-show="w.loading"></div>
     <component v-if="componentNames[w.type] && w.type.startsWith('imjoy/')" :is="componentNames[w.type]" :w="w" :loaders="loaders" />
     <md-empty-state v-else-if="w.type.startsWith('imjoy/')" md-icon="hourglass_empty" md-label="IMJOY.IO" md-description="" />
@@ -131,6 +131,9 @@ export default {
     if(this.w){
       this.w.refresh = this.refresh
       this.w.focus = ()=>{this.$el.scrollIntoView(true)}
+      if(this.w.fullscreen){
+        this.fullScreen(this.w)
+      }
     }
   },
   beforeDestroy() {
@@ -141,6 +144,9 @@ export default {
       this.w.refresh = this.refresh
       this.w.focus = ()=>{this.$el.scrollIntoView(true)}
       this.w.focus()
+      if(this.w.fullscreen){
+        this.fullScreen(this.w)
+      }
     }
   },
   methods: {
@@ -218,13 +224,20 @@ export default {
 .plugin-iframe-container {
   display: flex;
   width: 100%;
-  height: calc(100% - 40px);
   flex-direction: column;
   overflow: hidden;
   padding-left: 2px;
   padding-right: 2px;
   padding-top: 2px;
   padding-bottom: 2px;
+}
+
+.taller-container{
+  height: calc(100% - 5px);
+}
+
+.shorter-container{
+  height: calc(100% - 40px);
 }
 
 .allow-scroll {

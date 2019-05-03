@@ -132,7 +132,7 @@ export class WindowManager {
     }
     w.selected = true
     this.active_windows = [w]
-    if(w.focus) w.focus()
+    if(!w.standalone&&w.focus) w.focus()
     if(w.refresh) w.refresh()
   }
 

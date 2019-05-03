@@ -718,10 +718,12 @@ export default {
       ui: "{id:'workflow', type:'ops'}"
     }
     const insideWhiteboard = (target) => {
-      return target && document.getElementById('whiteboard').contains(target)
+      const whiteboard = document.getElementById('whiteboard')
+      return target && whiteboard && whiteboard.contains(target)
     }
     const insideFileDialog = (target) =>{
-      return target && document.getElementById('engine-file-dialog').contains(target)
+      const dialog = document.getElementById('engine-file-dialog')
+      return target && dialog && dialog.contains(target)
     }
     document.addEventListener("dragover", (e) => {
       e.preventDefault()

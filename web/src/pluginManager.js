@@ -1150,7 +1150,7 @@ export class PluginManager {
       tconfig.workspace = this.selected_workspace
       const _interface = _.assign({TAG: tconfig.tag, WORKSPACE: this.selected_workspace}, this.imjoy_api)
       const plugin = new DynamicPlugin(tconfig, _interface, this.fm.api)
-      if(pconfig.focus) pconfig.focus()
+      if(!pconfig.standalone && pconfig.focus) pconfig.focus()
       plugin.whenConnected(() => {
         if (!plugin.api) {
           console.error('the window plugin seems not ready.')

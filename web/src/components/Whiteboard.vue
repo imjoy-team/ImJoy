@@ -50,14 +50,11 @@ export default {
       scrolling: false,
       scrollClientY: 0,
       screenWidth: window.innerWidth,
-      standaloneWindows: [],
-      gridWindows: [],
+      windows: []
     }
   },
   created(){
     this.wm = this.windowManager
-    this.windows = this.wm && this.wm.windows
-    assert(this.windows)
     this.event_bus = this.wm.event_bus
     this.event_bus.$on('add_window', this.onWindowAdd)
     this.event_bus.$on('close_window', this.onWindowClose)
@@ -75,7 +72,8 @@ export default {
     this.marked = marked
   },
   mounted() {
-    
+    this.windows = this.wm && this.wm.windows
+    assert(this.windows)
     this.screenWidth = window.innerWidth
     this.col_num = parseInt(this.$refs.whiteboard.clientWidth/this.column_width)
     window.onbeforeunload = function (evt) {
@@ -93,6 +91,18 @@ export default {
     this.event_bus.$off('add_window', this.onWindowAdd)
     this.event_bus.$off('close_window', this.onWindowClose)
     this.event_bus.$off('resize', this.updateSize)
+  },
+  computed: {
+    gridWindows: function () {
+      return this.windows.filter((w)=>{
+        return !w.standalone
+      })
+    },
+    standaloneWindows: function() {
+      return this.windows.filter((w)=>{
+        return this.mode!=='grid' || w.standalone
+      })
+    }
   },
   methods: {
     overlayMousemove(e){
@@ -127,8 +137,6 @@ export default {
         if(!this.scrolling)
         scroll()
       }
-
-      // console.log('hi', top, bottom, this.scrollClientY, this.$refs.whiteboard.scrollTop, this.$refs.whiteboard.scrollHeight, bbox)
     },
     updateSize(e){
       this.screenWidth = e.width
@@ -136,12 +144,6 @@ export default {
       this.col_num = parseInt(this.$refs.whiteboard.clientWidth/this.column_width)
     },
     onWindowAdd(w) {
-      this.standaloneWindows = this.windows.filter((w)=>{
-        return this.mode!=='grid' || w.standalone
-      })
-      this.gridWindows = this.windows.filter((w)=>{
-        return !w.standalone
-      })
       if(w.fullscreen){
         this.fullScreen(w)
       }
@@ -149,13 +151,6 @@ export default {
       this.$forceUpdate()
     },
     onWindowClose() {
-      this.standaloneWindows = this.windows.filter((w)=>{
-        return this.mode!=='grid' || w.standalone
-      })
-      this.gridWindows = this.windows.filter((w)=>{
-        return !w.standalone
-      })
-      console.log(this.standaloneWindows , this.gridWindows )
       this.$forceUpdate()
     },
     detach(w){
