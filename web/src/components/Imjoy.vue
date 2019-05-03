@@ -98,13 +98,16 @@
               <md-icon>settings</md-icon>Settings
             </md-menu-item>
             <md-menu-item href="/docs/" target="_blank" class="md-primary">
-              <md-icon>library_books</md-icon>Docs
+              <md-icon>library_books</md-icon>Documentation
             </md-menu-item>
             <md-menu-item href="https://forum.image.sc/tags/imjoy" target="_blank" class="md-primary">
               <md-icon>help</md-icon>Help
             </md-menu-item>
             <md-menu-item @click="showAboutDialog=true" class="md-primary">
               <md-icon>info</md-icon>About
+            </md-menu-item>
+            <md-menu-item :disabled="true">
+              <md-icon>update</md-icon> ImJoy v{{imjoy_version}}
             </md-menu-item>
           </md-menu-content>
         </md-menu>
@@ -561,6 +564,8 @@ import NATIVE_PYTHON_PLUGIN_TEMPLATE from '../plugins/nativePythonTemplate.imjoy
 import WEB_PYTHON_PLUGIN_TEMPLATE from '../plugins/webPythonTemplate.imjoy.html';
 import WINDOW_PLUGIN_TEMPLATE from '../plugins/windowTemplate.imjoy.html';
 
+import {version} from '../../package.json';
+
 import {
   randId,
   url_regex,
@@ -652,7 +657,7 @@ export default {
       plugin_loaded: false,
       new_workspace_name: '',
       workspace_dropping: false,
-      max_window_buttons: 9
+      max_window_buttons: 9,
     }
   },
   watch: {
@@ -661,6 +666,7 @@ export default {
     }
   },
   created() {
+    this.imjoy_version = version
     // mocks it for testing if not available
     this.event_bus = this.$root.$data.store && this.$root.$data.store.event_bus || new Vue()
     const imjoy_api = {
@@ -2124,5 +2130,13 @@ button.md-speed-dial-target {
 
 .file-dropping {
   background: #cad8ef!important;
+}
+
+.md-list-item-content>.md-icon:last-child {
+    margin-left: 1px!important;
+}
+
+.md-list-item-content>.md-icon:first-child {
+    margin-right: 5px!important;
 }
 </style>
