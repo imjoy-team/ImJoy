@@ -33,7 +33,7 @@
               <span>Duplicate</span>
               <md-icon>filter</md-icon>
             </md-menu-item>
-            <md-menu-item v-if="w.type!='main'" @click="close(w)">
+            <md-menu-item @click="close(w)">
               <span>Close</span>
               <md-icon>close</md-icon>
             </md-menu-item>
