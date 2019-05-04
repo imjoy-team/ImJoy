@@ -561,10 +561,10 @@ Requirements are specified as a list of strings specifying the required python m
 ```json
 "requirements": ["numpy", "matplotlib"]
 ```
+By default, the packages are loaded from our static hosting on Github (https://github.com/oeway/static.imjoy.io/tree/master/docs/pyodide). Specifically for `scipy`, you need to include an absolute url: `"requirements": ["https://alpha.iodide.app/pyodide-0.10.0/scipy.js"]`.
 
 Please note that `web-python` plugins are based on [pyodide](https://github.com/iodide-project/pyodide/)
 and only a limited number of python modules is currently supported.
-
 
 ### Typical scenarios
 Here we describe typically encountered scenarios to add requirements for public

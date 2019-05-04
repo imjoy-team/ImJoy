@@ -20,6 +20,13 @@
  */
 
 
+import {
+  randId,
+  assert,
+  compareVersions
+} from '../utils.js'
+
+
 var __jailed__path__;
 var __is__node__ = ((typeof process !== 'undefined') &&
                     (!process.browser) &&
@@ -36,10 +43,6 @@ if (__is__node__) {
     //     .split('/')
     //     .slice(0, -1)
     //     .join('/')+'/static/jailed/';
-}
-
-function randId() {
-    return Math.random().toString(36).substr(2, 10);
 }
 
 
@@ -330,7 +333,7 @@ var basicConnectionWeb = function() {
                 me._frame = sample.cloneNode(false);
                 me._frame.src = me._frame.src+'?type='+type+'&name='+config.name;
                 me._frame.id = 'iframe_'+id;
-                if(type == 'iframe' || type == 'window'){
+                if(type == 'iframe' || type == 'window' || type == 'web-python-window'){
                   if(typeof iframe_container == 'string'){
                     iframe_container = document.getElementById(iframe_container)
                   }
@@ -691,10 +694,12 @@ Connection.prototype.importJailedScript = function(path, sCb, fCb) {
  * @param {Function} sCb to call upon success
  * @param {Function} fCb to call upon failure
  */
-Connection.prototype.execute = function(code, sCb, fCb) {
-    this._executeSCb = sCb||function(){};
-    this._executeFCb = fCb||function(){};
+Connection.prototype.execute = function(code) {
+  return new Promise((resolve, reject)=>{
+    this._executeSCb = resolve
+    this._executeFCb = reject
     this._platformConnection.send({type: 'execute', code: code});
+  })
 }
 
 
@@ -892,10 +897,10 @@ DynamicPlugin.prototype._connect =
 
     // binded failure callback
     this._fCb = function(error){
-        console.error('execute failure:', error);
         me._fail.emit(error);
         me.disconnect();
         me.initializing = false;
+        if(error) me.error(error.toString())
         me._updateUI()
     }
     if(this.type == 'native-python' && (!this.config.engine || !this.config.engine.socket)){
@@ -956,6 +961,9 @@ DynamicPlugin.prototype._init =
       lang = 'python'
     }
     else if(this.type == 'web-python'){
+      lang = 'web-python'
+    }
+    else if(this.type == 'web-python-window'){
       lang = 'web-python'
     }
     else{
@@ -1061,28 +1069,42 @@ Plugin.prototype._loadPlugin = function() {
  * Loads the plugin body (executes the code in case of the
  * DynamicPlugin)
  */
-DynamicPlugin.prototype._loadPlugin = function() {
-  var me = this;
-  var sCb = function() {
-      me._requestRemote();
-  }
-
-  for (let i = 0; i < this.config.scripts.length; i++) {
-    this._connection.execute({type: 'script', content: this.config.scripts[i].content, src: this.config.scripts[i].attrs.src}, sCb, this._fCb);
-  }
-  if(this.config.type == 'iframe' || this.config.type == 'window'){
-    for (let i = 0; i < this.config.styles.length; i++) {
-      this._connection.execute({type: 'style', content: this.config.styles[i].content, src: this.config.styles[i].attrs.src}, sCb, this._fCb);
+DynamicPlugin.prototype._loadPlugin = async function() {
+    try{
+      if(this.config.type === 'native-python' && this.config.engine && this.config.engine.engine_info){
+        if(this.config.engine.engine_info.api_version && compareVersions(this.config.engine.engine_info.api_version, ">", '0.1.0')){
+          await this._connection.execute({type: 'requirements', lang: this.config.lang, requirements: this.config.requirements, env: this.config.env});
+          for (let i = 0; i < this.config.scripts.length; i++) {
+            await this._connection.execute({type: 'script', content: this.config.scripts[i].content, lang: this.config.scripts[i].attrs.lang, src: this.config.scripts[i].attrs.src});
+          }
+        }
+        else{
+          assert(this.config.scripts.length === 1, 'only 1 script block is supported')
+          await this._connection.execute({type: 'script', main: true, content: this.config.scripts[0].content, lang: this.config.lang, requirements: this.config.requirements, env: this.config.env});
+        }
+      }
+      else{
+        await this._connection.execute({type: 'requirements', lang: this.config.lang, requirements: this.config.requirements, env: this.config.env});
+        if(this.config.type === 'iframe' || this.config.type === 'window' || this.config.type === 'web-python-window'){
+          for (let i = 0; i < this.config.styles.length; i++) {
+            await this._connection.execute({type: 'style', content: this.config.styles[i].content, src: this.config.styles[i].attrs.src});
+          }
+          for (let i = 0; i < this.config.links.length; i++) {
+            await this._connection.execute({type: 'link', rel: this.config.links[i].attrs.rel, type_: this.config.links[i].attrs.type, href: this.config.links[i].attrs.href });
+          }
+          for (let i = 0; i < this.config.windows.length; i++) {
+            await this._connection.execute({type: 'html', content: this.config.windows[i].content});
+          }
+        }
+        for (let i = 0; i < this.config.scripts.length; i++) {
+          await this._connection.execute({type: 'script', content: this.config.scripts[i].content, lang: this.config.scripts[i].attrs.lang, src: this.config.scripts[i].attrs.src});
+        }
+      }
+      this._requestRemote();
     }
-    for (let i = 0; i < this.config.links.length; i++) {
-      this._connection.execute({type: 'link', rel: this.config.links[i].attrs.rel, type_: this.config.links[i].attrs.type, href: this.config.links[i].attrs.href }, sCb, this._fCb);
+    catch(e){
+      this._fCb((e && e.toString())|| 'Error') 
     }
-    for (let i = 0; i < this.config.windows.length; i++) {
-      this._connection.execute({type: 'html', content: this.config.windows[i].content}, sCb, this._fCb);
-    }
-  }
-
-  this._connection.execute({type: 'script', content: this.config.script, lang: this.config.lang, main: true, requirements: this.config.requirements, env: this.config.env}, sCb, this._fCb);
 }
 
 

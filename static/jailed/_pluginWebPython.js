@@ -98,50 +98,84 @@ var execute_python_code = function(code) {
       if(!_export_plugin_api){
         _export_plugin_api = api.export
         api.export = function(p){
-          const getattr = pyodide.pyimport('getattr')
-          const hasattr = pyodide.pyimport('hasattr')
-          const _api = {}
-          for(let k of Object.getOwnPropertyNames(p)){
-            if(!k.startsWith('_') && hasattr(p, k)){
-              const func = getattr(p, k)
-              _api[k] = function(){
-                return func(...Array.prototype.slice.call(arguments))
+          if(typeof p === 'function'){
+            const _api = {}
+            const getattr = pyodide.pyimport('getattr')
+            const hasattr = pyodide.pyimport('hasattr')
+            for(let k of Object.getOwnPropertyNames(p)){
+              if(!k.startsWith('_') && hasattr(p, k)){
+                const func = getattr(p, k)
+                _api[k] = function(){
+                  return func(...Array.prototype.slice.call(arguments))
+                }
               }
             }
+            _export_plugin_api(_api)
           }
-          _export_plugin_api(_api)
+          else if(typeof p === 'object'){
+            _export_plugin_api(p)
+          }
+          else{
+            throw "unsupported api export"
+          }
         }
       }
       pyodide.runPython('from js import api')
       pyodide.runPython(code.content)
-      if(code.main)  parent.postMessage({type : 'executeSuccess'}, '*');
   } catch (e) {
-      console.error(e.message, e.stack)
-      parent.postMessage({type : 'executeFailure', error: e.toString()}, '*');
       throw e;
   }
 }
+
 // evaluates the provided string
-var execute = function(code) {
-    if(code.type == 'script'){
+var execute = async function(code) {
+  try{
+    if(code.type == 'requirements'){
+      if(code.requirements){
+        code.requirements = typeof code.requirements === 'string'? [code.requirements] : code.requirements
+        if((Array.isArray(code.requirements))){
+          const python_packages = []
+          for(var i=0;i<code.requirements.length;i++){
+            if(code.requirements[i].toLowerCase().endsWith('.css') || code.requirements[i].startsWith('css:')){
+              if(code.requirements[i].startsWith('css:')){
+                code.requirements[i] = code.requirements[i].slice(4)
+              }
+              link_node = document.createElement('link');
+              link_node.rel = 'stylesheet'
+              link_node.href = code.requirements[i]
+              document.head.appendChild(link_node)
+            }
+            else if(code.requirements[i].startsWith('js:')){
+              code.requirements[i] = code.requirements[i].slice(3)
+              await importScripts(code.requirements[i])
+            }
+            else{
+              python_packages.push(code.requirements[i])
+            }
+          }
+          await pyodide.loadPackage(python_packages)
+        }
+        else{
+          throw "unsupported requirements definition"
+        }
+      }
+    }
+    else if(code.type == 'script'){
       if(code.src){
         var script_node = document.createElement('script');
         script_node.setAttribute('src', code.src);
         document.head.appendChild(script_node);
       }
       else{
-        if(code.content){
-          if(code.requirements && (Array.isArray(code.requirements) || typeof code.requirements === 'string') ){
-            pyodide.loadPackage(code.requirements).then(()=>{
-              execute_python_code(code)
-            }).catch(()=>{
-              var e = "failed to load packages: " + code.requirements.toString()
-              parent.postMessage({type : 'executeFailure', error: e}, '*');
-              throw e;
-            })
-          }
-          else{
-            execute_python_code(code)
+        if(code.content && code.lang === 'python'){
+          execute_python_code(code)
+        }
+        else if(code.content && code.lang === 'javascript'){
+          try {
+            eval(code.content);
+          } catch (e) {
+            console.error(e.message, e.stack)
+            throw e;
           }
         }
       }
@@ -168,12 +202,17 @@ var execute = function(code) {
         document.head.appendChild(link_node)
     }
     else if (code.type == 'html'){
-         document.body.appendChild(_htmlToElement(code.content));
+        document.body.appendChild(_htmlToElement(code.content));
     }
     else{
       throw "unsupported code type."
     }
-
+    parent.postMessage({type : 'executeSuccess'}, '*');
+  }
+  catch(e){
+    console.error("failed to execute scripts: ", code, e)
+    parent.postMessage({type : 'executeFailure', error: e.toString()}, '*');
+  }
 }
 
 
@@ -192,6 +231,17 @@ window.connection = conn;
 window.languagePluginUrl = 'https://static.imjoy.io/pyodide/';
 
 importScripts('https://static.imjoy.io/pyodide/pyodide.js').then(()=>{
+  // hack for matplotlib etc.
+  window.iodide = {
+    output: { element: function element(type){
+        const div = document.createElement(type);
+        const output = document.getElementById('output') || document.body
+        output.appendChild(div);
+        return div;
+      }
+    }
+  }
+
   languagePluginLoader.then(() => {
       // pyodide is now ready to use...
       console.log(pyodide.runPython('import sys\nsys.version'));
