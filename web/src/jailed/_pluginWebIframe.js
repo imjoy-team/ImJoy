@@ -95,97 +95,85 @@ var importScript = function(url) {
 
 // evaluates the provided string
 var execute = async function(code) {
-    if(code.type == 'script'){
-      if(code.src){
-        var script_node = document.createElement('script');
-        script_node.setAttribute('src', code.src);
-        document.head.appendChild(script_node);
-      }
-      else{
-        if(code.content){
-          // document.addEventListener("DOMContentLoaded", function(){
-          try {
-              if(code.requirements && (Array.isArray(code.requirements) || typeof code.requirements === 'string') ){
-                try {
-                  var link_node;
-                  if(Array.isArray(code.requirements)){
-                    for(var i=0;i<code.requirements.length;i++){
-                      if(code.requirements[i].toLowerCase().endsWith('.css') || code.requirements[i].startsWith('css:')){
-                        if(code.requirements[i].startsWith('css:')){
-                          code.requirements[i] = code.requirements[i].slice(4)
-                        }
-                        link_node = document.createElement('link');
-                        link_node.rel = 'stylesheet'
-                        link_node.href = code.requirements[i]
-                        document.head.appendChild(link_node)
-                      }
-                      else{
-                        if(code.requirements[i].startsWith('js:')){
-                          code.requirements[i] = code.requirements[i].slice(3)
-                        }
-                        await importScripts(code.requirements[i])
-                      }
+    try {
+      if(code.type == 'requirements'){
+          if(code.requirements && (Array.isArray(code.requirements) || typeof code.requirements === 'string') ){
+            try {
+              var link_node;
+              code.requirements = typeof code.requirements === 'string'? [code.requirements] : code.requirements
+              if(Array.isArray(code.requirements)){
+                for(var i=0;i<code.requirements.length;i++){
+                  if(code.requirements[i].toLowerCase().endsWith('.css') || code.requirements[i].startsWith('css:')){
+                    if(code.requirements[i].startsWith('css:')){
+                      code.requirements[i] = code.requirements[i].slice(4)
                     }
+                    link_node = document.createElement('link');
+                    link_node.rel = 'stylesheet'
+                    link_node.href = code.requirements[i]
+                    document.head.appendChild(link_node)
                   }
                   else{
-                    if(code.requirements.toLowerCase().endsWith('.css') || code.requirements.startsWith('css:')){
-                      if(code.requirements.startsWith('css:')){
-                        code.requirements = code.requirements.slice(4)
-                      }
-                      link_node = document.createElement('link');
-                      link_node.rel = 'stylesheet'
-                      link_node.href = code.requirements
-                      document.head.appendChild(link_node)
+                    if(code.requirements[i].startsWith('js:')){
+                      code.requirements[i] = code.requirements[i].slice(3)
                     }
-                    else{
-                      if(code.requirements.startsWith('js:')){
-                        code.requirements = code.requirements.slice(3)
-                      }
-                      await importScripts(code.requirements)
-                    }
+                    await importScripts(code.requirements[i])
                   }
-                } catch (e) {
-                  throw "failed to import required scripts: " + code.requirements.toString()
                 }
               }
-              eval(code.content);
-              if(code.main)  parent.postMessage({type : 'executeSuccess'}, '*');
-          } catch (e) {
-              console.error(e.message, e.stack)
-              parent.postMessage({type : 'executeFailure', error: e.toString()}, '*');
-              throw e;
+              else{
+                throw "unsupported requirements definition"
+              }
+            } catch (e) {
+              throw "failed to import required scripts: " + code.requirements.toString()
+            }
           }
-          // });
+      }
+      else if(code.type == 'script'){
+        if(code.src){
+          var script_node = document.createElement('script');
+          script_node.setAttribute('src', code.src);
+          document.head.appendChild(script_node);
+        }
+        else{
+          if(code.content){
+            // document.addEventListener("DOMContentLoaded", function(){
+            eval(code.content);
+            // });
+          }
         }
       }
-    }
-    else if (code.type == 'style'){
-        var style_node = document.createElement('style');
-        if(code.src){
-          style_node.src = code.src
-        }
-        style_node.innerHTML = code.content;
-        document.head.appendChild(style_node)
-    }
-    else if (code.type == 'link'){
-        var link_node_ = document.createElement('link');
-        if(code.rel){
-          link_node_.rel = code.rel
-        }
-        if(code.href){
-          link_node_.href = code.href
-        }
-        if(code.type_){
-          link_node_.type = code.type_
-        }
-        document.head.appendChild(link_node_)
-    }
-    else if (code.type == 'html'){
-         document.body.appendChild(_htmlToElement(code.content));
-    }
-    else{
-      throw "unsupported code type."
-    }
+      else if (code.type == 'style'){
+          var style_node = document.createElement('style');
+          if(code.src){
+            style_node.src = code.src
+          }
+          style_node.innerHTML = code.content;
+          document.head.appendChild(style_node)
+      }
+      else if (code.type == 'link'){
+          var link_node_ = document.createElement('link');
+          if(code.rel){
+            link_node_.rel = code.rel
+          }
+          if(code.href){
+            link_node_.href = code.href
+          }
+          if(code.type_){
+            link_node_.type = code.type_
+          }
+          document.head.appendChild(link_node_)
+      }
+      else if (code.type == 'html'){
+          document.body.appendChild(_htmlToElement(code.content));
+      }
+      else{
+        throw "unsupported code type."
+      }
+      parent.postMessage({type : 'executeSuccess'}, '*');
+  } catch (e) {
+      console.error("failed to execute scripts: ", code, e)
+      parent.postMessage({type : 'executeFailure', error: e.toString()}, '*');
+  }
 
 }
 

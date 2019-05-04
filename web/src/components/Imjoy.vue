@@ -261,7 +261,7 @@
             </md-menu>
 
             <md-button class="joy-run-button" :class="plugin.running?'md-accent':(plugin._disconnected && plugin.type === 'native-python'? 'disconnected-plugin': 'md-primary')" :disabled="plugin._disconnected && plugin.type != 'native-python'" @click="plugin._disconnected?connectPlugin(plugin):runOp(plugin.ops[plugin.name])">
-              {{plugin.type === 'native-python'? plugin.name + ' 🚀': ( plugin.type === 'web-python' ? plugin.name + ' 🐍': plugin.name) }}
+              {{plugin.type === 'native-python'? plugin.name + ' 🚀': ( plugin.type === 'web-python' || plugin.type === 'web-python-window' ? plugin.name + ' 🐍': plugin.name) }}
             </md-button>
 
 
@@ -705,12 +705,20 @@ export default {
       revs_limit: 2,
       auto_compaction: true
     })
-    this.em = new EngineManager({ event_bus: this.event_bus, config_db: config_db, show_message_callback: this.showMessage, show_engine_callback: this.showEngineConnection.bind(this)})
+  
+    this.client_id = localStorage.getItem("imjoy_client_id")
+    if(!this.client_id){
+      this.client_id = 'imjoy_web_'+randId()
+      localStorage.setItem("imjoy_client_id", this.client_id);
+    }
+
+    this.em = new EngineManager({ event_bus: this.event_bus, config_db: config_db, show_message_callback: this.showMessage, show_engine_callback: (show, message, resolve, reject)=>{this.showEngineConnection(show, message, resolve, reject)}, client_id: this.client_id})
     this.wm = new WindowManager({ event_bus: this.event_bus, show_message_callback: this.showMessage, add_window_callback: this.addWindowCallback})
     this.fm = new FileSystemManager()
     this.pm = new PluginManager({ event_bus: this.event_bus, config_db: config_db, engine_manager: this.em, window_manager:this.wm, file_system_manager: this.fm, imjoy_api: imjoy_api, show_message_callback: this.showMessage, update_ui_callback: ()=>{this.$forceUpdate()}})
 
-    this.client_id = null
+
+
     this.IMJOY_PLUGIN = {
       _id: 'IMJOY_APP'
     }
@@ -869,11 +877,6 @@ export default {
     this.is_https_mode = ('https:' === location.protocol)
     // Make sure the GUI is refreshed
     setInterval(()=>{this.$forceUpdate()}, 5000)
-    this.client_id = localStorage.getItem("imjoy_client_id")
-    if(!this.client_id){
-      this.client_id = 'imjoy_web_'+randId()
-      localStorage.setItem("imjoy_client_id", this.client_id);
-    }
 
     let connection_token = null
     if(this.$route.query.token || this.$route.query.t){
@@ -1136,7 +1139,8 @@ export default {
     },
     showEngineConnection(show, message, resolve, reject){
       if(message && resolve && reject){
-        this.permission_message = resolve
+        this.permission_message = message
+        this.resolve_permission = resolve
         this.reject_permission = reject
         this.showPermissionConfirmation = true
       }

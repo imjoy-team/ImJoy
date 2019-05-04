@@ -9,6 +9,7 @@ import WEB_WORKER_PLUGIN_TEMPLATE from '../src/plugins/webWorkerTemplate.imjoy.h
 import WINDOW_PLUGIN_TEMPLATE from '../src/plugins/windowTemplate.imjoy.html';
 // import NATIVE_PYTHON_PLUGIN_TEMPLATE from '../src/plugins/nativePythonTemplate.imjoy.html';
 import WEB_PYTHON_PLUGIN_TEMPLATE from '../src/plugins/webPythonTemplate.imjoy.html';
+import WEB_PYTHON_WINDOW_PLUGIN_TEMPLATE from '../src/plugins/webPythonWindowTemplate.imjoy.html';
 
 import TEST_WEB_WORKER_PLUGIN_1 from './testWebWorkerPlugin1.imjoy.html';
 import TEST_WEB_WORKER_PLUGIN_2 from './testWebWorkerPlugin2.imjoy.html';
@@ -117,6 +118,16 @@ describe('ImJoy.vue', async () => {
     const plugin = await pm.reloadPlugin({_id: 'new plugin', tag: null, name:'new plugin', code: code})
     expect(plugin.name).to.equal('Untitled Plugin')
     expect(plugin.type).to.equal('web-python')
+    expect(typeof plugin.api.run).to.equal('function')
+    await plugin.api.run({})
+    plugin.terminate()
+  }).timeout(20000)
+
+  it('should load the new web-python-window plugin', async () => {
+    const code = _.clone(WEB_PYTHON_WINDOW_PLUGIN_TEMPLATE)
+    const plugin = await pm.reloadPlugin({_id: 'new plugin', tag: null, name:'new plugin', code: code})
+    expect(plugin.name).to.equal('Untitled Plugin')
+    expect(plugin.type).to.equal('web-python-window')
     expect(typeof plugin.api.run).to.equal('function')
     await plugin.api.run({})
     plugin.terminate()

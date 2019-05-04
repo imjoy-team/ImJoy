@@ -164,7 +164,13 @@ export default {
       }
 
       if(!this.window_plugin_id && plugin.config && plugin.config.ui) {
-        config = await this.window.plugin_manager.imjoy_api.showDialog(plugin, plugin.config)
+        //show dialog only when there is input field in the ui string
+        if(plugin.config.ui.indexOf('{')>-1){
+          config = await this.window.plugin_manager.imjoy_api.showDialog(plugin, plugin.config)
+        }
+        else{
+          config = {}
+        }
       }
       else{
         config = this.window_plugin_config
@@ -174,7 +180,7 @@ export default {
         if(node)  node.parentNode.removeChild(node);
       }
       const w = await plugin.api.run({id: this.window_plugin_id, config: config, data: {}})
-      if(plugin.config && plugin.config.type === 'window'){
+      if(plugin.config && plugin.config.type === 'window' || plugin.config.type === 'web-python-window'){
         this.window_plugin_id = w.__id__
         this.window_plugin_config = config
       }

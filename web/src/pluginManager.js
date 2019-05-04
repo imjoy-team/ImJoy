@@ -559,7 +559,7 @@ export class PluginManager {
               this.installed_plugins.push(config)
               this.reloadPlugin(config).catch((e)=>{
                 console.error(config, e)
-                this.showMessage(`<${config.name}>: ${e.toString()}`)
+                this.showMessage(`<${config.name}>: ${e}`)
               })
             }
           }
@@ -796,7 +796,7 @@ export class PluginManager {
         this.unloadPlugin(template, true)
         let p
 
-        if (template.type === 'window') {
+        if (template.type === 'window' || template.type === 'web-python-window') {
           p = this.preLoadPlugin(template)
         } else {
           p = this.loadPlugin(template)
@@ -896,6 +896,7 @@ export class PluginManager {
     try {
       if (uri && uri.endsWith('.js')) {
         config.lang = config.lang || 'javascript'
+        config.scripts = [code]
         config.script = code
         config.style = null
         config.window = null
@@ -906,23 +907,17 @@ export class PluginManager {
         config.scripts = []
         for (let i = 0; i < pluginComp.script.length; i++) {
           if (pluginComp.script[i].attrs.lang) {
-            config.script = pluginComp.script[i].content
-            config.lang = pluginComp.script[i].attrs.lang || 'javascript'
-          }
-          else{
             config.scripts.push(pluginComp.script[i])
           }
         }
         if(!config.script){
           config.script = pluginComp.script[0].content
-          config.lang = pluginComp.script[0].attrs.lang || 'javascript'
         }
         config.tag = tag || config.tags && config.tags[0]
         // try to match the script with current tag
         for (let i = 0; i < pluginComp.script.length; i++) {
           if (pluginComp.script[i].attrs.tag === config.tag) {
             config.script = pluginComp.script[i].content
-            config.lang = pluginComp.script[i].attrs.lang || 'javascript'
             break
           }
         }
@@ -952,6 +947,21 @@ export class PluginManager {
             }
           }
       }
+      const t = config.type || config.mode
+      if(t && t.toLowerCase().indexOf('python')>-1){
+          config.lang = 'python'
+      }
+      else{
+          config.lang = 'javascript'
+      }
+
+      //set default lang for script blocks
+      for (let i = 0; i < config.scripts.length; i++) {
+        if (!config.scripts[i].attrs.lang) {
+          config.scripts[i].attrs.lang = config.lang
+        }
+      }
+  
       config = upgradePluginAPI(config)
       if (!PLUGIN_SCHEMA(config)) {
         const error = PLUGIN_SCHEMA.errors
@@ -1383,6 +1393,9 @@ export class PluginManager {
       else if(config.type === 'web-python'){
         joy_template.tags.push('web-python')
       }
+      else if(config.type === 'web-python-window'){
+        joy_template.tags.push('web-python-window')
+      }
       else if(config.type === 'iframe'){
         joy_template.tags.push('iframe')
       }
@@ -1587,7 +1600,7 @@ export class PluginManager {
         pconfig.window_type = pconfig.type
         //assign plugin type ('window')
         pconfig.type = window_config.type
-        if (pconfig.type != 'window') {
+        if (pconfig.type !== 'window' && pconfig.type !== 'web-python-window') {
           throw 'Window plugin must be with type "window"'
         }
 

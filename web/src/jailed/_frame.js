@@ -231,7 +231,7 @@ var initIframePlugin = function() {
 }
 
 var plugin_mode = getParamValue('type');
-if(plugin_mode =='web-worker'){
+if(plugin_mode === 'web-worker'){
   try {
       initWebworkerPlugin();
   } catch(e) {
@@ -239,10 +239,10 @@ if(plugin_mode =='web-worker'){
       initIframePlugin();
   }
 }
-else if(plugin_mode =='web-python'){
+else if(plugin_mode === 'web-python' || plugin_mode === 'web-python-window'){
   initWebPythonIframePlugin();
 }
-else if(plugin_mode=='iframe' || plugin_mode=='window'){
+else if(plugin_mode === 'iframe' || plugin_mode === 'window'){
   initIframePlugin();
 }
 else{

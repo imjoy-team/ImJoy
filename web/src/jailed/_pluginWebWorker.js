@@ -72,36 +72,58 @@ self.connection = {};
      * @param {String} code code to execute
      */
     var execute = function(code) {
-      if(code.type == 'script'){
-        try {
-            if(code.requirements && (Array.isArray(code.requirements) || typeof code.requirements === 'string') ){
-              try {
-                if(Array.isArray(code.requirements)){
-                  for(var i=0;i<code.requirements.length;i++){
-                    importScripts(code.requirements[i])
+      try{
+        if(code.type == 'requirements'){
+          try {
+              if(code.requirements && (Array.isArray(code.requirements) || typeof code.requirements === 'string') ){
+                try {
+                  if(Array.isArray(code.requirements)){
+                    for(var i=0;i<code.requirements.length;i++){
+                      importScripts(code.requirements[i])
+                    }
                   }
+                  else{
+                    importScripts(code.requirements)
+                  }
+                } catch (e) {
+                  throw "failed to import required scripts: " + code.requirements.toString()
                 }
-                else{
-                  importScripts(code.requirements)
-                }
-              } catch (e) {
-                throw "failed to import required scripts: " + code.requirements.toString()
               }
-            }
-            eval(code.content);
-            if(code.main) self.postMessage({type: 'executeSuccess'});
-        } catch (e) {
-            console.error(e.message, e.stack)
-            self.postMessage({type: 'executeFailure', error: e.toString()});
-            throw e;
+          } catch (e) {
+              throw e;
+          }
         }
-
+        else if(code.type == 'script'){
+          try {
+              if(code.requirements && (Array.isArray(code.requirements) || typeof code.requirements === 'string') ){
+                try {
+                  if(Array.isArray(code.requirements)){
+                    for(let i=0;i<code.requirements.length;i++){
+                      importScripts(code.requirements[i])
+                    }
+                  }
+                  else{
+                    importScripts(code.requirements)
+                  }
+                } catch (e) {
+                  throw "failed to import required scripts: " + code.requirements.toString()
+                }
+              }
+              eval(code.content);
+          } catch (e) {
+              console.error(e.message, e.stack)
+              throw e;
+          }
+        }
+        else{
+          throw "unsupported code type."
+        }
+        self.postMessage({type: 'executeSuccess'});
       }
-      else{
-        throw "unsupported code type."
+      catch(e){
+        console.error("failed to execute scripts: ", code, e)
+        self.postMessage({type : 'executeFailure', error: e.toString()});
       }
-
-
     }
 
 

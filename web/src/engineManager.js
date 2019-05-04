@@ -5,10 +5,11 @@ import {
 } from './utils.js'
 
 export class Engine {
-  constructor({config={}, event_bus=null, show_message_callback=null, update_ui_callback=null, show_engine_callback=null}){
+  constructor({config={}, event_bus=null, show_message_callback=null, update_ui_callback=null, show_engine_callback=null, client_id=null}){
     this.socket = null
     this.activate = false
     this.connection = 'Disconnected'
+    this.client_id = client_id
     this.config = config
     this.id = this.config.id
     this.name = this.config.name
@@ -101,6 +102,8 @@ export class Engine {
           socket.emit('register_client', {id: this.client_id, token: token, base_url: url, session_id: this.engine_session_id}, (ret)=>{
             if(ret && ret.success){
               const connect_client = ()=>{
+                this.engine_info = ret.engine_info || {}
+                this.engine_info.api_version = this.engine_info.api_version || '0.1.0'
                 this.socket = socket
                 this.connected = true
                 this.connected_url_token_ = url + token
@@ -279,11 +282,12 @@ export class Engine {
 }
 
 export class EngineManager {
-  constructor({event_bus=null, config_db=null,show_message_callback=null, update_ui_callback=null, show_engine_callback=null}){
+  constructor({event_bus=null, config_db=null,show_message_callback=null, update_ui_callback=null, show_engine_callback=null, client_id=null}){
     this.event_bus = event_bus
     this.config_db = config_db
     assert(this.event_bus)
     assert(this.config_db, 'config database is not available')
+    this.client_id = client_id || randId()
     this.engines = []
     this.show_engine_callback = show_engine_callback || function(){}
     this.show_message_callback = show_message_callback || function (){}
@@ -310,7 +314,7 @@ export class EngineManager {
       config.id = config.id || '_' + config.name + '_' + config.url
 
       let existed = false
-      let engine = new Engine({config: config, event_bus: this.event_bus, show_engine_callback: this.show_engine_callback, show_message_callback: this.show_message_callback, update_ui_callback: this.update_ui_callback});
+      let engine = new Engine({config: config, event_bus: this.event_bus, show_engine_callback: this.show_engine_callback, show_message_callback: this.show_message_callback, update_ui_callback: this.update_ui_callback, client_id: this.client_id});
       for(let e of this.engines){
         if(e.id === engine.id){
           engine = e

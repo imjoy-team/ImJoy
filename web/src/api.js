@@ -7,7 +7,7 @@ var ajv = new Ajv()
 
 export const CONFIGURABLE_FIELDS = ["env", "requirements", "dependencies", "icon", "ui", "type", "flags"]
 
-export const SUPPORTED_PLUGIN_TYPES = ['web-worker', 'native-python', 'web-python', 'iframe', 'window', 'collection']
+export const SUPPORTED_PLUGIN_TYPES = ['web-worker', 'native-python', 'web-python', 'web-python-window', 'iframe', 'window', 'collection']
 
 export function upgradePluginAPI(config){
   if(compareVersions(config.api_version, '<=', '0.1.1')){
