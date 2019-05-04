@@ -27,8 +27,13 @@ var _importScript = function(url) {
     return new Promise((resolve, reject) => {
         var scriptTag = document.createElement('script');
         scriptTag.src = url;
+        scriptTag.type='text/javascript';
         scriptTag.onload = resolve;
-        scriptTag.onreadystatechange = resolve;
+        scriptTag.onreadystatechange = function() {
+            if (this.readyState ==='loaded' || this.readyState == 'complete') {
+              resolve();
+            }
+        }
         scriptTag.onerror = reject;
         document.head.appendChild(scriptTag);
     })

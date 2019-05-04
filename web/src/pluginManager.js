@@ -1085,7 +1085,18 @@ export class PluginManager {
         if (template.extensions && template.extensions.length > 0) {
           this.registerExtension(template.extensions, plugin)
         }
-        if(plugin.api.setup){
+        if(plugin.config.resumed && plugin.api.resume){
+          plugin.api.resume().then(() => {
+            this.event_bus.$emit('plugin_loaded', plugin)
+            resolve(plugin)
+          }).catch((e) => {
+            console.error('error occured when loading plugin ' + template.name + ": ", e)
+            this.showMessage(`<${template.name}>: ${e}`, 15)
+            reject(e)
+            plugin.terminate().then(()=>{this.update_ui_callback()})
+          })
+        }
+        else if(plugin.api.setup){
           plugin.api.setup().then(() => {
             this.event_bus.$emit('plugin_loaded', plugin)
             resolve(plugin)

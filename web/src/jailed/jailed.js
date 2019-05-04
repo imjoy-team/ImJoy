@@ -462,6 +462,7 @@ var SocketioConnectionWeb = function() {
                 this._disconnected = false;
                 this.secret = result.secret
                 config.work_dir = result.work_dir
+                config.resumed = result.resumed
                 this.engine.socket.on('message_from_plugin_'+this.secret,  (data)=>{
                     // console.log('message_from_plugin_'+this.id, data)
                     if (data.type == 'initialized') {

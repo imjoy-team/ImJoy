@@ -346,7 +346,7 @@
     </md-app-drawer>
     <md-app-content :class="workspace_dropping?'file-dropping':''" class="whiteboard-content">
       <md-progress-bar md-mode="determinate" :md-value="progress"></md-progress-bar>
-      <whiteboard id="whiteboard" @create="pm.createWindow(null, $event)" :mode="wm.window_mode" :window-manager="wm"></whiteboard>
+      <whiteboard v-if="wm" id="whiteboard" @create="pm.createWindow(null, $event)" :mode="wm.window_mode" :window-manager="wm"></whiteboard>
     </md-app-content>
   </md-app>
   <md-dialog-confirm :md-active.sync="showRemoveConfirmation" md-title="Removing Plugin" md-content="Do you really want to <strong>delete</strong> this plugin" md-confirm-text="Yes" md-cancel-text="Cancel" @md-cancel="showRemoveConfirmation=false" @md-confirm="pm.removePlugin(plugin2_remove);plugin2_remove=null;showRemoveConfirmation=false"/>
