@@ -81,7 +81,7 @@ export class Engine {
             this.disconnecting = true
             socket.disconnect()
             if(!auto) {
-              this.show_engine_callback(true)
+              this.show_engine_callback(true, this)
               this.showMessage('Failed to connect, please make sure you have started the plugin engine.')
             }
             if(url.endsWith(':8080') && !auto){
@@ -91,7 +91,7 @@ export class Engine {
           }
         }, 2500)
 
-        //if(!auto) {this.show_engine_callback(true)}
+        //if(!auto) {this.show_engine_callback(true, this)}
 
         socket.on('connect', () => {
           clearTimeout(timer)
@@ -107,7 +107,7 @@ export class Engine {
                 this.socket = socket
                 this.connected = true
                 this.connected_url_token_ = url + token
-                //this.show_engine_callback(false)
+                //this.show_engine_callback(false, this)
                 this.connection = 'Plugin Engine Connected.'
                 this.connection_token = token
                 localStorage.setItem("imjoy_connection_token", token)
@@ -138,7 +138,7 @@ export class Engine {
                 this.showMessage('Failed to connect: ' + ret.reason)
               }
               else{
-                if(!auto) this.show_engine_callback(true)
+                if(!auto) this.show_engine_callback(true, this)
                 if(ret.reason) this.showMessage('Failed to connect: ' + ret.reason)
                 console.error('Failed to connect to the plugin engine.', ret.reason)
               }
@@ -351,7 +351,7 @@ export class EngineManager {
       else{
         engine.connect(true).then(()=>{
           save_engine()
-          this.show_engine_callback(false)
+          this.show_engine_callback(false, engine)
         })
       }
       return engine

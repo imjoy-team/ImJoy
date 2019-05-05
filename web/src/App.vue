@@ -180,4 +180,11 @@ html, body
 .md-toolbar.md-dense {
     min-height: 36px;
 }
+
+li.md-menu-item{
+  margin-top: 0px;
+}
+ol li, ul li {
+    margin-top: 0rem!important;
+}
 </style>

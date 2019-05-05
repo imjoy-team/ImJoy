@@ -88,7 +88,7 @@
             </md-menu-item>
           </md-menu-content>
         </md-menu>
-        <engine-control-panel :engine-manager="em" :show-engine-dialog.sync="showPluginEngineInfo" />
+        <engine-control-panel :engine-manager="em"/>
         <md-menu>
           <md-button class="md-icon-button md-primary" md-menu-trigger>
             <md-icon>more_horiz</md-icon>
@@ -655,7 +655,6 @@ export default {
       show_installed_plugins: false,
       progress: 0,
       status_text: '',
-      showPluginEngineInfo: false,
       showWorkspaceDialog: false,
       showWelcomeDialog: false,
       show_file_dialog: false,
@@ -726,7 +725,7 @@ export default {
       localStorage.setItem("imjoy_client_id", this.client_id);
     }
 
-    this.em = new EngineManager({ event_bus: this.event_bus, config_db: config_db, show_message_callback: this.showMessage, show_engine_callback: (show, message, resolve, reject)=>{this.showEngineConnection(show, message, resolve, reject)}, client_id: this.client_id})
+    this.em = new EngineManager({ event_bus: this.event_bus, config_db: config_db, show_message_callback: this.showMessage, show_engine_callback: (show, engine)=>{this.showEngineConnection(show, engine)}, client_id: this.client_id})
     this.wm = new WindowManager({ event_bus: this.event_bus, show_message_callback: this.showMessage, add_window_callback: this.addWindowCallback})
     this.fm = new FileSystemManager()
     this.pm = new PluginManager({ event_bus: this.event_bus, config_db: config_db, engine_manager: this.em, window_manager:this.wm, file_system_manager: this.fm, imjoy_api: imjoy_api, show_message_callback: this.showMessage, update_ui_callback: ()=>{this.$forceUpdate()}})
@@ -1147,17 +1146,14 @@ export default {
         if(this.max_window_buttons>9) this.max_window_buttons = 9
       }
     },
-    showEngineConnection(show, message, resolve, reject){
-      if(message && resolve && reject){
-        this.permission_message = message
-        this.resolve_permission = resolve
-        this.reject_permission = reject
-        this.showPermissionConfirmation = true
-      }
-      else{
-        this.showPluginEngineInfo = show
-      }
-
+    showEngineConnection(show, engine){
+      // if(message && resolve && reject){
+      //   this.permission_message = message
+      //   this.resolve_permission = resolve
+      //   this.reject_permission = reject
+      //   this.showPermissionConfirmation = true
+      // }
+      this.event_bus.$emit('show_engine_dialog', {show: show, engine: engine})
     },
     getRepository(repo_name){
       for(let r of this.pm.repository_list){
