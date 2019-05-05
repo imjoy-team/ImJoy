@@ -1,11 +1,11 @@
 self.__precacheManifest = [
   {
-    "revision": "fa75b30c2e7c236f839a",
-    "url": "/static/css/app.60c456b9.css"
+    "revision": "ab8d523ca67519f5c78b",
+    "url": "/static/css/app.460aa149.css"
   },
   {
-    "revision": "fa75b30c2e7c236f839a",
-    "url": "/static/js/app.1564d6ec.js"
+    "revision": "ab8d523ca67519f5c78b",
+    "url": "/static/js/app.6f9e8aea.js"
   },
   {
     "revision": "b8859e2632feade2aed6",
@@ -240,7 +240,7 @@ self.__precacheManifest = [
     "url": "/static/vs/editor.worker.js"
   },
   {
-    "revision": "36f557f847386437b8d4e4a24d9ec26c",
+    "revision": "cd7dc7b4f404b1e037da05fa6febc21a",
     "url": "/index.html"
   },
   {
@@ -748,6 +748,10 @@ self.__precacheManifest = [
     "url": "/static/vs/language/json/jsonMode.js"
   },
   {
+    "revision": "7d2a277c0d00a4bb615596ae1ab93213",
+    "url": "/static/vs/language/json/jsonWorker.js"
+  },
+  {
     "revision": "a3f8339f361d9f2683c37abb09f8c75e",
     "url": "/static/vs/language/typescript/tsMode.js"
   },
@@ -758,10 +762,6 @@ self.__precacheManifest = [
   {
     "revision": "11a854433bcc74085be053c3ab713b15",
     "url": "/static/vs/language/css/cssWorker.js"
-  },
-  {
-    "revision": "7d2a277c0d00a4bb615596ae1ab93213",
-    "url": "/static/vs/language/json/jsonWorker.js"
   },
   {
     "revision": "51880b243dfb4c0a65c406b155e9a716",
