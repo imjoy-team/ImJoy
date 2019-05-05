@@ -632,6 +632,7 @@ export class PluginManager {
     const code = response.data
     let config = this.parsePluginCode(code, {tag: selected_tag})
     config.uri = uri
+    config.origin = uri
     config.scoped_plugins = scoped_plugins
     return config
   }

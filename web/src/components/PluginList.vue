@@ -26,7 +26,7 @@
           <p>{{plugin.description}}</p>
           <p><span v-for="tag in plugin.tags" :key="tag">{{tag}}, </span></p>
         </div>
-        <p>
+        <span>
         <md-button  class="md-icon-button md-list-action md-accent" v-if="pm && pm.removePlugin && plugin.installed" @click="plugin2_remove_=plugin;showRemoveConfirmation=true;">
           <md-icon>delete_forever</md-icon>
           <md-tooltip>Delete {{plugin.name}}</md-tooltip>
@@ -50,7 +50,7 @@
           <md-icon>update</md-icon>
           <md-tooltip>Update {{plugin.name}}</md-tooltip>
         </md-button>
-        </p>
+        </span>
         <md-menu>
           <md-button class="md-icon-button md-list-action" md-menu-trigger>
             <md-icon class="md-primary">more_horiz</md-icon>

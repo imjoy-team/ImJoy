@@ -88,7 +88,7 @@
             </md-menu-item>
           </md-menu-content>
         </md-menu>
-        <engine-control-panel :engine-manager="em" :show-dialog.sync="showPluginEngineInfo" />
+        <engine-control-panel :engine-manager="em"/>
         <md-menu>
           <md-button class="md-icon-button md-primary" md-menu-trigger>
             <md-icon>more_horiz</md-icon>
@@ -499,7 +499,10 @@
                 {{plugin4install.type === 'native-python'? plugin4install.name + ' 🚀': plugin4install.name}}
               </h2>
             </div>
-            <div v-if="tag4install" class="md-toolbar-section-end">
+            <div v-if="installing" class="md-toolbar-section-end">
+              <div style="padding-right: 30px;" class="loading loading-lg"></div>
+            </div>
+            <div v-else-if="tag4install" class="md-toolbar-section-end">
               <md-button class="md-button md-primary" @click="installPlugin(plugin4install, tag4install)">
                 <md-icon>cloud_download</md-icon>{{plugin4install._installation_text || 'Install'}}
                 <md-tooltip>Install {{plugin4install.name}} (tag=`{{tag4install}}`)</md-tooltip>
@@ -521,10 +524,11 @@
                 <md-icon>cloud_download</md-icon>{{plugin4install._installation_text || 'Install'}}
               </md-button>
             </div>
+            
           </md-toolbar>
         </md-card-header>
         <md-card-content>
-          <p>version:{{plugin4install.version}}</p>
+          <p>Version: {{plugin4install.version}}</p>
           <p>{{plugin4install.description}}</p>
           <md-chip v-for="tag in plugin4install.tags" @click="tag4install=tag" :class="tag4install===tag? 'md-primary':''" :key="tag">{{tag}}</md-chip>
           <!-- <md-button class="md-button md-primary" @click="showCode(plugin4install)">
@@ -651,7 +655,6 @@ export default {
       show_installed_plugins: false,
       progress: 0,
       status_text: '',
-      showPluginEngineInfo: false,
       showWorkspaceDialog: false,
       showWelcomeDialog: false,
       show_file_dialog: false,
@@ -667,6 +670,7 @@ export default {
       new_workspace_name: '',
       workspace_dropping: false,
       max_window_buttons: 9,
+      installing: false
     }
   },
   watch: {
@@ -721,7 +725,7 @@ export default {
       localStorage.setItem("imjoy_client_id", this.client_id);
     }
 
-    this.em = new EngineManager({ event_bus: this.event_bus, config_db: config_db, show_message_callback: this.showMessage, show_engine_callback: (show, message, resolve, reject)=>{this.showEngineConnection(show, message, resolve, reject)}, client_id: this.client_id})
+    this.em = new EngineManager({ event_bus: this.event_bus, config_db: config_db, show_message_callback: this.showMessage, show_engine_callback: (show, engine)=>{this.showEngineConnection(show, engine)}, client_id: this.client_id})
     this.wm = new WindowManager({ event_bus: this.event_bus, show_message_callback: this.showMessage, add_window_callback: this.addWindowCallback})
     this.fm = new FileSystemManager()
     this.pm = new PluginManager({ event_bus: this.event_bus, config_db: config_db, engine_manager: this.em, window_manager:this.wm, file_system_manager: this.fm, imjoy_api: imjoy_api, show_message_callback: this.showMessage, update_ui_callback: ()=>{this.$forceUpdate()}})
@@ -1142,17 +1146,14 @@ export default {
         if(this.max_window_buttons>9) this.max_window_buttons = 9
       }
     },
-    showEngineConnection(show, message, resolve, reject){
-      if(message && resolve && reject){
-        this.permission_message = message
-        this.resolve_permission = resolve
-        this.reject_permission = reject
-        this.showPermissionConfirmation = true
-      }
-      else{
-        this.showPluginEngineInfo = show
-      }
-
+    showEngineConnection(show, engine){
+      // if(message && resolve && reject){
+      //   this.permission_message = message
+      //   this.resolve_permission = resolve
+      //   this.reject_permission = reject
+      //   this.showPermissionConfirmation = true
+      // }
+      this.event_bus.$emit('show_engine_dialog', {show: show, engine: engine})
     },
     getRepository(repo_name){
       for(let r of this.pm.repository_list){
@@ -1367,19 +1368,21 @@ export default {
       }
     },
     installPlugin(plugin4install, tag4install){
+      this.installing = true
       this.pm.installPlugin(plugin4install, tag4install).then((template)=>{
         this.showAddPluginDialog = false
         this.clearPluginUrl(template)
         this.$forceUpdate()
-      })
+      }).finally(()=>{this.installing=false})
     },
     updatePlugin(pid){
       const plugin = this.pm.plugins[pid]
       const pconfig = plugin.config
       if(pconfig.origin){
+        this.installing = true
         this.pm.installPlugin(pconfig.origin).then(()=>{
           this.$forceUpdate()
-        })
+        }).finally(()=>{this.installing=false})
       }
       else{
         alert('Origin not found for this plugin.')
