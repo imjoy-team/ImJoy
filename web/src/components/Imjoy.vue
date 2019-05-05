@@ -88,7 +88,7 @@
             </md-menu-item>
           </md-menu-content>
         </md-menu>
-        <engine-control-panel :engine-manager="em" :show-dialog.sync="showPluginEngineInfo" />
+        <engine-control-panel :engine-manager="em" :show-engine-dialog.sync="showPluginEngineInfo" />
         <md-menu>
           <md-button class="md-icon-button md-primary" md-menu-trigger>
             <md-icon>more_horiz</md-icon>
@@ -499,7 +499,10 @@
                 {{plugin4install.type === 'native-python'? plugin4install.name + ' 🚀': plugin4install.name}}
               </h2>
             </div>
-            <div v-if="tag4install" class="md-toolbar-section-end">
+            <div v-if="installing" class="md-toolbar-section-end">
+              <div  style="padding-right: 30px;"  class="loading loading-lg"></div>
+            </div>
+            <div v-else-if="tag4install" class="md-toolbar-section-end">
               <md-button class="md-button md-primary" @click="installPlugin(plugin4install, tag4install)">
                 <md-icon>cloud_download</md-icon>{{plugin4install._installation_text || 'Install'}}
                 <md-tooltip>Install {{plugin4install.name}} (tag=`{{tag4install}}`)</md-tooltip>
@@ -521,10 +524,11 @@
                 <md-icon>cloud_download</md-icon>{{plugin4install._installation_text || 'Install'}}
               </md-button>
             </div>
+            
           </md-toolbar>
         </md-card-header>
         <md-card-content>
-          <p>version:{{plugin4install.version}}</p>
+          <p>Version: {{plugin4install.version}}</p>
           <p>{{plugin4install.description}}</p>
           <md-chip v-for="tag in plugin4install.tags" @click="tag4install=tag" :class="tag4install===tag? 'md-primary':''" :key="tag">{{tag}}</md-chip>
           <!-- <md-button class="md-button md-primary" @click="showCode(plugin4install)">
@@ -667,6 +671,7 @@ export default {
       new_workspace_name: '',
       workspace_dropping: false,
       max_window_buttons: 9,
+      installing: false
     }
   },
   watch: {
@@ -1367,19 +1372,21 @@ export default {
       }
     },
     installPlugin(plugin4install, tag4install){
+      this.installing = true
       this.pm.installPlugin(plugin4install, tag4install).then((template)=>{
         this.showAddPluginDialog = false
         this.clearPluginUrl(template)
         this.$forceUpdate()
-      })
+      }).finally(()=>{this.installing=false})
     },
     updatePlugin(pid){
       const plugin = this.pm.plugins[pid]
       const pconfig = plugin.config
       if(pconfig.origin){
+        this.installing = true
         this.pm.installPlugin(pconfig.origin).then(()=>{
           this.$forceUpdate()
-        })
+        }).finally(()=>{this.installing=false})
       }
       else{
         alert('Origin not found for this plugin.')

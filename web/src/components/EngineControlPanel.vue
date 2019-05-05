@@ -10,7 +10,7 @@
         <md-tooltip>ImJoy Plugin Engines</md-tooltip>
       </md-button>
       <md-menu-content class="engine-panel">
-        <md-menu-item @click="showEngineDialog()">
+        <md-menu-item @click="showEngineSettings()">
           <md-icon>🚀</md-icon>
           <span>Plugin Engine Management</span>
         </md-menu-item>
@@ -28,9 +28,9 @@
               <md-icon>highlight_off</md-icon>
               <md-tooltip>Disconnect Plugin Engines</md-tooltip>
             </md-button>
-            <md-button @click.stop="engine.resetEngine()" class="md-icon-button md-accent">
-              <md-icon>restore</md-icon>
-              <md-tooltip>Reset Plugin Engines</md-tooltip>
+            <md-button @click="showInfo(engine)" class="md-icon-button md-primary">
+              <md-icon>info</md-icon>
+              <md-tooltip>About Engine ({{engine.url}})</md-tooltip>
             </md-button>
           </md-menu-item>
           <md-menu-item v-else @click.stop="engine.connect(false)">
@@ -67,7 +67,7 @@
         </div>
       </md-menu-content>
     </md-menu>
-    <md-dialog :md-active.sync="showDialog" :md-click-outside-to-close="false" :md-close-on-esc="false">
+    <md-dialog :md-active.sync="showEngineDialog" :md-click-outside-to-close="false" :md-close-on-esc="false">
       <md-dialog-title>ImJoy Plugin Engine</md-dialog-title>
       <md-dialog-content>
           <p>
@@ -89,7 +89,7 @@
                     <md-icon class="md-primary">more_horiz</md-icon>
                   </md-button>
                   <md-menu-content>
-                    <md-menu-item @click="getInfo(engine)" disabled>
+                    <md-menu-item @click="showInfo(engine)">
                       <md-icon>info</md-icon>Info
                     </md-menu-item>
                     <!-- <md-menu-item @click="setDefault(engine)" disabled>
@@ -110,12 +110,12 @@
             If this is your first time to use ImJoy Plugin Engine, please <a href="https://github.com/oeway/ImJoy-App/releases" target="_blank">click here</a> to download the ImJoy Desktop App.
             <br> If you have it already, please start the Plugin Engine, and connect to it.<br>
           </p>
-          <md-autocomplete v-model="engine_url" :md-options="engine_url_list" @keyup.enter="addEngine()" name="engine_url">
+          <md-autocomplete v-model="engine_url" :md-options="engine_url_list" name="engine_url">
             <label for="engine_url">Plugin Engine URL</label>
           </md-autocomplete>
           <md-field>
             <label for="connection_token">Connection Token</label>
-            <md-input type="password" v-model="connection_token" @keyup.enter="addEngine()" name="connection_token"></md-input>
+            <md-input type="password" v-model="connection_token" name="connection_token"></md-input>
           </md-field>
           <md-button class="md-primary md-raised" @click="addEngine()">Connect</md-button>
           <!-- <span>🚀{{engine.name}} <md-switch @change="addEngine()" v-model="engine.activate">Connect</md-switch>
@@ -123,13 +123,56 @@
           <p>
             If you failed to install or start the Plugin Engine, please consult <a href="https://github.com/oeway/ImJoy-Engine" target="_blank">here</a>, and choose the alternative solution.<br>
           </p>
-
-
           <!-- <p v-if="is_https_mode">Please notice that, browsers such as Safari do not allow the connection form a `https` website to the Plugin Engine, in that case please <a href="http://imjoy.io/#/app" target="_blank">Switch to HTTP version</a> of ImJoy. </p> -->
           <!-- <p v-if="is_https_mode">Also notice that data and settings of ImJoy in the HTTP version and HTTPS version are not shared.</p> -->
       </md-dialog-content>
       <md-dialog-actions>
-        <md-button class="md-primary" @click="hideEngineDialog()">OK</md-button>
+        <md-button class="md-primary" @click="hideEngineSettings()">OK</md-button>
+      </md-dialog-actions>
+    </md-dialog>
+    <md-dialog :md-active.sync="showEngineInfo" :md-click-outside-to-close="true" :md-close-on-esc="true">
+      <md-dialog-title>About Plugin Engine</md-dialog-title>
+      <md-dialog-content v-if="selected_engine">
+        <h3>{{selected_engine.url}}</h3>
+        <md-field>
+          <label for="connection_token">Connection Token</label>
+          <md-input type="password" v-model="selected_engine.config.token" @keyup.enter="connectEngine()" name="connection_token"></md-input>
+        </md-field>
+        <md-chip>api version: {{selected_engine.engine_info.api_version}}</md-chip>
+        <div v-if="selected_engine.engine_info.platform" class="platform-info">
+          <p v-for="(v, k) in selected_engine.engine_info.platform" :key="k">{{k}}: {{v}}</p>
+        </div>
+        <br>
+        <md-divider></md-divider>
+        <md-button class="md-primary md-raised" :disabled="selected_engine.connected" @click="connectEngine()">Connect</md-button>
+        <md-button class="md-primary" :disabled="!selected_engine.connected" @click="expand(selected_engine)">
+          <md-icon>autorenew</md-icon> Show Processes
+        </md-button>
+        <div v-if="selected_engine.connected && selected_engine.config.show_processes">
+          <ul>
+            <li v-show="selected_engine.plugin_processes" v-for="p in selected_engine.plugin_processes" :key="p.pid">
+              &nbsp;&nbsp;
+              {{p.name}} (#{{p.pid}})
+              <md-button @click.stop="kill(selected_engine, p)" class="md-icon-button md-accent">
+                <md-icon>clear</md-icon>
+              </md-button>
+            </li>
+            <li v-if="!selected_engine.plugin_processes">
+              <md-button>
+                <div class="loading loading-lg"></div>
+              </md-button>
+            </li>
+            <li :disabled="true" v-if="selected_engine.plugin_num>1">
+              <span>&nbsp;&nbsp;{{selected_engine.plugin_num}} Running Plugins</span>
+              <md-button @click.stop="kill(selected_engine)" class="md-icon-button md-accent">
+                <md-icon>clear</md-icon>
+              </md-button>
+            </li>
+          </ul>
+          </div>
+      </md-dialog-content>
+      <md-dialog-actions>
+        <md-button class="md-primary" @click="showEngineInfo=false">OK</md-button>
       </md-dialog-actions>
     </md-dialog>
   </div>
@@ -140,12 +183,14 @@
 
 export default {
   name: 'engine-control-panel',
-  props: ['engineManager', 'showDialog'],
+  props: ['engineManager', 'showEngineDialog'],
   data(){
     return {
       engine_url: 'http://127.0.0.1:9527',
       engine_url_list: ['http://127.0.0.1:9527'],
       connection_token: null,
+      showEngineInfo: false,
+      selected_engine: null
     }
   },
   created(){
@@ -181,11 +226,11 @@ export default {
         this.update(engine)
       });
     },
-    showEngineDialog(){
-      this.$emit('update:showDialog', true)
+    showEngineSettings(){
+      this.$emit('update:showEngineDialog', true)
     },
-    hideEngineDialog(){
-      this.$emit('update:showDialog', false)
+    hideEngineSettings(){
+      this.$emit('update:showEngineDialog', false)
     },
     addEngine(){
       this.engineManager.addEngine({type: 'default', name:this.engine_url,  url: this.engine_url, token: this.connection_token})
@@ -195,10 +240,12 @@ export default {
       this.$forceUpdate()
     },
     connectEngine(engine){
+      if(!engine.connected)
       engine.connect()
       this.$forceUpdate()
     },
     disconnectEngine(engine){
+      if(engine.connected)
       engine.disconnect()
       this.$forceUpdate()
     },
@@ -206,11 +253,12 @@ export default {
       this.engine_url = engine.config.url
       this.connection_token = engine.config.token
     },
-    getInfo(){
-
+    resetEngine(engine){
+      engine.resetEngine()
     },
-    setDefault(){
-
+    showInfo(engine){
+      this.selected_engine = engine
+      this.showEngineInfo=true
     }
   }
 }
@@ -221,5 +269,9 @@ export default {
 .engine-panel{
   width: 350px!important;
   max-width: 100%!important;
+}
+
+.platform-info>p{
+ margin: 3px;
 }
 </style>
