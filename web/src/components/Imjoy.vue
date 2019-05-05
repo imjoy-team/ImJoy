@@ -158,7 +158,7 @@
               <md-icon>folder_open</md-icon><span class="md-xsmall-hide">Files</span>
             </md-button>
             <md-menu-content>
-              <md-menu-item @click="showEngineFileDialog(); files_expand=false" class="md-button">
+              <md-menu-item @click="showEngineFileDialog(); files_expand=false" :disabled="em.engines.length<=0" class="md-button">
                 <md-icon>add_to_queue</md-icon>Open Engine File
                 <md-tooltip>Load files through Plugin Engine</md-tooltip>
               </md-menu-item>
@@ -947,13 +947,13 @@ export default {
 
         const selected_workspace = this.$route.query.workspace || this.$route.query.w || workspace_list[0]
         await this.pm.loadWorkspace(selected_workspace)
-        this.em.connectAll(true)
+        const connections = this.em.connectAll(true)
         await this.pm.reloadPlugins()
-        // try {
-        //   await connections
-        // } catch (e) {
-        //   console.error(e)
-        // }
+        try {
+          await connections
+        } catch (e) {
+          console.error(e)
+        }
         this.plugin_loaded = true
         this.event_bus.$emit('plugins_loaded', this.pm.plugins)
         try {
