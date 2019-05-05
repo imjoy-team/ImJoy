@@ -339,7 +339,16 @@
             </div>
           </div>
           <md-divider></md-divider>
-          <p v-if="pm.installed_plugins.length<=0">&nbsp;No plugin installed.</p>
+          <!-- <p v-if="pm.installed_plugins.length<=0">&nbsp;No plugin installed.</p> -->
+          <md-empty-state
+            v-if="pm.installed_plugins.length<=0"
+            md-icon="extension"
+            md-label="No plugin installed"
+            md-description="">
+            <md-button ref="add_plugin_button" class="md-primary md-raised" @click="showPluginManagement()">
+              <md-icon>add</md-icon>Add Plugins
+            </md-button>
+          </md-empty-state>
         </md-card-content>
       </md-card>
     </md-app-drawer>
@@ -2152,13 +2161,7 @@ button.md-speed-dial-target {
     margin-right: 15px!important;
 }
 
-@media screen and (min-height: 786px) {
-  .md-toolbar {
-    height: 48px!important;
-  }
-}
-
-@media screen and (min-height: 786px) {
+@media screen and (max-height: 786px) {
   .md-toolbar {
     height: 48px!important;
   }
