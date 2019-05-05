@@ -60,6 +60,7 @@ export default {
 html, body
 {
     height: 100%;
+    width: 100%;
     overflow-y: hidden;
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
