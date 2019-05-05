@@ -1,6 +1,6 @@
 <template>
   <div class="engine-control-panel">
-    <md-button class="md-icon-button md-primary" v-if="!engineManager.engines || engineManager.engines.length==0" @click="showEngineDialog()">
+    <md-button class="md-icon-button md-primary" v-if="!engineManager.engines || engineManager.engines.length==0" @click="showEngineSettings()">
       <md-icon>🚀</md-icon>
       <md-tooltip>Connection to the Plugin Engine</md-tooltip>
     </md-button>
