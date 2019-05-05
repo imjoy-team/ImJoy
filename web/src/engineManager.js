@@ -119,17 +119,17 @@ export class Engine {
                 resolve()
               }
 
-              if(ret.message && ret.confirmation){
-                this.show_engine_callback(true, ret.message, connect_client,  ()=>{
-                  this.disconnecting = true
-                  socket.disconnect()
-                  console.log('you canceled the connection.')
-                  reject('User cancelled the connection.')
-                })
-              }
-              else{
-                connect_client()
-              }
+              // if(ret.message && ret.confirmation){
+              //   this.show_engine_callback(true, ret.message, connect_client,  ()=>{
+              //     this.disconnecting = true
+              //     socket.disconnect()
+              //     console.log('you canceled the connection.')
+              //     reject('User cancelled the connection.')
+              //   })
+              // }
+              // else{
+              connect_client()
+              // }
             }
             else{
               reason = ret.reason

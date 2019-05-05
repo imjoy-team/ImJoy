@@ -67,6 +67,7 @@ html, body
     /* Disables pull-to-refresh but allows overscroll glow effects. */
     overscroll-behavior-y: contain;
     overscroll-behavior-x: none;
+    position: fixed;
 }
 
 .h1, h1 {
@@ -175,4 +176,7 @@ html, body
   -webkit-transform: translateZ(0);
 }
 
+.md-toolbar.md-dense {
+    min-height: 36px;
+}
 </style>

@@ -120,7 +120,7 @@
       </form>
     </md-app-toolbar>
     <md-app-drawer :md-active.sync="menuVisible" md-persistent="full">
-      <div class="md-toolbar-row">
+      <div class="md-toolbar-row title-bar">
         <div class="md-toolbar-section-start">
           <md-button class="site-button site-title" @click="$router.push('/')">
             <img class="site-title" src="static/img/imjoy-logo-black.svg" alt="ImJoy">
@@ -150,7 +150,6 @@
           </md-button>
         </div>
       </div>
-      <br>
       <div v-if="!plugin_loaded" style="top: 10%;" class="loading loading-lg"></div>
       <md-card id="plugin-menu" v-show="plugin_loaded" v-if="pm">
         <md-card-header>
@@ -937,22 +936,18 @@ export default {
         }
 
         const selected_workspace = this.$route.query.workspace || this.$route.query.w || workspace_list[0]
-        this.$forceUpdate()
         await this.pm.loadWorkspace(selected_workspace)
-        const connections = this.em.connectAll(true)
+        this.em.connectAll(true)
         await this.pm.reloadPlugins()
-        try {
-          await connections
-        } catch (e) {
-          console.error(e)
-        }
+        // try {
+        //   await connections
+        // } catch (e) {
+        //   console.error(e)
+        // }
         this.plugin_loaded = true
-        this.$forceUpdate()
-        this.$forceUpdate()
         this.event_bus.$emit('plugins_loaded', this.pm.plugins)
         try {
           const manifest = this.pm.reloadRepository()
-          this.$forceUpdate()
           this.event_bus.$emit('repositories_loaded', manifest)
         }
         finally {
@@ -1868,6 +1863,12 @@ export default {
   }
 }
 
+@media screen and (max-height: 768px) {
+  .site-title {
+    height: 50px;
+  }
+}
+
 .subheader-title {
   font-size: 16px;
   font-weight: 500;
@@ -2060,6 +2061,7 @@ button.md-speed-dial-target {
 
 
 #plugin-menu{
+  height: 100%;
   max-height: calc( 100vh - 95px );
   padding: 10px;
 }
@@ -2072,6 +2074,12 @@ button.md-speed-dial-target {
 #plugin-menu > .md-card-header {
   justify-content: space-between;
   display: flex;
+}
+
+@media screen and (max-height: 900px) {
+  #plugin-menu > .md-card-header {
+    padding: 5px;
+  }
 }
 
 #plugin-menu > .md-button{
@@ -2103,11 +2111,11 @@ button.md-speed-dial-target {
 }
 
 .md-app {
-  height: 100vh;
+  height: 100%;
 }
 
 .md-app-content {
-  height: calc( 100vh - 65px );
+  height: calc( 100% );
 }
 
 .normal-text{
@@ -2141,6 +2149,22 @@ button.md-speed-dial-target {
 }
 
 .md-list-item-content>.md-icon:first-child {
-    margin-right: 5px!important;
+    margin-right: 15px!important;
+}
+
+@media screen and (min-height: 786px) {
+  .md-toolbar {
+    height: 48px!important;
+  }
+}
+
+@media screen and (min-height: 786px) {
+  .md-toolbar {
+    height: 48px!important;
+  }
+}
+
+.title-bar{
+  margin-bottom: 10px;
 }
 </style>
