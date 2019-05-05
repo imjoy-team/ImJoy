@@ -6,8 +6,8 @@
         <md-button v-if="!menuVisible" class="md-primary md-icon-button" @click="menuVisible=true">
           <md-icon>menu</md-icon>
         </md-button>
-        <md-button @click="$router.push('/')" v-if="!menuVisible" class="md-small-hide site-title">
-          <img class="site-title" src="static/img/imjoy-logo-black.svg" alt="ImJoy">
+        <md-button @click="$router.push('/')" v-if="!menuVisible" class="md-small-hide site-title-small">
+          <img class="site-title-small" src="static/img/imjoy-logo-black.svg" alt="ImJoy">
           <md-tooltip>ImJoy home</md-tooltip>
         </md-button>
         <md-button v-if="workspace_dropping" class="status-text">
@@ -1852,30 +1852,24 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+
 .site-title {
-  font-size: 35px;
-  font-weight: 300;
-  height: 60px;
-  width: 200px;
-}
-
-@media screen and (max-width: 600px) {
-  .site-title {
-    font-size: 26px;
-    font-weight: 250;
-  }
-}
-
-@media screen and (max-width: 400px) {
-  .site-title {
-    font-size: 22px;
-    font-weight: 220;
-  }
+  height: 65px;
 }
 
 @media screen and (max-height: 768px) {
   .site-title {
-    height: 50px;
+    height: 55px;
+  }
+}
+
+.site-title-small {
+  height: 55px;
+}
+
+@media screen and (max-height: 768px) {
+  .site-title-small{
+    height: 45px;
   }
 }
 
@@ -2162,23 +2156,18 @@ button.md-speed-dial-target {
     margin-right: 15px!important;
 }
 
-@media screen and (min-height: 786px) {
+.md-toolbar {
+  height: 58px!important;
+}
+
+@media screen and (max-height: 786px) {
   .md-toolbar {
-    height: 48px!important;
+    height: 42px!important;
   }
 }
 
 .title-bar{
   margin-bottom: 10px;
 }
-
-.md-empty-state-icon {
-    width: 120px;
-    min-width: 120px;
-    height: 120px;
-    font-size: 120px!important;
-    margin: 0;
-}
-
 </style>
 1
