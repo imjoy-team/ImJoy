@@ -1,4 +1,4 @@
-[![DOI](https://zenodo.org/badge/137741898.svg)](https://zenodo.org/badge/latestdoi/137741898) [![Build Status](https://travis-ci.com/oeway/ImJoy.svg?branch=master)](https://travis-ci.com/oeway/ImJoy) 
+[![DOI](https://zenodo.org/badge/137741898.svg)](https://zenodo.org/badge/latestdoi/137741898) [![Build Status](https://travis-ci.com/oeway/ImJoy.svg?branch=master)](https://travis-ci.com/oeway/ImJoy) [![Netlify Status](https://api.netlify.com/api/v1/badges/3aa71748-2778-4c31-a9ea-f7fdf5445fd1/deploy-status)](https://app.netlify.com/sites/imjoy/deploys)
 
 
 <a href="https://imjoy.io" target="_blank" ><img src="https://raw.githubusercontent.com/oeway/ImJoy/master/web/public/static/img/imjoy-logo-black.svg?sanitize=true" width="380"></img>

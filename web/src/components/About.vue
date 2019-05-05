@@ -1,7 +1,8 @@
 <template>
   <div class="about">
     <a href="https://zenodo.org/badge/latestdoi/137741898"><img src="https://zenodo.org/badge/137741898.svg" target="_blank" alt="DOI"></a>&nbsp;
-    <a href="https://travis-ci.com/oeway/ImJoy"><img src="https://travis-ci.com/oeway/ImJoy.svg?branch=master" target="_blank" alt="Travis-CI"></a>
+    <a href="https://travis-ci.com/oeway/ImJoy"><img src="https://travis-ci.com/oeway/ImJoy.svg?branch=master" target="_blank" alt="Travis-CI"></a>&nbsp;
+    <a href="https://app.netlify.com/sites/imjoy/deploys"><img src="https://api.netlify.com/api/v1/badges/3aa71748-2778-4c31-a9ea-f7fdf5445fd1/deploy-status" target="_blank" alt="Netlify-Deploy"></a>
     <br>
     <br>
     <img style="width: 300px" src="static/img/imjoy-logo-black.svg" />
