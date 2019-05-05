@@ -23,10 +23,10 @@
             <md-button v-else @click.stop="expand(engine)" class="md-icon-button md-primary">
               <md-icon>autorenew</md-icon>
             </md-button>
-            <span>{{engine.url}}</span>
+            <span>{{engine.url.replace(local_engine_url, 'My Computer')}}</span>
           </md-menu-item>
           <md-menu-item v-else @click.stop="engine.connect(false)">
-            <md-icon>sync_disabled</md-icon> {{engine.name}}
+            <md-icon>sync_disabled</md-icon> {{engine.url.replace(local_engine_url, 'My Computer')}}
             <md-tooltip>Connect to {{engine.name}} </md-tooltip>
           </md-menu-item>
           <div v-if="engine.connected && engine.config.show_processes">
@@ -63,7 +63,11 @@
             If this is your first time to use ImJoy Plugin Engine, please <a href="https://github.com/oeway/ImJoy-App/releases" target="_blank">click here</a> to download the ImJoy Desktop App.
             <br> If you have it already, please start the Plugin Engine, and connect to it.<br>
           </p>
-          <md-autocomplete v-model="engine_url" :md-options="engine_url_list" @keyup.enter="addEngine()" name="engine_url">
+          <div>
+            <md-radio v-model="url_type" value="localhost">My Computer</md-radio>
+            <md-radio v-model="url_type" value="remote">Another Computer</md-radio>
+          </div>
+          <md-autocomplete v-if="url_type==='remote'" v-model="engine_url" :md-options="engine_url_list" @keyup.enter="addEngine()" name="engine_url">
             <label for="engine_url">Plugin Engine URL</label>
           </md-autocomplete>
           <md-field>
@@ -82,7 +86,7 @@
     <md-dialog :md-active.sync="showEngineInfoDialog" :md-click-outside-to-close="true" :md-close-on-esc="true">
       <md-dialog-title>About Plugin Engine</md-dialog-title>
       <md-dialog-content v-if="selected_engine">
-        <h3>{{selected_engine.url}}</h3>
+        <h3>{{selected_engine.url.replace(local_engine_url, 'My computer ('+local_engine_url+')')}}</h3>
         <md-field>
           <label for="connection_token">Connection Token</label>
           <md-input type="password" v-model="selected_engine.config.token" @keyup.enter="connectEngine(selected_engine)" name="connection_token"></md-input>
@@ -102,16 +106,16 @@
             <md-icon class="md-primary">more_horiz</md-icon>
           </md-button>
           <md-menu-content>
-            <md-menu-item v-if="selected_engine.connected && !show_sys_info" @click.stop="show_sys_info=true" target="_blank">
+            <md-menu-item :disabled="!selected_engine.connected || show_sys_info" @click.stop="show_sys_info=true" target="_blank">
               <md-icon>info</md-icon> System Information
             </md-menu-item>
-            <md-menu-item @click.stop="openEngineUrl(engine.url)" target="_blank">
+            <md-menu-item @click.stop="openEngineUrl(selected_engine.url)" target="_blank">
               <md-icon>launch</md-icon> Open Engine Site
             </md-menu-item>
             <md-menu-item v-if="selected_engine.connected" @click.stop="resetEngine(selected_engine)" class="md-accent">
               <md-icon>restore</md-icon> Reset
             </md-menu-item>
-            <md-menu-item @click="removeEngine(engine)" class="md-accent">
+            <md-menu-item @click="removeEngine(selected_engine); showEngineInfoDialog=false; selected_engine=null; " class="md-accent">
               <md-icon>delete_forever</md-icon>Remove
             </md-menu-item>
           </md-menu-content>
@@ -157,12 +161,14 @@ export default {
   data(){
     return {
       engine_url: 'http://127.0.0.1:9527',
-      engine_url_list: ['http://127.0.0.1:9527'],
+      local_engine_url: 'http://127.0.0.1:9527',
+      engine_url_list: [],
       connection_token: null,
       showEngineInfoDialog: false,
       selected_engine: null,
       show_sys_info: false,
-      showAddEngineDialog: false
+      showAddEngineDialog: false,
+      url_type: 'localhost'
     }
   },
   created(){
@@ -187,7 +193,7 @@ export default {
       else{
         this.showAddEngineDialog  = false
         this.selected_engine = config.engine
-        this.showEngineInfoDialog = true
+        this.showEngineInfoDialog = config.show
       }
     },
     forceUpdate(){
@@ -221,7 +227,12 @@ export default {
       this.showAddEngineDialog = false
     },
     addEngine(){
-      this.engineManager.addEngine({type: 'default', name:this.engine_url,  url: this.engine_url, token: this.connection_token})
+      if(this.url_type === 'localhost'){
+        this.engineManager.addEngine({type: 'default', name: this.local_engine_url,  url: this.local_engine_url, token: this.connection_token})
+      }
+      else{
+        this.engineManager.addEngine({type: 'default', name:this.engine_url,  url: this.engine_url, token: this.connection_token})
+      }
     },
     removeEngine(engine){
       this.engineManager.removeEngine(engine)
