@@ -500,7 +500,7 @@
               </h2>
             </div>
             <div v-if="installing" class="md-toolbar-section-end">
-              <div  style="padding-right: 30px;"  class="loading loading-lg"></div>
+              <div style="padding-right: 30px;" class="loading loading-lg"></div>
             </div>
             <div v-else-if="tag4install" class="md-toolbar-section-end">
               <md-button class="md-button md-primary" @click="installPlugin(plugin4install, tag4install)">
