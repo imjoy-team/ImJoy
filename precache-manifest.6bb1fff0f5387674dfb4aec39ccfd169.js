@@ -1,11 +1,11 @@
 self.__precacheManifest = [
   {
-    "revision": "4d747e12be32a8163793",
-    "url": "/static/css/app.dbf682c8.css"
+    "revision": "6b1fe85cc1c05eb5fe8f",
+    "url": "/static/css/app.9b613c30.css"
   },
   {
-    "revision": "4d747e12be32a8163793",
-    "url": "/static/js/app.788ccce4.js"
+    "revision": "6b1fe85cc1c05eb5fe8f",
+    "url": "/static/js/app.023a5d33.js"
   },
   {
     "revision": "b8859e2632feade2aed6",
@@ -228,19 +228,19 @@ self.__precacheManifest = [
     "url": "/static/js/chunk-vendors.ca0f8304.js"
   },
   {
-    "revision": "493ef474936217113b20a6573247288a",
-    "url": "/static/vs/editor.worker.js"
-  },
-  {
     "revision": "2a3e222e6a41b32a7180e6afa3675990",
     "url": "/static/vs/html.worker.js"
+  },
+  {
+    "revision": "493ef474936217113b20a6573247288a",
+    "url": "/static/vs/editor.worker.js"
   },
   {
     "revision": "b00449080615ce71a2a8a52aee9f658f",
     "url": "/static/vs/css.worker.js"
   },
   {
-    "revision": "c7d1ae649803b727fe890434f87dbf87",
+    "revision": "b7f83331d0954d2674b81c3f26a48a81",
     "url": "/index.html"
   },
   {
@@ -452,20 +452,20 @@ self.__precacheManifest = [
     "url": "/static/img/imjoy-io-icon.svg"
   },
   {
-    "revision": "a0e93a89173b2a0fc62b45edf5e8b4aa",
-    "url": "/static/img/imjoy-logo-black.svg"
-  },
-  {
     "revision": "4ff3745dada38b925281e4fe03330cf7",
     "url": "/static/img/imjoy-logo-black.png"
   },
   {
-    "revision": "8e7b1b80a4458be8a27eac659447e42d",
-    "url": "/static/img/imjoy-logo-white.svg"
+    "revision": "a0e93a89173b2a0fc62b45edf5e8b4aa",
+    "url": "/static/img/imjoy-logo-black.svg"
   },
   {
     "revision": "26dfd76132f659f0ef33a27e46307bda",
     "url": "/static/img/imjoy-logo-white.png"
+  },
+  {
+    "revision": "8e7b1b80a4458be8a27eac659447e42d",
+    "url": "/static/img/imjoy-logo-white.svg"
   },
   {
     "revision": "1dec602940683e2a243fc1af6b97bda8",
@@ -628,12 +628,12 @@ self.__precacheManifest = [
     "url": "/static/vs/basic-languages/redshift/redshift.js"
   },
   {
-    "revision": "83f9d7a8568f0f86fd00bf3c21944ce8",
-    "url": "/static/vs/basic-languages/ruby/ruby.js"
-  },
-  {
     "revision": "524db18624629ebed6788b26cbf4820e",
     "url": "/static/img/perspective-hr.jpg"
+  },
+  {
+    "revision": "83f9d7a8568f0f86fd00bf3c21944ce8",
+    "url": "/static/vs/basic-languages/ruby/ruby.js"
   },
   {
     "revision": "140e93934b5c72cee447d043f514be21",
