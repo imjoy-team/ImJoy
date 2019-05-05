@@ -1,11 +1,11 @@
 self.__precacheManifest = [
   {
-    "revision": "6b1fe85cc1c05eb5fe8f",
-    "url": "/static/css/app.9b613c30.css"
+    "revision": "081e5904bf7120a42782",
+    "url": "/static/css/app.afbd912c.css"
   },
   {
-    "revision": "6b1fe85cc1c05eb5fe8f",
-    "url": "/static/js/app.023a5d33.js"
+    "revision": "081e5904bf7120a42782",
+    "url": "/static/js/app.aac560c1.js"
   },
   {
     "revision": "b8859e2632feade2aed6",
@@ -232,15 +232,15 @@ self.__precacheManifest = [
     "url": "/static/vs/html.worker.js"
   },
   {
-    "revision": "493ef474936217113b20a6573247288a",
-    "url": "/static/vs/editor.worker.js"
-  },
-  {
     "revision": "b00449080615ce71a2a8a52aee9f658f",
     "url": "/static/vs/css.worker.js"
   },
   {
-    "revision": "b7f83331d0954d2674b81c3f26a48a81",
+    "revision": "493ef474936217113b20a6573247288a",
+    "url": "/static/vs/editor.worker.js"
+  },
+  {
+    "revision": "7cb4c36dac87f6ce091d146641642e7e",
     "url": "/index.html"
   },
   {
@@ -628,12 +628,12 @@ self.__precacheManifest = [
     "url": "/static/vs/basic-languages/redshift/redshift.js"
   },
   {
-    "revision": "524db18624629ebed6788b26cbf4820e",
-    "url": "/static/img/perspective-hr.jpg"
-  },
-  {
     "revision": "83f9d7a8568f0f86fd00bf3c21944ce8",
     "url": "/static/vs/basic-languages/ruby/ruby.js"
+  },
+  {
+    "revision": "524db18624629ebed6788b26cbf4820e",
+    "url": "/static/img/perspective-hr.jpg"
   },
   {
     "revision": "140e93934b5c72cee447d043f514be21",
