@@ -6,7 +6,8 @@ plugins and makes the ImJoy App more secure.
 
 Interactions between plugins or between a plugin with the main ImJoy app are carried
 out through a set of API functions (`ImJoy API`). All plugins have access
-to a special object called `api`. With this object plugins can, for example,
+to a special object called `api`. In Javascript, `api` is a global object which you can use directly.
+In Python, you can import it by calling `from imjoy import api`. With this object plugins can, for example,
 show a dialog, send results to the main app, or call another plugin with
 parameters and data.
 
@@ -72,6 +73,7 @@ don't forget to `import asyncio`.
 
 #### ** Python **
 ```python
+from imjoy import api
 import asyncio
 
 class ImJoyPlugin():
@@ -124,6 +126,7 @@ class ImJoyPlugin(){
 
 #### ** Python **
 ```python
+from imjoy import api
 class ImJoyPlugin():
     def setup(self):
         pass
