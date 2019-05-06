@@ -77,6 +77,7 @@ import asyncio
 
 from imjoy import api
 
+
 class ImJoyPlugin():
     async def setup(self):
         pass
