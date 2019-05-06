@@ -73,8 +73,8 @@ don't forget to `import asyncio`.
 
 #### ** Python **
 ```python
-from imjoy import api
 import asyncio
+from imjoy import api
 
 class ImJoyPlugin():
     async def setup(self):
