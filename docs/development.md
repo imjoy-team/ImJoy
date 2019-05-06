@@ -633,7 +633,7 @@ You can add the repo with
 
 and install the environment with
 ```json
-"env": []"conda env create -f myRepo/environment.yml"]
+"env": ["conda env create -f myRepo/environment.yml"]
 ```
 
 #### repo hosted on Dropbox
@@ -823,12 +823,19 @@ Optionally, the `flags` can be made configurable with `tags`, for example:
 The above `<config>` block will create a plugin with two tags(`Single` and `Multi`). During installation, the user which run-time behavior he would like to use (either a single instance of the plugin process (`Single`), or multiple plugin processes if multiple ImJoy interface with the same workspace are opened (`Multi`)).
 
 ### Virtual environments
-Python plugins for ImJoy can have different conda environments, which provides a way to isolate plugins. You can therefore run python plugins with different versions of Python, or use different pip packages. However, we recommend to limit the number of virtual environments, since each
-takes up considerable disk space.
+By default, Python plugins from ImJoy will be executed in the default conda environment
+(e.g. Python 3.6). However, these plugins can have specific virtual conda environments, which provide a way to isolate plugins. You can therefore run them with different versions of Python, or use different conda or pip packages.
 
-By default, python plugins from ImJoy will be executed in the default conda environment (e.g. Python 3.6).
-If you want to run a plugin in a different conda environment, you can specify it by setting the `env`
-field in the `<config>` section of the plugin.
+We encourage the use of virtual environments per plugin and tag to guarantee stability.  We further recommend specifying the full version numbers (X.X.X) for python, pip and conda packages. By specifying the full version, conda will try to reuse the packages with same version (and python version) across virtual environments, which reduces the required disk space. As an example, the following two environments will reuse the specified scipy package,
+but not the numpy package:
+
+```
+conda create -n test_env1 python=3.6.8 scipy=1.1.0 numpy=1.16.1
+conda create -n test_env2 python=3.6.8 scipy=1.1.0 numpy=1.15.4
+```
+
+In order to run a plugin in a different conda environment, you can specify it
+by setting the `env` field in the `<config>` section of the plugin.
 
 `env` can be a string or an array. When connecting multiple command in a line please use `&&` or `||` which are supported on different operating systems. If you have several command which are independent from each other, please use an array to store the commands.
 For example: `"env": ["export CUDA_VISIBLE_DEVICES=1", "conda create -n XXXXX python=3.7"]`.
