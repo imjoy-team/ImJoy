@@ -221,8 +221,8 @@ var execute = async function(code) {
         if(code.href){
           link_node.href = code.href
         }
-        if(code.type_){
-          link_node.type = code.type_
+        if(code.attrs && code.attrs.type){
+          link_node.type = code.attrs.type
         }
         document.head.appendChild(link_node)
     }
