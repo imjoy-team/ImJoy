@@ -110,7 +110,16 @@ var execute_python_code = function(code) {
       if(!_export_plugin_api){
         _export_plugin_api = api.export
         api.export = function(p){
-          if(typeof p === 'function'){
+          if(typeof p === 'object'){
+            const _api = {}
+            for(let k in p){
+              if(!k.startsWith('_')){
+                _api[k] = p[k]
+              }
+            }
+            _export_plugin_api(_api)
+          }
+          else if(typeof p === 'function'){
             const _api = {}
             const getattr = pyodide.pyimport('getattr')
             const hasattr = pyodide.pyimport('hasattr')
@@ -123,9 +132,6 @@ var execute_python_code = function(code) {
               }
             }
             _export_plugin_api(_api)
-          }
-          else if(typeof p === 'object'){
-            _export_plugin_api(p)
           }
           else{
             throw "unsupported api export"
