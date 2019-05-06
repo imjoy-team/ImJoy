@@ -245,17 +245,19 @@
                 <md-menu-item class="md-accent" @click="plugin2_remove=plugin;showRemoveConfirmation=true">
                   <md-icon>delete_forever</md-icon>Remove
                 </md-menu-item>
-                <md-divider></md-divider>
-                <md-menu-item @click="switchEngine(plugin)">
-                  <span v-if="plugin.config.engine_mode==='auto'">✅</span><span v-else>🚀</span><span :class="plugin.config.engine_mode==='auto'? 'bold':''">Auto</span>
-                </md-menu-item>
-                <md-menu-item v-for="engine in em.engines" :key="engine.id" @click="switchEngine(plugin, engine)">
-                  <span v-if="plugin.config.engine_mode===engine.id">✅</span><span v-else>🚀</span><span :class="plugin.config.engine&&plugin.config.engine.id===engine.id? 'bold':''">{{engine.name}}</span>
-                </md-menu-item>
-                <md-divider></md-divider>
-                <md-menu-item v-for="tag in plugin.config.tags" :key="tag" @click="switchTag(plugin, tag)">
-                  <span v-if="plugin.config.tag===tag">✅</span><span v-else>🔖</span><span :class="plugin.config.tag===tag? 'bold':''">Tag: {{tag}}</span>
-                </md-menu-item>
+                <div v-if="plugin.config.type === 'native-python'">
+                  <md-divider></md-divider>
+                  <md-menu-item @click="switchEngine(plugin)">
+                    <span v-if="plugin.config.engine_mode==='auto'">✅</span><span v-else>🚀</span><span :class="plugin.config.engine_mode==='auto'? 'bold':''">Auto</span>
+                  </md-menu-item>
+                  <md-menu-item v-for="engine in em.engines" :key="engine.id" @click="switchEngine(plugin, engine)">
+                    <span v-if="plugin.config.engine_mode===engine.id">✅</span><span v-else>🚀</span><span :class="plugin.config.engine&&plugin.config.engine.id===engine.id? 'bold':''">{{engine.name}}</span>
+                  </md-menu-item>
+                  <md-divider></md-divider>
+                  <md-menu-item v-for="tag in plugin.config.tags" :key="tag" @click="switchTag(plugin, tag)">
+                    <span v-if="plugin.config.tag===tag">✅</span><span v-else>🔖</span><span :class="plugin.config.tag===tag? 'bold':''">Tag: {{tag}}</span>
+                  </md-menu-item>
+                </div>
               </md-menu-content>
             </md-menu>
 
