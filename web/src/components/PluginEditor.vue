@@ -18,13 +18,18 @@
           <md-icon>delete</md-icon>
           <md-tooltip>Remove this plugin</md-tooltip>
         </md-button>
-        <span></span>
         <md-field  v-if="window && window.plugin&&window.plugin.tags&&window.plugin.tags.length>0">
-          <!-- <label for="tag">Tag</label> -->
           <md-select id="tag" @md-selected="window.plugin.tags.includes(window.plugin.tag) && reload()" v-model="window.plugin.tag" name="tag">
             <md-option :value="tag" v-for="tag in window.plugin.tags" :key="tag">{{tag}}</md-option>
           </md-select>
           <md-tooltip>Select a tag for testing, the plugin will be reloaded.</md-tooltip>
+        </md-field>
+        <md-field  v-if="window && window.plugin&&window.plugin.type === 'native-python' && window.plugin.config && window.engine_manager">
+          <md-select id="engine_mode" @md-selected="reload()" v-model="window.plugin.config.engine_mode" name="tag">
+            <md-option value="auto">auto</md-option>
+            <md-option :value="e.id" v-for="e in window.engine_manager.engines" :key="e.url">{{e.url}}</md-option>
+          </md-select>
+          <md-tooltip>Select an engine, the plugin will be reloaded.</md-tooltip>
         </md-field>
       </div>
     </md-toolbar>
@@ -210,7 +215,8 @@ export default {
               newTag = this.window.data.config.tags[0]
             }
           }
-          this.window.plugin_manager.reloadPlugin({_id: this.window.data._id, tag: newTag, name:this.window.data._name, code: this.codeValue}).then((plugin)=>{
+          const engine_mode = this.window.plugin &&  this.window.plugin.config && this.window.plugin.config.engine_mode
+          this.window.plugin_manager.reloadPlugin({_id: this.window.data._id, engine_mode: engine_mode, tag: newTag, name:this.window.data._name, code: this.codeValue}).then((plugin)=>{
             this.window.plugin = plugin
             this.$forceUpdate()
             resolve()
@@ -256,6 +262,9 @@ export default {
   height: 40px!important;
 }
 
+.md-field{
+  max-width: 84px;
+}
 /*
 
 .plugin-editor {
