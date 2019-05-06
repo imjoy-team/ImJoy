@@ -136,14 +136,21 @@ var execute = async function(code) {
       else if(code.type == 'script'){
         if(code.src){
           var script_node = document.createElement('script');
+          script_node.setAttribute('type', code.attrs.type);
           script_node.setAttribute('src', code.src);
           document.head.appendChild(script_node);
         }
         else{
-          if(code.content){
+          if(code.content && (! code.attrs.type || code.attrs.type==='text/javascript')){
             // document.addEventListener("DOMContentLoaded", function(){
             eval(code.content);
             // });
+          }
+          else{
+            var node = document.createElement('script');
+            node.setAttribute('type', code.attrs.type);
+            node.appendChild(document.createTextNode(code.content))
+            document.body.appendChild(node);
           }
         }
       }
@@ -163,8 +170,8 @@ var execute = async function(code) {
           if(code.href){
             link_node_.href = code.href
           }
-          if(code.type_){
-            link_node_.type = code.type_
+          if(code.attrs && code.attrs.type){
+            link_node_.type = code.attrs.type
           }
           document.head.appendChild(link_node_)
       }
