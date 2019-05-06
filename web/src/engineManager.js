@@ -292,9 +292,9 @@ export class EngineManager {
     this.show_engine_callback = show_engine_callback || function(){}
     this.show_message_callback = show_message_callback || function (){}
     this.update_ui_callback = update_ui_callback || function (){}
-    this.loadPluginEngineList().then(()=>{
+    this.loadPluginEngineList().then(async ()=>{
       for(let c of this.config.engines){
-        this.addEngine(c, true)
+        await this.addEngine(c, true)
       }
     })
 
@@ -309,7 +309,7 @@ export class EngineManager {
     return null
   }
 
-  addEngine(config, force_save){
+  async addEngine(config, force_save){
     if(config.type === 'default'){
       config.id = config.id || '_' + config.name + '_' + config.url
 
@@ -324,7 +324,7 @@ export class EngineManager {
         }
       }
 
-      const save_engine = ()=>{
+      const save_engine = async ()=>{
         if(existed) {
           return
         }
@@ -342,17 +342,16 @@ export class EngineManager {
         }
         es.push(engine)
         this.engines = es
-        this.savePluginEngineList()
+        await this.savePluginEngineList()
       }
       if(force_save){
-        save_engine()
-        engine.connect(true)
+        await save_engine()
+        await engine.connect(true)
       }
       else{
-        engine.connect(true).then(()=>{
-          save_engine()
-          this.show_engine_callback(false, engine)
-        })
+        await engine.connect(true)
+        await save_engine()
+        this.show_engine_callback(false, engine)
       }
       return engine
     }
@@ -363,7 +362,7 @@ export class EngineManager {
     this.engines = this.engines.filter(function(ele){
          return ele != engine;
     })
-    this.savePluginEngineList()
+    return this.savePluginEngineList()
   }
 
   getEngine(mode){
@@ -400,8 +399,10 @@ export class EngineManager {
 
   loadPluginEngineList(){
     return new Promise((resolve, reject)=>{
+      let _rev
       this.config_db.get('plugin_engine_list').then((doc) => {
         this.config = doc
+        _rev = doc._rev
         this.config.engines = this.config.engines || []
         resolve(this.config)
       }).catch((err) => {
@@ -410,6 +411,7 @@ export class EngineManager {
         }
         this.config = {engines: []}
         this.config_db.put({
+          _rev: _rev,
           _id: 'plugin_engine_list',
           engines: []
         }).then(()=>{
