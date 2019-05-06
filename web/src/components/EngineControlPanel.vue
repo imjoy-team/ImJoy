@@ -17,7 +17,7 @@
         <div v-for="engine in engineManager.engines" :key="engine.url">
           <md-divider></md-divider>
           <md-menu-item v-if="engine.connected"  @click="showInfo(engine)">
-            <md-button v-if="engine.config.show_processes && engine.plugin_processes && engine.plugin_processes.length>0" @click.stop="hide(engine)" class="md-icon-button md-primary">
+            <md-button v-if="engine.show_processes && engine.plugin_processes && engine.plugin_processes.length>0" @click.stop="hide(engine)" class="md-icon-button md-primary">
               <md-icon>remove</md-icon>
             </md-button>
             <md-button v-else @click.stop="expand(engine)" class="md-icon-button md-primary">
@@ -29,7 +29,7 @@
             <md-icon>sync_disabled</md-icon> {{engine.url.replace(local_engine_url, 'My Computer')}}
             <md-tooltip>Connect to {{engine.name}} </md-tooltip>
           </md-menu-item>
-          <div v-if="engine.connected && engine.config.show_processes">
+          <div v-if="engine.connected && engine.show_processes">
             <md-divider></md-divider>
             <md-menu-item v-show="engine.plugin_processes" v-for="p in engine.plugin_processes" :key="p.pid">
               &nbsp;&nbsp;
@@ -121,7 +121,7 @@
           </md-menu-content>
         </md-menu>
         
-        <div v-if="selected_engine.connected && selected_engine.config.show_processes">
+        <div v-if="selected_engine.connected && selected_engine.show_processes">
           <md-divider></md-divider>
           <ul>
             <li v-show="selected_engine.plugin_processes" v-for="p in selected_engine.plugin_processes" :key="p.pid">
@@ -200,12 +200,12 @@ export default {
       this.$forceUpdate()
     },
     expand(engine){
-      engine.config.show_processes = true
+      engine.show_processes = true
       this.$forceUpdate()
       this.update(engine)
     },
     hide(engine){
-      engine.config.show_processes = false
+      engine.show_processes = false
       this.$forceUpdate()
     },
     update(engine){
