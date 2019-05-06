@@ -227,7 +227,7 @@
                [resolve, reject] = this._unwrap(data.promise, false);
                try {
                  result = method.apply(_method_context, args);
-                 if(result instanceof Promise || method.constructor.name === 'AsyncFunction'){
+                 if(result instanceof Promise || method.constructor && method.constructor.name === 'AsyncFunction'){
                    result.then(resolve).catch(reject);
                  }
                  else{

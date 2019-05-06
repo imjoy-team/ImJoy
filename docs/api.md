@@ -382,25 +382,61 @@ api.error('Error occurred during processing.')
 
 ### api.export
 
-<!-- tabs:start -->
+Exports funcstions defined by the plugin as `Plugin API`.
 
-#### ** JavaScript **
+`Plugin API` can be exported as a plugin class or an object/dictionary contains all the api functions:
+
+<!-- tabs:start -->
+#### ** JavaScript (class) **
 ```javascript
+class ImJoyPlugin(){
+  async setup(){
+  }
+  async run(ctx){
+  }
+}
+
 api.export(new ImJoyPlugin())
 ```
+#### ** JavaScript (functions) **
+```javascript
+function setup(){
 
-#### ** Python **
+}
+
+function run(){
+
+}
+
+api.export({setup: setup, run: run})
+```
+
+#### ** Python (class) **
 ```python
+class ImJoyPlugin():
+    def setup(self):
+        pass
+
+    def run(self, ctx):
+        pass
+
 api.export(ImJoyPlugin())
+```
+
+#### ** Python (functions) **
+```python
+def setup():
+    pass
+
+def run(ctx):
+    pass
+
+api.export({'setup': setup, 'run': run})
 ```
 <!-- tabs:end -->
 
-
-Exports the plugin class or an object/dict as `Plugin API`.
-
 This call is mandatory for every ImJoy plugin (typically as the last line of the plugin script).
-Every member of the `ImJoyPlugin` instance will be exported as `Plugin API`, which means those exported functions
-or variables can be called or used by the ImJoy app or another plugin.
+Every member of the `ImJoyPlugin` instance will be exported as `Plugin API`, which means those exported functions can be called or used by the ImJoy app or another plugin.
 This then allows other plugins to use `api.run` or `api.call` to call functions of the plugin.
 
 Only functions and variables with primitive types can be exported (number, string, boolean).
