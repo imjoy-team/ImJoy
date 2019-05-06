@@ -907,9 +907,7 @@ export class PluginManager {
         config = JSON.parse(pluginComp.config[0].content)
         config.scripts = []
         for (let i = 0; i < pluginComp.script.length; i++) {
-          if (pluginComp.script[i].attrs.lang) {
-            config.scripts.push(pluginComp.script[i])
-          }
+          config.scripts.push(pluginComp.script[i])
         }
         if(!config.script){
           config.script = pluginComp.script[0].content
