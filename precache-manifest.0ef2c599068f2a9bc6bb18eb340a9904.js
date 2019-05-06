@@ -1,11 +1,11 @@
 self.__precacheManifest = [
   {
-    "revision": "846212bdf7e7415c1c2e",
+    "revision": "03605bafb68907eadf58",
     "url": "/static/css/app.ab26f062.css"
   },
   {
-    "revision": "846212bdf7e7415c1c2e",
-    "url": "/static/js/app.2af57a84.js"
+    "revision": "03605bafb68907eadf58",
+    "url": "/static/js/app.ff5c577d.js"
   },
   {
     "revision": "b8859e2632feade2aed6",
@@ -228,19 +228,19 @@ self.__precacheManifest = [
     "url": "/static/js/chunk-vendors.ca0f8304.js"
   },
   {
-    "revision": "493ef474936217113b20a6573247288a",
-    "url": "/static/vs/editor.worker.js"
-  },
-  {
     "revision": "b00449080615ce71a2a8a52aee9f658f",
     "url": "/static/vs/css.worker.js"
+  },
+  {
+    "revision": "493ef474936217113b20a6573247288a",
+    "url": "/static/vs/editor.worker.js"
   },
   {
     "revision": "2a3e222e6a41b32a7180e6afa3675990",
     "url": "/static/vs/html.worker.js"
   },
   {
-    "revision": "185a14b49586a5cc76c7497f41a9e9cd",
+    "revision": "999064fd6cf93eaa7f9d5d464e3d5d3d",
     "url": "/index.html"
   },
   {
@@ -452,12 +452,12 @@ self.__precacheManifest = [
     "url": "/static/img/imjoy-io-icon.svg"
   },
   {
-    "revision": "4ff3745dada38b925281e4fe03330cf7",
-    "url": "/static/img/imjoy-logo-black.png"
-  },
-  {
     "revision": "a0e93a89173b2a0fc62b45edf5e8b4aa",
     "url": "/static/img/imjoy-logo-black.svg"
+  },
+  {
+    "revision": "4ff3745dada38b925281e4fe03330cf7",
+    "url": "/static/img/imjoy-logo-black.png"
   },
   {
     "revision": "26dfd76132f659f0ef33a27e46307bda",
@@ -732,10 +732,6 @@ self.__precacheManifest = [
     "url": "/static/vs/editor/editor.main.nls.zh-tw.js"
   },
   {
-    "revision": "a14fcc89b2e121908c5cc7ec97787dfe",
-    "url": "/static/vs/language/css/cssMode.js"
-  },
-  {
     "revision": "a8422a20e7918f3a6547f85a09e590a7",
     "url": "/static/vs/language/html/htmlMode.js"
   },
@@ -758,6 +754,10 @@ self.__precacheManifest = [
   {
     "revision": "cf05f5559129d3145d705a8df6c6fb48",
     "url": "/static/vs/loader.js"
+  },
+  {
+    "revision": "a14fcc89b2e121908c5cc7ec97787dfe",
+    "url": "/static/vs/language/css/cssMode.js"
   },
   {
     "revision": "11a854433bcc74085be053c3ab713b15",
