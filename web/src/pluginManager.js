@@ -1585,6 +1585,7 @@ export class PluginManager {
       }
       if (wconfig.type && wconfig.type.startsWith('imjoy/')) {
         wconfig.id = 'imjoy_'+randId()
+        wconfig.window_type = wconfig.type
         wconfig.name = wconfig.name || 'untitled window'
         this.wm.addWindow(wconfig).then((wid)=>{
           const window_plugin_apis = {

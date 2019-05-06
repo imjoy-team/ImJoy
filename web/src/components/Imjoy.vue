@@ -357,7 +357,7 @@
     </md-app-drawer>
     <md-app-content :class="workspace_dropping?'file-dropping':''" class="whiteboard-content">
       <md-progress-bar md-mode="determinate" :md-value="progress"></md-progress-bar>
-      <whiteboard v-if="wm" id="whiteboard" @create="pm.createWindow(null, $event)" :mode="wm.window_mode" :window-manager="wm"></whiteboard>
+      <whiteboard v-if="wm" id="whiteboard" @create="createWindow($event)" :mode="wm.window_mode" :window-manager="wm"></whiteboard>
     </md-app-content>
   </md-app>
   <md-dialog-confirm :md-active.sync="showRemoveConfirmation" md-title="Removing Plugin" md-content="Do you really want to <strong>delete</strong> this plugin" md-confirm-text="Yes" md-cancel-text="Cancel" @md-cancel="showRemoveConfirmation=false" @md-confirm="pm.removePlugin(plugin2_remove);plugin2_remove=null;showRemoveConfirmation=false"/>
@@ -1067,7 +1067,7 @@ export default {
                   c.standalone = this.$route.query.standalone || c.standalone || false
                   c.data = data
                   c.config = {}
-                  await this.pm.createWindow(null, c)
+                  await this.createWindow(c)
                 } catch (e) {
                   console.error(`Plugin ${pname} failed to load data.`, e)
                 }
@@ -1111,11 +1111,14 @@ export default {
         }
       })
     },
+    createWindow(w){
+      return this.pm.createWindow(null, w)
+    },
     getDefaultInputLoaders(){
       const image_loader = (file)=>{
         const reader = new FileReader();
         reader.onload =  () => {
-          this.pm.createWindow(null, {
+          this.createWindow({
             name: file.name,
             type: 'imjoy/image',
             data: {src: reader.result, _file: file}
@@ -1311,7 +1314,7 @@ export default {
           scroll: true,
           data: urls
         }
-        this.wm.addWindow(w)
+        this.createWindow(w)
       })
     },
     processPermission(allow){
@@ -1343,7 +1346,7 @@ export default {
           source: pconfig && pconfig.docs[0] && pconfig.docs[0].content
         }
       }
-      this.wm.addWindow(w)
+      this.createWindow(w)
     },
     clearPluginUrl(){
       const query = Object.assign({}, this.$route.query);
@@ -1408,7 +1411,7 @@ export default {
           code: pconfig.code
         }
       }
-      this.wm.addWindow(w)
+      this.createWindow(w)
     },
     newPlugin(code) {
       const w = {
@@ -1426,7 +1429,7 @@ export default {
           code: JSON.parse(JSON.stringify(code))
         }
       }
-      this.wm.addWindow(w)
+      this.createWindow(w)
     },
     closePluginDialog(ok) {
       this.showPluginDialog = false
@@ -1470,7 +1473,7 @@ export default {
         _transfer: false,
         data: selected_files
       }
-      this.wm.addWindow(w)
+      this.createWindow(w)
     },
     clearWorkflow() {
       this.workflow_joy_config.data = null
@@ -1519,7 +1522,7 @@ export default {
         if (w && !my.__jailed_type__) {
           w.name = w.name || 'result'
           w.type = w.type || 'imjoy/generic'
-          this.pm.createWindow(null, w)
+          this.createWindow(w)
         }
         this.progress = 100
       }).catch((e) => {
@@ -1813,7 +1816,7 @@ export default {
         else if(config.type){
           config.window_container = 'window_dialog_container'
           this.showPluginDialog = true
-          this.pm.createWindow(null, config).then((api)=>{
+          this.createWindow(config).then((api)=>{
             const _close = api.close
             this.plugin_dialog_promise = [api.close, api.close]
             api.close = async ()=>{
@@ -1841,7 +1844,7 @@ export default {
           log_history: _plugin._log_history
         }
       }
-      this.pm.createWindow(null, w)
+      this.createWindow(w)
     },
     openUrl(_plugin, url){
       assert(url)
