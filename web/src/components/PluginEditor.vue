@@ -195,7 +195,7 @@ export default {
       this.codeValue = this.editor.getValue()
       this.$emit('input', this.codeValue)
       this.window.data._id = null
-      this.window.plugin_manager.removePlugin(this.window.plugin).then(()=>{
+      this.window.plugin_manager.removePlugin(this.window.plugin.config).then(()=>{
         this.window.plugin = {}
       })
     },
