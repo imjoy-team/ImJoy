@@ -155,7 +155,8 @@ export default {
     },
     detach(w){
       this.close(w)
-      this.$emit('create', {name: w.name, type: w.window_type, data: w.data, config: w.config, w:w.w, h:w.h, fullscreen:w.fullscreen, standalone:true})
+      const new_w = Object.assign({}, w, {name: w.name, type: w.window_type, data: w.data, config: w.config, w:w.w, h:w.h, fullscreen:w.fullscreen, standalone:true})
+      this.$emit('create', new_w)
     },
     close(w) {
       w.onclose()
