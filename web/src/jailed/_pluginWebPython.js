@@ -95,7 +95,15 @@ var importScript = function(url) {
     }
 }
 
-
+var startup_script = `
+from js import api
+import sys
+from types import ModuleType
+m = ModuleType("imjoy")
+sys.modules[m.__name__] = m
+m.__file__ = m.__name__ + ".py"
+m.api = api
+`
 var _export_plugin_api = null;
 var execute_python_code = function(code) {
   try {
@@ -124,7 +132,7 @@ var execute_python_code = function(code) {
           }
         }
       }
-      pyodide.runPython('from js import api')
+      pyodide.runPython(startup_script)
       pyodide.runPython(code.content)
   } catch (e) {
       throw e;
