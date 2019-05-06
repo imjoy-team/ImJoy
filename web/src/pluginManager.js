@@ -704,30 +704,30 @@ export class PluginManager {
     })
   }
 
-  removePlugin(plugin){
+  removePlugin(plugin_config){
     return new Promise((resolve, reject) => {
       // remove if exists
-      this.db.get(plugin._id).then((doc) => {
+      this.db.get(plugin_config._id).then((doc) => {
         return this.db.remove(doc);
       }).then(() => {
 
         for (let i = 0; i < this.installed_plugins.length; i++) {
-          if(this.installed_plugins[i].name === plugin.name){
+          if(this.installed_plugins[i].name === plugin_config.name){
             this.installed_plugins.splice(i, 1)
           }
         }
         for (let p of this.available_plugins) {
-            if(p.name === plugin.name){
+            if(p.name === plugin_config.name){
               p.installed = false
               p.tag = null
             }
         }
         resolve()
-        this.showMessage(`"${plugin.name}" has been removed.`)
-        this.unloadPlugin(plugin, true)
+        this.showMessage(`"${plugin_config.name}" has been removed.`)
+        this.unloadPlugin(plugin_config, true)
       }).catch((err) => {
         this.showMessage( err.toString() || "Error occured.")
-        console.error('error occured when removing ', plugin, err)
+        console.error('error occured when removing ', plugin_config, err)
         reject(err)
       });
     });
@@ -907,9 +907,7 @@ export class PluginManager {
         config = JSON.parse(pluginComp.config[0].content)
         config.scripts = []
         for (let i = 0; i < pluginComp.script.length; i++) {
-          if (pluginComp.script[i].attrs.lang) {
-            config.scripts.push(pluginComp.script[i])
-          }
+          config.scripts.push(pluginComp.script[i])
         }
         if(!config.script){
           config.script = pluginComp.script[0].content
@@ -1585,6 +1583,7 @@ export class PluginManager {
       }
       if (wconfig.type && wconfig.type.startsWith('imjoy/')) {
         wconfig.id = 'imjoy_'+randId()
+        wconfig.window_type = wconfig.type
         wconfig.name = wconfig.name || 'untitled window'
         this.wm.addWindow(wconfig).then((wid)=>{
           const window_plugin_apis = {

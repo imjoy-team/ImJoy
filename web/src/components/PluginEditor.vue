@@ -18,13 +18,18 @@
           <md-icon>delete</md-icon>
           <md-tooltip>Remove this plugin</md-tooltip>
         </md-button>
-        <span></span>
-        <md-field  v-if="window && window.plugin&&window.plugin.tags&&window.plugin.tags.length>0">
-          <!-- <label for="tag">Tag</label> -->
+        <md-field style="max-width: 100px;" v-if="this.editor&&window && window.plugin&&window.plugin.tags&&window.plugin.tags.length>0">
           <md-select id="tag" @md-selected="window.plugin.tags.includes(window.plugin.tag) && reload()" v-model="window.plugin.tag" name="tag">
             <md-option :value="tag" v-for="tag in window.plugin.tags" :key="tag">{{tag}}</md-option>
           </md-select>
           <md-tooltip>Select a tag for testing, the plugin will be reloaded.</md-tooltip>
+        </md-field>
+        <md-field style="max-width: 220px;"  v-if="this.editor&&window && window.plugin&&window.plugin.type === 'native-python' && window.plugin.config && window.engine_manager">
+          <md-select id="engine_mode" @md-selected="reload()" v-model="window.plugin.config.engine_mode" name="tag">
+            <md-option value="auto">auto</md-option>
+            <md-option :value="e.id" v-for="e in window.engine_manager.engines" :key="e.url">{{e.url}}</md-option>
+          </md-select>
+          <md-tooltip>Select an engine, the plugin will be reloaded.</md-tooltip>
         </md-field>
       </div>
     </md-toolbar>
@@ -68,7 +73,8 @@ export default {
   data() {
     return {
       codeValue: '',
-      editor: null
+      editor: null,
+      saved: false
     }
   },
   created(){
@@ -131,7 +137,11 @@ export default {
   methods: {
     save(){
       assert(this.window.plugin_manager)
-      return new Promise((resolve) => {
+      return new Promise((resolve, reject) => {
+        if(!this.editor){
+          reject('editor is not available')
+          return
+        }
         this.codeValue = this.editor.getValue()
         this.$emit('input', this.codeValue)
         this.window.plugin_manager.savePlugin({pluginId: this.pluginId, code: this.codeValue, tag: this.window.plugin && this.window.plugin.tag}).then((config)=>{
@@ -139,7 +149,7 @@ export default {
           // this.window.plugin._id = config._id
           // this.window.plugin.config._id= config._id
           this.window.data.config = config
-
+          this.saved = true
           this.reload().catch(()=>{
             this.window.plugin = {config: config}
           }).finally(()=>{
@@ -190,13 +200,18 @@ export default {
       this.codeValue = this.editor.getValue()
       this.$emit('input', this.codeValue)
       this.window.data._id = null
-      this.window.plugin_manager.removePlugin(this.window.plugin).then(()=>{
+      this.window.plugin_manager.removePlugin(this.window.plugin.config).then(()=>{
         this.window.plugin = {}
       })
     },
     reload(){
       assert(this.window.plugin_manager)
+      
       return new Promise((resolve, reject) => {
+        if(!this.editor || !this.saved){
+          reject('editor is not available or never saved')
+          return
+        }
         this.codeValue = this.editor.getValue()
         if(this.codeValue){
           this.$emit('input', this.codeValue)
@@ -210,7 +225,8 @@ export default {
               newTag = this.window.data.config.tags[0]
             }
           }
-          this.window.plugin_manager.reloadPlugin({_id: this.window.data._id, tag: newTag, name:this.window.data._name, code: this.codeValue}).then((plugin)=>{
+          const engine_mode = this.window.plugin &&  this.window.plugin.config && this.window.plugin.config.engine_mode
+          this.window.plugin_manager.reloadPlugin({_id: this.window.data._id, engine_mode: engine_mode, tag: newTag, name:this.window.data._name, code: this.codeValue}).then((plugin)=>{
             this.window.plugin = plugin
             this.$forceUpdate()
             resolve()

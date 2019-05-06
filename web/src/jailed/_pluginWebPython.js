@@ -181,6 +181,7 @@ var execute = async function(code) {
     else if(code.type == 'script'){
       if(code.src){
         var script_node = document.createElement('script');
+        script_node.setAttribute('type', code.attrs.type);
         script_node.setAttribute('src', code.src);
         document.head.appendChild(script_node);
       }
@@ -195,6 +196,12 @@ var execute = async function(code) {
             console.error(e.message, e.stack)
             throw e;
           }
+        }
+        else{
+          var node = document.createElement('script');
+          node.setAttribute('type', code.attrs.type);
+          node.appendChild(document.createTextNode(code.content))
+          document.body.appendChild(node);
         }
       }
     }
@@ -214,8 +221,8 @@ var execute = async function(code) {
         if(code.href){
           link_node.href = code.href
         }
-        if(code.type_){
-          link_node.type = code.type_
+        if(code.attrs && code.attrs.type){
+          link_node.type = code.attrs.type
         }
         document.head.appendChild(link_node)
     }
