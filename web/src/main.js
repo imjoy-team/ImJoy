@@ -8,8 +8,6 @@ import 'vue-material/dist/theme/default.css'
 
 import App from './App'
 import VueGridLayout from 'vue-grid-layout'
-import Grid from "vue-js-grid"
-import vueSlider from 'vue-slider-component'
 import store from './store.js'
 
 import Navbar from '@/components/Navbar'
@@ -29,10 +27,8 @@ import './registerServiceWorker'
 Vue.config.productionTip = false
 
 Vue.use(VueMaterial)
-Vue.use(Grid)
 
 // register
-Vue.component('vue-slider', vueSlider)
 Vue.component('navbar', Navbar)
 Vue.component('imjoy', Imjoy)
 Vue.component('main-footer', Footer)
