@@ -294,7 +294,7 @@ export class EngineManager {
     this.update_ui_callback = update_ui_callback || function (){}
     this.loadPluginEngineList().then(async ()=>{
       for(let c of this.config.engines){
-        await this.addEngine(c, false)
+        await this.addEngine(c, true)
       }
     })
 
