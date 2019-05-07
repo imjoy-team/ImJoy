@@ -1073,6 +1073,7 @@ export default {
                 }
               }
               else{
+                let started_plugin = null
                 const plugin_loaded_handler = (plugin)=>{
                   if(plugin.name === pname){
                     try {
@@ -1082,8 +1083,20 @@ export default {
                     }
                     this.event_bus.$off('plugin_loaded', plugin_loaded_handler)
                   }
+                  // close it if it already started.
+                  if(started_plugin && started_plugin.api.close){
+                    started_plugin.api.close()
+                  }
+                  started_plugin = plugin
                 }
-                this.event_bus.$on('plugin_loaded', plugin_loaded_handler)
+                const start_when_loaded = (p)=>{
+                  if(p.name !== pname){
+                    return
+                  }
+                  this.event_bus.$on('plugin_loaded', plugin_loaded_handler)
+                  this.event_bus.$off('plugin_installed', start_when_loaded)
+                }
+                this.event_bus.$on('plugin_installed', start_when_loaded)
               }
             }
           }

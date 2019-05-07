@@ -689,6 +689,7 @@ export class PluginManager {
             }
           }
           this.showMessage(`Plugin "${template.name}" has been successfully installed.`)
+          this.event_bus.$emit('plugin_installed', template)
           resolve(template)
           if(!do_not_load) this.reloadPlugin(template)
         }
