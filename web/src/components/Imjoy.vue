@@ -928,10 +928,10 @@ export default {
         let connection_token = null
         if(this.$route.query.token || this.$route.query.t){
           connection_token = (this.$route.query.token || this.$route.query.t).trim()
-          // const query = Object.assign({}, this.$route.query);
-          // delete query.token;
-          // delete query.t;
-          // this.$router.replace({ query });
+          const query = Object.assign({}, this.$route.query);
+          delete query.token;
+          delete query.t;
+          this.$router.replace({ query });
         }
         if(this.$route.query.engine || this.$route.query.e){
           const engine_url = (this.$route.query.engine || this.$route.query.e).trim()
