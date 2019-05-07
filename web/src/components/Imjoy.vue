@@ -893,21 +893,7 @@ export default {
     this.is_https_mode = ('https:' === location.protocol)
     // Make sure the GUI is refreshed
     setInterval(()=>{this.$forceUpdate()}, 5000)
-
-    let connection_token = null
-    if(this.$route.query.token || this.$route.query.t){
-      connection_token = (this.$route.query.token || this.$route.query.t).trim()
-      const query = Object.assign({}, this.$route.query);
-      delete query.token;
-      delete query.t;
-      this.$router.replace({ query });
-    }
-
-    if(this.$route.query.engine || this.$route.query.e){
-      const engine_url = (this.$route.query.engine || this.$route.query.e).trim()
-      this.em.addEngine({type: 'default', url: engine_url, token: connection_token})
-    }
-
+  
     if(this.welcome){
       this.showWelcomeDialog = true
     }
@@ -938,6 +924,28 @@ export default {
         this.showMessage('Failed to initialize file system: ' + e.toString())
       }
       this.pm.init()
+      try{
+        await this.em.init()
+        let connection_token = null
+        if(this.$route.query.token || this.$route.query.t){
+          connection_token = (this.$route.query.token || this.$route.query.t).trim()
+          const query = Object.assign({}, this.$route.query);
+          delete query.token;
+          delete query.t;
+          this.$router.replace({ query });
+        }
+        if(this.$route.query.engine || this.$route.query.e){
+          const engine_url = (this.$route.query.engine || this.$route.query.e).trim()
+          this.em.addEngine({type: 'default', url: engine_url, token: connection_token}, true)
+        }
+        console.log('Successfully initialized the engine manager.')
+      }
+      catch(e){
+        console.error(e)
+        this.showMessage('Failed to initialize the engine manager: ' + e.toString())
+      }
+      
+
       for(let inputs of this.getDefaultInputLoaders()){
         this.wm.registerInputLoader(inputs.loader_key, inputs, inputs.loader)
       }
