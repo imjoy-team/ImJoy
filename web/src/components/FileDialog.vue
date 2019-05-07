@@ -152,7 +152,7 @@ export default {
      },
      go(){
        const path = prompt('Go to the folder', this.root)
-       this.listFiles(this.selected_engine, path, 'dir', true).then((tree)=>{
+       this.listFiles(this.selected_engine, path, 'dir', false).then((tree)=>{
          this.root = tree.path
          this.file_tree = tree
          this.listFiles(this.selected_engine, tree.path, this.options.type, this.options.recursive).then((tree)=>{
