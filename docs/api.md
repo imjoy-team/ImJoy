@@ -176,7 +176,7 @@ in JavaScript, but the api functions are called in similar fashion in Python.
 await api.alert(message)
 ```
 
-Shows an alert dialog with a message.
+Shows an alert dialog with a message to the user.
 
 **Arguments**
 
@@ -187,6 +187,26 @@ Shows an alert dialog with a message.
 await api.alert('hello world')
 ```
 [Try yourself >>](https://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:alert&w=examples)
+
+### api.prompt
+
+```javascript
+const anwser = await api.prompt(question, default_anwser)
+```
+
+Shows a prompt to ask the user input.
+
+**Arguments**
+
+* **question**: String. Contains the question to be displayed.
+
+* **default_anwser** (optional): String. Contains the default anwser to the question.
+
+**Example**
+```javascript
+const anwser = await api.prompt('hello world')
+```
+<!--****[TODO] add example **-->
 
 
 ### api.call
