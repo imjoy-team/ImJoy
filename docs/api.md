@@ -202,12 +202,36 @@ Shows a prompt to ask the user input.
 
 * **default_anwser** (optional): String. Contains the default anwser to the question.
 
+**Returns**
+* **anwser**: Boolean. The anwser from the user.
+
 **Example**
 ```javascript
-const anwser = await api.prompt('hello world')
+const anwser = await api.prompt('What is your name?')
 ```
 <!--****[TODO] add example **-->
 
+### api.confirm
+
+```javascript
+const confirmation = await api.confirm(question)
+```
+
+Shows a confirmation message to the user.
+
+**Arguments**
+
+* **question**: String. Contains the question to be displayed.
+
+**Returns**
+* **confirmation**: Boolean. True or false.
+
+
+**Example**
+```javascript
+const anwser = await api.confirm('Do you want to delete these files?')
+```
+<!--****[TODO] add example **-->
 
 ### api.call
 ```javascript
