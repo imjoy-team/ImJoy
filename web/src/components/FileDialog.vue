@@ -6,7 +6,6 @@
       <div class="loading-info">
         <h3 v-if="dropping">Drop files to upload to {{root}}</h3>
         <md-progress-bar md-mode="determinate" v-if="loading" :md-value="loading_progress"></md-progress-bar>
-        <p v-if="status_text">{{status_text}}</p>
       </div>
       <ul :class="dropping?'dropping-files': ''" v-if="selected_engine && file_tree">
         <file-item :model="file_tree" :engine="selected_engine" :root="root" :selected="file_tree_selection" @load="loadFile" @select="fileTreeSelected" @select_append="fileTreeSelectedAppend">
@@ -19,6 +18,7 @@
 
     </md-dialog-content>
     <md-dialog-actions>
+      <p v-if="status_text">{{status_text}}</p>
       <md-menu v-show="file_tree_selection_info">
         <md-button class="md-button md-primary" md-menu-trigger>
           options
@@ -312,8 +312,12 @@ p{
 }
 
 ul {
-  list-style-position: outside !important;
+  list-style: none outside !important;
   margin: .1rem 0 .1rem 1.2rem;
+}
+
+span{
+  margin: 3px;
 }
 
 .dropping-files{

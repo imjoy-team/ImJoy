@@ -6,7 +6,14 @@
         <md-icon v-if="model.type==='file'">insert_drive_file</md-icon> <md-icon v-else>folder_open</md-icon>
         <span class="noselect" :class="{bold: isFolder, selected: (root)===selected || (selected && Array.isArray(selected) && selected.indexOf(root)>=0)}">{{ model.name }}</span>
       </span>
-      <span class="item" v-if="isFolder||(model.children&&model.children.length===0)" @click="up()" ><md-icon>arrow_upward</md-icon></span>
+      <span class="item" v-if="isFolder||(model.children&&model.children.length===0)" @click="up()" > <md-icon>arrow_upward</md-icon></span>
+      <div v-if="model.drives" class="drives">
+        <span class="noselect" @click="select({target: model, path: d}); load({target: model, path: d});" v-for="d in model.drives" :key="d">
+          <md-icon>storage</md-icon>
+          <span class="noselect" :class="{bold: isFolder, selected: (d)===selected || (selected && Array.isArray(selected) && selected.indexOf(d)>=0)}">{{ d }}</span>
+        </span>
+        </div>
+      
     </div>
 
     <ul v-if="open&&isFolder">
@@ -107,5 +114,14 @@ ul {
 
 ol li, ul li {
   margin-top: 0px;
+}
+
+.drives {
+  margin: 20px;
+  display: inline;
+}
+
+.drives > span {
+  margin: 10px;
 }
 </style>
