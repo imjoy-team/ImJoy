@@ -422,7 +422,6 @@ HtmlWhitelistedSanitizer.makeUrlSanitizer = function(allowed_urls) {
   return function(str) {
     if (!str) { return ''; }
     for (var i in allowed_urls) {
-      console.log(allowed_urls[i]);
       if (str.startsWith(allowed_urls[i])) {
         return str;
       }
@@ -463,7 +462,6 @@ HtmlWhitelistedSanitizer.prototype.sanitizeNode = function(node) {
   }
   if (!this.allowedTags.hasOwnProperty(node_name)) {
     // this node isn't allowed
-    console.log("forbidden node: " + node_name);
     if (this.escape) {
       return this.doc.createTextNode(node.outerHTML);
     }
