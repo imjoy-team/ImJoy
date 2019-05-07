@@ -686,6 +686,7 @@ export default {
     this.event_bus = this.$root.$data.store && this.$root.$data.store.event_bus || new Vue()
     const imjoy_api = {
       alert: this.showAlert,
+      prompt: this.showPrompt,
       showDialog: this.showDialog,
       showProgress: this.showProgress,
       showStatus: this.showStatus,
@@ -1858,6 +1859,9 @@ export default {
     showAlert(_plugin, text){
       console.log('alert: ', text)
       alert(text)
+    },
+    showPrompt(_plugin, text, defaultText){
+      return prompt(text, defaultText)
     },
     showLog(_plugin){
       const w = {

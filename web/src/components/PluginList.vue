@@ -132,7 +132,7 @@ export default {
       default: null
     },
     pluginManager: {
-      type: PluginManager,
+      type: [PluginManager, Object],
       default: null
     },
     workspace: {
