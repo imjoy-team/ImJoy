@@ -18,20 +18,24 @@
 
     </md-dialog-content>
     <md-dialog-actions>
-      <p v-if="status_text">{{status_text}}</p>
-      <md-menu v-show="file_tree_selection_info">
+      
+      <md-menu style="flex: auto;">
         <md-button class="md-button md-primary" md-menu-trigger>
-          options
+          <md-icon>menu</md-icon>options
         </md-button>
         <md-menu-content>
-          <md-menu-item class="md-primary" @click="downloadFiles()">
+          <md-menu-item class="md-primary" @click="go()">
+              <md-icon>forward</md-icon> Go to Folder
+          </md-menu-item>
+          <md-menu-item v-show="file_tree_selection_info" class="md-primary" @click="downloadFiles()">
               <md-icon>cloud_download</md-icon> Download
           </md-menu-item>
-          <md-menu-item class="md-accent" @click="remove()">
+          <md-menu-item v-show="file_tree_selection_info" class="md-accent" @click="remove()">
               <md-icon>delete</md-icon> Delete
           </md-menu-item>
         </md-menu-content>
       </md-menu>
+      <p style="flex: auto;" class="md-small-hide" v-if="status_text">{{status_text}}</p>
       <md-button class="md-primary" :disabled="!file_tree_selection" @click="show_=false; resolve(file_tree_selection)">OK <md-tooltip v-if="file_tree_selection">Selected: {{file_tree_selection}}</md-tooltip> </md-button>
       <md-button class="md-primary" @click="show_=false; reject('file dialog canceled by the user.')">Cancel</md-button>
     </md-dialog-actions>
@@ -66,7 +70,7 @@ export default {
        show_all_engines: true,
        dropping: false,
        loading: false,
-       status_text: '(Drag and drop here to upload files)',
+       status_text: 'Drag and drop here to upload files',
        loading_progress: 0
      }
    },
@@ -78,9 +82,6 @@ export default {
        this.event_bus.$on('drag_upload', this.uploadFiles)
      }
 
-   },
-   mounted(){
-     // this.file_tree = this.listFiles()
    },
    beforeDestroy(){
      if(this.event_bus){
@@ -147,6 +148,16 @@ export default {
          this.root = tree.path
          this.file_tree = tree
          this.$forceUpdate()
+       })
+     },
+     go(){
+       const path = prompt('Go to the folder', this.root)
+       this.listFiles(this.selected_engine, path, 'dir', false).then((tree)=>{
+         this.root = tree.path
+         this.file_tree = tree
+         this.$forceUpdate()
+       }).catch((e)=>{
+         alert(e.toString())
        })
      },
      loadFile(f){
@@ -230,7 +241,7 @@ export default {
          }
          this.dropping = false
          this.loading_progress = 0
-         this.status_text = '(Drag and drop here to upload files)'
+         this.status_text = 'Drag and drop here to upload files'
        })
      },
      selectEngine(engine){
