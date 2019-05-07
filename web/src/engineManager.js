@@ -143,7 +143,9 @@ export class Engine {
                 console.error('Failed to connect to the plugin engine.', ret.reason)
               }
               this.disconnecting = true
-              socket.disconnect()
+              setTimeout(()=>{
+                socket.disconnect()
+              }, 200)
               reject('Failed to connect: ' + ret.reason)
             }
           })
@@ -292,12 +294,10 @@ export class EngineManager {
     this.show_engine_callback = show_engine_callback || function(){}
     this.show_message_callback = show_message_callback || function (){}
     this.update_ui_callback = update_ui_callback || function (){}
-    this.loadPluginEngineList().then(async ()=>{
-      for(let c of this.config.engines){
-        await this.addEngine(c, true)
-      }
-    })
+  }
 
+  async init(){
+    await this.loadPluginEngineList()
   }
 
   getEngineByUrl(url){
@@ -316,7 +316,7 @@ export class EngineManager {
       let existed = false
       let engine = new Engine({config: config, event_bus: this.event_bus, show_engine_callback: this.show_engine_callback, show_message_callback: this.show_message_callback, update_ui_callback: this.update_ui_callback, client_id: this.client_id});
       for(let e of this.engines){
-        if(e.id === engine.id){
+        if(e.id === engine.id && engine.config.token === e.config.token){
           engine = e
           existed = true
           this.show_message_callback('Plugin Engine already exists.')
@@ -404,6 +404,11 @@ export class EngineManager {
         this.config = doc
         _rev = doc._rev
         this.config.engines = this.config.engines || []
+        this.engines = []
+        for(let c of this.config.engines){
+          const engine = new Engine({config: c, event_bus: this.event_bus, show_engine_callback: this.show_engine_callback, show_message_callback: this.show_message_callback, update_ui_callback: this.update_ui_callback, client_id: this.client_id});
+          this.engines.push(engine)
+        }
         resolve(this.config)
       }).catch((err) => {
         if(err.name != 'not_found'){
@@ -415,6 +420,10 @@ export class EngineManager {
           _id: 'plugin_engine_list',
           engines: []
         }).then(()=>{
+          for(let c of this.config.engines){
+            const engine = new Engine({config: c, event_bus: this.event_bus, show_engine_callback: this.show_engine_callback, show_message_callback: this.show_message_callback, update_ui_callback: this.update_ui_callback, client_id: this.client_id});
+            this.engines.push(engine)
+          }
           resolve(this.config)
         }).catch(()=>{
           reject("Failed to load Plugin Engine list, database Error:" + err.toString())
