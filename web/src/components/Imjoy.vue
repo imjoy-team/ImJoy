@@ -687,6 +687,7 @@ export default {
     const imjoy_api = {
       alert: this.showAlert,
       prompt: this.showPrompt,
+      confirm: this.showConfirm,
       showDialog: this.showDialog,
       showProgress: this.showProgress,
       showStatus: this.showStatus,
@@ -1862,6 +1863,9 @@ export default {
     },
     showPrompt(_plugin, text, defaultText){
       return prompt(text, defaultText)
+    },
+    showConfirm(_plugin, text){
+      return confirm(text)
     },
     showLog(_plugin){
       const w = {
