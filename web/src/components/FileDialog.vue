@@ -2,7 +2,7 @@
   <md-dialog :md-active.sync="show_" :md-click-outside-to-close="false" :md-close-on-esc="false">
     <md-dialog-title>{{this.options.title || 'ImJoy File Dialog'}}</md-dialog-title>
     <md-dialog-content>
-      <md-button v-show="show_all_engines && engine.connected" :key="engine.id" v-for="engine in engines" :class="selected_engine===engine?'md-primary md-raised':'md-raised'" @click="selectEngine(engine)">{{engine.name}}</md-button>
+      <md-button style="text-transform: none;" v-show="show_all_engines && engine.connected" :key="engine.id" v-for="engine in engines" :class="selected_engine===engine?'md-raised':''" @click="selectEngine(engine)">{{engine.name}}</md-button>
       <div class="loading-info">
         <h3 v-if="dropping">Drop files to upload to {{root}}</h3>
         <md-progress-bar md-mode="determinate" v-if="loading" :md-value="loading_progress"></md-progress-bar>
