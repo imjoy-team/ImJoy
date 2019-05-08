@@ -196,12 +196,14 @@ export default {
        this.options.root = this.options.root || './'
        this.options.mode = this.options.mode || 'single|multiple'
        this.options.uri_type = this.options.uri_type|| 'path'
+       this.options.return_engine = this.options.return_engine || true
        if(this.options.engine){
          this.show_all_engines = false
          this.selected_engine = this.options.engine
        }
        else{
          this.show_all_engines = true
+         this.selected_engine = this.engines[Object.keys(this.engines)[0]]
        }
        if(this.options.type != 'file' && this.options.root){
          this.file_tree_selection = this.options.root
@@ -209,28 +211,49 @@ export default {
        else{
          this.file_tree_selection = null
        }
-       return new Promise((resolve, reject) => {
+       return new Promise((resolve2, reject2) => {
          if(this.options.uri_type === 'path'){
-           this.resolve = resolve
-           this.reject = reject
+             this.resolve = (path)=> {
+               if(this.options.return_engine){
+                resolve2({path: path, engine: this.selected_engine.url})
+               }
+               else{
+                resolve2(path)
+               }
+              }
+             this.reject = reject2
          }
          else if(this.options.uri_type === 'url'){
-           this.reject = reject
+           this.reject = reject2
            this.resolve = (paths)=>{
               if(typeof paths === 'string'){
-                this.getFileUrl(_plugin, {path: paths, engine: this.selected_engine}).then(resolve).catch(reject)
+                this.getFileUrl(_plugin, {path: paths, engine: this.selected_engine.url}).then((url)=> {
+                  if(this.options.return_engine){
+                    resolve2({url: url, engine: this.selected_engine.url, path: paths})
+                  }
+                  else{
+                    resolve2(url)
+                  }
+                }).catch(reject2)
               }
               else{
                   const ps = []
                   for(let path of paths){
-                    ps.push(this.getFileUrl(_plugin, {path: path, engine: this.selected_engine}))
+                    ps.push(this.getFileUrl(_plugin, {path: path, engine: this.selected_engine.url}))
                   }
-                  Promise.all(ps).then(resolve).catch(reject)
+                  Promise.all(ps).then((urls)=> {
+                    if(this.options.return_engine){
+                      resolve2({url: urls, engine: this.selected_engine.url, path: paths})
+                    }
+                    else{
+                      resolve2(urls)
+                    }
+                  }).catch(reject2)
               }
            }
          }
          else{
-           reject("unsupported uri_type: " + this.options.uri_type)
+           reject2("unsupported uri_type: " + this.options.uri_type)
          }
          this.root = this.options.root
          if(this.show_all_engines){

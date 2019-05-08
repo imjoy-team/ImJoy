@@ -1125,7 +1125,7 @@ result = await api.showDialog({
 
 ### api.showFileDialog
 ```javascript
-file_path = await api.showFileDialog(config)
+ret = await api.showFileDialog(config)
 ```
 
 Shows a file dialog to select files or directories.
@@ -1171,11 +1171,15 @@ It contains the following fields:
   - **uri_type**: String. Format of returned file path.
     - `url` (default for JavaScript plugins): <!--**[TODO]**-->
     - `path` (default for Python plugins): <!--**[TODO]**-->
+  - **engine**: String. Specify the engine url.
 
 (Please also consult [this section](api?id=input-arguments) for how arguments can be set.)
 
 **Returns**
-* **file_path**: String. Contains file-path as specified by `uri_type`.
+* **ret**: Object (JavaScript) or dictionary (Python). Contains path or url and engine url as specified by `uri_type`.
+  - **path**: String or Array. It will be included for both `uri_type` (`'path'` or `'url'`). If multiple files are selected, it will be an array of paths.
+  - **url**: String or Array. Only available for `uri_type = 'url'`. If multiple files are selected, it will be an array of urls.
+  - **engine**: String. The engine url selected by the user.
 
 **Examples**
 
@@ -1184,13 +1188,14 @@ user canceled or that the plugin engine was not running.
 
 ```javascript
 try{
-  const file_path = await api.showFileDialog({root: '~'})
-  await api.alert("Selected file " + file_path)
+  const ret = await api.showFileDialog({root: '~', uri_type: 'url'})
+  await api.alert("Selected file " + ret.url)
 }
 catch(e){
   await api.alert("Error: "+e.toString())
 };
 ```
+<!--**[TODO]: update this example to new api**-->
 [Try yourself >>](https://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:showFileDialog&w=examples)
 
 

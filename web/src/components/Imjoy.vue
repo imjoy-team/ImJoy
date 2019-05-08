@@ -1324,12 +1324,17 @@ export default {
     },
     showEngineFileDialog(){
       this.showFileDialog(this.IMJOY_PLUGIN, {uri_type: 'url', root: './'}).then((selection)=>{
-        if(typeof selection === 'string'){
+        if(!Array.isArray(selection)){
           selection = [selection]
         }
         const urls = []
         for(let u of selection){
-          urls.push({href: u, text: u.split('name=')[1]})
+          if(u.url){
+            urls.push({href: u.url, path: u.path, engine: u.engine})
+          }
+          else{
+            urls.push({href: u})
+          }
         }
         const w = {
           name: "Files",
@@ -1609,6 +1614,13 @@ export default {
         }
         else{
           config.uri_type = config.uri_type || 'path'
+        }
+        //TODO: remove this in the future
+        if(_plugin.config.api_version && compareVersions(_plugin.config.api_version, '<=', '0.1.3')){
+          config.return_engine = config.return_engine || false
+        }
+        else{
+          config.return_engine = config.return_engine || true
         }
         return this.$refs['file-dialog'].showDialog(_plugin, config)
       }
