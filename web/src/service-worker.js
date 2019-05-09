@@ -45,6 +45,27 @@ if (workbox) {
     new workbox.strategies.NetworkFirst()
   );
 
+  // badges
+  workbox.routing.registerRoute(
+    new RegExp("https://img.shields.io/.*"),
+    new workbox.strategies.NetworkFirst()
+  );
+
+  workbox.routing.registerRoute(
+    new RegExp("https://travis-ci.com/oeway/.*"),
+    new workbox.strategies.NetworkFirst()
+  );
+
+  workbox.routing.registerRoute(
+    new RegExp("https://zenodo.org/badge/.*"),
+    new workbox.strategies.NetworkFirst()
+  );
+
+  workbox.routing.registerRoute(
+    new RegExp("https://api.netlify.com/api/v1/badges/.*"),
+    new workbox.strategies.NetworkFirst()
+  );
+
   workbox.routing.setDefaultHandler(new workbox.strategies.NetworkOnly());
 
   self.addEventListener("message", e => {
