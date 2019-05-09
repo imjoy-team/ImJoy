@@ -144,7 +144,7 @@ export default {
         }
         this.codeValue = this.editor.getValue()
         this.$emit('input', this.codeValue)
-        this.window.plugin_manager.savePlugin({pluginId: this.pluginId, code: this.codeValue, tag: this.window.plugin && this.window.plugin.tag}).then((config)=>{
+        this.window.plugin_manager.savePlugin({pluginId: this.pluginId, code: this.codeValue, tag: this.window.plugin && this.window.plugin.tag, publish_id: this.window.plugin && this.window.plugin.publish_id}).then((config)=>{
           // this.window.data._id = config._id
           // this.window.plugin._id = config._id
           // this.window.plugin.config._id= config._id

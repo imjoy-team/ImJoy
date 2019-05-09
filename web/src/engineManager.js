@@ -15,6 +15,7 @@ export class Engine {
     this.name = this.config.name
     this.url = this.config.url
     this.token = this.config.token
+    this.role = this.config.role || 'admin'
 
     this.show_engine_callback = show_engine_callback || function(){}
     this.show_message_callback = show_message_callback || function (){}
@@ -55,6 +56,55 @@ export class Engine {
     })
   }
 
+  publishPlugin(config) {
+    return new Promise((resolve, reject)=>{
+      try {
+        this.socket.emit('publish_plugin', config, resolve)
+      } catch (e) {
+        reject(e)
+      }
+    })
+  }
+
+  unpublishPlugin(config) {
+    return new Promise((resolve, reject)=>{
+      try {
+        this.socket.emit('unpublish_plugin', config, resolve)
+      } catch (e) {
+        reject(e)
+      }
+    })
+  }
+
+  getPublishedPlugins() {
+    return new Promise((resolve, reject)=>{
+      try {
+        this.published_plugins = null
+        this.socket.emit('get_published_plugins', {}, (ret)=>{
+          if(ret && ret.success){
+            this.published_plugins = ret.plugins
+            resolve(ret.plugins)
+          }
+          else{
+            reject(ret && ret.reason)
+          }
+        })
+      } catch (e) {
+        reject(e)
+      }
+    })
+  }
+
+  getPublicationInfo(config) {
+    return new Promise((resolve, reject)=>{
+      try {
+        this.socket.emit('get_publication_info', config, resolve)
+      } catch (e) {
+        reject(e)
+      }
+    })
+  }
+
   connect(auto) {
     return new Promise((resolve, reject) => {
         let url = this.config.url
@@ -89,7 +139,7 @@ export class Engine {
             }
             reject('Failed to connect, please make sure you have started the plugin engine.')
           }
-        }, 2500)
+        }, 1200)
 
         //if(!auto) {this.show_engine_callback(true, this)}
 
@@ -99,56 +149,79 @@ export class Engine {
             clearTimeout(this.connection_lost_timer)
             this.connection_lost_timer = null
           }
-          socket.emit('register_client', {id: this.client_id, token: token, base_url: url, session_id: this.engine_session_id}, (ret)=>{
-            if(ret && ret.success){
-              const connect_client = ()=>{
-                this.engine_info = ret.engine_info || {}
-                this.engine_info.api_version = this.engine_info.api_version || '0.1.0'
-                this.socket = socket
-                this.connected = true
-                this.connected_url_token_ = url + token
-                //this.show_engine_callback(false, this)
-                this.connection = 'Plugin Engine Connected.'
-                this.connection_token = token
-                localStorage.setItem("imjoy_connection_token", token)
-                localStorage.setItem("imjoy_engine_url", url)
-                this.showMessage(`Successfully connected to the Plugin Engine 🚀 (${url}).`)
-                // console.log('plugin engine connected.')
-                this.event_bus.$emit('engine_connected', this)
-                this.update_ui_callback()
-                resolve()
-              }
-
-              // if(ret.message && ret.confirmation){
-              //   this.show_engine_callback(true, ret.message, connect_client,  ()=>{
-              //     this.disconnecting = true
-              //     socket.disconnect()
-              //     console.log('you canceled the connection.')
-              //     reject('User cancelled the connection.')
-              //   })
-              // }
-              // else{
-              connect_client()
-              // }
-            }
-            else{
-              reason = ret.reason
-              if(ret.no_retry && ret.reason){
-                this.showStatus('Failed to connect: ' + ret.reason)
-                this.showMessage('Failed to connect: ' + ret.reason)
+          if(this.role === 'admin'){
+            socket.emit('register_client', {id: this.client_id, token: token, base_url: url, session_id: this.engine_session_id}, (ret)=>{
+              if(ret && ret.success){
+                const connect_client = ()=>{
+                  this.engine_info = ret.engine_info || {}
+                  this.engine_info.api_version = this.engine_info.api_version || '0.1.0'
+                  this.socket = socket
+                  this.connected = true
+                  //this.show_engine_callback(false, this)
+                  this.connection = 'Plugin Engine Connected.'
+                  this.connection_token = token
+                  localStorage.setItem("imjoy_connection_token", token)
+                  localStorage.setItem("imjoy_engine_url", url)
+                  this.showMessage(`Successfully connected to the Plugin Engine 🚀 (${url}).`)
+                  // console.log('plugin engine connected.')
+                  this.event_bus.$emit('engine_connected', this)
+                  this.update_ui_callback()
+                  resolve()
+                }
+  
+                // if(ret.message && ret.confirmation){
+                //   this.show_engine_callback(true, ret.message, connect_client,  ()=>{
+                //     this.disconnecting = true
+                //     socket.disconnect()
+                //     console.log('you canceled the connection.')
+                //     reject('User cancelled the connection.')
+                //   })
+                // }
+                // else{
+                connect_client()
+                // }
               }
               else{
-                if(!auto) this.show_engine_callback(true, this)
-                if(ret.reason) this.showMessage('Failed to connect: ' + ret.reason)
-                console.error('Failed to connect to the plugin engine.', ret.reason)
+                reason = ret.reason
+                if(ret.no_retry && ret.reason){
+                  this.showStatus('Failed to connect: ' + ret.reason)
+                  this.showMessage('Failed to connect: ' + ret.reason)
+                }
+                else{
+                  if(!auto) this.show_engine_callback(true, this)
+                  if(ret.reason) this.showMessage('Failed to connect: ' + ret.reason)
+                  console.error('Failed to connect to the plugin engine.', ret.reason)
+                }
+                this.disconnecting = true
+                setTimeout(()=>{
+                  socket.disconnect()
+                }, 200)
+                reject('Failed to connect: ' + ret.reason)
               }
+            })
+          }
+          else if (this.role === 'user'){
+            this.socket = socket
+            this.getPublishedPlugins().then(()=>{
+              this.engine_info = {}
+              this.connected = true
+              this.showMessage(`Successfully connected to the Plugin Engine 🚀 (${url}).`)
+              // console.log('plugin engine connected.')
+              this.event_bus.$emit('engine_connected', this)
+              this.update_ui_callback()
+              resolve()
+            }).catch((e)=>{
               this.disconnecting = true
               setTimeout(()=>{
                 socket.disconnect()
+                this.socket = null
               }, 200)
-              reject('Failed to connect: ' + ret.reason)
-            }
-          })
+              reject('Failed to connect: ' + e)
+            })
+          }
+          else{
+            reject('Unsupported engine role ' + this.role)
+          }
         })
         socket.on('disconnect', () => {
           console.error('Socket io disconnected from ' + this.url)

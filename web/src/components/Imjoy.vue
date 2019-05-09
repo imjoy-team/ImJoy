@@ -88,7 +88,7 @@
             </md-menu-item>
           </md-menu-content>
         </md-menu>
-        <engine-control-panel :engine-manager="em"/>
+        <engine-control-panel :engine-manager="em" :plugin-manager="pm"/>
         <md-menu>
           <md-button class="md-icon-button md-primary" md-menu-trigger>
             <md-icon>more_horiz</md-icon>
@@ -233,6 +233,9 @@
                 <md-menu-item @click="editPlugin(plugin.id)">
                   <md-icon>edit</md-icon>Edit
                 </md-menu-item>
+                <md-menu-item @click="plugin4publish=plugin; showPublishDialog=true">
+                  <md-icon>publish</md-icon>Publish
+                </md-menu-item>
                 <md-menu-item @click="pm.reloadPlugin(plugin.config)">
                   <md-icon>autorenew</md-icon>Reload
                 </md-menu-item>
@@ -375,6 +378,27 @@
     <md-dialog-actions v-if="plugin_dialog_config && plugin_dialog_config.ui">
       <md-button class="md-primary" @click="closePluginDialog(true)">OK</md-button>
       <md-button class="md-primary" @click="closePluginDialog(false)">Cancel</md-button>
+    </md-dialog-actions>
+  </md-dialog>
+
+  <md-dialog :md-active.sync="showPublishDialog" :md-click-outside-to-close="false" :md-close-on-esc="false">
+    <md-dialog-title>Publishing Plugin {{plugin4publish && plugin4publish.name}}</md-dialog-title>
+    <md-dialog-content v-if="plugin4publish && publish_config">
+      <md-field>
+        <md-select v-model="publish_config.engine" name="publish">
+          <md-option :value="engine.url" v-for="engine in em.engines" :key="engine.id">{{engine.url}}</md-option>
+        </md-select>
+        <md-tooltip>Select a engine to publish the plugin.</md-tooltip>
+      </md-field>
+      <md-switch v-model="publish_config.with_token">Access Token</md-switch>
+      <!-- <md-field v-if="publish_config.with_token">
+        <label for="app_token">Plugin Token</label>
+        <md-input type="text" v-model="publish_config.token" placeholder="" name="plugin_token"></md-input>
+      </md-field> -->
+    </md-dialog-content>
+    <md-dialog-actions>
+      <md-button class="md-primary" @click="publishPlugin(plugin4publish); showPublishDialog=false;plugin4publish=null">OK</md-button>
+      <md-button class="md-primary" @click="showPublishDialog=false; plugin4publish=null">Cancel</md-button>
     </md-dialog-actions>
   </md-dialog>
 
@@ -659,6 +683,9 @@ export default {
       status_text: '',
       showWorkspaceDialog: false,
       showWelcomeDialog: false,
+      showPublishDialog: false,
+      plugin4publish: null,
+      publish_config: {},
       show_file_dialog: false,
       show_workflow: false,
       plugins: null,
@@ -1400,6 +1427,34 @@ export default {
         saveAs(file, filename);
       }
     },
+    async publishPlugin(plugin){
+      console.log('x-==============================', plugin,plugin.config.publish_id)
+      assert(this.publish_config.engine)
+      const engine = this.em.getEngineByUrl(this.publish_config.engine)
+      assert(engine, 'engine not found')
+      assert(compareVersions(engine.engine_info.api_version, '>=', '0.1.2'), "engine version must be greater than 0.1.2")
+      const publish_id = plugin.config.publish_id || randId()
+      
+      
+      const plugin_config_dependencies = await this.pm.getPluginsWithDependencies(plugin.config)
+
+      // replace plugins with the current version
+      for(let i=0;i<plugin_config_dependencies.length;i++){
+        const p = Object.values(this.pm.plugins).filter((p)=>{p.name === plugin_config_dependencies[i].name})[0] || plugin_config_dependencies[i]
+        plugin_config_dependencies[i] = {id: p.id, name: p.name, code: p.code}
+      }
+      console.log('===========publishing', {id: plugin.id, publish_id: publish_id, name: plugin.name, plugin_list: plugin_config_dependencies})
+      const ret = await engine.publishPlugin({id: plugin.id, publish_id: publish_id, name: plugin.name, plugin_list: plugin_config_dependencies})
+      if(ret && ret.success){
+        plugin.config.publish_id = ret.publish_id
+        this.pm.savePlugin(plugin.config).then(()=>{
+          alert(ret.token)
+        })
+      }
+      else{
+        throw ret.reseaon
+      }
+    },
     installPlugin(plugin4install, tag4install){
       this.installing = true
       this.pm.installPlugin(plugin4install, tag4install).then((template)=>{
@@ -1694,14 +1749,14 @@ export default {
             }
           })
           .then((response)=>{
-            if(response.status !== 200){
-              console.error(response)
-              reject(response.statusText)
-            }
-            else{
+            if(response.status && response.status === 200){
               this.showMessage(`File uploaded to ${config.url}`)
               if(_plugin.log) _plugin.log(`File uploaded to ${config.url}`)
               resolve(response.data)
+            }
+            else{
+              console.error(response)
+              reject(response.statusText)
             }
           })
           .catch((response)=>{
@@ -1734,13 +1789,13 @@ export default {
             }
           })
           .then((response)=>{
-            if(response.status !== 200){
-              console.error(response)
-              reject(response.statusText)
-            }
-            else{
+            if(response.status && response.status == 200){
               this.showMessage(`File downloaded from ${config.url}`)
               resolve(response.data)
+            }
+            else{
+              console.error(response)
+              reject(response.statusText)
             }
           })
           .catch((response)=> {

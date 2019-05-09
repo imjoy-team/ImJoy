@@ -323,6 +323,7 @@ var basicConnectionWeb = function() {
      */
     BasicConnection = function(id, type, config) {
         this._init = new Whenable;
+        this._fail = new Whenable;
         this._disconnected = false;
         this.id = id;
         var iframe_container = config.iframe_container
@@ -377,6 +378,10 @@ var basicConnectionWeb = function() {
      */
     BasicConnection.prototype.whenInit = function(handler) {
         this._init.whenEmitted(handler);
+    }
+
+    BasicConnection.prototype.whenFailed = function(handler) {
+        this._fail.whenEmitted(handler);
     }
 
 
@@ -443,6 +448,7 @@ var SocketioConnectionWeb = function() {
      */
     SocketioConnection = function(id, type, config) {
         this._init = new Whenable;
+        this._fail = new Whenable;
         this._disconnected = false;
         this.id = id;
         this.engine = config.engine
@@ -455,8 +461,8 @@ var SocketioConnectionWeb = function() {
           if (!this._disconnected && this.engine && this.engine.socket) {
             const config_ = {api_version: config.api_version, flags: config.flags, tag: config.tag, workspace: config.workspace, env: config.env, requirements: config.requirements, cmd: config.cmd, name: config.name, type: config.type, inputs: config.inputs, outputs: config.outputs}
             // create a plugin here
-            this.engine.socket.emit('init_plugin', {id: id, type: type, config: config_}, (result) => {
-              // console.log('init_plugin: ', result)
+            this.engine.socket.emit('init_plugin', {id: id, publish_id: config.publish_id, plugin_token: config.plugin_token, name:config.name, role: this.engine.role, type: type, config: config_}, (result) => {
+              console.log('init_plugin: ', result, type, config_)
               this.initializing = false;
               if(result.success){
                 this._disconnected = false;
@@ -485,13 +491,16 @@ var SocketioConnectionWeb = function() {
                 }
               }
               else{
+                this._fail.emit(result.reason);
                 this._disconnected = true;
-                console.error('failed to initialize plugin on the plugin engine')
+                console.error('failed to initialize plugin on the plugin engine: ' + result.reason)
                 throw('failed to initialize plugin on the plugin engine')
               }
             })
           }
           else{
+            this._fail.emit('connection is not established.');
+            this._disconnected = true;
             throw('connection is not established.')
           }
       })
@@ -513,7 +522,10 @@ var SocketioConnectionWeb = function() {
         this._init.whenEmitted(handler);
     }
 
-
+    SocketioConnection.prototype.whenFailed = function(handler) {
+        this._fail.whenEmitted(handler);
+    }
+    
     /**
      * Sends a message to the plugin site
      *
@@ -618,6 +630,10 @@ var Connection = function(id, type, config){
     var me = this;
     this.whenInit = function(cb){
         me._platformConnection.whenInit(cb);
+    };
+
+    this.whenFailed = function(cb){
+        me._platformConnection.whenFailed(cb);
     };
 
     this._platformConnection.onMessage(function(m) {
@@ -914,6 +930,9 @@ DynamicPlugin.prototype._connect =
       me._updateUI()
       me._connection.whenInit(function(){
           me._init();
+      });
+      me._connection.whenFailed(function(e){
+          me._fail.emit(e);
       });
       if(this.type == 'native-python'){
         me._connection._platformConnection.onLogging(function(details){

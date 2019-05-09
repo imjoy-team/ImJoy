@@ -637,6 +637,20 @@ export class PluginManager {
     return config
   }
 
+  async getPluginsWithDependencies(pconfig){
+    let ret = [pconfig]
+    for (let i = 0; i < pconfig.dependencies.length; i++) {
+      const new_config = await this.getPluginFromUrl(pconfig.dependencies[i])
+      const ps = await this.getPluginsWithDependencies(new_config)
+      ret = ret.concat(ps)
+    }
+    return ret
+  }
+
+  getPluginByName(name){
+    return this.plugins.filter((p)=>{p.name === name})[0]
+  }
+
   installPlugin(pconfig, tag, do_not_load){
     return new Promise((resolve, reject) => {
       let uri = typeof pconfig === 'string' ? pconfig : pconfig.uri
@@ -784,12 +798,12 @@ export class PluginManager {
     }
   }
 
-  reloadPlugin(pconfig) {
+  reloadPlugin(pconfig, rplugin) {
     return new Promise((resolve, reject) => {
       try {
         this.unloadPlugin(pconfig, true)
         const template = this.parsePluginCode(pconfig.code, pconfig)
-        template._id = pconfig._id
+        template._id = pconfig._id || template.name.replace(/ /g, '_')
         template.engine_mode = pconfig.engine_mode
 
         if(template.type === 'collection'){
@@ -797,14 +811,15 @@ export class PluginManager {
         }
         this.unloadPlugin(template, true)
         let p
+        console.log('==========================', template, rplugin)
 
         if (template.type === 'window' || template.type === 'web-python-window') {
-          p = this.preLoadPlugin(template)
+          p = this.preLoadPlugin(template, rplugin)
         } else {
-          p = this.loadPlugin(template)
+          p = this.loadPlugin(template, rplugin)
         }
         p.then((plugin) => {
-          plugin._id = pconfig._id
+          plugin._id = pconfig._id || template._id
           pconfig.name = plugin.name
           pconfig.type = plugin.type
           pconfig.plugin = plugin
@@ -825,11 +840,9 @@ export class PluginManager {
     return new Promise((resolve, reject) => {
       const code = pconfig.code
       try {
-        const template = this.parsePluginCode(code, {tag: pconfig.tag})
+        const template = this.parsePluginCode(code, {tag: pconfig.tag, publish_id: pconfig.publish_id, engine_mode: pconfig.engine_mode, origin: pconfig.origin})
         template.code = code
-        template.origin = pconfig.origin
         template._id = template.name.replace(/ /g, '_')
-        template.engine_mode = pconfig.engine_mode
         const addPlugin = (template) => {
           this.db.put(template).then(() => {
             for (let i = 0; i < this.installed_plugins.length; i++) {
@@ -905,7 +918,9 @@ export class PluginManager {
         config.tag = tag || null
       } else {
         const pluginComp = parseComponent(code)
-        config = JSON.parse(pluginComp.config[0].content)
+        const config_ = JSON.parse(pluginComp.config[0].content)
+        // overwrite the properties from source code
+        config = Object.assign(config_, config)
         config.scripts = []
         for (let i = 0; i < pluginComp.script.length; i++) {
           config.scripts.push(pluginComp.script[i])
@@ -1007,6 +1022,8 @@ export class PluginManager {
         config.id = rplugin.id
         config.initialized = true
       }
+      config.engine = null
+    
       const tconfig = _.assign({}, template, config)
       const _interface = _.assign({TAG: tconfig.tag, WORKSPACE: this.selected_workspace}, this.imjoy_api)
 
@@ -1050,26 +1067,41 @@ export class PluginManager {
       if(!rplugin){
         config.id = template.name.trim().replace(/ /g, '_') + '_' + randId()
         config.initialized = false
+        config.engine_mode = template.engine_mode || 'auto'
+        if (template.type === 'native-python') {
+          config.engine = this.em.getEngine(config.engine_mode)
+          if (!config.engine || !config.engine.connected ) {
+            console.error("Please connect to the Plugin Engine 🚀.")
+          }
+        }
+        else{
+          config.engine = null
+        }
       }
       else{
         config.id = rplugin.id
         config.initialized = true
-      }
-      config._id = template._id
-      config.engine_mode = template.engine_mode || 'auto'
 
-      if (template.type === 'native-python') {
-        config.engine = this.em.getEngine(config.engine_mode)
-        if (!config.engine || !config.engine.connected ) {
-          console.error("Please connect to the Plugin Engine 🚀.")
+        if (template.type === 'native-python') {
+          config.engine = this.em.getEngineByUrl(rplugin.engine)
+          config.publish_id = rplugin.publish_id
+          if (!config.engine || !config.engine.connected ) {
+            console.error("Please connect to the Plugin Engine 🚀.")
+          }
+          config.engine_mode = config.engine && config.engine.id || 'auto'
+        }
+        else{
+          config.engine = null
+          config.publish_id = null
         }
       }
-      else{
-        config.engine = null
-      }
+      config._id = template._id
+     
       const tconfig = _.assign({}, template, config)
       tconfig.workspace = this.selected_workspace
+      tconfig.plugin_token = rplugin && rplugin.plugin_token
       const _interface = _.assign({TAG: tconfig.tag, WORKSPACE: this.selected_workspace, ENGINE_URL: config.engine && config.engine.url}, this.imjoy_api)
+      console.log('=============================================xxx', tconfig, _interface, this.fm.api)
       const plugin = new DynamicPlugin(tconfig, _interface, this.fm.api)
       plugin.whenConnected(() => {
         if (!plugin.api) {

@@ -11,9 +11,9 @@
         <file-item :model="file_tree" :engine="selected_engine" :root="root" :selected="file_tree_selection" @load="loadFile" @select="fileTreeSelected" @select_append="fileTreeSelectedAppend">
         </file-item>
       </ul>
-      <div class="loading loading-lg" v-else-if="selected_engine"></div>
+      <div class="loading loading-lg" v-else-if="selected_engine && loading"></div>
       <p v-else>
-        No plugin engine available.
+        No file available for display.
       </p>
 
     </md-dialog-content>
@@ -90,14 +90,12 @@ export default {
        this.event_bus.$off('drag_upload', this.uploadFiles)
      }
    },
-   computed: {
-   },
    methods: {
      async upload(f, progress_text){
        this.status_text = 'requesting upload url from the engine...'
        const url = await this.requestUploadUrl(null, {'dir': this.root, 'path': f.relativePath, 'overwrite': true, 'engine': this.selected_engine.url})
        console.log('loading file to url', url)
-       this.status_text = progress_text + ` ${url}`
+       this.status_text = progress_text
        const ret = await this.uploadFileToUrl(null, {file: f, url: url, progress: (uploaded, total)=>{
          this.loading_progress = uploaded*100/total
          this.status_text = progress_text + ` (${Math.round(this.loading_progress)}%)`
@@ -113,7 +111,12 @@ export default {
            await this.upload(files[i], `uploading ${i+1}/${files.length}: ${files[i].name}`)
          }
        } catch (e) {
-         this.status_text = 'failed to upload, error:' + e&&e.toString()
+         if(e){
+           this.status_text = 'failed to upload, error:' + e.toString()
+         }
+         else{
+           this.status_text = 'failed to upload'
+         }
        } finally {
          this.loading = false
          this.refreshList()
@@ -144,9 +147,15 @@ export default {
        this.$forceUpdate()
      },
      refreshList(){
+       this.loading = true
        this.listFiles(this.selected_engine, this.root, this.options.type, this.options.recursive).then((tree)=>{
          this.root = tree.path
          this.file_tree = tree
+         this.$forceUpdate()
+       }).catch((e)=>{
+         this.status_text = e
+       }).finally(()=>{
+         this.loading = false
          this.$forceUpdate()
        })
      },
