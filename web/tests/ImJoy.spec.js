@@ -86,7 +86,7 @@ describe('ImJoy.vue', async () => {
 
   it('should load the new web-worker plugin', async () => {
     const code = _.clone(WEB_WORKER_PLUGIN_TEMPLATE)
-    const plugin = await pm.reloadPlugin({_id: 'new plugin', tag: null, name:'new plugin', code: code})
+    const plugin = await pm.reloadPlugin({code: code})
     expect(plugin.name).to.equal('Untitled Plugin')
     expect(plugin.type).to.equal('web-worker')
     expect(typeof plugin.api.run).to.equal('function')
@@ -96,7 +96,7 @@ describe('ImJoy.vue', async () => {
 
   it('should load the new window plugin', async () => {
     const code = _.clone(WINDOW_PLUGIN_TEMPLATE)
-    const plugin = await pm.reloadPlugin({_id: 'new plugin', tag: null, name:'new plugin', code: code})
+    const plugin = await pm.reloadPlugin({code: code})
     expect(plugin.name).to.equal('Untitled Plugin')
     expect(plugin.type).to.equal('window')
     expect(typeof plugin.api.run).to.equal('function')
@@ -106,7 +106,7 @@ describe('ImJoy.vue', async () => {
 
   // it('should load the new native-python plugin', async () => {
   //   const code = _.clone(NATIVE_PYTHON_PLUGIN_TEMPLATE)
-  //   const plugin = await vm.pm.reloadPlugin({_id: 'new plugin', tag: null, name:'new plugin', code: code})
+  //   const plugin = await vm.pm.reloadPlugin({code: code})
   //   expect(plugin.name).to.equal('Untitled Plugin')
   //   expect(plugin.type).to.equal('native-python')
   //   expect(typeof plugin.api.run).to.equal('function')
@@ -115,7 +115,7 @@ describe('ImJoy.vue', async () => {
 
   it('should load the new web-python plugin', async () => {
     const code = _.clone(WEB_PYTHON_PLUGIN_TEMPLATE)
-    const plugin = await pm.reloadPlugin({_id: 'new plugin', tag: null, name:'new plugin', code: code})
+    const plugin = await pm.reloadPlugin({code: code})
     expect(plugin.name).to.equal('Untitled Plugin')
     expect(plugin.type).to.equal('web-python')
     expect(typeof plugin.api.run).to.equal('function')
@@ -125,7 +125,7 @@ describe('ImJoy.vue', async () => {
 
   it('should load the new web-python-window plugin', async () => {
     const code = _.clone(WEB_PYTHON_WINDOW_PLUGIN_TEMPLATE)
-    const plugin = await pm.reloadPlugin({_id: 'new plugin', tag: null, name:'new plugin', code: code})
+    const plugin = await pm.reloadPlugin({code: code})
     expect(plugin.name).to.equal('Untitled Plugin')
     expect(plugin.type).to.equal('web-python-window')
     expect(typeof plugin.api.run).to.equal('function')
@@ -159,18 +159,18 @@ describe('ImJoy.vue', async () => {
     let pluginw
     before(function(done){
       this.timeout(20000)
-      pm.reloadPlugin({_id: 'new plugin 1', tag: null, name:'new plugin1', code: _.clone(TEST_WEB_WORKER_PLUGIN_1)}).then((p1)=>{
+      pm.reloadPlugin({code: _.clone(TEST_WEB_WORKER_PLUGIN_1)}).then((p1)=>{
         plugin1 = p1
         expect(plugin1.name).to.equal('Test Web Worker Plugin 1')
         expect(plugin1.type).to.equal('web-worker')
         expect(typeof plugin1.api.run).to.equal('function')
-        pm.reloadPlugin({_id: 'new plugin 2', tag: null, name:'new plugin2', code: _.clone(TEST_WEB_WORKER_PLUGIN_2)}).then((p2)=>{
+        pm.reloadPlugin({code: _.clone(TEST_WEB_WORKER_PLUGIN_2)}).then((p2)=>{
           plugin2 = p2
           expect(plugin2.name).to.equal('Test Web Worker Plugin 2')
           expect(plugin2.type).to.equal('web-worker')
           expect(typeof plugin2.api.run).to.equal('function')
 
-          pm.reloadPlugin({_id: 'new window plugin', tag: null, name:'new window plugin', code: _.clone(TEST_WINDOW_PLUGIN_1)}).then((pw)=>{
+          pm.reloadPlugin({code: _.clone(TEST_WINDOW_PLUGIN_1)}).then((pw)=>{
             pluginw = pw
             expect(pluginw.name).to.equal('Test Window Plugin')
             expect(pluginw.type).to.equal('window')

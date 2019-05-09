@@ -100,6 +100,9 @@
             <md-menu-item href="/docs/" target="_blank" class="md-primary">
               <md-icon>library_books</md-icon>Documentation
             </md-menu-item>
+            <md-menu-item href="https://github.com/oeway/ImJoy" target="_blank" class="md-primary">
+              <md-icon>code</md-icon>Github
+            </md-menu-item>
             <md-menu-item href="https://forum.image.sc/tags/imjoy" target="_blank" class="md-primary">
               <md-icon>help</md-icon>Help
             </md-menu-item>
@@ -473,7 +476,9 @@
           </md-toolbar>
         </md-card-header>
       </md-card>
-      <md-progress-spinner v-if="downloading_plugin && !plugin4install" class="md-accent" :md-diameter="40" md-mode="indeterminate"></md-progress-spinner>
+      <div v-if="downloading_plugin && !plugin4install"  class="md-toolbar-section-center">
+        <div style="padding-right: 30px;" class="loading loading-lg"></div>
+      </div>
       <h2 v-if="downloading_error">&nbsp;&nbsp;{{downloading_error}}</h2>
       <md-card  v-if="plugin4install">
         <md-card-media v-if="plugin4install.cover&&(typeof plugin4install.cover === 'string')" md-ratio="16:9">
@@ -1976,6 +1981,10 @@ export default {
   #engine-file-dialog{
     min-height: 400px!important;
   }
+}
+
+#engine-file-dialog{
+  z-index: 999;
 }
 
 @media screen and (max-height: 900px) {
