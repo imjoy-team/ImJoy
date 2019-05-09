@@ -791,6 +791,7 @@ export class PluginManager {
         const template = this.parsePluginCode(pconfig.code, pconfig)
         template._id = pconfig._id
         template.engine_mode = pconfig.engine_mode
+        template.engine = null
 
         if(template.type === 'collection'){
           return
