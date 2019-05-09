@@ -1978,6 +1978,10 @@ export default {
   }
 }
 
+#engine-file-dialog{
+  z-index: 999;
+}
+
 @media screen and (max-height: 900px) {
   .plugin-dialog {
     max-height: 100%;
