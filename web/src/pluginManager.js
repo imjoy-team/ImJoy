@@ -789,8 +789,6 @@ export class PluginManager {
       try {
         this.unloadPlugin(pconfig, true)
         const template = this.parsePluginCode(pconfig.code, pconfig)
-        template._id = pconfig._id
-        template.engine_mode = pconfig.engine_mode
         template.engine = null
 
         if(template.type === 'collection'){
@@ -826,11 +824,9 @@ export class PluginManager {
     return new Promise((resolve, reject) => {
       const code = pconfig.code
       try {
-        const template = this.parsePluginCode(code, {tag: pconfig.tag})
+        const template = this.parsePluginCode(code, {tag: pconfig.tag, origin: pconfig.origin, engine_mode: pconfig.engine_mode})
         template.code = code
-        template.origin = pconfig.origin
         template._id = template.name.replace(/ /g, '_')
-        template.engine_mode = pconfig.engine_mode
         const addPlugin = (template) => {
           this.db.put(template).then(() => {
             for (let i = 0; i < this.installed_plugins.length; i++) {
@@ -906,7 +902,8 @@ export class PluginManager {
         config.tag = tag || null
       } else {
         const pluginComp = parseComponent(code)
-        config = JSON.parse(pluginComp.config[0].content)
+        const config_ = JSON.parse(pluginComp.config[0].content)
+        config = Object.assign(config_, config)
         config.scripts = []
         for (let i = 0; i < pluginComp.script.length; i++) {
           config.scripts.push(pluginComp.script[i])
