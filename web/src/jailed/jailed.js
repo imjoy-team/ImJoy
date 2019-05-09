@@ -1139,13 +1139,13 @@ DynamicPlugin.prototype._requestRemote =
        Plugin.prototype._requestRemote = function() {
     var me = this;
     this._site.onRemoteUpdate(function(){
+        me._disconnected = false
+        me.initializing = false
+        me._updateUI()
         me.remote = me._site.getRemote();
         me.api = me.remote;
         me.api.__jailed_type__ = 'plugin_api';
         me.api.__id__ = me.id;
-        me._disconnected = false
-        me.initializing = false
-        me._updateUI()
         me._connect.emit();
     });
 
@@ -1232,16 +1232,18 @@ DynamicPlugin.prototype.terminate =
     }
 
     try {
-      if(this.api && this.api.exit && typeof this.api.exit == 'function'){
-        await this.api.exit()
+      if(this.config.engine && this.config.engine.role === 'admin'){
+        if(this.api && this.api.exit && typeof this.api.exit == 'function'){
+          await this.api.exit()
+        }
       }
     } catch (e) {
       console.error('error occured when terminating the plugin',e)
     }
     finally{
       this._set_disconnected()
-      if(this._site) {this._site.disconnect(); this._site = null }
-      if(this._connection) {this._connection.disconnect(); this._connection = null }
+      if(this._site) {this._site.disconnect(); }
+      if(this._connection) {this._connection.disconnect();}
     }
 
 }

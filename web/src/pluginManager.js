@@ -1058,6 +1058,7 @@ export class PluginManager {
   }
 
   loadPlugin(template, rplugin) {
+    template.engine = null
     template = _clone(template)
     this.validatePluginConfig(template)
     //generate a random id for the plugin
@@ -1397,6 +1398,7 @@ export class PluginManager {
   register(plugin, config) {
     try {
       if(!plugin) throw "Plugin not found."
+      config.engine = null
       config = _clone(config)
       config.name = config.name || plugin.name
       config.show_panel = config.show_panel || false

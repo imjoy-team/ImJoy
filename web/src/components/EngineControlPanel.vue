@@ -169,7 +169,7 @@
                 {{p.name}}  
                 <md-icon>cloud_download</md-icon>
               </md-button>
-              <md-button @click.stop="unPublishPlugin(selected_engine, p)" v-if="selected_engine.role==='admin'" class="md-icon-button md-accent small-icon-button">
+              <md-button @click.stop="unPublishPlugin(selected_engine, p)" v-if="selected_engine.role==='admin'" class="md-icon-button md-accent big-icon-button">
                 <md-icon>clear</md-icon>
               </md-button>
             </li>
@@ -283,7 +283,9 @@ export default {
         if(ret && ret.success){
           ret.plugin_list = ret.plugin_list || []
           for(let p of ret.plugin_list){
-            await this.pluginManager.reloadPlugin({code: p.code}, {id: p.id, publish_id: p.publish_id, engine: engine.url, plugin_token: plugin_token})
+            await this.pluginManager.reloadPlugin({code: p.code}, {id: p.id, publish_id: p.publish_id, engine: engine.url, plugin_token: plugin_token}).then(()=>{
+              this.$forceUpdate()
+            })
           }
           
         }
@@ -362,5 +364,10 @@ export default {
   min-width: 24px!important;
   height: 24px!important;
   margin: 0 2px;
+}
+
+.big-icon-button {
+  width: 48px;
+  height: 48px;
 }
 </style>
