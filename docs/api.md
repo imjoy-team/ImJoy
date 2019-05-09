@@ -188,29 +188,6 @@ await api.alert('hello world')
 ```
 [Try yourself >>](https://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:alert&w=examples)
 
-### api.prompt
-
-```javascript
-const anwser = await api.prompt(question, default_anwser)
-```
-
-Shows a prompt to ask the user input.
-
-**Arguments**
-
-* **question**: String. Contains the question to be displayed.
-
-* **default_anwser** (optional): String. Contains the default anwser to the question.
-
-**Returns**
-* **anwser**: Boolean. The anwser from the user.
-
-**Example**
-```javascript
-const anwser = await api.prompt('What is your name?')
-```
-<!--****[TODO] add example **-->
-
 ### api.confirm
 
 ```javascript
@@ -849,6 +826,29 @@ api.progress(85)
 ```
 [Try yourself >>](https://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:progress&w=examples)
 
+
+### api.prompt
+
+```javascript
+const anwser = await api.prompt(question, default_anwser)
+```
+
+Shows a prompt to ask the user input.
+
+**Arguments**
+
+* **question**: String. Contains the question to be displayed.
+
+* **default_anwser** (optional): String. Contains the default answer to the question.
+
+**Returns**
+* **anwser**: String. The user provided answer.
+
+**Example**
+```javascript
+const anwser = await api.prompt('What is your name?')
+```
+[Try yourself >>](https://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:prompt&w=examples)
 
 ### api.register
 ```javascript
