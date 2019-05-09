@@ -279,10 +279,8 @@ export default {
     },
     loadPublishedPlugin(engine, p){
       const plugin_token = prompt('Plugin token?')
-      console.log('====================================load published=', p)
       engine.getPublicationInfo({publish_id: p.publish_id, token: plugin_token}).then(async (ret)=>{
         if(ret && ret.success){
-          console.log('=====================================', ret.plugin_list)
           ret.plugin_list = ret.plugin_list || []
           for(let p of ret.plugin_list){
             await this.pluginManager.reloadPlugin({code: p.code}, {id: p.id, publish_id: p.publish_id, engine: engine.url, plugin_token: plugin_token})

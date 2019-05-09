@@ -811,7 +811,6 @@ export class PluginManager {
         }
         this.unloadPlugin(template, true)
         let p
-        console.log('==========================', template, rplugin)
 
         if (template.type === 'window' || template.type === 'web-python-window') {
           p = this.preLoadPlugin(template, rplugin)
@@ -1101,7 +1100,6 @@ export class PluginManager {
       tconfig.workspace = this.selected_workspace
       tconfig.plugin_token = rplugin && rplugin.plugin_token
       const _interface = _.assign({TAG: tconfig.tag, WORKSPACE: this.selected_workspace, ENGINE_URL: config.engine && config.engine.url}, this.imjoy_api)
-      console.log('=============================================xxx', tconfig, _interface, this.fm.api)
       const plugin = new DynamicPlugin(tconfig, _interface, this.fm.api)
       plugin.whenConnected(() => {
         if (!plugin.api) {

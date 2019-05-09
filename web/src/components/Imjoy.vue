@@ -1428,7 +1428,6 @@ export default {
       }
     },
     async publishPlugin(plugin){
-      console.log('x-==============================', plugin,plugin.config.publish_id)
       assert(this.publish_config.engine)
       const engine = this.em.getEngineByUrl(this.publish_config.engine)
       assert(engine, 'engine not found')
@@ -1443,7 +1442,6 @@ export default {
         const p = Object.values(this.pm.plugins).filter((p)=>{p.name === plugin_config_dependencies[i].name})[0] || plugin_config_dependencies[i]
         plugin_config_dependencies[i] = {id: p.id, name: p.name, code: p.code}
       }
-      console.log('===========publishing', {id: plugin.id, publish_id: publish_id, name: plugin.name, plugin_list: plugin_config_dependencies})
       const ret = await engine.publishPlugin({id: plugin.id, publish_id: publish_id, name: plugin.name, plugin_list: plugin_config_dependencies})
       if(ret && ret.success){
         plugin.config.publish_id = ret.publish_id
