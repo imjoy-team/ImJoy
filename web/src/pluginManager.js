@@ -525,6 +525,7 @@ export class PluginManager {
 
   reloadPlugins(skip_native_python=false) {
     return new Promise((resolve, reject) => {
+      console.log('reloading all plugins...')
       if (this.plugins) {
         for (let k in this.plugins) {
           if (this.plugins.hasOwnProperty(k)) {
@@ -566,6 +567,7 @@ export class PluginManager {
               })
             }
           }
+          console.log('plugins loaded.')
           resolve()
         }).catch((err) => {
           console.error(err)
@@ -773,7 +775,7 @@ export class PluginManager {
               plugin._unloaded = true
               this.unregister(plugin)
               if (typeof plugin.terminate === 'function') {
-                plugin.terminate().then(()=>{this.update_ui_callback()})
+                plugin.terminate().finally(()=>{this.update_ui_callback()})
               }
             } catch (e) {
               console.error(e)
@@ -783,7 +785,7 @@ export class PluginManager {
     }
     this.unregister(_plugin)
     if (typeof _plugin.terminate === 'function') {
-      _plugin.terminate().then(()=>{this.update_ui_callback()})
+      _plugin.terminate().finally(()=>{this.update_ui_callback()})
     }
   }
 
@@ -862,28 +864,41 @@ export class PluginManager {
     })
   }
 
-  reloadPythonPlugins(engine){
+  async reloadPythonPlugins(engine){
 
     for(let p of this.installed_plugins){
-      if(p.type === 'native-python' && p.engine_mode === engine.id){
-        this.reloadPlugin(p)
+      if(p.type !== 'native-python'){
+        continue
       }
-      else if(p.type === 'native-python' && (!p.engine_mode || p.engine_mode === 'auto') && (!p.plugin || p.plugin._unloaded)){
-        this.reloadPlugin(p)
+      if(p.engine_mode === engine.id){
+        await this.reloadPlugin(p)
+      }
+      else if(!p.engine_mode || p.engine_mode === 'auto'){
+        const running_plugins = Object.values(this.plugins).filter((pl)=>{
+          return pl.name === p.name 
+        }) || []
+
+        const running_plugin = running_plugins[0]
+        if(running_plugin && (!running_plugin.config.engine || (!running_plugin.initializing && running_plugin._disconnected))){
+          await this.reloadPlugin(p)
+        }
+        else if(!running_plugin){
+          await this.reloadPlugin(p)
+        }
       }
     }
   }
 
-  unloadPythonPlugins(engine){
+  async unloadPythonPlugins(engine){
     for (let k in this.plugins) {
       if (this.plugins.hasOwnProperty(k)) {
         const plugin = this.plugins[k]
         if(plugin.type === 'native-python' && plugin.config.engine === engine){
           if(plugin.config.engine_mode === 'auto' && plugin._disconnected && plugin.code){
-            this.reloadPlugin(plugin)
+            await this.reloadPlugin(plugin)
           }
           else{
-            this.unloadPlugin(plugin, false)
+            await this.unloadPlugin(plugin, false)
           }
         }
       }
@@ -1061,10 +1076,15 @@ export class PluginManager {
       config.engine_mode = template.engine_mode || 'auto'
 
       if (template.type === 'native-python') {
-        config.engine = this.em.getEngine(config.engine_mode)
-        if (!config.engine || !config.engine.connected ) {
+        const engine = this.em.getEngine(config.engine_mode)
+        if (!engine || !engine.connected ) {
           console.error("Please connect to the Plugin Engine 🚀.")
+          config.engine = null
         }
+        else{
+          config.engine = engine
+        }
+        
       }
       else{
         config.engine = null
@@ -1079,6 +1099,11 @@ export class PluginManager {
           this.showMessage('Error occured when loading plugin.')
           reject('Error occured when loading plugin.')
           throw 'Error occured when loading plugin.'
+        }
+        if(plugin._unloaded){
+          console.log('WARNING: this plugin is ready but unloaded: '+plugin.id)
+          plugin.terminate().then(()=>{this.update_ui_callback()})
+          return
         }
 
         if (template.type) {
