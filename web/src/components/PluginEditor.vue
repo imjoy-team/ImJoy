@@ -169,6 +169,9 @@ export default {
       await this.save()
       let config = {}
       const plugin = this.window.plugin
+      if(!plugin || !plugin.api){
+        return
+      }
       if(this.window_plugin_id && !this.window.plugin_manager.wm.window_ids[this.window_plugin_id]){
         this.window_plugin_id = null
       }

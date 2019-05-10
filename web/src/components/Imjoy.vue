@@ -1322,6 +1322,7 @@ export default {
       })
     },
     showMessage(info, duration) {
+      assert(typeof info === 'string')
       this.snackbar_info = info
       if(duration){
         duration = duration * 1000
