@@ -127,7 +127,7 @@
             <li v-show="selected_engine.plugin_processes" v-for="p in selected_engine.plugin_processes" :key="p.pid">
               &nbsp;&nbsp;
               {{p.name}} (#{{p.pid}})
-              <md-button @click.stop="kill(selected_engine, p)" class="md-icon-button md-accent">
+              <md-button @click.stop="kill(selected_engine, p)" class="md-icon-button md-accent small-icon-button">
                 <md-icon>clear</md-icon>
               </md-button>
             </li>
@@ -137,9 +137,8 @@
               </md-button>
             </li>
             <li :disabled="true" v-if="selected_engine.plugin_num>1">
-              <span>&nbsp;&nbsp;{{selected_engine.plugin_num}} Running Plugins</span>
-              <md-button @click.stop="kill(selected_engine)" class="md-icon-button md-accent">
-                <md-icon>clear</md-icon>
+              <md-button @click.stop="kill(selected_engine)" class="md-accent ">
+                <md-icon>clear</md-icon> Kill All ({{selected_engine.plugin_num}} Running Plugins)
               </md-button>
             </li>
           </ul>
@@ -276,5 +275,11 @@ export default {
 
 .platform-info>p{
  margin: 3px;
+}
+
+.small-icon-button{
+  width: 22px!important;
+  min-width: 22px!important;
+  height: 22px!important;
 }
 </style>

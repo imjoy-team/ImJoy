@@ -567,9 +567,8 @@ var SocketioConnectionWeb = function() {
         // console.log('message_to_plugin_'+this.id, {type: 'message', data: data})
       }
       else{
-        console.error('socketio disconnected.')
+        throw 'socketio disconnected.'
       }
-
     }
 
 
@@ -1223,7 +1222,6 @@ DynamicPlugin.prototype.whenFailed =
 DynamicPlugin.prototype.whenConnected =
        Plugin.prototype.whenConnected = function(handler) {
     this._connect.whenEmitted(handler);
-
 }
 
 

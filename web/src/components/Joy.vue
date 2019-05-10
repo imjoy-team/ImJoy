@@ -38,7 +38,7 @@ export default {
   },
   watch: {
     config: () => {
-      this.setupJoy&&this.setupJoy()
+      this.setupJoy()
     }
   },
   methods: {
@@ -49,36 +49,39 @@ export default {
       if(!reset && this.joy){
         this.config.data = this.joy.top.data
       }
-      this.$refs.editor.innerHTML = ''
-      const joy_config = {
-        // Where the Joy editor goes:
-        container: this.$refs.editor,
+      this.$nextTick(()=>{
+        this.$refs.editor.innerHTML = ''
+        const joy_config = {
+          // Where the Joy editor goes:
+          container: this.$refs.editor,
 
-        // The words & ops inside the editor:
-        init: this.config.ui || '', //"{id:'localizationWorkflow', type:'ops'} " + // a list of ops
-        //"<hr> {type:'save'}", // a save button!
+          // The words & ops inside the editor:
+          init: this.config.ui || '', //"{id:'localizationWorkflow', type:'ops'} " + // a list of ops
+          //"<hr> {type:'save'}", // a save button!
 
-        // Load data from URL, otherwise blank:
-        data: this.config.data, // || Joy.loadFromURL(),
+          // Load data from URL, otherwise blank:
+          data: this.config.data, // || Joy.loadFromURL(),
 
-        // Other ops to include, beyond turtle ops:
-        modules: this.config.modules || ["instructions", "math"],
+          // Other ops to include, beyond turtle ops:
+          modules: this.config.modules || ["instructions", "math"],
 
-        onexecute: this.config.onexecute,
-        // What to do when the user makes a change:
-        onupdate: this.config.onupdate,
+          onexecute: this.config.onexecute,
+          // What to do when the user makes a change:
+          onupdate: this.config.onupdate,
 
-      }
-      // console.log('setting up joy ', this.config)
-      try {
-        this.joy = new Joy(joy_config)
-      } catch (e) {
-        console.error('error occured when loading the workflow', e)
-        joy_config.data = ''
-        this.joy = new Joy(joy_config)
-        throw e
-      }
-      this.config.joy = this.joy
+        }
+        // console.log('setting up joy ', this.config)
+        try {
+          this.joy = new Joy(joy_config)
+        } catch (e) {
+          console.error('error occured when loading the workflow', e)
+          joy_config.data = ''
+          this.joy = new Joy(joy_config)
+          throw e
+        }
+        this.config.joy = this.joy
+      })
+      
     },
     runJoy() {
       this.$emit('run', this.joy)

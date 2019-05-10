@@ -10,6 +10,7 @@ export class Engine {
     this.activate = false
     this.connection = 'Disconnected'
     this.client_id = client_id
+    this.socket_id = null
     this.config = config
     this.id = this.config.id
     this.name = this.config.name || this.config.url
@@ -99,9 +100,11 @@ export class Engine {
 
         socket.on('connect', () => {
           clearTimeout(timer)
-          if(this.connection_lost_timer){
+          if(this.connection_lost_timer && this.socket_id === socket.id){
             clearTimeout(this.connection_lost_timer)
             this.connection_lost_timer = null
+            this.showMessage(`Connection to ${this.name} has been recovered`)
+            return
           }
           socket.emit('register_client', {id: this.client_id, token: token, base_url: url, session_id: this.engine_session_id}, (ret)=>{
             if(ret && ret.success){
@@ -109,6 +112,7 @@ export class Engine {
                 this.engine_info = ret.engine_info || {}
                 this.engine_info.api_version = this.engine_info.api_version || '0.1.0'
                 this.socket = socket
+                this.socket_id = socket.id
                 this.connected = true
                 this.connected_url_token_ = url + token
                 //this.show_engine_callback(false, this)
@@ -179,12 +183,14 @@ export class Engine {
             //wait for 10s to see if it recovers
             this.connection_lost_timer = setTimeout(() => {
               this.showMessage('Timeout, connection failed to recover.')
-              this.socket = null
-              this.connected = false
-              this.event_bus.$emit('engine_disconnected', this)
-              this.connection = 'Disconnected.'
-              this.update_ui_callback()
-            }, 10000)
+              if(this.connected){
+                this.socket = null
+                this.connected = false
+                this.event_bus.$emit('engine_disconnected', this)
+                this.connection = 'Disconnected.'
+                this.update_ui_callback()
+              }
+            }, 5000)
           }
         });
     })

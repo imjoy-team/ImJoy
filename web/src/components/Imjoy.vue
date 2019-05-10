@@ -236,10 +236,10 @@
                 <md-menu-item @click="editPlugin(plugin.id)">
                   <md-icon>edit</md-icon>Edit
                 </md-menu-item>
-                <md-menu-item @click="pm.reloadPlugin(plugin.config)">
+                <md-menu-item @click="reloadPlugin(plugin.config)">
                   <md-icon>autorenew</md-icon>Reload
                 </md-menu-item>
-                <md-menu-item @click="pm.unloadPlugin(plugin)">
+                <md-menu-item @click="unloadPlugin(plugin)">
                   <md-icon>clear</md-icon>Terminate
                 </md-menu-item>
                 <md-menu-item v-if="plugin.config.origin" @click="updatePlugin(plugin.id)">
@@ -264,7 +264,7 @@
               </md-menu-content>
             </md-menu>
 
-            <md-button class="joy-run-button" :class="plugin.running?'md-accent':(plugin._disconnected && plugin.type === 'native-python'? 'disconnected-plugin': 'md-primary')" :disabled="plugin._disconnected && plugin.type != 'native-python'" @click="plugin._disconnected?connectPlugin(plugin):runOp(plugin.ops[plugin.name])">
+            <md-button class="joy-run-button" :class="plugin.running?'busy-plugin':(plugin._disconnected && plugin.type === 'native-python'? 'md-accent': 'md-primary')" :disabled="plugin._disconnected && plugin.type != 'native-python'" @click="plugin._disconnected?connectPlugin(plugin):runOp(plugin.ops[plugin.name])">
               {{plugin.type === 'native-python'? plugin.name + ' 🚀': ( plugin.type === 'web-python' || plugin.type === 'web-python-window' ? plugin.name + ' 🐍': plugin.name) }}
             </md-button>
 
@@ -319,10 +319,10 @@
                   <md-menu-item @click="editPlugin(plugin.id)">
                     <md-icon>edit</md-icon>Edit
                   </md-menu-item>
-                  <md-menu-item @click="pm.reloadPlugin(plugin.config)">
+                  <md-menu-item @click="reloadPlugin(plugin.config)">
                     <md-icon>autorenew</md-icon>Reload
                   </md-menu-item>
-                  <md-menu-item @click="pm.unloadPlugin(plugin)">
+                  <md-menu-item @click="unloadPlugin(plugin)">
                     <md-icon>clear</md-icon>Terminate
                   </md-menu-item>
                   <md-menu-item v-if="plugin.config.origin" @click="updatePlugin(plugin.id)">
@@ -334,7 +334,7 @@
                 </md-menu-content>
               </md-menu>
 
-              <md-button class="joy-run-button" :class="plugin.running?'md-accent':(plugin._disconnected && plugin.type === 'native-python'? 'disconnected-plugin': '')" :disabled="plugin.type != 'native-python' || !plugin._disconnected" @click="connectPlugin(plugin)">
+              <md-button class="joy-run-button" :class="plugin.running? 'busy-plugin':(plugin._disconnected && plugin.type === 'native-python'? 'md-accent' : '')" :disabled="plugin.type != 'native-python' || !plugin._disconnected" @click="connectPlugin(plugin)">
                 {{plugin.type === 'native-python'? plugin.name + ' 🚀': plugin.name}}
               </md-button>
               <md-button class="md-icon-button" :disabled="true">
@@ -913,10 +913,10 @@ export default {
     }
     else {
       this.startImJoy().then(()=>{
-        /* global gtag window */
-        if(gtag){
+        /* global window */
+        if(window.gtag){
           // CAREFUL: DO NOT SEND ANY QUERY STRING, ONLY LOCATION AND PATH
-          gtag('config', 'UA-134837258-1', {'page_location': location.href.split('#')[0], 'page_path': '/#/app'})
+          window.gtag('config', 'UA-134837258-1', {'page_location': location.href.split('#')[0], 'page_path': '/#/app'})
         }
       })
     }
@@ -1448,6 +1448,16 @@ export default {
       else{
         alert('Origin not found for this plugin.')
       }
+    },
+    reloadPlugin(config){
+      this.pm.reloadPlugin(config).finally(()=>{
+        this.$forceUpdate()
+      })
+    },
+    unloadPlugin(plugin){
+      this.pm.unloadPlugin(plugin).finally(()=>{
+        this.$forceUpdate()
+      })
     },
     editPlugin(pid) {
       const plugin = this.pm.plugins[pid]
@@ -2160,7 +2170,7 @@ button.md-speed-dial-target {
   margin: 1px;
 }
 
-.disconnected-plugin{
+.busy-plugin{
   color: orange!important;
 }
 
