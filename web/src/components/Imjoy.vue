@@ -1472,6 +1472,7 @@ export default {
     },
     closePluginDialog(ok) {
       this.showPluginDialog = false
+      this.plugin_dialog_window_config = null 
       if(this.plugin_dialog_promise){
         let [resolve, reject] = this.plugin_dialog_promise
         if (ok) {
