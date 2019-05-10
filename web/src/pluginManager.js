@@ -1587,19 +1587,46 @@ export class PluginManager {
         wconfig.id = 'imjoy_'+randId()
         wconfig.window_type = wconfig.type
         wconfig.name = wconfig.name || 'untitled window'
-        this.wm.addWindow(wconfig).then((wid)=>{
+        if(wconfig.window_container === 'window_dialog_container' && wconfig.render){
+          wconfig.render(wconfig)
           const window_plugin_apis = {
             __jailed_type__: 'plugin_api',
-            __id__: wid,
-            run: (wconfig)=>{
-              const w = this.wm.window_ids[wid]
-              for(let k in wconfig){
-                w[k] = wconfig[k]
+            __id__: wconfig.id,
+            run: (config)=>{
+              for(let k in config){
+                wconfig[k] = config[k]
+              }
+            },
+            close: ()=>{
+              if(wconfig.onclose){
+                wconfig.onclose()
               }
             }
           }
           resolve(window_plugin_apis)
-        })
+        }
+        else{
+          this.wm.addWindow(wconfig).then((wid)=>{
+            const window_plugin_apis = {
+              __jailed_type__: 'plugin_api',
+              __id__: wid,
+              run: (wconfig)=>{
+                const w = this.wm.window_ids[wid]
+                for(let k in wconfig){
+                  w[k] = wconfig[k]
+                }
+              },
+              close: ()=>{
+                const w = this.wm.window_ids[wid]
+                if(w.onclose){
+                  w.onclose()
+                }
+              }
+            }
+            resolve(window_plugin_apis)
+          })
+        }
+        
       } else {
         const window_config = this.registered.windows[wconfig.type]
         if (!window_config) {
