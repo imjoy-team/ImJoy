@@ -887,8 +887,8 @@ export class PluginManager {
     }
   }
 
-  parsePluginCode(code, config) {
-    config = config || {}
+  parsePluginCode(code, overwrite_config) {
+    let config = {}
     const uri = config.uri
     const tag = config.tag
     const origin = config.origin
@@ -902,8 +902,7 @@ export class PluginManager {
         config.tag = tag || null
       } else {
         const pluginComp = parseComponent(code)
-        const config_ = JSON.parse(pluginComp.config[0].content)
-        config = Object.assign(config_, config)
+        config = JSON.parse(pluginComp.config[0].content)
         config.scripts = []
         for (let i = 0; i < pluginComp.script.length; i++) {
           config.scripts.push(pluginComp.script[i])
@@ -959,6 +958,8 @@ export class PluginManager {
           config.scripts[i].attrs.lang = config.lang
         }
       }
+  
+      config = Object.assign(config, overwrite_config)
   
       config = upgradePluginAPI(config)
       if (!PLUGIN_SCHEMA(config)) {
@@ -1584,23 +1585,51 @@ export class PluginManager {
         wconfig.id = 'imjoy_'+randId()
         wconfig.window_type = wconfig.type
         wconfig.name = wconfig.name || 'untitled window'
-        this.wm.addWindow(wconfig).then((wid)=>{
+        if(wconfig.window_container === 'window_dialog_container' && wconfig.render){
+          wconfig.render(wconfig)
           const window_plugin_apis = {
             __jailed_type__: 'plugin_api',
-            __id__: wid,
-            run: (wconfig)=>{
-              const w = this.wm.window_ids[wid]
-              for(let k in wconfig){
-                w[k] = wconfig[k]
+            __id__: wconfig.id,
+            run: (config)=>{
+              for(let k in config){
+                wconfig[k] = config[k]
+              }
+            },
+            close: ()=>{
+              if(wconfig.onclose){
+                wconfig.onclose()
               }
             }
           }
           resolve(window_plugin_apis)
-        })
+        }
+        else{
+          this.wm.addWindow(wconfig).then((wid)=>{
+            const window_plugin_apis = {
+              __jailed_type__: 'plugin_api',
+              __id__: wid,
+              run: (wconfig)=>{
+                const w = this.wm.window_ids[wid]
+                for(let k in wconfig){
+                  w[k] = wconfig[k]
+                }
+              },
+              close: ()=>{
+                const w = this.wm.window_ids[wid]
+                if(w.onclose){
+                  w.onclose()
+                }
+              }
+            }
+            resolve(window_plugin_apis)
+          })
+        }
+        
       } else {
         const window_config = this.registered.windows[wconfig.type]
         if (!window_config) {
           console.error('no plugin registered for window type: ', wconfig.type)
+          reject('no plugin registered for window type: ', wconfig.type)
           throw 'no plugin registered for window type: ', wconfig.type
         }
         const pconfig = wconfig
