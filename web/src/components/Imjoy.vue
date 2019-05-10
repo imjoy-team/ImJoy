@@ -199,7 +199,7 @@
           </md-button>
         </md-card-header>
          <md-card-content>
-          <div id="workflow-panel" v-show="workflow_expand" v-if="pm && show_workflow">
+          <div id="workflow-panel" v-show="workflow_expand" v-if="pm">
             <joy :config="workflow_joy_config" ref="workflow" v-if="plugin_loaded"></joy>
             <p>
               <md-button class="md-button" v-if="plugin_loaded" @click="runWorkflow(workflow_joy_config.joy)">
@@ -673,7 +673,6 @@ export default {
       showWorkspaceDialog: false,
       showWelcomeDialog: false,
       show_file_dialog: false,
-      show_workflow: false,
       plugins: null,
       registered: null,
       menuVisible: false,
@@ -978,7 +977,6 @@ export default {
         if(this.$route.query.engine && this.$route.query.start){
           const en = this.em.getEngineByUrl(this.$route.query.engine)
           const pl = this.pm.installed_plugins[this.$route.query.start]
-          console.log('==============================', en, pl, this.pm.plugins, this.em.engines)
           if(en && pl){
             console.log(`setting plugin engine of ${pl.name} to ${en.name}`)
             pl.engine_mode = en;
@@ -1065,28 +1063,9 @@ export default {
               this.showAddPluginDialog = true
             }
           }
-
-          this.show_workflow = true
-          if(this.$route.query.workflow){
-            const data = Joy.decodeWorkflow(this.$route.query.workflow)
-            if(data){
-              this.workflow_expand = true
-              this.workflow_joy_config.data = JSON.parse(data)
-              this.$nextTick(()=>{
-                try{
-                  this.$refs.workflow.setupJoy(true)
-                  const query = Object.assign({}, this.$route.query);
-                  delete query.workflow;
-                  this.$router.replace({ query });
-                }
-                catch(e){
-                  console.error(e)
-                  this.showMessage('Failed to load workflow: ' + e)
-                }
-              })
-            }
-            else{
-              console.log('failed to workflow')
+          else{
+            if(this.$route.query.workflow){
+              this.loadWorkfowFromUrl()
             }
           }
 
@@ -1574,11 +1553,37 @@ export default {
         this.showMessage(e.toString() || "Error." , 12)
       })
     },
-
     loadWorkflow(w) {
       this.workflow_joy_config.data = JSON.parse(w.workflow)
-      console.log('===================load workflow', this.workflow_joy_config.data)
       this.$refs.workflow.setupJoy(true)
+    },
+    loadWorkfowFromUrl(){
+      const data = Joy.decodeWorkflow(this.$route.query.workflow)
+      if(data){
+        try{
+           this.workflow_expand = true
+          this.workflow_joy_config.data = JSON.parse(data)
+          this.$nextTick(()=>{
+            try{
+              this.$refs.workflow.setupJoy(true)
+              const query = Object.assign({}, this.$route.query);
+              delete query.workflow;
+              this.$router.replace({ query });
+            }
+            catch(e){
+              console.error(e)
+              this.showMessage('Failed to load workflow: ' + e)
+            }
+          })
+        }
+        catch(e){
+          console.error(e)
+          this.showMessage('Failed to parse workflow: ' + e)
+        }
+      }
+      else{
+        console.log('failed to workflow')
+      }
     },
     shareWorkflow(w) {
       const url = Joy.encodeWorkflow(w.workflow)
