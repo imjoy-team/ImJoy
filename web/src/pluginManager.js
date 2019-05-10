@@ -523,7 +523,7 @@ export class PluginManager {
     }
   }
 
-  reloadPlugins() {
+  reloadPlugins(skip_native_python=false) {
     return new Promise((resolve, reject) => {
       if (this.plugins) {
         for (let k in this.plugins) {
@@ -557,6 +557,9 @@ export class PluginManager {
             } else {
               config.installed = true
               this.installed_plugins.push(config)
+              if(skip_native_python && config.type === 'native-python'){
+                continue
+              }
               this.reloadPlugin(config).catch((e)=>{
                 console.error(config, e)
                 this.showMessage(`<${config.name}>: ${e}`)

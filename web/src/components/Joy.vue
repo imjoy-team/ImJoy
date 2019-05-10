@@ -76,6 +76,7 @@ export default {
         console.error('error occured when loading the workflow', e)
         joy_config.data = ''
         this.joy = new Joy(joy_config)
+        throw e
       }
       this.config.joy = this.joy
     },
