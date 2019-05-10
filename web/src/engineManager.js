@@ -183,12 +183,14 @@ export class Engine {
             //wait for 10s to see if it recovers
             this.connection_lost_timer = setTimeout(() => {
               this.showMessage('Timeout, connection failed to recover.')
-              this.socket = null
-              this.connected = false
-              this.event_bus.$emit('engine_disconnected', this)
-              this.connection = 'Disconnected.'
-              this.update_ui_callback()
-            }, 10000)
+              if(this.connected){
+                this.socket = null
+                this.connected = false
+                this.event_bus.$emit('engine_disconnected', this)
+                this.connection = 'Disconnected.'
+                this.update_ui_callback()
+              }
+            }, 5000)
           }
         });
     })

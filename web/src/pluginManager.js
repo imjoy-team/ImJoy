@@ -761,7 +761,7 @@ export class PluginManager {
     })
   }
 
-  unloadPlugin(_plugin, temp_remove){
+  async unloadPlugin(_plugin, temp_remove){
     const name = _plugin.name
     for (let k in this.plugins) {
       if (this.plugins.hasOwnProperty(k)) {
@@ -775,7 +775,16 @@ export class PluginManager {
               plugin._unloaded = true
               this.unregister(plugin)
               if (typeof plugin.terminate === 'function') {
-                plugin.terminate().finally(()=>{this.update_ui_callback()})
+                try{
+                  await plugin.terminate()
+                }
+                catch(e){
+                  console.error(e)
+                }
+                finally{
+                  this.update_ui_callback()
+                }
+                
               }
             } catch (e) {
               console.error(e)
@@ -1228,8 +1237,7 @@ export class PluginManager {
               }
               resolve(plugin)
             }).catch((e) => {
-              console.error('Error in the run function of plugin ' + plugin.name, e)
-              plugin.error(`<${plugin.name}>: (e.toString() || "Error.")`)
+              plugin.error(`<${plugin.name}>: (${e.toString()} || "Error.")`)
               reject(e)
             })
           }
@@ -1237,14 +1245,12 @@ export class PluginManager {
             resolve(plugin)
           }
         }).catch((e) => {
-          console.error('Error occured when loading the window plugin ' + pconfig.name + ": ", e)
           plugin.error(`Error occured when loading the window plugin ${pconfig.name}: ${e.toString()}`)
           plugin.terminate().then(()=>{this.update_ui_callback()})
           reject(e)
         })
       });
       plugin.whenFailed((e) => {
-        console.error('error occured when loading ' + pconfig.name + ":", e)
         plugin.error(`Error occured when loading ${pconfig.name}: ${e}.`)
         plugin.terminate().then(()=>{this.update_ui_callback()})
         reject(e)
