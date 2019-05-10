@@ -23,10 +23,10 @@
             <md-button v-else @click.stop="expand(engine)" class="md-icon-button md-primary">
               <md-icon>autorenew</md-icon>
             </md-button>
-            <span>{{engine.url.replace(local_engine_url, 'My Computer')}}</span>
+            <span>{{engine.name}}</span>
           </md-menu-item>
           <md-menu-item v-else @click.stop="engine.connect(false)">
-            <md-icon>sync_disabled</md-icon> {{engine.url.replace(local_engine_url, 'My Computer')}}
+            <md-icon>sync_disabled</md-icon> {{engine.name}}
             <md-tooltip>Connect to {{engine.name}} </md-tooltip>
           </md-menu-item>
           <div v-if="engine.connected && engine.show_processes">

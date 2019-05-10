@@ -12,7 +12,9 @@ export class Engine {
     this.client_id = client_id
     this.config = config
     this.id = this.config.id
-    this.name = this.config.name
+    this.name = this.config.name || this.config.url
+    this.name = this.name.replace('http://127.0.0.1:9527', 'My Computer')
+    this.config.name = this.name
     this.url = this.config.url
     this.token = this.config.token
 
@@ -71,6 +73,8 @@ export class Engine {
         this.connection = 'Connecting...'
 
         this.name = this.config.name || url
+        this.name = this.name.replace('http://127.0.0.1:9527', 'My Computer')
+      
         this.disconnecting = false
         this.engine_session_id = randId()
         if(!auto) this.showMessage('Trying to connect to the plugin engine...')

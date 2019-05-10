@@ -19,8 +19,8 @@
     <ul v-if="open&&isFolder">
       <file-item
         class="item"
-        v-for="(model, index) in model.children.slice(0, 300)"
-        :key="index"
+        v-for="model in model.children.slice(0, max_files)"
+        :key="model.name"
         :root="root+'/'+model.name"
         :model="model"
         :selected="selected"
@@ -28,11 +28,13 @@
         @select="select($event)"
         @select_append="select($event, true)">
       </file-item>
+      <md-button v-if="model.children.length>max_files" class="md-primary" @click="max_files=max_files+200">Load more ...</md-button>
     </ul>
   </li>
 </template>
 <script>
 
+const DEFAULT_MAX = 200
 
 export default {
   name: 'file-item',
@@ -44,7 +46,8 @@ export default {
    },
    data: function () {
      return {
-       open: true
+       open: true,
+       max_files: DEFAULT_MAX
      }
    },
    mounted(){
@@ -61,6 +64,7 @@ export default {
      },
      load(m){
        this.$emit('load', m || {target: this.model, path: this.root, engine: this.engine})
+       this.max_files = DEFAULT_MAX
      },
      select(m, append){
        // this.model.selected = !this.model.selected

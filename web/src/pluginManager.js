@@ -523,7 +523,7 @@ export class PluginManager {
     }
   }
 
-  reloadPlugins() {
+  reloadPlugins(skip_native_python=false) {
     return new Promise((resolve, reject) => {
       if (this.plugins) {
         for (let k in this.plugins) {
@@ -557,6 +557,9 @@ export class PluginManager {
             } else {
               config.installed = true
               this.installed_plugins.push(config)
+              if(skip_native_python && config.type === 'native-python'){
+                continue
+              }
               this.reloadPlugin(config).catch((e)=>{
                 console.error(config, e)
                 this.showMessage(`<${config.name}>: ${e}`)
@@ -788,9 +791,7 @@ export class PluginManager {
     return new Promise((resolve, reject) => {
       try {
         this.unloadPlugin(pconfig, true)
-        const template = this.parsePluginCode(pconfig.code, pconfig)
-        template._id = pconfig._id
-        template.engine_mode = pconfig.engine_mode
+        const template = this.parsePluginCode(pconfig.code, {engine_mode: pconfig.engine_mode, tag: pconfig.tag, _id: pconfig._id, origin: pconfig.origin})
         template.engine = null
 
         if(template.type === 'collection'){
@@ -826,11 +827,9 @@ export class PluginManager {
     return new Promise((resolve, reject) => {
       const code = pconfig.code
       try {
-        const template = this.parsePluginCode(code, {tag: pconfig.tag})
+        const template = this.parsePluginCode(code, {tag: pconfig.tag, origin: pconfig.origin, engine_mode: pconfig.engine_mode})
         template.code = code
-        template.origin = pconfig.origin
         template._id = template.name.replace(/ /g, '_')
-        template.engine_mode = pconfig.engine_mode
         const addPlugin = (template) => {
           this.db.put(template).then(() => {
             for (let i = 0; i < this.installed_plugins.length; i++) {
@@ -891,8 +890,8 @@ export class PluginManager {
     }
   }
 
-  parsePluginCode(code, config) {
-    config = config || {}
+  parsePluginCode(code, overwrite_config) {
+    let config = {}
     const uri = config.uri
     const tag = config.tag
     const origin = config.origin
@@ -962,6 +961,8 @@ export class PluginManager {
           config.scripts[i].attrs.lang = config.lang
         }
       }
+  
+      config = Object.assign(config, overwrite_config)
   
       config = upgradePluginAPI(config)
       if (!PLUGIN_SCHEMA(config)) {
@@ -1587,23 +1588,51 @@ export class PluginManager {
         wconfig.id = 'imjoy_'+randId()
         wconfig.window_type = wconfig.type
         wconfig.name = wconfig.name || 'untitled window'
-        this.wm.addWindow(wconfig).then((wid)=>{
+        if(wconfig.window_container === 'window_dialog_container' && wconfig.render){
+          wconfig.render(wconfig)
           const window_plugin_apis = {
             __jailed_type__: 'plugin_api',
-            __id__: wid,
-            run: (wconfig)=>{
-              const w = this.wm.window_ids[wid]
-              for(let k in wconfig){
-                w[k] = wconfig[k]
+            __id__: wconfig.id,
+            run: (config)=>{
+              for(let k in config){
+                wconfig[k] = config[k]
+              }
+            },
+            close: ()=>{
+              if(wconfig.onclose){
+                wconfig.onclose()
               }
             }
           }
           resolve(window_plugin_apis)
-        })
+        }
+        else{
+          this.wm.addWindow(wconfig).then((wid)=>{
+            const window_plugin_apis = {
+              __jailed_type__: 'plugin_api',
+              __id__: wid,
+              run: (wconfig)=>{
+                const w = this.wm.window_ids[wid]
+                for(let k in wconfig){
+                  w[k] = wconfig[k]
+                }
+              },
+              close: ()=>{
+                const w = this.wm.window_ids[wid]
+                if(w.onclose){
+                  w.onclose()
+                }
+              }
+            }
+            resolve(window_plugin_apis)
+          })
+        }
+        
       } else {
         const window_config = this.registered.windows[wconfig.type]
         if (!window_config) {
           console.error('no plugin registered for window type: ', wconfig.type)
+          reject('no plugin registered for window type: ', wconfig.type)
           throw 'no plugin registered for window type: ', wconfig.type
         }
         const pconfig = wconfig

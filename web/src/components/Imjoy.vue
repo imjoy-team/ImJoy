@@ -100,6 +100,9 @@
             <md-menu-item href="/docs/" target="_blank" class="md-primary">
               <md-icon>library_books</md-icon>Documentation
             </md-menu-item>
+            <md-menu-item href="https://github.com/oeway/ImJoy" target="_blank" class="md-primary">
+              <md-icon>code</md-icon>Github
+            </md-menu-item>
             <md-menu-item href="https://forum.image.sc/tags/imjoy" target="_blank" class="md-primary">
               <md-icon>help</md-icon>Help
             </md-menu-item>
@@ -196,7 +199,7 @@
           </md-button>
         </md-card-header>
          <md-card-content>
-          <div id="workflow-panel" v-show="workflow_expand" v-if="pm && show_workflow">
+          <div id="workflow-panel" v-show="workflow_expand" v-if="pm">
             <joy :config="workflow_joy_config" ref="workflow" v-if="plugin_loaded"></joy>
             <p>
               <md-button class="md-button" v-if="plugin_loaded" @click="runWorkflow(workflow_joy_config.joy)">
@@ -363,6 +366,7 @@
   <md-dialog-confirm :md-active.sync="showRemoveConfirmation" md-title="Removing Plugin" md-content="Do you really want to <strong>delete</strong> this plugin" md-confirm-text="Yes" md-cancel-text="Cancel" @md-cancel="showRemoveConfirmation=false" @md-confirm="pm.removePlugin(plugin2_remove);plugin2_remove=null;showRemoveConfirmation=false"/>
   <file-dialog id="engine-file-dialog" ref="file-dialog" :engines="em.engines" :remove-files="removeFiles" :list-files="listFiles" :get-file-url="getFileUrl" :request-upload-url="requestUploadUrl" :download-file-from-url="downloadFileFromUrl" :upload-file-to-url="uploadFileToUrl"></file-dialog>
   <md-dialog :class="plugin_dialog_config && plugin_dialog_config.ui?'':'window-dialog'" :md-active.sync="showPluginDialog" :md-click-outside-to-close="false" :md-close-on-esc="false">
+    <md-dialog-title v-if="plugin_dialog_config && plugin_dialog_config.name">{{plugin_dialog_config.name}}</md-dialog-title>
     <md-dialog-actions v-if="!plugin_dialog_config || !plugin_dialog_config.ui">
       <md-button class="md-accent" @click="closePluginDialog(true)"><md-icon>clear</md-icon></md-button>
     </md-dialog-actions>
@@ -370,7 +374,9 @@
       <div v-if="plugin_dialog_config && plugin_dialog_config.ui">
         <joy :config="plugin_dialog_config" :showHeader="false" :controlButtons="false" ref="plugin_dialog_joy"></joy>
       </div>
-      <div v-else id="window_dialog_container" class="plugin-iframe" />
+      <div v-else id="window_dialog_container" class="plugin-iframe">
+        <window v-if="plugin_dialog_window_config" :w="plugin_dialog_window_config" :withDragHandle="false" @close="closePluginDialog(true)"></window>
+      </div>
     </md-dialog-content>
     <md-dialog-actions v-if="plugin_dialog_config && plugin_dialog_config.ui">
       <md-button class="md-primary" @click="closePluginDialog(true)">OK</md-button>
@@ -424,10 +430,15 @@
       @md-cancel="showPermissionConfirmation=false;processPermission(true)"
       @md-confirm="showPermissionConfirmation=false;processPermission(false)" />
 
-  <md-dialog-alert
-      :md-active.sync="showShareUrl"
-      :md-content="share_url_message"
-      md-confirm-text="Close" />
+  <md-dialog :md-active.sync="showShareUrl" >
+    <md-dialog-title>Sharing Workflow</md-dialog-title>
+    <md-dialog-content>
+      <a :href="share_url_message" style="word-wrap: break-word;" target="_blank">{{share_url_message}} </a>
+    </md-dialog-content>
+    <md-dialog-actions>
+      <md-button class="md-primary" @click="showShareUrl=false;">OK</md-button>
+    </md-dialog-actions>
+  </md-dialog>
 
   <md-dialog style="max-width: 800px; width: 100%; height: 100%;" :md-active.sync="showAboutDialog" :md-click-outside-to-close="false" :md-close-on-esc="false">
     <md-dialog-title>About ImJoy</md-dialog-title>
@@ -473,7 +484,9 @@
           </md-toolbar>
         </md-card-header>
       </md-card>
-      <md-progress-spinner v-if="downloading_plugin && !plugin4install" class="md-accent" :md-diameter="40" md-mode="indeterminate"></md-progress-spinner>
+      <div v-if="downloading_plugin && !plugin4install"  class="md-toolbar-section-center">
+        <div style="padding-right: 30px;" class="loading loading-lg"></div>
+      </div>
       <h2 v-if="downloading_error">&nbsp;&nbsp;{{downloading_error}}</h2>
       <md-card  v-if="plugin4install">
         <md-card-media v-if="plugin4install.cover&&(typeof plugin4install.cover === 'string')" md-ratio="16:9">
@@ -660,7 +673,6 @@ export default {
       showWorkspaceDialog: false,
       showWelcomeDialog: false,
       show_file_dialog: false,
-      show_workflow: false,
       plugins: null,
       registered: null,
       menuVisible: false,
@@ -672,7 +684,8 @@ export default {
       new_workspace_name: '',
       workspace_dropping: false,
       max_window_buttons: 9,
-      installing: false
+      installing: false,
+      plugin_dialog_window_config: null
     }
   },
   watch: {
@@ -927,18 +940,7 @@ export default {
       this.pm.init()
       try{
         await this.em.init()
-        let connection_token = null
-        if(this.$route.query.token || this.$route.query.t){
-          connection_token = (this.$route.query.token || this.$route.query.t).trim()
-          const query = Object.assign({}, this.$route.query);
-          delete query.token;
-          delete query.t;
-          this.$router.replace({ query });
-        }
-        if(this.$route.query.engine || this.$route.query.e){
-          const engine_url = (this.$route.query.engine || this.$route.query.e).trim()
-          this.em.addEngine({type: 'default', url: engine_url, token: connection_token}, true)
-        }
+        
         console.log('Successfully initialized the engine manager.')
       }
       catch(e){
@@ -952,6 +954,7 @@ export default {
       }
       this.repository_list = await this.pm.loadRepositoryList()
       this.pm.selected_repository = this.repository_list[0]
+  
       try {
         const workspace_list = await this.pm.loadWorkspaceList()
         if(this.$route.query.start || this.$route.query.s){
@@ -963,13 +966,47 @@ export default {
 
         const selected_workspace = this.$route.query.workspace || this.$route.query.w || workspace_list[0]
         await this.pm.loadWorkspace(selected_workspace)
+        await this.pm.reloadPlugins(true)
         const connections = this.em.connectAll(true)
-        await this.pm.reloadPlugins()
         try {
           await connections
         } catch (e) {
           console.error(e)
         }
+
+        if(this.$route.query.engine && this.$route.query.start){
+          const en = this.em.getEngineByUrl(this.$route.query.engine)
+          const pl = this.pm.installed_plugins[this.$route.query.start]
+          if(en && pl){
+            console.log(`setting plugin engine of ${pl.name} to ${en.name}`)
+            pl.engine_mode = en;
+            pl.config.engine_mode = en
+          }
+          if(!en){
+            this.showMessage(`Plugin engine ${this.$route.query.engine} not found.`)
+          }
+          if(!pl){
+            this.showMessage(`Plugin ${this.$route.query.start} not found.`)
+          }
+        }
+      
+        let connection_token = null
+        if(this.$route.query.token || this.$route.query.t){
+          connection_token = (this.$route.query.token || this.$route.query.t).trim()
+          const query = Object.assign({}, this.$route.query);
+          delete query.token;
+          delete query.t;
+          this.$router.replace({ query });
+        }
+        if(this.$route.query.engine || this.$route.query.e){
+          const engine_url = (this.$route.query.engine || this.$route.query.e).trim()
+          this.em.addEngine({type: 'default', url: engine_url, token: connection_token}, false).finally(()=>{
+            this.em.getEngineByUrl(engine_url).connect()
+            this.$forceUpdate()
+          })
+        }
+      
+        
         this.plugin_loaded = true
         this.event_bus.$emit('plugins_loaded', this.pm.plugins)
         try {
@@ -1026,19 +1063,9 @@ export default {
               this.showAddPluginDialog = true
             }
           }
-
-          this.show_workflow = true
-          if(this.$route.query.workflow){
-            const data = Joy.decodeWorkflow(this.$route.query.workflow)
-            // const query = Object.assign({}, this.$route.query);
-            // delete query.workflow;
-            // this.$router.replace({ query });
-            if(data){
-              this.workflow_joy_config.data = data
-              this.workflow_expand = true
-            }
-            else{
-              console.log('failed to workflow')
+          else{
+            if(this.$route.query.workflow){
+              this.loadWorkfowFromUrl()
             }
           }
 
@@ -1313,6 +1340,7 @@ export default {
       })
     },
     showMessage(info, duration) {
+      assert(typeof info === 'string')
       this.snackbar_info = info
       if(duration){
         duration = duration * 1000
@@ -1463,6 +1491,7 @@ export default {
     },
     closePluginDialog(ok) {
       this.showPluginDialog = false
+      this.plugin_dialog_window_config = null 
       if(this.plugin_dialog_promise){
         let [resolve, reject] = this.plugin_dialog_promise
         if (ok) {
@@ -1524,10 +1553,37 @@ export default {
         this.showMessage(e.toString() || "Error." , 12)
       })
     },
-
     loadWorkflow(w) {
       this.workflow_joy_config.data = JSON.parse(w.workflow)
       this.$refs.workflow.setupJoy(true)
+    },
+    loadWorkfowFromUrl(){
+      const data = Joy.decodeWorkflow(this.$route.query.workflow)
+      if(data){
+        try{
+           this.workflow_expand = true
+          this.workflow_joy_config.data = JSON.parse(data)
+          this.$nextTick(()=>{
+            try{
+              this.$refs.workflow.setupJoy(true)
+              const query = Object.assign({}, this.$route.query);
+              delete query.workflow;
+              this.$router.replace({ query });
+            }
+            catch(e){
+              console.error(e)
+              this.showMessage('Failed to load workflow: ' + e)
+            }
+          })
+        }
+        catch(e){
+          console.error(e)
+          this.showMessage('Failed to parse workflow: ' + e)
+        }
+      }
+      else{
+        console.log('failed to workflow')
+      }
     },
     shareWorkflow(w) {
       const url = Joy.encodeWorkflow(w.workflow)
@@ -1852,6 +1908,14 @@ export default {
         }
         else if(config.type){
           config.window_container = 'window_dialog_container'
+          config.standalone = true
+          this.plugin_dialog_window_config = null 
+          if(config.type.startsWith('imjoy/')){
+            config.render = (wconfig)=>{
+              this.plugin_dialog_window_config = wconfig
+              this.$forceUpdate()
+            }
+          }
           this.showPluginDialog = true
           this.createWindow(config).then((api)=>{
             const _close = api.close
