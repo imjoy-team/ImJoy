@@ -788,7 +788,7 @@ export class PluginManager {
     return new Promise((resolve, reject) => {
       try {
         this.unloadPlugin(pconfig, true)
-        const template = this.parsePluginCode(pconfig.code, pconfig)
+        const template = this.parsePluginCode(pconfig.code, {engine_mode: pconfig.engine_mode, tag: pconfig.tag, _id: pconfig._id, origin: pconfig.origin})
         template.engine = null
 
         if(template.type === 'collection'){
