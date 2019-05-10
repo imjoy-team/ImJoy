@@ -237,6 +237,18 @@ var basicConnectionNode = function() {
         handler();
     }
 
+    /**
+     * Sets-up the handler to be called upon the BasicConnection
+     * failed.
+     *
+     * For Node.js the connection is fully initialized within the
+     * constructor, so simply calls the provided handler.
+     * 
+     * @param {Function} handler to be called upon connection init
+     */
+    BasicConnection.prototype.whenFailed = function(handler) {
+        handler();
+    }
 
     /**
      * Sends a message to the plugin site
@@ -323,6 +335,7 @@ var basicConnectionWeb = function() {
      */
     BasicConnection = function(id, type, config) {
         this._init = new Whenable;
+        this._fail = new Whenable;
         this._disconnected = false;
         this.id = id;
         var iframe_container = config.iframe_container
@@ -379,7 +392,21 @@ var basicConnectionWeb = function() {
         this._init.whenEmitted(handler);
     }
 
-
+    /**
+     * Sets-up the handler to be called upon the BasicConnection
+     * failed.
+     *
+     * For the web-browser environment, the handler is issued when
+     * the plugin worker successfully imported and executed the
+     * _pluginWebWorker.js or _pluginWebIframe.js, and replied to
+     * the application site with the initImprotSuccess message.
+     *
+     * @param {Function} handler to be called upon connection init
+     */
+    BasicConnection.prototype.whenFailed = function(handler) {
+        this._fail.whenEmitted(handler);
+    }
+    
     /**
      * Sends a message to the plugin site
      *
@@ -443,6 +470,7 @@ var SocketioConnectionWeb = function() {
      */
     SocketioConnection = function(id, type, config) {
         this._init = new Whenable;
+        this._fail = new Whenable;
         this._disconnected = false;
         this.id = id;
         this.engine = config.engine
@@ -487,11 +515,13 @@ var SocketioConnectionWeb = function() {
               else{
                 this._disconnected = true;
                 console.error('failed to initialize plugin on the plugin engine')
+                this._fail.emit('failed to initialize plugin on the plugin engine');
                 throw('failed to initialize plugin on the plugin engine')
               }
             })
           }
           else{
+            this._fail.emit('connection is not established.');
             throw('connection is not established.')
           }
       })
@@ -513,6 +543,16 @@ var SocketioConnectionWeb = function() {
         this._init.whenEmitted(handler);
     }
 
+    /**
+     * Sets-up the handler to be called upon the BasicConnection
+     * failed.
+     *
+     *
+     * @param {Function} handler to be called upon connection init
+     */
+    SocketioConnection.prototype.whenFailed = function(handler) {
+      this._fail.whenEmitted(handler);
+    }
 
     /**
      * Sends a message to the plugin site
@@ -618,6 +658,10 @@ var Connection = function(id, type, config){
     var me = this;
     this.whenInit = function(cb){
         me._platformConnection.whenInit(cb);
+    };
+
+    this.whenFailed = function(cb){
+        me._platformConnection.whenFailed(cb);
     };
 
     this._platformConnection.onMessage(function(m) {
@@ -914,6 +958,9 @@ DynamicPlugin.prototype._connect =
       me._updateUI()
       me._connection.whenInit(function(){
           me._init();
+      });
+      me._connection.whenFailed(function(e){
+        me._fail.emit(e);
       });
       if(this.type == 'native-python'){
         me._connection._platformConnection.onLogging(function(details){
