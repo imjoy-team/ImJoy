@@ -366,7 +366,6 @@
   <md-dialog-confirm :md-active.sync="showRemoveConfirmation" md-title="Removing Plugin" md-content="Do you really want to <strong>delete</strong> this plugin" md-confirm-text="Yes" md-cancel-text="Cancel" @md-cancel="showRemoveConfirmation=false" @md-confirm="pm.removePlugin(plugin2_remove);plugin2_remove=null;showRemoveConfirmation=false"/>
   <file-dialog id="engine-file-dialog" ref="file-dialog" :engines="em.engines" :remove-files="removeFiles" :list-files="listFiles" :get-file-url="getFileUrl" :request-upload-url="requestUploadUrl" :download-file-from-url="downloadFileFromUrl" :upload-file-to-url="uploadFileToUrl"></file-dialog>
   <md-dialog :class="plugin_dialog_config && plugin_dialog_config.ui?'':'window-dialog'" :md-active.sync="showPluginDialog" :md-click-outside-to-close="false" :md-close-on-esc="false">
-    <md-dialog-title v-if="plugin_dialog_config && plugin_dialog_config.name">{{plugin_dialog_config.name}}</md-dialog-title>
     <md-dialog-actions v-if="!plugin_dialog_config || !plugin_dialog_config.ui">
       <md-button class="md-accent" @click="closePluginDialog(true)"><md-icon>clear</md-icon></md-button>
     </md-dialog-actions>
@@ -374,9 +373,7 @@
       <div v-if="plugin_dialog_config && plugin_dialog_config.ui">
         <joy :config="plugin_dialog_config" :showHeader="false" :controlButtons="false" ref="plugin_dialog_joy"></joy>
       </div>
-      <div v-else id="window_dialog_container" class="plugin-iframe">
-        <window v-if="plugin_dialog_window_config" :w="plugin_dialog_window_config" :withDragHandle="false" @close="closePluginDialog(true)"></window>
-      </div>
+      <div v-else id="window_dialog_container" class="plugin-iframe" />
     </md-dialog-content>
     <md-dialog-actions v-if="plugin_dialog_config && plugin_dialog_config.ui">
       <md-button class="md-primary" @click="closePluginDialog(true)">OK</md-button>
@@ -680,8 +677,7 @@ export default {
       new_workspace_name: '',
       workspace_dropping: false,
       max_window_buttons: 9,
-      installing: false,
-      plugin_dialog_window_config: null
+      installing: false
     }
   },
   watch: {
@@ -1322,7 +1318,6 @@ export default {
       })
     },
     showMessage(info, duration) {
-      assert(typeof info === 'string')
       this.snackbar_info = info
       if(duration){
         duration = duration * 1000
@@ -1473,7 +1468,6 @@ export default {
     },
     closePluginDialog(ok) {
       this.showPluginDialog = false
-      this.plugin_dialog_window_config = null 
       if(this.plugin_dialog_promise){
         let [resolve, reject] = this.plugin_dialog_promise
         if (ok) {
@@ -1863,14 +1857,6 @@ export default {
         }
         else if(config.type){
           config.window_container = 'window_dialog_container'
-          config.standalone = true
-          this.plugin_dialog_window_config = null 
-          if(config.type.startsWith('imjoy/')){
-            config.render = (wconfig)=>{
-              this.plugin_dialog_window_config = wconfig
-              this.$forceUpdate()
-            }
-          }
           this.showPluginDialog = true
           this.createWindow(config).then((api)=>{
             const _close = api.close
