@@ -913,10 +913,10 @@ export default {
     }
     else {
       this.startImJoy().then(()=>{
-        /* global gtag window */
-        if(gtag){
+        /* global window */
+        if(window.gtag){
           // CAREFUL: DO NOT SEND ANY QUERY STRING, ONLY LOCATION AND PATH
-          gtag('config', 'UA-134837258-1', {'page_location': location.href.split('#')[0], 'page_path': '/#/app'})
+          window.gtag('config', 'UA-134837258-1', {'page_location': location.href.split('#')[0], 'page_path': '/#/app'})
         }
       })
     }

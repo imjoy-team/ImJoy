@@ -761,7 +761,7 @@ export class PluginManager {
     })
   }
 
-  async unloadPlugin(_plugin, temp_remove){
+  unloadPlugin(_plugin, temp_remove){
     const name = _plugin.name
     for (let k in this.plugins) {
       if (this.plugins.hasOwnProperty(k)) {
@@ -775,16 +775,9 @@ export class PluginManager {
               plugin._unloaded = true
               this.unregister(plugin)
               if (typeof plugin.terminate === 'function') {
-                try{
-                  await plugin.terminate()
-                }
-                catch(e){
-                  console.error(e)
-                }
-                finally{
+                plugin.terminate().then(()=>{
                   this.update_ui_callback()
-                }
-                
+                })
               }
             } catch (e) {
               console.error(e)
@@ -907,7 +900,7 @@ export class PluginManager {
             await this.reloadPlugin(plugin)
           }
           else{
-            await this.unloadPlugin(plugin, false)
+            this.unloadPlugin(plugin, false)
           }
         }
       }
@@ -1662,9 +1655,9 @@ export class PluginManager {
       } else {
         const window_config = this.registered.windows[wconfig.type]
         if (!window_config) {
-          console.error('no plugin registered for window type: ', wconfig.type)
-          reject('no plugin registered for window type: ', wconfig.type)
-          throw 'no plugin registered for window type: ', wconfig.type
+          console.error('no plugin registered for window type: ' + wconfig.type, this.registered.windows)
+          reject('no plugin registered for window type: ' + wconfig.type)
+          throw 'no plugin registered for window type: '+ wconfig.type
         }
         const pconfig = wconfig
         //generate a new window id
