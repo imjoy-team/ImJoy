@@ -90,6 +90,9 @@
       "parser": "babel-eslint"
     }
   },
+  "prettier": {
+    "trailingComma": "es5"
+  },
   "postcss": {
     "plugins": {
       "autoprefixer": {}
