@@ -1002,7 +1002,7 @@ export default {
         }
         if(this.$route.query.engine || this.$route.query.e){
           const engine_url = (this.$route.query.engine || this.$route.query.e).trim()
-          this.em.addEngine({type: 'default', url: engine_url, token: connection_token}, false).finally((engine)=>{
+          this.em.addEngine({type: 'default', url: engine_url, token: connection_token}, false).finally(()=>{
             this.em.getEngineByUrl(engine_url).connect()
             this.$forceUpdate()
           })
