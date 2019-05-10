@@ -887,8 +887,8 @@ export class PluginManager {
     }
   }
 
-  parsePluginCode(code, config) {
-    config = config || {}
+  parsePluginCode(code, overwrite_config) {
+    let config = {}
     const uri = config.uri
     const tag = config.tag
     const origin = config.origin
@@ -902,8 +902,7 @@ export class PluginManager {
         config.tag = tag || null
       } else {
         const pluginComp = parseComponent(code)
-        const config_ = JSON.parse(pluginComp.config[0].content)
-        config = Object.assign(config_, config)
+        config = JSON.parse(pluginComp.config[0].content)
         config.scripts = []
         for (let i = 0; i < pluginComp.script.length; i++) {
           config.scripts.push(pluginComp.script[i])
@@ -959,6 +958,8 @@ export class PluginManager {
           config.scripts[i].attrs.lang = config.lang
         }
       }
+  
+      config = Object.assign(config, overwrite_config)
   
       config = upgradePluginAPI(config)
       if (!PLUGIN_SCHEMA(config)) {
@@ -1628,6 +1629,7 @@ export class PluginManager {
         const window_config = this.registered.windows[wconfig.type]
         if (!window_config) {
           console.error('no plugin registered for window type: ', wconfig.type)
+          reject('no plugin registered for window type: ', wconfig.type)
           throw 'no plugin registered for window type: ', wconfig.type
         }
         const pconfig = wconfig
