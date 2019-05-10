@@ -2,7 +2,9 @@
   <md-dialog :md-active.sync="show_" :md-click-outside-to-close="false" :md-close-on-esc="false">
     <md-dialog-title>{{this.options.title || 'ImJoy File Dialog'}}</md-dialog-title>
     <md-dialog-content>
-      <md-button style="text-transform: none;" v-show="show_all_engines && engine.connected" :key="engine.id" v-for="engine in engines" :class="selected_engine===engine?'md-raised':''" @click="selectEngine(engine)">{{engine.name}}</md-button>
+      <md-button style="text-transform: none;" v-show="show_all_engines && engine.connected" :key="engine.id" v-for="engine in engines" :class="selected_engine===engine?'md-raised':''" @click="selectEngine(engine)">
+        {{engine.name}}
+      </md-button>
       <div class="loading-info">
         <h3 v-if="dropping">Drop files to upload to {{root}}</h3>
         <md-progress-bar md-mode="determinate" v-if="loading" :md-value="loading_progress"></md-progress-bar>
@@ -19,7 +21,7 @@
     </md-dialog-content>
     <md-dialog-actions>
       
-      <md-menu style="flex: auto;">
+      <md-menu style="flex: auto;" v-if="!this.loading">
         <md-button class="md-button md-primary" md-menu-trigger>
           <md-icon>menu</md-icon>options
         </md-button>
@@ -35,8 +37,8 @@
           </md-menu-item>
         </md-menu-content>
       </md-menu>
-      <p style="flex: auto;" class="md-small-hide" v-if="status_text">{{status_text}}</p>
-      <md-button class="md-primary" :disabled="!file_tree_selection" @click="show_=false; resolve(file_tree_selection)">OK <md-tooltip v-if="file_tree_selection">Selected: {{file_tree_selection}}</md-tooltip> </md-button>
+      <p style="flex: auto;" class="md-small-hide" v-if="status_text">{{status_text.slice(0, 100)}}</p>
+      <md-button class="md-primary" v-if="!this.loading" :disabled="!file_tree_selection" @click="show_=false; resolve(file_tree_selection)">OK <md-tooltip v-if="file_tree_selection">Selected: {{file_tree_selection}}</md-tooltip> </md-button>
       <md-button class="md-primary" @click="show_=false; reject('file dialog canceled by the user.')">Cancel</md-button>
     </md-dialog-actions>
   </md-dialog>
@@ -94,10 +96,13 @@ export default {
    },
    methods: {
      async upload(f, progress_text){
+       if(!this.show_){
+         return
+       }
        this.status_text = 'requesting upload url from the engine...'
        const url = await this.requestUploadUrl(null, {'dir': this.root, 'path': f.relativePath, 'overwrite': true, 'engine': this.selected_engine.url})
        console.log('loading file to url', url)
-       this.status_text = progress_text + ` ${url}`
+       this.status_text = progress_text
        const ret = await this.uploadFileToUrl(null, {file: f, url: url, progress: (uploaded, total)=>{
          this.loading_progress = uploaded*100/total
          this.status_text = progress_text + ` (${Math.round(this.loading_progress)}%)`
@@ -110,6 +115,10 @@ export default {
        this.loading = true
        try {
          for(let i=0;i<files.length;i++){
+           if(files[i].name.startsWith('.')){
+             console.log('skipping file: ' + files[i].relativePath)
+             continue
+           }
            await this.upload(files[i], `uploading ${i+1}/${files.length}: ${files[i].name}`)
          }
        } catch (e) {
@@ -322,6 +331,9 @@ export default {
       }
     },
     async download(f, progress_text){
+       if(!this.show_){
+         return
+       }
        this.status_text = 'requesting upload url from the engine...'
        const url = await this.getFileUrl(null, {path: f.path, engine: this.selected_engine})
        this.status_text = progress_text
