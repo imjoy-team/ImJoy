@@ -352,7 +352,7 @@ def window_callback(win):
 api.createWindow({name: 'new window', type: 'Image Window', w:7, h:7, data: {image: ...}, config: {}}).then(window_callback)
 ```
 
-Use the returned object to update the window, or use `onclose` to set a callback
+Use the returned object to update the window, or use `onClose` to set a callback
 function which will be called when the window is closed.
 
 To close the created window, call `win.close()`.
@@ -364,8 +364,8 @@ To close the created window, call `win.close()`.
 // win is the object retured from api.createWindow
 await win.run({'data': {'image': ...}})
 
-// set `onclose` callback
-win.onclose(()=>{
+// set `onClose` callback
+win.onClose(()=>{
   console.log('closing window.')
 })
 ```
@@ -393,11 +393,11 @@ await win.run({'data': {'image': ...}})
 # or named arguments
 await win.run(data={'image': ...})
 
-# set `onclose` callback
+# set `onClose` callback
 def close_callback():
     print('closing window.')
 
-win.onclose(close_callback)
+win.onClose(close_callback)
 ```
 <!-- tabs:end -->
 
