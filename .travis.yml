@@ -18,8 +18,9 @@ before_script:
   - npm prune
 script:
   - export NODE_OPTIONS="--max-old-space-size=4096"
-  - npm run test
+  - npm run check-format
   - npm run lint
+  - npm run test
   - npm run build
 after_success:
   - cd ..
