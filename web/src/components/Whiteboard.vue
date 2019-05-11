@@ -1,44 +1,116 @@
 <template>
-<div class="whiteboard noselect" ref="whiteboard" @mouseup="show_overlay=false"  @click="unselectWindows()">
-  <div @mousemove="overlayMousemove" class="overlay" @click="show_overlay=false" v-if="show_overlay"></div>
-  <grid-layout v-if="gridWindows && gridWindows.length>0" :layout.sync="gridWindows" v-show="!wm.selected_window" style="min-height:100%" :col-num.sync="col_num" :is-mirrored="false" :auto-size="true" :row-height.sync="row_height" :is-responsive="true" :is-draggable="true" :is-resizable="true" :vertical-compact="true" :margin="[3, 3]" :use-css-transforms="true">
-    <grid-item :key="w.id" v-for="w in gridWindows" drag-allow-from=".drag-handle" drag-ignore-from=".no-drag" :x="w.x" :y="w.y" :w.sync="w.w" :h.sync="w.h" :i="w.i" @resize="viewChanging(w)" @move="viewChanging(w)" @resized="show_overlay=false;w.resize&&w.resize();focusWindow(w)" @moved="show_overlay=false;w.move&&w.move();focusWindow(w)">
-      <window :w="w" @detach="detach" :withDragHandle="true" @duplicate="duplicate" @select="selectWindow" :loaders="wm.registered_loaders" @close="close" @fullscreen="fullScreen" @normalsize="normalSize"></window>
-    </grid-item>
-  </grid-layout>
-  <div class="md-layout md-gutter md-alignment-center-center" v-if="!gridWindows || gridWindows.length===0">
-    <md-empty-state  md-icon="static/img/imjoy-io-icon.svg" md-label="" md-description="">
-    </md-empty-state>
+  <div
+    class="whiteboard noselect"
+    ref="whiteboard"
+    @mouseup="show_overlay = false"
+    @click="unselectWindows()"
+  >
+    <div
+      @mousemove="overlayMousemove"
+      class="overlay"
+      @click="show_overlay = false"
+      v-if="show_overlay"
+    ></div>
+    <grid-layout
+      v-if="gridWindows && gridWindows.length > 0"
+      :layout.sync="gridWindows"
+      v-show="!wm.selected_window"
+      style="min-height:100%"
+      :col-num.sync="col_num"
+      :is-mirrored="false"
+      :auto-size="true"
+      :row-height.sync="row_height"
+      :is-responsive="true"
+      :is-draggable="true"
+      :is-resizable="true"
+      :vertical-compact="true"
+      :margin="[3, 3]"
+      :use-css-transforms="true"
+    >
+      <grid-item
+        :key="w.id"
+        v-for="w in gridWindows"
+        drag-allow-from=".drag-handle"
+        drag-ignore-from=".no-drag"
+        :x="w.x"
+        :y="w.y"
+        :w.sync="w.w"
+        :h.sync="w.h"
+        :i="w.i"
+        @resize="viewChanging(w)"
+        @move="viewChanging(w)"
+        @resized="
+          show_overlay = false;
+          w.resize && w.resize();
+          focusWindow(w);
+        "
+        @moved="
+          show_overlay = false;
+          w.move && w.move();
+          focusWindow(w);
+        "
+      >
+        <window
+          :w="w"
+          @detach="detach"
+          :withDragHandle="true"
+          @duplicate="duplicate"
+          @select="selectWindow"
+          :loaders="wm.registered_loaders"
+          @close="close"
+          @fullscreen="fullScreen"
+          @normalsize="normalSize"
+        ></window>
+      </grid-item>
+    </grid-layout>
+    <div
+      class="md-layout md-gutter md-alignment-center-center"
+      v-if="!gridWindows || gridWindows.length === 0"
+    >
+      <md-empty-state
+        md-icon="static/img/imjoy-io-icon.svg"
+        md-label=""
+        md-description=""
+      >
+      </md-empty-state>
+    </div>
+    <window
+      :w="w"
+      @detach="detach"
+      v-for="w in standaloneWindows"
+      :key="w.id + '_standalone'"
+      v-show="wm.selected_window === w"
+      :loaders="wm.registered_loaders"
+      :withDragHandle="false"
+      @duplicate="duplicate"
+      @select="selectWindow"
+      @close="close"
+      @fullscreen="fullScreen"
+      @normalsize="normalSize"
+    ></window>
   </div>
-  <window :w="w" @detach="detach"  v-for="w in standaloneWindows" :key="w.id+'_standalone'" v-show="wm.selected_window===w" :loaders="wm.registered_loaders" :withDragHandle="false" @duplicate="duplicate" @select="selectWindow" @close="close" @fullscreen="fullScreen" @normalsize="normalSize" ></window>
-</div>
 </template>
 
 <script>
-import {
-  randId,
-  assert
-} from '../utils.js'
-import {
-  WindowManager
-} from '../windowManager.js'
+import { randId, assert } from "../utils.js";
+import { WindowManager } from "../windowManager.js";
 
-import marked from 'marked';
+import marked from "marked";
 export default {
-  name: 'whiteboard',
+  name: "whiteboard",
   props: {
     mode: {
       type: String,
       default: function() {
-        return 'grid'
-      }
+        return "grid";
+      },
     },
-    windowManager:{
+    windowManager: {
       type: WindowManager,
       default: function() {
-        return null
-      }
-    }
+        return null;
+      },
+    },
   },
   data() {
     return {
@@ -50,212 +122,249 @@ export default {
       scrolling: false,
       scrollClientY: 0,
       screenWidth: window.innerWidth,
-      windows: []
-    }
+      windows: [],
+    };
   },
-  created(){
-    this.wm = this.windowManager
-    this.windows = this.wm && this.wm.windows
-    assert(this.windows)
-    this.event_bus = this.wm.event_bus
-    this.event_bus.$on('add_window', this.onWindowAdd)
-    this.event_bus.$on('close_window', this.onWindowClose)
-    this.event_bus.$on('resize', this.updateSize)
+  created() {
+    this.wm = this.windowManager;
+    this.windows = this.wm && this.wm.windows;
+    assert(this.windows);
+    this.event_bus = this.wm.event_bus;
+    this.event_bus.$on("add_window", this.onWindowAdd);
+    this.event_bus.$on("close_window", this.onWindowClose);
+    this.event_bus.$on("resize", this.updateSize);
 
     //open link in a new tab
     const renderer = new marked.Renderer();
     renderer.link = function(href, title, text) {
-        var link = marked.Renderer.prototype.link.call(this, href, title, text);
-        return link.replace("<a","<a target='_blank' ");
+      var link = marked.Renderer.prototype.link.call(this, href, title, text);
+      return link.replace("<a", "<a target='_blank' ");
     };
     marked.setOptions({
-        renderer: renderer
+      renderer: renderer,
     });
-    this.marked = marked
+    this.marked = marked;
   },
   mounted() {
-    this.screenWidth = window.innerWidth
-    this.col_num = parseInt(this.$refs.whiteboard.clientWidth/this.column_width)
-    window.onbeforeunload = function (evt) {
-      var message = 'Are you sure you want to leave?';
-      if (typeof evt == 'undefined') {
+    this.screenWidth = window.innerWidth;
+    this.col_num = parseInt(
+      this.$refs.whiteboard.clientWidth / this.column_width
+    );
+    window.onbeforeunload = function(evt) {
+      var message = "Are you sure you want to leave?";
+      if (typeof evt == "undefined") {
         evt = window.event;
       }
       if (evt) {
         evt.returnValue = message;
       }
       return message;
-    }
+    };
   },
   beforeDestroy() {
-    this.event_bus.$off('add_window', this.onWindowAdd)
-    this.event_bus.$off('close_window', this.onWindowClose)
-    this.event_bus.$off('resize', this.updateSize)
+    this.event_bus.$off("add_window", this.onWindowAdd);
+    this.event_bus.$off("close_window", this.onWindowClose);
+    this.event_bus.$off("resize", this.updateSize);
   },
   computed: {
-    gridWindows: function () {
-      return this.windows.filter((w)=>{
-        return !w.standalone && this.mode==='grid'
-      })
+    gridWindows: function() {
+      return this.windows.filter(w => {
+        return !w.standalone && this.mode === "grid";
+      });
     },
     standaloneWindows: function() {
-      return this.windows.filter((w)=>{
-        return this.mode!=='grid' || w.standalone
-      })
-    }
+      return this.windows.filter(w => {
+        return this.mode !== "grid" || w.standalone;
+      });
+    },
   },
   methods: {
-    overlayMousemove(e){
-      const bbox = this.$refs.whiteboard.getBoundingClientRect()
-      const top = bbox.y
-      const bottom = bbox.y+ bbox.height
-      this.scrollClientY = e.clientY
-      let scroll
-      if(this.scrollClientY<top+10){
-        scroll =()=>{this.$refs.whiteboard.scrollTop = this.$refs.whiteboard.scrollTop - (top-this.scrollClientY)/2
-          if(this.show_overlay && this.scrollClientY<top){
-            this.scrolling = true
-            window.requestAnimationFrame(scroll)
+    overlayMousemove(e) {
+      const bbox = this.$refs.whiteboard.getBoundingClientRect();
+      const top = bbox.y;
+      const bottom = bbox.y + bbox.height;
+      this.scrollClientY = e.clientY;
+      let scroll;
+      if (this.scrollClientY < top + 10) {
+        scroll = () => {
+          this.$refs.whiteboard.scrollTop =
+            this.$refs.whiteboard.scrollTop - (top - this.scrollClientY) / 2;
+          if (this.show_overlay && this.scrollClientY < top) {
+            this.scrolling = true;
+            window.requestAnimationFrame(scroll);
+          } else {
+            this.scrolling = false;
           }
-          else{
-            this.scrolling = false
+        };
+        if (!this.scrolling) scroll();
+      } else if (this.scrollClientY > bottom - 20) {
+        scroll = () => {
+          this.$refs.whiteboard.scrollTop =
+            this.$refs.whiteboard.scrollTop +
+            (this.scrollClientY - bottom + 20) / 2;
+          if (this.show_overlay && this.scrollClientY > bottom - 10) {
+            this.scrolling = true;
+            window.requestAnimationFrame(scroll);
+          } else {
+            this.scrolling = false;
           }
-        }
-        if(!this.scrolling)
-        scroll()
-      }
-      else if(this.scrollClientY>bottom-20){
-        scroll =()=>{this.$refs.whiteboard.scrollTop = this.$refs.whiteboard.scrollTop+(this.scrollClientY-bottom+20)/2
-          if(this.show_overlay && this.scrollClientY>bottom-10){
-            this.scrolling = true
-            window.requestAnimationFrame(scroll)
-          }
-          else{
-            this.scrolling = false
-          }
-        }
-        if(!this.scrolling)
-        scroll()
+        };
+        if (!this.scrolling) scroll();
       }
     },
-    updateSize(e){
-      this.screenWidth = e.width
+    updateSize(e) {
+      this.screenWidth = e.width;
       // this.column_width = parseInt(this.screenWidth/60)
-      this.col_num = parseInt(this.$refs.whiteboard.clientWidth/this.column_width)
+      this.col_num = parseInt(
+        this.$refs.whiteboard.clientWidth / this.column_width
+      );
     },
     onWindowAdd(w) {
-      if(w.fullscreen){
-        this.fullScreen(w)
+      if (w.fullscreen) {
+        this.fullScreen(w);
       }
-      this.selectWindow(w, {})
-      this.$forceUpdate()
+      this.selectWindow(w, {});
+      this.$forceUpdate();
     },
     onWindowClose() {
-      this.$forceUpdate()
+      this.$forceUpdate();
     },
-    detach(w){
-      this.close(w)
-      const new_w = Object.assign({}, w, {name: w.name, type: w.window_type, data: w.data, config: w.config, w:w.w, h:w.h, fullscreen:w.fullscreen, standalone:true})
-      this.$emit('create', new_w)
+    detach(w) {
+      this.close(w);
+      const new_w = Object.assign({}, w, {
+        name: w.name,
+        type: w.window_type,
+        data: w.data,
+        config: w.config,
+        w: w.w,
+        h: w.h,
+        fullscreen: w.fullscreen,
+        standalone: true,
+      });
+      this.$emit("create", new_w);
     },
     close(w) {
-      const ai = this.active_windows.indexOf(w)
-      if(ai>=0){
-        this.active_windows[ai].selected = false
-        this.active_windows[ai].refresh()
-        this.active_windows.splice(ai, 1)
-        this.wm.active_windows = this.active_windows
-        this.$emit('select', this.active_windows, null)
+      const ai = this.active_windows.indexOf(w);
+      if (ai >= 0) {
+        this.active_windows[ai].selected = false;
+        this.active_windows[ai].refresh();
+        this.active_windows.splice(ai, 1);
+        this.wm.active_windows = this.active_windows;
+        this.$emit("select", this.active_windows, null);
       }
-      this.wm.closeWindow(w)
-      this.$emit('close', w)
+      this.wm.closeWindow(w);
+      this.$emit("close", w);
     },
-    isTypedArray(obj)
-    {
+    isTypedArray(obj) {
       return !!obj && obj.byteLength !== undefined;
     },
     fullScreen(w) {
-      w.fullscreen = true
-      this.col_num = parseInt(this.$refs.whiteboard.clientWidth/this.column_width)
-      const fh = parseInt((this.$refs.whiteboard.clientHeight-76)/this.row_height)
-      const fw = parseInt(this.$refs.whiteboard.clientWidth/this.column_width) + 1
-      w._h = w.h
-      w._w = w.w
-      w.h = fh
-      w.w = fw
-      setTimeout(()=>{w.resize&&w.resize(); w.refresh(); w.focus();}, 500);
+      w.fullscreen = true;
+      this.col_num = parseInt(
+        this.$refs.whiteboard.clientWidth / this.column_width
+      );
+      const fh = parseInt(
+        (this.$refs.whiteboard.clientHeight - 76) / this.row_height
+      );
+      const fw =
+        parseInt(this.$refs.whiteboard.clientWidth / this.column_width) + 1;
+      w._h = w.h;
+      w._w = w.w;
+      w.h = fh;
+      w.w = fw;
+      setTimeout(() => {
+        w.resize && w.resize();
+        w.refresh();
+        w.focus();
+      }, 500);
     },
     normalSize(w) {
-      this.col_num = parseInt(this.$refs.whiteboard.clientWidth/this.column_width)
-      w.fullscreen = false
-      w.h = w._h || 5
-      w.w = w._w || 5
-      w._w = null
-      w._h = null
-      setTimeout(()=>{w.resize&&w.resize(); w.refresh(); w.focus();}, 500);
+      this.col_num = parseInt(
+        this.$refs.whiteboard.clientWidth / this.column_width
+      );
+      w.fullscreen = false;
+      w.h = w._h || 5;
+      w.w = w._w || 5;
+      w._w = null;
+      w._h = null;
+      setTimeout(() => {
+        w.resize && w.resize();
+        w.refresh();
+        w.focus();
+      }, 500);
     },
     duplicate(w) {
-      this.$emit('create', {name: w.name+randId(), type: w.window_type, data: w.data, config: w.config, w:w.w, h:w.h, fullscreen:w.fullscreen, standalone:w.standalone})
+      this.$emit("create", {
+        name: w.name + randId(),
+        type: w.window_type,
+        data: w.data,
+        config: w.config,
+        w: w.w,
+        h: w.h,
+        fullscreen: w.fullscreen,
+        standalone: w.standalone,
+      });
     },
-    unselectWindows(){
-      if(this.active_windows && this.active_windows.length>0){
+    unselectWindows() {
+      if (this.active_windows && this.active_windows.length > 0) {
         for (let i = 0; i < this.active_windows.length; i++) {
-            this.active_windows[i].selected = false
-            this.active_windows[i].refresh()
+          this.active_windows[i].selected = false;
+          this.active_windows[i].refresh();
         }
-        this.active_windows = []
-        this.wm.active_windows = this.active_windows
+        this.active_windows = [];
+        this.wm.active_windows = this.active_windows;
         //this.wm.selected_window = null
-        this.$emit('select', this.active_windows, null)
-        this.$forceUpdate()
+        this.$emit("select", this.active_windows, null);
+        this.$forceUpdate();
       }
     },
     selectWindow(w, evt) {
-      w.selected = true
-      w.refresh && w.refresh()
-      if (this.active_windows.length <= 0 || this.active_windows[this.active_windows.length - 1] !== w) {
+      w.selected = true;
+      w.refresh && w.refresh();
+      if (
+        this.active_windows.length <= 0 ||
+        this.active_windows[this.active_windows.length - 1] !== w
+      ) {
         //unselect previous windows if no shift key pressed
         if (!evt.shiftKey) {
           for (let i = 0; i < this.active_windows.length; i++) {
-            this.active_windows[i].selected = false
-            this.active_windows[i].refresh()
+            this.active_windows[i].selected = false;
+            this.active_windows[i].refresh();
           }
         }
         if (evt.shiftKey && this.active_windows.length > 0) {
-          this.active_windows.push(w)
+          this.active_windows.push(w);
         } else {
-          this.active_windows = [w]
+          this.active_windows = [w];
         }
-        this.wm.active_windows = this.active_windows
-        this.$emit('select', this.active_windows, w)
-
+        this.wm.active_windows = this.active_windows;
+        this.$emit("select", this.active_windows, w);
       } else if (!evt.shiftKey && this.active_windows.length > 1) {
         for (let i = 0; i < this.active_windows.length; i++) {
           if (this.active_windows[i] !== w)
-            this.active_windows[i].selected = false
-            this.active_windows[i].refresh()
+            this.active_windows[i].selected = false;
+          this.active_windows[i].refresh();
         }
-        this.active_windows = [w]
+        this.active_windows = [w];
       }
-      this.$forceUpdate()
-
+      this.$forceUpdate();
     },
-    viewChanging(){
-      this.show_overlay = true
+    viewChanging() {
+      this.show_overlay = true;
       //this.$refs.whiteboard.scrollTop = this.$refs.whiteboard.scrollHeight
     },
     focusWindow(w) {
-      this.show_overlay = false
-      this.selectWindow(w, {})
+      this.show_overlay = false;
+      this.selectWindow(w, {});
     },
     stopDragging() {
       setTimeout(() => {
-        this.show_overlay = false
-        this.$forceUpdate()
-      }, 300)
-    }
-  }
-}
+        this.show_overlay = false;
+        this.$forceUpdate();
+      }, 300);
+    },
+  },
+};
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
@@ -286,15 +395,15 @@ export default {
 .window-selected {
   color: var(--md-theme-default-text-accent-on-primary, #fff) !important;
   background-color: var(--md-theme-default-primary, #448aff) !important;
-  height: 30px!important;
+  height: 30px !important;
 }
 
 .window-header {
   color: var(--md-theme-default-text-primary-on-primary, #fff) !important;
   background-color: #ddd !important;
-  height: 30px!important;
+  height: 30px !important;
 }
-.fill-container{
+.fill-container {
   width: 100%;
   height: 100%;
 }
