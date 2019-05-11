@@ -931,7 +931,7 @@ export default {
     async startImJoy() {
       try{
         await this.fm.init()
-        console.log('Successfully initialized the file system.', this.fm.fs)
+        console.log('Successfully initialized the file system.')
       }
       catch(e){
         console.error(e)

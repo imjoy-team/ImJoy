@@ -87,7 +87,7 @@ export class WindowManager {
   addWindow(w){
     return new Promise((resolve, reject)=>{
       try {
-        w.onclose = w.onclose || function (){}
+        w.onClose = w.onClose || function (){}
         w.id = w.id || w.name + randId()
         w.loaders = this.getDataLoaders(w.data)
         this.generateGridPosition(w)
@@ -137,7 +137,12 @@ export class WindowManager {
   }
 
   async closeWindow(w){
-    await w.onclose()
+    try{
+      await w.onClose()
+    }
+    catch(e){
+      console.log(e)
+    }
     this.windows.splice(this.windows.indexOf(w), 1)
     delete this.window_ids[w.id]
     if(w.selected || this.selected_window===w){

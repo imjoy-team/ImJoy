@@ -193,13 +193,30 @@ describe('ImJoy.vue', async () => {
       expect(Object.keys(plugin1.ops).length).to.equal(1)
     })
 
+    it('should create imjoy window', async () => {
+      const count = wm.windows.length
+      expect(await plugin1.api.test_createImJoyWindow()).to.be.true
+      expect(wm.windows.length).to.equal(count+1)
+      expect(wm.windows[wm.windows.length-1].name).to.equal('new image')
+      await wm.closeWindow(wm.windows[wm.windows.length-1])
+      expect(wm.windows.length).to.equal(count)
+    })
+
     it('should create window', async () => {
       const count = wm.windows.length
       expect(await plugin1.api.test_createWindow()).to.be.true
       expect(wm.windows.length).to.equal(count+1)
-      expect(wm.windows[wm.windows.length-1].name).to.equal('new image')
-      wm.closeWindow(wm.windows[wm.windows.length-1])
+      expect(wm.windows[wm.windows.length-1].name).to.equal('new window')
+      await wm.closeWindow(wm.windows[wm.windows.length-1])
       expect(wm.windows.length).to.equal(count)
+    })
+
+    it('should close imjoy window', async () => {
+      expect(await plugin1.api.test_closeImJoyWindow()).to.be.true
+    })
+
+    it('should close window', async () => {
+      expect(await plugin1.api.test_closeWindow()).to.be.true
     })
 
     it('should run plugin', async () => {

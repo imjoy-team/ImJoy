@@ -52,13 +52,58 @@ class ImJoyPlugin {
     return true
   }
 
-  async test_createWindow() {
+  async test_createImJoyWindow() {
     await api.createWindow({
       name: 'new image',
       type: 'imjoy/image',
       data: {src: 'https://imjoy.io/static/img/loader.gif'}
     })
     return true
+  }
+
+  async test_createWindow() {
+    await api.createWindow({
+      name: 'new window',
+      type: 'Test Window Plugin',
+      data: {}
+    })
+    return true
+  }
+
+  async test_closeImJoyWindow() {
+    return new Promise(async (resolve)=>{
+      const win = await api.createWindow({ name: 'untitled',type: 'imjoy/image',
+        data: {src: 'https://imjoy.io/static/img/loader.gif'}})
+      win.onClose(()=>{
+        console.log('closing window')
+        resolve(true)
+      })
+      setTimeout(()=>{
+        win.close()
+      }, 500)
+      setTimeout(()=>{
+        resolve(false)
+      }, 800)
+    })
+  }
+
+  async test_closeWindow() {
+    return new Promise(async (resolve)=>{
+      const win = await api.createWindow({ name: 'new window',
+        type: 'Test Window Plugin',
+        data: {}
+      })
+      win.onClose(()=>{
+        console.log('closing window')
+        resolve(true)
+      })
+      setTimeout(()=>{
+        win.close()
+      }, 500)
+      setTimeout(()=>{
+        resolve(false)
+      }, 800)
+    })
   }
 
   async test_run() {
