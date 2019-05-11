@@ -19,6 +19,7 @@ export class Engine {
     this.id = this.config.id;
     this.name = this.config.name || this.config.url;
     this.name = this.name.replace("http://127.0.0.1:9527", "My Computer");
+    this.name = this.name.replace("https://", "");
     this.config.name = this.name;
     this.url = this.config.url;
     this.token = this.config.token;
