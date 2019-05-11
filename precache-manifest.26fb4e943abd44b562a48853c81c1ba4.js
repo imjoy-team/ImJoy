@@ -1,11 +1,11 @@
 self.__precacheManifest = [
   {
-    "revision": "29895f41ee6cc610651a",
-    "url": "/static/css/app.639b58f2.css"
+    "revision": "39c1b6bd3ef5f636874c",
+    "url": "/static/css/app.ee834d4e.css"
   },
   {
-    "revision": "29895f41ee6cc610651a",
-    "url": "/static/js/app.3f7907cf.js"
+    "revision": "39c1b6bd3ef5f636874c",
+    "url": "/static/js/app.3f3a8450.js"
   },
   {
     "revision": "b8859e2632feade2aed6",
@@ -228,19 +228,19 @@ self.__precacheManifest = [
     "url": "/static/js/chunk-vendors.13c6622d.js"
   },
   {
-    "revision": "2a3e222e6a41b32a7180e6afa3675990",
-    "url": "/static/vs/html.worker.js"
+    "revision": "b00449080615ce71a2a8a52aee9f658f",
+    "url": "/static/vs/css.worker.js"
   },
   {
     "revision": "493ef474936217113b20a6573247288a",
     "url": "/static/vs/editor.worker.js"
   },
   {
-    "revision": "b00449080615ce71a2a8a52aee9f658f",
-    "url": "/static/vs/css.worker.js"
+    "revision": "2a3e222e6a41b32a7180e6afa3675990",
+    "url": "/static/vs/html.worker.js"
   },
   {
-    "revision": "54190c7862f90c813631e94169c29767",
+    "revision": "268b5ff494994b314b834d8bb0017042",
     "url": "/index.html"
   },
   {
@@ -556,10 +556,6 @@ self.__precacheManifest = [
     "url": "/static/vs/basic-languages/javascript/javascript.js"
   },
   {
-    "revision": "d38afb4a2727c22d145458825c210eee",
-    "url": "/static/vs/basic-languages/less/less.js"
-  },
-  {
     "revision": "59508c8afefbc43b359c085d36c696d0",
     "url": "/static/vs/basic-languages/lua/lua.js"
   },
@@ -578,6 +574,10 @@ self.__precacheManifest = [
   {
     "revision": "25d5426b0915297db94b8d2b7c35437c",
     "url": "/static/vs/basic-languages/objective-c/objective-c.js"
+  },
+  {
+    "revision": "d38afb4a2727c22d145458825c210eee",
+    "url": "/static/vs/basic-languages/less/less.js"
   },
   {
     "revision": "ead1f6c7a8bef73c6743a728d8e1ae13",
