@@ -184,8 +184,15 @@
           </md-menu>
           <engine-control-panel :engine-manager="em" />
           <md-menu>
-            <md-button class="md-icon-button md-primary" md-menu-trigger>
-              <md-icon>more_horiz</md-icon>
+            <md-button
+              v-if="latest_version && !is_latest_version"
+              class="md-icon-button md-accent"
+              md-menu-trigger
+            >
+              <md-icon>error_outline</md-icon>
+            </md-button>
+            <md-button v-else class="md-icon-button md-primary" md-menu-trigger>
+              <md-icon>details</md-icon>
             </md-button>
             <md-menu-content>
               <md-menu-item @click="showSettingsDialog = true" :disabled="true">
@@ -211,8 +218,25 @@
               <md-menu-item @click="showAboutDialog = true" class="md-primary">
                 <md-icon>info</md-icon>About
               </md-menu-item>
-              <md-menu-item :disabled="true">
-                <md-icon>update</md-icon> ImJoy v{{ imjoy_version }}
+              <md-menu-item>
+                <md-icon v-if="latest_version && is_latest_version"
+                  >check</md-icon
+                >
+                <md-icon v-else>error_outline</md-icon>
+                <div
+                  @click.stop="checkUpdate"
+                  style="width: 100%;cursor: pointer;"
+                >
+                  <div
+                    v-if="checking"
+                    style="left: -30px"
+                    class="loading loading-lg"
+                  ></div>
+                  <img v-else-if="version_badge_url" :src="version_badge_url" />
+                  <span v-else>ImJoy v{{ imjoy_version }}</span>
+                </div>
+
+                <md-tooltip>click to check updates</md-tooltip>
               </md-menu-item>
             </md-menu-content>
           </md-menu>
@@ -241,7 +265,12 @@
           />
         </form>
       </md-app-toolbar>
-      <md-app-drawer :md-active.sync="menuVisible" md-persistent="full">
+      <md-app-drawer
+        :md-active.sync="menuVisible"
+        @md-closed="wm.resizeAll()"
+        @md-opened="wm.resizeAll()"
+        md-persistent="full"
+      >
         <div class="md-toolbar-row title-bar">
           <div class="md-toolbar-section-start">
             <md-button
@@ -1268,11 +1297,30 @@ export default {
       max_window_buttons: 9,
       installing: false,
       plugin_dialog_window_config: null,
+      latest_version: null,
+      is_latest_version: false,
+      checking: false,
     };
   },
   watch: {
-    menuVisible() {
-      this.wm.resizeAll();
+    // menuVisible() {
+    //   this.wm.resizeAll();
+    // },
+  },
+  computed: {
+    version_badge_url: function() {
+      if (this.latest_version) {
+        const color = this.is_latest_version ? "success" : "orange";
+        return (
+          "https://img.shields.io/badge/imjoy-v" +
+          this.imjoy_version +
+          "-" +
+          color +
+          ".svg"
+        );
+      } else {
+        return null;
+      }
     },
   },
   created() {
@@ -1815,6 +1863,13 @@ export default {
         this.showMessage(e.toString());
       }
       this.$forceUpdate();
+      this.$nextTick(() => {
+        this.checkUpdate();
+        //check for update every 20 minutes
+        window.setInterval(() => {
+          this.checkUpdate(true);
+        }, 1200000);
+      });
     },
     addWindowCallback(w) {
       return new Promise((resolve, reject) => {
@@ -1833,6 +1888,56 @@ export default {
     },
     createWindow(w) {
       return this.pm.createWindow(null, w);
+    },
+    async checkUpdate(quiet) {
+      this.checking = true;
+      try {
+        const response = await axios.get(
+          "https://raw.githubusercontent.com/oeway/ImJoy/master/web/package.json?" +
+            randId()
+        );
+        console.log(response.data);
+        if (!response || !response.data) {
+          this.showMessage("failed to fetch imjoy version information");
+          return;
+        }
+        const obj = response.data;
+        if (obj && obj.version) {
+          this.latest_version = obj.version;
+          this.is_latest_version = compareVersions(
+            this.imjoy_version,
+            ">=",
+            obj.version
+          );
+          if (this.is_latest_version) {
+            if (!quiet) {
+              if (compareVersions(this.imjoy_version, ">", obj.version)) {
+                this.showMessage(
+                  `🍻 Your ImJoy (v${
+                    this.imjoy_version
+                  }) is newer than the release (v${this.latest_version}).`
+                );
+              } else {
+                this.showMessage(
+                  `🎉 ImJoy is up to date (version ${this.latest_version}).`
+                );
+              }
+            }
+          } else {
+            this.showMessage(
+              `📣 A newer version of ImJoy (version ${
+                this.latest_version
+              }) is available, please refresh your browser.`
+            );
+          }
+        } else {
+          this.latest_version = null;
+        }
+      } catch (e) {
+        this.showMessage("failed to fetch imjoy version information");
+      } finally {
+        this.checking = false;
+      }
     },
     getDefaultInputLoaders() {
       const image_loader = file => {

@@ -61,11 +61,6 @@ if (workbox) {
     new workbox.strategies.NetworkFirst()
   );
 
-  workbox.routing.registerRoute(
-    new RegExp("https://api.netlify.com/api/v1/badges/.*"),
-    new workbox.strategies.NetworkFirst()
-  );
-
   workbox.routing.setDefaultHandler(new workbox.strategies.NetworkOnly());
 
   self.addEventListener("message", e => {

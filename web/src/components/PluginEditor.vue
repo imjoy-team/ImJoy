@@ -144,20 +144,11 @@ export default {
   },
   created() {
     this.store = this.$root.$data.store;
+    this.event_bus = this.$root.$data.store && this.$root.$data.store.event_bus;
+    if (this.event_bus) this.event_bus.$on("resize", this.updateSize);
   },
-  watch: {
-    // window: {
-    //     handler: function(newValue){
-    //       newValue.resize = ()=>{
-    //         setTimeout(()=>{
-    //           this.$data.editor.layout();
-    //         }, 200)
-    //         setTimeout(()=>{
-    //           this.$data.editor.layout();
-    //         }, 500)
-    //       }
-    //     }
-    // }
+  beforeDestroy() {
+    if (this.event_bus) this.event_bus.$off("resize", this.updateSize);
   },
   mounted() {
     this.$el.addEventListener("touchmove", function(ev) {
@@ -167,30 +158,19 @@ export default {
     this.editor = monaco.editor.create(this.$refs.code_editor, {
       value: this.codeValue,
       language: "html",
+      minimap: {
+        enabled: this.$el.clientWidth > 500,
+      },
     });
 
     this.editor.layout();
     this.window.refresh();
     if (this.window) {
       this.window.resize = () => {
-        setTimeout(() => {
-          this.editor.layout();
-          this.window.refresh();
-        }, 200);
-        setTimeout(() => {
-          this.editor.layout();
-          this.window.refresh();
-        }, 500);
+        this.$nextTick(this.updateSize);
       };
     }
-    setTimeout(() => {
-      this.editor.layout();
-      this.window.refresh();
-    }, 200);
-    setTimeout(() => {
-      this.editor.layout();
-      this.window.refresh();
-    }, 500);
+    this.updateSize();
 
     this.editor.addCommand(
       window.monaco.KeyMod.CtrlCmd | window.monaco.KeyCode.KEY_S,
@@ -206,6 +186,31 @@ export default {
     );
   },
   methods: {
+    updateSize() {
+      if (this.editor) {
+        const medianScreen = this.$el.clientWidth > 500;
+        const bigScreen = this.$el.clientWidth > 900;
+        this.editor.updateOptions({
+          minimap: {
+            enabled: bigScreen,
+          },
+          lineNumbers: medianScreen ? "on" : "off",
+          glyphMargin: medianScreen,
+          folding: medianScreen,
+          lineDecorationsWidth: medianScreen ? 5 : 2,
+          lineNumbersMinChars: 0,
+        });
+        this.editor.layout();
+        setTimeout(() => {
+          this.editor.layout();
+          this.window.refresh();
+        }, 200);
+        setTimeout(() => {
+          this.editor.layout();
+          this.window.refresh();
+        }, 500);
+      }
+    },
     save() {
       assert(this.window.plugin_manager);
       return new Promise((resolve, reject) => {

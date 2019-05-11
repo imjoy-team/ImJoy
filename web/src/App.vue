@@ -89,6 +89,20 @@ body {
   }
 }
 
+.md-list-item-content {
+  min-height: 48px;
+}
+
+@media screen and (max-height: 800px) and (pointer: fine) {
+  .md-list-item-content {
+    min-height: 36px;
+  }
+}
+
+.md-menu-content {
+  max-height: 60vh;
+}
+
 .md-app-content {
   padding: 0px;
 }

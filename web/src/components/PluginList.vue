@@ -278,7 +278,16 @@ export default {
         this.searchPlugin();
       }
     } else if (this.configUrl) {
-      axios.get(this.configUrl).then(response => {
+      let uri = this.configUrl;
+      //if the file is from github or gist, then add random query string to avoid browser caching
+      if (
+        (uri.startsWith("https://raw.githubusercontent.com") ||
+          uri.startsWith("https://gist.githubusercontent.com")) &&
+        uri.indexOf("?") === -1
+      ) {
+        uri = uri + "?" + randId();
+      }
+      axios.get(uri).then(response => {
         if (response && response.data && response.data.plugins) {
           this.manifest = response.data;
           this.available_plugins = this.manifest.plugins;
@@ -374,7 +383,15 @@ export default {
             console.log("error occured when editing ", plugin.name, err);
           });
       } else {
-        const uri = plugin.uri;
+        let uri = plugin.uri;
+        //if the file is from github or gist, then add random query string to avoid browser caching
+        if (
+          (uri.startsWith("https://raw.githubusercontent.com") ||
+            uri.startsWith("https://gist.githubusercontent.com")) &&
+          uri.indexOf("?") === -1
+        ) {
+          uri = uri + "?" + randId();
+        }
         axios.get(uri).then(response => {
           if (!response || !response.data) {
             alert("failed to get plugin code from " + uri);
@@ -403,7 +420,15 @@ export default {
             console.log("error occured when editing ", plugin.name, err);
           });
       } else {
-        const uri = plugin.uri;
+        let uri = plugin.uri;
+        //if the file is from github or gist, then add random query string to avoid browser caching
+        if (
+          (uri.startsWith("https://raw.githubusercontent.com") ||
+            uri.startsWith("https://gist.githubusercontent.com")) &&
+          uri.indexOf("?") === -1
+        ) {
+          uri = uri + "?" + randId();
+        }
         axios.get(uri).then(response => {
           if (!response || !response.data) {
             alert("failed to get plugin code from " + uri);

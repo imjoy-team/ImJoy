@@ -31,7 +31,11 @@
         <p class="badges">
           <a href="https://github.com/oeway/ImJoy" target="_blank"
             ><img
-              src="https://img.shields.io/badge/dynamic/json.svg?color=success&label=imjoy&prefix=v&query=version&url=https://raw.githubusercontent.com/oeway/ImJoy/master/web/package.json"
+              :src="
+                'https://img.shields.io/badge/imjoy-v' +
+                  app_version +
+                  '-success.svg'
+              "
               alt="ImJoy"
           /></a>
           &nbsp;
@@ -63,8 +67,13 @@
 </template>
 
 <script>
+import { version } from "../../package.json";
+
 export default {
   name: "home",
+  created() {
+    this.app_version = version;
+  },
 };
 </script>
 

@@ -19,7 +19,7 @@
           <span>Add Plugin Engine 🚀</span>
         </md-menu-item>
         <div v-for="engine in engineManager.engines" :key="engine.url">
-          <md-divider></md-divider>
+          <!-- <md-divider></md-divider> -->
           <md-menu-item v-if="engine.connected" @click="showInfo(engine)">
             <md-button
               v-if="
@@ -52,13 +52,13 @@
               v-for="p in engine.plugin_processes"
               :key="p.pid"
             >
-              &nbsp;&nbsp; - {{ p.name }} (#{{ p.pid }})
-              <md-button
+              &nbsp;&nbsp;<md-button
                 @click.stop="kill(engine, p)"
                 class="md-icon-button md-accent"
               >
                 <md-icon>clear</md-icon>
               </md-button>
+              {{ p.name }} (#{{ p.pid }})
             </md-menu-item>
             <md-menu-item v-if="!engine.plugin_processes">
               <md-button>
@@ -144,14 +144,16 @@
     >
       <md-dialog-title>About Plugin Engine</md-dialog-title>
       <md-dialog-content v-if="selected_engine">
-        <h3>
-          {{
-            selected_engine.url.replace(
-              local_engine_url,
-              "My computer (" + local_engine_url + ")"
-            )
-          }}
-        </h3>
+        <h4>
+          <a :href="selected_engine.url" target="_blank">
+            {{
+              selected_engine.url.replace(
+                local_engine_url,
+                "My computer (" + local_engine_url + ")"
+              )
+            }}
+          </a>
+        </h4>
         <md-field>
           <label for="connection_token">Connection Token</label>
           <md-input
@@ -240,14 +242,13 @@
               v-for="p in selected_engine.plugin_processes"
               :key="p.pid"
             >
-              &nbsp;&nbsp;
-              {{ p.name }} (#{{ p.pid }})
-              <md-button
+              &nbsp;<md-button
                 @click.stop="kill(selected_engine, p)"
                 class="md-icon-button md-accent small-icon-button"
               >
                 <md-icon>clear</md-icon>
               </md-button>
+              {{ p.name }} (#{{ p.pid }})
             </li>
             <li v-if="!selected_engine.plugin_processes">
               <md-button>
@@ -396,7 +397,7 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 .engine-panel {
-  width: 350px !important;
+  width: 280px !important;
   max-width: 100% !important;
 }
 
@@ -408,5 +409,20 @@ export default {
   width: 22px !important;
   min-width: 22px !important;
   height: 22px !important;
+}
+
+.md-list-item {
+  height: 48px;
+}
+
+.md-list-item {
+  padding: 2px 0;
+}
+
+@media screen and (max-height: 800px) and (pointer: fine) {
+  .md-list-item {
+    height: 36px;
+    min-height: 36px;
+  }
 }
 </style>
