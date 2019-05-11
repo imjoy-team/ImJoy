@@ -100,7 +100,7 @@ export class Engine {
 
         socket.on('connect', () => {
           clearTimeout(timer)
-          if(this.connection_lost_timer){
+          if(this.connection_lost_timer && this.socket_id === socket.id){
             clearTimeout(this.connection_lost_timer)
             this.connection_lost_timer = null
 
