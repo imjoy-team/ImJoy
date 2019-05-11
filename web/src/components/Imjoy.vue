@@ -1850,6 +1850,10 @@ export default {
       this.$forceUpdate();
       this.$nextTick(() => {
         this.checkUpdate();
+        //check for update every 20 minutes
+        window.setInterval(() => {
+          this.checkUpdate();
+        }, 1200000);
       });
     },
     addWindowCallback(w) {
