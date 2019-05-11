@@ -1,6 +1,6 @@
 {
   "name": "ImJoy.io",
-  "version": "0.9.46",
+  "version": "0.9.47",
   "private": true,
   "description": "ImJoy -- deploying deep learning made easy.",
   "author": "Wei OUYANG <wei.ouyang@cri-paris.org>",
@@ -11,6 +11,7 @@
     "check-format": "prettier --check \"{src,tests}/**/**\"",
     "format": "prettier --write \"{src,tests}/**/**\"",
     "lint": "vue-cli-service lint",
+    "check": "vue-cli-service lint && prettier --check \"{src,tests}/**/**\" && vue-cli-service test:unit",
     "deploy": "DEPLOY_MODE=dev vue-cli-service build && node ./deploy-dev.js"
   },
   "dependencies": {
