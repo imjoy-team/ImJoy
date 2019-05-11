@@ -18,33 +18,35 @@ api = null;
  * @param {Object} msg stack provided by error.stack or a message
  */
 var printError = function(msg) {
-  console.error(msg);
-};
+    console.error(msg);
+}
+
 
 /**
  * Event lisener for the plugin message
  */
-process.on("message", function(m) {
-  switch (m.type) {
-    case "import":
-      importScript(m.url);
-      break;
-    case "importJailed":
-      importScriptJailed(m.url);
-      break;
-    case "execute":
-      execute(m.code);
-      break;
-    case "message":
-      // unhandled exception would break the IPC channel
-      try {
-        conn._messageHandler(m.data);
-      } catch (e) {
-        printError(e.stack);
-      }
-      break;
-  }
+process.on('message', function(m) {
+    switch(m.type){
+    case 'import':
+        importScript(m.url);
+        break;
+    case 'importJailed':
+        importScriptJailed(m.url);
+        break;
+    case 'execute':
+        execute(m.code);
+        break;
+    case 'message':
+        // unhandled exception would break the IPC channel
+        try {
+            conn._messageHandler(m.data);
+        } catch(e) {
+            printError(e.stack);
+        }
+        break;
+    }
 });
+
 
 /**
  * Checks if the given path is remote
@@ -53,11 +55,10 @@ process.on("message", function(m) {
  * @returns {Boolean} true if path is remote
  */
 var isRemote = function(path) {
-  return (
-    path.substr(0, 7).toLowerCase() == "http://" ||
-    path.substr(0, 8).toLowerCase() == "https://"
-  );
-};
+    return (path.substr(0,7).toLowerCase() == 'http://' ||
+            path.substr(0,8).toLowerCase() == 'https://');
+}
+
 
 /**
  * Loads and executes the JavaScript file with the given url
@@ -65,29 +66,31 @@ var isRemote = function(path) {
  * @param {String} url of the script to load
  */
 var importScript = function(url) {
-  var sCb = function() {
-    process.send({ type: "importSuccess", url: url });
-  };
-
-  var fCb = function() {
-    process.send({ type: "importFailure", url: url });
-  };
-
-  var run = function(code) {
-    executeNormal(code, url, sCb, fCb);
-  };
-
-  if (isRemote(url)) {
-    loadRemote(url, run, fCb);
-  } else {
-    try {
-      run(loadLocal(url));
-    } catch (e) {
-      printError(e.stack);
-      fCb();
+    var sCb = function() {
+       process.send({type: 'importSuccess', url: url});
     }
-  }
-};
+
+    var fCb = function() {
+        process.send({type: 'importFailure', url: url});
+    }
+
+    var run = function(code) {
+        executeNormal(code, url, sCb, fCb);
+    }
+
+    if (isRemote(url)) {
+        loadRemote(url, run, fCb);
+    } else {
+        try {
+            run(loadLocal(url));
+        } catch(e) {
+            printError(e.stack);
+            fCb();
+        }
+    }
+
+}
+
 
 /**
  * Loads and executes the JavaScript file with the given url in a
@@ -96,29 +99,32 @@ var importScript = function(url) {
  * @param {String} url of the script to load
  */
 var importScriptJailed = function(url) {
-  var sCb = function() {
-    process.send({ type: "importSuccess", url: url });
-  };
-
-  var fCb = function() {
-    process.send({ type: "importFailure", url: url });
-  };
-
-  var run = function(code) {
-    executeJailed(code, url, sCb, fCb);
-  };
-
-  if (isRemote(url)) {
-    loadRemote(url, run, fCb);
-  } else {
-    try {
-      run(loadLocal(url));
-    } catch (e) {
-      printError(e.stack);
-      fCb();
+    var sCb = function() {
+       process.send({type: 'importSuccess', url: url});
     }
-  }
-};
+
+    var fCb = function() {
+       process.send({type: 'importFailure', url: url});
+    }
+
+    var run = function(code) {
+        executeJailed(code, url, sCb, fCb);
+    }
+
+    if (isRemote(url)) {
+        loadRemote(url, run, fCb);
+    } else {
+        try {
+            run(loadLocal(url));
+        } catch (e) {
+            printError(e.stack);
+            fCb();
+        }
+
+    }
+
+}
+
 
 /**
  * Executes the given code in the jailed environment, sends the
@@ -127,16 +133,17 @@ var importScriptJailed = function(url) {
  * @param {String} code to execute
  */
 var execute = function(code) {
-  var sCb = function() {
-    process.send({ type: "executeSuccess" });
-  };
+    var sCb = function() {
+        process.send({type: 'executeSuccess'});
+    }
 
-  var fCb = function(e) {
-    process.send({ type: "executeFailure", error: e.toString() });
-  };
+    var fCb = function(e) {
+        process.send({type: 'executeFailure', error: e.toString()});
+    }
 
-  executeJailed(code, "DYNAMIC PLUGIN", sCb, fCb);
-};
+    executeJailed(code, 'DYNAMIC PLUGIN', sCb, fCb);
+}
+
 
 /**
  * Executes the given code in the current environment / scope, runs
@@ -148,15 +155,16 @@ var execute = function(code) {
  * @param {Function} fCb
  */
 var executeNormal = function(code, url, sCb, fCb) {
-  // var err = null;
-  try {
-    require("vm").runInThisContext(code, url);
-    sCb();
-  } catch (e) {
-    printError(e.stack);
-    fCb();
-  }
-};
+    // var err = null;
+    try {
+        require('vm').runInThisContext(code, url);
+        sCb();
+    } catch (e) {
+        printError(e.stack);
+        fCb();
+    }
+}
+
 
 /**
  * Executes the given code in a jailed environment, runs the
@@ -168,29 +176,30 @@ var executeNormal = function(code, url, sCb, fCb) {
  * @param {Function} fCb
  */
 var executeJailed = function(code, url, sCb, fCb) {
-  var vm = require("vm");
-  var sandbox = {};
-  var expose = [
-    "application",
-    "setTimeout",
-    "setInterval",
-    "clearTimeout",
-    "clearInterval",
-  ];
+    var vm  = require('vm');
+    var sandbox = {};
+    var expose = [
+        'application',
+        'setTimeout',
+        'setInterval',
+        'clearTimeout',
+        'clearInterval'
+    ];
 
-  for (var i = 0; i < expose.length; i++) {
-    sandbox[expose[i]] = global[expose[i]];
-  }
+    for (var i = 0; i < expose.length; i++) {
+        sandbox[expose[i]] = global[expose[i]];
+    }
 
-  code = '"use strict";\n' + code;
-  try {
-    vm.runInNewContext(code, vm.createContext(sandbox), url);
-    sCb();
-  } catch (e) {
-    printError(e.stack);
-    fCb(e);
-  }
-};
+    code = '"use strict";\n'+code;
+    try {
+        vm.runInNewContext(code, vm.createContext(sandbox), url);
+        sCb();
+    } catch (e) {
+        printError(e.stack);
+        fCb(e);
+    }
+}
+
 
 /**
  * Loads local file and
@@ -200,10 +209,9 @@ var executeJailed = function(code, url, sCb, fCb) {
  * @returns {String} file contents
  */
 var loadLocal = function(path) {
-  return require("fs")
-    .readFileSync(path)
-    .toString();
-};
+    return require("fs").readFileSync(path).toString();
+}
+
 
 /**
  * Downloads the script by remote url and provides its content as a
@@ -214,54 +222,46 @@ var loadLocal = function(path) {
  * @param {Function} fCb failure callback
  */
 var loadRemote = function(url, sCb, fCb) {
-  var receive = function(res) {
-    if (res.statusCode != 200) {
-      var msg =
-        "Failed to load " +
-        url +
-        "\n" +
-        "HTTP responce status code: " +
-        res.statusCode;
-      printError(msg);
-      fCb();
-    } else {
-      var content = "";
-      res.on("end", function() {
-        sCb(content);
-      });
-      res.on("readable", function() {
-        var chunk = res.read();
-        content += chunk.toString();
-      });
+    var receive = function(res) {
+        if (res.statusCode != 200) {
+            var msg = 'Failed to load ' + url + '\n' +
+                'HTTP responce status code: ' + res.statusCode;
+            printError(msg);
+            fCb();
+        } else {
+            var content = '';
+            res.on('end', function(){ sCb(content); });
+            res.on(
+                'readable',
+                function() {
+                    var chunk = res.read();
+                    content += chunk.toString();
+                }
+           );
+        }
     }
-  };
 
-  try {
-    require("http")
-      .get(url, receive)
-      .on("error", fCb);
-  } catch (e) {
-    printError(e.stack);
-    fCb();
-  }
-};
+    try {
+        require('http').get(url, receive).on('error', fCb);
+    } catch (e) {
+        printError(e.stack);
+        fCb();
+    }
+}
+
 
 /**
  * Connection object provided to the SandboxedSite constructor, plugin
  * site implementation for the Node.js environment
  */
 var conn = {
-  disconnect: function() {
-    process.exit();
-  },
-  send: function(data, transferables) {
-    process.send({ type: "message", data: data }, transferables);
-  },
-  onMessage: function(h) {
-    conn._messageHandler = h;
-  },
-  _messageHandler: function() {},
-  onDisconnect: function() {},
+    disconnect: function(){ process.exit(); },
+    send: function(data, transferables) {
+        process.send({type: 'message', data: data}, transferables);
+    },
+    onMessage: function(h){ conn._messageHandler = h; },
+    _messageHandler: function(){},
+    onDisconnect: function() {}
 };
 
 connection = conn;
