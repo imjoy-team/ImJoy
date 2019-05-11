@@ -11,7 +11,7 @@
     "check-format": "prettier --check \"{src,tests}/**/**\"",
     "format": "prettier --write \"{src,tests}/**/**\"",
     "lint": "vue-cli-service lint",
-    "check": "vue-cli-service lint && prettier --check \"{src,tests}/**/**\" && vue-cli-service test:unit",
+    "check": "prettier --check \"{src,tests}/**/**\" && vue-cli-service lint && vue-cli-service test:unit",
     "deploy": "DEPLOY_MODE=dev vue-cli-service build && node ./deploy-dev.js"
   },
   "dependencies": {
