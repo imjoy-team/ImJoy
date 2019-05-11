@@ -212,10 +212,13 @@ export class PluginManager {
             this.repository_names.push(r.name);
           }
           this.config_db
-            .put({
-              _id: "repository_list",
-              list: this.repository_list,
-            })
+            .put(
+              {
+                _id: "repository_list",
+                list: this.repository_list,
+              },
+              { force: true }
+            )
             .then(() => {
               resolve(this.repository_list);
             })
@@ -243,11 +246,14 @@ export class PluginManager {
         })
         .finally(() => {
           this.config_db
-            .put({
-              _id: "repository_list",
-              _rev: _rev || undefined,
-              list: this.repository_list,
-            })
+            .put(
+              {
+                _id: "repository_list",
+                _rev: _rev || undefined,
+                list: this.repository_list,
+              },
+              { force: true }
+            )
             .then(() => {
               resolve(this.repository_list);
             })
