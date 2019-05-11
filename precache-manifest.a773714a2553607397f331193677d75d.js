@@ -1,11 +1,11 @@
 self.__precacheManifest = [
   {
-    "revision": "559eddc13412415dfdcf",
-    "url": "/static/css/app.5bd30cda.css"
+    "revision": "f29f47c56d84419c89e5",
+    "url": "/static/css/app.390e0d03.css"
   },
   {
-    "revision": "559eddc13412415dfdcf",
-    "url": "/static/js/app.17526a4e.js"
+    "revision": "f29f47c56d84419c89e5",
+    "url": "/static/js/app.fa3a3434.js"
   },
   {
     "revision": "b8859e2632feade2aed6",
@@ -228,19 +228,19 @@ self.__precacheManifest = [
     "url": "/static/js/chunk-vendors.13c6622d.js"
   },
   {
-    "revision": "b00449080615ce71a2a8a52aee9f658f",
-    "url": "/static/vs/css.worker.js"
+    "revision": "2a3e222e6a41b32a7180e6afa3675990",
+    "url": "/static/vs/html.worker.js"
   },
   {
     "revision": "493ef474936217113b20a6573247288a",
     "url": "/static/vs/editor.worker.js"
   },
   {
-    "revision": "2a3e222e6a41b32a7180e6afa3675990",
-    "url": "/static/vs/html.worker.js"
+    "revision": "b00449080615ce71a2a8a52aee9f658f",
+    "url": "/static/vs/css.worker.js"
   },
   {
-    "revision": "cab6199cb70c8beb45f5a9271cc1cdd9",
+    "revision": "d5e75f19be2a479797d75e9b0656f4f2",
     "url": "/index.html"
   },
   {
@@ -436,12 +436,12 @@ self.__precacheManifest = [
     "url": "/static/img/imjoy-icon-white.png"
   },
   {
-    "revision": "e37c947f86aa593ba9e34029c119257a",
-    "url": "/static/img/imjoy-icon.png"
-  },
-  {
     "revision": "0cc69c2a860acde29e9411275ca4bb8d",
     "url": "/static/img/imjoy-icon-white.svg"
+  },
+  {
+    "revision": "e37c947f86aa593ba9e34029c119257a",
+    "url": "/static/img/imjoy-icon.png"
   },
   {
     "revision": "0c8de05e92e480a948f58cb8e808f67b",
