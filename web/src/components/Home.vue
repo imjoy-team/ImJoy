@@ -28,7 +28,25 @@
           />
         </p>
         <h1>Deploying Deep Learning Made Easy!</h1>
-        <span class="space-holder"></span>
+        <p class="badges">
+          <a href="https://github.com/oeway/ImJoy" target="_blank"
+            ><img
+              src="https://img.shields.io/badge/dynamic/json.svg?color=success&label=imjoy&prefix=v&query=version&url=https://raw.githubusercontent.com/oeway/ImJoy/master/web/package.json"
+              alt="ImJoy"
+          /></a>
+          &nbsp;
+
+          <a href="https://travis-ci.com/oeway/ImJoy" target="_blank"
+            ><img
+              src="https://travis-ci.com/oeway/ImJoy.svg?branch=master"
+              alt="Travis-CI"/></a
+          >&nbsp;
+          <a href="https://github.com/oeway/ImJoy" target="_blank">
+            <img
+              src="https://img.shields.io/github/license/oeway/ImJoy-Engine.svg"
+              alt="LICENSE"/></a
+          >&nbsp;
+        </p>
         <p>
           <a href="https://github.com/oeway/ImJoy/" target="_blank">GitHub</a>
           <a href="/docs">Docs</a>
@@ -54,5 +72,8 @@ export default {
 <style scoped>
 .space-holder {
   height: 40px;
+}
+.badges > a > img {
+  width: unset;
 }
 </style>

@@ -222,6 +222,8 @@ Within the **``<config>``** block, the following fields can be made configurable
 - `icon`
 - `ui`
 - `type`
+- `flags`
+- `cover`
 
 **Example 1**: a python plugin should install different requirements depending if it will
 be executed on GPU or CPU. You can then defined two tags: `"tags" : ["GPU", "CPU"]`.

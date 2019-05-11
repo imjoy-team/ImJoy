@@ -6,9 +6,7 @@
         alt="LICENSE"/></a
     >&nbsp;
     <a href="https://zenodo.org/badge/latestdoi/137741898" target="_blank"
-      ><img
-        src="https://zenodo.org/badge/137741898.svg"
-        alt="DOI"/></a
+      ><img src="https://zenodo.org/badge/137741898.svg" alt="DOI"/></a
     >&nbsp;
     <a href="https://travis-ci.com/oeway/ImJoy" target="_blank"
       ><img
@@ -18,8 +16,8 @@
     <a href="https://app.netlify.com/sites/imjoy/deploys" target="_blank"
       ><img
         src="https://api.netlify.com/api/v1/badges/3aa71748-2778-4c31-a9ea-f7fdf5445fd1/deploy-status"
-        alt="Netlify-Deploy"
-    /></a>&nbsp;
+        alt="Netlify-Deploy"/></a
+    >&nbsp;
     <a href="https://github.com/oeway/ImJoy-Engine" target="_blank"
       ><img
         src="https://img.shields.io/badge/dynamic/json.svg?color=success&label=imjoy%20engine&prefix=v&query=version&url=https%3A%2F%2Fraw.githubusercontent.com%2Foeway%2FImJoy-Engine%2Fmaster%2Fimjoy%2FVERSION"
