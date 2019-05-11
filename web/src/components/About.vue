@@ -1,123 +1,69 @@
 <template>
   <div class="about">
-    <a href="https://zenodo.org/badge/latestdoi/137741898"
-      ><img
-        src="https://zenodo.org/badge/137741898.svg"
-        target="_blank"
-        alt="DOI"/></a
-    >&nbsp;
-    <a href="https://travis-ci.com/oeway/ImJoy"
-      ><img
-        src="https://travis-ci.com/oeway/ImJoy.svg?branch=master"
-        target="_blank"
-        alt="Travis-CI"/></a
-    >&nbsp;
-    <a href="https://app.netlify.com/sites/imjoy/deploys"
-      ><img
-        src="https://api.netlify.com/api/v1/badges/3aa71748-2778-4c31-a9ea-f7fdf5445fd1/deploy-status"
-        target="_blank"
-        alt="Netlify-Deploy"
-    /></a>
-    <br />
-    <br />
+    <a href="https://zenodo.org/badge/latestdoi/137741898"><img src="https://zenodo.org/badge/137741898.svg" target="_blank" alt="DOI"></a>&nbsp;
+    <a href="https://travis-ci.com/oeway/ImJoy"><img src="https://travis-ci.com/oeway/ImJoy.svg?branch=master" target="_blank" alt="Travis-CI"></a>&nbsp;
+    <a href="https://app.netlify.com/sites/imjoy/deploys"><img src="https://api.netlify.com/api/v1/badges/3aa71748-2778-4c31-a9ea-f7fdf5445fd1/deploy-status" target="_blank" alt="Netlify-Deploy"></a>
+    <br>
+    <br>
     <img style="width: 300px" src="static/img/imjoy-logo-black.svg" />
-    <br />
-    <md-button
-      class="normal-text"
-      href="https://github.com/oeway"
-      target="_blank"
-      >Version: {{ app_version }} <br />
-      Made by Wei OUYANG with <span class="red">❤</span></md-button
-    >
-    <br />
-    <br />
-    <p>
-      The ImJoy project was originally carried out in
-      <a
-        href="https://research.pasteur.fr/en/team/imaging-and-modeling/"
-        target="_blank"
-        >Imaging and Modeling Unit</a
-      >
-      at Institut Pasteur.
-    </p>
-    <p>
-      Ongoing development of ImJoy is mainly supported by the
-      <a
-        href="https://www.scilifelab.se/researchers/emma-lundberg/"
-        target="_blank"
-        >Cell Profiling Group</a
-      >
-      headed by Emma Lundberg at
-      <a href="https://www.scilifelab.se/" target="_blank">SciLifeLab</a>.
-    </p>
+    <br>
+    <md-button class="normal-text" href="https://github.com/oeway" target="_blank">Version: {{app_version}} <br>  Made by Wei OUYANG with <span class="red">❤</span></md-button>
+    <br>
+    <br>
+    <p>The ImJoy project was originally carried out in <a href="https://research.pasteur.fr/en/team/imaging-and-modeling/" target="_blank">Imaging and Modeling Unit</a> at Institut Pasteur.</p>
+    <p>Ongoing development of ImJoy is mainly supported by the <a href="https://www.scilifelab.se/researchers/emma-lundberg/" target="_blank">Cell Profiling Group</a> headed by Emma Lundberg at <a href="https://www.scilifelab.se/" target="_blank">SciLifeLab</a>.</p>
     <p>Main Contributors:</p>
     <ul>
       <li>Wei OUYANG</li>
       <li>Florian MUELLER</li>
       <li>Martin HJELMARE</li>
     </ul>
-    <p>
-      We also thank
-      <a
-        href="https://sites.google.com/site/imagingandmodeling/people"
-        target="_blank"
-        >all the team members</a
-      >
-      from the Imaging and Modeling Unit and people who have been using,
-      testing, contributing valuable feedbacks and suggestions for improving
-      ImJoy.
+    <p>We also thank <a href="https://sites.google.com/site/imagingandmodeling/people" target="_blank">all the team members</a> from the Imaging and Modeling Unit and people who have been using, testing, contributing valuable feedbacks and suggestions for improving ImJoy.</p>
+    <p>This project is mainly funded by
     </p>
-    <p>This project is mainly funded by</p>
     <p>
       <a href="https://www.pasteur.fr" target="_blank">
-        <img
-          style="width: 150px; margin: 10px;"
-          src="static/img/Institut_Pasteur_logo.svg"
-          alt="Institut Pasteur"
-        />
-        &nbsp;&nbsp;
-        <img
-          style="width: 150px; margin: 10px;"
-          src="static/img/logga-KAW-300x155.png"
-        />
-      </a>
-    </p>
+     <img style="width: 150px; margin: 10px;" src="static/img/Institut_Pasteur_logo.svg" alt="Institut Pasteur">
+     &nbsp;&nbsp;
+     <img style="width: 150px; margin: 10px;" src="static/img/logga-KAW-300x155.png" />
+     </a>
+   </p>
   </div>
 </template>
 
 <script>
-import { version } from "../../package.json";
+import {version} from '../../package.json';
 
 export default {
-  name: "about",
-  created() {
-    this.app_version = version;
-  },
-};
+  name: 'about',
+  created (){
+    this.app_version = version
+  }
+}
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-.about {
+.about{
   padding: 40px;
   overflow-y: auto !important;
   max-width: 800px;
   position: absolute;
   left: 50%;
   margin-right: -50%;
-  transform: translate(-50%, 0%);
+  transform: translate(-50%, 0%)
 }
-.centered-fixed {
+.centered-fixed{
   max-width: 800px;
   margin: 0 auto;
-  text-align: center;
+  text-align:center;
 }
-.normal-text {
+.normal-text{
   text-transform: none;
 }
-.red {
+.red{
   display: inline-block;
   color: #f44336;
-  transition: 0.3s;
+  transition: .3s;
 }
 </style>

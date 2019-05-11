@@ -1,58 +1,55 @@
 <template>
-  <md-app id="app" md-waterfall md-mode="fixed">
-    <md-app-content>
-      <router-view />
-    </md-app-content>
-  </md-app>
+    <md-app id="app"  md-waterfall md-mode="fixed">
+      <md-app-content>
+        <router-view/>
+      </md-app-content>
+   </md-app>
 </template>
 <script>
 export default {
-  name: "app",
-  data() {
+  name: 'app',
+  data () {
     return {
-      show_navbar: true,
-    };
+      show_navbar: true
+    }
   },
-  mounted() {
-    if (window.location.href.indexOf("navbar=0") >= 0) {
-      this.show_navbar = false;
+  mounted(){
+    if(window.location.href.indexOf('navbar=0')>=0){
+      this.show_navbar = false
     }
 
-    this.$nextTick(() => {
-      const updateSize = () => {
-        this.$root.$data.store.event_bus.$emit("resize", {
-          height: window.innerHeight,
-          width: window.innerWidth,
-        });
-      };
-      updateSize();
+    this.$nextTick(()=>{
+      const updateSize = ()=>{
+        this.$root.$data.store.event_bus.$emit('resize', {height:window.innerHeight, width:window.innerWidth})
+      }
+      updateSize()
       // window.addEventListener('resize', updateSize);
-      document.addEventListener(
-        "orientationchange",
-        (window.onresize = updateSize)
-      );
+      document.addEventListener("orientationchange", window.onresize = updateSize)
 
       // hide animation
-      const element = document.getElementById("welcome-page");
-      if (element) element.parentNode.removeChild(element);
+      const element = document.getElementById('welcome-page')
+      if(element) element.parentNode.removeChild(element);
 
-      const element2 = document.getElementById("loading-imjoy-section");
-      if (element2) element2.parentNode.removeChild(element2);
-    });
+      const element2 = document.getElementById('loading-imjoy-section')
+      if(element2) element2.parentNode.removeChild(element2);
+
+
+    })
   },
   methods: {
     show(info, duration) {
-      this.snackbar_info = info;
-      this.snackbar_duration = duration || 3000;
-      this.showSnackbar = true;
+        this.snackbar_info = info
+        this.snackbar_duration = duration || 3000
+        this.showSnackbar = true
     },
   },
-  watch: {},
-};
+  watch: {
+  }
+}
 </script>
 
 <style>
-/* #app {
+ /* #app {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -60,47 +57,42 @@ export default {
   color: #2c3e50;
   margin-top: 0px;
 } */
-html,
-body {
-  height: 100%;
-  width: 100%;
-  overflow-y: hidden;
-  overflow-x: hidden;
-  -webkit-overflow-scrolling: touch;
-  -webkit-transform: translate3d(0, 0, 0);
-  /* Disables pull-to-refresh but allows overscroll glow effects. */
-  overscroll-behavior-y: contain;
-  overscroll-behavior-x: none;
-  position: fixed;
+html, body
+{
+    height: 100%;
+    width: 100%;
+    overflow-y: hidden;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    -webkit-transform: translate3d(0,0,0);
+    /* Disables pull-to-refresh but allows overscroll glow effects. */
+    overscroll-behavior-y: contain;
+    overscroll-behavior-x: none;
+    position: fixed;
 }
 
-.h1,
-h1 {
-  font-size: 1.3rem !important;
+.h1, h1 {
+  font-size: 1.3rem!important;
 }
 
-.h2,
-h2 {
-  font-size: 1rem !important;
+.h2, h2 {
+   font-size: 1.0rem!important;
 }
 
-.h3,
-h3 {
-  font-size: 0.8rem !important;
+.h3, h3 {
+   font-size: 0.8rem!important;
 }
 
-.h4,
-h4 {
-  font-size: 0.75rem !important;
+.h4, h4 {
+   font-size: 0.75rem!important;
 }
 
-.h5,
-h5 {
-  font-size: 0.7rem !important;
+.h5, h5 {
+   font-size: 0.7rem!important;
 }
 
 .md-app {
-  height: 100%;
+  height:100%;
   margin: 0px;
 }
 
@@ -114,23 +106,23 @@ h5 {
   }
 }
 
-.md-app-content {
+.md-app-content{
   padding: 0px;
 }
 
-.md-list-item-content {
+.md-list-item-content{
   justify-content: flex-start !important;
 }
 
-.joy-run-button .md-ripple {
+.joy-run-button .md-ripple{
   justify-content: flex-start !important;
 }
 
-.md-menu-content {
+.md-menu-content{
   z-index: 9998;
 }
 
-.md-tooltip {
+.md-tooltip{
   z-index: 9999;
 }
 
@@ -143,19 +135,19 @@ h5 {
   font-size: 16px !important;
 }
 
-.table-head-checkbox {
+.table-head-checkbox{
   margin-top: 5px;
   width: 50px;
 }
 
-.CodeMirror {
+.CodeMirror{
   /* height: 500px!important; */
-  height: calc(100%) !important;
-  width: calc(100%) !important;
+  height: calc(100%)!important;
+  width: calc(100%)!important;
   max-width: 1000px;
 }
 
-.vue-resizable-handle {
+.vue-resizable-handle{
   z-index: 9999 !important;
 }
 /*
@@ -179,21 +171,20 @@ h5 {
                                   supported by Chrome and Opera */
 }
 
-.md-dialog-container {
+.md-dialog-container{
   max-width: 100% !important;
   overflow: auto;
   -webkit-transform: translateZ(0);
 }
 
 .md-toolbar.md-dense {
-  min-height: 36px;
+    min-height: 36px;
 }
 
-li.md-menu-item {
+li.md-menu-item{
   margin-top: 0px;
 }
-ol li,
-ul li {
-  margin-top: 0rem !important;
+ol li, ul li {
+    margin-top: 0rem!important;
 }
 </style>
