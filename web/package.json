@@ -8,8 +8,8 @@
     "serve": "vue-cli-service serve --host 0.0.0.0",
     "build": "vue-cli-service build",
     "test": "vue-cli-service test:unit",
-    "check-format": "prettier --check \"{src,tests}/**/!(*@(.imjoy.html))\"",
-    "format": "prettier --write \"{src,tests}/**/!(*@(.imjoy.html))\"",
+    "check-format": "prettier --check \"{src,tests}/**/**\"",
+    "format": "prettier --write \"{src,tests}/**/**\"",
     "lint": "vue-cli-service lint",
     "deploy": "DEPLOY_MODE=dev vue-cli-service build && node ./deploy-dev.js"
   },
