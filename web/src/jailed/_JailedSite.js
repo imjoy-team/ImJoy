@@ -136,9 +136,11 @@
      * @param {Object} _interface to set
      */
     JailedSite.prototype.setInterface = function(_interface) {
-        _interface.onclose = (cb)=>{
-          this._remote.onClose(cb)
-        };
+        if(this.id === '__plugin__'){
+          _interface.onClose = (cb)=>{
+            this._remote.onClose(cb)
+          };
+        }
         this._interface = _interface;
         this._sendInterface();
     }
@@ -447,8 +449,8 @@
           }
           this._plugin_interfaces[aObject['__id__']] = encoded_interface
 
-          if(aObject.onclose){
-            aObject.onclose(()=>{
+          if(aObject.onClose){
+            aObject.onClose(()=>{
               delete this._plugin_interfaces[aObject['__id__']]
             })
           }

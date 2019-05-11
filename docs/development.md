@@ -315,12 +315,12 @@ These flags allow to specify how ImJoy instances are handled by the Interface an
 For more information we refer to the dedicated section on [plugin run time behaviour](development?id=controlling-run-time-behaviour-of-native-python-plugins).
 
 * `single-instance` (**for python plugins only**). Python engine will only run a single plugin process even if
-  plugin is called from multiple BUT identical workspaces. In this case, the different ImJoy instances will share
-  the same plugin process.
+  plugin is called from different browsers or workspacess. In this case, the different ImJoy instances will share
+  the same plugin process. This is especially useful when your plugin need to occupy limited resources such as GPU.
 
 * `allow-detach` (**for python plugins only**). Allows the plugin process to detach from the user interface. This means
   the plugin will not be killed when the user interface is disconnected or closed. However, in order to reconnect to this process,
-  you  also need to add the `single-instance` flag.
+  you need to reconnect from the exact browser and same workspace, or add the `single-instance` flag.
 
 Example: to make a plugin which can run without the user interface in the background and to which you can attach set
  `"flags": ["single-instance", "allow-detach"]`. The interface will automatically reconnect to this process when re-launched.
@@ -796,8 +796,9 @@ You can control the run-time behaviour of a Python plugin process with the `flag
 
 Below we describe the three main run-time behaviour of python plugins:
 * By **default** (none of the flags is set), each ImJoy instance has its own process on the plugin engine. If you close the interface, you will kill the process.
-* The **`single-instance`** flag will allow only one process to run for a given workspace. A workspace is defined by its name, all installed plugins, and the selected `tags`. If two ImJoy instances run the exact same workspace, then the `single-instance` means that they access the same process. Only closing last instance will  kill the process.
-* The **`allow-detach`** flag means that the process is not killed when its ImJoy instance is closed. For instance, this allows to perform long computational tasks in the background which don't require additional user feedback and which terminate autonomously. Can also be used to protect a long computational tasks again browser instabilities. If you want to be able to attach to a detached process, the plugin has additionally have the `single-instance` flag.
+* The **`single-instance`** flag will allow only one process to run for the entire plugin engine. For plugins with the same name and tag, then the `single-instance` means that they access the same process. 
+
+* The **`allow-detach`** flag means that the process is not killed when its ImJoy instance is closed. For instance, this allows to perform long computational tasks in the background which don't require additional user feedback and which terminate autonomously. Can also be used to protect a long computational tasks again browser instabilities. If you want to be able to attach to a detached process, your can reconnect from the same browser and workspace, or have the `single-instance` flag which works despite connecting from different browser and workspace.
 
 This is how the `flags` option looks like in the `<config>` block:
 ```json

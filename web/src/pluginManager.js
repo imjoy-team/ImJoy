@@ -1608,12 +1608,17 @@ export class PluginManager {
         console.error("Error occured during creating window ", wconfig, error)
         throw error
       }
+      wconfig.name = wconfig.name || 'untitled window'
       if (wconfig.type && wconfig.type.startsWith('imjoy/')) {
         wconfig.id = 'imjoy_'+randId()
         wconfig.window_type = wconfig.type
-        wconfig.name = wconfig.name || 'untitled window'
+        wconfig._onclose_callbacks = []
+        wconfig.onClose = async ()=>{
+          await Promise.all(wconfig._onclose_callbacks.map(item => item()))
+        }
         if(wconfig.window_container === 'window_dialog_container' && wconfig.render){
           wconfig.render(wconfig)
+          
           const window_plugin_apis = {
             __jailed_type__: 'plugin_api',
             __id__: wconfig.id,
@@ -1623,9 +1628,10 @@ export class PluginManager {
               }
             },
             close: ()=>{
-              if(wconfig.onclose){
-                wconfig.onclose()
-              }
+              this.wm.closeWindow(wconfig)
+            },
+            onClose: (cb)=>{
+              wconfig._onclose_callbacks.push(cb)
             }
           }
           resolve(window_plugin_apis)
@@ -1643,9 +1649,11 @@ export class PluginManager {
               },
               close: ()=>{
                 const w = this.wm.window_ids[wid]
-                if(w.onclose){
-                  w.onclose()
-                }
+                this.wm.closeWindow(w)
+              },
+              onClose: (cb)=>{
+                const w = this.wm.window_ids[wid]
+                w._onclose_callbacks.push(cb)
               }
             }
             resolve(window_plugin_apis)
@@ -1683,11 +1691,11 @@ export class PluginManager {
         if(pconfig.window_container){
           Vue.nextTick(()=>{
             this.renderWindow(pconfig).then((wplugin)=>{
-              pconfig.onclose = ()=>{
+              pconfig.onClose = ()=>{
                 return wplugin.terminate()
               }
               wplugin.api.close = ()=>{
-                return pconfig.onclose()
+                return pconfig.onClose()
               }
               resolve(wplugin.api)
             }).catch(reject)
@@ -1698,13 +1706,13 @@ export class PluginManager {
             this.wm.window_ids[wid].loading = true
             this.wm.window_ids[wid].refresh()
             this.renderWindow(pconfig).then((wplugin)=>{
-              pconfig.onclose = ()=>{
+              pconfig.onClose = ()=>{
                 return wplugin.terminate()
               }
               wplugin.api.close = async ()=>{
                 const w = this.wm.window_ids[wplugin.id]
                 try {
-                  await pconfig.onclose()
+                  await pconfig.onClose()
                 } finally {
                   this.wm.closeWindow(w)
                 }

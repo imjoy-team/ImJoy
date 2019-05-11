@@ -103,9 +103,14 @@ export class Engine {
           if(this.connection_lost_timer && this.socket_id === socket.id){
             clearTimeout(this.connection_lost_timer)
             this.connection_lost_timer = null
-            this.showMessage(`Connection to ${this.name} has been recovered`)
-            return
+
+            //return if it's the same session
+            if(this.socket_id === socket.id){
+              this.showMessage(`Connection to ${this.name} has been recovered`)
+              return
+            }
           }
+          
           socket.emit('register_client', {id: this.client_id, token: token, base_url: url, session_id: this.engine_session_id}, (ret)=>{
             if(ret && ret.success){
               const connect_client = ()=>{

@@ -159,7 +159,6 @@ export default {
       this.$emit('create', new_w)
     },
     close(w) {
-      w.onclose()
       const ai = this.active_windows.indexOf(w)
       if(ai>=0){
         this.active_windows[ai].selected = false
@@ -280,7 +279,7 @@ export default {
   width: 100%;
   height: 100%;
   max-height: 100%;
-  max_width: 100%;
+  max-width: 100%;
   margin: 0px;
 }
 
