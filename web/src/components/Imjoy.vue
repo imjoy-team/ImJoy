@@ -265,7 +265,12 @@
           />
         </form>
       </md-app-toolbar>
-      <md-app-drawer :md-active.sync="menuVisible" md-persistent="full">
+      <md-app-drawer
+        :md-active.sync="menuVisible"
+        @md-closed="wm.resizeAll()"
+        @md-opened="wm.resizeAll()"
+        md-persistent="full"
+      >
         <div class="md-toolbar-row title-bar">
           <div class="md-toolbar-section-start">
             <md-button
@@ -1298,9 +1303,9 @@ export default {
     };
   },
   watch: {
-    menuVisible() {
-      this.wm.resizeAll();
-    },
+    // menuVisible() {
+    //   this.wm.resizeAll();
+    // },
   },
   computed: {
     version_badge_url: function() {
