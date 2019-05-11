@@ -1906,9 +1906,17 @@ export default {
           );
           if (this.is_latest_version) {
             if (!quiet) {
-              this.showMessage(
-                `🎉 ImJoy is up to date (version ${this.latest_version}).`
-              );
+              if (compareVersions(this.imjoy_version, ">", obj.version)) {
+                this.showMessage(
+                  `🍻 Your ImJoy (v${
+                    this.imjoy_version
+                  }) is newer than the release (v${this.latest_version}).`
+                );
+              } else {
+                this.showMessage(
+                  `🎉 ImJoy is up to date (version ${this.latest_version}).`
+                );
+              }
             }
           } else {
             this.showMessage(
