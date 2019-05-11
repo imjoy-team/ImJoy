@@ -144,20 +144,12 @@ export default {
   },
   created() {
     this.store = this.$root.$data.store;
+    this.event_bus =
+      (this.$root.$data.store && this.$root.$data.store.event_bus) || new Vue();
+    this.event_bus.$on("resize", this.updateSize);
   },
-  watch: {
-    // window: {
-    //     handler: function(newValue){
-    //       newValue.resize = ()=>{
-    //         setTimeout(()=>{
-    //           this.$data.editor.layout();
-    //         }, 200)
-    //         setTimeout(()=>{
-    //           this.$data.editor.layout();
-    //         }, 500)
-    //       }
-    //     }
-    // }
+  beforeDestroy(){
+    this.event_bus.$off("resize", this.updateSize);
   },
   mounted() {
     this.$el.addEventListener("touchmove", function(ev) {
@@ -206,6 +198,19 @@ export default {
     );
   },
   methods: {
+    updateSize(){
+      if(this.editor){
+        this.editor.layout();
+        setTimeout(() => {
+          this.editor.layout();
+          this.window.refresh();
+        }, 200);
+        setTimeout(() => {
+          this.editor.layout();
+          this.window.refresh();
+        }, 500);
+      }
+    },
     save() {
       assert(this.window.plugin_manager);
       return new Promise((resolve, reject) => {
