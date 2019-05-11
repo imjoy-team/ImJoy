@@ -516,7 +516,7 @@
             };
           }
         } else if (
-        /*global tf*/
+          /*global tf*/
           typeof tf != "undefined" &&
           tf.Tensor &&
           v instanceof tf.Tensor
@@ -551,7 +551,7 @@
             __dtype__: v.dtype,
           };
         } else if (
-        /*global nj*/
+          /*global nj*/
           typeof nj != "undefined" &&
           nj.NdArray &&
           v instanceof nj.NdArray
@@ -649,7 +649,7 @@
           aObject.__plugin_id__
         );
       } else if (aObject.__jailed_type__ == "ndarray") {
-      /*global nj tf*/
+        /*global nj tf*/
         //create build array/tensor if used in the plugin
         if (this.id == "__plugin__" && typeof nj != "undefined" && nj.array) {
           if (Array.isArray(aObject.__value__)) {
