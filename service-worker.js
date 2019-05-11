@@ -1,4 +1,4 @@
-importScripts("/precache-manifest.318ed0facb4b6517e8ebef9bbf009f04.js", "https://storage.googleapis.com/workbox-cdn/releases/3.6.3/workbox-sw.js");
+importScripts("/precache-manifest.ae6f2676cd317854df2f2c478234ef74.js", "https://storage.googleapis.com/workbox-cdn/releases/3.6.3/workbox-sw.js");
 
 /* eslint-disable */
 
@@ -60,11 +60,6 @@ if (workbox) {
 
   workbox.routing.registerRoute(
     new RegExp("https://zenodo.org/badge/.*"),
-    new workbox.strategies.NetworkFirst()
-  );
-
-  workbox.routing.registerRoute(
-    new RegExp("https://api.netlify.com/api/v1/badges/.*"),
     new workbox.strategies.NetworkFirst()
   );
 
