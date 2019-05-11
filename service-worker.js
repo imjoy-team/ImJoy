@@ -1,4 +1,4 @@
-importScripts("/precache-manifest.65278498a53fbfc393ca8c7d6c83706b.js", "https://storage.googleapis.com/workbox-cdn/releases/3.6.3/workbox-sw.js");
+importScripts("/precache-manifest.318ed0facb4b6517e8ebef9bbf009f04.js", "https://storage.googleapis.com/workbox-cdn/releases/3.6.3/workbox-sw.js");
 
 /* eslint-disable */
 
@@ -44,6 +44,27 @@ if (workbox) {
 
   workbox.routing.registerRoute(
     new RegExp("https://gist.githubusercontent.com/.*"),
+    new workbox.strategies.NetworkFirst()
+  );
+
+  // badges
+  workbox.routing.registerRoute(
+    new RegExp("https://img.shields.io/.*"),
+    new workbox.strategies.NetworkFirst()
+  );
+
+  workbox.routing.registerRoute(
+    new RegExp("https://travis-ci.com/oeway/.*"),
+    new workbox.strategies.NetworkFirst()
+  );
+
+  workbox.routing.registerRoute(
+    new RegExp("https://zenodo.org/badge/.*"),
+    new workbox.strategies.NetworkFirst()
+  );
+
+  workbox.routing.registerRoute(
+    new RegExp("https://api.netlify.com/api/v1/badges/.*"),
     new workbox.strategies.NetworkFirst()
   );
 

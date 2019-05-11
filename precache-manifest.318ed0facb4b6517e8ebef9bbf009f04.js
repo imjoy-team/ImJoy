@@ -1,11 +1,11 @@
 self.__precacheManifest = [
   {
-    "revision": "a0d86391cb71f77e6003",
-    "url": "/static/css/app.ee834d4e.css"
+    "revision": "f7248c9057456d47cbda",
+    "url": "/static/css/app.ebdec0fc.css"
   },
   {
-    "revision": "a0d86391cb71f77e6003",
-    "url": "/static/js/app.56b6876e.js"
+    "revision": "f7248c9057456d47cbda",
+    "url": "/static/js/app.fa86b43f.js"
   },
   {
     "revision": "b8859e2632feade2aed6",
@@ -240,7 +240,7 @@ self.__precacheManifest = [
     "url": "/static/vs/editor.worker.js"
   },
   {
-    "revision": "9da2434e0478e20bd3123c14097e0fb7",
+    "revision": "2c045ea654b579b1da3bdae658a8d176",
     "url": "/index.html"
   },
   {
@@ -426,10 +426,6 @@ self.__precacheManifest = [
   {
     "revision": "f0d21da3f74ffbbcc644dafd7b957e57",
     "url": "/static/img/github.svg"
-  },
-  {
-    "revision": "075b8cf414d164345ac981e2da839d91",
-    "url": "/static/img/imjoy-card-plain.png"
   },
   {
     "revision": "5729dc069431278b12e8100500dff158",
@@ -630,6 +626,10 @@ self.__precacheManifest = [
   {
     "revision": "83f9d7a8568f0f86fd00bf3c21944ce8",
     "url": "/static/vs/basic-languages/ruby/ruby.js"
+  },
+  {
+    "revision": "075b8cf414d164345ac981e2da839d91",
+    "url": "/static/img/imjoy-card-plain.png"
   },
   {
     "revision": "524db18624629ebed6788b26cbf4820e",
