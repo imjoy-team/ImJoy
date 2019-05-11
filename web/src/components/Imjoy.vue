@@ -184,8 +184,15 @@
           </md-menu>
           <engine-control-panel :engine-manager="em" />
           <md-menu>
-            <md-button class="md-icon-button md-primary" md-menu-trigger>
-              <md-icon>more_horiz</md-icon>
+            <md-button
+              v-if="latest_version && !is_latest_version"
+              class="md-icon-button md-accent"
+              md-menu-trigger
+            >
+              <md-icon>error_outline</md-icon>
+            </md-button>
+            <md-button v-else class="md-icon-button md-primary" md-menu-trigger>
+              <md-icon>details</md-icon>
             </md-button>
             <md-menu-content>
               <md-menu-item @click="showSettingsDialog = true" :disabled="true">
@@ -212,7 +219,10 @@
                 <md-icon>info</md-icon>About
               </md-menu-item>
               <md-menu-item>
-                <md-icon>update</md-icon>
+                <md-icon v-if="latest_version && is_latest_version"
+                  >check</md-icon
+                >
+                <md-icon v-else>error_outline</md-icon>
                 <div
                   @click.stop="checkUpdate"
                   style="width: 100%;cursor: pointer;"
@@ -1896,11 +1906,11 @@ export default {
           );
           if (this.is_latest_version) {
             this.showMessage(
-              `ImJoy is up to date (version ${this.latest_version}).`
+              `🎉 ImJoy is up to date (version ${this.latest_version}).`
             );
           } else {
             this.showMessage(
-              `A newer version of ImJoy (version ${
+              `📣 A newer version of ImJoy (version ${
                 this.latest_version
               }) is available, please refresh your browser.`
             );
