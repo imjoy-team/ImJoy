@@ -1862,7 +1862,7 @@ export default {
         this.checkUpdate();
         //check for update every 20 minutes
         window.setInterval(() => {
-          this.checkUpdate();
+          this.checkUpdate(true);
         }, 1200000);
       });
     },
@@ -1884,7 +1884,7 @@ export default {
     createWindow(w) {
       return this.pm.createWindow(null, w);
     },
-    async checkUpdate() {
+    async checkUpdate(quiet) {
       this.checking = true;
       try {
         const response = await axios.get(
@@ -1905,9 +1905,11 @@ export default {
             obj.version
           );
           if (this.is_latest_version) {
-            this.showMessage(
-              `🎉 ImJoy is up to date (version ${this.latest_version}).`
-            );
+            if (!quiet) {
+              this.showMessage(
+                `🎉 ImJoy is up to date (version ${this.latest_version}).`
+              );
+            }
           } else {
             this.showMessage(
               `📣 A newer version of ImJoy (version ${
