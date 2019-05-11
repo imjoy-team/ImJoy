@@ -136,7 +136,8 @@ export class WindowManager {
     if(w.refresh) w.refresh()
   }
 
-  closeWindow(w){
+  async closeWindow(w){
+    await w.onclose()
     this.windows.splice(this.windows.indexOf(w), 1)
     delete this.window_ids[w.id]
     if(w.selected || this.selected_window===w){

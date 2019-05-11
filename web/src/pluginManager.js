@@ -1608,10 +1608,10 @@ export class PluginManager {
         console.error("Error occured during creating window ", wconfig, error)
         throw error
       }
+      wconfig.name = wconfig.name || 'untitled window'
       if (wconfig.type && wconfig.type.startsWith('imjoy/')) {
         wconfig.id = 'imjoy_'+randId()
         wconfig.window_type = wconfig.type
-        wconfig.name = wconfig.name || 'untitled window'
         if(wconfig.window_container === 'window_dialog_container' && wconfig.render){
           wconfig.render(wconfig)
           const window_plugin_apis = {

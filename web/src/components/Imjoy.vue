@@ -24,7 +24,7 @@
         </md-snackbar>
 
       <div class="md-toolbar-section-end">
-        <md-button class="md-icon-button md-accent" v-if="wm.selected_window && wm.selected_window.standalone" @click="wm.selected_window.onclose(); wm.closeWindow(wm.selected_window);" >
+        <md-button class="md-icon-button md-accent" v-if="wm.selected_window && wm.selected_window.standalone" @click="wm.closeWindow(wm.selected_window);" >
           <md-icon>close</md-icon>
           <md-tooltip>Close window: {{wm.selected_window.name.slice(0, 30)+'(#'+wm.selected_window.index+')'}}</md-tooltip>
         </md-button>
@@ -41,7 +41,7 @@
               <span>Duplicate</span>
               <md-icon>filter</md-icon>
             </md-menu-item> -->
-            <!-- <md-menu-item @click="wm.selected_window.onclose(); wm.closeWindow(wm.selected_window);">
+            <!-- <md-menu-item @click="wm.closeWindow(wm.selected_window);">
               <span>Close</span>
               <md-icon>close</md-icon>
             </md-menu-item> -->
