@@ -707,6 +707,14 @@ export class PluginManager {
     if (!uri.split("?")[0].endsWith(".imjoy.html")) {
       throw 'Plugin url must be ends with ".imjoy.html"';
     }
+    //if the file is from github or gist, then add random query string to avoid browser caching
+    if (
+      (uri.startsWith("https://raw.githubusercontent.com") ||
+        uri.startsWith("https://gist.githubusercontent.com")) &&
+      uri.indexOf("?") === -1
+    ) {
+      uri = uri + "?" + randId();
+    }
     const response = await axios.get(uri);
     if (!response || !response.data || response.data === "") {
       alert("failed to get plugin code from " + uri);

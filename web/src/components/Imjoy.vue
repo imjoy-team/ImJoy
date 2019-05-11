@@ -211,8 +211,22 @@
               <md-menu-item @click="showAboutDialog = true" class="md-primary">
                 <md-icon>info</md-icon>About
               </md-menu-item>
-              <md-menu-item :disabled="true">
-                <md-icon>update</md-icon> ImJoy v{{ imjoy_version }}
+              <md-menu-item>
+                <md-icon>update</md-icon>
+                <div
+                  @click.stop="checkUpdate"
+                  style="width: 100%;cursor: pointer;"
+                >
+                  <div
+                    v-if="checking"
+                    style="left: -30px"
+                    class="loading loading-lg"
+                  ></div>
+                  <img v-else-if="version_badge_url" :src="version_badge_url" />
+                  <span v-else>ImJoy v{{ imjoy_version }}</span>
+                </div>
+
+                <md-tooltip>click to check updates</md-tooltip>
               </md-menu-item>
             </md-menu-content>
           </md-menu>
@@ -1268,11 +1282,30 @@ export default {
       max_window_buttons: 9,
       installing: false,
       plugin_dialog_window_config: null,
+      latest_version: null,
+      is_latest_version: false,
+      checking: false,
     };
   },
   watch: {
     menuVisible() {
       this.wm.resizeAll();
+    },
+  },
+  computed: {
+    version_badge_url: function() {
+      if (this.latest_version) {
+        const color = this.is_latest_version ? "success" : "orange";
+        return (
+          "https://img.shields.io/badge/imjoy-v" +
+          this.imjoy_version +
+          "-" +
+          color +
+          ".svg"
+        );
+      } else {
+        return null;
+      }
     },
   },
   created() {
@@ -1815,6 +1848,9 @@ export default {
         this.showMessage(e.toString());
       }
       this.$forceUpdate();
+      this.$nextTick(() => {
+        this.checkUpdate();
+      });
     },
     addWindowCallback(w) {
       return new Promise((resolve, reject) => {
@@ -1833,6 +1869,46 @@ export default {
     },
     createWindow(w) {
       return this.pm.createWindow(null, w);
+    },
+    async checkUpdate() {
+      this.checking = true;
+      try {
+        const response = await axios.get(
+          "https://raw.githubusercontent.com/oeway/ImJoy/master/web/package.json?" +
+            randId()
+        );
+        console.log(response.data);
+        if (!response || !response.data) {
+          this.showMessage("failed to fetch imjoy version information");
+          return;
+        }
+        const obj = response.data;
+        if (obj && obj.version) {
+          this.latest_version = obj.version;
+          this.is_latest_version = compareVersions(
+            this.imjoy_version,
+            ">=",
+            obj.version
+          );
+          if (this.is_latest_version) {
+            this.showMessage(
+              `ImJoy is up to date (version ${this.latest_version}).`
+            );
+          } else {
+            this.showMessage(
+              `A newer version of ImJoy (version ${
+                this.latest_version
+              }) is available, please refresh your browser.`
+            );
+          }
+        } else {
+          this.latest_version = null;
+        }
+      } catch (e) {
+        this.showMessage("failed to fetch imjoy version information");
+      } finally {
+        this.checking = false;
+      }
     },
     getDefaultInputLoaders() {
       const image_loader = file => {

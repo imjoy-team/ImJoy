@@ -1,29 +1,31 @@
 <template>
   <div class="about">
-    <a href="https://github.com/oeway/ImJoy" target="_blank"
+    <a href="https://github.com/oeway/ImJoy-Engine" target="_blank"
       ><img
-        src="https://img.shields.io/github/license/oeway/ImJoy-Engine.svg"
-        alt="LICENSE"/></a
+        :src="
+          'https://img.shields.io/badge/imjoy-v' + app_version + '-success.svg'
+        "
+        alt="ImJoy"/></a
     >&nbsp;
-    <a href="https://zenodo.org/badge/latestdoi/137741898" target="_blank"
-      ><img src="https://zenodo.org/badge/137741898.svg" alt="DOI"/></a
+    <a href="https://github.com/oeway/ImJoy-Engine" target="_blank"
+      ><img
+        src="https://img.shields.io/badge/dynamic/json.svg?color=success&label=imjoy%20engine&prefix=v&query=version&url=https%3A%2F%2Fraw.githubusercontent.com%2Foeway%2FImJoy-Engine%2Fmaster%2Fimjoy%2FVERSION"
+        alt="ImJoy-Engine"/></a
     >&nbsp;
     <a href="https://travis-ci.com/oeway/ImJoy" target="_blank"
       ><img
         src="https://travis-ci.com/oeway/ImJoy.svg?branch=master"
         alt="Travis-CI"/></a
     >&nbsp;
-    <a href="https://app.netlify.com/sites/imjoy/deploys" target="_blank"
-      ><img
-        src="https://api.netlify.com/api/v1/badges/3aa71748-2778-4c31-a9ea-f7fdf5445fd1/deploy-status"
-        alt="Netlify-Deploy"/></a
-    >&nbsp;
-    <a href="https://github.com/oeway/ImJoy-Engine" target="_blank"
-      ><img
-        src="https://img.shields.io/badge/dynamic/json.svg?color=success&label=imjoy%20engine&prefix=v&query=version&url=https%3A%2F%2Fraw.githubusercontent.com%2Foeway%2FImJoy-Engine%2Fmaster%2Fimjoy%2FVERSION"
-        alt="ImJoy-Engine"
-    /></a>
 
+    <a href="https://zenodo.org/badge/latestdoi/137741898" target="_blank"
+      ><img src="https://zenodo.org/badge/137741898.svg" alt="DOI"/></a
+    >&nbsp;
+    <a href="https://github.com/oeway/ImJoy" target="_blank"
+      ><img
+        src="https://img.shields.io/github/license/oeway/ImJoy-Engine.svg"
+        alt="LICENSE"/></a
+    >&nbsp;
     <br />
     <br />
     <img style="width: 300px" src="static/img/imjoy-logo-black.svg" />
