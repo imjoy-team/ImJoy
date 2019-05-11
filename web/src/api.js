@@ -11,7 +11,7 @@ export const CONFIGURABLE_FIELDS = [
   "ui",
   "type",
   "flags",
-  "cover"
+  "cover",
 ];
 
 export const SUPPORTED_PLUGIN_TYPES = [
