@@ -1069,6 +1069,7 @@ export function HtmlWhitelistedSanitizer(escape, tags, css, urls) {
       h2: globalAttributes,
       h3: globalAttributes,
       h4: globalAttributes,
+      h5: globalAttributes,
     };
   }
   if (this.allowedCss == null) {
