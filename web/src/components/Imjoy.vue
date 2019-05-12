@@ -2348,9 +2348,7 @@ export default {
       });
     },
     unloadPlugin(plugin) {
-      this.pm.unloadPlugin(plugin).finally(() => {
-        this.$forceUpdate();
-      });
+      this.pm.unloadPlugin(plugin);
     },
     editPlugin(pid) {
       const plugin = this.pm.plugins[pid];
