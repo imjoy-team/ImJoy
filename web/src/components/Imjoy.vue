@@ -40,7 +40,7 @@
           >
         </div>
         <md-snackbar
-          :md-position="'center'"
+          md-position="center"
           class="md-accent"
           :md-active.sync="show_snackbar"
           :md-duration="snackbar_duration"
@@ -782,6 +782,7 @@
     />
     <md-dialog-alert
       :md-active.sync="alert_config.show"
+      :md-title="alert_config.title"
       :md-content="alert_config.content"
       :md-confirm-text="alert_config.confirm_text"
     />
@@ -800,6 +801,7 @@
       :md-active.sync="prompt_config.show"
       v-model="prompt_config.value"
       :md-title="prompt_config.title"
+      :md-content="prompt_config.content"
       md-input-maxlength="100000"
       :md-input-placeholder="prompt_config.placeholder"
       :md-confirm-text="prompt_config.confirm_text"
@@ -1257,6 +1259,7 @@ import {
   assert,
   _clone,
   compareVersions,
+  HtmlWhitelistedSanitizer,
 } from "../utils.js";
 
 import { PluginManager } from "../pluginManager.js";
@@ -1273,6 +1276,8 @@ import { Joy } from "../joy";
 
 import Ajv from "ajv";
 const ajv = new Ajv();
+
+const sanitizer = new HtmlWhitelistedSanitizer(true);
 
 export default {
   name: "imjoy",
@@ -2891,12 +2896,13 @@ export default {
     showAlert(_plugin, text) {
       console.log("alert: ", text);
       if (typeof text === "string") {
-        this.alert_config.title = "Alert";
-        this.alert_config.content = text;
+        this.alert_config.title = null;
+        this.alert_config.content = sanitizer.sanitizeString(text);
         this.alert_config.confirm_text = "OK";
       } else if (typeof text === "object") {
-        this.alert_config.title = text.title || "Alert";
-        this.alert_config.content = text.content || "undefined";
+        this.alert_config.title = text.title;
+        this.alert_config.content =
+          sanitizer.sanitizeString(text.content) || "undefined";
         this.alert_config.confirm_text = text.confirm_text || "OK";
       } else {
         throw "unsupported alert arguments";
@@ -2909,14 +2915,15 @@ export default {
     showPrompt(_plugin, text, defaultText) {
       return new Promise((resolve, reject) => {
         if (typeof text === "string") {
-          this.prompt_config.title = "Prompt";
-          this.prompt_config.content = text;
+          this.prompt_config.title = null;
+          this.prompt_config.content = sanitizer.sanitizeString(text);
           this.prompt_config.placeholder = defaultText;
           this.prompt_config.cancel_text = "Cancel";
           this.prompt_config.confirm_text = "Done";
         } else if (typeof text === "object") {
-          this.prompt_config.title = text.title || "Prompt";
-          this.prompt_config.content = text.content || "undefined";
+          this.prompt_config.title = text.title;
+          this.prompt_config.content =
+            sanitizer.sanitizeString(text.content) || "undefined";
           this.prompt_config.placeholder = text.placeholder || null;
           this.prompt_config.cancel_text = text.cancel_text || "Cancel";
           this.prompt_config.confirm_text = text.confirm_text || "Done";
@@ -2937,13 +2944,14 @@ export default {
     showConfirm(_plugin, text) {
       return new Promise((resolve, reject) => {
         if (typeof text === "string") {
-          this.confirm_config.title = "Confirmation";
-          this.confirm_config.content = text;
+          this.confirm_config.title = null;
+          this.confirm_config.content = sanitizer.sanitizeString(text);
           this.confirm_config.cancel_text = "Cancel";
           this.confirm_config.confirm_text = "Done";
         } else if (typeof text === "object") {
-          this.confirm_config.title = text.title || "Confirmation";
-          this.confirm_config.content = text.content || "undefined";
+          this.confirm_config.title = text.title;
+          this.confirm_config.content =
+            sanitizer.sanitizeString(text.content) || "undefined";
           this.confirm_config.cancel_text = text.cancel_text || "Cancel";
           this.confirm_config.confirm_text = text.confirm_text || "Done";
         } else {
