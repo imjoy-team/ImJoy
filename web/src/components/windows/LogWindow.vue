@@ -8,10 +8,7 @@
         </p>
       </li>
     </ul>
-    <md-button
-      class="md-mini"
-      @click="refresh()"
-    >
+    <md-button class="md-mini" @click="refresh()">
       <md-icon>autorenew</md-icon>Refresh
     </md-button>
     <md-button
@@ -70,8 +67,8 @@ export default {
     },
   },
   methods: {
-    refresh(){
-      this.$forceUpdate()
+    refresh() {
+      this.$forceUpdate();
     },
     clearLog() {
       const log_history = this.log_history;
