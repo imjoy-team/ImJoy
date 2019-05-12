@@ -171,6 +171,7 @@
           "
           class="platform-info"
         >
+          <p>- engine version: {{ selected_engine.engine_info.version }}</p>
           <p>- api version: {{ selected_engine.engine_info.api_version }}</p>
           <p v-for="(v, k) in selected_engine.engine_info.platform" :key="k">
             - {{ k }}: {{ v }}
