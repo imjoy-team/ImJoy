@@ -2220,7 +2220,7 @@ export default {
       }
       this.snackbar_duration = duration || 10000;
       this.show_snackbar = true;
-      this.status_text = info;
+      this.status_text = info.slice(0, 120);
       this.$forceUpdate();
     },
     showEngineFileDialog() {

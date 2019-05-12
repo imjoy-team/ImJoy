@@ -10,14 +10,9 @@ export default {
   name: "app",
   data() {
     return {
-      show_navbar: true,
     };
   },
   mounted() {
-    if (window.location.href.indexOf("navbar=0") >= 0) {
-      this.show_navbar = false;
-    }
-
     this.$nextTick(() => {
       const updateSize = () => {
         this.$root.$data.store.event_bus.$emit("resize", {
@@ -41,11 +36,6 @@ export default {
     });
   },
   methods: {
-    show(info, duration) {
-      this.snackbar_info = info;
-      this.snackbar_duration = duration || 3000;
-      this.showSnackbar = true;
-    },
   },
   watch: {},
 };
