@@ -417,9 +417,10 @@ Contains the actual plugin code.
 
 Plugins can be written in JavaScript or Python, a minimal plugin needs to implement two functions: `setup()` and `run()`. Exceptions are helper plugins (specified with `"runnable": false`), which don't need the `run()` function. Optionally, the function `exit` will be called when the plugin is killed.
 
-  * **`setup()` function**: executed when a plugin is loaded and initialises
+  * **`setup()` function**: executed when a plugin is loaded and initialises for the first time.
       it.
   * **`run()` function**: will be called each time a plugin is executed. When executed, an object (for Javascript) or a dictionary (for Python) with context (named `ctx`) will be passed into the function. The returned result will be displayed as a new window or passed to the next `op` in a workflow. More in the section [Plugin during runtime](development?id=plugin-during-runtime) below.
+  * optional: **`resume()` function**: only for detachable plugins with the `allow-detach` flag, `resume()` will be called (instead of `setup()`) when the ImJoy is reconnected to a running plugin process.  More details about flags can be found in [Plugin during runtime](development?id=plugin-during-runtime) below.
   * optional: **`update()` function**: will be called when any setting of the op is changed.
 
 The `lang` property of the `<script>` block is used to specify the used programming language:

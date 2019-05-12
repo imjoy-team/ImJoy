@@ -74,9 +74,7 @@ don't forget to `import asyncio`.
 #### ** Python **
 ```python
 import asyncio
-
 from imjoy import api
-
 
 class ImJoyPlugin():
     async def setup(self):
@@ -110,6 +108,7 @@ Below examples for an api function named `XXXXX`:
 class ImJoyPlugin(){
   setup(){
   }
+
   run(ctx){
       api.XXXXX().then(this.callback)
 
