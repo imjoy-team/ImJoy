@@ -897,6 +897,7 @@ export class PluginManager {
                 this.update_ui_callback();
               });
             }
+            this.update_ui_callback();
           } catch (e) {
             console.error(e);
           }
@@ -909,6 +910,7 @@ export class PluginManager {
         this.update_ui_callback();
       });
     }
+    this.update_ui_callback();
   }
 
   reloadPlugin(pconfig) {
