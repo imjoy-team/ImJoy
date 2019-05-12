@@ -140,7 +140,10 @@
         this._remote.close();
       };
       // if it's not a webworker
-      if (typeof WorkerGlobalScope === 'undefined' || !(self instanceof WorkerGlobalScope)) {
+      if (
+        typeof WorkerGlobalScope === "undefined" ||
+        !(self instanceof WorkerGlobalScope)
+      ) {
         if (window && window.__imjoy_plugin_type__ === "window") {
           _interface.onResize = cb => {
             this._remote.onResize(cb);
@@ -156,7 +159,6 @@
           };
         }
       }
-      
     }
     this._interface = _interface;
     this._sendInterface();
