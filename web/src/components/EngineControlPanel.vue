@@ -123,7 +123,7 @@
             name="connection_token"
             @keyup.enter="addEngine()"
           ></md-input>
-          <span v-if="url_type==='localhost'" class="md-helper-text"
+          <span v-if="url_type === 'localhost'" class="md-helper-text"
             >you can find the token from imjoy desktop app or terminal</span
           >
         </md-field>
