@@ -9,8 +9,7 @@
 export default {
   name: "app",
   data() {
-    return {
-    };
+    return {};
   },
   mounted() {
     this.$nextTick(() => {
@@ -35,8 +34,7 @@ export default {
       if (element2) element2.parentNode.removeChild(element2);
     });
   },
-  methods: {
-  },
+  methods: {},
   watch: {},
 };
 </script>
