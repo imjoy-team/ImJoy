@@ -1507,11 +1507,9 @@ export default {
     document.addEventListener("dragleave", e => {
       e.preventDefault();
       e.stopPropagation();
-      if (!insideWhiteboard(e.target)) {
-        if (this.workspace_dropping) {
-          this.workspace_dropping = false;
-          this.$forceUpdate();
-        }
+      if (this.workspace_dropping) {
+        this.workspace_dropping = false;
+        this.$forceUpdate();
       }
       if (!insideFileDialog(e.target)) {
         this.event_bus.$emit("drag_upload_leave");
@@ -2219,13 +2217,13 @@ export default {
     },
     showMessage(info, duration) {
       assert(typeof info === "string");
-      this.snackbar_info = info;
+      this.snackbar_info = info.slice(0, 120);
       if (duration) {
         duration = duration * 1000;
       }
       this.snackbar_duration = duration || 10000;
       this.show_snackbar = true;
-      this.status_text = info.slice(0, 120);
+      this.status_text = info;
       this.$forceUpdate();
     },
     showEngineFileDialog() {
@@ -2520,7 +2518,6 @@ export default {
           this.progress = 100;
         })
         .catch(e => {
-          console.error(e);
           this.showMessage(
             "<" + op.name + ">" + ((e && e.toString()) || "Error."),
             15
@@ -2971,7 +2968,8 @@ export default {
         name: `Log (${_plugin.name})`,
         type: "imjoy/log",
         data: {
-          log_history: _plugin._log_history,
+          plugins: this.pm.plugin_names,
+          name: _plugin.name,
         },
       };
       this.createWindow(w);
