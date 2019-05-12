@@ -1917,9 +1917,18 @@ export default {
           return;
         }
         try {
-          w.refresh = () => {
+          w.onRefresh(() => {
             this.$forceUpdate();
-          };
+          });
+          //move refresh to next tick
+          const _refresh = w.refresh;
+          if (_refresh) {
+            w.refresh = () => {
+              this.$nextTick(() => {
+                _refresh();
+              });
+            };
+          }
           this.$nextTick(() => {
             this.$forceUpdate();
             resolve();
@@ -2039,6 +2048,7 @@ export default {
         this.max_window_buttons = parseInt(this.screenWidth / 36 - 4);
         if (this.max_window_buttons > 9) this.max_window_buttons = 9;
       }
+      this.wm.resizeAll();
     },
     showEngineConnection(show, engine) {
       // if(message && resolve && reject){

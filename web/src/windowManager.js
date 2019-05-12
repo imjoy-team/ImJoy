@@ -103,6 +103,23 @@ export class WindowManager {
         }
         this.windows.push(w);
         this.window_ids[w.id] = w;
+        w._refresh_callbacks = [];
+        w.onRefresh = handler => {
+          w._refresh_callbacks.push(handler);
+        };
+        w.refresh = () => {
+          w._refresh_callbacks.map(item => item());
+        };
+
+        w._resize_callbacks = [];
+        w.onResize = handler => {
+          w._resize_callbacks.push(handler);
+        };
+        w.resize = () => {
+          console.log("resizing...");
+          w._resize_callbacks.map(item => item());
+        };
+
         this.selectWindow(w);
         if (this.add_window_callback) {
           this.add_window_callback(w).then(() => {
@@ -133,7 +150,10 @@ export class WindowManager {
     w.selected = true;
     this.active_windows = [w];
     if (!w.standalone && w.focus) w.focus();
-    if (w.refresh) w.refresh();
+    if (w.refresh) {
+      console.log("=====================refreshing...........................");
+      w.refresh();
+    }
   }
 
   async closeWindow(w) {

@@ -45,9 +45,9 @@ export default {
     },
   },
   mounted() {
-    this.w.resize = () => {
+    this.w.onResize(() => {
       this.$refs.compare.handleResize();
-    };
+    });
   },
 };
 </script>
