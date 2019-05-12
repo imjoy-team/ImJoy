@@ -474,7 +474,10 @@
                   <md-menu-item @click="showDoc(plugin.id)">
                     <md-icon>description</md-icon>Docs
                   </md-menu-item>
-                  <md-menu-item v-if="plugin.config.origin" @click="sharePlugin(plugin.id)">
+                  <md-menu-item
+                    v-if="plugin.config.origin"
+                    @click="sharePlugin(plugin.id)"
+                  >
                     <md-icon>share</md-icon>Share
                   </md-menu-item>
                   <md-menu-item v-else @click="downloadPlugin(plugin.id)">
@@ -780,7 +783,8 @@
     <md-dialog-alert
       :md-active.sync="alert_config.show"
       :md-content="alert_config.content"
-      :md-confirm-text="alert_config.confirm_text" />
+      :md-confirm-text="alert_config.confirm_text"
+    />
 
     <md-dialog-confirm
       :md-active.sync="confirm_config.show"
@@ -788,9 +792,9 @@
       :md-content="confirm_config.content"
       :md-confirm-text="confirm_config.confirm_text"
       :md-cancel-text="confirm_config.canel_text"
-      @md-confirm="confirm_config.confirm" 
+      @md-confirm="confirm_config.confirm"
       @md-cancel="confirm_config.cancel"
-      />
+    />
 
     <md-dialog-prompt
       :md-active.sync="prompt_config.show"
@@ -800,8 +804,9 @@
       :md-input-placeholder="prompt_config.placeholder"
       :md-confirm-text="prompt_config.confirm_text"
       @md-confirm="prompt_config.confirm"
-      @md-cancel="prompt_config.cancel"/>
-  
+      @md-cancel="prompt_config.cancel"
+    />
+
     <file-dialog
       id="engine-file-dialog"
       ref="file-dialog"
@@ -1328,9 +1333,9 @@ export default {
       latest_version: null,
       is_latest_version: false,
       checking: false,
-      alert_config: {show: false},
-      confirm_config: {show: false, confirm: ()=>{}, cancel: ()=>{}},
-      prompt_config: {show: false, confirm: ()=>{}, cancel: ()=>{}},
+      alert_config: { show: false },
+      confirm_config: { show: false, confirm: () => {}, cancel: () => {} },
+      prompt_config: { show: false, confirm: () => {}, cancel: () => {} },
     };
   },
   watch: {
@@ -1904,9 +1909,9 @@ export default {
     },
     addWindowCallback(w) {
       return new Promise((resolve, reject) => {
-        if(!this.wm.window_ids[w.id]){
-          reject('window was closed')
-          return
+        if (!this.wm.window_ids[w.id]) {
+          reject("window was closed");
+          return;
         }
         try {
           w.refresh = () => {
@@ -2446,7 +2451,7 @@ export default {
       mw.target._workflow_id = mw.target._workflow_id || "workflow_" + randId();
       joy.workflow.execute(mw.target).catch(e => {
         console.error(e);
-        this.showMessage(e && e.toString() || "Error.", 12);
+        this.showMessage((e && e.toString()) || "Error.", 12);
       });
     },
     loadWorkflow(w) {
@@ -2514,7 +2519,7 @@ export default {
         .catch(e => {
           console.error(e);
           this.showMessage(
-            "<" + op.name + ">" + (e && e.toString() || "Error."),
+            "<" + op.name + ">" + ((e && e.toString()) || "Error."),
             15
           );
         });
@@ -2885,72 +2890,74 @@ export default {
     },
     showAlert(_plugin, text) {
       console.log("alert: ", text);
-      if(typeof text === 'string'){
-        this.alert_config.title = 'Alert'
-        this.alert_config.content = text
-        this.alert_config.confirm_text = 'OK'
-      }
-      else if(typeof text === 'object'){
-        this.alert_config.title = text.title || 'Alert'
-        this.alert_config.content = text.content || 'undefined'
-        this.alert_config.confirm_text = text.confirm_text || 'OK'
-      }
-      else{
-        throw "unsupported alert arguments"
+      if (typeof text === "string") {
+        this.alert_config.title = "Alert";
+        this.alert_config.content = text;
+        this.alert_config.confirm_text = "OK";
+      } else if (typeof text === "object") {
+        this.alert_config.title = text.title || "Alert";
+        this.alert_config.content = text.content || "undefined";
+        this.alert_config.confirm_text = text.confirm_text || "OK";
+      } else {
+        throw "unsupported alert arguments";
       }
 
-      this.alert_config.show = true
-      this.$forceUpdate()
+      this.alert_config.show = true;
+      this.$forceUpdate();
       //alert(text);
     },
     showPrompt(_plugin, text, defaultText) {
-      return new Promise((resolve, reject )=>{
-        if(typeof text === 'string'){
-          this.prompt_config.title = 'Prompt'
-          this.prompt_config.content = text
-          this.prompt_config.placeholder = defaultText
-           this.prompt_config.cancel_text = 'Cancel'
-          this.prompt_config.confirm_text = 'Done'
+      return new Promise((resolve, reject) => {
+        if (typeof text === "string") {
+          this.prompt_config.title = "Prompt";
+          this.prompt_config.content = text;
+          this.prompt_config.placeholder = defaultText;
+          this.prompt_config.cancel_text = "Cancel";
+          this.prompt_config.confirm_text = "Done";
+        } else if (typeof text === "object") {
+          this.prompt_config.title = text.title || "Prompt";
+          this.prompt_config.content = text.content || "undefined";
+          this.prompt_config.placeholder = text.placeholder || null;
+          this.prompt_config.cancel_text = text.cancel_text || "Cancel";
+          this.prompt_config.confirm_text = text.confirm_text || "Done";
+        } else {
+          reject("unsupported prompt arguments");
+          throw "unsupported prompt arguments";
         }
-        else if(typeof text === 'object'){
-          this.prompt_config.title = text.title || 'Prompt'
-          this.prompt_config.content = text.content || 'undefined'
-          this.prompt_config.placeholder = text.placeholder || null
-          this.prompt_config.cancel_text = text.cancel_text || 'Cancel'
-          this.prompt_config.confirm_text = text.confirm_text || 'Done'
-        }
-        else{
-          reject("unsupported prompt arguments")
-          throw "unsupported prompt arguments"
-        }
-        this.prompt_config.confirm = ()=>{ resolve(this.prompt_config.value || this.prompt_config.placeholder)}
-        this.prompt_config.cancel = ()=>{ reject()}
-        this.prompt_config.show = true
-      })
+        this.prompt_config.confirm = () => {
+          resolve(this.prompt_config.value || this.prompt_config.placeholder);
+        };
+        this.prompt_config.cancel = () => {
+          reject();
+        };
+        this.prompt_config.show = true;
+      });
       //return prompt(text, defaultText);
     },
     showConfirm(_plugin, text) {
-      return new Promise((resolve, reject )=>{
-        if(typeof text === 'string'){
-          this.confirm_config.title = 'Confirmation'
-          this.confirm_config.content = text
-          this.confirm_config.cancel_text = 'Cancel'
-          this.confirm_config.confirm_text = 'Done'
+      return new Promise((resolve, reject) => {
+        if (typeof text === "string") {
+          this.confirm_config.title = "Confirmation";
+          this.confirm_config.content = text;
+          this.confirm_config.cancel_text = "Cancel";
+          this.confirm_config.confirm_text = "Done";
+        } else if (typeof text === "object") {
+          this.confirm_config.title = text.title || "Confirmation";
+          this.confirm_config.content = text.content || "undefined";
+          this.confirm_config.cancel_text = text.cancel_text || "Cancel";
+          this.confirm_config.confirm_text = text.confirm_text || "Done";
+        } else {
+          reject("unsupported prompt arguments");
+          throw "unsupported prompt arguments";
         }
-        else if(typeof text === 'object'){
-          this.confirm_config.title = text.title || 'Confirmation'
-          this.confirm_config.content = text.content || 'undefined'
-          this.confirm_config.cancel_text = text.cancel_text  || 'Cancel'
-          this.confirm_config.confirm_text = text.confirm_text || 'Done'
-        }
-        else{
-          reject("unsupported prompt arguments")
-          throw "unsupported prompt arguments"
-        }
-        this.confirm_config.confirm = ()=>{ resolve()}
-        this.confirm_config.cancel = ()=>{ reject()}
-        this.confirm_config.show = true
-      })
+        this.confirm_config.confirm = () => {
+          resolve();
+        };
+        this.confirm_config.cancel = () => {
+          reject();
+        };
+        this.confirm_config.show = true;
+      });
       //return confirm(text);
     },
     showLog(_plugin) {

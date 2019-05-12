@@ -241,10 +241,9 @@ export default {
         fullscreen: w.fullscreen,
         standalone: true,
       });
-      this.$nextTick(()=>{
+      this.$nextTick(() => {
         this.$emit("create", new_w);
-      })
-      
+      });
     },
     close(w) {
       const ai = this.active_windows.indexOf(w);

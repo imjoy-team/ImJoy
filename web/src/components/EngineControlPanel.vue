@@ -111,7 +111,9 @@
           name="engine_url"
         >
           <label for="engine_url">Plugin Engine URL</label>
-          <span class="md-helper-text">engine url, e.g.: https://my-imjoy-plugin-engine.com</span>
+          <span class="md-helper-text"
+            >engine url, e.g.: https://my-imjoy-plugin-engine.com</span
+          >
         </md-autocomplete>
         <md-field>
           <label for="connection_token">Connection Token</label>
@@ -297,16 +299,16 @@ export default {
     };
   },
   created() {
-    this.is_mobile_or_tablet = mobileAndTabletcheck()
+    this.is_mobile_or_tablet = mobileAndTabletcheck();
     this.event_bus = this.$root.$data.store && this.$root.$data.store.event_bus;
   },
   mounted() {
     this.event_bus.$on("engine_connected", this.forceUpdate);
     this.event_bus.$on("engine_disconnected", this.forceUpdate);
     this.event_bus.$on("show_engine_dialog", this.showDialog);
-    if(this.is_mobile_or_tablet){
-      this.url_type = 'remote'
-      this.engine_url = ''
+    if (this.is_mobile_or_tablet) {
+      this.url_type = "remote";
+      this.engine_url = "";
     }
   },
   beforeDestroy() {
