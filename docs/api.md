@@ -74,9 +74,7 @@ don't forget to `import asyncio`.
 #### ** Python **
 ```python
 import asyncio
-
 from imjoy import api
-
 
 class ImJoyPlugin():
     async def setup(self):
@@ -110,6 +108,7 @@ Below examples for an api function named `XXXXX`:
 class ImJoyPlugin(){
   setup(){
   }
+
   run(ctx){
       api.XXXXX().then(this.callback)
 
@@ -176,11 +175,12 @@ in JavaScript, but the api functions are called in similar fashion in Python.
 await api.alert(message)
 ```
 
-Shows an alert dialog with a message to the user.
+Shows an alert dialog with a message to the user. 
 
 **Arguments**
+<!--****[TODO] add instructions about customizable parameters **-->
 
-* **message**: String. Contains the message to be displayed.
+* **message**: String. Contains the message to be displayed. HTML tags can be used in the message, but only limited to a restricted set of tags and css, more details can be found [here](api?id=sanitized-html-and-css).
 
 **Example**
 ```javascript
@@ -197,8 +197,9 @@ const anwser = await api.prompt(question, default_anwser)
 Shows a prompt to ask the user input.
 
 **Arguments**
+<!--****[TODO] add instructions about customizable parameters **-->
 
-* **question**: String. Contains the question to be displayed.
+* **question**: String. Contains the question to be displayed.  HTML tags can be used in the message, but only limited to a restricted set of tags and css, more details can be found [here](api?id=sanitized-html-and-css).
 
 * **default_anwser** (optional): String. Contains the default anwser to the question.
 
@@ -220,8 +221,9 @@ const confirmation = await api.confirm(question)
 Shows a confirmation message to the user.
 
 **Arguments**
+<!--****[TODO] add instructions about customizable parameters **-->
 
-* **question**: String. Contains the question to be displayed.
+* **question**: String. Contains the question to be displayed.  HTML tags can be used in the message, but only limited to a restricted set of tags and css, more details can be found [here](api?id=sanitized-html-and-css).
 
 **Returns**
 * **confirmation**: Boolean. True or false.
@@ -1316,3 +1318,13 @@ Name of the current workspace.
 **Only available to native-python plugins**
 
 URL of the current plugin engine.
+
+
+## Sanitized HTML and CSS
+
+For security reasons, HTML and CSS provided to shown in the ImJoy main interface are restricted (only for `ui` string for `<config>` block and `api.register`, the content shown in `api.alert`, `api.confirm` and `api.prompt`). Also notice that the content shown inside a `window` plugin do not have these restrictions.
+
+Currently allowed HTML tags are: `a`, `img`, `p`, `div`, `span`, `br`, `b`, `i`, `u`, `hr`, `h1`, `h2`, `h3`, `h4`, `h5`.
+Further, the following CSS styles are allowed: `border`, `margin`, `padding`.
+These restriction are imposed to prevent XSS attacks.
+

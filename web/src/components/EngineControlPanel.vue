@@ -97,7 +97,7 @@
           If you have it already, please start the Plugin Engine, and connect to
           it.<br />
         </p>
-        <div>
+        <div v-if="!is_mobile_or_tablet">
           <md-radio v-model="url_type" value="localhost">My Computer</md-radio>
           <md-radio v-model="url_type" value="remote"
             >Another Computer</md-radio
@@ -111,6 +111,9 @@
           name="engine_url"
         >
           <label for="engine_url">Plugin Engine URL</label>
+          <span class="md-helper-text"
+            >engine url, e.g.: https://my-imjoy-plugin-engine.com</span
+          >
         </md-autocomplete>
         <md-field>
           <label for="connection_token">Connection Token</label>
@@ -120,6 +123,9 @@
             name="connection_token"
             @keyup.enter="addEngine()"
           ></md-input>
+          <span v-if="url_type === 'localhost'" class="md-helper-text"
+            >you can find the token from imjoy desktop app or terminal</span
+          >
         </md-field>
         <md-button class="md-primary md-raised" @click="addEngine()"
           >Connect</md-button
@@ -171,6 +177,7 @@
           "
           class="platform-info"
         >
+          <p>- engine version: {{ selected_engine.engine_info.version }}</p>
           <p>- api version: {{ selected_engine.engine_info.api_version }}</p>
           <p v-for="(v, k) in selected_engine.engine_info.platform" :key="k">
             - {{ k }}: {{ v }}
@@ -276,12 +283,14 @@
 </template>
 
 <script>
+import { mobileAndTabletcheck } from "../utils.js";
+
 export default {
   name: "engine-control-panel",
   props: ["engineManager"],
   data() {
     return {
-      engine_url: "http://127.0.0.1:9527",
+      engine_url: "",
       local_engine_url: "http://127.0.0.1:9527",
       engine_url_list: [],
       connection_token: null,
@@ -293,12 +302,17 @@ export default {
     };
   },
   created() {
+    this.is_mobile_or_tablet = mobileAndTabletcheck();
     this.event_bus = this.$root.$data.store && this.$root.$data.store.event_bus;
   },
   mounted() {
     this.event_bus.$on("engine_connected", this.forceUpdate);
     this.event_bus.$on("engine_disconnected", this.forceUpdate);
     this.event_bus.$on("show_engine_dialog", this.showDialog);
+    if (this.is_mobile_or_tablet) {
+      this.url_type = "remote";
+      this.engine_url = "";
+    }
   },
   beforeDestroy() {
     this.event_bus.$off("engine_connected", this.forceUpdate);

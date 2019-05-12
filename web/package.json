@@ -1,6 +1,6 @@
 {
   "name": "ImJoy.io",
-  "version": "0.9.47",
+  "version": "0.9.48",
   "private": true,
   "description": "ImJoy -- deploying deep learning made easy.",
   "author": "Wei OUYANG <wei.ouyang@cri-paris.org>",
@@ -32,7 +32,7 @@
     "spectre.css": "^0.5.8",
     "vue": "^2.5.17",
     "vue-grid-layout": "github:jbaysolutions/vue-grid-layout#9e13ea9",
-    "vue-material": "github:vuematerial/vue-material#4fa84a4",
+    "vue-material": "^1.0.0-beta-11",
     "vue-router": "^3.0.1"
   },
   "devDependencies": {

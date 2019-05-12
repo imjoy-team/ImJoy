@@ -265,10 +265,8 @@ In some cases, the ui might only contain a brief description of the op.
 This can either be plain text, or you can also specify a **link**    with `"ui": " <a href='https://imjoy.io' target='_blank'> ImJoy</a>"`. The `target='_blank'` will open this page in a new tab.
 
 
-**HTML and CSS**: for better rendering of the interface, we support **certain html tags** in the ui string.
-Currently allowed tags are: `a`, `img`, `p`, `div`, `span`, `br`, `b`, `i`, `u`,`hr`.
-Further, the following **css specification** are allowed: `border`, `margin`, `padding`.
-These restriction are imposed to prevent XSS attacks.
+**HTML and CSS**: for better rendering of the interface, we support **certain html tags** in the ui string. More details about allowed HTML tags and CSS can be found [here](api?id=sanitized-html-and-css).
+
 
 **Longer forms**: to define forms with multiple lines, we support additional definitions of the `ui` string.
 
@@ -419,9 +417,10 @@ Contains the actual plugin code.
 
 Plugins can be written in JavaScript or Python, a minimal plugin needs to implement two functions: `setup()` and `run()`. Exceptions are helper plugins (specified with `"runnable": false`), which don't need the `run()` function. Optionally, the function `exit` will be called when the plugin is killed.
 
-  * **`setup()` function**: executed when a plugin is loaded and initialises
+  * **`setup()` function**: executed when a plugin is loaded and initialises for the first time.
       it.
   * **`run()` function**: will be called each time a plugin is executed. When executed, an object (for Javascript) or a dictionary (for Python) with context (named `ctx`) will be passed into the function. The returned result will be displayed as a new window or passed to the next `op` in a workflow. More in the section [Plugin during runtime](development?id=plugin-during-runtime) below.
+  * optional: **`resume()` function**: only for detachable `native-python` plugins with the `allow-detach` flag, `resume()` will be called (instead of `setup()`) when the ImJoy is reconnected to a running plugin process.  More details about flags can be found [here](development?id=run-time-behaviour-of-native-python-plugins) below.
   * optional: **`update()` function**: will be called when any setting of the op is changed.
 
 The `lang` property of the `<script>` block is used to specify the used programming language:
@@ -801,6 +800,8 @@ Below we describe the three main run-time behaviour of python plugins:
 * The **`single-instance`** flag will allow only one process to run for the entire plugin engine. For plugins with the same name and tag, then the `single-instance` means that they access the same process. 
 
 * The **`allow-detach`** flag means that the process is not killed when its ImJoy instance is closed. For instance, this allows to perform long computational tasks in the background which don't require additional user feedback and which terminate autonomously. Can also be used to protect a long computational tasks again browser instabilities. If you want to be able to attach to a detached process, your can reconnect from the same browser and workspace, or have the `single-instance` flag which works despite connecting from different browser and workspace.
+
+When imjoy is trying to reconnect a previously detached plugin process, `resume()` will be called if it was defined in the plugin class, otherwise call `setup()` as usual. Notice that when `resume` is present, `setup` won't be called during the reattachment.
 
 This is how the `flags` option looks like in the `<config>` block:
 ```json

@@ -1411,7 +1411,7 @@ export class PluginManager {
                 })
                 .catch(e => {
                   plugin.error(
-                    `<${plugin.name}>: (${e.toString()} || "Error.")`
+                    `<${plugin.name}>: (${e && e.toString()} || "Error.")`
                   );
                   reject(e);
                 });
@@ -1423,7 +1423,7 @@ export class PluginManager {
             plugin.error(
               `Error occured when loading the window plugin ${
                 pconfig.name
-              }: ${e.toString()}`
+              }: ${e && e.toString()}`
             );
             plugin.terminate().then(() => {
               this.update_ui_callback();
@@ -1646,7 +1646,7 @@ export class PluginManager {
             const result = await run(this.joy2plugin(my));
             return this.plugin2joy(result);
           } catch (e) {
-            plugin.error(e.toString());
+            plugin.error(e && e.toString());
             throw e;
           }
         };

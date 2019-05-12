@@ -117,17 +117,6 @@
         </md-button>
       </div>
     </div>
-    <md-snackbar
-      :md-position="'center'"
-      class="md-accent"
-      :md-active.sync="showSnackbar"
-      :md-duration="snackbar_duration"
-    >
-      <span>{{ snackbar_info }}</span>
-      <md-button class="md-accent" @click="showSnackbar = false"
-        >close</md-button
-      >
-    </md-snackbar>
   </div>
 </template>
 
@@ -136,9 +125,6 @@ export default {
   name: "navbar",
   data() {
     return {
-      snackbar_info: "",
-      snackbar_duration: 1000,
-      showSnackbar: false,
       screenWidth: window.innerWidth,
     };
   },
