@@ -55,7 +55,7 @@
           <md-button
             class="md-icon-button md-accent"
             v-if="wm.selected_window && wm.selected_window.standalone"
-            @click="wm.closeWindow(wm.selected_window)"
+            @click="wm.selected_window.close()"
           >
             <md-icon>close</md-icon>
             <md-tooltip
@@ -102,7 +102,7 @@
               <span>Duplicate</span>
               <md-icon>filter</md-icon>
             </md-menu-item> -->
-              <!-- <md-menu-item @click="wm.closeWindow(wm.selected_window);">
+              <!-- <md-menu-item @click="wm.selected_window.close()">
               <span>Close</span>
               <md-icon>close</md-icon>
             </md-menu-item> -->
@@ -2910,7 +2910,7 @@ export default {
           sanitizer.sanitizeString(text.content) || "undefined";
         this.alert_config.confirm_text = text.confirm_text || "OK";
       } else {
-        throw "unsupported alert arguments";
+        this.alert_config.content = "undefined";
       }
 
       this.alert_config.show = true;

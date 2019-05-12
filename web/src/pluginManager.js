@@ -1837,14 +1837,12 @@ export class PluginManager {
       if (wconfig.type && wconfig.type.startsWith("imjoy/")) {
         wconfig.id = "imjoy_" + randId();
         wconfig.window_type = wconfig.type;
-        wconfig._onclose_callbacks = [];
-        wconfig.onClose = async () => {
-          await Promise.all(wconfig._onclose_callbacks.map(item => item()));
-        };
+
         if (
           wconfig.window_container === "window_dialog_container" &&
           wconfig.render
         ) {
+          this.wm.setupCallbacks(wconfig);
           wconfig.render(wconfig);
 
           const window_plugin_apis = {
@@ -1855,12 +1853,12 @@ export class PluginManager {
                 wconfig[k] = config[k];
               }
             },
-            close: () => {
-              this.wm.closeWindow(wconfig);
-            },
-            onClose: cb => {
-              wconfig._onclose_callbacks.push(cb);
-            },
+            close: wconfig.close,
+            onClose: wconfig.onClose,
+            refresh: wconfig.refresh,
+            onRefresh: wconfig.onRefresh,
+            resize: wconfig.resize,
+            onResize: wconfig.onResize,
           };
           resolve(window_plugin_apis);
         } else {
@@ -1868,20 +1866,17 @@ export class PluginManager {
             const window_plugin_apis = {
               __jailed_type__: "plugin_api",
               __id__: wid,
-              run: wconfig => {
-                const w = this.wm.window_ids[wid];
-                for (let k in wconfig) {
-                  w[k] = wconfig[k];
+              run: new_config => {
+                for (let k in new_config) {
+                  wconfig[k] = new_config[k];
                 }
               },
-              close: () => {
-                const w = this.wm.window_ids[wid];
-                this.wm.closeWindow(w);
-              },
-              onClose: cb => {
-                const w = this.wm.window_ids[wid];
-                w._onclose_callbacks.push(cb);
-              },
+              close: wconfig.close,
+              onClose: wconfig.onClose,
+              refresh: wconfig.refresh,
+              onRefresh: wconfig.onRefresh,
+              resize: wconfig.resize,
+              onResize: wconfig.onResize,
             };
             resolve(window_plugin_apis);
           });
@@ -1923,43 +1918,43 @@ export class PluginManager {
           throw error;
         }
         if (pconfig.window_container) {
+          this.wm.setupCallbacks(wconfig);
           Vue.nextTick(() => {
             this.renderWindow(pconfig)
               .then(wplugin => {
-                pconfig.onClose = () => {
-                  return wplugin.terminate();
-                };
-                wplugin.api.close = () => {
-                  return pconfig.onClose();
-                };
+                pconfig.onClose(async () => {
+                  await wplugin.terminate();
+                });
+                wplugin.api.close = pconfig.close;
+                wplugin.api.refresh = pconfig.refresh;
+                wplugin.api.resize = pconfig.resize;
+                wplugin.api.onRefresh = pconfig.onRefresh;
+                wplugin.api.onResize = pconfig.onResize;
                 resolve(wplugin.api);
               })
               .catch(reject);
           });
         } else {
-          this.wm.addWindow(pconfig).then(wid => {
-            this.wm.window_ids[wid].loading = true;
-            this.wm.window_ids[wid].refresh();
+          this.wm.addWindow(pconfig).then(() => {
+            pconfig.loading = true;
+            pconfig.refresh();
             this.renderWindow(pconfig)
               .then(wplugin => {
-                pconfig.onClose = () => {
-                  return wplugin.terminate();
-                };
-                wplugin.api.close = async () => {
-                  const w = this.wm.window_ids[wplugin.id];
-                  try {
-                    await pconfig.onClose();
-                  } finally {
-                    this.wm.closeWindow(w);
-                  }
-                };
-                this.wm.window_ids[wid].loading = false;
-                this.wm.window_ids[wid].refresh();
+                pconfig.onClose(async () => {
+                  await wplugin.terminate();
+                });
+                wplugin.api.close = pconfig.close;
+                wplugin.api.refresh = pconfig.refresh;
+                wplugin.api.resize = pconfig.resize;
+                wplugin.api.onRefresh = pconfig.onRefresh;
+                wplugin.api.onResize = pconfig.onResize;
+                pconfig.loading = false;
+                pconfig.refresh();
                 resolve(wplugin.api);
               })
               .catch(e => {
-                this.wm.window_ids[wid].loading = false;
-                this.wm.window_ids[wid].refresh();
+                pconfig.loading = false;
+                pconfig.refresh();
                 reject(e);
               });
           });

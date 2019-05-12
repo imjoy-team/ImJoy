@@ -254,7 +254,7 @@ export default {
         this.wm.active_windows = this.active_windows;
         this.$emit("select", this.active_windows, null);
       }
-      this.wm.closeWindow(w);
+      w.close();
       this.$emit("close", w);
     },
     isTypedArray(obj) {

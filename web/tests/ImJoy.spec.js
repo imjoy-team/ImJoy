@@ -218,7 +218,7 @@ describe("ImJoy.vue", async () => {
       expect(await plugin1.api.test_create_imjoy_window()).to.be.true;
       expect(wm.windows.length).to.equal(count + 1);
       expect(wm.windows[wm.windows.length - 1].name).to.equal("new image");
-      await wm.closeWindow(wm.windows[wm.windows.length - 1]);
+      await wm.windows[wm.windows.length - 1].close();
       expect(wm.windows.length).to.equal(count);
     });
 
@@ -227,7 +227,7 @@ describe("ImJoy.vue", async () => {
       expect(await plugin1.api.test_create_window()).to.be.true;
       expect(wm.windows.length).to.equal(count + 1);
       expect(wm.windows[wm.windows.length - 1].name).to.equal("new window");
-      await wm.closeWindow(wm.windows[wm.windows.length - 1]);
+      await wm.windows[wm.windows.length - 1].close();
       expect(wm.windows.length).to.equal(count);
     });
 
