@@ -110,25 +110,36 @@ export class WindowManager {
     };
 
     w.close = async () => {
+      let close_timer = setTimeout(() => {
+        this.showMessage("Force quitting the window due to timeout.");
+        forceClose();
+      }, 5000);
+
+      const forceClose = () => {
+        const index = this.windows.indexOf(w);
+        if (index > -1) {
+          this.windows.splice(index, 1);
+          delete this.window_ids[w.id];
+        }
+        if (w.selected || this.selected_window === w) {
+          w.selected = false;
+          if (this.window_mode === "single") {
+            this.selected_window = this.windows[0];
+          } else {
+            this.selected_window = null;
+          }
+        }
+        this.event_bus.$emit("close_window", w);
+      };
+
       try {
         await Promise.all(w._close_callbacks.map(item => item()));
       } catch (e) {
         console.log(e);
+      } finally {
+        clearTimeout(close_timer);
+        forceClose();
       }
-      const index = this.windows.indexOf(w);
-      if (index > -1) {
-        this.windows.splice(index, 1);
-        delete this.window_ids[w.id];
-      }
-      if (w.selected || this.selected_window === w) {
-        w.selected = false;
-        if (this.window_mode === "single") {
-          this.selected_window = this.windows[0];
-        } else {
-          this.selected_window = null;
-        }
-      }
-      this.event_bus.$emit("close_window", w);
     };
   }
 
