@@ -123,6 +123,9 @@
             name="connection_token"
             @keyup.enter="addEngine()"
           ></md-input>
+          <span v-if="url_type==='localhost'" class="md-helper-text"
+            >you can find the token from imjoy desktop app or terminal</span
+          >
         </md-field>
         <md-button class="md-primary md-raised" @click="addEngine()"
           >Connect</md-button
@@ -289,7 +292,7 @@ export default {
     return {
       engine_url: "",
       local_engine_url: "http://127.0.0.1:9527",
-      engine_url_list: ["http://127.0.0.1:9527"],
+      engine_url_list: [],
       connection_token: null,
       showEngineInfoDialog: false,
       selected_engine: null,
