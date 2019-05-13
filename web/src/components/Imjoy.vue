@@ -2372,8 +2372,8 @@ export default {
         plugin: plugin,
         plugin_manager: this.pm,
         engine_manager: this.em,
-        w: 20,
-        h: 10,
+        w: 30,
+        h: 40,
         standalone: this.screenWidth < 1200,
         data: {
           name: pconfig.name,
@@ -2390,8 +2390,8 @@ export default {
         config: {},
         plugin_manager: this.pm,
         engine_manager: this.em,
-        w: 20,
-        h: 10,
+        w: 30,
+        h: 40,
         standalone: this.screenWidth < 1200,
         plugin: {},
         data: {
