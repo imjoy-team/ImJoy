@@ -292,7 +292,10 @@ export default {
       this.options.root = this.options.root || "./";
       this.options.mode = this.options.mode || "single|multiple";
       this.options.uri_type = this.options.uri_type || "path";
-      this.options.return_engine = this.options.return_engine || true;
+      this.options.return_engine =
+        this.options.return_engine === undefined
+          ? true
+          : this.options.return_engine;
       if (this.options.engine) {
         this.show_all_engines = false;
         this.selected_engine = this.options.engine;
