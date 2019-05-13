@@ -304,11 +304,6 @@ export default {
           this.window.plugin = {};
         });
     },
-    renumber(content) {
-      const lines = content.split("\n");
-      for (let line of lines) {
-      }
-    },
     reload() {
       assert(this.window.plugin_manager);
 
