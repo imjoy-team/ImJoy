@@ -154,7 +154,9 @@ export default {
   },
   mounted() {
     if (this.w) {
-      this.w.refresh = this.refresh;
+      this.w.onRefresh(() => {
+        this.refresh();
+      });
       this.w.focus = () => {
         this.$el.scrollIntoView(true);
       };
@@ -168,7 +170,9 @@ export default {
   },
   watch: {
     w() {
-      this.w.refresh = this.refresh;
+      this.w.onRefresh(() => {
+        this.refresh();
+      });
       this.w.focus = () => {
         this.$el.scrollIntoView(true);
       };

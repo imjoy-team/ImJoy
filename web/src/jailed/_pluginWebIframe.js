@@ -9,6 +9,7 @@
 window.application = {};
 window.connection = {};
 window.api = null;
+window.__imjoy_plugin_type__ = "window";
 
 // Create a new, plain <span> element
 function _htmlToElement(html) {

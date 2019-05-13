@@ -55,7 +55,7 @@
           <md-button
             class="md-icon-button md-accent"
             v-if="wm.selected_window && wm.selected_window.standalone"
-            @click="wm.closeWindow(wm.selected_window)"
+            @click="wm.selected_window.close()"
           >
             <md-icon>close</md-icon>
             <md-tooltip
@@ -102,7 +102,7 @@
               <span>Duplicate</span>
               <md-icon>filter</md-icon>
             </md-menu-item> -->
-              <!-- <md-menu-item @click="wm.closeWindow(wm.selected_window);">
+              <!-- <md-menu-item @click="wm.selected_window.close()">
               <span>Close</span>
               <md-icon>close</md-icon>
             </md-menu-item> -->
@@ -1507,11 +1507,9 @@ export default {
     document.addEventListener("dragleave", e => {
       e.preventDefault();
       e.stopPropagation();
-      if (!insideWhiteboard(e.target)) {
-        if (this.workspace_dropping) {
-          this.workspace_dropping = false;
-          this.$forceUpdate();
-        }
+      if (this.workspace_dropping) {
+        this.workspace_dropping = false;
+        this.$forceUpdate();
       }
       if (!insideFileDialog(e.target)) {
         this.event_bus.$emit("drag_upload_leave");
@@ -1919,9 +1917,18 @@ export default {
           return;
         }
         try {
-          w.refresh = () => {
+          w.onRefresh(() => {
             this.$forceUpdate();
-          };
+          });
+          //move refresh to next tick
+          const _refresh = w.refresh;
+          if (_refresh) {
+            w.refresh = () => {
+              this.$nextTick(() => {
+                _refresh();
+              });
+            };
+          }
           this.$nextTick(() => {
             this.$forceUpdate();
             resolve();
@@ -2041,6 +2048,7 @@ export default {
         this.max_window_buttons = parseInt(this.screenWidth / 36 - 4);
         if (this.max_window_buttons > 9) this.max_window_buttons = 9;
       }
+      this.wm.resizeAll();
     },
     showEngineConnection(show, engine) {
       // if(message && resolve && reject){
@@ -2219,39 +2227,43 @@ export default {
     },
     showMessage(info, duration) {
       assert(typeof info === "string");
-      this.snackbar_info = info;
+      this.snackbar_info = info.slice(0, 120);
       if (duration) {
         duration = duration * 1000;
       }
       this.snackbar_duration = duration || 10000;
       this.show_snackbar = true;
-      this.status_text = info.slice(0, 120);
+      this.status_text = info;
       this.$forceUpdate();
     },
     showEngineFileDialog() {
       this.showFileDialog(this.IMJOY_PLUGIN, {
         uri_type: "url",
         root: "./",
-      }).then(selection => {
-        if (!Array.isArray(selection)) {
-          selection = [selection];
-        }
-        const urls = [];
-        for (let u of selection) {
-          if (u.url) {
-            urls.push({ href: u.url, path: u.path, engine: u.engine });
-          } else {
-            urls.push({ href: u });
+      })
+        .then(selection => {
+          if (!Array.isArray(selection)) {
+            selection = [selection];
           }
-        }
-        const w = {
-          name: "Files",
-          type: "imjoy/url_list",
-          scroll: true,
-          data: urls,
-        };
-        this.createWindow(w);
-      });
+          const urls = [];
+          for (let u of selection) {
+            if (u.url) {
+              urls.push({ href: u.url, path: u.path, engine: u.engine });
+            } else {
+              urls.push({ href: u });
+            }
+          }
+          const w = {
+            name: "Files",
+            type: "imjoy/url_list",
+            scroll: true,
+            data: urls,
+          };
+          this.createWindow(w);
+        })
+        .catch(e => {
+          throw e;
+        });
     },
     processPermission(allow) {
       if (allow && this.resolve_permission) {
@@ -2520,7 +2532,6 @@ export default {
           this.progress = 100;
         })
         .catch(e => {
-          console.error(e);
           this.showMessage(
             "<" + op.name + ">" + ((e && e.toString()) || "Error."),
             15
@@ -2584,14 +2595,19 @@ export default {
         } else {
           config.uri_type = config.uri_type || "path";
         }
+        if (config.root && typeof config.root !== "string") {
+          throw "You need to specify a root with string type ";
+        }
         //TODO: remove this in the future
         if (
           _plugin.config.api_version &&
           compareVersions(_plugin.config.api_version, "<=", "0.1.3")
         ) {
-          config.return_engine = config.return_engine || false;
+          config.return_object =
+            config.return_object === undefined ? false : config.return_object;
         } else {
-          config.return_engine = config.return_engine || true;
+          config.return_object =
+            config.return_object === undefined ? true : config.return_object;
         }
         return this.$refs["file-dialog"].showDialog(_plugin, config);
       } else {
@@ -2903,7 +2919,7 @@ export default {
           sanitizer.sanitizeString(text.content) || "undefined";
         this.alert_config.confirm_text = text.confirm_text || "OK";
       } else {
-        throw "unsupported alert arguments";
+        this.alert_config.content = "undefined";
       }
 
       this.alert_config.show = true;
@@ -2971,7 +2987,8 @@ export default {
         name: `Log (${_plugin.name})`,
         type: "imjoy/log",
         data: {
-          log_history: _plugin._log_history,
+          plugins: this.pm.plugin_names,
+          name: _plugin.name,
         },
       };
       this.createWindow(w);

@@ -2,7 +2,7 @@
  * Contains the JailedSite object used both by the application
  * site, and by each plugin
  */
-/*global JailedSite*/
+/*global JailedSite WorkerGlobalScope*/
 /*eslint no-global-assign: "off"*/
 
 (function() {
@@ -132,9 +132,33 @@
    */
   JailedSite.prototype.setInterface = function(_interface) {
     if (this.id === "__plugin__") {
+      // these functions will be exposed as window plugin api
       _interface.onClose = cb => {
         this._remote.onClose(cb);
       };
+      _interface.close = () => {
+        this._remote.close();
+      };
+      // if it's not a webworker
+      if (
+        typeof WorkerGlobalScope === "undefined" ||
+        !(self instanceof WorkerGlobalScope)
+      ) {
+        if (window && window.__imjoy_plugin_type__ === "window") {
+          _interface.onResize = cb => {
+            this._remote.onResize(cb);
+          };
+          _interface.onRefresh = cb => {
+            this._remote.onRefresh(cb);
+          };
+          _interface.resize = () => {
+            this._remote.resize();
+          };
+          _interface.refresh = () => {
+            this._remote.refresh();
+          };
+        }
+      }
     }
     this._interface = _interface;
     this._sendInterface();

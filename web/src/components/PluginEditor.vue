@@ -163,12 +163,14 @@ export default {
       },
     });
 
-    this.editor.layout();
-    this.window.refresh();
+    this.window.onRefresh(() => {
+      this.editor.layout();
+    });
+
     if (this.window) {
-      this.window.resize = () => {
+      this.window.onResize(() => {
         this.$nextTick(this.updateSize);
-      };
+      });
     }
     this.updateSize();
 

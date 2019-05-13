@@ -87,6 +87,62 @@ export class WindowManager {
     return loaders;
   }
 
+  setupCallbacks(w) {
+    w._refresh_callbacks = [];
+    w.onRefresh = handler => {
+      w._refresh_callbacks.push(handler);
+    };
+    w.refresh = async () => {
+      await Promise.all(w._refresh_callbacks.map(item => item()));
+    };
+
+    w._resize_callbacks = [];
+    w.onResize = handler => {
+      w._resize_callbacks.push(handler);
+    };
+    w.resize = async () => {
+      await Promise.all(w._resize_callbacks.map(item => item()));
+    };
+
+    w._close_callbacks = [];
+    w.onClose = handler => {
+      w._close_callbacks.push(handler);
+    };
+
+    w.close = async () => {
+      let close_timer = setTimeout(() => {
+        this.showMessage("Force quitting the window due to timeout.");
+        forceClose();
+      }, 5000);
+
+      const forceClose = () => {
+        const index = this.windows.indexOf(w);
+        if (index > -1) {
+          this.windows.splice(index, 1);
+          delete this.window_ids[w.id];
+        }
+        if (w.selected || this.selected_window === w) {
+          w.selected = false;
+          if (this.window_mode === "single") {
+            this.selected_window = this.windows[0];
+          } else {
+            this.selected_window = null;
+          }
+        }
+        this.event_bus.$emit("close_window", w);
+      };
+
+      try {
+        await Promise.all(w._close_callbacks.map(item => item()));
+      } catch (e) {
+        console.log(e);
+      } finally {
+        clearTimeout(close_timer);
+        forceClose();
+      }
+    };
+  }
+
   addWindow(w) {
     return new Promise((resolve, reject) => {
       try {
@@ -103,6 +159,7 @@ export class WindowManager {
         }
         this.windows.push(w);
         this.window_ids[w.id] = w;
+        this.setupCallbacks(w);
         this.selectWindow(w);
         if (this.add_window_callback) {
           this.add_window_callback(w).then(() => {
@@ -133,26 +190,9 @@ export class WindowManager {
     w.selected = true;
     this.active_windows = [w];
     if (!w.standalone && w.focus) w.focus();
-    if (w.refresh) w.refresh();
-  }
-
-  async closeWindow(w) {
-    try {
-      await w.onClose();
-    } catch (e) {
-      console.log(e);
+    if (w.refresh) {
+      w.refresh();
     }
-    this.windows.splice(this.windows.indexOf(w), 1);
-    delete this.window_ids[w.id];
-    if (w.selected || this.selected_window === w) {
-      w.selected = false;
-      if (this.window_mode === "single") {
-        this.selected_window = this.windows[0];
-      } else {
-        this.selected_window = null;
-      }
-    }
-    this.event_bus.$emit("close_window", w);
   }
 
   resizeAll() {
@@ -180,7 +220,7 @@ export class WindowManager {
       if (this.windows[i].type != "imjoy/plugin-editor") {
         // delete this.window_ids[this.windows[i].id]
         // this.windows.splice(i, 1);
-        this.closeWindow(this.windows[i]);
+        this.windows[i].close();
       }
     }
     if (this.windows.length === 0) {

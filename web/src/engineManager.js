@@ -285,16 +285,22 @@ export class Engine {
       this.socket.emit(
         "list_dir",
         {
-          path: path || "~",
+          path: path || "",
           type: type || "file",
           recursive: recursive || false,
         },
-        ret => {
+        async ret => {
           if (ret && ret.success) {
             resolve(ret);
           } else {
             this.showMessage(`Failed to list dir: ${path} ${ret.error}`);
-            reject(ret.error);
+            if (path !== "") {
+              path = "";
+              ret = await this.listFiles(path, type, false);
+              resolve(ret);
+            } else {
+              reject(ret.error);
+            }
           }
         }
       );
