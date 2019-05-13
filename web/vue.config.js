@@ -4,6 +4,17 @@ const webpack = require('webpack')
 const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 const CnameWebpackPlugin = require('cname-webpack-plugin')
+const CreateFileWebpack = require('create-file-webpack')
+const package_json = require('./package.json')
+
+const version_file = {
+  // path to folder in which the file will be created
+  path: path.join(__dirname, "dist"),
+  // file name
+  fileName: 'version.json',
+  // content of the file
+  content: `{"name": "${package_json.name}", "version": "${package_json.version}", "description": "${package_json.description}"}`
+};
 
 module.exports = {
   runtimeCompiler: true,
@@ -27,6 +38,7 @@ module.exports = {
       exprContextCritical: false
     },
     plugins: [
+      new CreateFileWebpack(version_file),
       new CnameWebpackPlugin({
         domain: process.env.DEPLOY_MODE === 'dev' ? 'dev.imjoy.io' : 'imjoy.io',
       }),

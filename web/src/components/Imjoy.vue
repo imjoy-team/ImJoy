@@ -1950,8 +1950,7 @@ export default {
       this.checking = true;
       try {
         const response = await axios.get(
-          "https://raw.githubusercontent.com/oeway/ImJoy/master/web/package.json?" +
-            randId()
+          "https://imjoy.io/version.json?" + randId()
         );
         if (!response || !response.data) {
           this.showMessage("failed to fetch imjoy version information");

@@ -48,6 +48,7 @@
     "chromedriver": "^2.38.2",
     "cname-webpack-plugin": "^1.0.3",
     "copy-webpack-plugin": "^4.6.0",
+    "create-file-webpack": "^1.0.2",
     "cross-env": "^5.0.1",
     "cross-spawn": "^5.0.1",
     "css-loader": "^2.1.1",
