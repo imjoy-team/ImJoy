@@ -10,6 +10,7 @@
 window.application = {};
 window.connection = {};
 window.api = null;
+window.__imjoy_plugin_type__ = "web-python";
 
 // Create a new, plain <span> element
 function _htmlToElement(html) {
