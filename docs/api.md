@@ -180,7 +180,16 @@ Shows an alert dialog with a message to the user.
 **Arguments**
 <!--****[TODO] add instructions about customizable parameters **-->
 
+For plain text:
+
 * **message**: String. Contains the message to be displayed. HTML tags can be used in the message, but only limited to a restricted set of tags and css, more details can be found [here](api?id=sanitized-html-and-css).
+
+For HTML:
+
+* **message**: Object. It contains the following fields:
+  - **content**: Contains the question to be displayed. HTML tags can be used in the message, but only limited to a restricted set of tags and css, more details can be found [here](api?id=sanitized-html-and-css).
+  - **title**: The title of the dialog
+
 
 **Example**
 ```javascript
@@ -199,7 +208,16 @@ Shows a prompt to ask the user input.
 **Arguments**
 <!--****[TODO] add instructions about customizable parameters **-->
 
+For plain text:
+
 * **question**: String. Contains the question to be displayed.  HTML tags can be used in the message, but only limited to a restricted set of tags and css, more details can be found [here](api?id=sanitized-html-and-css).
+
+For HTML:
+
+* **question**: Object. It contains the following fields:
+  - **content**: Contains the question to be displayed. HTML tags can be used in the message, but only limited to a restricted set of tags and css, more details can be found [here](api?id=sanitized-html-and-css).
+  - **placeholder**: The default anwser of the question
+  - **title**: The title of the dialog
 
 * **default_anwser** (optional): String. Contains the default anwser to the question.
 
@@ -223,7 +241,15 @@ Shows a confirmation message to the user.
 **Arguments**
 <!--****[TODO] add instructions about customizable parameters **-->
 
+For plain text:
+
 * **question**: String. Contains the question to be displayed.  HTML tags can be used in the message, but only limited to a restricted set of tags and css, more details can be found [here](api?id=sanitized-html-and-css).
+
+For HTML:
+
+* **question**: Object. It contains the following fields:
+  - **content**: Contains the question to be displayed. HTML tags can be used in the message, but only limited to a restricted set of tags and css, more details can be found [here](api?id=sanitized-html-and-css).
+  - **title**: The title of the dialog
 
 **Returns**
 * **confirmation**: Boolean. True or false.
@@ -231,7 +257,13 @@ Shows a confirmation message to the user.
 
 **Example**
 ```javascript
-const anwser = await api.confirm('Do you want to delete these files?')
+const confirmation = await api.confirm('Do you want to delete these files?')
+if(confirmation){
+  delete_file()
+}
+else{
+  console.log('User cancelled file deletion.')
+}
 ```
 <!--****[TODO] add example **-->
 
@@ -829,7 +861,7 @@ Set a callback function to the current plugin which will be called when terminat
 
 **Arguments**
 
-* **callback_func**: String. The callback function to be called during plugin termination.
+* **callback_func**: Function. The callback function to be called during plugin termination.
 
 
 ### api.progress
@@ -956,6 +988,7 @@ Upload a file to a upload url.
 * **config**. Object (JavaScript) or dictionary (Python).
 It contains the following fields:
   - **url** : String. The upload url to be uploaded (get from `api.requestUploadUrl`).
+  - **method** (optional): String. The request method, default value: 'POST'.
 
 **Returns**
 * **fileInfo**. Object (JavaScript) or dictionary (Python). Information about the uploaded file.
@@ -987,6 +1020,8 @@ Upload a file to a upload url.
 * **config**. Object (JavaScript) or dictionary (Python).
 It contains the following fields:
   - **url** : String. The url to the remote file (get from `api.getFileUrl`).
+  - **method** (optional): String. The request method, default value: 'GET'.
+  - **responseType** (optional): String. The default response type, default value: 'blob'. 
 
 **Returns**
 * **fileInfo**. Object (JavaScript) or dictionary (Python). The downloaded file.
@@ -1180,17 +1215,20 @@ It contains the following fields:
 
 **Examples**
 
-Example will show either the specified file-name or an error message that the
+Example will show either the specified file-name or an message that the
 user canceled or that the plugin engine was not running.
 
 ```javascript
-try{
-  const ret = await api.showFileDialog({root: '/', uri_type: 'url'})
+
+const ret = await api.showFileDialog({root: '/', uri_type: 'url'})
+if(ret){
   await api.alert("Selected file " + ret.url)
 }
-catch(e){
-  await api.alert("Error: "+e.toString())
-};
+else{
+  await api.alert("User cancelled file selection.")
+}
+
+
 ```
 <!--**[TODO]: update this example to new api**-->
 [Try yourself >>](https://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:showFileDialog&w=examples)

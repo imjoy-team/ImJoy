@@ -707,6 +707,12 @@ export function randId() {
     .substr(2, 10);
 }
 
+export function escapeHTML(html) {
+  const escapeEl = document.createElement("textarea");
+  escapeEl.textContent = html;
+  return escapeEl.innerHTML;
+}
+
 // Deep clone
 export function _clone(aObject) {
   if (!aObject) {

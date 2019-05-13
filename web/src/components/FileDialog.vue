@@ -310,6 +310,7 @@ export default {
       }
       return new Promise((resolve2, reject2) => {
         if (this.options.uri_type === "path") {
+          // user selected
           this.resolve = path => {
             if (this.options.return_object) {
               resolve2({ path: path, engine: this.selected_engine.url });
@@ -317,9 +318,24 @@ export default {
               resolve2(path);
             }
           };
-          this.reject = reject2;
+          // if user cancelled
+          this.reject = () => {
+            if (this.options.return_object) {
+              resolve2(false);
+            } else {
+              reject2("User cancelled selection.");
+            }
+          };
         } else if (this.options.uri_type === "url") {
-          this.reject = reject2;
+          // if user cancelled
+          this.reject = () => {
+            if (this.options.return_object) {
+              resolve2(false);
+            } else {
+              reject2("User cancelled selection.");
+            }
+          };
+          // user selected
           this.resolve = paths => {
             if (typeof paths === "string") {
               this.getFileUrl(_plugin, {
@@ -404,23 +420,31 @@ export default {
     },
     async remove() {
       let files = [];
-      if (!this.file_tree_selection_info) {
-        throw "no file selected";
+      try {
+        if (!this.file_tree_selection_info) {
+          throw "no file selected";
+        }
+        if (Array.isArray(this.file_tree_selection_info)) {
+          files = this.file_tree_selection_info;
+        } else {
+          files = [this.file_tree_selection_info];
+        }
+        // clear selection
+        this.file_tree_selection = null;
+        this.file_tree_selection_info = null;
+        for (let f of files) {
+          await this.removeFiles(
+            this.selected_engine,
+            f.path,
+            f.target.type,
+            this.options.recursive
+          );
+          this.status_text = `"${f.target.name}" has been removed.`;
+        }
+        this.refreshList();
+      } catch (e) {
+        this.status_text = `Error occured when removing file or folder: ${e}`;
       }
-      if (Array.isArray(this.file_tree_selection_info)) {
-        files = this.file_tree_selection_info;
-      } else {
-        files = [this.file_tree_selection_info];
-      }
-      for (let f of files) {
-        await this.removeFiles(
-          this.selected_engine,
-          f.path,
-          f.target.type,
-          this.options.recursive
-        );
-      }
-      this.refreshList();
     },
     async downloadFiles() {
       let files = [];
