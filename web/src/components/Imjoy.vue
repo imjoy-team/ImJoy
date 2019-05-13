@@ -294,6 +294,10 @@
                 >
               </md-button>
               <md-menu-content>
+                <md-menu-item @click="showWorkspaceDialog = true">
+                  <md-icon>view_list</md-icon>Add Workspace
+                </md-menu-item>
+                <md-divider></md-divider>
                 <md-menu-item
                   @click="switchWorkspace(w)"
                   :disabled="w === pm.selected_workspace"
@@ -303,10 +307,6 @@
                   <span>{{ w }}</span
                   ><md-icon>forward</md-icon>
                   <md-tooltip>Switch to workspace: {{ w }} </md-tooltip>
-                </md-menu-item>
-                <md-divider></md-divider>
-                <md-menu-item @click="showWorkspaceDialog = true">
-                  <md-icon>view_list</md-icon>Workspaces
                 </md-menu-item>
               </md-menu-content>
             </md-menu>
@@ -598,7 +598,6 @@
               </md-button>
 
               <md-button
-                v-if="!plugin._disconnected"
                 class="md-icon-button"
                 @click="
                   plugin.panel_expanded = !plugin.panel_expanded;
