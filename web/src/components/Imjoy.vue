@@ -2976,10 +2976,10 @@ export default {
           throw "unsupported prompt arguments";
         }
         this.confirm_config.confirm = () => {
-          resolve();
+          resolve(true);
         };
         this.confirm_config.cancel = () => {
-          reject();
+          resolve(false);
         };
         this.confirm_config.show = true;
       });
