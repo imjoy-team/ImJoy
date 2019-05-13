@@ -75,6 +75,7 @@ export default {
       log_history.splice(0, log_history.length);
       log_history._error = "";
       log_history._info = "";
+      this.$forceUpdate()
     },
     exportLog() {
       const log_history = this.log_history;

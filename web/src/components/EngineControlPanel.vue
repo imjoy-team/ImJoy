@@ -169,6 +169,7 @@
             name="connection_token"
           ></md-input>
         </md-field>
+        <p>- engine version: {{ selected_engine.engine_info.version }}</p>
         <div
           v-if="
             selected_engine.connected &&
@@ -177,7 +178,6 @@
           "
           class="platform-info"
         >
-          <p>- engine version: {{ selected_engine.engine_info.version }}</p>
           <p>- api version: {{ selected_engine.engine_info.api_version }}</p>
           <p v-for="(v, k) in selected_engine.engine_info.platform" :key="k">
             - {{ k }}: {{ v }}
@@ -438,5 +438,9 @@ export default {
     height: 36px;
     min-height: 36px;
   }
+}
+
+p {
+    margin: 0 0 0.5rem;
 }
 </style>
