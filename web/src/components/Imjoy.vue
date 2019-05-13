@@ -2672,7 +2672,7 @@ export default {
         this.showMessage("Uploading a file to " + config.url);
         let totalLength = null;
         axios({
-          method: "post",
+          method: "post" || config.method,
           url: config.url,
           data: bodyFormData,
           headers: config.headers || { "Content-Type": "multipart/form-data" },
@@ -2723,7 +2723,10 @@ export default {
         this.showMessage("Downloading from " + config.url);
         let totalLength = null;
         axios
-          .get(config.url, {
+          .get({
+            url: config.url,
+            method: config.method || "GET",
+            responseType: config.method || "blob",
             onDownloadProgress: progressEvent => {
               totalLength =
                 totalLength || progressEvent.lengthComputable

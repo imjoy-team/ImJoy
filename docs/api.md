@@ -982,6 +982,7 @@ Upload a file to a upload url.
 * **config**. Object (JavaScript) or dictionary (Python).
 It contains the following fields:
   - **url** : String. The upload url to be uploaded (get from `api.requestUploadUrl`).
+  - **method** (optional): String. The request method, default value: 'POST'.
 
 **Returns**
 * **fileInfo**. Object (JavaScript) or dictionary (Python). Information about the uploaded file.
@@ -1013,6 +1014,8 @@ Upload a file to a upload url.
 * **config**. Object (JavaScript) or dictionary (Python).
 It contains the following fields:
   - **url** : String. The url to the remote file (get from `api.getFileUrl`).
+  - **method** (optional): String. The request method, default value: 'GET'.
+  - **responseType** (optional): String. The default response type, default value: 'blob'. 
 
 **Returns**
 * **fileInfo**. Object (JavaScript) or dictionary (Python). The downloaded file.
