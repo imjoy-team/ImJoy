@@ -1244,13 +1244,18 @@ export class PluginManager {
         {
           TAG: tconfig.tag,
           WORKSPACE: this.selected_workspace,
-          ENGINE_URL: config.engine && config.engine.url || undefined,
+          ENGINE_URL: (config.engine && config.engine.url) || undefined,
         },
         this.imjoy_api
       );
       const plugin = new DynamicPlugin(tconfig, _interface, this.fm.api);
-      plugin._log_history.push(`Loading plugin ${plugin.id} (TAG=${_interface.TAG}, WORKSPACE=${_interface.WORKSPACE})`)
-      if(_interface.ENGINE_URL) plugin._log_history.push(`ENGINE_URL=${_interface.ENGINE_URL}`)
+      plugin._log_history.push(
+        `Loading plugin ${plugin.id} (TAG=${_interface.TAG}, WORKSPACE=${
+          _interface.WORKSPACE
+        })`
+      );
+      if (_interface.ENGINE_URL)
+        plugin._log_history.push(`ENGINE_URL=${_interface.ENGINE_URL}`);
       plugin.whenConnected(() => {
         if (!plugin.api) {
           console.error("Error occured when loading plugin.");
@@ -1258,7 +1263,7 @@ export class PluginManager {
           reject("Error occured when loading plugin.");
           throw "Error occured when loading plugin.";
         }
-        plugin._log_history.push(`Plugin connected.`)
+        plugin._log_history.push(`Plugin connected.`);
         if (plugin._unloaded) {
           console.log(
             "WARNING: this plugin is ready but unloaded: " + plugin.id
@@ -1276,7 +1281,7 @@ export class PluginManager {
           this.registerExtension(template.extensions, plugin);
         }
         if (plugin.config.resumed && plugin.api.resume) {
-          plugin._log_history.push(`Resuming plugin.`)
+          plugin._log_history.push(`Resuming plugin.`);
           plugin.api
             .resume()
             .then(() => {
@@ -1295,7 +1300,7 @@ export class PluginManager {
               });
             });
         } else if (plugin.api.setup) {
-          plugin._log_history.push(`Setting up plugin.`)
+          plugin._log_history.push(`Setting up plugin.`);
           plugin.api
             .setup()
             .then(() => {
