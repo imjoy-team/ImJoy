@@ -428,6 +428,9 @@ export default {
       } else {
         files = [this.file_tree_selection_info];
       }
+      // clear selection
+      this.file_tree_selection = null;
+      this.file_tree_selection_info = null;
       for (let f of files) {
         await this.removeFiles(
           this.selected_engine,
