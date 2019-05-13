@@ -2603,9 +2603,11 @@ export default {
           _plugin.config.api_version &&
           compareVersions(_plugin.config.api_version, "<=", "0.1.3")
         ) {
-          config.return_engine = config.return_engine || false;
+          config.return_object =
+            config.return_object === undefined ? false : config.return_object;
         } else {
-          config.return_engine = config.return_engine || true;
+          config.return_object =
+            config.return_object === undefined ? true : config.return_object;
         }
         return this.$refs["file-dialog"].showDialog(_plugin, config);
       } else {

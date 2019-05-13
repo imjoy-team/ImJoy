@@ -292,10 +292,10 @@ export default {
       this.options.root = this.options.root || "./";
       this.options.mode = this.options.mode || "single|multiple";
       this.options.uri_type = this.options.uri_type || "path";
-      this.options.return_engine =
-        this.options.return_engine === undefined
+      this.options.return_object =
+        this.options.return_object === undefined
           ? true
-          : this.options.return_engine;
+          : this.options.return_object;
       if (this.options.engine) {
         this.show_all_engines = false;
         this.selected_engine = this.options.engine;
@@ -311,7 +311,7 @@ export default {
       return new Promise((resolve2, reject2) => {
         if (this.options.uri_type === "path") {
           this.resolve = path => {
-            if (this.options.return_engine) {
+            if (this.options.return_object) {
               resolve2({ path: path, engine: this.selected_engine.url });
             } else {
               resolve2(path);
@@ -327,7 +327,7 @@ export default {
                 engine: this.selected_engine.url,
               })
                 .then(url => {
-                  if (this.options.return_engine) {
+                  if (this.options.return_object) {
                     resolve2({
                       url: url,
                       engine: this.selected_engine.url,
@@ -350,7 +350,7 @@ export default {
               }
               Promise.all(ps)
                 .then(urls => {
-                  if (this.options.return_engine) {
+                  if (this.options.return_object) {
                     resolve2({
                       url: urls,
                       engine: this.selected_engine.url,
