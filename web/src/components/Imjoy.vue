@@ -308,7 +308,6 @@
                   ><md-icon>forward</md-icon>
                   <md-tooltip>Switch to workspace: {{ w }} </md-tooltip>
                 </md-menu-item>
-               
               </md-menu-content>
             </md-menu>
 
