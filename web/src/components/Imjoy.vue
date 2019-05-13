@@ -1953,7 +1953,7 @@ export default {
           "https://imjoy.io/version.json?" + randId()
         );
         if (!response || !response.data) {
-          this.showMessage("failed to fetch imjoy version information");
+          this.showMessage("Failed to fetch imjoy version information.");
           return;
         }
         const obj = response.data;
@@ -1989,7 +1989,7 @@ export default {
           this.latest_version = null;
         }
       } catch (e) {
-        this.showMessage("failed to fetch imjoy version information");
+        this.showMessage("Failed to fetch imjoy version information");
       } finally {
         this.checking = false;
       }
@@ -2380,7 +2380,7 @@ export default {
         plugin_manager: this.pm,
         engine_manager: this.em,
         w: 30,
-        h: 40,
+        h: 20,
         standalone: this.screenWidth < 1200,
         data: {
           name: pconfig.name,
@@ -2398,7 +2398,7 @@ export default {
         plugin_manager: this.pm,
         engine_manager: this.em,
         w: 30,
-        h: 40,
+        h: 20,
         standalone: this.screenWidth < 1200,
         plugin: {},
         data: {
@@ -2715,7 +2715,7 @@ export default {
           })
           .catch(response => {
             this.showMessage(
-              `failed to upload files, error: ${response.statusText}`
+              `Failed to upload files, error: ${response.statusText}`
             );
             console.error(response);
             reject(response.statusText);
@@ -2765,7 +2765,7 @@ export default {
           })
           .catch(response => {
             this.showMessage(
-              `failed to download files, error: ${response.statusText}`
+              `Failed to download files, error: ${response.statusText}`
             );
             console.error(response);
             reject(response.statusText);
