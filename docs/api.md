@@ -180,7 +180,16 @@ Shows an alert dialog with a message to the user.
 **Arguments**
 <!--****[TODO] add instructions about customizable parameters **-->
 
+For plain text:
+
 * **message**: String. Contains the message to be displayed. HTML tags can be used in the message, but only limited to a restricted set of tags and css, more details can be found [here](api?id=sanitized-html-and-css).
+
+For HTML:
+
+* **message**: Object. It contains the following fields:
+  - **content**: Contains the question to be displayed. HTML tags can be used in the message, but only limited to a restricted set of tags and css, more details can be found [here](api?id=sanitized-html-and-css).
+  - **title**: The title of the dialog
+
 
 **Example**
 ```javascript
@@ -199,7 +208,16 @@ Shows a prompt to ask the user input.
 **Arguments**
 <!--****[TODO] add instructions about customizable parameters **-->
 
+For plain text:
+
 * **question**: String. Contains the question to be displayed.  HTML tags can be used in the message, but only limited to a restricted set of tags and css, more details can be found [here](api?id=sanitized-html-and-css).
+
+For HTML:
+
+* **question**: Object. It contains the following fields:
+  - **content**: Contains the question to be displayed. HTML tags can be used in the message, but only limited to a restricted set of tags and css, more details can be found [here](api?id=sanitized-html-and-css).
+  - **placeholder**: The default anwser of the question
+  - **title**: The title of the dialog
 
 * **default_anwser** (optional): String. Contains the default anwser to the question.
 
@@ -223,7 +241,15 @@ Shows a confirmation message to the user.
 **Arguments**
 <!--****[TODO] add instructions about customizable parameters **-->
 
+For plain text:
+
 * **question**: String. Contains the question to be displayed.  HTML tags can be used in the message, but only limited to a restricted set of tags and css, more details can be found [here](api?id=sanitized-html-and-css).
+
+For HTML:
+
+* **question**: Object. It contains the following fields:
+  - **content**: Contains the question to be displayed. HTML tags can be used in the message, but only limited to a restricted set of tags and css, more details can be found [here](api?id=sanitized-html-and-css).
+  - **title**: The title of the dialog
 
 **Returns**
 * **confirmation**: Boolean. True or false.
