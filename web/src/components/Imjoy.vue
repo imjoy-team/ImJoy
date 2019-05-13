@@ -2240,26 +2240,30 @@ export default {
       this.showFileDialog(this.IMJOY_PLUGIN, {
         uri_type: "url",
         root: "./",
-      }).then(selection => {
-        if (!Array.isArray(selection)) {
-          selection = [selection];
-        }
-        const urls = [];
-        for (let u of selection) {
-          if (u.url) {
-            urls.push({ href: u.url, path: u.path, engine: u.engine });
-          } else {
-            urls.push({ href: u });
+      })
+        .then(selection => {
+          if (!Array.isArray(selection)) {
+            selection = [selection];
           }
-        }
-        const w = {
-          name: "Files",
-          type: "imjoy/url_list",
-          scroll: true,
-          data: urls,
-        };
-        this.createWindow(w);
-      });
+          const urls = [];
+          for (let u of selection) {
+            if (u.url) {
+              urls.push({ href: u.url, path: u.path, engine: u.engine });
+            } else {
+              urls.push({ href: u });
+            }
+          }
+          const w = {
+            name: "Files",
+            type: "imjoy/url_list",
+            scroll: true,
+            data: urls,
+          };
+          this.createWindow(w);
+        })
+        .catch(e => {
+          throw e;
+        });
     },
     processPermission(allow) {
       if (allow && this.resolve_permission) {
@@ -2590,6 +2594,9 @@ export default {
           config.uri_type = config.uri_type || "url";
         } else {
           config.uri_type = config.uri_type || "path";
+        }
+        if (config.root && typeof config.root !== "string") {
+          throw "You need to specify a root with string type ";
         }
         //TODO: remove this in the future
         if (

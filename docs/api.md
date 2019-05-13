@@ -730,26 +730,26 @@ It contains the following fields:
 Obtain file url with default settings
 
 ```javascript
-api.getFileUrl({'path': '~/data/output.png', 'engine': 'http://127.0.0.1:9527'})
+api.getFileUrl({'path': 'data/output.png', 'engine': 'http://127.0.0.1:9527'})
 // will return something like `http://127.0.0.1:9527/file/1ba89354-ae98-457c-a53b-39a4bdd14941/output.png`.
 ```
 
 Specify password to access file
 ```javascript
-api.getFileUrl({'path': '~/data/output.png', 'password': 'SECRET_PASSWORD', 'engine': 'http://127.0.0.1:9527'})
+api.getFileUrl({'path': 'data/output.png', 'password': 'SECRET_PASSWORD', 'engine': 'http://127.0.0.1:9527'})
 // will return something like `http://127.0.0.1:9527/file/1ba89354-ae98-457c-a53b-39a4bdd14941@SECRET_PASSWORD/output.png`.
 ```
 
 Specify header to create downloadable link
 ```javascript
 headers={'Content-disposition': 'attachment; filename="XXXXXXXXX.XXX"'}
-api.getFileUrl({'path': '~/data/output.png', 'headers': headers, 'engine': 'http://127.0.0.1:9527'})
+api.getFileUrl({'path': 'data/output.png', 'headers': headers, 'engine': 'http://127.0.0.1:9527'})
 ```
 
 Specify header for specific content type
 ```javascript
 headers={'Content-disposition': 'inline; filename="XXXXXXXXX.XXX"', 'Content-Type': 'image/png'}
-api.getFileUrl({'path': '~/data/output.png', 'headers': headers, 'engine': 'http://127.0.0.1:9527'})
+api.getFileUrl({'path': 'data/output.png', 'headers': headers, 'engine': 'http://127.0.0.1:9527'})
 ```
 
 ### api.getPlugin
@@ -1141,11 +1141,6 @@ types.
 
 The file handling is different for the ImJoy app and the plugin engine. We recommend
 reading the dedicated section in the [user manual](development?id=loading-saving-data) to understand the difference.
-When calling this api function within a **JavaScript** plugin, you will obtain
-a warning message as the one shown below. It essentially indicates that the
-ImJoy app now requests access to this part of your local file system:
-
-![imjoy-showFileDialog-warning](assets/imjoy-showFileDialog-warning.png ':size=700')
 
 Please note that the file-path for a JavaScript plugin is returned as an url, while
 for a Python plugin it will be the absolute file-path. The url format is required for
@@ -1190,7 +1185,7 @@ user canceled or that the plugin engine was not running.
 
 ```javascript
 try{
-  const ret = await api.showFileDialog({root: '~', uri_type: 'url'})
+  const ret = await api.showFileDialog({root: '/', uri_type: 'url'})
   await api.alert("Selected file " + ret.url)
 }
 catch(e){
