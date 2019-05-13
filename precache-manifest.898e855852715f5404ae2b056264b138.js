@@ -1,11 +1,11 @@
 self.__precacheManifest = [
   {
-    "revision": "0951540e4e108c07eac4",
-    "url": "/static/css/app.eef5df7e.css"
+    "revision": "4458f26f46054dbdef26",
+    "url": "/static/css/app.af89327a.css"
   },
   {
-    "revision": "0951540e4e108c07eac4",
-    "url": "/static/js/app.6e378772.js"
+    "revision": "4458f26f46054dbdef26",
+    "url": "/static/js/app.98a4865d.js"
   },
   {
     "revision": "b8859e2632feade2aed6",
@@ -228,6 +228,10 @@ self.__precacheManifest = [
     "url": "/static/js/chunk-vendors.64edc74e.js"
   },
   {
+    "revision": "493ef474936217113b20a6573247288a",
+    "url": "/static/vs/editor.worker.js"
+  },
+  {
     "revision": "b00449080615ce71a2a8a52aee9f658f",
     "url": "/static/vs/css.worker.js"
   },
@@ -236,11 +240,7 @@ self.__precacheManifest = [
     "url": "/static/vs/html.worker.js"
   },
   {
-    "revision": "493ef474936217113b20a6573247288a",
-    "url": "/static/vs/editor.worker.js"
-  },
-  {
-    "revision": "a0fdbff8edbe6318ac52dcd6df07262f",
+    "revision": "ff34cd26fe893d40510588d074ca4227",
     "url": "/index.html"
   },
   {
@@ -432,12 +432,12 @@ self.__precacheManifest = [
     "url": "/static/img/imjoy-card-plain.png"
   },
   {
-    "revision": "0cc69c2a860acde29e9411275ca4bb8d",
-    "url": "/static/img/imjoy-icon-white.svg"
-  },
-  {
     "revision": "5729dc069431278b12e8100500dff158",
     "url": "/static/img/imjoy-icon-white.png"
+  },
+  {
+    "revision": "0cc69c2a860acde29e9411275ca4bb8d",
+    "url": "/static/img/imjoy-icon-white.svg"
   },
   {
     "revision": "e37c947f86aa593ba9e34029c119257a",
@@ -636,10 +636,6 @@ self.__precacheManifest = [
     "url": "/static/img/perspective-hr.jpg"
   },
   {
-    "revision": "140e93934b5c72cee447d043f514be21",
-    "url": "/static/vs/basic-languages/rust/rust.js"
-  },
-  {
     "revision": "d89f8e23e929864846ab63beae060e70",
     "url": "/static/vs/basic-languages/sb/sb.js"
   },
@@ -650,6 +646,10 @@ self.__precacheManifest = [
   {
     "revision": "ce940bdd17ddab29ed4d630523a48aa8",
     "url": "/static/vs/basic-languages/scss/scss.js"
+  },
+  {
+    "revision": "140e93934b5c72cee447d043f514be21",
+    "url": "/static/vs/basic-languages/rust/rust.js"
   },
   {
     "revision": "4ed77e76271ad4b2fd8e587e0a3892d9",
