@@ -855,7 +855,7 @@ Set a callback function to the current plugin which will be called when terminat
 
 **Arguments**
 
-* **callback_func**: String. The callback function to be called during plugin termination.
+* **callback_func**: Function. The callback function to be called during plugin termination.
 
 
 ### api.progress
