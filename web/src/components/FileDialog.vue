@@ -420,26 +420,31 @@ export default {
     },
     async remove() {
       let files = [];
-      if (!this.file_tree_selection_info) {
-        throw "no file selected";
+      try {
+        if (!this.file_tree_selection_info) {
+          throw "no file selected";
+        }
+        if (Array.isArray(this.file_tree_selection_info)) {
+          files = this.file_tree_selection_info;
+        } else {
+          files = [this.file_tree_selection_info];
+        }
+        // clear selection
+        this.file_tree_selection = null;
+        this.file_tree_selection_info = null;
+        for (let f of files) {
+          await this.removeFiles(
+            this.selected_engine,
+            f.path,
+            f.target.type,
+            this.options.recursive
+          );
+          this.status_text = `"${f.target.name}" has been removed.`;
+        }
+        this.refreshList();
+      } catch (e) {
+        this.status_text = `Error occured when removing file or folder: ${e}`;
       }
-      if (Array.isArray(this.file_tree_selection_info)) {
-        files = this.file_tree_selection_info;
-      } else {
-        files = [this.file_tree_selection_info];
-      }
-      // clear selection
-      this.file_tree_selection = null;
-      this.file_tree_selection_info = null;
-      for (let f of files) {
-        await this.removeFiles(
-          this.selected_engine,
-          f.path,
-          f.target.type,
-          this.options.recursive
-        );
-      }
-      this.refreshList();
     },
     async downloadFiles() {
       let files = [];

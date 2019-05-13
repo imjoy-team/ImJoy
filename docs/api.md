@@ -257,7 +257,13 @@ For HTML:
 
 **Example**
 ```javascript
-const anwser = await api.confirm('Do you want to delete these files?')
+const confirmation = await api.confirm('Do you want to delete these files?')
+if(confirmation){
+  delete_file()
+}
+else{
+  console.log('User cancelled file deletion.')
+}
 ```
 <!--****[TODO] add example **-->
 
@@ -1209,17 +1215,20 @@ It contains the following fields:
 
 **Examples**
 
-Example will show either the specified file-name or an error message that the
+Example will show either the specified file-name or an message that the
 user canceled or that the plugin engine was not running.
 
 ```javascript
-try{
-  const ret = await api.showFileDialog({root: '/', uri_type: 'url'})
+
+const ret = await api.showFileDialog({root: '/', uri_type: 'url'})
+if(ret){
   await api.alert("Selected file " + ret.url)
 }
-catch(e){
-  await api.alert("Error: "+e.toString())
-};
+else{
+  await api.alert("User cancelled file selection.")
+}
+
+
 ```
 <!--**[TODO]: update this example to new api**-->
 [Try yourself >>](https://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:showFileDialog&w=examples)

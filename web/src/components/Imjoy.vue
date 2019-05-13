@@ -39,18 +39,6 @@
             >Deploying Deep Learning Made Easy!</span
           >
         </div>
-        <md-snackbar
-          md-position="center"
-          class="md-accent"
-          :md-active.sync="show_snackbar"
-          :md-duration="snackbar_duration"
-        >
-          <span>{{ snackbar_info }}</span>
-          <md-button class="md-accent" @click="show_snackbar = false"
-            >close</md-button
-          >
-        </md-snackbar>
-
         <div class="md-toolbar-section-end">
           <md-button
             class="md-icon-button md-accent"
@@ -779,7 +767,22 @@
         showRemoveConfirmation = false;
       "
     />
+
+    <md-snackbar
+      id="api-snackbar"
+      md-position="center"
+      class="md-accent"
+      :md-active.sync="show_snackbar"
+      :md-duration="snackbar_duration"
+    >
+      <span>{{ snackbar_info }}</span>
+      <md-button class="md-accent" @click="show_snackbar = false"
+        >close</md-button
+      >
+    </md-snackbar>
+
     <md-dialog-alert
+      class="api-dialog"
       :md-active.sync="alert_config.show"
       :md-title="alert_config.title"
       :md-content="alert_config.content"
@@ -787,6 +790,7 @@
     />
 
     <md-dialog-confirm
+      class="api-dialog"
       :md-active.sync="confirm_config.show"
       :md-title="confirm_config.title"
       :md-content="confirm_config.content"
@@ -797,6 +801,7 @@
     />
 
     <md-dialog-prompt
+      class="api-dialog"
       :md-active.sync="prompt_config.show"
       v-model="prompt_config.value"
       :md-title="prompt_config.title"
@@ -847,7 +852,7 @@
             ref="plugin_dialog_joy"
           ></joy>
         </div>
-        <div v-else id="window_dialog_container" class="plugin-iframe">
+        <div v-else id="window-dialog-container" class="plugin-iframe">
           <window
             v-if="plugin_dialog_window_config"
             :w="plugin_dialog_window_config"
@@ -2242,6 +2247,9 @@ export default {
         root: "./",
       })
         .then(selection => {
+          if (!selection) {
+            return;
+          }
           if (!Array.isArray(selection)) {
             selection = [selection];
           }
@@ -2883,7 +2891,7 @@ export default {
             reject,
           ];
         } else if (config.type) {
-          config.window_container = "window_dialog_container";
+          config.window_container = "window-dialog-container";
           config.standalone = true;
           this.plugin_dialog_window_config = null;
           if (config.type.startsWith("imjoy/")) {
@@ -2936,14 +2944,14 @@ export default {
           this.prompt_config.content = escapeHTML(text);
           this.prompt_config.placeholder = defaultText;
           this.prompt_config.cancel_text = "Cancel";
-          this.prompt_config.confirm_text = "Done";
+          this.prompt_config.confirm_text = "OK";
         } else if (typeof text === "object") {
           this.prompt_config.title = text.title;
           this.prompt_config.content =
             sanitizer.sanitizeString(text.content) || "undefined";
           this.prompt_config.placeholder = text.placeholder || null;
           this.prompt_config.cancel_text = text.cancel_text || "Cancel";
-          this.prompt_config.confirm_text = text.confirm_text || "Done";
+          this.prompt_config.confirm_text = text.confirm_text || "OK";
         } else {
           reject("unsupported prompt arguments");
           throw "unsupported prompt arguments";
@@ -2964,13 +2972,13 @@ export default {
           this.confirm_config.title = null;
           this.confirm_config.content = escapeHTML(text);
           this.confirm_config.cancel_text = "Cancel";
-          this.confirm_config.confirm_text = "Done";
+          this.confirm_config.confirm_text = "OK";
         } else if (typeof text === "object") {
           this.confirm_config.title = text.title;
           this.confirm_config.content =
             sanitizer.sanitizeString(text.content) || "undefined";
           this.confirm_config.cancel_text = text.cancel_text || "Cancel";
-          this.confirm_config.confirm_text = text.confirm_text || "Done";
+          this.confirm_config.confirm_text = text.confirm_text || "OK";
         } else {
           reject("unsupported prompt arguments");
           throw "unsupported prompt arguments";
@@ -3090,7 +3098,15 @@ export default {
 }
 
 #engine-file-dialog {
-  z-index: 999;
+  z-index: 12 !important;
+}
+
+.api-dialog {
+  z-index: 13 !important;
+}
+
+#api-snackbar {
+  z-index: 14 !important;
 }
 
 @media screen and (max-height: 900px) {
@@ -3116,9 +3132,10 @@ export default {
   max-height: 900px;
 }
 
-#window_dialog_container {
+#window-dialog-container {
   height: 100%;
   width: 100%;
+  z-index: 11 !important;
 }
 .md-card {
   /* width: 100%; */

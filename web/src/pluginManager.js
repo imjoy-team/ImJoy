@@ -1839,7 +1839,7 @@ export class PluginManager {
         wconfig.window_type = wconfig.type;
 
         if (
-          wconfig.window_container === "window_dialog_container" &&
+          wconfig.window_container === "window-dialog-container" &&
           wconfig.render
         ) {
           this.wm.setupCallbacks(wconfig);
