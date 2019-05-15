@@ -162,6 +162,12 @@ body {
   -webkit-transform: translateZ(0);
 }
 
+@media screen and (max-width: 500px) {
+  .md-dialog-content{
+    padding: 0px!important;
+  }
+}
+
 .md-toolbar.md-dense {
   min-height: 36px;
 }

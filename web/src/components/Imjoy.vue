@@ -839,6 +839,9 @@
       <md-dialog-actions
         v-if="!plugin_dialog_config || !plugin_dialog_config.ui"
       >
+        <md-button class="md-primary" v-if="plugin_dialog_window_config && !plugin_dialog_window_config.fullscreen" @click="plugin_dialog_window_config.fullscreen=true"
+          ><md-icon>fullscreen</md-icon></md-button
+        >
         <md-button class="md-accent" @click="closePluginDialog(true)"
           ><md-icon>clear</md-icon></md-button
         >
@@ -852,7 +855,7 @@
             ref="plugin_dialog_joy"
           ></joy>
         </div>
-        <div v-else id="window-dialog-container" class="plugin-iframe">
+        <div v-else id="window-dialog-container" :class="plugin_dialog_window_config && (plugin_dialog_window_config.fullscreen || plugin_dialog_window_config.standalone) ? 'fullscreen-dialog' : 'normal-dialog'">
           <window
             v-if="plugin_dialog_window_config"
             :w="plugin_dialog_window_config"
@@ -3087,6 +3090,7 @@ export default {
   }
   .window-dialog {
     width: 100% !important;
+    height: 100% !important;
     max-width: 800px;
   }
 }
@@ -3123,7 +3127,7 @@ export default {
 
 .window-dialog {
   margin: 0px;
-  min-width: 400px;
+  min-width: 200px;
   min-height: 500px;
   width: 95%;
   height: 95%;
@@ -3352,5 +3356,23 @@ button.md-speed-dial-target {
 .title-bar {
   margin-bottom: 10px;
 }
+
+.normal-dialog {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  flex-grow: 1;
+  border: none;
+}
+
+.fullscreen-dialog {
+  width: calc( 100vw - 40px );
+  height: calc( 100vh - 145px);
+  margin: 0;
+  padding: 0;
+  flex-grow: 1;
+  border: none;
+}
+
 </style>
-1
