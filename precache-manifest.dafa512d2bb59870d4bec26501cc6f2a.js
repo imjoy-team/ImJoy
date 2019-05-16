@@ -1,11 +1,11 @@
 self.__precacheManifest = [
   {
-    "revision": "4458f26f46054dbdef26",
-    "url": "/static/css/app.af89327a.css"
+    "revision": "63f4b1e787dce78a3637",
+    "url": "/static/css/app.6742ac54.css"
   },
   {
-    "revision": "4458f26f46054dbdef26",
-    "url": "/static/js/app.98a4865d.js"
+    "revision": "63f4b1e787dce78a3637",
+    "url": "/static/js/app.ecb42f0c.js"
   },
   {
     "revision": "b8859e2632feade2aed6",
@@ -228,19 +228,19 @@ self.__precacheManifest = [
     "url": "/static/js/chunk-vendors.64edc74e.js"
   },
   {
-    "revision": "493ef474936217113b20a6573247288a",
-    "url": "/static/vs/editor.worker.js"
+    "revision": "2a3e222e6a41b32a7180e6afa3675990",
+    "url": "/static/vs/html.worker.js"
   },
   {
     "revision": "b00449080615ce71a2a8a52aee9f658f",
     "url": "/static/vs/css.worker.js"
   },
   {
-    "revision": "2a3e222e6a41b32a7180e6afa3675990",
-    "url": "/static/vs/html.worker.js"
+    "revision": "493ef474936217113b20a6573247288a",
+    "url": "/static/vs/editor.worker.js"
   },
   {
-    "revision": "ff34cd26fe893d40510588d074ca4227",
+    "revision": "5e43197325324bcc1d85bffafde23745",
     "url": "/index.html"
   },
   {
@@ -636,6 +636,10 @@ self.__precacheManifest = [
     "url": "/static/img/perspective-hr.jpg"
   },
   {
+    "revision": "140e93934b5c72cee447d043f514be21",
+    "url": "/static/vs/basic-languages/rust/rust.js"
+  },
+  {
     "revision": "d89f8e23e929864846ab63beae060e70",
     "url": "/static/vs/basic-languages/sb/sb.js"
   },
@@ -646,10 +650,6 @@ self.__precacheManifest = [
   {
     "revision": "ce940bdd17ddab29ed4d630523a48aa8",
     "url": "/static/vs/basic-languages/scss/scss.js"
-  },
-  {
-    "revision": "140e93934b5c72cee447d043f514be21",
-    "url": "/static/vs/basic-languages/rust/rust.js"
   },
   {
     "revision": "4ed77e76271ad4b2fd8e587e0a3892d9",

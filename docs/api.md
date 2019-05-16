@@ -447,6 +447,8 @@ Log a error message for the current plugin, which is stored in its log history.
 The presence of an error message is indicated with a red icon next to
 the plugin name. Pressing on this icon will open a window showing the log history.
 
+Similar to `console.error` or `print`, `api.error` can accept multiple arguments, which will be concatenated with a space.
+
 **Arguments**
 
 * **message**: String. Error message to be logged.
@@ -836,9 +838,11 @@ logged messages.
 Status message can either be a string or an image. The latter can be used to create
 an automated log, for example, to log the training of a neural network.
 
+Similar to `console.log` or `print`, `api.log` can accept multiple arguments, which will be concatenated with a space.
+
 **Arguments**
 
-* **message**: String. Message to be logged.
+* **message**: String. Message to be logged.value
 
 **Examples**
 

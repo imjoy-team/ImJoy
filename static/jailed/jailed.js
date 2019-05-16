@@ -1298,16 +1298,18 @@ DynamicPlugin.prototype.log = Plugin.prototype.log = function(msg) {
     this._log_history.push(msg);
     console.log(`Plugin ${this.id}:`, msg);
   } else {
-    this._log_history._info = msg;
-    this._log_history.push({ type: "info", value: msg });
-    console.log(`Plugin ${this.id}: ${msg}`);
+    const args = Array.prototype.slice.call(arguments).join(" ");
+    this._log_history._info = args.slice(0, 100);
+    this._log_history.push({ type: "info", value: args });
+    console.log(`Plugin ${this.id}: ${args}`);
   }
 };
 
-DynamicPlugin.prototype.error = Plugin.prototype.error = function(msg) {
-  this._log_history._error = msg;
-  this._log_history.push({ type: "error", value: msg });
-  console.error(`Error in Plugin ${this.id}: ${msg}`);
+DynamicPlugin.prototype.error = Plugin.prototype.error = function() {
+  const args = Array.prototype.slice.call(arguments).join(" ");
+  this._log_history._error = args.slice(0, 100);
+  this._log_history.push({ type: "error", value: args });
+  console.error(`Error in Plugin ${this.id}: ${args}`);
 };
 
 DynamicPlugin.prototype.progress = Plugin.prototype.progress = function(p) {
