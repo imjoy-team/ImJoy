@@ -8,7 +8,12 @@
       <md-icon>🚀</md-icon>
       <md-tooltip>Connection to the Plugin Engine</md-tooltip>
     </md-button>
-    <md-menu v-else md-size="big" md-direction="top-start" @md-closed="collapseProcesses()">
+    <md-menu
+      v-else
+      md-size="big"
+      md-direction="top-start"
+      @md-closed="collapseProcesses()"
+    >
       <md-button class="md-icon-button md-primary" md-menu-trigger>
         <md-icon>🚀</md-icon>
         <md-tooltip>ImJoy Plugin Engines</md-tooltip>
@@ -354,9 +359,9 @@ export default {
         this.update(engine);
       });
     },
-    collapseProcesses(){
-      for(let engine of this.engineManager.engines){
-        engine.show_processes = false
+    collapseProcesses() {
+      for (let engine of this.engineManager.engines) {
+        engine.show_processes = false;
       }
       this.$forceUpdate();
     },
