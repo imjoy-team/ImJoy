@@ -112,7 +112,7 @@ export class Engine {
 
       socket.on("connect", () => {
         clearTimeout(timer);
-        if (this.connection_lost_timer && this.socket_id === socket.id) {
+        if (this.connection_lost_timer) {
           clearTimeout(this.connection_lost_timer);
           this.connection_lost_timer = null;
 
@@ -218,7 +218,7 @@ export class Engine {
               this.connection = "Disconnected.";
               this.update_ui_callback();
             }
-          }, 5000);
+          }, 10000);
         }
       });
     });
