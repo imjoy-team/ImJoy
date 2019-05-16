@@ -1124,7 +1124,7 @@
                   }}
                 </h2>
               </div>
-              <div v-if="installing" class="md-toolbar-section-end">
+              <div v-if="installing || !plugin_loaded" class="md-toolbar-section-end">
                 <div
                   style="padding-right: 30px;"
                   class="loading loading-lg"
@@ -1693,6 +1693,77 @@ export default {
         );
       }
 
+      const r = (
+        this.$route.query.repo ||
+        this.$route.query.r ||
+        ""
+      ).trim();
+      if (r) {
+        this.plugin_url = null;
+        this.init_plugin_search = null;
+        this.show_plugin_store = true;
+        this.show_plugin_url = false;
+        this.downloading_plugin = true;
+        this.pm
+          .addRepository(r)
+          .then(repo => {
+            this.pm.selected_repository = repo;
+            this.downloading_plugin = false;
+          })
+          .catch(e => {
+            this.downloading_plugin = false;
+            this.downloading_error =
+              "Sorry, the repository URL is invalid: " + e.toString();
+          });
+        this.show_plugin_templates = false;
+        this.showAddPluginDialog = true;
+      }
+
+      const p = (
+        this.$route.query.plugin ||
+        this.$route.query.p ||
+        ""
+      ).trim();
+      let plugin_config = null;
+      if (p) {
+        if (p.match(url_regex) || (p.includes("/") && p.includes(":"))) {
+          this.plugin_url = p;
+          this.init_plugin_search = null;
+          this.show_plugin_store = false;
+          this.show_plugin_url = false;
+          try {
+            plugin_config = await this.getPlugin4Install(p);
+            //check if the same plugin is already installed
+            if (
+              !this.pm.plugin_names[plugin_config.name] ||
+              this.$route.query.upgrade ||
+              plugin_config.version !==
+                this.pm.plugin_names[plugin_config.name].config.version
+            ) {
+              this.show_plugin_templates = false;
+              this.showAddPluginDialog = true;
+            } else {
+              this.showMessage(
+                `Plugin "${plugin_config.name}" is already installed.`
+              );
+            }
+          } catch (e) {
+            console.error(e);
+          }
+        } else {
+          this.plugin_url = null;
+          this.init_plugin_search = p;
+          this.show_plugin_store = true;
+          this.show_plugin_url = false;
+          this.show_plugin_templates = false;
+          this.showAddPluginDialog = true;
+        }
+      } else {
+        if (this.$route.query.workflow) {
+          this.loadWorkfowFromUrl();
+        }
+      }
+
       for (let inputs of this.getDefaultInputLoaders()) {
         this.wm.registerInputLoader(inputs.loader_key, inputs, inputs.loader);
       }
@@ -1769,76 +1840,7 @@ export default {
           const manifest = this.pm.reloadRepository();
           this.event_bus.$emit("repositories_loaded", manifest);
         } finally {
-          const r = (
-            this.$route.query.repo ||
-            this.$route.query.r ||
-            ""
-          ).trim();
-          if (r) {
-            this.plugin_url = null;
-            this.init_plugin_search = null;
-            this.show_plugin_store = true;
-            this.show_plugin_url = false;
-            this.downloading_plugin = true;
-            this.pm
-              .addRepository(r)
-              .then(repo => {
-                this.pm.selected_repository = repo;
-                this.downloading_plugin = false;
-              })
-              .catch(e => {
-                this.downloading_plugin = false;
-                this.downloading_error =
-                  "Sorry, the repository URL is invalid: " + e.toString();
-              });
-            this.show_plugin_templates = false;
-            this.showAddPluginDialog = true;
-          }
-
-          const p = (
-            this.$route.query.plugin ||
-            this.$route.query.p ||
-            ""
-          ).trim();
-          let plugin_config = null;
-          if (p) {
-            if (p.match(url_regex) || (p.includes("/") && p.includes(":"))) {
-              this.plugin_url = p;
-              this.init_plugin_search = null;
-              this.show_plugin_store = false;
-              this.show_plugin_url = false;
-              try {
-                plugin_config = await this.getPlugin4Install(p);
-                //check if the same plugin is already installed
-                if (
-                  !this.pm.plugin_names[plugin_config.name] ||
-                  this.$route.query.upgrade ||
-                  plugin_config.version !==
-                    this.pm.plugin_names[plugin_config.name].config.version
-                ) {
-                  this.show_plugin_templates = false;
-                  this.showAddPluginDialog = true;
-                } else {
-                  this.showMessage(
-                    `Plugin "${plugin_config.name}" is already installed.`
-                  );
-                }
-              } catch (e) {
-                console.error(e);
-              }
-            } else {
-              this.plugin_url = null;
-              this.init_plugin_search = p;
-              this.show_plugin_store = true;
-              this.show_plugin_url = false;
-              this.show_plugin_templates = false;
-              this.showAddPluginDialog = true;
-            }
-          } else {
-            if (this.$route.query.workflow) {
-              this.loadWorkfowFromUrl();
-            }
-          }
+          
 
           if (this.$route.query.start || this.$route.query.s) {
             const pname = this.$route.query.start || this.$route.query.s;
