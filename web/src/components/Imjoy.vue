@@ -2914,18 +2914,20 @@ export default {
             };
           }
           this.showPluginDialog = true;
-          this.createWindow(config)
-            .then(api => {
-              const _close = api.close;
-              this.plugin_dialog_promise = [api.close, api.close];
-              api.close = async () => {
-                await _close();
-                this.showPluginDialog = false;
-                this.plugin_dialog_promise = null;
-              };
-              resolve(api);
-            })
-            .catch(reject);
+          this.$nextTick(() => {
+            this.createWindow(config)
+              .then(api => {
+                const _close = api.close;
+                this.plugin_dialog_promise = [api.close, api.close];
+                api.close = async () => {
+                  await _close();
+                  this.showPluginDialog = false;
+                  this.plugin_dialog_promise = null;
+                };
+                resolve(api);
+              })
+              .catch(reject);
+          });
         } else {
           this.showMessage("Unsupported dialog type.");
         }
