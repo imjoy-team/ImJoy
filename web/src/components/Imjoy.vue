@@ -3096,17 +3096,23 @@ export default {
   max-height: 90%;
 }
 
-@media screen and (max-width: 800px) {
+@media screen and (max-width: 400px) {
   .md-dialog {
     width: 100%;
-    max-width: 800px;
+    height: 100%;
+    max-height: 100%;
+    max-width: 100%;
   }
+}
+
+@media screen and (max-width: 800px) {
   .window-dialog {
     width: 100% !important;
     height: 100% !important;
-    max-width: 800px;
+    max-width: 100%;
   }
 }
+
 @media screen and (min-height: 500px) {
   #engine-file-dialog {
     min-height: 400px !important;
@@ -3115,6 +3121,8 @@ export default {
 
 #engine-file-dialog {
   z-index: 12 !important;
+  max-width: 100%;
+  width: 700px;
 }
 
 .api-dialog {
