@@ -839,6 +839,15 @@
       <md-dialog-actions
         v-if="!plugin_dialog_config || !plugin_dialog_config.ui"
       >
+        <md-button
+          class="md-primary"
+          v-if="
+            plugin_dialog_window_config &&
+              !plugin_dialog_window_config.fullscreen
+          "
+          @click="plugin_dialog_window_config.fullscreen = true"
+          ><md-icon>fullscreen</md-icon></md-button
+        >
         <md-button class="md-accent" @click="closePluginDialog(true)"
           ><md-icon>clear</md-icon></md-button
         >
@@ -852,7 +861,17 @@
             ref="plugin_dialog_joy"
           ></joy>
         </div>
-        <div v-else id="window-dialog-container" class="plugin-iframe">
+        <div
+          v-else
+          id="window-dialog-container"
+          :class="
+            plugin_dialog_window_config &&
+            (plugin_dialog_window_config.fullscreen ||
+              plugin_dialog_window_config.standalone)
+              ? 'fullscreen-dialog'
+              : 'normal-dialog'
+          "
+        >
           <window
             v-if="plugin_dialog_window_config"
             :w="plugin_dialog_window_config"
@@ -1105,7 +1124,10 @@
                   }}
                 </h2>
               </div>
-              <div v-if="installing" class="md-toolbar-section-end">
+              <div
+                v-if="installing || !plugin_loaded"
+                class="md-toolbar-section-end"
+              >
                 <div
                   style="padding-right: 30px;"
                   class="loading loading-lg"
@@ -1392,16 +1414,16 @@ export default {
       showMessage: (plugin, info, duration) => {
         this.showMessage(info, duration);
       },
-      log: (plugin, text) => {
-        plugin.log(text);
+      log: (plugin, ...args) => {
+        plugin.log(...args);
         this.$forceUpdate();
       },
-      error: (plugin, text) => {
-        plugin.error(text);
+      error: (plugin, ...args) => {
+        plugin.error(...args);
         this.$forceUpdate();
       },
-      progress: (plugin, text) => {
-        plugin.progress(text);
+      progress: (plugin, value) => {
+        plugin.progress(value);
         this.$forceUpdate();
       },
       utils: {
@@ -1674,6 +1696,69 @@ export default {
         );
       }
 
+      const r = (this.$route.query.repo || this.$route.query.r || "").trim();
+      if (r) {
+        this.plugin_url = null;
+        this.init_plugin_search = null;
+        this.show_plugin_store = true;
+        this.show_plugin_url = false;
+        this.downloading_plugin = true;
+        this.pm
+          .addRepository(r)
+          .then(repo => {
+            this.pm.selected_repository = repo;
+            this.downloading_plugin = false;
+          })
+          .catch(e => {
+            this.downloading_plugin = false;
+            this.downloading_error =
+              "Sorry, the repository URL is invalid: " + e.toString();
+          });
+        this.show_plugin_templates = false;
+        this.showAddPluginDialog = true;
+      }
+
+      const p = (this.$route.query.plugin || this.$route.query.p || "").trim();
+      let plugin_config = null;
+      if (p) {
+        if (p.match(url_regex) || (p.includes("/") && p.includes(":"))) {
+          this.plugin_url = p;
+          this.init_plugin_search = null;
+          this.show_plugin_store = false;
+          this.show_plugin_url = false;
+          try {
+            plugin_config = await this.getPlugin4Install(p);
+            //check if the same plugin is already installed
+            if (
+              !this.pm.plugin_names[plugin_config.name] ||
+              this.$route.query.upgrade ||
+              plugin_config.version !==
+                this.pm.plugin_names[plugin_config.name].config.version
+            ) {
+              this.show_plugin_templates = false;
+              this.showAddPluginDialog = true;
+            } else {
+              this.showMessage(
+                `Plugin "${plugin_config.name}" is already installed.`
+              );
+            }
+          } catch (e) {
+            console.error(e);
+          }
+        } else {
+          this.plugin_url = null;
+          this.init_plugin_search = p;
+          this.show_plugin_store = true;
+          this.show_plugin_url = false;
+          this.show_plugin_templates = false;
+          this.showAddPluginDialog = true;
+        }
+      } else {
+        if (this.$route.query.workflow) {
+          this.loadWorkfowFromUrl();
+        }
+      }
+
       for (let inputs of this.getDefaultInputLoaders()) {
         this.wm.registerInputLoader(inputs.loader_key, inputs, inputs.loader);
       }
@@ -1750,77 +1835,6 @@ export default {
           const manifest = this.pm.reloadRepository();
           this.event_bus.$emit("repositories_loaded", manifest);
         } finally {
-          const r = (
-            this.$route.query.repo ||
-            this.$route.query.r ||
-            ""
-          ).trim();
-          if (r) {
-            this.plugin_url = null;
-            this.init_plugin_search = null;
-            this.show_plugin_store = true;
-            this.show_plugin_url = false;
-            this.downloading_plugin = true;
-            this.pm
-              .addRepository(r)
-              .then(repo => {
-                this.pm.selected_repository = repo;
-                this.downloading_plugin = false;
-              })
-              .catch(e => {
-                this.downloading_plugin = false;
-                this.downloading_error =
-                  "Sorry, the repository URL is invalid: " + e.toString();
-              });
-            this.show_plugin_templates = false;
-            this.showAddPluginDialog = true;
-          }
-
-          const p = (
-            this.$route.query.plugin ||
-            this.$route.query.p ||
-            ""
-          ).trim();
-          let plugin_config = null;
-          if (p) {
-            if (p.match(url_regex) || (p.includes("/") && p.includes(":"))) {
-              this.plugin_url = p;
-              this.init_plugin_search = null;
-              this.show_plugin_store = false;
-              this.show_plugin_url = false;
-              try {
-                plugin_config = await this.getPlugin4Install(p);
-                //check if the same plugin is already installed
-                if (
-                  !this.pm.plugin_names[plugin_config.name] ||
-                  this.$route.query.upgrade ||
-                  plugin_config.version !==
-                    this.pm.plugin_names[plugin_config.name].config.version
-                ) {
-                  this.show_plugin_templates = false;
-                  this.showAddPluginDialog = true;
-                } else {
-                  this.showMessage(
-                    `Plugin "${plugin_config.name}" is already installed.`
-                  );
-                }
-              } catch (e) {
-                console.error(e);
-              }
-            } else {
-              this.plugin_url = null;
-              this.init_plugin_search = p;
-              this.show_plugin_store = true;
-              this.show_plugin_url = false;
-              this.show_plugin_templates = false;
-              this.showAddPluginDialog = true;
-            }
-          } else {
-            if (this.$route.query.workflow) {
-              this.loadWorkfowFromUrl();
-            }
-          }
-
           if (this.$route.query.start || this.$route.query.s) {
             const pname = this.$route.query.start || this.$route.query.s;
             const ps = this.pm.installed_plugins.filter(p => {
@@ -2900,18 +2914,20 @@ export default {
             };
           }
           this.showPluginDialog = true;
-          this.createWindow(config)
-            .then(api => {
-              const _close = api.close;
-              this.plugin_dialog_promise = [api.close, api.close];
-              api.close = async () => {
-                await _close();
-                this.showPluginDialog = false;
-                this.plugin_dialog_promise = null;
-              };
-              resolve(api);
-            })
-            .catch(reject);
+          this.$nextTick(() => {
+            this.createWindow(config)
+              .then(api => {
+                const _close = api.close;
+                this.plugin_dialog_promise = [api.close, api.close];
+                api.close = async () => {
+                  await _close();
+                  this.showPluginDialog = false;
+                  this.plugin_dialog_promise = null;
+                };
+                resolve(api);
+              })
+              .catch(reject);
+          });
         } else {
           this.showMessage("Unsupported dialog type.");
         }
@@ -2921,7 +2937,7 @@ export default {
       console.log("alert: ", text);
       if (typeof text === "string") {
         this.alert_config.title = null;
-        this.alert_config.content = escapeHTML(text);
+        this.alert_config.content = escapeHTML(text).replace(/\n/g, "<br>");
         this.alert_config.confirm_text = "OK";
       } else if (typeof text === "object") {
         this.alert_config.title = text.title;
@@ -2940,7 +2956,7 @@ export default {
       return new Promise((resolve, reject) => {
         if (typeof text === "string") {
           this.prompt_config.title = null;
-          this.prompt_config.content = escapeHTML(text);
+          this.prompt_config.content = escapeHTML(text).replace(/\n/g, "<br>");
           this.prompt_config.placeholder = defaultText;
           this.prompt_config.cancel_text = "Cancel";
           this.prompt_config.confirm_text = "OK";
@@ -2969,7 +2985,7 @@ export default {
       return new Promise((resolve, reject) => {
         if (typeof text === "string") {
           this.confirm_config.title = null;
-          this.confirm_config.content = escapeHTML(text);
+          this.confirm_config.content = escapeHTML(text).replace(/\n/g, "<br>");
           this.confirm_config.cancel_text = "Cancel";
           this.confirm_config.confirm_text = "OK";
         } else if (typeof text === "object") {
@@ -3087,6 +3103,7 @@ export default {
   }
   .window-dialog {
     width: 100% !important;
+    height: 100% !important;
     max-width: 800px;
   }
 }
@@ -3123,7 +3140,7 @@ export default {
 
 .window-dialog {
   margin: 0px;
-  min-width: 400px;
+  min-width: 200px;
   min-height: 500px;
   width: 95%;
   height: 95%;
@@ -3352,5 +3369,22 @@ button.md-speed-dial-target {
 .title-bar {
   margin-bottom: 10px;
 }
+
+.normal-dialog {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  flex-grow: 1;
+  border: none;
+}
+
+.fullscreen-dialog {
+  width: calc(100vw - 40px);
+  height: calc(100vh - 145px);
+  margin: 0;
+  padding: 0;
+  flex-grow: 1;
+  border: none;
+}
 </style>
-1
