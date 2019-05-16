@@ -1124,7 +1124,10 @@
                   }}
                 </h2>
               </div>
-              <div v-if="installing || !plugin_loaded" class="md-toolbar-section-end">
+              <div
+                v-if="installing || !plugin_loaded"
+                class="md-toolbar-section-end"
+              >
                 <div
                   style="padding-right: 30px;"
                   class="loading loading-lg"
@@ -1693,11 +1696,7 @@ export default {
         );
       }
 
-      const r = (
-        this.$route.query.repo ||
-        this.$route.query.r ||
-        ""
-      ).trim();
+      const r = (this.$route.query.repo || this.$route.query.r || "").trim();
       if (r) {
         this.plugin_url = null;
         this.init_plugin_search = null;
@@ -1719,11 +1718,7 @@ export default {
         this.showAddPluginDialog = true;
       }
 
-      const p = (
-        this.$route.query.plugin ||
-        this.$route.query.p ||
-        ""
-      ).trim();
+      const p = (this.$route.query.plugin || this.$route.query.p || "").trim();
       let plugin_config = null;
       if (p) {
         if (p.match(url_regex) || (p.includes("/") && p.includes(":"))) {
@@ -1840,8 +1835,6 @@ export default {
           const manifest = this.pm.reloadRepository();
           this.event_bus.$emit("repositories_loaded", manifest);
         } finally {
-          
-
           if (this.$route.query.start || this.$route.query.s) {
             const pname = this.$route.query.start || this.$route.query.s;
             const ps = this.pm.installed_plugins.filter(p => {
