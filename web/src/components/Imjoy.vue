@@ -1414,16 +1414,16 @@ export default {
       showMessage: (plugin, info, duration) => {
         this.showMessage(info, duration);
       },
-      log: (plugin, text) => {
-        plugin.log(text);
+      log: (plugin, ...args) => {
+        plugin.log(...args);
         this.$forceUpdate();
       },
-      error: (plugin, text) => {
-        plugin.error(text);
+      error: (plugin, ...args) => {
+        plugin.error(...args);
         this.$forceUpdate();
       },
-      progress: (plugin, text) => {
-        plugin.progress(text);
+      progress: (plugin, value) => {
+        plugin.progress(value);
         this.$forceUpdate();
       },
       utils: {
@@ -2937,7 +2937,7 @@ export default {
       console.log("alert: ", text);
       if (typeof text === "string") {
         this.alert_config.title = null;
-        this.alert_config.content = escapeHTML(text).replace(/\n/g, '<br>');
+        this.alert_config.content = escapeHTML(text).replace(/\n/g, "<br>");
         this.alert_config.confirm_text = "OK";
       } else if (typeof text === "object") {
         this.alert_config.title = text.title;
@@ -2956,7 +2956,7 @@ export default {
       return new Promise((resolve, reject) => {
         if (typeof text === "string") {
           this.prompt_config.title = null;
-          this.prompt_config.content = escapeHTML(text).replace(/\n/g, '<br>');
+          this.prompt_config.content = escapeHTML(text).replace(/\n/g, "<br>");
           this.prompt_config.placeholder = defaultText;
           this.prompt_config.cancel_text = "Cancel";
           this.prompt_config.confirm_text = "OK";
@@ -2985,7 +2985,7 @@ export default {
       return new Promise((resolve, reject) => {
         if (typeof text === "string") {
           this.confirm_config.title = null;
-          this.confirm_config.content = escapeHTML(text).replace(/\n/g, '<br>');
+          this.confirm_config.content = escapeHTML(text).replace(/\n/g, "<br>");
           this.confirm_config.cancel_text = "Cancel";
           this.confirm_config.confirm_text = "OK";
         } else if (typeof text === "object") {
