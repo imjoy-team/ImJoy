@@ -965,23 +965,6 @@
       "
     />
 
-    <md-dialog :md-active.sync="showShareUrl">
-      <md-dialog-title>Sharing Workflow</md-dialog-title>
-      <md-dialog-content>
-        <a
-          :href="share_url_message"
-          style="word-wrap: break-word;"
-          target="_blank"
-          >{{ share_url_message }}
-        </a>
-      </md-dialog-content>
-      <md-dialog-actions>
-        <md-button class="md-primary" @click="showShareUrl = false"
-          >OK</md-button
-        >
-      </md-dialog-actions>
-    </md-dialog>
-
     <md-dialog
       style="max-width: 800px; width: 100%; height: 100%;"
       :md-active.sync="showAboutDialog"
@@ -1326,7 +1309,6 @@ export default {
       showPermissionConfirmation: false,
       permission_message: "No permission message.",
       share_url_message: "No url",
-      showShareUrl: false,
       resolve_permission: null,
       reject_permission: null,
       plugin_dialog_config: null,
@@ -2325,13 +2307,17 @@ export default {
     sharePlugin(pid) {
       const plugin = this.pm.plugins[pid];
       const pconfig = plugin.config;
-      const url = "https://imjoy.io/#/app?p=" + pconfig.origin;
-      this.share_url_message = `<h2>Sharing "${
-        plugin.name
-      }"</h2> <br> <a href="${encodeURI(
-        url
-      )}" target="_blank">${url}</a> <br> (Right click on the link and select "Copy Link Address")`;
-      this.showShareUrl = true;
+      const url = `${location.protocol}//${location.hostname}${
+        location.port ? ":" + location.port : ""
+      }/#/app/?p=${pconfig.origin}`;
+      this.showAlert(null, {
+        content: `<h3>Sharing "${
+          plugin.name
+        }"</h3> <br> <a style="word-wrap: break-word;" href="${encodeURI(
+          url
+        )}" target="_blank">${url}</a> <br> (Right click on the link and select "Copy Link Address")`,
+      });
+
       const query = Object.assign({}, this.$route.query);
       query.p = pconfig.origin;
       this.$router.replace({ query });
@@ -2521,10 +2507,17 @@ export default {
     },
     shareWorkflow(w) {
       const url = Joy.encodeWorkflow(w.workflow);
-      this.share_url_message = `${location.protocol}//${location.hostname}${
-        location.port ? ":" + location.port : ""
-      }/#/app/?workflow=${url}`;
-      this.showShareUrl = true;
+      this.showAlert(null, {
+        content: `<h3>Sharing Workflow</h3><a style="word-wrap: break-word;" href="${
+          location.protocol
+        }//${location.hostname}${
+          location.port ? ":" + location.port : ""
+        }/#/app/?workflow=${url}" target="_blank">${location.protocol}//${
+          location.hostname
+        }${
+          location.port ? ":" + location.port : ""
+        }/#/app/?workflow=${url}</a><br> (Right click on the link and select "Copy Link Address")`,
+      });
     },
     runOp(op) {
       if (!op || !op.name) {
