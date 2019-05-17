@@ -4,7 +4,15 @@
       <span v-if="isFolder" @click="toggle">[{{ open ? "-" : "+" }}]</span>
       <span
         class="noselect"
-        @click="select({ target: model, path: root }, $event.shiftKey)"
+        @click="
+          (root === selected ||
+            (selected &&
+              Array.isArray(selected) &&
+              selected.indexOf(root) >= 0)) &&
+          model.type !== 'file'
+            ? load()
+            : select({ target: model, path: root }, $event.shiftKey)
+        "
         @dblclick="load()"
       >
         <md-icon v-if="model.type === 'file'">insert_drive_file</md-icon>
