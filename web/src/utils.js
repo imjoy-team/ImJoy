@@ -1080,7 +1080,7 @@ export function HtmlWhitelistedSanitizer(escape, tags, css, urls) {
   }
   if (this.allowedCss == null) {
     // Small set of default css properties
-    this.allowedCss = ["border", "margin", "padding"];
+    this.allowedCss = ["border", "margin", "padding", "word-wrap"];
   }
 }
 

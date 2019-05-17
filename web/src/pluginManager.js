@@ -1098,6 +1098,9 @@ export class PluginManager {
       config.code = code;
       config.id = config.name.trim().replace(/ /g, "_") + "_" + randId();
       config.runnable = config.runnable === false ? false : true;
+
+      config = Object.assign(config, overwrite_config);
+
       for (let i = 0; i < CONFIGURABLE_FIELDS.length; i++) {
         const obj = config[CONFIGURABLE_FIELDS[i]];
         if (obj && typeof obj === "object" && !(obj instanceof Array)) {
@@ -1129,8 +1132,6 @@ export class PluginManager {
           config.scripts[i].attrs.lang = config.lang;
         }
       }
-
-      config = Object.assign(config, overwrite_config);
 
       config = upgradePluginAPI(config);
       if (!PLUGIN_SCHEMA(config)) {
