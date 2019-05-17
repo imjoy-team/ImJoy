@@ -365,7 +365,7 @@
           for (var key in data) {
             if (data.hasOwnProperty(key)) {
               if (data[key] == "**@@FUNCTION@@**:" + key) {
-                data2[key] = this._genRemoteMethod(name + "." + key);
+                data2[key] = this._genRemoteMethod(name + "." + key, this.id);
               } else {
                 data2[key] = data[key];
               }
@@ -376,7 +376,7 @@
           this._remote[name] = data;
         }
       } else {
-        this._remote[name] = this._genRemoteMethod(name);
+        this._remote[name] = this._genRemoteMethod(name, this.id);
       }
     }
 
