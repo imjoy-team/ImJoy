@@ -1098,7 +1098,7 @@ export class PluginManager {
       config.code = code;
       config.id = config.name.trim().replace(/ /g, "_") + "_" + randId();
       config.runnable = config.runnable === false ? false : true;
-      
+
       config = Object.assign(config, overwrite_config);
 
       for (let i = 0; i < CONFIGURABLE_FIELDS.length; i++) {
