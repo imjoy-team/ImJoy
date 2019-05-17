@@ -1057,17 +1057,15 @@ export class PluginManager {
 
   parsePluginCode(code, overwrite_config) {
     let config = {};
-    const uri = config.uri;
-    const tag = config.tag;
-    const origin = config.origin;
+    const uri = overwrite_config.uri;
     try {
       if (uri && uri.endsWith(".js")) {
-        config.lang = config.lang || "javascript";
+        config.lang = "javascript";
         config.scripts = [code];
         config.script = code;
         config.style = null;
         config.window = null;
-        config.tag = tag || null;
+        config.tag = overwrite_config.tag || null;
       } else {
         const pluginComp = parseComponent(code);
         config = JSON.parse(pluginComp.config[0].content);
@@ -1078,7 +1076,7 @@ export class PluginManager {
         if (!config.script) {
           config.script = pluginComp.script[0].content;
         }
-        config.tag = tag || (config.tags && config.tags[0]);
+        config.tag = overwrite_config.tag || (config.tags && config.tags[0]);
         // try to match the script with current tag
         for (let i = 0; i < pluginComp.script.length; i++) {
           if (pluginComp.script[i].attrs.tag === config.tag) {
@@ -1092,14 +1090,13 @@ export class PluginManager {
         config.docs = pluginComp.docs || null;
         config.attachments = pluginComp.attachment || null;
       }
-      config._id = config._id || null;
+      config._id = overwrite_config._id || null;
       config.uri = uri;
-      config.origin = origin;
+      config.origin = overwrite_config.origin;
       config.code = code;
       config.id = config.name.trim().replace(/ /g, "_") + "_" + randId();
       config.runnable = config.runnable === false ? false : true;
-
-      config = Object.assign(config, overwrite_config);
+      config.engine_mode = overwrite_config.engine_mode;
 
       for (let i = 0; i < CONFIGURABLE_FIELDS.length; i++) {
         const obj = config[CONFIGURABLE_FIELDS[i]];

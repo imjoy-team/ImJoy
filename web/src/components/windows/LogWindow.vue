@@ -50,24 +50,28 @@ export default {
       },
     },
   },
-  computed: {
-    log_history: function() {
+  data() {
+    return {
+      log_history: null,
+    };
+  },
+  mounted() {
+    this.refresh();
+  },
+  methods: {
+    refresh() {
       if (this.w.data.log_history) {
-        return this.w.data.log_history;
+        this.log_history = this.w.data.log_history;
       } else if (
         this.w.data.plugins &&
         this.w.data.name &&
         this.w.data.plugins[this.w.data.name]
       ) {
-        return this.w.data.plugins[this.w.data.name]._log_history;
+        this.log_history = this.w.data.plugins[this.w.data.name]._log_history;
       } else {
         console.error("unsupported log input.");
-        return [];
+        this.log_history = [];
       }
-    },
-  },
-  methods: {
-    refresh() {
       this.$forceUpdate();
     },
     clearLog() {
