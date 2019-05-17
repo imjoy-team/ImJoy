@@ -365,7 +365,7 @@
           for (var key in data) {
             if (data.hasOwnProperty(key)) {
               if (data[key] == "**@@FUNCTION@@**:" + key) {
-                data2[key] = this._genRemoteMethod(name + "." + key, this.id);
+                data2[key] = this._genRemoteMethod(name + "." + key);
               } else {
                 data2[key] = data[key];
               }
@@ -376,7 +376,7 @@
           this._remote[name] = data;
         }
       } else {
-        this._remote[name] = this._genRemoteMethod(name, this.id);
+        this._remote[name] = this._genRemoteMethod(name);
       }
     }
 
@@ -428,7 +428,7 @@
         } catch (e) {
           if (id) me._method_refs.fetch(id);
           reject(
-            `Failed to exectue remote method (plugin: ${plugin_id}, method: ${name}).`
+            `Failed to exectue remote method (plugin: ${plugin_id || me.id}, method: ${name}).`
           );
         }
       });
