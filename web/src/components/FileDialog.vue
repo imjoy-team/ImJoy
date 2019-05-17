@@ -186,7 +186,8 @@ export default {
           );
         }
       } catch (e) {
-        this.status_text = "Failed to upload, error:" + (e?e.toString(): 'undefined');
+        this.status_text =
+          "Failed to upload, error:" + (e ? e.toString() : "undefined");
       } finally {
         this.loading = false;
         this.refreshList();
