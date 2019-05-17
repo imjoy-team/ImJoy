@@ -1381,8 +1381,9 @@ export class PluginManager {
         this.imjoy_api
       );
       const plugin = new DynamicPlugin(tconfig, _interface, this.fm.api);
-      if (!pconfig.standalone && pconfig.focus) pconfig.focus();
+
       plugin.whenConnected(() => {
+        if (!pconfig.standalone && pconfig.focus) pconfig.focus();
         if (!plugin.api) {
           console.error("the window plugin seems not ready.");
           reject("the window plugin seems not ready.");
@@ -1442,6 +1443,7 @@ export class PluginManager {
           });
       });
       plugin.whenFailed(e => {
+        if (!pconfig.standalone && pconfig.focus) pconfig.focus();
         plugin.error(`Error occured when loading ${pconfig.name}: ${e}.`);
         plugin.terminate().then(() => {
           this.update_ui_callback();

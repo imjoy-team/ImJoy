@@ -12,9 +12,9 @@
       v-if="show_overlay"
     ></div>
     <grid-layout
-      v-if="gridWindows && gridWindows.length > 0"
+      v-if="gridWindows"
       :layout.sync="gridWindows"
-      v-show="!wm.selected_window"
+      v-show="!wm.selected_window && gridWindows.length > 0"
       style="min-height:100%"
       :col-num.sync="col_num"
       :is-mirrored="false"
