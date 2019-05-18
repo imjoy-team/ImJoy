@@ -1,6 +1,8 @@
 <template>
   <div class="terminal">
-    <h5 v-if="!engine || !engine.connected || disconnected">{{ status }}</h5>
+    <md-button v-if="error" @click="start()">
+      <md-icon>restore</md-icon> Restart Terminal
+    </md-button>
     <div
       ref="terminal_container"
       :style="{ height: window_height }"
@@ -44,7 +46,7 @@ export default {
   },
   data() {
     return {
-      status: "Disconnected",
+      error: false,
       disconnected: false,
       engine: null,
       window_height: "500px",
@@ -64,39 +66,55 @@ export default {
     });
     term.open(this.$refs.terminal_container);
     this.fitToscreen();
-    term.write("Welcome to ImJoy plugin engine terminal!\r\n");
+
     this.term = term;
     if (this.engine && this.engine.connected) {
-      this.status = "Connecting terminal...";
       this.start();
     } else {
-      this.status = "Waiting for engine to connect.";
+      term.write("Engine is not connected.\r\n");
       this.engine.socket.on("connect", this.start);
+      this.engine.socket.on("disconnect", this.disconnect);
     }
   },
   beforeDestroy() {
     if (this.engine && this.engine.socket) {
       this.engine.socket.removeListener("terminal_output", this.write_terminal);
       this.engine.socket.removeListener("connect", this.start);
+      this.engine.socket.removeListener("disconnect", this.disconnect);
     }
   },
   methods: {
+    disconnect() {
+      this.term.write("\r\nDisconnected from the plugin engine.\r\n");
+    },
     start() {
       if (this.engine && this.engine.socket) {
         this.engine.socket.emit("start_terminal", {}, ret => {
           if (ret && ret.success) {
+            this.term.write(ret.message + "\r\n");
+            this.error = null;
             this.term.on("key", key => {
-              this.engine.socket.emit("terminal_input", { input: key });
+              this.engine.socket.emit(
+                "terminal_input",
+                { input: key },
+                error => {
+                  if (error) {
+                    this.error = true;
+                  } else {
+                    this.error = false;
+                  }
+                }
+              );
             });
             this.term.on("paste", data => {
               this.engine.socket.emit("terminal_input", { input: data });
             });
             this.engine.socket.on("terminal_output", this.write_terminal);
-            this.status = "Terminal connected.";
             this.disconnected = false;
             this.$forceUpdate();
           } else {
-            this.status = "Failed to start terminal.";
+            this.term.write("\r\nFailed to start terminal.\r\n");
+            this.error = true;
             this.disconnected = true;
             this.$forceUpdate();
           }
@@ -107,6 +125,10 @@ export default {
           this.w.onRefresh(fit2screen);
         });
       } else {
+        this.term.write(
+          "\r\nCannot start terminal because engine is not connected.\r\n"
+        );
+        this.error = true;
         console.error("cannot start terminal because engine is not connected.");
       }
     },
