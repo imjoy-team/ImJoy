@@ -44,13 +44,6 @@
             >
               <md-icon>autorenew</md-icon>
             </md-button>
-            <md-button
-              class="md-icon-button md-primary"
-              v-if="engine.connected"
-              @click.stop="startTerminal(engine)"
-              ><md-icon>code</md-icon></md-button
-            >
-
             <span>{{ engine.name }}</span>
           </md-menu-item>
           <md-menu-item v-else @click.stop="engine.connect(false)">
@@ -217,6 +210,18 @@
         >
           <md-icon>autorenew</md-icon> Show Processes
         </md-button>
+        <md-button
+          v-if="selected_engine.connected"
+          @click="
+            startTerminal(selected_engine);
+            showEngineInfoDialog = false;
+          "
+          class="md-primary"
+          :disabled="!selected_engine.connected"
+        >
+          <md-icon>code</md-icon> Open Terminal
+        </md-button>
+
         <md-menu>
           <md-button class="md-icon-button" md-menu-trigger>
             <md-icon class="md-primary">more_horiz</md-icon>

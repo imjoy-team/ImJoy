@@ -63,10 +63,7 @@ export default {
       scrollback: true,
     });
     term.open(this.$refs.terminal_container);
-    term.fit();
-    term.resize(15, 50);
-    // term.toggleFullScreen(true)
-    term.fit();
+    this.fitToscreen()
     term.write("Welcome to ImJoy plugin engine terminal!\r\n");
     this.term = term;
     if (this.engine && this.engine.connected) {
