@@ -44,6 +44,13 @@
             >
               <md-icon>autorenew</md-icon>
             </md-button>
+            <md-button
+              class="md-icon-button md-primary"
+              v-if="engine.connected"
+              @click.stop="startTerminal(engine)"
+              ><md-icon>code</md-icon></md-button
+            >
+
             <span>{{ engine.name }}</span>
           </md-menu-item>
           <md-menu-item v-else @click.stop="engine.connect(false)">
@@ -174,7 +181,9 @@
             name="connection_token"
           ></md-input>
         </md-field>
-        <p>- engine version: {{ selected_engine.engine_info.version }}</p>
+        <p v-if="selected_engine.connected && selected_engine.engine_info">
+          - engine version: {{ selected_engine.engine_info.version }}
+        </p>
         <div
           v-if="
             selected_engine.connected &&
@@ -399,6 +408,9 @@ export default {
     disconnectEngine(engine) {
       if (engine.connected) engine.disconnect();
       this.$forceUpdate();
+    },
+    startTerminal(engine) {
+      this.$emit("start-terminal", engine);
     },
     showToken(engine) {
       this.engine_url = engine.config.url;
