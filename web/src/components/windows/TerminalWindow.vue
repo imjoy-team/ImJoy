@@ -69,35 +69,45 @@ export default {
     term.fit();
     term.write("Welcome to ImJoy plugin engine terminal!\r\n");
     this.term = term;
-
-    this.engine.socket.emit("start_terminal", {}, ret => {
-      if (ret && ret.success) {
-        term.on("key", (key, ev) => {
-          this.engine.socket.emit("terminal_input", { input: key });
-        });
-        this.engine.socket.on("terminal_output", function(data) {
-          term.write(data.output);
-        });
-        this.status = "Terminal connected.";
-        this.disconnected = false;
-        this.$forceUpdate();
-      } else {
-        this.status = "Failed to start terminal.";
-        this.disconnected = true;
-        this.$forceUpdate();
-      }
-      const wait_ms = 50;
-      const fit2screen = debounce(this.fitToscreen, wait_ms);
-      window.onresize = fit2screen;
-      this.w.onResize(fit2screen);
-      this.w.onRefresh(fit2screen);
-    });
+    if (this.engine && this.engine.connected) {
+      this.status = "Connecting terminal...";
+      this.start();
+    } else {
+      this.status = "Waiting for engine to connect.";
+      this.engine.socket.on("connect", this.start);
+    }
   },
   methods: {
+    start() {
+      this.engine.socket.emit("start_terminal", {}, ret => {
+        if (ret && ret.success) {
+          this.term.on("key", (key, ev) => {
+            this.engine.socket.emit("terminal_input", { input: key });
+          });
+          this.term.on("paste", (data, ev) => {
+            this.engine.socket.emit("terminal_input", { input: data });
+          });
+          this.engine.socket.on("terminal_output", data => {
+            this.term.write(data.output);
+          });
+          this.status = "Terminal connected.";
+          this.disconnected = false;
+          this.$forceUpdate();
+        } else {
+          this.status = "Failed to start terminal.";
+          this.disconnected = true;
+          this.$forceUpdate();
+        }
+        const wait_ms = 50;
+        const fit2screen = debounce(this.fitToscreen, wait_ms);
+        window.onresize = fit2screen;
+        this.w.onResize(fit2screen);
+        this.w.onRefresh(fit2screen);
+      });
+    },
     fitToscreen() {
       this.window_height = this.$el.clientHeight + "px";
       this.$forceUpdate();
-      console.log("===============", this.window_height);
       this.$nextTick(() => {
         this.term.fit();
         console.log(`size: ${this.term.cols} columns, ${this.term.rows} rows`);
