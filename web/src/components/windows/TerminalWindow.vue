@@ -65,9 +65,9 @@ export default {
     });
     term.open(this.$refs.terminal_container);
     this.term = term;
-    this.$nextTick(()=>{
+    this.$nextTick(() => {
       this.fitToscreen();
-    })
+    });
     if (this.engine && this.engine.connected) {
       this.start();
     } else {
