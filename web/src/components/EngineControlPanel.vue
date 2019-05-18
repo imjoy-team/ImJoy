@@ -174,7 +174,9 @@
             name="connection_token"
           ></md-input>
         </md-field>
-        <p>- engine version: {{ selected_engine.engine_info.version }}</p>
+        <p v-if="selected_engine.connected && selected_engine.engine_info">
+          - engine version: {{ selected_engine.engine_info.version }}
+        </p>
         <div
           v-if="
             selected_engine.connected &&
@@ -206,8 +208,20 @@
           :disabled="!selected_engine.connected"
           @click="expand(selected_engine)"
         >
-          <md-icon>autorenew</md-icon> Show Processes
+          <md-icon>autorenew</md-icon> Processes
         </md-button>
+        <md-button
+          v-if="selected_engine.connected"
+          @click="
+            startTerminal(selected_engine);
+            showEngineInfoDialog = false;
+          "
+          class="md-primary"
+          :disabled="!selected_engine.connected"
+        >
+          <md-icon>code</md-icon> Terminal
+        </md-button>
+
         <md-menu>
           <md-button class="md-icon-button" md-menu-trigger>
             <md-icon class="md-primary">more_horiz</md-icon>
@@ -399,6 +413,9 @@ export default {
     disconnectEngine(engine) {
       if (engine.connected) engine.disconnect();
       this.$forceUpdate();
+    },
+    startTerminal(engine) {
+      this.$emit("start-terminal", engine);
     },
     showToken(engine) {
       this.engine_url = engine.config.url;
