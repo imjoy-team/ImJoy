@@ -1981,7 +1981,7 @@ export default {
             this.showMessage(
               `📣 A newer version of ImJoy (version ${
                 this.latest_version
-              }) is available, please refresh your browser.`
+              }) is available, please restart ImJoy.`
             );
           }
         } else {

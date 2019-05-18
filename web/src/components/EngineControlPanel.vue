@@ -52,6 +52,16 @@
           </md-menu-item>
           <div v-if="engine.connected && engine.show_processes">
             <md-divider></md-divider>
+
+            <md-menu-item
+              v-show="engine.plugin_processes"
+              @click="startTerminal(engine)"
+            >
+              &nbsp;&nbsp;<md-button class="md-icon-button">
+                <md-icon>code</md-icon>
+              </md-button>
+              Open terminal
+            </md-menu-item>
             <md-menu-item
               v-show="engine.plugin_processes"
               v-for="p in engine.plugin_processes"
@@ -71,14 +81,18 @@
               </md-button>
             </md-menu-item>
             <md-menu-item :disabled="true" v-if="engine.plugin_num > 1">
-              <span>&nbsp;&nbsp;{{ engine.plugin_num }} Running Plugins</span>
+              &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;<span
+                >Running Plugins: {{ engine.plugin_num }}
+              </span>
               <md-button
                 @click.stop="kill(engine)"
                 class="md-icon-button md-accent"
               >
                 <md-icon>clear</md-icon>
+                <md-tooltip>Kill all the running plugins</md-tooltip>
               </md-button>
             </md-menu-item>
+            <md-divider></md-divider>
           </div>
         </div>
       </md-menu-content>
@@ -364,12 +378,13 @@ export default {
     update(engine) {
       engine.plugin_processes = null;
       this.$forceUpdate();
-      engine.updateEngineStatus().then(() => {
+      engine.updateEngineStatus().finally(() => {
         this.$forceUpdate();
       });
     },
     kill(engine, p) {
-      engine.killPluginProcess(p).then(() => {
+      engine.plugin_processes = null;
+      engine.killPluginProcess(p).finally(() => {
         this.update(engine);
       });
     },
