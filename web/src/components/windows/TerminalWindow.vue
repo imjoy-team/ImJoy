@@ -11,7 +11,7 @@
 
 <script>
 import { Terminal } from "xterm";
-import style from "xterm/lib/xterm.css";
+import "xterm/lib/xterm.css";
 import * as fullscreen from "xterm/lib/addons/fullscreen/fullscreen";
 import * as fit from "xterm/lib/addons/fit/fit";
 import * as webLinks from "xterm/lib/addons/webLinks/webLinks";
@@ -81,10 +81,10 @@ export default {
     start() {
       this.engine.socket.emit("start_terminal", {}, ret => {
         if (ret && ret.success) {
-          this.term.on("key", (key, ev) => {
+          this.term.on("key", key => {
             this.engine.socket.emit("terminal_input", { input: key });
           });
-          this.term.on("paste", (data, ev) => {
+          this.term.on("paste", data => {
             this.engine.socket.emit("terminal_input", { input: data });
           });
           this.engine.socket.on("terminal_output", data => {
