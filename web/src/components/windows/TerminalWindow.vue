@@ -65,6 +65,7 @@ export default {
       scrollback: true,
     });
     term.open(this.$refs.terminal_container);
+
     this.fitToscreen();
 
     this.term = term;
@@ -138,7 +139,8 @@ export default {
     fitToscreen() {
       this.window_height = this.$el.clientHeight + "px";
       this.$forceUpdate();
-      this.$nextTick(() => {
+      setTimeout(() => {
+        this.window_height = this.$el.clientHeight + "px";
         this.term.fit();
         if (this.engine && this.engine.socket) {
           this.engine.socket.emit("terminal_window_resize", {
@@ -149,7 +151,7 @@ export default {
           console.error("engine is not connected.");
         }
         this.$forceUpdate();
-      });
+      }, 400);
     },
   },
 };
@@ -158,9 +160,9 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 .terminal {
-  height: 100%;
   width: 100%;
 }
+
 .info {
   color: #4286f4;
   transition: 0.3s;
