@@ -2379,7 +2379,7 @@ export default {
         config: {},
         w: 30,
         h: 20,
-        standalone: false, //this.screenWidth < 1200,
+        standalone: this.screenWidth < 1200,
         data: {
           engine: engine,
         },

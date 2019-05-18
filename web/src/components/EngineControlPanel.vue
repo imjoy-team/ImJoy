@@ -208,7 +208,7 @@
           :disabled="!selected_engine.connected"
           @click="expand(selected_engine)"
         >
-          <md-icon>autorenew</md-icon> Show Processes
+          <md-icon>autorenew</md-icon> Processes
         </md-button>
         <md-button
           v-if="selected_engine.connected"
@@ -219,7 +219,7 @@
           class="md-primary"
           :disabled="!selected_engine.connected"
         >
-          <md-icon>code</md-icon> Open Terminal
+          <md-icon>code</md-icon> Terminal
         </md-button>
 
         <md-menu>

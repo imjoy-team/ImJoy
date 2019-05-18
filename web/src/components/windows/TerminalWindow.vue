@@ -63,7 +63,7 @@ export default {
       scrollback: true,
     });
     term.open(this.$refs.terminal_container);
-    this.fitToscreen()
+    this.fitToscreen();
     term.write("Welcome to ImJoy plugin engine terminal!\r\n");
     this.term = term;
     if (this.engine && this.engine.connected) {
@@ -72,6 +72,12 @@ export default {
     } else {
       this.status = "Waiting for engine to connect.";
       this.engine.socket.on("connect", this.start);
+    }
+  },
+  beforeDestroy() {
+    if (this.engine && this.engine.socket) {
+      this.engine.socket.removeListener("terminal_output", this.write_terminal);
+      this.engine.socket.removeListener("connect", this.start);
     }
   },
   methods: {
@@ -84,9 +90,7 @@ export default {
           this.term.on("paste", data => {
             this.engine.socket.emit("terminal_input", { input: data });
           });
-          this.engine.socket.on("terminal_output", data => {
-            this.term.write(data.output);
-          });
+          this.engine.socket.on("terminal_output", this.write_terminal);
           this.status = "Terminal connected.";
           this.disconnected = false;
           this.$forceUpdate();
@@ -102,12 +106,14 @@ export default {
         this.w.onRefresh(fit2screen);
       });
     },
+    write_terminal(data) {
+      this.term.write(data.output);
+    },
     fitToscreen() {
       this.window_height = this.$el.clientHeight + "px";
       this.$forceUpdate();
       this.$nextTick(() => {
         this.term.fit();
-        console.log(`size: ${this.term.cols} columns, ${this.term.rows} rows`);
         this.engine.socket.emit("terminal_window_resize", {
           cols: this.term.cols,
           rows: this.term.rows,
