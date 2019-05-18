@@ -391,6 +391,8 @@ function which will be called when the window is closed.
 
 To close the created window, call `win.close()`.
 
+To scroll to the window in the ImJoy workspace, call `win.focus()`.
+
 <!-- tabs:start -->
 
 #### ** JavaScript **
