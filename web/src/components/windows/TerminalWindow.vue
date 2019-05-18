@@ -82,29 +82,33 @@ export default {
   },
   methods: {
     start() {
-      this.engine.socket.emit("start_terminal", {}, ret => {
-        if (ret && ret.success) {
-          this.term.on("key", key => {
-            this.engine.socket.emit("terminal_input", { input: key });
-          });
-          this.term.on("paste", data => {
-            this.engine.socket.emit("terminal_input", { input: data });
-          });
-          this.engine.socket.on("terminal_output", this.write_terminal);
-          this.status = "Terminal connected.";
-          this.disconnected = false;
-          this.$forceUpdate();
-        } else {
-          this.status = "Failed to start terminal.";
-          this.disconnected = true;
-          this.$forceUpdate();
-        }
-        const wait_ms = 50;
-        const fit2screen = debounce(this.fitToscreen, wait_ms);
-        window.onresize = fit2screen;
-        this.w.onResize(fit2screen);
-        this.w.onRefresh(fit2screen);
-      });
+      if (this.engine && this.engine.socket) {
+        this.engine.socket.emit("start_terminal", {}, ret => {
+          if (ret && ret.success) {
+            this.term.on("key", key => {
+              this.engine.socket.emit("terminal_input", { input: key });
+            });
+            this.term.on("paste", data => {
+              this.engine.socket.emit("terminal_input", { input: data });
+            });
+            this.engine.socket.on("terminal_output", this.write_terminal);
+            this.status = "Terminal connected.";
+            this.disconnected = false;
+            this.$forceUpdate();
+          } else {
+            this.status = "Failed to start terminal.";
+            this.disconnected = true;
+            this.$forceUpdate();
+          }
+          const wait_ms = 50;
+          const fit2screen = debounce(this.fitToscreen, wait_ms);
+          window.onresize = fit2screen;
+          this.w.onResize(fit2screen);
+          this.w.onRefresh(fit2screen);
+        });
+      } else {
+        console.error("cannot start terminal because engine is not connected.");
+      }
     },
     write_terminal(data) {
       this.term.write(data.output);
@@ -114,10 +118,14 @@ export default {
       this.$forceUpdate();
       this.$nextTick(() => {
         this.term.fit();
-        this.engine.socket.emit("terminal_window_resize", {
-          cols: this.term.cols,
-          rows: this.term.rows,
-        });
+        if (this.engine && this.engine.socket) {
+          this.engine.socket.emit("terminal_window_resize", {
+            cols: this.term.cols,
+            rows: this.term.rows,
+          });
+        } else {
+          console.error("engine is not connected.");
+        }
         this.$forceUpdate();
       });
     },
