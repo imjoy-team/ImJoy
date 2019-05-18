@@ -170,7 +170,10 @@
               </md-menu-item>
             </md-menu-content>
           </md-menu>
-          <engine-control-panel :engine-manager="em" />
+          <engine-control-panel
+            :engine-manager="em"
+            @start-terminal="startTerminal"
+          />
           <md-menu>
             <md-button
               v-if="latest_version && !is_latest_version"
@@ -1978,7 +1981,7 @@ export default {
             this.showMessage(
               `📣 A newer version of ImJoy (version ${
                 this.latest_version
-              }) is available, please refresh your browser.`
+              }) is available, please restart ImJoy.`
             );
           }
         } else {
@@ -2368,6 +2371,20 @@ export default {
     },
     unloadPlugin(plugin) {
       this.pm.unloadPlugin(plugin);
+    },
+    startTerminal(engine) {
+      const w = {
+        name: "Terminal " + engine.url,
+        type: "imjoy/terminal",
+        config: {},
+        w: 30,
+        h: 20,
+        standalone: this.screenWidth < 1200,
+        data: {
+          engine: engine,
+        },
+      };
+      this.createWindow(w);
     },
     editPlugin(pid) {
       const plugin = this.pm.plugins[pid];
