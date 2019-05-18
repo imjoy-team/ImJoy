@@ -1863,6 +1863,7 @@ export class PluginManager {
                 wconfig[k] = config[k];
               }
             },
+            focus: wconfig.focus,
             close: wconfig.close,
             onClose: wconfig.onClose,
             refresh: wconfig.refresh,
@@ -1881,6 +1882,7 @@ export class PluginManager {
                   wconfig[k] = new_config[k];
                 }
               },
+              focus: wconfig.focus,
               close: wconfig.close,
               onClose: wconfig.onClose,
               refresh: wconfig.refresh,
@@ -1935,6 +1937,7 @@ export class PluginManager {
                 pconfig.onClose(async () => {
                   await wplugin.terminate();
                 });
+                wplugin.api.focus = pconfig.focus;
                 wplugin.api.close = pconfig.close;
                 wplugin.api.refresh = pconfig.refresh;
                 wplugin.api.resize = pconfig.resize;
@@ -1953,6 +1956,7 @@ export class PluginManager {
                 pconfig.onClose(async () => {
                   await wplugin.terminate();
                 });
+                wplugin.api.focus = pconfig.focus;
                 wplugin.api.close = pconfig.close;
                 wplugin.api.refresh = pconfig.refresh;
                 wplugin.api.resize = pconfig.resize;
