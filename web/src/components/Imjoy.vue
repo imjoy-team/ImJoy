@@ -1729,6 +1729,7 @@ export default {
             }
           } catch (e) {
             console.error(e);
+            await this.showAlert(null, "Error: " + e)
           }
         } else {
           this.plugin_url = null;
