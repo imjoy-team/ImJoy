@@ -40,11 +40,14 @@
             <md-button
               v-else
               @click.stop="expand(engine)"
-              class="md-icon-button md-primary"
+              class="md-icon-button md-primary md-raised median-icon-button"
             >
               <md-icon>autorenew</md-icon>
+              <md-tooltip
+                >Show plugin processes or terminal of the engine.</md-tooltip
+              >
             </md-button>
-            <span>{{ engine.name }}</span>
+            <span>&nbsp;{{ engine.name }}</span>
           </md-menu-item>
           <md-menu-item v-else @click.stop="engine.connect(false)">
             <md-icon>sync_disabled</md-icon> {{ engine.name }}
@@ -52,7 +55,6 @@
           </md-menu-item>
           <div v-if="engine.connected && engine.show_processes">
             <md-divider></md-divider>
-
             <md-menu-item
               v-show="engine.plugin_processes"
               @click="startTerminal(engine)"
@@ -466,6 +468,12 @@ export default {
   width: 22px !important;
   min-width: 22px !important;
   height: 22px !important;
+}
+
+.median-icon-button {
+  width: 32px !important;
+  min-width: 32px !important;
+  height: 32px !important;
 }
 
 .md-list-item {

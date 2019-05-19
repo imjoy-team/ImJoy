@@ -1,12 +1,12 @@
 <template>
-  <div class="terminal">
+  <div class="terminal-window">
     <md-button v-if="error" @click="start()">
       <md-icon>restore</md-icon> Restart Terminal
     </md-button>
     <div
       ref="terminal_container"
       :style="{ height: window_height }"
-      class="terminal-window"
+      class="terminal-container"
     ></div>
   </div>
 </template>
@@ -18,7 +18,6 @@ import * as fullscreen from "xterm/lib/addons/fullscreen/fullscreen";
 import * as fit from "xterm/lib/addons/fit/fit";
 import * as webLinks from "xterm/lib/addons/webLinks/webLinks";
 import * as search from "xterm/lib/addons/search/search";
-
 function debounce(func, wait_ms) {
   let timeout;
   return function(...args) {
@@ -65,9 +64,10 @@ export default {
       scrollback: true,
     });
     term.open(this.$refs.terminal_container);
-    this.fitToscreen();
-
     this.term = term;
+    this.$nextTick(() => {
+      this.fitToscreen();
+    });
     if (this.engine && this.engine.connected) {
       this.start();
     } else {
@@ -157,7 +157,7 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-.terminal {
+.terminal-window {
   height: 100%;
   width: 100%;
 }
@@ -165,13 +165,11 @@ export default {
   color: #4286f4;
   transition: 0.3s;
 }
-
 .error {
   color: #f44336;
   transition: 0.3s;
 }
-
-.terminal-window {
+.terminal-container {
   width: 100%;
   display: block;
 }

@@ -20,6 +20,7 @@ export class Engine {
     this.name = this.config.name || this.config.url;
     this.name = this.name.replace("http://127.0.0.1:9527", "My Computer");
     this.name = this.name.replace("https://", "");
+    this.name = this.name.replace("http://", "");
     this.config.name = this.name;
     this.url = this.config.url;
     this.token = this.config.token;
@@ -72,7 +73,7 @@ export class Engine {
         return;
       }
       //enforcing 127.0.0.1 for avoid security restrictions
-      url = url.replace("localhost", "127.0.0.1");
+      url = url.replace("//localhost", "//127.0.0.1");
       token = (token && token.trim()) || "";
       let reason = "";
       this.connected = false;

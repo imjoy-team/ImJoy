@@ -2377,9 +2377,9 @@ export default {
         name: "Terminal " + engine.url,
         type: "imjoy/terminal",
         config: {},
-        w: 30,
+        w: 25,
         h: 20,
-        standalone: this.screenWidth < 1200,
+        standalone: false,
         data: {
           engine: engine,
         },

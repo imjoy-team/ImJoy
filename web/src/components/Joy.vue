@@ -147,6 +147,7 @@ More prefixing to avoid NAME COLLISIONS
 }
 
 .joy-master {
+  line-height: 30px;
   display: block;
   margin: 0.3em;
   margin-bottom: 1.2em;
