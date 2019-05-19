@@ -43,6 +43,7 @@
               class="md-icon-button md-primary md-raised median-icon-button"
             >
               <md-icon>autorenew</md-icon>
+              <md-tooltip>Show plugin processes or terminal of the engine.</md-tooltip>
             </md-button>
             <span>&nbsp;{{ engine.name }}</span>
           </md-menu-item>
