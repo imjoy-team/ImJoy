@@ -190,7 +190,6 @@
             name="connection_token"
           ></md-input>
         </md-field>
-        <br />
         <md-button
           class="md-primary md-raised"
           v-if="!selected_engine.connected"
