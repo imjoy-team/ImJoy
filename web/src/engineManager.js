@@ -18,9 +18,7 @@ export class Engine {
     this.config = config;
     this.id = this.config.id;
     this.name = this.config.name || this.config.url;
-    this.name = this.name.replace("http://127.0.0.1:9527", "My Computer");
-    this.name = this.name.replace("https://", "");
-    this.name = this.name.replace("http://", "");
+    this.normalizeName();
     this.config.name = this.name;
     this.url = this.config.url;
     this.token = this.config.token;
@@ -33,7 +31,11 @@ export class Engine {
     this.disconnecting = false;
     this.connection_lost_timer = null;
   }
-
+  normalizeName() {
+    this.name = this.name.replace("http://127.0.0.1:9527", "My Computer");
+    this.name = this.name.replace("https://", "");
+    this.name = this.name.replace("http://", "");
+  }
   requestUploadUrl(config) {
     return new Promise((resolve, reject) => {
       try {
@@ -80,7 +82,7 @@ export class Engine {
       this.connection = "Connecting...";
 
       this.name = this.config.name || url;
-      this.name = this.name.replace("http://127.0.0.1:9527", "My Computer");
+      this.normalizeName();
 
       this.disconnecting = false;
       this.engine_session_id = randId();
@@ -112,7 +114,6 @@ export class Engine {
       //if(!auto) {this.show_engine_callback(true, this)}
 
       socket.on("connect", () => {
-        clearTimeout(timer);
         if (this.connection_lost_timer) {
           clearTimeout(this.connection_lost_timer);
           this.connection_lost_timer = null;
@@ -133,6 +134,7 @@ export class Engine {
             session_id: this.engine_session_id,
           },
           ret => {
+            clearTimeout(timer);
             if (ret && ret.success) {
               const connect_client = () => {
                 this.engine_info = ret.engine_info || {};
