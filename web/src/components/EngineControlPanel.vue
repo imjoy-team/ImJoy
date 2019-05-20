@@ -190,27 +190,6 @@
             name="connection_token"
           ></md-input>
         </md-field>
-        <p v-if="selected_engine.connected && selected_engine.engine_info">
-          - engine version: {{ selected_engine.engine_info.version }}
-        </p>
-        <div
-          v-if="
-            selected_engine.connected &&
-              show_sys_info &&
-              selected_engine.engine_info.platform
-          "
-          class="platform-info"
-        >
-          <p>- api version: {{ selected_engine.engine_info.api_version }}</p>
-          <p v-for="(v, k) in selected_engine.engine_info.platform" :key="k">
-            - {{ k }}: {{ v }}
-          </p>
-          <div v-for="gpu in selected_engine.engine_info.GPUs" :key="gpu.id">
-            <md-divider></md-divider>
-            <span>GPU #{{ gpu.id }}</span>
-            <p v-for="(v, k) in gpu" :key="k">- {{ k }}: {{ v }}</p>
-          </div>
-        </div>
         <br />
         <md-button
           class="md-primary md-raised"
@@ -280,6 +259,43 @@
             </md-menu-item>
           </md-menu-content>
         </md-menu>
+        <md-divider></md-divider>
+        <br />
+        <div v-if="selected_engine.connected && selected_engine.engine_info">
+          <code>
+            ImJoy Plugin Engine (v {{ selected_engine.engine_info.version }},
+            api version: {{ selected_engine.engine_info.api_version }})
+          </code>
+        </div>
+        <div
+          v-if="
+            selected_engine.connected &&
+              show_sys_info &&
+              selected_engine.engine_info.platform
+          "
+          class="platform-info"
+        >
+          <div>
+            <br />
+            <code>## Platform</code>
+            <br />
+            <code
+              v-for="(v, k) in selected_engine.engine_info.platform"
+              :key="k"
+            >
+              - {{ k }}: {{ v }}
+              <br />
+            </code>
+          </div>
+
+          <div v-for="gpu in selected_engine.engine_info.GPUs" :key="gpu.id">
+            <br />
+            <code>## GPU {{ gpu.id }}</code>
+            <br />
+            <code v-for="(v, k) in gpu" :key="k">- {{ k }}: {{ v }}</code>
+          </div>
+        </div>
+        <br />
 
         <div v-if="selected_engine.connected && selected_engine.show_processes">
           <md-divider></md-divider>
