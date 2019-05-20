@@ -229,7 +229,10 @@
           <md-menu-content>
             <md-menu-item
               :disabled="!selected_engine.connected || show_sys_info"
-              @click.stop="show_sys_info = true"
+              @click.stop="
+                show_sys_info = true;
+                hide(selected_engine);
+              "
               target="_blank"
             >
               <md-icon>info</md-icon> System Information
@@ -264,8 +267,8 @@
         <div v-if="selected_engine.connected && selected_engine.engine_info">
           <br />
           <code>
-            ImJoy Plugin Engine (v {{ selected_engine.engine_info.version }},
-            api version: {{ selected_engine.engine_info.api_version }})
+            ImJoy Plugin Engine (v{{ selected_engine.engine_info.version }},
+            api: v{{ selected_engine.engine_info.api_version }})
           </code>
         </div>
         <div
@@ -391,6 +394,7 @@ export default {
       this.$forceUpdate();
     },
     expand(engine) {
+      this.show_sys_info = false;
       engine.show_processes = true;
       this.$forceUpdate();
       this.update(engine);
@@ -511,9 +515,7 @@ export default {
 }
 
 @media screen and (max-width: 800px) {
-
-  
-.md-dialog {
+  .md-dialog {
     width: 100% !important;
     height: 100% !important;
     max-width: 100%;
