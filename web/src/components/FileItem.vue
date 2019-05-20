@@ -27,7 +27,7 @@
                 Array.isArray(selected) &&
                 selected.indexOf(root) >= 0),
           }"
-          >{{ model.name }}</span
+          >{{ isFolder ? root : model.name }}</span
         >
       </span>
       <span

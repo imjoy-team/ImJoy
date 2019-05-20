@@ -129,6 +129,7 @@ export default {
       loading_progress: 0,
     };
   },
+
   created() {
     this.event_bus = this.$root.$data.store && this.$root.$data.store.event_bus;
     if (this.event_bus) {
@@ -234,6 +235,7 @@ export default {
     },
     go() {
       const path = prompt("Go to the folder", this.root);
+      if (!path || path == this.root) return;
       this.listFiles(this.selected_engine, path, "dir", false)
         .then(tree => {
           this.root = tree.path;
@@ -256,9 +258,10 @@ export default {
     },
     loadFile(f) {
       if (f.target.type != "file") {
-        // if(f.path === this.root){
-        //   f.path = f.path+'/../'
-        // }
+        if (f.path === this.root) {
+          this.go();
+          return;
+        }
         this.listFiles(
           this.selected_engine,
           f.path,
