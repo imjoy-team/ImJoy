@@ -1061,6 +1061,7 @@
           <div class="carousel" v-else-if="plugin4install.cover">
             <!-- carousel locator -->
             <input
+              v-once
               class="carousel-locator"
               v-for="(c, k) in plugin4install.cover"
               :key="k"
@@ -1068,6 +1069,7 @@
               type="radio"
               name="carousel-radio"
               hidden=""
+              :checked="k === 1"
             />
             <!-- carousel container -->
             <div class="carousel-container">
@@ -1729,6 +1731,7 @@ export default {
             }
           } catch (e) {
             console.error(e);
+            await this.showAlert(null, "Error: " + e);
           }
         } else {
           this.plugin_url = null;
@@ -3352,14 +3355,10 @@ button.md-speed-dial-target {
 }
 
 .carousel .carousel-nav .nav-item {
-  color: rgba(165, 162, 162, 0.5);
+  color: rgba(5, 142, 255, 0.5);
 }
-
-.carousel
-  .carousel-locator:nth-of-type(1):checked
-  ~ .carousel-nav
-  .nav-item:nth-of-type(1) {
-  color: #92add0;
+.carousel .carousel-nav .nav-item::before {
+  height: 0.15rem;
 }
 
 .file-dropping {

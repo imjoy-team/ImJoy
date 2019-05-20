@@ -205,6 +205,11 @@
           <p v-for="(v, k) in selected_engine.engine_info.platform" :key="k">
             - {{ k }}: {{ v }}
           </p>
+          <div v-for="gpu in selected_engine.engine_info.GPUs" :key="gpu.id">
+            <md-divider></md-divider>
+            <span>GPU #{{ gpu.id }}</span>
+            <p v-for="(v, k) in gpu" :key="k">- {{ k }}: {{ v }}</p>
+          </div>
         </div>
         <br />
         <md-button
