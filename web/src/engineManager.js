@@ -105,7 +105,6 @@ export class Engine {
                 url.replace(":8080", ":9527")
             );
           }
-          console.log("rejecting....");
           reject(
             "Failed to connect, please make sure you have started the plugin engine."
           );
