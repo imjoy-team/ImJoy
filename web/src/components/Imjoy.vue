@@ -3124,6 +3124,13 @@ export default {
     height: 100% !important;
     max-width: 100%;
   }
+
+  .api-dialog {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100%;
+    max-height: 100%;
+  }
 }
 
 @media screen and (min-height: 500px) {
@@ -3139,6 +3146,7 @@ export default {
 }
 
 .api-dialog {
+  width: 500px;
   z-index: 13 !important;
 }
 

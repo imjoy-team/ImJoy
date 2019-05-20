@@ -190,7 +190,6 @@
             name="connection_token"
           ></md-input>
         </md-field>
-        <br />
         <md-button
           class="md-primary md-raised"
           v-if="!selected_engine.connected"
@@ -229,7 +228,10 @@
           <md-menu-content>
             <md-menu-item
               :disabled="!selected_engine.connected || show_sys_info"
-              @click.stop="show_sys_info = true"
+              @click.stop="
+                show_sys_info = true;
+                hide(selected_engine);
+              "
               target="_blank"
             >
               <md-icon>info</md-icon> System Information
@@ -260,11 +262,12 @@
           </md-menu-content>
         </md-menu>
         <md-divider></md-divider>
-        <br />
+
         <div v-if="selected_engine.connected && selected_engine.engine_info">
+          <br />
           <code>
-            ImJoy Plugin Engine (v {{ selected_engine.engine_info.version }},
-            api version: {{ selected_engine.engine_info.api_version }})
+            ImJoy Plugin Engine (v{{ selected_engine.engine_info.version }},
+            api: v{{ selected_engine.engine_info.api_version }})
           </code>
         </div>
         <div
@@ -292,12 +295,12 @@
             <br />
             <code>## GPU {{ gpu.id }}</code>
             <br />
-            <code v-for="(v, k) in gpu" :key="k">- {{ k }}: {{ v }}</code>
+            <code v-for="(v, k) in gpu" :key="k">- {{ k }}: {{ v }}<br /></code>
           </div>
         </div>
-        <br />
 
         <div v-if="selected_engine.connected && selected_engine.show_processes">
+          <br />
           <md-divider></md-divider>
           <ul>
             <li
@@ -390,6 +393,7 @@ export default {
       this.$forceUpdate();
     },
     expand(engine) {
+      this.show_sys_info = false;
       engine.show_processes = true;
       this.$forceUpdate();
       this.update(engine);
@@ -503,6 +507,19 @@ export default {
 
 .md-list-item {
   padding: 2px 0;
+}
+
+.md-dialog {
+  width: 600px;
+}
+
+@media screen and (max-width: 800px) {
+  .md-dialog {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100%;
+    max-height: 100%;
+  }
 }
 
 @media screen and (max-height: 800px) and (pointer: fine) {
