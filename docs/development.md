@@ -708,7 +708,7 @@ has to be called only once.
 
 ### Data exchange
 A window in ImJoy can contain data, e.g. an image. When selecting such a window
-and executing a plugin, the contained data will be transferred to the Python plugin.
+and executing a plugin, the contained data will be transferred to the Python plugin if the data type is acceptable (matched with json schema defined with `inputs`).
 A plugin can then process the data within the `run` function, by accessing `ctx.data`.
 The results will be sent back to the ImJoy workspace and displayed as a new window.
 
@@ -743,7 +743,7 @@ When executing a plugin, it can access different fields from `ctx`:
     or from a separate operation `api.register`, more below). For example, if you defined an ui string (e.g. `"ui": "option {id: 'opt1', type: 'number'}"`) in the plugin `<config>`, you can access it through `ctx.config.opt1`.
 
  * `ctx.data`
-     It stores the data from current active window and state for running the plugin.
+     It stores the data from current active window and state for running the plugin. Notice that, it will be passed to the plugin only if the data matches the `inputs` json schema syntax defined by the plugin or the `op`.
 
  * `ctx._variables`
      When the plugin is executed in a workflow, variables will be set in the workflow will be passed as `ctx._variables`. It will be set to the actual variable value if the user used ops such as `Set [number]`.

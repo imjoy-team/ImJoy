@@ -1721,7 +1721,7 @@ export class PluginManager {
             config.inputs.required = Object.keys(config.inputs.properties);
           }
           const sch = ajv.compile(config.inputs);
-
+          op_config.inputs_schema = sch;
           this.registered.inputs[op_key] = {
             loader_key: op_key,
             op_name: op_name,
@@ -1783,6 +1783,7 @@ export class PluginManager {
             config.outputs.required = Object.keys(config.outputs.properties);
           }
           const sch = ajv.compile(config.outputs);
+          op_config.outputs_schema = sch;
           this.registered.outputs[op_key] = {
             op_name: config.name,
             plugin_name: plugin.name,

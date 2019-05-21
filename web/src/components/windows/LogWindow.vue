@@ -54,26 +54,26 @@ export default {
   },
   mounted() {
     this.event_bus = this.$root.$data.store && this.$root.$data.store.event_bus;
-    if(this.event_bus ){
+    if (this.event_bus) {
       this.event_bus.$on("plugin_loaded", this.fetchLog);
     }
-    this.log_history = this.w.data.log_history
-    this.plugin_id = this.w.data.plugin_id
-    this.plugin_name = this.w.data.plugin_name
+    this.log_history = this.w.data.log_history;
+    this.plugin_id = this.w.data.plugin_id;
+    this.plugin_name = this.w.data.plugin_name;
   },
-  beforeDestroy(){
-    if(this.event_bus ){
+  beforeDestroy() {
+    if (this.event_bus) {
       this.event_bus.$off("plugin_loaded", this.fetchLog);
     }
   },
   methods: {
-    fetchLog(plugin){
-      if(plugin.name == this.w.data.plugin_name){
-        this.log_history = plugin._log_history
-        this.plugin_id = plugin.id
-        this.plugin_name = plugin.name
+    fetchLog(plugin) {
+      if (plugin.name == this.w.data.plugin_name) {
+        this.log_history = plugin._log_history;
+        this.plugin_id = plugin.id;
+        this.plugin_name = plugin.name;
       }
-      this.$forceUpdate()
+      this.$forceUpdate();
     },
     clearLog() {
       const log_history = this.log_history;
