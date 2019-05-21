@@ -2369,9 +2369,11 @@ export default {
     },
     reloadPlugin(config) {
       //TODO: this is a temporary fix for the reloading bug, the reloading sometimes causing "RangeError: Maximum call stack size exceeded"
-      this.pm.unloadPlugin(plugin);
-      this.pm.reloadPlugin(config).finally(() => {
-        this.$forceUpdate();
+      this.pm.unloadPlugin(config);
+      this.$nextTick(() => {
+        this.pm.reloadPlugin(config).finally(() => {
+          this.$forceUpdate();
+        });
       });
     },
     unloadPlugin(plugin) {
