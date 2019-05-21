@@ -8,9 +8,6 @@
         </p>
       </li>
     </ul>
-    <md-button class="md-mini" @click="refresh()">
-      <md-icon>autorenew</md-icon>Refresh
-    </md-button>
     <md-button
       class="md-mini"
       v-if="log_history && log_history.length > 0"
@@ -56,23 +53,23 @@ export default {
     };
   },
   mounted() {
-    this.refresh();
+    this.event_bus = this.$root.$data.store && this.$root.$data.store.event_bus;
+    if(this.event_bus ){
+      this.event_bus.$on("plugin_loaded", this.fetchLog);
+    }
+    this.log_history = this.w.data.log_history
+  },
+  beforeDestroy(){
+    if(this.event_bus ){
+      this.event_bus.$off("plugin_loaded", this.fetchLog);
+    }
   },
   methods: {
-    refresh() {
-      if (this.w.data.log_history) {
-        this.log_history = this.w.data.log_history;
-      } else if (
-        this.w.data.plugins &&
-        this.w.data.name &&
-        this.w.data.plugins[this.w.data.name]
-      ) {
-        this.log_history = this.w.data.plugins[this.w.data.name]._log_history;
-      } else {
-        console.error("unsupported log input.");
-        this.log_history = [];
+    fetchLog(plugin){
+      if(plugin.name == this.w.data.plugin_name){
+        this.log_history = plugin._log_history
       }
-      this.$forceUpdate();
+      this.$forceUpdate()
     },
     clearLog() {
       const log_history = this.log_history;
@@ -83,7 +80,7 @@ export default {
     },
     exportLog() {
       const log_history = this.log_history;
-      const filename = this.w.name + "_log.txt";
+      const filename = this.w.data.plugin_name + "_log.txt";
       let content = "";
       for (let c of log_history) {
         content = c.type + ":" + content + c.value + "\n";
