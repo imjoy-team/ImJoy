@@ -3026,6 +3026,7 @@ export default {
         name: `Log (${_plugin.name})`,
         type: "imjoy/log",
         data: {
+          plugin_id: _plugin.id,
           plugin_name: _plugin.name,
           log_history: _plugin._log_history
         },

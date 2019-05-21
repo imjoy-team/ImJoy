@@ -58,6 +58,8 @@ export default {
       this.event_bus.$on("plugin_loaded", this.fetchLog);
     }
     this.log_history = this.w.data.log_history
+    this.plugin_id = this.w.data.plugin_id
+    this.plugin_name = this.w.data.plugin_name
   },
   beforeDestroy(){
     if(this.event_bus ){
@@ -68,6 +70,8 @@ export default {
     fetchLog(plugin){
       if(plugin.name == this.w.data.plugin_name){
         this.log_history = plugin._log_history
+        this.plugin_id = plugin.id
+        this.plugin_name = plugin.name
       }
       this.$forceUpdate()
     },
@@ -80,7 +84,7 @@ export default {
     },
     exportLog() {
       const log_history = this.log_history;
-      const filename = this.w.data.plugin_name + "_log.txt";
+      const filename = this.plugin_id || this.plugin_name + "_log.txt";
       let content = "";
       for (let c of log_history) {
         content = c.type + ":" + content + c.value + "\n";
