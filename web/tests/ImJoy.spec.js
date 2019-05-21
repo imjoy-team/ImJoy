@@ -47,31 +47,31 @@ describe("ImJoy.vue", async () => {
     expect(pm.repository_names).to.include("ImJoy Demos");
   });
 
-  it("should add and remove repositories", async () => {
-    await pm.addRepository({
-      name: "test",
-      url: "oeway/ImJoy-project-template",
-    });
-    expect(pm.repository_names).to.include("Project Template");
-    await pm.removeRepository({
-      name: "Project Template",
-      url: "oeway/ImJoy-project-template",
-    });
-    expect(pm.repository_names).to.not.include("Project Template");
-  });
+  // it("should add and remove repositories", async () => {
+  //   await pm.addRepository({
+  //     name: "test",
+  //     url: "oeway/ImJoy-project-template",
+  //   });
+  //   expect(pm.repository_names).to.include("Project Template");
+  //   await pm.removeRepository({
+  //     name: "Project Template",
+  //     url: "oeway/ImJoy-project-template",
+  //   });
+  //   expect(pm.repository_names).to.not.include("Project Template");
+  // });
 
-  it("should load a repository and install plugin from it", async () => {
-    await pm.reloadRepository({ url: "oeway/ImJoy-project-template" });
-    await pm.installPlugin(
-      { uri: "oeway/ImJoy-project-template:Template plugin" },
-      null,
-      true
-    );
-    const ps = pm.installed_plugins.filter(p => {
-      return p.name === "Template plugin";
-    });
-    expect(ps.length).to.equal(1);
-  });
+  // it("should load a repository and install plugin from it", async () => {
+  //   await pm.reloadRepository({ url: "oeway/ImJoy-project-template" });
+  //   await pm.installPlugin(
+  //     { uri: "oeway/ImJoy-project-template:Template plugin" },
+  //     null,
+  //     true
+  //   );
+  //   const ps = pm.installed_plugins.filter(p => {
+  //     return p.name === "Template plugin";
+  //   });
+  //   expect(ps.length).to.equal(1);
+  // });
 
   it("should show add plugin dialog", async () => {
     // wrapper.find({ ref: 'add_plugin_button' }).trigger('click')
