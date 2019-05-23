@@ -2368,8 +2368,12 @@ export default {
       }
     },
     reloadPlugin(config) {
-      this.pm.reloadPlugin(config).finally(() => {
-        this.$forceUpdate();
+      //TODO: this is a temporary fix for the reloading bug, the reloading sometimes causing "RangeError: Maximum call stack size exceeded"
+      this.pm.unloadPlugin(config);
+      this.$nextTick(() => {
+        this.pm.reloadPlugin(config).finally(() => {
+          this.$forceUpdate();
+        });
       });
     },
     unloadPlugin(plugin) {
@@ -2545,8 +2549,18 @@ export default {
       }
       this.status_text = "";
       this.progress = 0;
-      const w = this.wm.active_windows[this.wm.active_windows.length - 1] || {};
-      const mw = this.pm.plugin2joy(w) || {};
+      let mw;
+      if (op.inputs_schema) {
+        const w =
+          this.wm.active_windows[this.wm.active_windows.length - 1] || {};
+        if (op.inputs_schema(w.data)) {
+          mw = this.pm.plugin2joy(w) || {};
+        } else {
+          mw = {};
+        }
+      } else {
+        mw = {};
+      }
       mw.target = mw.target || {};
       mw.target._op = op.name;
       mw.target._source_op = null;
@@ -3026,8 +3040,9 @@ export default {
         name: `Log (${_plugin.name})`,
         type: "imjoy/log",
         data: {
-          plugins: this.pm.plugin_names,
-          name: _plugin.name,
+          plugin_id: _plugin.id,
+          plugin_name: _plugin.name,
+          log_history: _plugin._log_history,
         },
       };
       this.createWindow(w);
