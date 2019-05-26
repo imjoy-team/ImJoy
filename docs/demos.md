@@ -70,7 +70,7 @@ with open(name_plot, 'rb') as f:
     data = f.read()
     result = base64.b64encode(data).decode('ascii')
     imgurl = 'data:image/png;base64,' + result
-    api.createWindow('type':'imjoy/image','w':12, 'h':15,data = {"src": imgurl})
+    api.createWindow(type='imjoy/image', w=12, h=15, data={"src": imgurl})
 ```
 
 ### User interface calling Python worker
