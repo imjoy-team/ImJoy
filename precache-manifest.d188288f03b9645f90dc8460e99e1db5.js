@@ -228,16 +228,16 @@ self.__precacheManifest = [
     "url": "/static/js/chunk-vendors.14a30188.js"
   },
   {
+    "revision": "2a3e222e6a41b32a7180e6afa3675990",
+    "url": "/static/vs/html.worker.js"
+  },
+  {
     "revision": "b00449080615ce71a2a8a52aee9f658f",
     "url": "/static/vs/css.worker.js"
   },
   {
     "revision": "493ef474936217113b20a6573247288a",
     "url": "/static/vs/editor.worker.js"
-  },
-  {
-    "revision": "2a3e222e6a41b32a7180e6afa3675990",
-    "url": "/static/vs/html.worker.js"
   },
   {
     "revision": "54ed6313df118674cd00fb83356ef7f6",
@@ -250,10 +250,6 @@ self.__precacheManifest = [
   {
     "revision": "3f48374e22408fdad37aed08b9ef2d06",
     "url": "/404.html"
-  },
-  {
-    "revision": "b6216d61c03e6ce0c9aea6ca7808f7ca",
-    "url": "/robots.txt"
   },
   {
     "revision": "470a8df97a2028ec9980f3c09e529d4d",
@@ -338,6 +334,10 @@ self.__precacheManifest = [
   {
     "revision": "edba2cda2b6fa6c55e9c7c336d2de3b4",
     "url": "/static/icons/apple-icon-152x152.png"
+  },
+  {
+    "revision": "b6216d61c03e6ce0c9aea6ca7808f7ca",
+    "url": "/robots.txt"
   },
   {
     "revision": "4efc4b6b32a094bfb5aaccbbff3ea510",
