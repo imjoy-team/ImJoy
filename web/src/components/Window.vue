@@ -100,7 +100,6 @@
 </template>
 
 <script>
-import marked from "marked";
 import * as windowComponents from "./windows";
 
 const components = {};
@@ -137,17 +136,6 @@ export default {
     };
   },
   created() {
-    //open link in a new tab
-    const renderer = new marked.Renderer();
-    renderer.link = function(href, title, text) {
-      var link = marked.Renderer.prototype.link.call(this, href, title, text);
-      return link.replace("<a", "<a target='_blank' ");
-    };
-    marked.setOptions({
-      renderer: renderer,
-    });
-    this.marked = marked;
-
     for (let c in components) {
       this.componentNames[components[c].type] = components[c].name;
     }

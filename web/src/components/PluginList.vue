@@ -263,6 +263,15 @@ export default {
   },
   created() {
     this.event_bus = this.$root.$data.store && this.$root.$data.store.event_bus;
+    //open link in a new tab
+    const renderer = new marked.Renderer();
+    renderer.link = function(href, title, text) {
+      var link = marked.Renderer.prototype.link.call(this, href, title, text);
+      return link.replace("<a", "<a target='_blank' ");
+    };
+    marked.setOptions({
+      renderer: renderer,
+    });
     this.marked = marked;
   },
   mounted() {

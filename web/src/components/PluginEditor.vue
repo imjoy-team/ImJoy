@@ -236,7 +236,7 @@ export default {
             this.saved = true;
             this.reload()
               .catch(() => {
-                this.window.plugin = { config: config };
+                this.window.plugin = config;
               })
               .finally(() => {
                 this.window.data._id = config._id;

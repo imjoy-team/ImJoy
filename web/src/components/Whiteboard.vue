@@ -95,7 +95,6 @@
 import { randId, assert } from "../utils.js";
 import { WindowManager } from "../windowManager.js";
 
-import marked from "marked";
 export default {
   name: "whiteboard",
   props: {
@@ -133,17 +132,6 @@ export default {
     this.event_bus.$on("add_window", this.onWindowAdd);
     this.event_bus.$on("close_window", this.onWindowClose);
     this.event_bus.$on("resize", this.updateSize);
-
-    //open link in a new tab
-    const renderer = new marked.Renderer();
-    renderer.link = function(href, title, text) {
-      var link = marked.Renderer.prototype.link.call(this, href, title, text);
-      return link.replace("<a", "<a target='_blank' ");
-    };
-    marked.setOptions({
-      renderer: renderer,
-    });
-    this.marked = marked;
   },
   mounted() {
     this.screenWidth = window.innerWidth;
