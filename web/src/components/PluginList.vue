@@ -18,11 +18,17 @@
         v-show="!search && pm && pm.installPlugin"
         @click="updateAll()"
         class="md-button md-primary"
+        :disabled="loading"
       >
         <md-icon>update</md-icon><span class="md-small-hide">Update All</span>
       </md-button>
     </md-toolbar>
-    <md-list class="md-triple-line md-dense" v-if="display === 'list'">
+    <div
+      v-if="loading"
+      style="left: -30px"
+      class="loading loading-lg floating"
+    ></div>
+    <md-list class="md-triple-line md-dense">
       <div v-for="(plugin, k) in searched_plugins" :key="k">
         <md-list-item>
           <md-avatar>
@@ -51,6 +57,7 @@
                 plugin2_remove_ = plugin.conofig;
                 showRemoveConfirmation = true;
               "
+              :disabled="loading"
             >
               <md-icon>delete_forever</md-icon>
               <md-tooltip>Delete {{ plugin.name }}</md-tooltip>
@@ -67,6 +74,7 @@
               <md-button
                 class="md-icon-button md-list-action md-primary"
                 md-menu-trigger
+                :disabled="loading"
               >
                 <md-icon>cloud_download</md-icon>
                 <md-tooltip>Install {{ plugin.name }}</md-tooltip>
@@ -85,6 +93,7 @@
               class="md-icon-button md-list-action md-primary"
               v-else-if="!plugin.installed && pm && pm.installPlugin"
               @click="install(plugin)"
+              :disabled="loading"
             >
               <md-icon>cloud_download</md-icon>
               <md-tooltip>Install {{ plugin.name }}</md-tooltip>
@@ -93,13 +102,18 @@
               class="md-icon-button md-list-action md-primary"
               v-if="plugin.installed && pm && pm.installPlugin"
               @click="install(plugin)"
+              :disabled="loading"
             >
               <md-icon>update</md-icon>
               <md-tooltip>Update {{ plugin.name }}</md-tooltip>
             </md-button>
           </span>
           <md-menu>
-            <md-button class="md-icon-button md-list-action" md-menu-trigger>
+            <md-button
+              :disabled="loading"
+              class="md-icon-button md-list-action"
+              md-menu-trigger
+            >
               <md-icon class="md-primary">more_horiz</md-icon>
             </md-button>
             <md-menu-content>
@@ -220,12 +234,6 @@ export default {
       type: String,
       default: null,
     },
-    display: {
-      type: String,
-      default: function() {
-        return "list";
-      },
-    },
     initSearch: {
       type: String,
       default: null,
@@ -243,6 +251,7 @@ export default {
   },
   data() {
     return {
+      loading: false,
       search: "",
       editorCode: "",
       editorPlugin: null,
@@ -461,6 +470,8 @@ export default {
     },
     install(pconfig, t) {
       if (this.pm && this.pm.installPlugin) {
+        this.loading = true;
+        this.$forceUpdate();
         this.pm
           .installPlugin(pconfig, t)
           .then(() => {
@@ -468,6 +479,10 @@ export default {
           })
           .catch(e => {
             this.$emit("message", e);
+            this.$forceUpdate();
+          })
+          .finally(() => {
+            this.loading = false;
             this.$forceUpdate();
           });
       }
@@ -533,5 +548,12 @@ export default {
 .md-dialog-content {
   height: 100%;
   padding: 4px;
+}
+
+.floating {
+  position: absolute !important;
+  left: calc(50% - 1.5rem) !important;
+  top: calc(5% - 1.5rem) !important;
+  z-index: 999;
 }
 </style>

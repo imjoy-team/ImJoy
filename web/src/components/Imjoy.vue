@@ -1018,7 +1018,7 @@
           <div class="md-title">Installed Plugins</div>
         </md-card-header>
         <md-card-content>
-          <plugin-list display="list" name="Installed Plugins" description="" v-if="pm" :plugin-manager="pm" @message="showMessage" :plugins="pm.installed_plugins" :workspace="pm.selected_workspace"></plugin-list>
+          <plugin-list name="Installed Plugins" description="" v-if="pm" :plugin-manager="pm" @message="showMessage" :plugins="pm.installed_plugins" :workspace="pm.selected_workspace"></plugin-list>
         </md-card-content>
       </md-card> -->
         <md-card v-if="show_plugin_url">
@@ -1231,7 +1231,6 @@
               v-if="pm"
               :plugin-manager="pm"
               :init-search="init_plugin_search"
-              display="list"
               :plugins="pm.available_plugins"
               :workspace="pm.selected_workspace"
             ></plugin-list>
@@ -1766,7 +1765,7 @@ export default {
           this.$route.query.w ||
           workspace_list[0];
         await this.pm.loadWorkspace(selected_workspace);
-        await this.pm.reloadPlugins(true);
+        await this.pm.reloadPlugins(false);
         const connections = this.em.connectAll(true);
         try {
           await connections;
@@ -1776,11 +1775,12 @@ export default {
 
         if (this.$route.query.engine && this.$route.query.start) {
           const en = this.em.getEngineByUrl(this.$route.query.engine);
-          const pl = this.pm.installed_plugins[this.$route.query.start];
+          const pl = this.pm.plugin_names[this.$route.query.start];
+          console.log("=======================", en, pl);
           if (en && pl) {
             console.log(`setting plugin engine of ${pl.name} to ${en.name}`);
-            pl.engine_mode = en;
-            pl.config.engine_mode = en;
+            pl.engine_mode = en.id;
+            pl.config.engine_mode = en.id;
           }
           if (!en) {
             this.showMessage(
