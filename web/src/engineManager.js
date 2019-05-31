@@ -377,7 +377,7 @@ export class EngineManager {
 
   async addEngine(config, force_save) {
     if (config.type === "default") {
-      config.id = config.id || "_" + config.name + "_" + config.url;
+      config.id = config.id || config.url;
 
       let existed = false;
       let engine = new Engine({

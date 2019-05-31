@@ -752,6 +752,12 @@ export class PluginManager {
 
       this.getPluginFromUrl(uri, scoped_plugins)
         .then(async config => {
+          if (config.type === "native-python") {
+            const old_plugin = this.plugin_names[config.name];
+            if (old_plugin) {
+              config.engine_mode = old_plugin.config.engine_mode;
+            }
+          }
           config.origin = pconfig.origin || uri;
           if (!config) {
             console.error(`Failed to fetch the plugin from "${uri}".`);
@@ -762,7 +768,11 @@ export class PluginManager {
             reject("Unsupported plugin type: " + config.type);
             return;
           }
-          config.tag = tag || config.tag;
+          config.tag =
+            tag ||
+            (this.plugin_names[config.name] &&
+              this.plugin_names[config.name].config.tag) ||
+            config.tag;
           if (config.tag) {
             // remove existing tag
             const sp = config.origin.split(":");
