@@ -227,7 +227,7 @@ Within the **``<config>``** block, the following fields can be made configurable
 
 **Example 1**: a python plugin should install different requirements depending if it will
 be executed on GPU or CPU. You can then defined two tags: `"tags" : ["GPU", "CPU"]`.
-You can set different `requirements` accordingly: `"requirements": {"gpu": ["tensorflow-gpu", "keras"], "cpu": ["tensorflow", "keras"]}`.
+You can set different `requirements` accordingly: `"requirements": {"GPU": ["tensorflow-gpu", "keras"], "CPU": ["tensorflow", "keras"]}`.
 The user will be asked to choose one of the tags during the installation, which will then install
 the specified requirements.
 
@@ -432,7 +432,7 @@ The `lang` property of the `<script>` block is used to specify the used programm
 ## Specifying requirements
 
 The plugin requirements are specified in the dedicated field
-[`requirements`](http://localhost:8000/docs#/development?id=requirements)
+[`requirements`](development?id=requirements)
 in its `config` block.
 
 Depending on the plugin type, requirements can be specified differently.
