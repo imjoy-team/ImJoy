@@ -1776,7 +1776,6 @@ export default {
         if (this.$route.query.engine && this.$route.query.start) {
           const en = this.em.getEngineByUrl(this.$route.query.engine);
           const pl = this.pm.plugin_names[this.$route.query.start];
-          console.log("=======================", en, pl);
           if (en && pl) {
             console.log(`setting plugin engine of ${pl.name} to ${en.name}`);
             pl.engine_mode = en.id;
