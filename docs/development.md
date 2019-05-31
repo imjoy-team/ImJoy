@@ -432,7 +432,7 @@ The `lang` property of the `<script>` block is used to specify the used programm
 ## Specifying requirements
 
 The plugin requirements are specified in the dedicated field
-[`requirements`](http://localhost:8000/docs#/development?id=requirements)
+[`requirements`](development?id=requirements)
 in its `config` block.
 
 Depending on the plugin type, requirements can be specified differently.
