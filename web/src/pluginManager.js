@@ -1386,9 +1386,29 @@ export class PluginManager {
     return new Promise((resolve, reject) => {
       const tconfig = _.assign({}, pconfig.plugin, pconfig);
       tconfig.workspace = this.selected_workspace;
+      const imjoy_api = _.assign({}, this.imjoy_api);
+      imjoy_api.focus = () => {
+        pconfig.focus();
+      };
+      imjoy_api.close = () => {
+        pconfig.close();
+      };
+      imjoy_api.refresh = () => {
+        pconfig.refresh();
+      };
+      imjoy_api.resize = () => {
+        pconfig.resize();
+      };
+      imjoy_api.onRefresh = (_, handler) => {
+        pconfig.onRefresh(handler);
+      };
+      imjoy_api.onResize = (_, handler) => {
+        pconfig.onResize(handler);
+      };
+
       const _interface = _.assign(
         { TAG: tconfig.tag, WORKSPACE: this.selected_workspace },
-        this.imjoy_api
+        imjoy_api
       );
       const plugin = new DynamicPlugin(tconfig, _interface, this.fm.api);
 
@@ -1402,6 +1422,13 @@ export class PluginManager {
         plugin.api
           .setup()
           .then(() => {
+            plugin.api.focus = pconfig.focus;
+            plugin.api.close = pconfig.close;
+            plugin.api.refresh = pconfig.refresh;
+            plugin.api.resize = pconfig.resize;
+            plugin.api.onRefresh = pconfig.onRefresh;
+            plugin.api.onResize = pconfig.onResize;
+
             //asuming the data._op is passed from last op
             pconfig.data = pconfig.data || {};
             pconfig.data._source_op = pconfig.data && pconfig.data._op;
@@ -1948,12 +1975,7 @@ export class PluginManager {
                 pconfig.onClose(async () => {
                   await wplugin.terminate();
                 });
-                wplugin.api.focus = pconfig.focus;
-                wplugin.api.close = pconfig.close;
-                wplugin.api.refresh = pconfig.refresh;
-                wplugin.api.resize = pconfig.resize;
-                wplugin.api.onRefresh = pconfig.onRefresh;
-                wplugin.api.onResize = pconfig.onResize;
+
                 resolve(wplugin.api);
               })
               .catch(reject);
@@ -1967,12 +1989,6 @@ export class PluginManager {
                 pconfig.onClose(async () => {
                   await wplugin.terminate();
                 });
-                wplugin.api.focus = pconfig.focus;
-                wplugin.api.close = pconfig.close;
-                wplugin.api.refresh = pconfig.refresh;
-                wplugin.api.resize = pconfig.resize;
-                wplugin.api.onRefresh = pconfig.onRefresh;
-                wplugin.api.onResize = pconfig.onResize;
                 pconfig.loading = false;
                 pconfig.refresh();
                 resolve(wplugin.api);
