@@ -1905,7 +1905,7 @@ export default {
           });
         }
       } catch (e) {
-        this.showMessage(e.toString());
+        this.showMessage(e);
       }
       this.$forceUpdate();
       this.$nextTick(() => {
@@ -2227,7 +2227,7 @@ export default {
           }
         })
         .catch(e => {
-          this.showMessage(String(e));
+          this.showMessage(e);
         });
     },
     showMessage(info, duration) {
@@ -2496,7 +2496,7 @@ export default {
       mw.target._workflow_id = mw.target._workflow_id || "workflow_" + randId();
       joy.workflow.execute(mw.target).catch(e => {
         console.error(e);
-        this.showMessage((e && e.toString()) || "Error.", 12);
+        this.showMessage(e || "Error.", 12);
       });
     },
     loadWorkflow(w) {
@@ -2580,7 +2580,7 @@ export default {
         })
         .catch(e => {
           this.showMessage(
-            "<" + op.name + ">" + ((e && e.toString()) || "Error."),
+            "<" + op.name + ">" + (e || "Error."),
             15
           );
         });
