@@ -30,7 +30,7 @@
       console.error("WARNING: overwriting function 'dispose'.");
     }
     api.export = application.setInterface;
-    api.onload = application.whenConnected;
+    api.onLoad = application.whenConnected;
     api.dispose = application.disconnect;
   });
 
