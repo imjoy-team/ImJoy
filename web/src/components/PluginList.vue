@@ -54,7 +54,7 @@
               class="md-icon-button md-list-action md-accent"
               v-if="pm && pm.removePlugin && plugin.installed"
               @click="
-                plugin2_remove_ = plugin.conofig;
+                plugin2_remove_ = plugin;
                 showRemoveConfirmation = true;
               "
               :disabled="loading"
@@ -487,7 +487,7 @@ export default {
             this.$forceUpdate();
           })
           .catch(e => {
-            this.$emit("message", e);
+            this.$emit("message", e.toString());
             this.$forceUpdate();
           })
           .finally(() => {
@@ -503,7 +503,7 @@ export default {
           p.then(() => {
             this.$forceUpdate();
           }).catch(e => {
-            this.$emit("message", e);
+            this.$emit("message", e.toString());
             this.$forceUpdate();
           });
         }
