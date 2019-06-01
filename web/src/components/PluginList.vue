@@ -54,7 +54,7 @@
               class="md-icon-button md-list-action md-accent"
               v-if="pm && pm.removePlugin && plugin.installed"
               @click="
-                plugin2_remove_ = plugin.conofig;
+                plugin2_remove_ = plugin;
                 showRemoveConfirmation = true;
               "
               :disabled="loading"

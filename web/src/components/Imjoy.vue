@@ -1905,7 +1905,7 @@ export default {
           });
         }
       } catch (e) {
-        this.showMessage(e.toString());
+        this.showMessage(e);
       }
       this.$forceUpdate();
       this.$nextTick(() => {
@@ -2227,11 +2227,11 @@ export default {
           }
         })
         .catch(e => {
-          this.showMessage(e.toString());
+          this.showMessage(e);
         });
     },
     showMessage(info, duration) {
-      assert(typeof info === "string");
+      info = String(info);
       this.snackbar_info = info.slice(0, 120);
       if (duration) {
         duration = duration * 1000;
@@ -2496,7 +2496,7 @@ export default {
       mw.target._workflow_id = mw.target._workflow_id || "workflow_" + randId();
       joy.workflow.execute(mw.target).catch(e => {
         console.error(e);
-        this.showMessage((e && e.toString()) || "Error.", 12);
+        this.showMessage(e || "Error.", 12);
       });
     },
     loadWorkflow(w) {
@@ -2579,10 +2579,7 @@ export default {
           this.progress = 100;
         })
         .catch(e => {
-          this.showMessage(
-            "<" + op.name + ">" + ((e && e.toString()) || "Error."),
-            15
-          );
+          this.showMessage("<" + op.name + ">" + (e || "Error."), 15);
         });
 
       if (this.screenWidth <= 800) {
@@ -2604,6 +2601,7 @@ export default {
 
     //#################ImJoy API functions##################
     showSnackbar(_plugin, msg, duration) {
+      msg = String(msg);
       this.snackbar_info = msg;
       if (duration) {
         duration = duration * 1000;
@@ -2908,7 +2906,7 @@ export default {
       // this.$forceUpdate()
     },
     showStatus(_plugin, s) {
-      this.status_text = s;
+      this.status_text = String(s);
       // this.$forceUpdate()
     },
     showDialog(_plugin, config) {
@@ -2968,10 +2966,10 @@ export default {
       } else if (typeof text === "object") {
         this.alert_config.title = text.title;
         this.alert_config.content =
-          sanitizer.sanitizeString(text.content) || "undefined";
+          sanitizer.sanitizeString(String(text.content)) || "undefined";
         this.alert_config.confirm_text = text.confirm_text || "OK";
       } else {
-        this.alert_config.content = "undefined";
+        this.alert_config.content = String(text);
       }
 
       this.alert_config.show = true;
@@ -2989,7 +2987,7 @@ export default {
         } else if (typeof text === "object") {
           this.prompt_config.title = text.title;
           this.prompt_config.content =
-            sanitizer.sanitizeString(text.content) || "undefined";
+            sanitizer.sanitizeString(String(text.content)) || "undefined";
           this.prompt_config.placeholder = text.placeholder || null;
           this.prompt_config.cancel_text = text.cancel_text || "Cancel";
           this.prompt_config.confirm_text = text.confirm_text || "OK";
@@ -3017,7 +3015,7 @@ export default {
         } else if (typeof text === "object") {
           this.confirm_config.title = text.title;
           this.confirm_config.content =
-            sanitizer.sanitizeString(text.content) || "undefined";
+            sanitizer.sanitizeString(String(text.content)) || "undefined";
           this.confirm_config.cancel_text = text.cancel_text || "Cancel";
           this.confirm_config.confirm_text = text.confirm_text || "OK";
         } else {
