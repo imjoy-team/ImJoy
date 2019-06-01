@@ -387,11 +387,13 @@ api.createWindow({name: 'new window', type: 'Image Window', w:7, h:7, data: {ima
 ```
 
 Use the returned object to update the window, or use `onClose` to set a callback
-function which will be called when the window is closed.
+function which will be called when the window is closed. Similarily, `onResize` can be used to set callbacks which will be called when the window size is changed.
 
 To close the created window, call `win.close()`.
 
 To scroll to the window in the ImJoy workspace, call `win.focus()`.
+
+Inside the window plugin, `this.close`, `this.onClose`, `this.focus`, `this.resize`, `this.onResize` can be used.
 
 <!-- tabs:start -->
 
@@ -857,17 +859,6 @@ Log a an image file.
 ```javascript
 api.log({type: 'image', value: 'https://imjoy.io/static/img/imjoy-icon.png' })
 ```
-
-### api.onClose
-```javascript
-api.onClose(callback_func)
-```
-
-Set a callback function to the current plugin which will be called when terminating the plugin.
-
-**Arguments**
-
-* **callback_func**: Function. The callback function to be called during plugin termination.
 
 
 ### api.progress
