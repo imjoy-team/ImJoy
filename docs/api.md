@@ -387,7 +387,7 @@ api.createWindow({name: 'new window', type: 'Image Window', w:7, h:7, data: {ima
 ```
 
 Use the returned object to update the window, or use `onClose` to set a callback
-function which will be called when the window is closed. Similarily, `onResize` can be used to set callbacks which will be called when the window size is changed.
+function which will be called when the window is closed. Similarly, `onResize` can be used to set callbacks which will be called when the window size is changed.
 
 To close the created window, call `win.close()`.
 
