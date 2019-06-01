@@ -487,7 +487,7 @@ export default {
             this.$forceUpdate();
           })
           .catch(e => {
-            this.$emit("message", e.toString());
+            this.$emit("message", e);
             this.$forceUpdate();
           })
           .finally(() => {
@@ -503,7 +503,7 @@ export default {
           p.then(() => {
             this.$forceUpdate();
           }).catch(e => {
-            this.$emit("message", e.toString());
+            this.$emit("message", e);
             this.$forceUpdate();
           });
         }
