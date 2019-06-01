@@ -2231,7 +2231,7 @@ export default {
         });
     },
     showMessage(info, duration) {
-      info = String(info)
+      info = String(info);
       this.snackbar_info = info.slice(0, 120);
       if (duration) {
         duration = duration * 1000;
@@ -2604,7 +2604,7 @@ export default {
 
     //#################ImJoy API functions##################
     showSnackbar(_plugin, msg, duration) {
-      msg = String(msg)
+      msg = String(msg);
       this.snackbar_info = msg;
       if (duration) {
         duration = duration * 1000;
