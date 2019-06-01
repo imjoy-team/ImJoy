@@ -146,7 +146,6 @@ export class WindowManager {
   addWindow(w) {
     return new Promise((resolve, reject) => {
       try {
-        w.onClose = w.onClose || function() {};
         w.id = w.id || w.name + randId();
         w.loaders = this.getDataLoaders(w.data);
         this.generateGridPosition(w);
