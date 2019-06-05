@@ -23,7 +23,7 @@
 
 <script>
 import { default as Comparify } from "./Comparify.vue";
-import { setTimeout } from 'timers';
+import { setTimeout } from "timers";
 
 export default {
   name: "image-compare-window",
@@ -47,15 +47,15 @@ export default {
   },
   mounted() {
     this.w.onResize(() => {
-      setTimeout(()=>{
+      setTimeout(() => {
         this.$refs.compare.handleResize();
-      },0)
+      }, 0);
     });
-    this.w.onRefresh(()=>{
-      setTimeout(()=>{
+    this.w.onRefresh(() => {
+      setTimeout(() => {
         this.$refs.compare.handleResize();
-      },0)
-    })
+      }, 0);
+    });
   },
 };
 </script>
