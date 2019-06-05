@@ -730,6 +730,7 @@ export class PluginManager {
     config.uri = uri;
     config.origin = uri;
     config.scoped_plugins = scoped_plugins;
+    config.tag = selected_tag;
     return config;
   }
 
