@@ -27,11 +27,6 @@
         <span
           v-else-if="status_text && status_text.length"
           class="status-text"
-          :style="{
-            'max-width': menuVisible
-              ? 'calc( 100vw - 550px) !important'
-              : 'calc(100vw - 350px) !important',
-          }"
           @click="showAlert(null, status_text)"
           :class="
             status_text.includes('rror') || status_text.includes('Traceback')
@@ -47,7 +42,7 @@
           >Deploying Deep Learning Made Easy!</span
         >
 
-        <div class="md-toolbar-section-end">
+        <div class="md-toolbar-section-end menubar-icons">
           <md-button
             class="md-icon-button md-accent"
             v-if="wm.selected_window && wm.selected_window.standalone"
@@ -3271,6 +3266,12 @@ button.md-speed-dial-target {
   height: 100%;
   max-height: 100%;
 }
+.menubar-icons {
+  display: inline-flex;
+  position: absolute;
+  right: 0;
+  background-color: rgba(245, 245, 245, 0.8);
+}
 
 .status-text {
   font-size: 0.95em;
@@ -3283,7 +3284,7 @@ button.md-speed-dial-target {
   text-overflow: ellipsis;
   white-space: nowrap;
   margin-top: 10px;
-  max-width: calc(100vw - 300px);
+  max-width: 100vw;
 }
 
 .centered-button {
