@@ -178,8 +178,8 @@ body {
   .md-dialog-content {
     margin-bottom: 5px !important;
   }
-  .md-dialog-title{
-    margin-bottom: 5px!important;
+  .md-dialog-title {
+    margin-bottom: 5px !important;
   }
 }
 
@@ -187,7 +187,7 @@ body {
   margin-bottom: 20px;
 }
 
-.md-dialog-title{
+.md-dialog-title {
   margin-bottom: 20px;
 }
 
