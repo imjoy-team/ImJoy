@@ -3289,7 +3289,7 @@ button.md-speed-dial-target {
   text-overflow: ellipsis;
   white-space: nowrap;
   margin-top: 10px;
-  max-width: calc( 100vw - 300px);
+  max-width: calc(100vw - 300px);
 }
 
 .centered-button {
