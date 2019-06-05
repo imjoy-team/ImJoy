@@ -32,7 +32,6 @@ import { Joy } from "./joy";
 
 import Ajv from "ajv";
 const ajv = new Ajv();
-import Vue from "vue";
 
 export class PluginManager {
   constructor({
@@ -1912,23 +1911,26 @@ export class PluginManager {
           resolve(window_plugin_apis);
         } else {
           this.wm.addWindow(wconfig).then(wid => {
-            const window_plugin_apis = {
-              __jailed_type__: "plugin_api",
-              __id__: wid,
-              run: new_config => {
-                for (let k in new_config) {
-                  wconfig[k] = new_config[k];
-                }
-              },
-              focus: wconfig.focus,
-              close: wconfig.close,
-              onClose: wconfig.onClose,
-              refresh: wconfig.refresh,
-              onRefresh: wconfig.onRefresh,
-              resize: wconfig.resize,
-              onResize: wconfig.onResize,
-            };
-            resolve(window_plugin_apis);
+            setTimeout(() => {
+              wconfig.refresh();
+              const window_plugin_apis = {
+                __jailed_type__: "plugin_api",
+                __id__: wid,
+                run: new_config => {
+                  for (let k in new_config) {
+                    wconfig[k] = new_config[k];
+                  }
+                },
+                focus: wconfig.focus,
+                close: wconfig.close,
+                onClose: wconfig.onClose,
+                refresh: wconfig.refresh,
+                onRefresh: wconfig.onRefresh,
+                resize: wconfig.resize,
+                onResize: wconfig.onResize,
+              };
+              resolve(window_plugin_apis);
+            }, 0);
           });
         }
       } else {
@@ -1969,9 +1971,10 @@ export class PluginManager {
         }
         if (pconfig.window_container) {
           this.wm.setupCallbacks(wconfig);
-          Vue.nextTick(() => {
+          setTimeout(() => {
             this.renderWindow(pconfig)
               .then(wplugin => {
+                pconfig.refresh();
                 pconfig.onClose(async () => {
                   await wplugin.terminate();
                 });
@@ -1979,25 +1982,27 @@ export class PluginManager {
                 resolve(wplugin.api);
               })
               .catch(reject);
-          });
+          }, 0);
         } else {
           this.wm.addWindow(pconfig).then(() => {
             pconfig.loading = true;
-            pconfig.refresh();
-            this.renderWindow(pconfig)
-              .then(wplugin => {
-                pconfig.onClose(async () => {
-                  await wplugin.terminate();
+            setTimeout(() => {
+              pconfig.refresh();
+              this.renderWindow(pconfig)
+                .then(wplugin => {
+                  pconfig.onClose(async () => {
+                    await wplugin.terminate();
+                  });
+                  pconfig.loading = false;
+                  pconfig.refresh();
+                  resolve(wplugin.api);
+                })
+                .catch(e => {
+                  pconfig.loading = false;
+                  pconfig.refresh();
+                  reject(e);
                 });
-                pconfig.loading = false;
-                pconfig.refresh();
-                resolve(wplugin.api);
-              })
-              .catch(e => {
-                pconfig.loading = false;
-                pconfig.refresh();
-                reject(e);
-              });
+            }, 0);
           });
         }
       }

@@ -2939,7 +2939,7 @@ export default {
             };
           }
           this.showPluginDialog = true;
-          this.$nextTick(() => {
+          setTimeout(() => {
             this.createWindow(config)
               .then(api => {
                 const _close = api.close;
@@ -2952,7 +2952,7 @@ export default {
                 resolve(api);
               })
               .catch(reject);
-          });
+          }, 0);
         } else {
           this.showMessage("Unsupported dialog type.");
         }
