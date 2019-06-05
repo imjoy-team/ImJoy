@@ -107,7 +107,7 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 .about {
-  padding: 40px;
+  padding: 10px 30px;
   overflow-y: auto !important;
   max-width: 800px;
   position: absolute;
