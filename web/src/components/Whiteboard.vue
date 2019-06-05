@@ -403,18 +403,6 @@ export default {
   white-space: nowrap;
 }
 
-.plugin-iframe-container {
-  display: flex;
-  width: 100%;
-  height: calc(100% - 40px);
-  flex-direction: column;
-  overflow: hidden;
-  padding-left: 2px;
-  padding-right: 2px;
-  padding-top: 2px;
-  padding-bottom: 2px;
-}
-
 .allow-scroll {
   overflow: auto !important;
 }
@@ -426,15 +414,6 @@ export default {
 .iframe-load-button {
   width: 100%;
   height: 100%;
-}
-
-.plugin-iframe {
-  width: 100%;
-  height: 100%;
-  margin: 0;
-  padding: 0;
-  flex-grow: 1;
-  border: none;
 }
 
 .overlay {

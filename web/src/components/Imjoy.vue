@@ -25,7 +25,7 @@
           Drop files to the workspace.
         </md-button>
         <span
-          v-else-if="status_text && status_text.length"
+          v-else-if="screenWidth > 500 && status_text && status_text.length"
           class="status-text"
           :style="{
             'max-width': menuVisible
