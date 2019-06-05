@@ -23,9 +23,9 @@
           <md-icon style="margin: 16px;">add</md-icon>
           <span>Add Plugin Engine 🚀</span>
         </md-menu-item>
-        <div v-for="engine in engineManager.engines" :key="engine.url">
+        <template v-for="engine in engineManager.engines">
           <!-- <md-divider></md-divider> -->
-          <md-menu-item v-if="engine.connected" @click="showInfo(engine)">
+          <md-menu-item @click="showInfo(engine)" :key="engine.url">
             <md-button
               v-if="
                 engine.show_processes &&
@@ -33,31 +33,35 @@
                   engine.plugin_processes.length > 0
               "
               @click.stop="hide(engine)"
-              class="md-icon-button md-primary"
+              class="md-icon-button md-primary median-icon-button"
             >
               <md-icon>remove</md-icon>
             </md-button>
             <md-button
               v-else
               @click.stop="expand(engine)"
-              class="md-icon-button md-primary md-raised median-icon-button"
+              class="md-icon-button  median-icon-button"
+              :class="engine.connected?'md-primary md-raised': ''"
+              :disabled="!engine.connected"
             >
-              <md-icon>autorenew</md-icon>
+              <md-icon v-if="engine.connected">autorenew</md-icon>
+              <md-icon v-else>sync_disabled</md-icon>
               <md-tooltip
                 >Show plugin processes or terminal of the engine.</md-tooltip
               >
             </md-button>
             <span>&nbsp;{{ engine.name }}</span>
           </md-menu-item>
-          <md-menu-item v-else @click.stop="engine.connect(false)">
+          <!-- <md-menu-item v-else @click.stop="engine.connect(false)" :key="engine.url">
             <md-icon>sync_disabled</md-icon> {{ engine.name }}
             <md-tooltip>Connect to {{ engine.name }} </md-tooltip>
-          </md-menu-item>
-          <div v-if="engine.connected && engine.show_processes">
-            <md-divider></md-divider>
+          </md-menu-item> -->
+          <template v-if="engine.connected && engine.show_processes">
+            <md-divider :key="engine.url+'_start_divider'"></md-divider>
             <md-menu-item
               v-show="engine.plugin_processes"
               @click="startTerminal(engine)"
+              :key="engine.url+'_start_terminal'"
             >
               &nbsp;&nbsp;<md-button class="md-icon-button">
                 <md-icon>code</md-icon>
@@ -77,12 +81,12 @@
               </md-button>
               {{ p.name }} (#{{ p.pid }})
             </md-menu-item>
-            <md-menu-item v-if="!engine.plugin_processes">
+            <md-menu-item v-if="!engine.plugin_processes" :key="engine.url+'_processes'">
               <md-button>
                 <div class="loading loading-lg"></div>
               </md-button>
             </md-menu-item>
-            <md-menu-item :disabled="true" v-if="engine.plugin_num > 1">
+            <md-menu-item :disabled="true" v-if="engine.plugin_num > 1" :key="engine.url+'_running_plugins'">
               &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;<span
                 >Running Plugins: {{ engine.plugin_num }}
               </span>
@@ -94,9 +98,9 @@
                 <md-tooltip>Kill all the running plugins</md-tooltip>
               </md-button>
             </md-menu-item>
-            <md-divider></md-divider>
-          </div>
-        </div>
+            <md-divider :key="engine.url+'_end_divider'"></md-divider>
+          </template>
+        </template>
       </md-menu-content>
     </md-menu>
     <md-dialog
