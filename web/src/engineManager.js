@@ -113,15 +113,26 @@ export class Engine {
 
       //if(!auto) {this.show_engine_callback(true, this)}
 
+      const set_disconnected = () => {
+        //disconnect immediately
+        this.socket = null;
+        this.connected = false;
+        this.event_bus.$emit("engine_disconnected", this);
+        this.connection = "Disconnected.";
+        this.update_ui_callback();
+      };
+
       socket.on("connect", () => {
         if (this.connection_lost_timer) {
           clearTimeout(this.connection_lost_timer);
           this.connection_lost_timer = null;
-
           //return if it's the same session
           if (this.socket_id === socket.id) {
             this.showMessage(`Connection to ${this.name} has been recovered`);
             return;
+          } else {
+            // set disconnected first
+            set_disconnected();
           }
         }
 
@@ -204,12 +215,7 @@ export class Engine {
           }
         }
         if (this.disconnecting) {
-          //disconnect immediately
-          this.socket = null;
-          this.connected = false;
-          this.event_bus.$emit("engine_disconnected", this);
-          this.connection = "Disconnected.";
-          this.update_ui_callback();
+          set_disconnected();
         } else {
           //wait for 10s to see if it recovers
           this.connection_lost_timer = setTimeout(() => {
