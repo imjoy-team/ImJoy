@@ -268,7 +268,7 @@
         :md-active.sync="menuVisible"
         @md-closed="wm.resizeAll()"
         @md-opened="wm.resizeAll()"
-        :md-persistent="screenWidth > 800 ? 'full' : 'card'"
+        :md-persistent="screenWidth > 800 ? 'full' : null"
         :md-swipeable="screenWidth > 600 ? false : true"
       >
         <div class="md-toolbar-row title-bar">
@@ -468,7 +468,9 @@
                     plugin.config.icon
                   }}</md-icon>
                   <md-icon v-else>extension</md-icon>
-                  <md-tooltip>{{ plugin.config.description }}</md-tooltip>
+                  <md-tooltip>{{
+                    plugin.name + ": " + plugin.config.description
+                  }}</md-tooltip>
                 </md-button>
                 <md-menu-content>
                   <md-menu-item @click="showDoc(plugin.id)">
@@ -667,7 +669,9 @@
                       plugin.config.icon
                     }}</md-icon>
                     <md-icon v-else>extension</md-icon>
-                    <md-tooltip>{{ plugin.config.description }}</md-tooltip>
+                    <md-tooltip>{{
+                      plugin.name + ": " + plugin.config.description
+                    }}</md-tooltip>
                   </md-button>
                   <md-menu-content>
                     <md-menu-item @click="showDoc(plugin.id)">
@@ -2261,6 +2265,9 @@ export default {
         root: "./",
       })
         .then(selection => {
+          if (this.screenWidth <= 800) {
+            this.menuVisible = false;
+          }
           if (!selection) {
             return;
           }
