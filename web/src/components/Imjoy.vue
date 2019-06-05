@@ -27,6 +27,11 @@
         <span
           v-else-if="status_text && status_text.length"
           class="status-text"
+          :style="{
+            'max-width': menuVisible
+              ? 'calc( 100vw - 500px) !important'
+              : 'calc(100vw - 300px) !important',
+          }"
           @click="showAlert(null, status_text)"
           :class="
             status_text.includes('rror') || status_text.includes('Traceback')
@@ -3284,7 +3289,7 @@ button.md-speed-dial-target {
   text-overflow: ellipsis;
   white-space: nowrap;
   margin-top: 10px;
-  max-width: 100vw;
+  max-width: calc( 100vw - 300px);
 }
 
 .centered-button {
