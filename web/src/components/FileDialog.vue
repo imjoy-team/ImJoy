@@ -28,12 +28,7 @@
         {{ engine.name }}
       </md-button>
       <div class="loading-info">
-        <h3 v-if="dropping">Drop files to upload to {{ root }}</h3>
-        <md-progress-bar
-          md-mode="determinate"
-          v-if="loading"
-          :md-value="loading_progress"
-        ></md-progress-bar>
+        <h5 v-if="dropping">Drop files to upload to {{ root }}</h5>
       </div>
       <ul
         :disabled="!selected_engine || !selected_engine.connected"
@@ -59,6 +54,7 @@
         No plugin engine is available.
       </p>
     </md-dialog-content>
+
     <md-dialog-actions>
       <md-menu style="flex: auto;" v-if="!this.loading">
         <md-button class="md-button md-primary" md-menu-trigger>
@@ -109,6 +105,11 @@
         >Cancel</md-button
       >
     </md-dialog-actions>
+    <md-progress-bar
+      md-mode="determinate"
+      v-show="loading"
+      :md-value="loading_progress"
+    ></md-progress-bar>
   </md-dialog>
 </template>
 <script>
@@ -199,7 +200,7 @@ export default {
       this.status_text = `file uploaded to ${ret.path}.`;
     },
     async uploadFiles(files) {
-      this.status_text = "uploading...";
+      this.status_text = "Uploading...";
       this.loading = true;
       try {
         for (let i = 0; i < files.length; i++) {
@@ -209,7 +210,7 @@ export default {
           }
           await this.upload(
             files[i],
-            `uploading ${i + 1}/${files.length}: ${files[i].name}`
+            `Uploading ${i + 1}/${files.length}: ${files[i].name}`
           );
         }
       } catch (e) {

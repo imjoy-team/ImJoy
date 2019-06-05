@@ -3359,7 +3359,10 @@ button.md-speed-dial-target {
     padding: 10px;
   }
 }
-
+.md-snackbar-content {
+  overflow: hidden;
+  max-width: 680px;
+}
 .md-snackbar-content > button {
   position: absolute;
   right: 10px;
