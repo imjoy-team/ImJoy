@@ -2,51 +2,51 @@
   <div class="imjoy noselect">
     <md-app>
       <md-app-toolbar class="md-dense" md-elevation="0">
- 
-          <md-button
-            v-if="!menuVisible"
-            class="md-primary md-icon-button"
-            @click="menuVisible = true"
-          >
-            <md-icon>menu</md-icon>
-          </md-button>
-          <md-button
-            @click="$router.push('/')"
-            v-if="!menuVisible"
-            class="md-small-hide site-title-small"
-          >
-            <img
-              class="site-title-small"
-              src="static/img/imjoy-logo-black.svg"
-              alt="ImJoy"
-            />
-            <md-tooltip>ImJoy home</md-tooltip>
-          </md-button>
-          <md-button v-if="workspace_dropping">
-            Drop files to the workspace.
-          </md-button>
-          <span
-            v-else-if="status_text && status_text.length"
-            class="status-text"
-            :style="{
-              'max-width': menuVisible? 'calc( 100vw - 500px) !important': 'calc(100vw - 350px) !important',
-            }"
-            @click="showAlert(null, status_text)"
-            :class="
-              status_text.includes('rror') || status_text.includes('Traceback')
-                ? 'error-message'
-                : ''
-            "
-          >
-            {{
-              status_text.slice(0, 200) +
-                (status_text.length > 200 ? "..." : "")
-            }}
-          </span>
-          <span class="subheader-title md-medium-hide" style="flex: 1" v-else
-            >Deploying Deep Learning Made Easy!</span
-          >
-  
+        <md-button
+          v-if="!menuVisible"
+          class="md-primary md-icon-button"
+          @click="menuVisible = true"
+        >
+          <md-icon>menu</md-icon>
+        </md-button>
+        <md-button
+          @click="$router.push('/')"
+          v-if="!menuVisible"
+          class="md-small-hide site-title-small"
+        >
+          <img
+            class="site-title-small"
+            src="static/img/imjoy-logo-black.svg"
+            alt="ImJoy"
+          />
+          <md-tooltip>ImJoy home</md-tooltip>
+        </md-button>
+        <md-button v-if="workspace_dropping">
+          Drop files to the workspace.
+        </md-button>
+        <span
+          v-else-if="status_text && status_text.length"
+          class="status-text"
+          :style="{
+            'max-width': menuVisible
+              ? 'calc( 100vw - 500px) !important'
+              : 'calc(100vw - 350px) !important',
+          }"
+          @click="showAlert(null, status_text)"
+          :class="
+            status_text.includes('rror') || status_text.includes('Traceback')
+              ? 'error-message'
+              : ''
+          "
+        >
+          {{
+            status_text.slice(0, 200) + (status_text.length > 200 ? "..." : "")
+          }}
+        </span>
+        <span class="subheader-title md-medium-hide" style="flex: 1" v-else
+          >Deploying Deep Learning Made Easy!</span
+        >
+
         <div class="md-toolbar-section-end">
           <md-button
             class="md-icon-button md-accent"
