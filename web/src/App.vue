@@ -84,10 +84,10 @@ body {
 
 @media screen and (max-height: 800px) and (pointer: fine) {
   .md-list-item-content {
-    padding: 0px 10px!important;
+    padding: 0px 10px !important;
     min-height: 36px;
   }
-  .md-list-item{
+  .md-list-item {
     padding: 0px 0px !important;
   }
 }

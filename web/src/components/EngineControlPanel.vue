@@ -41,7 +41,7 @@
               v-else
               @click.stop="expand(engine)"
               class="md-icon-button  median-icon-button"
-              :class="engine.connected?'md-primary md-raised': ''"
+              :class="engine.connected ? 'md-primary md-raised' : ''"
               :disabled="!engine.connected"
             >
               <md-icon v-if="engine.connected">autorenew</md-icon>
@@ -57,11 +57,11 @@
             <md-tooltip>Connect to {{ engine.name }} </md-tooltip>
           </md-menu-item> -->
           <template v-if="engine.connected && engine.show_processes">
-            <md-divider :key="engine.url+'_start_divider'"></md-divider>
+            <md-divider :key="engine.url + '_start_divider'"></md-divider>
             <md-menu-item
               v-show="engine.plugin_processes"
               @click="startTerminal(engine)"
-              :key="engine.url+'_start_terminal'"
+              :key="engine.url + '_start_terminal'"
             >
               &nbsp;&nbsp;<md-button class="md-icon-button">
                 <md-icon>code</md-icon>
@@ -81,12 +81,19 @@
               </md-button>
               {{ p.name }} (#{{ p.pid }})
             </md-menu-item>
-            <md-menu-item v-if="!engine.plugin_processes" :key="engine.url+'_processes'">
+            <md-menu-item
+              v-if="!engine.plugin_processes"
+              :key="engine.url + '_processes'"
+            >
               <md-button>
                 <div class="loading loading-lg"></div>
               </md-button>
             </md-menu-item>
-            <md-menu-item :disabled="true" v-if="engine.plugin_num > 1" :key="engine.url+'_running_plugins'">
+            <md-menu-item
+              :disabled="true"
+              v-if="engine.plugin_num > 1"
+              :key="engine.url + '_running_plugins'"
+            >
               &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;<span
                 >Running Plugins: {{ engine.plugin_num }}
               </span>
@@ -98,7 +105,7 @@
                 <md-tooltip>Kill all the running plugins</md-tooltip>
               </md-button>
             </md-menu-item>
-            <md-divider :key="engine.url+'_end_divider'"></md-divider>
+            <md-divider :key="engine.url + '_end_divider'"></md-divider>
           </template>
         </template>
       </md-menu-content>
