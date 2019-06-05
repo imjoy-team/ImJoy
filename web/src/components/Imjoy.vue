@@ -855,7 +855,7 @@
           ><md-icon>clear</md-icon></md-button
         >
       </md-dialog-actions>
-      <md-dialog-content>
+      <md-dialog-content class="position-relative">
         <div v-if="plugin_dialog_config && plugin_dialog_config.ui">
           <joy
             :config="plugin_dialog_config"
@@ -874,6 +874,7 @@
               ? 'fullscreen-dialog'
               : 'normal-dialog'
           "
+          class="window-dialog-container-position"
         >
           <window
             v-if="plugin_dialog_window_config"
@@ -3423,5 +3424,17 @@ button.md-speed-dial-target {
   padding: 0;
   flex-grow: 1;
   border: none;
+}
+
+.position-relative {
+  position: relative;
+}
+
+.window-dialog-container-position {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
 }
 </style>
