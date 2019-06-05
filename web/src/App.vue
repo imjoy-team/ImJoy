@@ -160,6 +160,7 @@ body {
   max-width: 100% !important;
   overflow: auto;
   -webkit-transform: translateZ(0);
+  overflow-wrap: break-word;
 }
 
 @media screen and (max-width: 500px) {

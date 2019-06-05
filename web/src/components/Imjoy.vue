@@ -30,18 +30,18 @@
           :style="{
             'max-width': menuVisible
               ? 'calc( 100vw - 500px) !important'
-              : 'calc(100vw - 300px) !important',
+              : 'calc(100vw - 250px) !important',
           }"
           @click="showAlert(null, status_text)"
           :class="
-            status_text.includes('rror') || status_text.includes('Traceback')
+            status_text.includes('rror') ||
+            status_text.includes('Traceback') ||
+            status_text.includes('Fail')
               ? 'error-message'
               : ''
           "
         >
-          {{
-            status_text.slice(0, 200) + (status_text.length > 200 ? "..." : "")
-          }}
+          {{ status_text }}
         </span>
         <span class="subheader-title md-medium-hide" style="flex: 1" v-else
           >Deploying Deep Learning Made Easy!</span
@@ -786,7 +786,7 @@
       :md-active.sync="show_snackbar"
       :md-duration="snackbar_duration"
     >
-      <span>{{ snackbar_info }}</span>
+      <span @click="showAlert(null, snackbar_info)">{{ snackbar_info }}</span>
       <md-button class="md-accent" @click="show_snackbar = false"
         >close</md-button
       >
@@ -2241,7 +2241,7 @@ export default {
     },
     showMessage(info, duration) {
       info = String(info);
-      this.snackbar_info = info.slice(0, 120);
+      this.snackbar_info = info;
       if (duration) {
         duration = duration * 1000;
       }
@@ -3276,9 +3276,11 @@ button.md-speed-dial-target {
   position: absolute;
   right: 0;
   background-color: rgba(245, 245, 245, 0.8);
+  z-index: 1;
 }
 
 .status-text {
+  color: #2727ca;
   font-size: 0.95em;
   font-weight: 500;
   cursor: pointer;
@@ -3290,6 +3292,26 @@ button.md-speed-dial-target {
   white-space: nowrap;
   margin-top: 10px;
   max-width: calc(100vw - 300px);
+}
+
+@media screen and (max-width: 700px) {
+  .md-snackbar {
+    padding: 10px;
+  }
+}
+
+.md-snackbar-content > button {
+  position: absolute;
+  right: 10px;
+  top: 15px;
+  background-color: rgba(10, 10, 10, 0.6);
+}
+
+.md-snackbar-content > span {
+  white-space: nowrap;
+  overflow: hidden;
+  max-width: 100%;
+  text-overflow: ellipsis;
 }
 
 .centered-button {
