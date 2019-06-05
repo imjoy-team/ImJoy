@@ -3341,7 +3341,7 @@ button.md-speed-dial-target {
 }
 
 .status-text {
-  color: #2727ca;
+  color: #0060ff;
   font-size: 0.95em;
   font-weight: 500;
   cursor: pointer;
@@ -3351,7 +3351,6 @@ button.md-speed-dial-target {
   display: inline-block;
   text-overflow: ellipsis;
   white-space: nowrap;
-  margin-top: 10px;
   max-width: calc(100vw - 300px);
 }
 
