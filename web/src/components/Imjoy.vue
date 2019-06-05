@@ -603,9 +603,12 @@
                   >error</md-icon
                 >
                 <md-icon v-else>info</md-icon>
-                <md-tooltip>{{
-                  plugin._log_history._error || plugin._log_history._info
-                }}</md-tooltip>
+                <md-tooltip
+                  v-if="plugin._log_history._error || plugin._log_history._info"
+                  >{{
+                    plugin._log_history._error || plugin._log_history._info
+                  }}</md-tooltip
+                >
               </md-button>
               <md-button v-else class="md-icon-button md-xsmall-hide" disabled>
               </md-button>

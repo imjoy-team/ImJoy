@@ -20,7 +20,10 @@
       </md-button>
       <md-menu-content class="engine-panel">
         <md-menu-item @click="showAddEngineDialog = true">
-          <md-icon style="margin: 16px;">add</md-icon>
+          <md-button class="md-icon-button md-primary median-icon-button">
+            <md-icon>add</md-icon>
+          </md-button>
+
           <span>Add Plugin Engine 🚀</span>
         </md-menu-item>
         <template v-for="engine in engineManager.engines">
