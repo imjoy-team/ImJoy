@@ -115,7 +115,15 @@
       :md-click-outside-to-close="false"
       :md-close-on-esc="false"
     >
-      <md-dialog-title>New Plugin Engine</md-dialog-title>
+      <md-dialog-title
+        >New Plugin Engine
+        <md-button
+          class="md-accent"
+          style="position:absolute; top:8px; right:5px;"
+          @click="showAddEngineDialog = false"
+          ><md-icon>clear</md-icon></md-button
+        ></md-dialog-title
+      >
       <md-dialog-content>
         <p>
           Python plugins are supported by ImJoy with the ImJoy Plugin Engine.
@@ -182,18 +190,21 @@
           >, and choose the alternative solution.<br />
         </p>
       </md-dialog-content>
-      <md-dialog-actions>
-        <md-button class="md-primary" @click="showAddEngineDialog = false"
-          >OK</md-button
-        >
-      </md-dialog-actions>
     </md-dialog>
     <md-dialog
       :md-active.sync="showEngineInfoDialog"
       :md-click-outside-to-close="true"
       :md-close-on-esc="true"
     >
-      <md-dialog-title>About Plugin Engine</md-dialog-title>
+      <md-dialog-title
+        >About Plugin Engine
+        <md-button
+          class="md-accent"
+          style="position:absolute; top:8px; right:5px;"
+          @click="showEngineInfoDialog = false"
+          ><md-icon>clear</md-icon></md-button
+        ></md-dialog-title
+      >
       <md-dialog-content v-if="selected_engine">
         <h4>
           <a :href="selected_engine.url" target="_blank">
@@ -356,11 +367,6 @@
           </ul>
         </div>
       </md-dialog-content>
-      <md-dialog-actions>
-        <md-button class="md-primary" @click="showEngineInfoDialog = false"
-          >OK</md-button
-        >
-      </md-dialog-actions>
     </md-dialog>
   </div>
 </template>

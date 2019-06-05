@@ -4,9 +4,18 @@
     :md-click-outside-to-close="false"
     :md-close-on-esc="false"
   >
-    <md-dialog-title>{{
-      this.options.title || "ImJoy File Dialog"
-    }}</md-dialog-title>
+    <md-dialog-title
+      >{{ this.options.title || "ImJoy File Dialog" }}
+      <md-button
+        class="md-accent"
+        style="position:absolute; top:8px; right:5px;"
+        @click="
+          show_ = false;
+          reject('file dialog canceled by the user.');
+        "
+        ><md-icon>clear</md-icon></md-button
+      >
+    </md-dialog-title>
     <md-dialog-content>
       <md-button
         style="text-transform: none;"

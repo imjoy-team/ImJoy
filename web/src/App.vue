@@ -174,6 +174,16 @@ body {
   }
 }
 
+@media screen and (max-height: 700px) {
+  .md-dialog-content {
+    margin-bottom: 5px!important;
+  }
+}
+
+.md-dialog-content {
+  margin-bottom: 20px;
+}
+
 .md-toolbar.md-dense {
   min-height: 36px;
 }

@@ -911,7 +911,15 @@
       :md-active.sync="showWorkspaceDialog"
       :md-click-outside-to-close="true"
     >
-      <md-dialog-title>Workspace Management</md-dialog-title>
+      <md-dialog-title
+        >Workspace Management
+        <md-button
+          class="md-accent"
+          style="position:absolute; top:8px; right:5px;"
+          @click="showWorkspaceDialog = false"
+          ><md-icon>clear</md-icon>
+        </md-button></md-dialog-title
+      >
       <md-dialog-content>
         <md-toolbar class="md-dense" md-elevation="0">
           <div class="md-toolbar-section-start">
@@ -960,11 +968,6 @@
           </md-list-item>
         </md-list>
       </md-dialog-content>
-      <md-dialog-actions>
-        <md-button class="md-primary" @click="showWorkspaceDialog = false"
-          >OK</md-button
-        >
-      </md-dialog-actions>
     </md-dialog>
     <md-dialog-confirm
       :md-active.sync="showPermissionConfirmation"
@@ -988,15 +991,18 @@
       :md-click-outside-to-close="false"
       :md-close-on-esc="false"
     >
-      <md-dialog-title>About ImJoy</md-dialog-title>
+      <md-dialog-title
+        >About ImJoy
+        <md-button
+          class="md-accent"
+          style="position:absolute; top:8px; right:5px;"
+          @click="showAboutDialog = false"
+          ><md-icon>clear</md-icon>
+        </md-button>
+      </md-dialog-title>
       <md-dialog-content>
         <about></about>
       </md-dialog-content>
-      <md-dialog-actions>
-        <md-button class="md-primary" @click="showAboutDialog = false"
-          >OK</md-button
-        >
-      </md-dialog-actions>
     </md-dialog>
 
     <md-dialog
@@ -1004,9 +1010,20 @@
       :md-active.sync="showAddPluginDialog"
       :md-click-outside-to-close="false"
     >
-      <md-dialog-title>{{
-        plugin4install ? "Plugin Installation" : "ImJoy Plugin Management"
-      }}</md-dialog-title>
+      <md-dialog-title
+        >{{
+          plugin4install ? "Plugin Installation" : "ImJoy Plugin Management"
+        }}
+        <md-button
+          class="md-accent"
+          style="position:absolute; top:8px; right:5px;"
+          @click="
+            showAddPluginDialog = false;
+            clearPluginUrl();
+          "
+          ><md-icon>clear</md-icon></md-button
+        ></md-dialog-title
+      >
       <md-dialog-content>
         <md-card v-if="show_plugin_templates">
           <md-card-header>
@@ -1251,16 +1268,6 @@
           </md-card-content>
         </md-card>
       </md-dialog-content>
-      <md-dialog-actions>
-        <md-button
-          class="md-primary"
-          @click="
-            showAddPluginDialog = false;
-            clearPluginUrl();
-          "
-          >Exit</md-button
-        >
-      </md-dialog-actions>
     </md-dialog>
   </div>
 </template>
