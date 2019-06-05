@@ -121,13 +121,26 @@
           Python plugins are supported by ImJoy with the ImJoy Plugin Engine.
         </p>
         <p>
-          If this is your first time to use ImJoy Plugin Engine, please
-          <a href="https://github.com/oeway/ImJoy-App/releases" target="_blank"
-            >click here</a
+          If you don't have the Plugin Engine, please install it from the ImJoy
+          Desktop App.<br />
+          <md-button
+            class="md-raised"
+            target="_blank"
+            href="https://github.com/oeway/ImJoy-App/releases"
+            >Get ImJoy Desktop App</md-button
           >
-          to download the ImJoy Desktop App. <br />
+        </p>
+        <p>
+          Alternatively, if you have Anaconda or Miniconda installed already,
+          you can run <code>pip install imjoy</code> and start with
+          <code>imjoy</code> command from your teriminal (see
+          <a target="_blank" href="https://github.com/oeway/ImJoy-Engine"
+            >ImJoy-Engine</a
+          >).
+        </p>
+        <p>
           If you have it already, please start the Plugin Engine, and connect to
-          it.<br />
+          it.
         </p>
         <div v-if="!is_mobile_or_tablet">
           <md-radio v-model="url_type" value="localhost">My Computer</md-radio>
