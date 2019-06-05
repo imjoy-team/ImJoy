@@ -268,7 +268,8 @@
         :md-active.sync="menuVisible"
         @md-closed="wm.resizeAll()"
         @md-opened="wm.resizeAll()"
-        md-persistent="full"
+        :md-persistent="screenWidth>800?'full':'card'"
+        :md-swipeable="screenWidth>600?false:true"
       >
         <div class="md-toolbar-row title-bar">
           <div class="md-toolbar-section-start">
