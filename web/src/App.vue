@@ -60,6 +60,7 @@ body {
   overscroll-behavior-y: contain;
   overscroll-behavior-x: none;
   position: fixed;
+  overflow-wrap: break-word;
 }
 
 .md-app {
