@@ -116,7 +116,7 @@
       :md-close-on-esc="false"
     >
       <md-dialog-title
-        >New Plugin Engine
+        >Add New Plugin Engine
         <md-button
           class="md-accent"
           style="position:absolute; top:8px; right:5px;"

@@ -36,6 +36,7 @@
         ></md-progress-bar>
       </div>
       <ul
+        :disabled="!selected_engine || !selected_engine.connected"
         :class="dropping ? 'dropping-files' : ''"
         v-if="selected_engine && file_tree"
       >
@@ -50,9 +51,12 @@
         >
         </file-item>
       </ul>
-      <div class="loading loading-lg" v-else-if="selected_engine"></div>
+      <div
+        class="loading loading-lg"
+        v-else-if="selected_engine && selected_engine.connected"
+      ></div>
       <p v-else>
-        No plugin engine available.
+        No plugin engine is available.
       </p>
     </md-dialog-content>
     <md-dialog-actions>
@@ -138,7 +142,6 @@ export default {
       loading_progress: 0,
     };
   },
-
   created() {
     this.event_bus = this.$root.$data.store && this.$root.$data.store.event_bus;
     if (this.event_bus) {
@@ -154,7 +157,21 @@ export default {
       this.event_bus.$off("drag_upload", this.uploadFiles);
     }
   },
-  computed: {},
+  computed: {
+    no_engine_available: function() {
+      if (!this.engines) return true;
+      else {
+        let engine_available = false;
+        for (let engine of this.engines) {
+          if (engine.connected) {
+            engine_available = true;
+            break;
+          }
+        }
+        return !engine_available;
+      }
+    },
+  },
   methods: {
     async upload(f, progress_text) {
       if (!this.show_) {
