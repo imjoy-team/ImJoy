@@ -2,7 +2,7 @@
   <div class="imjoy noselect">
     <md-app>
       <md-app-toolbar class="md-dense" md-elevation="0">
-        <div class="md-toolbar-section-start">
+ 
           <md-button
             v-if="!menuVisible"
             class="md-primary md-icon-button"
@@ -22,23 +22,31 @@
             />
             <md-tooltip>ImJoy home</md-tooltip>
           </md-button>
-          <md-button v-if="workspace_dropping" class="status-text">
+          <md-button v-if="workspace_dropping">
             Drop files to the workspace.
           </md-button>
-          <md-button
+          <span
             v-else-if="status_text && status_text.length"
-            class="status-text md-small-hide"
+            class="status-text"
+            :style="{
+              'max-width': menuVisible? 'calc( 100vw - 500px) !important': 'calc(100vw - 350px) !important',
+            }"
             @click="showAlert(null, status_text)"
-            :class="status_text.includes('rror') ? 'error-message' : ''"
+            :class="
+              status_text.includes('rror') || status_text.includes('Traceback')
+                ? 'error-message'
+                : ''
+            "
           >
             {{
-              status_text.slice(0, 80) + (status_text.length > 80 ? "..." : "")
+              status_text.slice(0, 200) +
+                (status_text.length > 200 ? "..." : "")
             }}
-          </md-button>
+          </span>
           <span class="subheader-title md-medium-hide" style="flex: 1" v-else
             >Deploying Deep Learning Made Easy!</span
           >
-        </div>
+  
         <div class="md-toolbar-section-end">
           <md-button
             class="md-icon-button md-accent"
@@ -2904,11 +2912,14 @@ export default {
     showProgress(_plugin, p) {
       if (p < 1) this.progress = p * 100;
       else this.progress = p;
-      // this.$forceUpdate()
     },
     showStatus(_plugin, s) {
       this.status_text = String(s);
-      // this.$forceUpdate()
+
+      // fallback to showMessage on small screen
+      if (this.screenWidth < 500) {
+        this.showMessage(s);
+      }
     },
     showDialog(_plugin, config) {
       assert(config, "Please pass config to showDialog.");
@@ -3075,6 +3086,7 @@ export default {
 }
 
 .site-title-small {
+  display: inline-block;
   height: 55px;
 }
 
@@ -3124,8 +3136,6 @@ export default {
 
 @media screen and (max-width: 400px) {
   .md-dialog {
-    width: 100%;
-    height: 100%;
     max-height: 100%;
     max-width: 100%;
   }
@@ -3133,14 +3143,10 @@ export default {
 
 @media screen and (max-width: 800px) {
   .window-dialog {
-    width: 100% !important;
-    height: 100% !important;
     max-width: 100%;
   }
 
   .api-dialog {
-    width: 100% !important;
-    height: 100% !important;
     max-width: 100%;
     max-height: 100%;
   }
@@ -3230,7 +3236,7 @@ export default {
 }
 
 .error-message {
-  color: red;
+  color: red !important;
   user-select: text;
 }
 
@@ -3267,8 +3273,17 @@ button.md-speed-dial-target {
 }
 
 .status-text {
-  text-align: center;
+  font-size: 0.95em;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: left;
   text-transform: none;
+  overflow: hidden;
+  display: inline-block;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-top: 10px;
+  max-width: calc(100vw - 300px);
 }
 
 .centered-button {
