@@ -512,9 +512,12 @@
                   <div v-if="plugin.config.type === 'native-python'">
                     <md-divider></md-divider>
                     <md-menu-item @click="switchEngine(plugin)">
-                      <span v-if="plugin.config.engine_mode === 'auto'">✅</span
-                      ><span v-else>🚀</span
-                      ><span
+                      <md-icon v-if="plugin.config.engine_mode === 'auto'"
+                        >check_box</md-icon
+                      >
+                      <md-icon v-else>check_box_outline_blank</md-icon>
+
+                      <span
                         :class="
                           plugin.config.engine_mode === 'auto' ? 'bold' : ''
                         "
@@ -526,10 +529,16 @@
                       :key="engine.id"
                       @click="switchEngine(plugin, engine)"
                     >
-                      <span v-if="plugin.config.engine_mode === engine.id"
-                        >✅</span
-                      ><span v-else>🚀</span
-                      ><span
+                      <md-icon
+                        v-if="
+                          plugin.config.engine_mode === engine.id ||
+                            (plugin.config.engine &&
+                              plugin.config.engine.id === engine.id)
+                        "
+                        >radio_button_checked</md-icon
+                      >
+                      <md-icon v-else>radio_button_unchecked</md-icon>
+                      <span
                         :class="
                           plugin.config.engine &&
                           plugin.config.engine.id === engine.id
@@ -545,9 +554,11 @@
                       :key="tag"
                       @click="switchTag(plugin, tag)"
                     >
-                      <span v-if="plugin.config.tag === tag">✅</span
-                      ><span v-else>🔖</span
-                      ><span :class="plugin.config.tag === tag ? 'bold' : ''"
+                      <md-icon v-if="plugin.config.tag === tag"
+                        >radio_button_checked</md-icon
+                      >
+                      <md-icon v-else>radio_button_unchecked</md-icon>
+                      <span :class="plugin.config.tag === tag ? 'bold' : ''"
                         >Tag: {{ tag }}</span
                       >
                     </md-menu-item>
@@ -1025,24 +1036,30 @@
         ></md-dialog-title
       >
       <md-dialog-content>
-        <md-card v-if="show_plugin_templates">
-          <md-card-header>
-            <div class="md-title">Create a New Plugin</div>
-          </md-card-header>
-          <md-card-content>
-            <md-button
-              class="md-primary md-raised centered-button"
-              @click="
-                newPlugin(template.code);
-                showAddPluginDialog = false;
-              "
-              v-for="template in plugin_templates"
-              :key="template.name"
-            >
-              <md-icon>add</md-icon>{{ template.name }}
+        <template v-if="show_plugin_templates">
+          <md-menu>
+            <md-button class="md-primary md-raised" md-menu-trigger>
+              <md-icon>add</md-icon>Create a new plugin
+              <md-tooltip>Create a new plugin</md-tooltip>
             </md-button>
-          </md-card-content>
-        </md-card>
+            <md-menu-content>
+              <md-menu-item
+                @click="
+                  newPlugin(template.code);
+                  showAddPluginDialog = false;
+                "
+                v-for="template in plugin_templates"
+                :key="template.name"
+              >
+                <md-icon>{{ template.icon }}</md-icon
+                >{{ template.name }}
+              </md-menu-item>
+            </md-menu-content>
+          </md-menu>
+          <br />
+          <br />
+        </template>
+
         <!-- <md-switch v-if="pm.installed_plugins.length>0 && !plugin4install && !downloading_error && !downloading_plugin" v-model="show_installed_plugins">Show Installed Plugins</md-switch> -->
         <!-- <md-card v-if="show_installed_plugins">
         <md-card-header>
@@ -1229,7 +1246,7 @@
             ></plugin-editor>
           </md-card-content>
         </md-card>
-        <md-card v-if="show_plugin_store">
+        <md-card v-show="show_plugin_store">
           <md-card-header>
             <div class="md-title">Install from the plugin repository</div>
             <md-chips
@@ -1495,11 +1512,28 @@ export default {
       _id: "IMJOY_APP",
     };
     this.plugin_templates = [
-      { name: "Web Worker (JS)", code: WEB_WORKER_PLUGIN_TEMPLATE },
-      { name: "Window (HTML/CSS/JS)", code: WINDOW_PLUGIN_TEMPLATE },
-      { name: "Native Python 🚀", code: NATIVE_PYTHON_PLUGIN_TEMPLATE },
+      {
+        name: "Default template",
+        code: WEB_WORKER_PLUGIN_TEMPLATE,
+        icon: "code",
+      },
+      {
+        name: "Web Worker (JS)",
+        code: WEB_WORKER_PLUGIN_TEMPLATE,
+        icon: "swap_horiz",
+      },
+      {
+        name: "Window (HTML/CSS/JS)",
+        code: WINDOW_PLUGIN_TEMPLATE,
+        icon: "picture_in_picture",
+      },
+      {
+        name: "Native Python",
+        code: NATIVE_PYTHON_PLUGIN_TEMPLATE,
+        icon: "🚀",
+      },
       // {name: "Iframe(Javascript)", code: IFRAME_PLUGIN_TEMPLATE},
-      { name: "Web Python 🐍", code: WEB_PYTHON_PLUGIN_TEMPLATE },
+      { name: "Web Python", code: WEB_PYTHON_PLUGIN_TEMPLATE, icon: "🐍" },
     ];
     this.workflow_joy_config = {
       expanded: true,
@@ -3155,8 +3189,16 @@ export default {
 
 @media screen and (max-width: 400px) {
   .md-dialog {
+    width: 100% !important;
     max-height: 100%;
     max-width: 100%;
+  }
+}
+
+@media screen and (max-width: 700px) {
+  .plugin-dialog {
+    width: 100% !important;
+    max-width: 100% !important;
   }
 }
 
