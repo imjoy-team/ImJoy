@@ -29,7 +29,7 @@
           class="status-text"
           :style="{
             'max-width': menuVisible
-              ? 'calc( 100vw - 500px) !important'
+              ? 'calc( 100vw - 550px) !important'
               : 'calc(100vw - 350px) !important',
           }"
           @click="showAlert(null, status_text)"
