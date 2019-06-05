@@ -1643,7 +1643,11 @@ export default {
     });
 
     this.updateSize({ width: window.innerWidth });
-
+    if (this.screenWidth > 800) {
+      this.wm.window_mode = "grid";
+    } else {
+      this.wm.window_mode = "single";
+    }
     this.is_https_mode = "https:" === location.protocol;
     // Make sure the GUI is refreshed
     setInterval(() => {
@@ -2055,10 +2059,10 @@ export default {
     updateSize(e) {
       this.screenWidth = e.width;
       if (this.screenWidth > 800) {
-        this.wm.window_mode = "grid";
+        if (this.wm.windows.length === 0) this.wm.window_mode = "grid";
         this.max_window_buttons = 9;
       } else {
-        this.wm.window_mode = "single";
+        if (this.wm.windows.length === 0) this.wm.window_mode = "single";
         this.max_window_buttons = parseInt(this.screenWidth / 36 - 4);
         if (this.max_window_buttons > 9) this.max_window_buttons = 9;
       }

@@ -146,7 +146,7 @@ export default {
         this.refresh();
       });
       this.w.focus = () => {
-        this.$el.scrollIntoView(true);
+        if (!this.w.standalone) this.$el.scrollIntoView(true);
       };
       if (this.w.fullscreen) {
         this.fullScreen(this.w);
@@ -162,7 +162,7 @@ export default {
         this.refresh();
       });
       this.w.focus = () => {
-        this.$el.scrollIntoView(true);
+        if (!this.w.standalone) this.$el.scrollIntoView(true);
       };
       this.w.focus();
       if (this.w.fullscreen) {
