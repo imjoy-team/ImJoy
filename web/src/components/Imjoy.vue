@@ -473,6 +473,19 @@
                   }}</md-tooltip>
                 </md-button>
                 <md-menu-content>
+                  <md-menu-item
+                    @click="showLog(plugin)"
+                    v-if="
+                      plugin._log_history &&
+                        plugin._log_history.length > 0 &&
+                        screenWidth <= 400
+                    "
+                  >
+                    <md-icon v-if="plugin._log_history._error" class="red"
+                      >error_outline</md-icon
+                    >
+                    <md-icon v-else>info</md-icon>Log
+                  </md-menu-item>
                   <md-menu-item @click="showDoc(plugin.id)">
                     <md-icon>description</md-icon>Docs
                   </md-menu-item>
@@ -595,12 +608,16 @@
               </md-button>
               <div class="floating-right-buttons">
                 <md-button
-                  v-if="plugin._log_history && plugin._log_history.length > 0"
-                  class="md-icon-button md-xsmall-hide"
+                  v-if="
+                    plugin._log_history &&
+                      plugin._log_history.length > 0 &&
+                      screenWidth > 400
+                  "
+                  class="md-icon-button"
                   @click="showLog(plugin)"
                 >
                   <md-icon v-if="plugin._log_history._error" class="red"
-                    >error</md-icon
+                    >error_outline</md-icon
                   >
                   <md-icon v-else>info</md-icon>
                   <md-tooltip
@@ -694,6 +711,19 @@
                     }}</md-tooltip>
                   </md-button>
                   <md-menu-content>
+                    <md-menu-item
+                      @click="showLog(plugin)"
+                      v-if="
+                        plugin._log_history &&
+                          plugin._log_history.length > 0 &&
+                          screenWidth <= 400
+                      "
+                    >
+                      <md-icon v-if="plugin._log_history._error" class="red"
+                        >error_outline</md-icon
+                      >
+                      <md-icon v-else>info</md-icon>Log
+                    </md-menu-item>
                     <md-menu-item @click="showDoc(plugin.id)">
                       <md-icon>description</md-icon>Docs
                     </md-menu-item>
@@ -749,12 +779,16 @@
                 </md-button>
                 <div class="floating-right-buttons">
                   <md-button
-                    v-if="plugin._log_history && plugin._log_history.length > 0"
+                    v-if="
+                      plugin._log_history &&
+                        plugin._log_history.length > 0 &&
+                        screenWidth > 400
+                    "
                     class="md-icon-button md-xsmall-hide"
                     @click="showLog(plugin)"
                   >
                     <md-icon v-if="plugin._log_history._error" class="red"
-                      >error</md-icon
+                      >error_outline</md-icon
                     >
                     <md-icon v-else>info</md-icon>
                     <md-tooltip
@@ -3486,6 +3520,32 @@ button.md-speed-dial-target {
   text-align: center;
   margin-top: 10px;
   margin: 5px;
+}
+
+.joy-run-button {
+  width: calc(100% - 120px);
+  text-transform: none;
+  font-size: 1.2em;
+}
+
+.joy-run-button .md-ripple {
+  justify-content: flex-start !important;
+}
+
+@media screen and (max-width: 600px) {
+  .joy-run-button {
+    width: calc(100% - 105px)!important;
+    text-transform: none;
+    font-size: 1.2em;
+  }
+}
+
+@media screen and (max-width: 400px) {
+  .joy-run-button {
+    width: calc(100% - 70px)!important;
+    text-transform: none;
+    font-size: 1.2em;
+  }
 }
 
 @media screen and (max-width: 600px) {

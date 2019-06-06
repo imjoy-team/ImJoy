@@ -104,10 +104,6 @@ body {
   justify-content: flex-start !important;
 }
 
-.joy-run-button .md-ripple {
-  justify-content: flex-start !important;
-}
-
 .md-menu-content {
   z-index: 9998;
 }
