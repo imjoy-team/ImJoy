@@ -104,10 +104,6 @@ body {
   justify-content: flex-start !important;
 }
 
-.joy-run-button .md-ripple {
-  justify-content: flex-start !important;
-}
-
 .md-menu-content {
   z-index: 9998;
 }
@@ -201,5 +197,14 @@ li.md-menu-item {
 ol li,
 ul li {
   margin-top: 0rem !important;
+}
+
+.joy-run-button .md-ripple {
+  justify-content: flex-start !important;
+}
+
+/* for code editor */
+canvas.decorationsOverviewRuler {
+  background-color: white;
 }
 </style>

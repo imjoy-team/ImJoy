@@ -11,8 +11,8 @@
         </md-button>
         <md-button
           @click="$router.push('/')"
-          v-if="!menuVisible"
-          class="md-small-hide site-title-small"
+          v-if="!menuVisible && screenWidth > 400"
+          class="site-title-small"
         >
           <img
             class="site-title-small"
@@ -21,7 +21,7 @@
           />
           <md-tooltip>ImJoy home</md-tooltip>
         </md-button>
-        <md-button v-if="workspace_dropping">
+        <md-button v-if="workspace_dropping && screenWidth > 400">
           Drop files to the workspace.
         </md-button>
         <span
@@ -123,7 +123,7 @@
             class="md-icon-button"
           >
             <md-icon>{{ "filter_" + (i + 1) }}</md-icon>
-            <md-tooltip>{{
+            <md-tooltip class="md-xsmall-hide">{{
               w.name.slice(0, 30) + "(#" + w.index + ")"
             }}</md-tooltip>
           </md-button>
@@ -468,11 +468,24 @@
                     plugin.config.icon
                   }}</md-icon>
                   <md-icon v-else>extension</md-icon>
-                  <md-tooltip>{{
+                  <md-tooltip v-if="screenWidth > 500">{{
                     plugin.name + ": " + plugin.config.description
                   }}</md-tooltip>
                 </md-button>
                 <md-menu-content>
+                  <md-menu-item
+                    @click="showLog(plugin)"
+                    v-if="
+                      plugin._log_history &&
+                        plugin._log_history.length > 0 &&
+                        screenWidth <= 400
+                    "
+                  >
+                    <md-icon v-if="plugin._log_history._error" class="red"
+                      >error_outline</md-icon
+                    >
+                    <md-icon v-else>info</md-icon>Log
+                  </md-menu-item>
                   <md-menu-item @click="showDoc(plugin.id)">
                     <md-icon>description</md-icon>Docs
                   </md-menu-item>
@@ -593,36 +606,47 @@
                     : plugin.name
                 }}
               </md-button>
-
-              <md-button
-                v-if="plugin._log_history && plugin._log_history.length > 0"
-                class="md-icon-button md-xsmall-hide"
-                @click="showLog(plugin)"
-              >
-                <md-icon v-if="plugin._log_history._error" class="red"
-                  >error</md-icon
+              <div class="floating-right-buttons">
+                <md-button
+                  v-if="
+                    plugin._log_history &&
+                      plugin._log_history.length > 0 &&
+                      screenWidth > 400
+                  "
+                  class="md-icon-button"
+                  @click="showLog(plugin)"
                 >
-                <md-icon v-else>info</md-icon>
-                <md-tooltip
-                  v-if="plugin._log_history._error || plugin._log_history._info"
-                  >{{
-                    plugin._log_history._error || plugin._log_history._info
-                  }}</md-tooltip
+                  <md-icon v-if="plugin._log_history._error" class="red"
+                    >error_outline</md-icon
+                  >
+                  <md-icon v-else>info</md-icon>
+                  <md-tooltip
+                    v-if="
+                      plugin._log_history._error || plugin._log_history._info
+                    "
+                    >{{
+                      plugin._log_history._error || plugin._log_history._info
+                    }}</md-tooltip
+                  >
+                </md-button>
+                <md-button
+                  v-else
+                  class="md-icon-button md-xsmall-hide"
+                  disabled
                 >
-              </md-button>
-              <md-button v-else class="md-icon-button md-xsmall-hide" disabled>
-              </md-button>
+                </md-button>
 
-              <md-button
-                class="md-icon-button"
-                @click="
-                  plugin.panel_expanded = !plugin.panel_expanded;
-                  $forceUpdate();
-                "
-              >
-                <md-icon v-if="!plugin.panel_expanded">expand_more</md-icon>
-                <md-icon v-else>expand_less</md-icon>
-              </md-button>
+                <md-button
+                  class="md-icon-button"
+                  @click="
+                    plugin.panel_expanded = !plugin.panel_expanded;
+                    $forceUpdate();
+                  "
+                >
+                  <md-icon v-if="!plugin.panel_expanded">expand_more</md-icon>
+                  <md-icon v-else>expand_less</md-icon>
+                </md-button>
+              </div>
               <md-progress-bar
                 md-mode="determinate"
                 v-if="
@@ -651,15 +675,14 @@
                 >
                   {{ op.name }}
                 </md-button>
-
-                <!-- <md-button class="md-icon-button" v-show="plugin.panel_expanded &&  op.name != plugin.name" @click="op.panel_expanded=!op.panel_expanded; $forceUpdate()"> -->
-                <!-- <md-icon v-if="!op.panel_expanded">expand_more</md-icon>
-                <md-icon v-else>expand_less</md-icon> -->
-                <!-- </md-button> -->
-
-                <joy :config="op" :show="plugin.panel_expanded || false"></joy>
-                <md-divider></md-divider>
               </div>
+              <!-- <md-button class="md-icon-button" v-show="plugin.panel_expanded &&  op.name != plugin.name" @click="op.panel_expanded=!op.panel_expanded; $forceUpdate()"> -->
+              <!-- <md-icon v-if="!op.panel_expanded">expand_more</md-icon>
+                <md-icon v-else>expand_less</md-icon> -->
+              <!-- </md-button> -->
+
+              <joy :config="op" :show="plugin.panel_expanded || false"></joy>
+              <md-divider></md-divider>
             </div>
             <md-divider></md-divider>
             <div>
@@ -683,11 +706,24 @@
                       plugin.config.icon
                     }}</md-icon>
                     <md-icon v-else>extension</md-icon>
-                    <md-tooltip>{{
+                    <md-tooltip v-if="screenWidth > 500">{{
                       plugin.name + ": " + plugin.config.description
                     }}</md-tooltip>
                   </md-button>
                   <md-menu-content>
+                    <md-menu-item
+                      @click="showLog(plugin)"
+                      v-if="
+                        plugin._log_history &&
+                          plugin._log_history.length > 0 &&
+                          screenWidth <= 400
+                      "
+                    >
+                      <md-icon v-if="plugin._log_history._error" class="red"
+                        >error_outline</md-icon
+                      >
+                      <md-icon v-else>info</md-icon>Log
+                    </md-menu-item>
                     <md-menu-item @click="showDoc(plugin.id)">
                       <md-icon>description</md-icon>Docs
                     </md-menu-item>
@@ -741,9 +777,39 @@
                       : plugin.name
                   }}
                 </md-button>
-                <md-button class="md-icon-button" :disabled="true">
-                  <md-icon>visibility_off</md-icon>
-                </md-button>
+                <div class="floating-right-buttons">
+                  <md-button
+                    v-if="
+                      plugin._log_history &&
+                        plugin._log_history.length > 0 &&
+                        screenWidth > 400
+                    "
+                    class="md-icon-button md-xsmall-hide"
+                    @click="showLog(plugin)"
+                  >
+                    <md-icon v-if="plugin._log_history._error" class="red"
+                      >error_outline</md-icon
+                    >
+                    <md-icon v-else>info</md-icon>
+                    <md-tooltip
+                      v-if="
+                        plugin._log_history._error || plugin._log_history._info
+                      "
+                      >{{
+                        plugin._log_history._error || plugin._log_history._info
+                      }}</md-tooltip
+                    >
+                  </md-button>
+                  <md-button
+                    v-else
+                    class="md-icon-button md-xsmall-hide"
+                    disabled
+                  >
+                  </md-button>
+                  <md-button class="md-icon-button" :disabled="true">
+                    <md-icon>visibility_off</md-icon>
+                  </md-button>
+                </div>
                 <md-divider></md-divider>
               </div>
             </div>
@@ -3148,7 +3214,7 @@ export default {
 
 @media screen and (max-height: 768px) {
   .site-title-small {
-    height: 45px;
+    height: 36px;
   }
 }
 
@@ -3420,6 +3486,15 @@ button.md-speed-dial-target {
 #plugin-menu > .md-card-content {
   max-height: calc(100vh - 95px - 86px);
   overflow: auto;
+  padding-left: 6px;
+  padding-right: 6px;
+}
+
+@media screen and (max-width: 700px) {
+  #plugin-menu > .md-card-content {
+    padding-left: 0px;
+    padding-right: 0px;
+  }
 }
 
 #plugin-menu > .md-card-header {
@@ -3445,6 +3520,32 @@ button.md-speed-dial-target {
   text-align: center;
   margin-top: 10px;
   margin: 5px;
+}
+
+.joy-run-button {
+  width: calc(100% - 120px);
+  text-transform: none;
+  font-size: 1.2em;
+}
+
+.joy-run-button .md-ripple {
+  justify-content: flex-start !important;
+}
+
+@media screen and (max-width: 600px) {
+  .joy-run-button {
+    width: calc(100% - 105px) !important;
+    text-transform: none;
+    font-size: 1.2em;
+  }
+}
+
+@media screen and (max-width: 400px) {
+  .joy-run-button {
+    width: calc(100% - 70px) !important;
+    text-transform: none;
+    font-size: 1.2em;
+  }
 }
 
 @media screen and (max-width: 600px) {
@@ -3545,5 +3646,11 @@ button.md-speed-dial-target {
   bottom: 0;
   left: 0;
   right: 0;
+}
+
+.floating-right-buttons {
+  display: inline-block;
+  margin-left: auto;
+  margin-right: 0;
 }
 </style>

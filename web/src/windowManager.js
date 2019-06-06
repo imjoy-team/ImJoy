@@ -100,8 +100,9 @@ export class WindowManager {
     w.onResize = handler => {
       w._resize_callbacks.push(handler);
     };
-    w.resize = async () => {
-      await Promise.all(w._resize_callbacks.map(item => item()));
+    w.resize = async contentRect => {
+      contentRect = contentRect || (w.$el && w.$el.getBoundingClientRect());
+      await Promise.all(w._resize_callbacks.map(item => item(contentRect)));
     };
 
     w._close_callbacks = [];

@@ -1,6 +1,6 @@
 {
   "name": "ImJoy.io",
-  "version": "0.9.71",
+  "version": "0.9.72",
   "private": true,
   "description": "ImJoy -- deep learning made easy.",
   "author": "Wei OUYANG <wei.ouyang@cri-paris.org>",
@@ -64,6 +64,7 @@
     "postcss-url": "^7.2.1",
     "prettier": "1.17.0",
     "raw-loader": "^1.0.0",
+    "resize-observer-polyfill": "^1.5.1",
     "rimraf": "^2.6.2",
     "uglify-es": "github:mishoo/UglifyJS2#harmony",
     "uglify-js": "^2.8.29",

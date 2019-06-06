@@ -99,7 +99,6 @@ export default {
       const w = this.getContainerWidth();
       if (w === this.width) return;
       this.width = w;
-      console.log(this.width);
     },
     getContainerWidth() {
       return window.getComputedStyle(this.$el, null).getPropertyValue("width");
@@ -111,11 +110,11 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style>
 :root {
-  --handle-width: 50px;
-  --handle-height: 50px;
-  --handle-chevron-size: 30px;
+  --handle-width: 42px;
+  --handle-height: 42px;
+  --handle-chevron-size: 20px;
 
-  --handle-line-width: 5px;
+  --handle-line-width: 3px;
   --handle-line-height: 100%;
 
   --z-index-handle: 5;
@@ -178,6 +177,7 @@ export default {
   border-radius: 50%;
   width: var(--handle-width);
   height: var(--handle-height);
+  opacity: 0.75;
 }
 
 .handle-line {
@@ -190,6 +190,7 @@ export default {
   z-index: var(--z-index-handle-line);
   pointer-events: none;
   user-select: none;
+  opacity: 0.8;
 }
 
 .compare__range {
@@ -201,7 +202,7 @@ export default {
   top: calc(50%);
   z-index: var(--z-index-range-input);
   -webkit-appearance: none;
-  height: var(--handle-height);
+  height: 100%;
   /* debugging purposes only */
   background: rgba(0, 0, 0, 0.4);
   opacity: 0;

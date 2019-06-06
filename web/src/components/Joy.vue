@@ -113,11 +113,6 @@ export default {
   font-size: 1.2em;
   font-weight: 100;
 }
-.joy-run-button {
-  width: 60%;
-  text-transform: none;
-  font-size: 1.2em;
-}
 
 @media screen and (max-height: 600px) {
   .joy-run-button {
