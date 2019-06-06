@@ -68,6 +68,7 @@
 </template>
 
 <script>
+import ResizeObserver from "resize-observer-polyfill";
 export default {
   name: "comparify",
   props: {
@@ -89,6 +90,10 @@ export default {
     this.$nextTick(() => {
       this.handleResize();
     });
+    const ro = new ResizeObserver(() => {
+      this.handleResize();
+    });
+    ro.observe(this.$el);
   },
   methods: {
     handleInput(e) {
@@ -99,7 +104,6 @@ export default {
       const w = this.getContainerWidth();
       if (w === this.width) return;
       this.width = w;
-      console.log(this.width);
     },
     getContainerWidth() {
       return window.getComputedStyle(this.$el, null).getPropertyValue("width");
