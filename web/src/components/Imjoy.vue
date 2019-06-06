@@ -2,44 +2,52 @@
   <div class="imjoy noselect">
     <md-app>
       <md-app-toolbar class="md-dense" md-elevation="0">
-        <div class="md-toolbar-section-start">
-          <md-button
-            v-if="!menuVisible"
-            class="md-primary md-icon-button"
-            @click="menuVisible = true"
-          >
-            <md-icon>menu</md-icon>
-          </md-button>
-          <md-button
-            @click="$router.push('/')"
-            v-if="!menuVisible"
-            class="md-small-hide site-title-small"
-          >
-            <img
-              class="site-title-small"
-              src="static/img/imjoy-logo-black.svg"
-              alt="ImJoy"
-            />
-            <md-tooltip>ImJoy home</md-tooltip>
-          </md-button>
-          <md-button v-if="workspace_dropping" class="status-text">
-            Drop files to the workspace.
-          </md-button>
-          <md-button
-            v-else-if="status_text && status_text.length"
-            class="status-text md-small-hide"
-            @click="showAlert(null, status_text)"
-            :class="status_text.includes('rror') ? 'error-message' : ''"
-          >
-            {{
-              status_text.slice(0, 80) + (status_text.length > 80 ? "..." : "")
-            }}
-          </md-button>
-          <span class="subheader-title md-medium-hide" style="flex: 1" v-else
-            >Deploying Deep Learning Made Easy!</span
-          >
-        </div>
-        <div class="md-toolbar-section-end">
+        <md-button
+          v-if="!menuVisible"
+          class="md-primary md-icon-button"
+          @click="menuVisible = true"
+        >
+          <md-icon>menu</md-icon>
+        </md-button>
+        <md-button
+          @click="$router.push('/')"
+          v-if="!menuVisible"
+          class="md-small-hide site-title-small"
+        >
+          <img
+            class="site-title-small"
+            src="static/img/imjoy-logo-black.svg"
+            alt="ImJoy"
+          />
+          <md-tooltip>ImJoy home</md-tooltip>
+        </md-button>
+        <md-button v-if="workspace_dropping">
+          Drop files to the workspace.
+        </md-button>
+        <span
+          v-else-if="screenWidth > 500 && status_text && status_text.length"
+          class="status-text"
+          :style="{
+            'max-width': menuVisible
+              ? 'calc( 100vw - 500px) !important'
+              : 'calc(100vw - 250px) !important',
+          }"
+          @click="showAlert(null, status_text)"
+          :class="
+            status_text.includes('rror') ||
+            status_text.includes('Traceback') ||
+            status_text.includes('Fail')
+              ? 'error-message'
+              : ''
+          "
+        >
+          {{ status_text }}
+        </span>
+        <span class="subheader-title md-medium-hide" style="flex: 1" v-else
+          >Deploying Deep Learning Made Easy!</span
+        >
+
+        <div class="md-toolbar-section-end menubar-icons">
           <md-button
             class="md-icon-button md-accent"
             v-if="wm.selected_window && wm.selected_window.standalone"
@@ -260,7 +268,8 @@
         :md-active.sync="menuVisible"
         @md-closed="wm.resizeAll()"
         @md-opened="wm.resizeAll()"
-        md-persistent="full"
+        :md-persistent="screenWidth > 800 ? 'full' : null"
+        :md-swipeable="screenWidth > 600 ? false : true"
       >
         <div class="md-toolbar-row title-bar">
           <div class="md-toolbar-section-start">
@@ -459,7 +468,9 @@
                     plugin.config.icon
                   }}</md-icon>
                   <md-icon v-else>extension</md-icon>
-                  <md-tooltip>{{ plugin.config.description }}</md-tooltip>
+                  <md-tooltip>{{
+                    plugin.name + ": " + plugin.config.description
+                  }}</md-tooltip>
                 </md-button>
                 <md-menu-content>
                   <md-menu-item @click="showDoc(plugin.id)">
@@ -501,9 +512,12 @@
                   <div v-if="plugin.config.type === 'native-python'">
                     <md-divider></md-divider>
                     <md-menu-item @click="switchEngine(plugin)">
-                      <span v-if="plugin.config.engine_mode === 'auto'">✅</span
-                      ><span v-else>🚀</span
-                      ><span
+                      <md-icon v-if="plugin.config.engine_mode === 'auto'"
+                        >check_box</md-icon
+                      >
+                      <md-icon v-else>check_box_outline_blank</md-icon>
+
+                      <span
                         :class="
                           plugin.config.engine_mode === 'auto' ? 'bold' : ''
                         "
@@ -515,10 +529,16 @@
                       :key="engine.id"
                       @click="switchEngine(plugin, engine)"
                     >
-                      <span v-if="plugin.config.engine_mode === engine.id"
-                        >✅</span
-                      ><span v-else>🚀</span
-                      ><span
+                      <md-icon
+                        v-if="
+                          plugin.config.engine_mode === engine.id ||
+                            (plugin.config.engine &&
+                              plugin.config.engine.id === engine.id)
+                        "
+                        >radio_button_checked</md-icon
+                      >
+                      <md-icon v-else>radio_button_unchecked</md-icon>
+                      <span
                         :class="
                           plugin.config.engine &&
                           plugin.config.engine.id === engine.id
@@ -534,9 +554,11 @@
                       :key="tag"
                       @click="switchTag(plugin, tag)"
                     >
-                      <span v-if="plugin.config.tag === tag">✅</span
-                      ><span v-else>🔖</span
-                      ><span :class="plugin.config.tag === tag ? 'bold' : ''"
+                      <md-icon v-if="plugin.config.tag === tag"
+                        >radio_button_checked</md-icon
+                      >
+                      <md-icon v-else>radio_button_unchecked</md-icon>
+                      <span :class="plugin.config.tag === tag ? 'bold' : ''"
                         >Tag: {{ tag }}</span
                       >
                     </md-menu-item>
@@ -581,9 +603,12 @@
                   >error</md-icon
                 >
                 <md-icon v-else>info</md-icon>
-                <md-tooltip>{{
-                  plugin._log_history._error || plugin._log_history._info
-                }}</md-tooltip>
+                <md-tooltip
+                  v-if="plugin._log_history._error || plugin._log_history._info"
+                  >{{
+                    plugin._log_history._error || plugin._log_history._info
+                  }}</md-tooltip
+                >
               </md-button>
               <md-button v-else class="md-icon-button md-xsmall-hide" disabled>
               </md-button>
@@ -658,7 +683,9 @@
                       plugin.config.icon
                     }}</md-icon>
                     <md-icon v-else>extension</md-icon>
-                    <md-tooltip>{{ plugin.config.description }}</md-tooltip>
+                    <md-tooltip>{{
+                      plugin.name + ": " + plugin.config.description
+                    }}</md-tooltip>
                   </md-button>
                   <md-menu-content>
                     <md-menu-item @click="showDoc(plugin.id)">
@@ -778,7 +805,7 @@
       :md-active.sync="show_snackbar"
       :md-duration="snackbar_duration"
     >
-      <span>{{ snackbar_info }}</span>
+      <span @click="showAlert(null, snackbar_info)">{{ snackbar_info }}</span>
       <md-button class="md-accent" @click="show_snackbar = false"
         >close</md-button
       >
@@ -898,7 +925,15 @@
       :md-active.sync="showWorkspaceDialog"
       :md-click-outside-to-close="true"
     >
-      <md-dialog-title>Workspace Management</md-dialog-title>
+      <md-dialog-title
+        >Workspace Management
+        <md-button
+          class="md-accent"
+          style="position:absolute; top:8px; right:5px;"
+          @click="showWorkspaceDialog = false"
+          ><md-icon>clear</md-icon>
+        </md-button></md-dialog-title
+      >
       <md-dialog-content>
         <md-toolbar class="md-dense" md-elevation="0">
           <div class="md-toolbar-section-start">
@@ -947,11 +982,6 @@
           </md-list-item>
         </md-list>
       </md-dialog-content>
-      <md-dialog-actions>
-        <md-button class="md-primary" @click="showWorkspaceDialog = false"
-          >OK</md-button
-        >
-      </md-dialog-actions>
     </md-dialog>
     <md-dialog-confirm
       :md-active.sync="showPermissionConfirmation"
@@ -975,15 +1005,18 @@
       :md-click-outside-to-close="false"
       :md-close-on-esc="false"
     >
-      <md-dialog-title>About ImJoy</md-dialog-title>
+      <md-dialog-title
+        >About ImJoy
+        <md-button
+          class="md-accent"
+          style="position:absolute; top:8px; right:5px;"
+          @click="showAboutDialog = false"
+          ><md-icon>clear</md-icon>
+        </md-button>
+      </md-dialog-title>
       <md-dialog-content>
         <about></about>
       </md-dialog-content>
-      <md-dialog-actions>
-        <md-button class="md-primary" @click="showAboutDialog = false"
-          >OK</md-button
-        >
-      </md-dialog-actions>
     </md-dialog>
 
     <md-dialog
@@ -991,28 +1024,45 @@
       :md-active.sync="showAddPluginDialog"
       :md-click-outside-to-close="false"
     >
-      <md-dialog-title>{{
-        plugin4install ? "Plugin Installation" : "ImJoy Plugin Management"
-      }}</md-dialog-title>
+      <md-dialog-title
+        >{{
+          plugin4install ? "Plugin Installation" : "ImJoy Plugin Management"
+        }}
+        <md-button
+          class="md-accent"
+          style="position:absolute; top:8px; right:5px;"
+          @click="
+            showAddPluginDialog = false;
+            clearPluginUrl();
+          "
+          ><md-icon>clear</md-icon></md-button
+        ></md-dialog-title
+      >
       <md-dialog-content>
-        <md-card v-if="show_plugin_templates">
-          <md-card-header>
-            <div class="md-title">Create a New Plugin</div>
-          </md-card-header>
-          <md-card-content>
-            <md-button
-              class="md-primary md-raised centered-button"
-              @click="
-                newPlugin(template.code);
-                showAddPluginDialog = false;
-              "
-              v-for="template in plugin_templates"
-              :key="template.name"
-            >
-              <md-icon>add</md-icon>{{ template.name }}
+        <template v-if="show_plugin_templates">
+          <md-menu>
+            <md-button class="md-primary md-raised" md-menu-trigger>
+              <md-icon>add</md-icon>Create a new plugin
+              <md-tooltip>Create a new plugin</md-tooltip>
             </md-button>
-          </md-card-content>
-        </md-card>
+            <md-menu-content>
+              <md-menu-item
+                @click="
+                  newPlugin(template.code);
+                  showAddPluginDialog = false;
+                "
+                v-for="template in plugin_templates"
+                :key="template.name"
+              >
+                <md-icon>{{ template.icon }}</md-icon
+                >{{ template.name }}
+              </md-menu-item>
+            </md-menu-content>
+          </md-menu>
+          <br />
+          <br />
+        </template>
+
         <!-- <md-switch v-if="pm.installed_plugins.length>0 && !plugin4install && !downloading_error && !downloading_plugin" v-model="show_installed_plugins">Show Installed Plugins</md-switch> -->
         <!-- <md-card v-if="show_installed_plugins">
         <md-card-header>
@@ -1199,7 +1249,7 @@
             ></plugin-editor>
           </md-card-content>
         </md-card>
-        <md-card v-if="show_plugin_store">
+        <md-card v-show="show_plugin_store">
           <md-card-header>
             <div class="md-title">Install from the plugin repository</div>
             <md-chips
@@ -1238,16 +1288,6 @@
           </md-card-content>
         </md-card>
       </md-dialog-content>
-      <md-dialog-actions>
-        <md-button
-          class="md-primary"
-          @click="
-            showAddPluginDialog = false;
-            clearPluginUrl();
-          "
-          >Exit</md-button
-        >
-      </md-dialog-actions>
     </md-dialog>
   </div>
 </template>
@@ -1475,11 +1515,28 @@ export default {
       _id: "IMJOY_APP",
     };
     this.plugin_templates = [
-      { name: "Web Worker (JS)", code: WEB_WORKER_PLUGIN_TEMPLATE },
-      { name: "Window (HTML/CSS/JS)", code: WINDOW_PLUGIN_TEMPLATE },
-      { name: "Native Python 🚀", code: NATIVE_PYTHON_PLUGIN_TEMPLATE },
+      {
+        name: "Default template",
+        code: WEB_WORKER_PLUGIN_TEMPLATE,
+        icon: "code",
+      },
+      {
+        name: "Web Worker (JS)",
+        code: WEB_WORKER_PLUGIN_TEMPLATE,
+        icon: "swap_horiz",
+      },
+      {
+        name: "Window (HTML/CSS/JS)",
+        code: WINDOW_PLUGIN_TEMPLATE,
+        icon: "picture_in_picture",
+      },
+      {
+        name: "Native Python",
+        code: NATIVE_PYTHON_PLUGIN_TEMPLATE,
+        icon: "🚀",
+      },
       // {name: "Iframe(Javascript)", code: IFRAME_PLUGIN_TEMPLATE},
-      { name: "Web Python 🐍", code: WEB_PYTHON_PLUGIN_TEMPLATE },
+      { name: "Web Python", code: WEB_PYTHON_PLUGIN_TEMPLATE, icon: "🐍" },
     ];
     this.workflow_joy_config = {
       expanded: true,
@@ -1635,7 +1692,11 @@ export default {
     });
 
     this.updateSize({ width: window.innerWidth });
-
+    if (this.screenWidth > 800) {
+      this.wm.window_mode = "grid";
+    } else {
+      this.wm.window_mode = "single";
+    }
     this.is_https_mode = "https:" === location.protocol;
     // Make sure the GUI is refreshed
     setInterval(() => {
@@ -2047,10 +2108,10 @@ export default {
     updateSize(e) {
       this.screenWidth = e.width;
       if (this.screenWidth > 800) {
-        this.wm.window_mode = "grid";
+        if (this.wm.windows.length === 0) this.wm.window_mode = "grid";
         this.max_window_buttons = 9;
       } else {
-        this.wm.window_mode = "single";
+        if (this.wm.windows.length === 0) this.wm.window_mode = "single";
         this.max_window_buttons = parseInt(this.screenWidth / 36 - 4);
         if (this.max_window_buttons > 9) this.max_window_buttons = 9;
       }
@@ -2233,7 +2294,7 @@ export default {
     },
     showMessage(info, duration) {
       info = String(info);
-      this.snackbar_info = info.slice(0, 120);
+      this.snackbar_info = info;
       if (duration) {
         duration = duration * 1000;
       }
@@ -2248,6 +2309,9 @@ export default {
         root: "./",
       })
         .then(selection => {
+          if (this.screenWidth <= 800) {
+            this.menuVisible = false;
+          }
           if (!selection) {
             return;
           }
@@ -2904,11 +2968,14 @@ export default {
     showProgress(_plugin, p) {
       if (p < 1) this.progress = p * 100;
       else this.progress = p;
-      // this.$forceUpdate()
     },
     showStatus(_plugin, s) {
       this.status_text = String(s);
-      // this.$forceUpdate()
+
+      // fallback to showMessage on small screen
+      if (this.screenWidth < 500) {
+        this.showMessage(s);
+      }
     },
     showDialog(_plugin, config) {
       assert(config, "Please pass config to showDialog.");
@@ -2939,7 +3006,7 @@ export default {
             };
           }
           this.showPluginDialog = true;
-          this.$nextTick(() => {
+          setTimeout(() => {
             this.createWindow(config)
               .then(api => {
                 const _close = api.close;
@@ -2952,7 +3019,7 @@ export default {
                 resolve(api);
               })
               .catch(reject);
-          });
+          }, 0);
         } else {
           this.showMessage("Unsupported dialog type.");
         }
@@ -3075,6 +3142,7 @@ export default {
 }
 
 .site-title-small {
+  display: inline-block;
   height: 55px;
 }
 
@@ -3124,23 +3192,25 @@ export default {
 
 @media screen and (max-width: 400px) {
   .md-dialog {
-    width: 100%;
-    height: 100%;
+    width: 100% !important;
     max-height: 100%;
     max-width: 100%;
   }
 }
 
+@media screen and (max-width: 700px) {
+  .plugin-dialog {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+}
+
 @media screen and (max-width: 800px) {
   .window-dialog {
-    width: 100% !important;
-    height: 100% !important;
     max-width: 100%;
   }
 
   .api-dialog {
-    width: 100% !important;
-    height: 100% !important;
     max-width: 100%;
     max-height: 100%;
   }
@@ -3230,7 +3300,7 @@ export default {
 }
 
 .error-message {
-  color: red;
+  color: red !important;
   user-select: text;
 }
 
@@ -3265,10 +3335,49 @@ button.md-speed-dial-target {
   height: 100%;
   max-height: 100%;
 }
+.menubar-icons {
+  display: inline-flex;
+  position: absolute;
+  right: 0;
+  background-color: rgba(245, 245, 245, 0.8);
+  z-index: 1;
+}
 
 .status-text {
-  text-align: center;
+  color: #0060ff;
+  font-size: 0.95em;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: left;
   text-transform: none;
+  overflow: hidden;
+  display: inline-block;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: calc(100vw - 300px);
+}
+
+@media screen and (max-width: 700px) {
+  .md-snackbar {
+    padding: 10px;
+  }
+}
+.md-snackbar-content {
+  overflow: hidden;
+  max-width: 680px;
+}
+.md-snackbar-content > button {
+  position: absolute;
+  right: 10px;
+  top: 15px;
+  background-color: rgba(10, 10, 10, 0.6);
+}
+
+.md-snackbar-content > span {
+  white-space: nowrap;
+  overflow: hidden;
+  max-width: 100%;
+  text-overflow: ellipsis;
 }
 
 .centered-button {

@@ -20,12 +20,15 @@
       </md-button>
       <md-menu-content class="engine-panel">
         <md-menu-item @click="showAddEngineDialog = true">
-          <md-icon style="margin: 16px;">add</md-icon>
+          <md-button class="md-icon-button md-primary median-icon-button">
+            <md-icon>add</md-icon>
+          </md-button>
+
           <span>Add Plugin Engine 🚀</span>
         </md-menu-item>
-        <div v-for="engine in engineManager.engines" :key="engine.url">
+        <template v-for="engine in engineManager.engines">
           <!-- <md-divider></md-divider> -->
-          <md-menu-item v-if="engine.connected" @click="showInfo(engine)">
+          <md-menu-item @click="showInfo(engine)" :key="engine.url">
             <md-button
               v-if="
                 engine.show_processes &&
@@ -33,31 +36,35 @@
                   engine.plugin_processes.length > 0
               "
               @click.stop="hide(engine)"
-              class="md-icon-button md-primary"
+              class="md-icon-button md-primary median-icon-button"
             >
               <md-icon>remove</md-icon>
             </md-button>
             <md-button
               v-else
               @click.stop="expand(engine)"
-              class="md-icon-button md-primary md-raised median-icon-button"
+              class="md-icon-button  median-icon-button"
+              :class="engine.connected ? 'md-primary md-raised' : ''"
+              :disabled="!engine.connected"
             >
-              <md-icon>autorenew</md-icon>
+              <md-icon v-if="engine.connected">autorenew</md-icon>
+              <md-icon v-else>sync_disabled</md-icon>
               <md-tooltip
                 >Show plugin processes or terminal of the engine.</md-tooltip
               >
             </md-button>
             <span>&nbsp;{{ engine.name }}</span>
           </md-menu-item>
-          <md-menu-item v-else @click.stop="engine.connect(false)">
+          <!-- <md-menu-item v-else @click.stop="engine.connect(false)" :key="engine.url">
             <md-icon>sync_disabled</md-icon> {{ engine.name }}
             <md-tooltip>Connect to {{ engine.name }} </md-tooltip>
-          </md-menu-item>
-          <div v-if="engine.connected && engine.show_processes">
-            <md-divider></md-divider>
+          </md-menu-item> -->
+          <template v-if="engine.connected && engine.show_processes">
+            <md-divider :key="engine.url + '_start_divider'"></md-divider>
             <md-menu-item
               v-show="engine.plugin_processes"
               @click="startTerminal(engine)"
+              :key="engine.url + '_start_terminal'"
             >
               &nbsp;&nbsp;<md-button class="md-icon-button">
                 <md-icon>code</md-icon>
@@ -77,12 +84,19 @@
               </md-button>
               {{ p.name }} (#{{ p.pid }})
             </md-menu-item>
-            <md-menu-item v-if="!engine.plugin_processes">
+            <md-menu-item
+              v-if="!engine.plugin_processes"
+              :key="engine.url + '_processes'"
+            >
               <md-button>
                 <div class="loading loading-lg"></div>
               </md-button>
             </md-menu-item>
-            <md-menu-item :disabled="true" v-if="engine.plugin_num > 1">
+            <md-menu-item
+              :disabled="true"
+              v-if="engine.plugin_num > 1"
+              :key="engine.url + '_running_plugins'"
+            >
               &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;<span
                 >Running Plugins: {{ engine.plugin_num }}
               </span>
@@ -94,9 +108,9 @@
                 <md-tooltip>Kill all the running plugins</md-tooltip>
               </md-button>
             </md-menu-item>
-            <md-divider></md-divider>
-          </div>
-        </div>
+            <md-divider :key="engine.url + '_end_divider'"></md-divider>
+          </template>
+        </template>
       </md-menu-content>
     </md-menu>
     <md-dialog
@@ -104,19 +118,40 @@
       :md-click-outside-to-close="false"
       :md-close-on-esc="false"
     >
-      <md-dialog-title>New Plugin Engine</md-dialog-title>
+      <md-dialog-title
+        >Add New Plugin Engine
+        <md-button
+          class="md-accent"
+          style="position:absolute; top:8px; right:5px;"
+          @click="showAddEngineDialog = false"
+          ><md-icon>clear</md-icon></md-button
+        ></md-dialog-title
+      >
       <md-dialog-content>
         <p>
           Python plugins are supported by ImJoy with the ImJoy Plugin Engine.
         </p>
         <p>
-          If this is your first time to use ImJoy Plugin Engine, please
-          <a href="https://github.com/oeway/ImJoy-App/releases" target="_blank"
-            >click here</a
+          If you don't have the Plugin Engine, please install it from the ImJoy
+          Desktop App.<br />
+          <md-button
+            class="md-raised"
+            target="_blank"
+            href="https://github.com/oeway/ImJoy-App/releases"
+            >Get ImJoy Desktop App</md-button
           >
-          to download the ImJoy Desktop App. <br />
+        </p>
+        <p>
+          Alternatively, if you have Anaconda or Miniconda installed already,
+          you can run <code>pip install imjoy</code> and start with
+          <code>imjoy</code> command from your teriminal (see
+          <a target="_blank" href="https://github.com/oeway/ImJoy-Engine"
+            >ImJoy-Engine</a
+          >).
+        </p>
+        <p>
           If you have it already, please start the Plugin Engine, and connect to
-          it.<br />
+          it.
         </p>
         <div v-if="!is_mobile_or_tablet">
           <md-radio v-model="url_type" value="localhost">My Computer</md-radio>
@@ -158,18 +193,21 @@
           >, and choose the alternative solution.<br />
         </p>
       </md-dialog-content>
-      <md-dialog-actions>
-        <md-button class="md-primary" @click="showAddEngineDialog = false"
-          >OK</md-button
-        >
-      </md-dialog-actions>
     </md-dialog>
     <md-dialog
       :md-active.sync="showEngineInfoDialog"
       :md-click-outside-to-close="true"
       :md-close-on-esc="true"
     >
-      <md-dialog-title>About Plugin Engine</md-dialog-title>
+      <md-dialog-title
+        >About Plugin Engine
+        <md-button
+          class="md-accent"
+          style="position:absolute; top:8px; right:5px;"
+          @click="showEngineInfoDialog = false"
+          ><md-icon>clear</md-icon></md-button
+        ></md-dialog-title
+      >
       <md-dialog-content v-if="selected_engine">
         <h4>
           <a :href="selected_engine.url" target="_blank">
@@ -332,11 +370,6 @@
           </ul>
         </div>
       </md-dialog-content>
-      <md-dialog-actions>
-        <md-button class="md-primary" @click="showEngineInfoDialog = false"
-          >OK</md-button
-        >
-      </md-dialog-actions>
     </md-dialog>
   </div>
 </template>

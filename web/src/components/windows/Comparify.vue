@@ -124,6 +124,7 @@ export default {
 }
 
 .compare-wrapper {
+  overflow: hidden;
   position: relative;
   object-fit: contain;
   height: 100%;

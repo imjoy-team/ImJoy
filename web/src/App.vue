@@ -60,6 +60,7 @@ body {
   overscroll-behavior-y: contain;
   overscroll-behavior-x: none;
   position: fixed;
+  overflow-wrap: break-word;
 }
 
 .md-app {
@@ -83,7 +84,11 @@ body {
 
 @media screen and (max-height: 800px) and (pointer: fine) {
   .md-list-item-content {
+    padding: 0px 10px !important;
     min-height: 36px;
+  }
+  .md-list-item {
+    padding: 0px 0px !important;
   }
 }
 
@@ -160,12 +165,30 @@ body {
   max-width: 100% !important;
   overflow: auto;
   -webkit-transform: translateZ(0);
+  overflow-wrap: break-word;
 }
 
 @media screen and (max-width: 500px) {
   .md-dialog-content {
     padding: 16px !important;
   }
+}
+
+@media screen and (max-height: 700px) {
+  .md-dialog-content {
+    margin-bottom: 5px !important;
+  }
+  .md-dialog-title {
+    margin-bottom: 5px !important;
+  }
+}
+
+.md-dialog-content {
+  margin-bottom: 20px;
+}
+
+.md-dialog-title {
+  margin-bottom: 20px;
 }
 
 .md-toolbar.md-dense {

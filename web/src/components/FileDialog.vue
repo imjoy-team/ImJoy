@@ -4,9 +4,18 @@
     :md-click-outside-to-close="false"
     :md-close-on-esc="false"
   >
-    <md-dialog-title>{{
-      this.options.title || "ImJoy File Dialog"
-    }}</md-dialog-title>
+    <md-dialog-title
+      >{{ this.options.title || "ImJoy File Dialog" }}
+      <md-button
+        class="md-accent"
+        style="position:absolute; top:8px; right:5px;"
+        @click="
+          show_ = false;
+          reject('file dialog canceled by the user.');
+        "
+        ><md-icon>clear</md-icon></md-button
+      >
+    </md-dialog-title>
     <md-dialog-content>
       <md-button
         style="text-transform: none;"
@@ -19,14 +28,10 @@
         {{ engine.name }}
       </md-button>
       <div class="loading-info">
-        <h3 v-if="dropping">Drop files to upload to {{ root }}</h3>
-        <md-progress-bar
-          md-mode="determinate"
-          v-if="loading"
-          :md-value="loading_progress"
-        ></md-progress-bar>
+        <h5 v-if="dropping">Drop files to upload to {{ root }}</h5>
       </div>
       <ul
+        :disabled="!selected_engine || !selected_engine.connected"
         :class="dropping ? 'dropping-files' : ''"
         v-if="selected_engine && file_tree"
       >
@@ -41,11 +46,15 @@
         >
         </file-item>
       </ul>
-      <div class="loading loading-lg" v-else-if="selected_engine"></div>
+      <div
+        class="loading loading-lg"
+        v-else-if="selected_engine && selected_engine.connected"
+      ></div>
       <p v-else>
-        No plugin engine available.
+        No plugin engine is available.
       </p>
     </md-dialog-content>
+
     <md-dialog-actions>
       <md-menu style="flex: auto;" v-if="!this.loading">
         <md-button class="md-button md-primary" md-menu-trigger>
@@ -96,6 +105,11 @@
         >Cancel</md-button
       >
     </md-dialog-actions>
+    <md-progress-bar
+      md-mode="determinate"
+      v-show="loading"
+      :md-value="loading_progress"
+    ></md-progress-bar>
   </md-dialog>
 </template>
 <script>
@@ -129,7 +143,6 @@ export default {
       loading_progress: 0,
     };
   },
-
   created() {
     this.event_bus = this.$root.$data.store && this.$root.$data.store.event_bus;
     if (this.event_bus) {
@@ -145,7 +158,21 @@ export default {
       this.event_bus.$off("drag_upload", this.uploadFiles);
     }
   },
-  computed: {},
+  computed: {
+    no_engine_available: function() {
+      if (!this.engines) return true;
+      else {
+        let engine_available = false;
+        for (let engine of this.engines) {
+          if (engine.connected) {
+            engine_available = true;
+            break;
+          }
+        }
+        return !engine_available;
+      }
+    },
+  },
   methods: {
     async upload(f, progress_text) {
       if (!this.show_) {
@@ -173,7 +200,7 @@ export default {
       this.status_text = `file uploaded to ${ret.path}.`;
     },
     async uploadFiles(files) {
-      this.status_text = "uploading...";
+      this.status_text = "Uploading...";
       this.loading = true;
       try {
         for (let i = 0; i < files.length; i++) {
@@ -183,7 +210,7 @@ export default {
           }
           await this.upload(
             files[i],
-            `uploading ${i + 1}/${files.length}: ${files[i].name}`
+            `Uploading ${i + 1}/${files.length}: ${files[i].name}`
           );
         }
       } catch (e) {
