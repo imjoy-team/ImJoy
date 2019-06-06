@@ -27,7 +27,7 @@
             width="380"
           />
         </p>
-        <h1>Deploying Deep Learning Made Easy!</h1>
+        <h1>Deep Learning Made Easy!</h1>
         <p class="badges">
           <a href="https://github.com/oeway/ImJoy" target="_blank"
             ><img
@@ -52,7 +52,9 @@
           >&nbsp;
         </p>
         <p>
-          <a href="https://github.com/oeway/ImJoy/" target="_blank">GitHub</a>
+          <a href="https://arxiv.org/abs/1905.13105" target="_blank"
+            >Preprint</a
+          >
           <a href="/docs">Docs</a>
           <a href="/#/app" onclick="removeWelcomePage()" target="_self"
             >Start ImJoy</a

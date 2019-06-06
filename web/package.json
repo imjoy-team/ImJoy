@@ -1,8 +1,8 @@
 {
   "name": "ImJoy.io",
-  "version": "0.9.70",
+  "version": "0.9.71",
   "private": true,
-  "description": "ImJoy -- deploying deep learning made easy.",
+  "description": "ImJoy -- deep learning made easy.",
   "author": "Wei OUYANG <wei.ouyang@cri-paris.org>",
   "scripts": {
     "serve": "vue-cli-service serve --host 0.0.0.0",

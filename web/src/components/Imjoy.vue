@@ -44,7 +44,7 @@
           {{ status_text }}
         </span>
         <span class="subheader-title md-medium-hide" style="flex: 1" v-else
-          >Deploying Deep Learning Made Easy!</span
+          >Deep Learning Made Easy!</span
         >
 
         <div class="md-toolbar-section-end menubar-icons">
