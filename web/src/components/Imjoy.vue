@@ -3180,7 +3180,7 @@ export default {
 
 @media screen and (max-height: 768px) {
   .site-title-small {
-    height: 45px;
+    height: 36px;
   }
 }
 
