@@ -3534,7 +3534,7 @@ button.md-speed-dial-target {
 
 @media screen and (max-width: 600px) {
   .joy-run-button {
-    width: calc(100% - 105px)!important;
+    width: calc(100% - 105px) !important;
     text-transform: none;
     font-size: 1.2em;
   }
@@ -3542,7 +3542,7 @@ button.md-speed-dial-target {
 
 @media screen and (max-width: 400px) {
   .joy-run-button {
-    width: calc(100% - 70px)!important;
+    width: calc(100% - 70px) !important;
     text-transform: none;
     font-size: 1.2em;
   }
