@@ -11,8 +11,8 @@
         </md-button>
         <md-button
           @click="$router.push('/')"
-          v-if="!menuVisible"
-          class="md-small-hide site-title-small"
+          v-if="!menuVisible && screenWidth > 400"
+          class="site-title-small"
         >
           <img
             class="site-title-small"
@@ -21,7 +21,7 @@
           />
           <md-tooltip>ImJoy home</md-tooltip>
         </md-button>
-        <md-button v-if="workspace_dropping">
+        <md-button v-if="workspace_dropping && screenWidth > 400">
           Drop files to the workspace.
         </md-button>
         <span
