@@ -3423,7 +3423,9 @@ button.md-speed-dial-target {
   white-space: nowrap;
   max-width: calc(100vw - 300px);
 }
-
+.md-snackbar {
+  bottom: 0px !important;
+}
 @media screen and (max-width: 700px) {
   .md-snackbar {
     padding: 10px;
@@ -3436,8 +3438,8 @@ button.md-speed-dial-target {
 .md-snackbar-content > button {
   position: absolute;
   right: 12px;
-  bottom: 14px;
-  background-color: rgba(10, 10, 10, 0.8);
+  bottom: calc(50% - 12px) !important;
+  background-color: rgba(10, 10, 10, 1);
 }
 
 .md-snackbar-content > span {
