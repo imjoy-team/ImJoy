@@ -3430,6 +3430,9 @@ button.md-speed-dial-target {
   .md-snackbar {
     padding: 10px;
   }
+  .md-snackbar-content > button {
+    height: 32px !important;
+  }
 }
 .md-snackbar-content {
   overflow: hidden;
