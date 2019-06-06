@@ -748,6 +748,30 @@
                   }}
                 </md-button>
                 <div class="floating-right-buttons">
+                  <md-button
+                    v-if="plugin._log_history && plugin._log_history.length > 0"
+                    class="md-icon-button md-xsmall-hide"
+                    @click="showLog(plugin)"
+                  >
+                    <md-icon v-if="plugin._log_history._error" class="red"
+                      >error</md-icon
+                    >
+                    <md-icon v-else>info</md-icon>
+                    <md-tooltip
+                      v-if="
+                        plugin._log_history._error || plugin._log_history._info
+                      "
+                      >{{
+                        plugin._log_history._error || plugin._log_history._info
+                      }}</md-tooltip
+                    >
+                  </md-button>
+                  <md-button
+                    v-else
+                    class="md-icon-button md-xsmall-hide"
+                    disabled
+                  >
+                  </md-button>
                   <md-button class="md-icon-button" :disabled="true">
                     <md-icon>visibility_off</md-icon>
                   </md-button>
