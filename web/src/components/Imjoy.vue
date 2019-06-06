@@ -675,13 +675,14 @@
                 >
                   {{ op.name }}
                 </md-button>
-              </div>
-              <!-- <md-button class="md-icon-button" v-show="plugin.panel_expanded &&  op.name != plugin.name" @click="op.panel_expanded=!op.panel_expanded; $forceUpdate()"> -->
-              <!-- <md-icon v-if="!op.panel_expanded">expand_more</md-icon>
-                <md-icon v-else>expand_less</md-icon> -->
-              <!-- </md-button> -->
 
-              <joy :config="op" :show="plugin.panel_expanded || false"></joy>
+                <!-- <md-button class="md-icon-button" v-show="plugin.panel_expanded &&  op.name != plugin.name" @click="op.panel_expanded=!op.panel_expanded; $forceUpdate()"> -->
+                <!-- <md-icon v-if="!op.panel_expanded">expand_more</md-icon>
+                <md-icon v-else>expand_less</md-icon> -->
+                <!-- </md-button> -->
+
+                <joy :config="op" :show="plugin.panel_expanded || false"></joy>
+              </div>
               <md-divider></md-divider>
             </div>
             <md-divider></md-divider>
