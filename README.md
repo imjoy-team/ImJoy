@@ -4,7 +4,9 @@
 <a href="https://imjoy.io" target="_blank" ><img src="https://raw.githubusercontent.com/oeway/ImJoy/master/web/public/static/img/imjoy-logo-black.svg?sanitize=true" width="380"></img>
 </a>
 
-## ImJoy - Deploying Deep Learning Made Easy!
+## ImJoy - Deep Learning Made Easy!
+
+**New**: Preprint on Arxiv: [https://arxiv.org/abs/1905.13105](https://arxiv.org/abs/1905.13105)
 
 ImJoy is a plugin powered hybrid computing platform for deploying deep learning applications such as advanced image analysis tools.
 

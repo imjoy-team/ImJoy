@@ -13,7 +13,7 @@
       <span
         v-show="$route.path != '/'"
         class="md-layout-item md-medium-hide subheader-title"
-        >Deploying Deep Learning Made Easy!</span
+        >Deep Learning Made Easy!</span
       >
 
       <div class="md-toolbar-section-end">
