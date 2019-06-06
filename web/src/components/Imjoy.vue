@@ -593,36 +593,43 @@
                     : plugin.name
                 }}
               </md-button>
-
-              <md-button
-                v-if="plugin._log_history && plugin._log_history.length > 0"
-                class="md-icon-button md-xsmall-hide"
-                @click="showLog(plugin)"
-              >
-                <md-icon v-if="plugin._log_history._error" class="red"
-                  >error</md-icon
+              <div class="floating-right-buttons">
+                <md-button
+                  v-if="plugin._log_history && plugin._log_history.length > 0"
+                  class="md-icon-button md-xsmall-hide"
+                  @click="showLog(plugin)"
                 >
-                <md-icon v-else>info</md-icon>
-                <md-tooltip
-                  v-if="plugin._log_history._error || plugin._log_history._info"
-                  >{{
-                    plugin._log_history._error || plugin._log_history._info
-                  }}</md-tooltip
+                  <md-icon v-if="plugin._log_history._error" class="red"
+                    >error</md-icon
+                  >
+                  <md-icon v-else>info</md-icon>
+                  <md-tooltip
+                    v-if="
+                      plugin._log_history._error || plugin._log_history._info
+                    "
+                    >{{
+                      plugin._log_history._error || plugin._log_history._info
+                    }}</md-tooltip
+                  >
+                </md-button>
+                <md-button
+                  v-else
+                  class="md-icon-button md-xsmall-hide"
+                  disabled
                 >
-              </md-button>
-              <md-button v-else class="md-icon-button md-xsmall-hide" disabled>
-              </md-button>
+                </md-button>
 
-              <md-button
-                class="md-icon-button"
-                @click="
-                  plugin.panel_expanded = !plugin.panel_expanded;
-                  $forceUpdate();
-                "
-              >
-                <md-icon v-if="!plugin.panel_expanded">expand_more</md-icon>
-                <md-icon v-else>expand_less</md-icon>
-              </md-button>
+                <md-button
+                  class="md-icon-button"
+                  @click="
+                    plugin.panel_expanded = !plugin.panel_expanded;
+                    $forceUpdate();
+                  "
+                >
+                  <md-icon v-if="!plugin.panel_expanded">expand_more</md-icon>
+                  <md-icon v-else>expand_less</md-icon>
+                </md-button>
+              </div>
               <md-progress-bar
                 md-mode="determinate"
                 v-if="
@@ -651,15 +658,14 @@
                 >
                   {{ op.name }}
                 </md-button>
-
-                <!-- <md-button class="md-icon-button" v-show="plugin.panel_expanded &&  op.name != plugin.name" @click="op.panel_expanded=!op.panel_expanded; $forceUpdate()"> -->
-                <!-- <md-icon v-if="!op.panel_expanded">expand_more</md-icon>
-                <md-icon v-else>expand_less</md-icon> -->
-                <!-- </md-button> -->
-
-                <joy :config="op" :show="plugin.panel_expanded || false"></joy>
-                <md-divider></md-divider>
               </div>
+              <!-- <md-button class="md-icon-button" v-show="plugin.panel_expanded &&  op.name != plugin.name" @click="op.panel_expanded=!op.panel_expanded; $forceUpdate()"> -->
+              <!-- <md-icon v-if="!op.panel_expanded">expand_more</md-icon>
+                <md-icon v-else>expand_less</md-icon> -->
+              <!-- </md-button> -->
+
+              <joy :config="op" :show="plugin.panel_expanded || false"></joy>
+              <md-divider></md-divider>
             </div>
             <md-divider></md-divider>
             <div>
@@ -741,9 +747,11 @@
                       : plugin.name
                   }}
                 </md-button>
-                <md-button class="md-icon-button" :disabled="true">
-                  <md-icon>visibility_off</md-icon>
-                </md-button>
+                <div class="floating-right-buttons">
+                  <md-button class="md-icon-button" :disabled="true">
+                    <md-icon>visibility_off</md-icon>
+                  </md-button>
+                </div>
                 <md-divider></md-divider>
               </div>
             </div>
@@ -3420,6 +3428,15 @@ button.md-speed-dial-target {
 #plugin-menu > .md-card-content {
   max-height: calc(100vh - 95px - 86px);
   overflow: auto;
+  padding-left: 6px;
+  padding-right: 6px;
+}
+
+@media screen and (max-width: 700px) {
+  #plugin-menu > .md-card-content {
+    padding-left: 0px;
+    padding-right: 0px;
+  }
 }
 
 #plugin-menu > .md-card-header {
@@ -3545,5 +3562,11 @@ button.md-speed-dial-target {
   bottom: 0;
   left: 0;
   right: 0;
+}
+
+.floating-right-buttons {
+  display: inline-block;
+  margin-left: auto;
+  margin-right: 0;
 }
 </style>

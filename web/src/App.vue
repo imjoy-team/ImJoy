@@ -202,4 +202,9 @@ ol li,
 ul li {
   margin-top: 0rem !important;
 }
+
+/* for code editor */
+canvas.decorationsOverviewRuler {
+  background-color: white;
+}
 </style>
