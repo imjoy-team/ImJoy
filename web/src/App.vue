@@ -199,6 +199,10 @@ ul li {
   margin-top: 0rem !important;
 }
 
+.joy-run-button .md-ripple {
+  justify-content: flex-start !important;
+}
+
 /* for code editor */
 canvas.decorationsOverviewRuler {
   background-color: white;
