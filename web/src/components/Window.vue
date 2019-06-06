@@ -100,6 +100,7 @@
 </template>
 
 <script>
+import ResizeObserver from "resize-observer-polyfill";
 import * as windowComponents from "./windows";
 
 const components = {};
@@ -142,6 +143,7 @@ export default {
   },
   mounted() {
     if (this.w) {
+      this.w.$el = this.$el;
       this.w.onRefresh(() => {
         this.refresh();
       });
@@ -152,6 +154,10 @@ export default {
         this.fullScreen(this.w);
       }
     }
+    const ro = new ResizeObserver(entries => {
+      this.w.resize(entries[0].contentRect);
+    });
+    ro.observe(this.$el);
   },
   beforeDestroy() {
     this.w.closed = true;
