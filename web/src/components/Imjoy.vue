@@ -874,7 +874,7 @@
     >
       <span @click="showAlert(null, snackbar_info)">{{ snackbar_info }}</span>
       <md-button class="md-accent" @click="show_snackbar = false"
-        >close</md-button
+        ><md-icon>clear</md-icon></md-button
       >
     </md-snackbar>
 
@@ -3435,9 +3435,9 @@ button.md-speed-dial-target {
 }
 .md-snackbar-content > button {
   position: absolute;
-  right: 10px;
-  top: 15px;
-  background-color: rgba(10, 10, 10, 0.6);
+  right: 12px;
+  bottom: 14px;
+  background-color: rgba(10, 10, 10, 0.8);
 }
 
 .md-snackbar-content > span {
@@ -3481,12 +3481,13 @@ button.md-speed-dial-target {
 #plugin-menu {
   height: 100%;
   max-height: calc(100vh - 95px);
-  padding: 10px;
+  padding: 4px 10px;
 }
 
 #plugin-menu > .md-card-content {
   max-height: calc(100vh - 95px - 86px);
   overflow: auto;
+  padding-top: 5px;
   padding-left: 6px;
   padding-right: 6px;
 }
@@ -3495,6 +3496,9 @@ button.md-speed-dial-target {
   #plugin-menu > .md-card-content {
     padding-left: 0px;
     padding-right: 0px;
+  }
+  #plugin-menu {
+    padding: 2px 5px;
   }
 }
 
@@ -3506,6 +3510,7 @@ button.md-speed-dial-target {
 @media screen and (max-height: 900px) {
   #plugin-menu > .md-card-header {
     padding: 5px;
+    height: 38px;
   }
 }
 
