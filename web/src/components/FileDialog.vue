@@ -92,7 +92,7 @@
           resolve(file_tree_selection);
         "
         >OK
-        <md-tooltip v-if="file_tree_selection"
+        <md-tooltip class="md-small-hide" v-if="file_tree_selection"
           >Selected: {{ file_tree_selection }}</md-tooltip
         >
       </md-button>

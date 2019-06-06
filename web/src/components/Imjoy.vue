@@ -123,7 +123,7 @@
             class="md-icon-button"
           >
             <md-icon>{{ "filter_" + (i + 1) }}</md-icon>
-            <md-tooltip>{{
+            <md-tooltip class="md-xsmall-hide">{{
               w.name.slice(0, 30) + "(#" + w.index + ")"
             }}</md-tooltip>
           </md-button>
@@ -468,7 +468,7 @@
                     plugin.config.icon
                   }}</md-icon>
                   <md-icon v-else>extension</md-icon>
-                  <md-tooltip>{{
+                  <md-tooltip v-if="screenWidth > 500">{{
                     plugin.name + ": " + plugin.config.description
                   }}</md-tooltip>
                 </md-button>
@@ -706,7 +706,7 @@
                       plugin.config.icon
                     }}</md-icon>
                     <md-icon v-else>extension</md-icon>
-                    <md-tooltip>{{
+                    <md-tooltip v-if="screenWidth > 500">{{
                       plugin.name + ": " + plugin.config.description
                     }}</md-tooltip>
                   </md-button>
