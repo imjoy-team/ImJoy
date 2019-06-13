@@ -2145,7 +2145,7 @@ export default {
         reader.readAsText(file);
       };
 
-      const engine_loader = engine_file_obj => {
+      const engine_code_loader = engine_file_obj => {
         const w = {
           name: "New Plugin",
           type: "imjoy/plugin-editor",
@@ -2164,6 +2164,16 @@ export default {
           },
         };
         this.createWindow(w);
+      };
+
+      const engine_image_loader = engine_image_file => {
+        const tmp = engine_image_file.url.split("/");
+        const file_name = tmp[tmp.length - 1];
+        this.createWindow({
+          name: file_name,
+          type: "imjoy/image",
+          data: { src: engine_image_file.url },
+        });
       };
 
       return [
@@ -2188,7 +2198,7 @@ export default {
             },
             required: ["url", "path", "engine"],
           }),
-          loader: engine_loader,
+          loader: engine_code_loader,
         },
         {
           loader_key: "Image",
@@ -2203,6 +2213,21 @@ export default {
             required: ["type", "size"],
           }),
           loader: image_loader,
+        },
+        {
+          loader_key: "Image",
+          schema: ajv.compile({
+            properties: {
+              url: {
+                type: "string",
+                pattern: "(.*\\.jpg|\\.jpeg|\\.png|\\.gif)$",
+              },
+              path: { type: "string" },
+              engine: { type: "string" },
+            },
+            required: ["url", "path", "engine"],
+          }),
+          loader: engine_image_loader,
         },
       ];
     },
