@@ -318,31 +318,19 @@ export default {
       };
       reader.readAsText(file);
     },
-    async openEnigneFile() {
+    async openEnigneFile(config) {
       const api = this.window.plugin_manager.imjoy_api;
       try {
-        const retObj = await api.showFileDialog(null, {
-          title: "Load plugin source file",
-          uri_type: "url",
-          mode: "single",
-          type: "file",
-        });
-        const response = await axios.get(retObj.url + "?" + randId());
-        if (response && response.data) {
-          const code = response.data;
-          this.window.plugin_manager.parsePluginCode(code);
-          this.editor.setValue(code);
-          this.code_origin = retObj;
-          this.window.plugin_manager.showMessage(
-            `Successfully loading source code from ${retObj.engine}: ${
-              retObj.path
-            }.`
-          );
-        } else {
-          this.window.plugin_manager.showMessage(
-            "Failed to load plugin source code."
-          );
-        }
+        const retObj =
+          config ||
+          (await api.showFileDialog(null, {
+            title: "Load plugin source file",
+            uri_type: "url",
+            mode: "single",
+            type: "file",
+          }));
+        this.code_origin = retObj;
+        this.load_code_from_origin();
       } catch (e) {
         this.window.plugin_manager.showMessage(
           `Failed to load plugin source code, error: ${e}`
@@ -354,7 +342,8 @@ export default {
         const response = await axios.get(this.code_origin.url + "?" + randId());
         if (response && response.data) {
           const code = response.data;
-          this.window.plugin_manager.parsePluginCode(code);
+          const config = this.window.plugin_manager.parsePluginCode(code);
+          this.window.name = config.name;
           this.editor.setValue(code);
           this.window.plugin_manager.showMessage(
             `Successfully loading source code from ${
