@@ -1067,6 +1067,7 @@ export class PluginManager {
 
   parsePluginCode(code, overwrite_config) {
     let config = {};
+    overwrite_config = overwrite_config || {};
     const uri = overwrite_config.uri;
     try {
       if (uri && uri.endsWith(".js")) {

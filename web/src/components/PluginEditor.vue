@@ -1,11 +1,56 @@
 <template>
   <div class="plugin-editor">
+    <form v-show="false" ref="file_form">
+      <input
+        class="md-file"
+        type="file"
+        @change="openLocalFile"
+        ref="file_select"
+        multiple
+      />
+    </form>
     <md-toolbar
       v-if="window"
       class="md-dense editor-toolbar md-layout"
       md-elevation="1"
     >
       <div class="md-toolbar-section-start">
+        <md-menu md-size="big">
+          <md-button class="md-icon-button" md-menu-trigger>
+            <md-icon>insert_drive_file</md-icon>
+            <md-tooltip class="md-medium-hide">Open File</md-tooltip>
+          </md-button>
+
+          <md-menu-content>
+            <md-menu-item
+              @click="openEnigneFile()"
+              :disabled="window.engine_manager.engines.length <= 0"
+            >
+              <md-icon>add_to_queue</md-icon>Open Engine File
+              <md-tooltip>Load files through Plugin Engine</md-tooltip>
+            </md-menu-item>
+            <md-menu-item
+              @click="
+                $refs.file_form.reset();
+                $refs.file_select.click();
+              "
+            >
+              <md-icon>insert_drive_file</md-icon>Open Local File
+            </md-menu-item>
+          </md-menu-content>
+        </md-menu>
+
+        <md-button
+          @click="load_code_from_origin()"
+          v-if="code_origin"
+          class="md-icon-button"
+        >
+          <md-icon>autorenew</md-icon>
+          <md-tooltip class="md-medium-hide"
+            >Reload plugin source code file from the engine (Ctrl+L)</md-tooltip
+          >
+        </md-button>
+
         <md-button @click="run()" class="md-icon-button">
           <md-icon>play_arrow</md-icon>
           <md-tooltip class="md-medium-hide"
@@ -106,6 +151,8 @@
 
 <script>
 import { saveAs } from "file-saver";
+import axios from "axios";
+
 import { randId, assert } from "../utils.js";
 
 import * as monaco from "monaco-editor";
@@ -140,6 +187,7 @@ export default {
       codeValue: "",
       editor: null,
       saved: false,
+      code_origin: null,
     };
   },
   created() {
@@ -184,6 +232,12 @@ export default {
       window.monaco.KeyMod.CtrlCmd | window.monaco.KeyCode.KEY_E,
       () => {
         this.run();
+      }
+    );
+    this.editor.addCommand(
+      window.monaco.KeyMod.CtrlCmd | window.monaco.KeyCode.KEY_L,
+      () => {
+        this.load_code_from_origin();
       }
     );
   },
@@ -247,6 +301,76 @@ export default {
               });
           });
       });
+    },
+    openLocalFile(event) {
+      const file = event.target.files[0];
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const code = reader.result;
+          this.window.plugin_manager.parsePluginCode(code);
+          this.editor.setValue(code);
+        } catch (e) {
+          this.window.plugin_manager.showMessage(
+            `Failed to load plugin source code, error: ${e}`
+          );
+        }
+      };
+      reader.readAsText(file);
+    },
+    async openEnigneFile() {
+      const api = this.window.plugin_manager.imjoy_api;
+      try {
+        const retObj = await api.showFileDialog(null, {
+          title: "Load plugin source file",
+          uri_type: "url",
+          mode: "single",
+          type: "file",
+        });
+        const response = await axios.get(retObj.url + "?" + randId());
+        if (response && response.data) {
+          const code = response.data;
+          this.window.plugin_manager.parsePluginCode(code);
+          this.editor.setValue(code);
+          this.code_origin = retObj;
+          this.window.plugin_manager.showMessage(
+            `Successfully loading source code from ${retObj.engine}: ${
+              retObj.path
+            }.`
+          );
+        } else {
+          this.window.plugin_manager.showMessage(
+            "Failed to load plugin source code."
+          );
+        }
+      } catch (e) {
+        this.window.plugin_manager.showMessage(
+          `Failed to load plugin source code, error: ${e}`
+        );
+      }
+    },
+    async load_code_from_origin() {
+      try {
+        const response = await axios.get(this.code_origin.url + "?" + randId());
+        if (response && response.data) {
+          const code = response.data;
+          this.window.plugin_manager.parsePluginCode(code);
+          this.editor.setValue(code);
+          this.window.plugin_manager.showMessage(
+            `Successfully loading source code from ${
+              this.code_origin.engine
+            }: ${this.code_origin.path}.`
+          );
+        } else {
+          this.window.plugin_manager.showMessage(
+            "Failed to load plugin source code."
+          );
+        }
+      } catch (e) {
+        this.window.plugin_manager.showMessage(
+          `Failed to load plugin source code, error: ${e}`
+        );
+      }
     },
     async run() {
       assert(this.window.plugin_manager);

@@ -2903,7 +2903,7 @@ export default {
           .get({
             url: config.url,
             method: config.method || "GET",
-            responseType: config.method || "blob",
+            responseType: config.responseType || "blob",
             onDownloadProgress: progressEvent => {
               totalLength =
                 totalLength || progressEvent.lengthComputable
