@@ -223,7 +223,7 @@
                 >
                 <md-icon v-else>error_outline</md-icon>
                 <div
-                  @click.stop="checkUpdate"
+                  @click.stop="checkImJoyUpdate"
                   style="width: 100%;cursor: pointer;"
                 >
                   <div
@@ -2038,10 +2038,10 @@ export default {
       }
       this.$forceUpdate();
       this.$nextTick(() => {
-        this.checkUpdate();
+        this.checkImJoyUpdate();
         //check for update every 20 minutes
         window.setInterval(() => {
-          this.checkUpdate(true);
+          this.checkImJoyUpdate(true);
         }, 1200000);
       });
     },
@@ -2076,7 +2076,7 @@ export default {
     createWindow(w) {
       return this.pm.createWindow(null, w);
     },
-    async checkUpdate(quiet) {
+    async checkImJoyUpdate(quiet) {
       this.checking = true;
       try {
         const response = await axios.get(
