@@ -464,15 +464,24 @@
                     :md-diameter="20"
                     md-mode="indeterminate"
                   ></md-progress-spinner>
-                  <md-icon v-else-if="plugin.config.icon">{{
-                    plugin.config.icon
-                  }}</md-icon>
+                  <md-icon
+                    v-else-if="plugin.config.icon"
+                    :class="plugin.update_available ? 'md-primary' : ''"
+                    >{{ plugin.config.icon }}</md-icon
+                  >
                   <md-icon v-else>extension</md-icon>
                   <md-tooltip v-if="screenWidth > 500">{{
                     plugin.name + ": " + plugin.config.description
                   }}</md-tooltip>
                 </md-button>
                 <md-menu-content>
+                  <md-menu-item
+                    v-if="plugin.config.origin && plugin.update_available"
+                    @click="updatePlugin(plugin.id)"
+                    class="md-primary"
+                  >
+                    <md-icon class="md-primary">cloud_download</md-icon>Update
+                  </md-menu-item>
                   <md-menu-item
                     @click="showLog(plugin)"
                     v-if="
@@ -506,12 +515,6 @@
                   </md-menu-item>
                   <md-menu-item @click="unloadPlugin(plugin)">
                     <md-icon>clear</md-icon>Terminate
-                  </md-menu-item>
-                  <md-menu-item
-                    v-if="plugin.config.origin"
-                    @click="updatePlugin(plugin.id)"
-                  >
-                    <md-icon>cloud_download</md-icon>Update
                   </md-menu-item>
                   <md-menu-item
                     class="md-accent"
@@ -703,15 +706,24 @@
                       :md-diameter="20"
                       md-mode="indeterminate"
                     ></md-progress-spinner>
-                    <md-icon v-else-if="plugin.config.icon">{{
-                      plugin.config.icon
-                    }}</md-icon>
+                    <md-icon
+                      v-else-if="plugin.config.icon"
+                      :class="plugin.update_available ? 'md-primary' : ''"
+                      >{{ plugin.config.icon }}</md-icon
+                    >
                     <md-icon v-else>extension</md-icon>
                     <md-tooltip v-if="screenWidth > 500">{{
                       plugin.name + ": " + plugin.config.description
                     }}</md-tooltip>
                   </md-button>
                   <md-menu-content>
+                    <md-menu-item
+                      v-if="plugin.config.origin && plugin.update_available"
+                      @click="updatePlugin(plugin.id)"
+                      class="md-primary"
+                    >
+                      <md-icon class="md-primary">cloud_download</md-icon>Update
+                    </md-menu-item>
                     <md-menu-item
                       @click="showLog(plugin)"
                       v-if="
@@ -739,12 +751,6 @@
                     </md-menu-item>
                     <md-menu-item @click="unloadPlugin(plugin)">
                       <md-icon>clear</md-icon>Terminate
-                    </md-menu-item>
-                    <md-menu-item
-                      v-if="plugin.config.origin"
-                      @click="updatePlugin(plugin.id)"
-                    >
-                      <md-icon>cloud_download</md-icon>Update
                     </md-menu-item>
                     <md-menu-item
                       class="md-accent"
@@ -2123,6 +2129,7 @@ export default {
       } finally {
         this.checking = false;
       }
+      this.pm.checkUpdates();
     },
     getDefaultInputLoaders() {
       const image_loader = file => {
@@ -2279,9 +2286,8 @@ export default {
         return config;
       } catch (e) {
         this.downloading_plugin = false;
-        this.downloading_error =
-          "Sorry, the plugin URL is invalid: " + e.toString();
-        this.showMessage("Sorry, the plugin URL is invalid: " + e.toString());
+        this.downloading_error = `Failed to fetch plugin, error: ${e}`;
+        this.showMessage(this.downloading_error);
         throw e;
       }
     },
@@ -2485,15 +2491,10 @@ export default {
       const plugin = this.pm.plugins[pid];
       const pconfig = plugin.config;
       if (pconfig.origin) {
-        this.installing = true;
-        this.pm
-          .installPlugin(pconfig.origin)
-          .then(() => {
-            this.$forceUpdate();
-          })
-          .finally(() => {
-            this.installing = false;
-          });
+        this.getPlugin4Install(pconfig.origin).then(() => {
+          this.show_plugin_templates = false;
+          this.showAddPluginDialog = true;
+        });
       } else {
         alert("Origin not found for this plugin.");
       }

@@ -227,6 +227,7 @@ export default {
             pluginId: this.pluginId,
             code: this.codeValue,
             tag: this.window.plugin && this.window.plugin.tag,
+            origin: this.window.plugin && this.window.plugin.origin,
           })
           .then(config => {
             // this.window.data._id = config._id

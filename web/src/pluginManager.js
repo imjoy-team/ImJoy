@@ -1,5 +1,6 @@
 /*eslint no-unused-vars: ["error", { "argsIgnorePattern": "^_plugin$" }]*/
 import PouchDB from "pouchdb-browser";
+import SparkMD5 from "spark-md5";
 import axios from "axios";
 import _ from "lodash";
 
@@ -12,6 +13,7 @@ import {
   githubRepo,
   githubUrlRaw,
   assert,
+  compareVersions,
 } from "./utils.js";
 
 import { parseComponent } from "./pluginParser.js";
@@ -638,6 +640,16 @@ export class PluginManager {
               if (config.workflow) {
                 this.workflow_list.push(config);
               } else {
+                //verify hash
+                if (config.hash) {
+                  if (SparkMD5.hash(config.code) !== config.hash) {
+                    console.error(
+                      "Plugin source code signature mismatch, skip loading plugin",
+                      config
+                    );
+                    continue;
+                  }
+                }
                 config.installed = true;
                 this.installed_plugins.push(config);
                 if (skip_native_python && config.type === "native-python") {
@@ -726,11 +738,12 @@ export class PluginManager {
       throw "failed to get code.";
     }
     const code = response.data;
-    let config = this.parsePluginCode(code, { tag: selected_tag });
-    config.uri = uri;
-    config.origin = uri;
+    let config = this.parsePluginCode(code, {
+      tag: selected_tag,
+      origin: uri,
+      uri: uri,
+    });
     config.scoped_plugins = scoped_plugins;
-    config.tag = selected_tag;
     return config;
   }
 
@@ -978,6 +991,7 @@ export class PluginManager {
         });
         template.code = code;
         template._id = template.name.replace(/ /g, "_");
+        template.hash = SparkMD5.hash(template.code);
         const addPlugin = template => {
           this.db
             .put(template)
@@ -1067,41 +1081,32 @@ export class PluginManager {
 
   parsePluginCode(code, overwrite_config) {
     let config = {};
-    const uri = overwrite_config.uri;
     try {
-      if (uri && uri.endsWith(".js")) {
-        config.lang = "javascript";
-        config.scripts = [code];
-        config.script = code;
-        config.style = null;
-        config.window = null;
-        config.tag = overwrite_config.tag || null;
-      } else {
-        const pluginComp = parseComponent(code);
-        config = JSON.parse(pluginComp.config[0].content);
-        config.scripts = [];
-        for (let i = 0; i < pluginComp.script.length; i++) {
-          config.scripts.push(pluginComp.script[i]);
-        }
-        if (!config.script) {
-          config.script = pluginComp.script[0].content;
-        }
-        config.tag = overwrite_config.tag || (config.tags && config.tags[0]);
-        // try to match the script with current tag
-        for (let i = 0; i < pluginComp.script.length; i++) {
-          if (pluginComp.script[i].attrs.tag === config.tag) {
-            config.script = pluginComp.script[i].content;
-            break;
-          }
-        }
-        config.links = pluginComp.link || null;
-        config.windows = pluginComp.window || null;
-        config.styles = pluginComp.style || null;
-        config.docs = pluginComp.docs || null;
-        config.attachments = pluginComp.attachment || null;
+      const pluginComp = parseComponent(code);
+      config = JSON.parse(pluginComp.config[0].content);
+      config.scripts = [];
+      for (let i = 0; i < pluginComp.script.length; i++) {
+        config.scripts.push(pluginComp.script[i]);
       }
-      config._id = overwrite_config._id || null;
-      config.uri = uri;
+      if (!config.script) {
+        config.script = pluginComp.script[0].content;
+      }
+      config.tag = overwrite_config.tag || (config.tags && config.tags[0]);
+      // try to match the script with current tag
+      for (let i = 0; i < pluginComp.script.length; i++) {
+        if (pluginComp.script[i].attrs.tag === config.tag) {
+          config.script = pluginComp.script[i].content;
+          break;
+        }
+      }
+      config.links = pluginComp.link || null;
+      config.windows = pluginComp.window || null;
+      config.styles = pluginComp.style || null;
+      config.docs = pluginComp.docs || null;
+      config.attachments = pluginComp.attachment || null;
+
+      config._id = overwrite_config._id || config.name.replace(/ /g, "_");
+      config.uri = overwrite_config.uri;
       config.origin = overwrite_config.origin;
       config.code = code;
       config.id = config.name.trim().replace(/ /g, "_") + "_" + randId();
@@ -2083,5 +2088,37 @@ export class PluginManager {
 
   onClose(_plugin, cb) {
     _plugin.onClose(cb);
+  }
+
+  checkUpdates() {
+    for (let k in this.plugins) {
+      if (this.plugins.hasOwnProperty(k)) {
+        const plugin = this.plugins[k];
+        const pconfig = plugin.config;
+        if (pconfig.origin) {
+          this.getPluginFromUrl(pconfig.origin, this.available_plugins).then(
+            async config => {
+              if (pconfig.hash) {
+                if (pconfig.hash !== SparkMD5.hash(config.code)) {
+                  if (compareVersions(pconfig.version, "<=", config.version)) {
+                    plugin.update_available = true;
+                  } else {
+                    plugin.update_available = false;
+                  }
+                } else {
+                  plugin.update_available = false;
+                }
+              } else {
+                if (compareVersions(pconfig.version, "<", config.version)) {
+                  plugin.update_available = true;
+                } else {
+                  plugin.update_available = false;
+                }
+              }
+            }
+          );
+        }
+      }
+    }
   }
 }
