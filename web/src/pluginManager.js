@@ -2121,6 +2121,17 @@ export class PluginManager {
         const plugin = this.plugins[k];
         if (plugin.config.origin) {
           this.checkPluginUpdate(plugin);
+        } else {
+          const ps = this.available_plugins.filter(p => {
+            return plugin.name === p.name;
+          });
+          if (ps.length > 0) {
+            plugin.config.origin = ps[0].uri;
+            this.checkPluginUpdate(plugin);
+          }
+          // else{
+          //   console.log(`Plugin origin not found: ${plugin.name}`)
+          // }
         }
       }
     }
