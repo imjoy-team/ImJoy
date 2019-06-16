@@ -7,7 +7,7 @@
     <md-card-actions
       v-if="!w.standalone"
       :class="{
-        'drag-handle': withDragHandle,
+        
         'window-selected': w.selected,
         'window-header': !w.selected,
       }"
