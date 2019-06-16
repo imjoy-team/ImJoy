@@ -302,5 +302,11 @@ export default {
   .drag-handle {
     cursor: pointer !important;
   }
+  .md-button {
+    cursor: pointer !important;
+  }
+  .md-card {
+    cursor: pointer !important;
+  }
 }
 </style>
