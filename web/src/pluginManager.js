@@ -2127,16 +2127,13 @@ export class PluginManager {
         if (plugin.config.origin) {
           this.checkPluginUpdate(plugin);
         } else {
-          const ps = this.available_plugins.filter(p => {
+          const pc = this.available_plugins.find(p => {
             return plugin.name === p.name;
           });
-          if (ps.length > 0) {
-            plugin.config.origin = ps[0].uri;
+          if (pc) {
+            plugin.config.origin = pc.uri;
             this.checkPluginUpdate(plugin);
           }
-          // else{
-          //   console.log(`Plugin origin not found: ${plugin.name}`)
-          // }
         }
       }
     }
