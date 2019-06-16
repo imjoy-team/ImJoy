@@ -8,7 +8,10 @@
         'window-header': !w.selected,
       }"
       md-alignment="space-between"
-      @click.native="selectWindow(w, $event)"
+      @click.native="
+        selectWindow(w, $event);
+        options_menu_open = false;
+      "
       @dblclick.native="w._h && w._w ? normalSize(w) : fullScreen(w)"
     >
       <md-button class="md-icon-button md-accent no-drag" @click="close(w)">
@@ -19,7 +22,11 @@
         {{ w.name.slice(0, 30) + "(#" + w.index + ")" }}
       </div>
       <div class="no-drag">
-        <md-menu md-size="big" md-direction="bottom-end">
+        <md-menu
+          md-size="big"
+          md-direction="bottom-end"
+          :md-active.sync="options_menu_open"
+        >
           <md-button class="md-icon-button" md-menu-trigger>
             <md-icon>more_vert</md-icon>
           </md-button>
@@ -123,6 +130,7 @@ export default {
   data() {
     return {
       componentNames: {},
+      options_menu_open: false,
     };
   },
   created() {
