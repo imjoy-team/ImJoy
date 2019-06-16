@@ -3,7 +3,7 @@
     class="whiteboard noselect"
     ref="whiteboard"
     @mouseup="show_overlay = false"
-    @click="unselectWindows()"
+    @click="unselectWindows($event)"
   >
     <div
       @mousemove="overlayMousemove"
@@ -295,7 +295,10 @@ export default {
         standalone: w.standalone,
       });
     },
-    unselectWindows() {
+    unselectWindows(e) {
+      if (!e.target.classList.contains("vue-grid-layout")) {
+        return;
+      }
       if (this.active_windows && this.active_windows.length > 0) {
         for (let i = 0; i < this.active_windows.length; i++) {
           this.active_windows[i].selected = false;

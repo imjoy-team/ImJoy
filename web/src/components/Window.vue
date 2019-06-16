@@ -1,80 +1,70 @@
 <template>
-  <md-card v-if="w">
-    <md-card-expand
+  <md-card
+    v-if="w"
+    @click.native="selectWindow(w, $event)"
+    @dblclick.native="w._h && w._w ? normalSize(w) : fullScreen(w)"
+  >
+    <md-card-actions
       v-if="!w.standalone"
-      @click.native.stop="selectWindow(w, $event)"
-      @dblclick.native.stop="w._h && w._w ? normalSize(w) : fullScreen(w)"
-      :class="{ 'drag-handle': withDragHandle }"
+      :class="{
+        'drag-handle': withDragHandle,
+        'window-selected': w.selected,
+        'window-header': !w.selected,
+      }"
+      md-alignment="space-between"
     >
-      <md-card-actions
-        md-alignment="space-between"
-        :class="w.selected ? 'window-selected' : 'window-header'"
-      >
-        <md-card-expand-trigger v-if="w.panel">
-          <md-button class="md-icon-button">
-            <md-icon>keyboard_arrow_down</md-icon>
+      <md-button class="md-icon-button md-accent" @click="close(w)">
+        <md-icon>close</md-icon>
+      </md-button>
+      <div class="window-title noselect">
+        {{ w.name.slice(0, 30) + "(#" + w.index + ")" }}
+      </div>
+      <div>
+        <md-menu md-size="big" md-direction="bottom-end">
+          <md-button class="md-icon-button" md-menu-trigger>
+            <md-icon>more_vert</md-icon>
           </md-button>
-        </md-card-expand-trigger>
-        <md-button class="md-icon-button md-accent" @click="close(w)">
-          <md-icon>close</md-icon>
-        </md-button>
-        <div class="window-title noselect">
-          {{ w.name.slice(0, 30) + "(#" + w.index + ")" }}
-        </div>
-        <div>
-          <md-menu md-size="big" md-direction="bottom-end">
-            <md-button class="md-icon-button" md-menu-trigger>
-              <md-icon>more_vert</md-icon>
-            </md-button>
-            <md-menu-content>
-              <md-menu-item
-                @click.stop="normalSize(w)"
-                v-if="!w.standalone && w.fullscreen"
-              >
-                <span>Normal view</span>
-                <md-icon>fullscreen</md-icon>
-              </md-menu-item>
-              <md-menu-item
-                @click.stop="fullScreen(w)"
-                v-else-if="!w.standalone"
-              >
-                <span>Fullscreen</span>
-                <md-icon>fullscreen</md-icon>
-              </md-menu-item>
-              <md-menu-item @click.stop="detach(w)" v-if="!w.standalone">
-                <span>Detach</span>
-                <md-icon>launch</md-icon>
-              </md-menu-item>
-              <md-menu-item @click.stop="duplicate(w)">
-                <span>Duplicate</span>
-                <md-icon>filter</md-icon>
-              </md-menu-item>
-              <md-menu-item @click="close(w)">
-                <span>Close</span>
-                <md-icon>close</md-icon>
-              </md-menu-item>
-              <md-menu-item @click="printObject(w.type, w.data, w)">
-                <span>Console.log</span>
-                <md-icon>bug_report</md-icon>
-              </md-menu-item>
-              <md-menu-item
-                v-for="(loader, name) in w.loaders"
-                :key="name"
-                @click="loaders && loaders[loader](w.data)"
-              >
-                <span>{{ name }}</span>
-                <md-icon>play_arrow</md-icon>
-              </md-menu-item>
-            </md-menu-content>
-          </md-menu>
-        </div>
-      </md-card-actions>
-      <md-card-expand-content v-if="w.panel">
-        <md-card-content>
-          <joy :config="w.panel"></joy>
-        </md-card-content>
-      </md-card-expand-content>
-    </md-card-expand>
+          <md-menu-content>
+            <md-menu-item
+              @click="normalSize(w)"
+              v-if="!w.standalone && w.fullscreen"
+            >
+              <span>Normal view</span>
+              <md-icon>fullscreen</md-icon>
+            </md-menu-item>
+            <md-menu-item @click="fullScreen(w)" v-else-if="!w.standalone">
+              <span>Fullscreen</span>
+              <md-icon>fullscreen</md-icon>
+            </md-menu-item>
+            <md-menu-item @click="detach(w)" v-if="!w.standalone">
+              <span>Detach</span>
+              <md-icon>launch</md-icon>
+            </md-menu-item>
+            <md-menu-item @click="duplicate(w)">
+              <span>Duplicate</span>
+              <md-icon>filter</md-icon>
+            </md-menu-item>
+            <md-menu-item @click="close(w)">
+              <span>Close</span>
+              <md-icon>close</md-icon>
+            </md-menu-item>
+            <md-menu-item @click="printObject(w.type, w.data, w)">
+              <span>Console.log</span>
+              <md-icon>bug_report</md-icon>
+            </md-menu-item>
+            <md-menu-item
+              v-for="(loader, name) in w.loaders"
+              :key="name"
+              @click="loaders && loaders[loader](w.data)"
+            >
+              <span>{{ name }}</span>
+              <md-icon>play_arrow</md-icon>
+            </md-menu-item>
+          </md-menu-content>
+        </md-menu>
+      </div>
+    </md-card-actions>
+
     <md-card-content
       :class="w.standalone ? 'taller-container' : 'shorter-container'"
       class="plugin-iframe-container allow-scroll"
