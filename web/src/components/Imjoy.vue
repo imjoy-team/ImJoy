@@ -237,6 +237,12 @@
 
                 <md-tooltip>click to check updates</md-tooltip>
               </md-menu-item>
+              <md-menu-item @click="restartImJoy" class="md-primary">
+                <md-icon>autorenew</md-icon>
+
+                <span>Restart ImJoy</span>
+                <md-tooltip>click to reload</md-tooltip>
+              </md-menu-item>
             </md-menu-content>
           </md-menu>
         </div>
@@ -2097,6 +2103,9 @@ export default {
     },
     createWindow(w) {
       return this.pm.createWindow(null, w);
+    },
+    async restartImJoy() {
+      window.location.reload(true);
     },
     async checkImJoyUpdate(quiet) {
       this.checking = true;
