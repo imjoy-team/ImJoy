@@ -1080,10 +1080,10 @@ export class PluginManager {
   }
 
   parsePluginCode(code, overwrite_config) {
-    let config = {};
+    overwrite_config = overwrite_config || {};
     try {
       const pluginComp = parseComponent(code);
-      config = JSON.parse(pluginComp.config[0].content);
+      let config = JSON.parse(pluginComp.config[0].content);
       config.scripts = [];
       for (let i = 0; i < pluginComp.script.length; i++) {
         config.scripts.push(pluginComp.script[i]);

@@ -1,5 +1,6 @@
 <template>
   <plugin-editor
+    ref="code_editor"
     class="no-drag fill-container"
     :pluginId="w.data.id"
     :window="w"
@@ -25,6 +26,11 @@ export default {
         return null;
       },
     },
+  },
+  mounted() {
+    if (this.w.data.engine_file_obj) {
+      this.$refs.code_editor.openEnigneFile(this.w.data.engine_file_obj);
+    }
   },
   methods: {
     dataSummary(w) {
