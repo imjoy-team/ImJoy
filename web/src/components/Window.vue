@@ -8,10 +8,7 @@
         'window-header': !w.selected,
       }"
       md-alignment="space-between"
-      @click.native="
-        selectWindow(w, $event);
-        options_menu_open = false;
-      "
+      @click.native="selectWindow(w, $event)"
       @dblclick.native="w._h && w._w ? normalSize(w) : fullScreen(w)"
     >
       <md-button class="md-icon-button md-accent no-drag" @click="close(w)">
@@ -30,41 +27,46 @@
           <md-button class="md-icon-button" md-menu-trigger>
             <md-icon>more_vert</md-icon>
           </md-button>
+
           <md-menu-content>
+            <md-menu-item @click="options_menu_open = false">
+              <md-icon>highlight_off</md-icon>
+              <span>Cancel</span>
+            </md-menu-item>
             <md-menu-item
               @click="normalSize(w)"
               v-if="!w.standalone && w.fullscreen"
             >
-              <span>Normal view</span>
               <md-icon>fullscreen</md-icon>
+              <span>Normal view</span>
             </md-menu-item>
             <md-menu-item @click="fullScreen(w)" v-else-if="!w.standalone">
-              <span>Fullscreen</span>
               <md-icon>fullscreen</md-icon>
+              <span>Fullscreen</span>
             </md-menu-item>
             <md-menu-item @click="detach(w)" v-if="!w.standalone">
-              <span>Detach</span>
               <md-icon>launch</md-icon>
+              <span>Detach</span>
             </md-menu-item>
             <md-menu-item @click="duplicate(w)">
-              <span>Duplicate</span>
               <md-icon>filter</md-icon>
+              <span>Duplicate</span>
             </md-menu-item>
             <md-menu-item @click="close(w)">
-              <span>Close</span>
               <md-icon>close</md-icon>
+              <span>Close</span>
             </md-menu-item>
             <md-menu-item @click="printObject(w.type, w.data, w)">
-              <span>Console.log</span>
               <md-icon>bug_report</md-icon>
+              <span>Console.log</span>
             </md-menu-item>
             <md-menu-item
               v-for="(loader, name) in w.loaders"
               :key="name"
               @click="loaders && loaders[loader](w.data)"
             >
-              <span>{{ name }}</span>
               <md-icon>play_arrow</md-icon>
+              <span>{{ name }}</span>
             </md-menu-item>
           </md-menu-content>
         </md-menu>
