@@ -1,7 +1,7 @@
 <template>
   <ul v-if="w.data && w.data.length && w.data.length > 0">
-    <li v-for="u in w.data" :key="u.href || u">
-      <a :href="u.href || u" target="_blank">{{ u.text || u }}</a>
+    <li v-for="u in w.data" :key="u.url || u">
+      <a :href="u.url || u" target="_blank">{{ u.text || u }}</a>
     </li>
   </ul>
   <p v-else>No url.</p>

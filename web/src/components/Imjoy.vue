@@ -2144,6 +2144,38 @@ export default {
         };
         reader.readAsText(file);
       };
+
+      const engine_code_loader = engine_file_obj => {
+        const w = {
+          name: "New Plugin",
+          type: "imjoy/plugin-editor",
+          config: {},
+          plugin_manager: this.pm,
+          engine_manager: this.em,
+          w: 30,
+          h: 20,
+          standalone: this.screenWidth < 1200,
+          plugin: {},
+          data: {
+            name: "new plugin",
+            id: "plugin_" + randId(),
+            code: "",
+            engine_file_obj: engine_file_obj,
+          },
+        };
+        this.createWindow(w);
+      };
+
+      const engine_image_loader = engine_image_file => {
+        const tmp = engine_image_file.url.split("/");
+        const file_name = tmp[tmp.length - 1];
+        this.createWindow({
+          name: file_name,
+          type: "imjoy/image",
+          data: { src: engine_image_file.url },
+        });
+      };
+
       return [
         {
           loader_key: "Code Editor",
@@ -2155,6 +2187,18 @@ export default {
             required: ["name", "size"],
           }),
           loader: code_loader,
+        },
+        {
+          loader_key: "Code Editor",
+          schema: ajv.compile({
+            properties: {
+              url: { type: "string", pattern: ".*\\.imjoy.html$" },
+              path: { type: "string" },
+              engine: { type: "string" },
+            },
+            required: ["url", "path", "engine"],
+          }),
+          loader: engine_code_loader,
         },
         {
           loader_key: "Image",
@@ -2169,6 +2213,21 @@ export default {
             required: ["type", "size"],
           }),
           loader: image_loader,
+        },
+        {
+          loader_key: "Image",
+          schema: ajv.compile({
+            properties: {
+              url: {
+                type: "string",
+                pattern: "(.*\\.jpg|\\.jpeg|\\.png|\\.gif)$",
+              },
+              path: { type: "string" },
+              engine: { type: "string" },
+            },
+            required: ["url", "path", "engine"],
+          }),
+          loader: engine_image_loader,
         },
       ];
     },
@@ -2382,24 +2441,39 @@ export default {
           if (!selection) {
             return;
           }
-          if (!Array.isArray(selection)) {
-            selection = [selection];
-          }
-          const urls = [];
-          for (let u of selection) {
-            if (u.url) {
-              urls.push({ href: u.url, path: u.path, engine: u.engine });
-            } else {
-              urls.push({ href: u });
+
+          const loaders = this.wm.getDataLoaders(selection);
+          const keys = Object.keys(loaders);
+          if (keys.length > 1) {
+            const w = {
+              name: "Engine Files",
+              type: "imjoy/generic",
+              scroll: true,
+              data: selection,
+            };
+            this.createWindow(w);
+          } else if (keys.length === 1) {
+            this.wm.registered_loaders[loaders[keys[0]]](selection);
+          } else {
+            if (!Array.isArray(selection)) {
+              selection = [selection];
             }
+            const urls = [];
+            for (let u of selection) {
+              if (u.url) {
+                urls.push(u);
+              } else {
+                urls.push({ url: u });
+              }
+            }
+            const w = {
+              name: "Files",
+              type: "imjoy/url_list",
+              scroll: true,
+              data: urls,
+            };
+            this.createWindow(w);
           }
-          const w = {
-            name: "Files",
-            type: "imjoy/url_list",
-            scroll: true,
-            data: urls,
-          };
-          this.createWindow(w);
         })
         .catch(e => {
           throw e;
@@ -2903,7 +2977,7 @@ export default {
           .get({
             url: config.url,
             method: config.method || "GET",
-            responseType: config.method || "blob",
+            responseType: config.responseType || "blob",
             onDownloadProgress: progressEvent => {
               totalLength =
                 totalLength || progressEvent.lengthComputable
