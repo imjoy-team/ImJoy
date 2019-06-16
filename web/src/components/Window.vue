@@ -7,19 +7,19 @@
     <md-card-actions
       v-if="!w.standalone"
       :class="{
-        
+        'drag-handle': withDragHandle,
         'window-selected': w.selected,
         'window-header': !w.selected,
       }"
       md-alignment="space-between"
     >
-      <md-button class="md-icon-button md-accent" @click.native="close(w)">
+      <md-button class="md-icon-button md-accent no-drag" @click="close(w)">
         <md-icon>close</md-icon>
       </md-button>
       <div class="window-title noselect">
         {{ w.name.slice(0, 30) + "(#" + w.index + ")" }}
       </div>
-      <div>
+      <div class="no-drag">
         <md-menu md-size="big" md-direction="bottom-end">
           <md-button class="md-icon-button" md-menu-trigger>
             <md-icon>more_vert</md-icon>

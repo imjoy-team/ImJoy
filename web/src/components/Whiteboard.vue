@@ -25,7 +25,7 @@
       :is-resizable="true"
       :vertical-compact="true"
       :margin="[3, 3]"
-      :use-css-transforms="false"
+      :use-css-transforms="true"
     >
       <grid-item
         :key="w.id"
