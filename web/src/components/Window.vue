@@ -13,6 +13,7 @@
     >
       <md-button class="md-icon-button md-accent no-drag" @click="close(w)">
         <md-icon>close</md-icon>
+        <md-tooltip>Close window</md-tooltip>
       </md-button>
       <div class="window-title noselect">
         {{ w.name.slice(0, 30) + "(#" + w.index + ")" }}
