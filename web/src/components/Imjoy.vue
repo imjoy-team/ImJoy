@@ -453,6 +453,13 @@
             <div v-for="plugin in sortedRunnablePlugins()" :key="plugin.name">
               <md-divider></md-divider>
               <md-menu md-size="medium">
+                <md-badge
+                  v-if="plugin.update_available"
+                  class="md-square md-primary update-badge"
+                  md-dense
+                  md-content="NEW"
+                >
+                </md-badge>
                 <md-button
                   class="md-icon-button"
                   :class="plugin.running ? 'md-accent' : ''"
@@ -464,23 +471,24 @@
                     :md-diameter="20"
                     md-mode="indeterminate"
                   ></md-progress-spinner>
-                  <md-icon
-                    v-else-if="plugin.config.icon"
-                    :class="plugin.update_available ? 'md-primary' : ''"
-                    >{{ plugin.config.icon }}</md-icon
-                  >
+                  <md-icon v-else-if="plugin.config.icon">{{
+                    plugin.config.icon
+                  }}</md-icon>
                   <md-icon v-else>extension</md-icon>
                   <md-tooltip v-if="screenWidth > 500">{{
                     plugin.name + ": " + plugin.config.description
                   }}</md-tooltip>
                 </md-button>
+
                 <md-menu-content>
                   <md-menu-item
-                    v-if="plugin.config.origin && plugin.update_available"
+                    v-if="plugin.config.origin"
                     @click="updatePlugin(plugin.id)"
-                    class="md-primary"
                   >
-                    <md-icon class="md-primary">cloud_download</md-icon>Update
+                    <md-icon
+                      :class="plugin.update_available ? 'md-primary' : ''"
+                      >cloud_download</md-icon
+                    >Update
                   </md-menu-item>
                   <md-menu-item
                     @click="showLog(plugin)"
@@ -527,7 +535,7 @@
                   </md-menu-item>
                   <div v-if="plugin.config.type === 'native-python'">
                     <md-divider></md-divider>
-                    <md-menu-item @click="switchEngine(plugin)">
+                    <md-menu-item @click="switchEngine(plugin, 'auto')">
                       <md-icon v-if="plugin.config.engine_mode === 'auto'"
                         >check_box</md-icon
                       >
@@ -695,6 +703,13 @@
                 :key="plugin.name"
               >
                 <md-menu md-size="medium">
+                  <md-badge
+                    v-if="plugin.update_available"
+                    class="md-square md-primary update-badge"
+                    md-dense
+                    md-content="NEW"
+                  >
+                  </md-badge>
                   <md-button
                     class="md-icon-button"
                     :class="plugin.running ? 'md-accent' : ''"
@@ -706,11 +721,9 @@
                       :md-diameter="20"
                       md-mode="indeterminate"
                     ></md-progress-spinner>
-                    <md-icon
-                      v-else-if="plugin.config.icon"
-                      :class="plugin.update_available ? 'md-primary' : ''"
-                      >{{ plugin.config.icon }}</md-icon
-                    >
+                    <md-icon v-else-if="plugin.config.icon">{{
+                      plugin.config.icon
+                    }}</md-icon>
                     <md-icon v-else>extension</md-icon>
                     <md-tooltip v-if="screenWidth > 500">{{
                       plugin.name + ": " + plugin.config.description
@@ -718,11 +731,13 @@
                   </md-button>
                   <md-menu-content>
                     <md-menu-item
-                      v-if="plugin.config.origin && plugin.update_available"
+                      v-if="plugin.config.origin"
                       @click="updatePlugin(plugin.id)"
-                      class="md-primary"
                     >
-                      <md-icon class="md-primary">cloud_download</md-icon>Update
+                      <md-icon
+                        :class="plugin.update_available ? 'md-primary' : ''"
+                        >cloud_download</md-icon
+                      >Update
                     </md-menu-item>
                     <md-menu-item
                       @click="showLog(plugin)"
@@ -2491,12 +2506,20 @@ export default {
       const plugin = this.pm.plugins[pid];
       const pconfig = plugin.config;
       if (pconfig.origin) {
-        this.getPlugin4Install(pconfig.origin).then(() => {
-          this.show_plugin_templates = false;
-          this.showAddPluginDialog = true;
-        });
+        this.getPlugin4Install(pconfig.origin)
+          .then(() => {
+            this.show_plugin_templates = false;
+            this.showAddPluginDialog = true;
+            this.init_plugin_search = null;
+            this.show_plugin_store = false;
+            this.show_plugin_url = false;
+          })
+          .catch(e => {
+            this.showAlert(null, `Failed to fetch plugin source code (${e})`);
+            console.error(e);
+          });
       } else {
-        alert("Origin not found for this plugin.");
+        this.showAlert(null, "Origin not found for this plugin.");
       }
     },
     reloadPlugin(config) {
@@ -2532,7 +2555,7 @@ export default {
         name: "Edit-" + pconfig.name || "plugin",
         type: "imjoy/plugin-editor",
         config: {},
-        plugin: plugin,
+        plugin: plugin.config,
         plugin_manager: this.pm,
         engine_manager: this.em,
         w: 30,
@@ -3664,5 +3687,11 @@ button.md-speed-dial-target {
   display: inline-block;
   margin-left: auto;
   margin-right: 0;
+}
+
+.update-badge {
+  position: absolute;
+  left: 10px;
+  width: 22px !important;
 }
 </style>

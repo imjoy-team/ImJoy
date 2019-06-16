@@ -24,12 +24,7 @@
         </md-button>
         <md-button
           @click="remove()"
-          v-if="
-            window &&
-              window.plugin &&
-              window.plugin.config &&
-              window.plugin.config._id
-          "
+          v-if="window && window.plugin && window.plugin._id"
           class="md-icon-button"
         >
           <md-icon>delete</md-icon>
@@ -71,14 +66,13 @@
               window &&
               window.plugin &&
               window.plugin.type === 'native-python' &&
-              window.plugin.config &&
               window.engine_manager
           "
         >
           <md-select
             id="engine_mode"
             @md-selected="reload()"
-            v-model="window.plugin.config.engine_mode"
+            v-model="window.plugin.engine_mode"
             name="tag"
           >
             <md-option value="auto">auto</md-option>
@@ -307,17 +301,17 @@ export default {
     },
     reload() {
       assert(this.window.plugin_manager);
-
+      this.$forceUpdate();
       return new Promise((resolve, reject) => {
-        if (!this.editor || !this.saved) {
-          reject("editor is not available or never saved");
+        if (!this.editor) {
+          reject("editor is not available.");
           return;
         }
         this.codeValue = this.editor.getValue();
         if (this.codeValue) {
           this.$emit("input", this.codeValue);
-          if (this.window.plugin && this.window.plugin.config) {
-            this.window.plugin.config.code = this.codeValue;
+          if (this.window.plugin) {
+            this.window.plugin.code = this.codeValue;
           }
           let newTag = this.window.plugin.tag;
           const config = this.window.data && this.window.data.config;
@@ -329,9 +323,7 @@ export default {
             }
           }
           const engine_mode =
-            this.window.plugin &&
-            this.window.plugin.config &&
-            this.window.plugin.config.engine_mode;
+            this.window.plugin && this.window.plugin.engine_mode;
           this.window.plugin_manager
             .reloadPlugin({
               _id: this.window.data._id,
@@ -339,9 +331,10 @@ export default {
               tag: newTag,
               name: this.window.data._name,
               code: this.codeValue,
+              origin: this.window.plugin && this.window.plugin.origin,
             })
             .then(plugin => {
-              this.window.plugin = plugin;
+              this.window.plugin = plugin.config;
               this.$forceUpdate();
               resolve();
             })

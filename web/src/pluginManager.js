@@ -2090,33 +2090,37 @@ export class PluginManager {
     _plugin.onClose(cb);
   }
 
+  async checkPluginUpdate(plugin) {
+    const pconfig = plugin.config;
+    const config = await this.getPluginFromUrl(
+      pconfig.origin,
+      this.available_plugins
+    );
+    if (pconfig.hash) {
+      if (pconfig.hash !== SparkMD5.hash(config.code)) {
+        if (compareVersions(pconfig.version, "<=", config.version)) {
+          plugin.update_available = true;
+        } else {
+          plugin.update_available = false;
+        }
+      } else {
+        plugin.update_available = false;
+      }
+    } else {
+      if (compareVersions(pconfig.version, "<", config.version)) {
+        plugin.update_available = true;
+      } else {
+        plugin.update_available = false;
+      }
+    }
+    this.update_ui_callback();
+  }
   checkUpdates() {
     for (let k in this.plugins) {
       if (this.plugins.hasOwnProperty(k)) {
         const plugin = this.plugins[k];
-        const pconfig = plugin.config;
-        if (pconfig.origin) {
-          this.getPluginFromUrl(pconfig.origin, this.available_plugins).then(
-            async config => {
-              if (pconfig.hash) {
-                if (pconfig.hash !== SparkMD5.hash(config.code)) {
-                  if (compareVersions(pconfig.version, "<=", config.version)) {
-                    plugin.update_available = true;
-                  } else {
-                    plugin.update_available = false;
-                  }
-                } else {
-                  plugin.update_available = false;
-                }
-              } else {
-                if (compareVersions(pconfig.version, "<", config.version)) {
-                  plugin.update_available = true;
-                } else {
-                  plugin.update_available = false;
-                }
-              }
-            }
-          );
+        if (plugin.config.origin) {
+          this.checkPluginUpdate(plugin);
         }
       }
     }
