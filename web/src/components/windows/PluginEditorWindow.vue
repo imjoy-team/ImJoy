@@ -29,7 +29,7 @@ export default {
   },
   mounted() {
     if (this.w.data.engine_file_obj) {
-      this.$refs.code_editor.openEnigneFile(this.w.data.engine_file_obj);
+      this.$refs.code_editor.openEngineFile(this.w.data.engine_file_obj);
     }
   },
   methods: {

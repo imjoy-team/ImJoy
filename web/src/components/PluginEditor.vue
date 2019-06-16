@@ -23,7 +23,7 @@
 
           <md-menu-content>
             <md-menu-item
-              @click="openEnigneFile()"
+              @click="openEngineFile()"
               :disabled="window.engine_manager.engines.length <= 0"
             >
               <md-icon>add_to_queue</md-icon>Open Engine File
@@ -313,11 +313,11 @@ export default {
       };
       reader.readAsText(file);
     },
-    async openEnigneFile(config) {
+    async openEngineFile(fileObj) {
       const api = this.window.plugin_manager.imjoy_api;
       try {
         const retObj =
-          config ||
+          fileObj ||
           (await api.showFileDialog(null, {
             title: "Load plugin source file",
             uri_type: "url",
