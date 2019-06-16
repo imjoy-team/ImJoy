@@ -1402,6 +1402,7 @@ import {
   compareVersions,
   HtmlWhitelistedSanitizer,
   escapeHTML,
+  isTouchDevice,
 } from "../utils.js";
 
 import { PluginManager } from "../pluginManager.js";
@@ -1779,7 +1780,7 @@ export default {
     });
 
     this.updateSize({ width: window.innerWidth });
-    if (this.screenWidth > 800) {
+    if (this.screenWidth > 800 && !isTouchDevice()) {
       this.wm.window_mode = "grid";
     } else {
       this.wm.window_mode = "single";
@@ -2254,7 +2255,7 @@ export default {
     },
     updateSize(e) {
       this.screenWidth = e.width;
-      if (this.screenWidth > 800) {
+      if (this.screenWidth > 800 && !isTouchDevice()) {
         if (this.wm.windows.length === 0) this.wm.window_mode = "grid";
         this.max_window_buttons = 9;
       } else {
@@ -3763,9 +3764,5 @@ button.md-speed-dial-target {
   display: inline-block;
   margin-left: auto;
   margin-right: 0;
-}
-
-.hide-badge > .md-badge {
-  display: none;
 }
 </style>
