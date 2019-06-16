@@ -54,7 +54,7 @@
         <md-button @click="run()" class="md-icon-button">
           <md-icon>play_arrow</md-icon>
           <md-tooltip class="md-medium-hide"
-            >Run this plugin (Ctrl+E)</md-tooltip
+            >Save and run this plugin (Ctrl+E)</md-tooltip
           >
         </md-button>
         <md-button @click="save()" class="md-icon-button">
@@ -69,7 +69,7 @@
         </md-button>
         <md-button
           @click="remove()"
-          v-if="window && window.plugin && window.plugin._id"
+          v-if="window && window.config && window.config._id"
           class="md-icon-button"
         >
           <md-icon>delete</md-icon>
@@ -80,22 +80,22 @@
           v-if="
             this.editor &&
               window &&
-              window.plugin &&
-              window.plugin.tags &&
-              window.plugin.tags.length > 0
+              window.config &&
+              window.config.tags &&
+              window.config.tags.length > 0
           "
         >
           <md-select
             id="tag"
             @md-selected="
-              window.plugin.tags.includes(window.plugin.tag) && reload()
+              window.config.tags.includes(window.config.tag) && reload()
             "
-            v-model="window.plugin.tag"
+            v-model="window.config.tag"
             name="tag"
           >
             <md-option
               :value="tag"
-              v-for="tag in window.plugin.tags"
+              v-for="tag in window.config.tags"
               :key="tag"
               >{{ tag }}</md-option
             >
@@ -109,15 +109,15 @@
           v-if="
             this.editor &&
               window &&
-              window.plugin &&
-              window.plugin.type === 'native-python' &&
+              window.config &&
+              window.config.type === 'native-python' &&
               window.engine_manager
           "
         >
           <md-select
             id="engine_mode"
             @md-selected="reload()"
-            v-model="window.plugin.engine_mode"
+            v-model="window.config.engine_mode"
             name="tag"
           >
             <md-option value="auto">auto</md-option>
@@ -274,18 +274,15 @@ export default {
           .savePlugin({
             pluginId: this.pluginId,
             code: this.codeValue,
-            tag: this.window.plugin && this.window.plugin.tag,
-            origin: this.window.plugin && this.window.plugin.origin,
+            tag: this.window.config && this.window.config.tag,
+            origin: this.window.config && this.window.config.origin,
           })
           .then(config => {
-            // this.window.data._id = config._id
-            // this.window.plugin._id = config._id
-            // this.window.plugin.config._id= config._id
             this.window.data.config = config;
             this.saved = true;
             this.reload()
               .catch(() => {
-                this.window.plugin = config;
+                this.window.config = config;
               })
               .finally(() => {
                 this.window.data._id = config._id;
@@ -361,16 +358,18 @@ export default {
       await this.save();
       let config = {};
       const plugin = this.window.plugin;
+
       if (!plugin || !plugin.api) {
+        console.error("plugin is not loaded.");
         return;
       }
+
       if (
         this.window_plugin_id &&
         !this.window.plugin_manager.wm.window_ids[this.window_plugin_id]
       ) {
         this.window_plugin_id = null;
       }
-
       if (!this.window_plugin_id && plugin.config && plugin.config.ui) {
         //show dialog only when there is input field in the ui string
         if (plugin.config.ui.indexOf("{") > -1) {
@@ -406,11 +405,10 @@ export default {
       this.codeValue = this.editor.getValue();
       this.$emit("input", this.codeValue);
       this.window.data._id = null;
-      this.window.plugin_manager
-        .removePlugin(this.window.plugin.config)
-        .then(() => {
-          this.window.plugin = {};
-        });
+      this.window.plugin_manager.removePlugin(this.window.config).then(() => {
+        this.window.config = {};
+        this.window.plugin = null;
+      });
     },
     reload() {
       assert(this.window.plugin_manager);
@@ -423,20 +421,20 @@ export default {
         this.codeValue = this.editor.getValue();
         if (this.codeValue) {
           this.$emit("input", this.codeValue);
-          if (this.window.plugin) {
-            this.window.plugin.code = this.codeValue;
+          if (this.window.config) {
+            this.window.config.code = this.codeValue;
           }
-          let newTag = this.window.plugin.tag;
+          let newTag = this.window.config.tag;
           const config = this.window.data && this.window.data.config;
-          if (config && this.window.plugin && this.window.plugin.tag) {
+          if (config && this.window.config && this.window.config.tag) {
             if (
-              !this.window.data.config.tags.includes(this.window.plugin.tag)
+              !this.window.data.config.tags.includes(this.window.config.tag)
             ) {
               newTag = this.window.data.config.tags[0];
             }
           }
           const engine_mode =
-            this.window.plugin && this.window.plugin.engine_mode;
+            this.window.config && this.window.config.engine_mode;
           this.window.plugin_manager
             .reloadPlugin({
               _id: this.window.data._id,
@@ -444,10 +442,11 @@ export default {
               tag: newTag,
               name: this.window.data._name,
               code: this.codeValue,
-              origin: this.window.plugin && this.window.plugin.origin,
+              origin: this.window.config && this.window.config.origin,
             })
             .then(plugin => {
-              this.window.plugin = plugin.config;
+              this.window.config = plugin.config;
+              this.window.plugin = plugin;
               this.$forceUpdate();
               resolve();
             })
@@ -461,8 +460,8 @@ export default {
       this.codeValue = this.editor.getValue();
       this.$emit("input", this.codeValue);
       const filename =
-        this.window && this.window.plugin && this.window.plugin.name
-          ? this.window.plugin.name + "_" + randId() + ".imjoy.html"
+        this.window && this.window.config && this.window.config.name
+          ? this.window.config.name + "_" + randId() + ".imjoy.html"
           : "plugin_" + randId() + ".imjoy.html";
       const file = new Blob([this.codeValue], {
         type: "text/plain;charset=utf-8",
