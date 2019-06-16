@@ -1,11 +1,11 @@
 self.__precacheManifest = [
   {
-    "revision": "01ab0cdd0a6e799855fa",
-    "url": "/static/css/app.f668c2d1.css"
+    "revision": "3569774ee0253c9858c3",
+    "url": "/static/css/app.544db812.css"
   },
   {
-    "revision": "01ab0cdd0a6e799855fa",
-    "url": "/static/js/app.349bac2a.js"
+    "revision": "3569774ee0253c9858c3",
+    "url": "/static/js/app.3ae310fc.js"
   },
   {
     "revision": "b8859e2632feade2aed6",
@@ -228,10 +228,6 @@ self.__precacheManifest = [
     "url": "/static/js/chunk-vendors.a4694b2b.js"
   },
   {
-    "revision": "2a3e222e6a41b32a7180e6afa3675990",
-    "url": "/static/vs/html.worker.js"
-  },
-  {
     "revision": "493ef474936217113b20a6573247288a",
     "url": "/static/vs/editor.worker.js"
   },
@@ -240,7 +236,11 @@ self.__precacheManifest = [
     "url": "/static/vs/css.worker.js"
   },
   {
-    "revision": "bff9ec1c93b5808f795e7b33b4597031",
+    "revision": "2a3e222e6a41b32a7180e6afa3675990",
+    "url": "/static/vs/html.worker.js"
+  },
+  {
+    "revision": "4a0df0a85ad7af2069f8e695cd5d1f80",
     "url": "/index.html"
   },
   {
@@ -628,12 +628,12 @@ self.__precacheManifest = [
     "url": "/static/vs/basic-languages/redshift/redshift.js"
   },
   {
-    "revision": "83f9d7a8568f0f86fd00bf3c21944ce8",
-    "url": "/static/vs/basic-languages/ruby/ruby.js"
-  },
-  {
     "revision": "524db18624629ebed6788b26cbf4820e",
     "url": "/static/img/perspective-hr.jpg"
+  },
+  {
+    "revision": "83f9d7a8568f0f86fd00bf3c21944ce8",
+    "url": "/static/vs/basic-languages/ruby/ruby.js"
   },
   {
     "revision": "140e93934b5c72cee447d043f514be21",
@@ -686,10 +686,6 @@ self.__precacheManifest = [
   {
     "revision": "0fd4a6430117784fb44e2c59d4ad9b45",
     "url": "/static/vs/basic-languages/yaml/yaml.js"
-  },
-  {
-    "revision": "7f6fed6512bd7e3325304a0346e02098",
-    "url": "/static/vs/editor/editor.main.css"
   },
   {
     "revision": "2b6ac4494944b92db7dcfa0ce3a605ed",
@@ -762,6 +758,10 @@ self.__precacheManifest = [
   {
     "revision": "11a854433bcc74085be053c3ab713b15",
     "url": "/static/vs/language/css/cssWorker.js"
+  },
+  {
+    "revision": "7f6fed6512bd7e3325304a0346e02098",
+    "url": "/static/vs/editor/editor.main.css"
   },
   {
     "revision": "51880b243dfb4c0a65c406b155e9a716",
