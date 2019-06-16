@@ -297,5 +297,4 @@ export default {
   margin-top: -0.8rem;
   width: 3rem !important;
 }
-
 </style>
