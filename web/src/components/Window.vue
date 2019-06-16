@@ -1,9 +1,5 @@
 <template>
-  <md-card
-    v-if="w"
-    @click.native="selectWindow(w, $event)"
-    @dblclick.native="w._h && w._w ? normalSize(w) : fullScreen(w)"
-  >
+  <md-card v-if="w">
     <md-card-actions
       v-if="!w.standalone"
       :class="{
@@ -12,6 +8,8 @@
         'window-header': !w.selected,
       }"
       md-alignment="space-between"
+      @click.native="selectWindow(w, $event)"
+      @dblclick.native="w._h && w._w ? normalSize(w) : fullScreen(w)"
     >
       <md-button class="md-icon-button md-accent no-drag" @click="close(w)">
         <md-icon>close</md-icon>
