@@ -2506,8 +2506,11 @@ export default {
       const plugin = this.pm.plugins[pid];
       const pconfig = plugin.config;
       if (pconfig.origin) {
+        this.showMessage("Fetching plugin file...");
         this.getPlugin4Install(pconfig.origin)
           .then(() => {
+            //clear message
+            this.showStatus(null, " ");
             this.show_plugin_templates = false;
             this.showAddPluginDialog = true;
             this.init_plugin_search = null;
@@ -2515,7 +2518,7 @@ export default {
             this.show_plugin_url = false;
           })
           .catch(e => {
-            this.showAlert(null, `Failed to fetch plugin source code (${e})`);
+            this.showMessage(`Failed to fetch plugin source code (${e}).`);
             console.error(e);
           });
       } else {
