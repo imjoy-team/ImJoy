@@ -2630,8 +2630,8 @@ export default {
       const w = {
         name: "Edit-" + pconfig.name || "plugin",
         type: "imjoy/plugin-editor",
-        config: {},
-        plugin: plugin.config,
+        config: plugin.config,
+        plugin: plugin,
         plugin_manager: this.pm,
         engine_manager: this.em,
         w: 30,
@@ -2655,7 +2655,7 @@ export default {
         w: 30,
         h: 20,
         standalone: this.screenWidth < 1200,
-        plugin: {},
+        plugin: null,
         data: {
           name: "new plugin",
           id: "plugin_" + randId(),
