@@ -13,7 +13,7 @@
       }"
       md-alignment="space-between"
     >
-      <md-button class="md-icon-button md-accent" @click="close(w)">
+      <md-button class="md-icon-button md-accent" @click.native="close(w)">
         <md-icon>close</md-icon>
       </md-button>
       <div class="window-title noselect">
@@ -298,15 +298,4 @@ export default {
   width: 3rem !important;
 }
 
-@media (pointer: coarse) {
-  .drag-handle {
-    cursor: pointer !important;
-  }
-  .md-button {
-    cursor: pointer !important;
-  }
-  .md-card {
-    cursor: pointer !important;
-  }
-}
 </style>
