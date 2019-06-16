@@ -359,7 +359,7 @@ export default {
       let config = {};
       const plugin = this.window.plugin;
 
-      if (!plugin) {
+      if (!plugin || !plugin.api) {
         console.error("plugin is not loaded.");
         return;
       }
@@ -370,12 +370,12 @@ export default {
       ) {
         this.window_plugin_id = null;
       }
-      if (!this.window_plugin_id && plugin.ui) {
+      if (!this.window_plugin_id && plugin.config && plugin.config.ui) {
         //show dialog only when there is input field in the ui string
-        if (plugin.ui.indexOf("{") > -1) {
+        if (plugin.config.ui.indexOf("{") > -1) {
           config = await this.window.plugin_manager.imjoy_api.showDialog(
-            null,
-            plugin
+            plugin,
+            plugin.config
           );
         } else {
           config = {};
