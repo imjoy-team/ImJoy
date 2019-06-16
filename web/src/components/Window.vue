@@ -297,4 +297,10 @@ export default {
   margin-top: -0.8rem;
   width: 3rem !important;
 }
+
+@media (pointer: coarse) {
+  .drag-handle {
+    cursor: pointer !important;
+  }
+}
 </style>
