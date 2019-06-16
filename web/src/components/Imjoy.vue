@@ -484,6 +484,7 @@
                     <md-menu-item
                       v-if="plugin.config.origin"
                       @click="updatePlugin(plugin.id)"
+                      :class="plugin.update_available ? 'md-primary' : ''"
                     >
                       <md-icon
                         :class="plugin.update_available ? 'md-primary' : ''"
@@ -732,6 +733,7 @@
                       <md-menu-item
                         v-if="plugin.config.origin"
                         @click="updatePlugin(plugin.id)"
+                        :class="plugin.update_available ? 'md-primary' : ''"
                       >
                         <md-icon
                           :class="plugin.update_available ? 'md-primary' : ''"
