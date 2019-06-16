@@ -207,4 +207,8 @@ ul li {
 canvas.decorationsOverviewRuler {
   background-color: white;
 }
+
+.hide-badge > .md-badge {
+  display: none !important;
+}
 </style>
