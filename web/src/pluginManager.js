@@ -1035,24 +1035,29 @@ export class PluginManager {
       if (p.type !== "native-python") {
         continue;
       }
-      if (p.engine_mode === engine.id) {
-        await this.reloadPlugin(p);
-      } else if (!p.engine_mode || p.engine_mode === "auto") {
-        const running_plugins =
-          Object.values(this.plugins).filter(pl => {
-            return pl.name === p.name;
-          }) || [];
+      try {
+        if (p.engine_mode === engine.id) {
+          await this.reloadPlugin(p);
+        } else if (!p.engine_mode || p.engine_mode === "auto") {
+          const running_plugins =
+            Object.values(this.plugins).filter(pl => {
+              return pl.name === p.name;
+            }) || [];
 
-        const running_plugin = running_plugins[0];
-        if (
-          running_plugin &&
-          (!running_plugin.config.engine ||
-            (!running_plugin.initializing && running_plugin._disconnected))
-        ) {
-          await this.reloadPlugin(p);
-        } else if (!running_plugin) {
-          await this.reloadPlugin(p);
+          const running_plugin = running_plugins[0];
+          if (
+            running_plugin &&
+            (!running_plugin.config.engine ||
+              (!running_plugin.initializing && running_plugin._disconnected))
+          ) {
+            await this.reloadPlugin(p);
+          } else if (!running_plugin) {
+            await this.reloadPlugin(p);
+          }
         }
+      } catch (e) {
+        console.error(e);
+        continue;
       }
     }
   }
