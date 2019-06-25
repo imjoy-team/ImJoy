@@ -150,7 +150,7 @@
           >).
         </p>
         <p>
-          Once installed, please start the Plugin Engine, and fill the
+          Once installed, please start the Plugin Engine, and enter the
           connection token below.
         </p>
         <div v-if="!is_mobile_or_tablet">
