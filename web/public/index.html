@@ -68,6 +68,21 @@
           if(window.location.hash && window.location.hash !== '#/' ){
             removeWelcomePage()
           }
+
+          //propose to restart if it takes too long to load the page
+          function reload(){
+            var elem = document.getElementById("loading-imjoy-section");
+            if(elem){
+              var ret = confirm("It takes too long to load the app, would you like to restart?");
+              if(ret){
+                window.location.reload(true);
+              }
+              else{
+                setTimeout(reload, 10000);
+              }
+            }
+          }
+          setTimeout(reload, 10000);
       })();
     </script>
 

@@ -201,18 +201,25 @@
                 <md-icon>library_books</md-icon>Documentation
               </md-menu-item>
               <md-menu-item
-                href="https://github.com/oeway/ImJoy"
+                href="/docs/#/api?id=api-functions"
                 target="_blank"
                 class="md-primary"
               >
-                <md-icon>code</md-icon>Github
+                <md-icon>toc</md-icon>API Functions
               </md-menu-item>
               <md-menu-item
                 href="https://forum.image.sc/tags/imjoy"
                 target="_blank"
                 class="md-primary"
               >
-                <md-icon>help</md-icon>Help
+                <md-icon>help</md-icon>Forum
+              </md-menu-item>
+              <md-menu-item
+                href="https://github.com/oeway/ImJoy"
+                target="_blank"
+                class="md-primary"
+              >
+                <md-icon>code</md-icon>Github
               </md-menu-item>
               <md-menu-item @click="showAboutDialog = true" class="md-primary">
                 <md-icon>info</md-icon>About
