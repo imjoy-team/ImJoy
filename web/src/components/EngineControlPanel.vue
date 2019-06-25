@@ -150,7 +150,8 @@
           >).
         </p>
         <p>
-          Once installed, please start the Plugin Engine, and fill the connection token below.
+          Once installed, please start the Plugin Engine, and fill the
+          connection token below.
         </p>
         <div v-if="!is_mobile_or_tablet">
           <md-radio v-model="url_type" value="localhost">My Computer</md-radio>
