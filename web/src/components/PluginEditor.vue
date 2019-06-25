@@ -245,10 +245,8 @@ export default {
             enabled: bigScreen,
           },
           lineNumbers: medianScreen ? "on" : "off",
-          glyphMargin: medianScreen,
           folding: medianScreen,
           lineDecorationsWidth: medianScreen ? 5 : 2,
-          lineNumbersMinChars: 0,
         });
         this.editor.layout();
         setTimeout(() => {
