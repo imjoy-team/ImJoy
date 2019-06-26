@@ -1,11 +1,11 @@
 self.__precacheManifest = [
   {
-    "revision": "07d25653ed5038f8677c",
-    "url": "/static/css/app.c0cd4003.css"
+    "revision": "51105e934c6854b8fd54",
+    "url": "/static/css/app.38436565.css"
   },
   {
-    "revision": "07d25653ed5038f8677c",
-    "url": "/static/js/app.ea7a7a88.js"
+    "revision": "51105e934c6854b8fd54",
+    "url": "/static/js/app.8d3bb21f.js"
   },
   {
     "revision": "b8859e2632feade2aed6",
@@ -228,19 +228,19 @@ self.__precacheManifest = [
     "url": "/static/js/chunk-vendors.a4694b2b.js"
   },
   {
-    "revision": "493ef474936217113b20a6573247288a",
-    "url": "/static/vs/editor.worker.js"
+    "revision": "2a3e222e6a41b32a7180e6afa3675990",
+    "url": "/static/vs/html.worker.js"
   },
   {
     "revision": "b00449080615ce71a2a8a52aee9f658f",
     "url": "/static/vs/css.worker.js"
   },
   {
-    "revision": "2a3e222e6a41b32a7180e6afa3675990",
-    "url": "/static/vs/html.worker.js"
+    "revision": "493ef474936217113b20a6573247288a",
+    "url": "/static/vs/editor.worker.js"
   },
   {
-    "revision": "7d6698549ffad1de32170dc0810c94ae",
+    "revision": "ce8a5cb9b35693b3a550a7dab202d39f",
     "url": "/index.html"
   },
   {
@@ -248,7 +248,7 @@ self.__precacheManifest = [
     "url": "/.nojekyll"
   },
   {
-    "revision": "3f48374e22408fdad37aed08b9ef2d06",
+    "revision": "e5e08310b3ee1c06ba4cb63bd0c22cea",
     "url": "/404.html"
   },
   {
@@ -428,7 +428,7 @@ self.__precacheManifest = [
     "url": "/static/img/github.svg"
   },
   {
-    "revision": "075b8cf414d164345ac981e2da839d91",
+    "revision": "6927c75e85be261a4e36e189576c505d",
     "url": "/static/img/imjoy-card-plain.png"
   },
   {
@@ -708,12 +708,12 @@ self.__precacheManifest = [
     "url": "/static/vs/editor/editor.main.nls.it.js"
   },
   {
-    "revision": "7c5522016f018c3226287c88363be05b",
-    "url": "/static/vs/editor/editor.main.nls.ja.js"
-  },
-  {
     "revision": "6c2e4bbc2f1390147bb8705f79cb58e7",
     "url": "/static/vs/editor/editor.main.nls.js"
+  },
+  {
+    "revision": "7c5522016f018c3226287c88363be05b",
+    "url": "/static/vs/editor/editor.main.nls.ja.js"
   },
   {
     "revision": "09e5a4cc32305727ff958438e4c3fad1",
