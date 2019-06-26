@@ -1,7 +1,7 @@
 <template>
   <div class="imjoy noselect">
     <md-app>
-      <md-app-toolbar class="md-dense" md-elevation="0">
+      <md-app-toolbar class="md-dense app-toolbar" md-elevation="0">
         <md-button
           v-if="!menuVisible"
           class="md-primary md-icon-button"
@@ -3320,6 +3320,10 @@ export default {
   height: 65px;
 }
 
+.app-toolbar {
+  background-color: #d7e5fd52 !important;
+}
+
 @media screen and (max-height: 768px) {
   .site-title {
     height: 55px;
@@ -3520,11 +3524,12 @@ button.md-speed-dial-target {
   height: 100%;
   max-height: 100%;
 }
+
 .menubar-icons {
   display: inline-flex;
   position: absolute;
   right: 0;
-  background-color: rgba(245, 245, 245, 0.8);
+  background-color: #ffffff00;
   z-index: 1;
 }
 
