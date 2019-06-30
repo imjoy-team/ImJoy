@@ -1284,7 +1284,3 @@ Communication between the window and Python plugin is achieved by the ImJoy API 
 
 Let's have a look at the Python function `calc_results`. It receives the JavaScript dictionary, extracts all necessary parameters and perform the desired calculation. Then it stores the data with `self.x_values = x`. Lastly, invokes the callback function to print in the main window with `callback_fun(...)`. Here the parameters are again passed as a dictionary. Please note, the **numpy** arrays are not supported, and the data has therefore be transformed to a list.
 
-## Using JavaScript libraries in ImJoy
-You can readily use existing JavaScript libraries in ImJoy. Here we provide some
-examples.
-
