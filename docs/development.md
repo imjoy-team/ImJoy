@@ -11,7 +11,7 @@ The following list illustrates key features of the plugin system in ImJoy:
    - Support concurrent API calls using `async/await` syntax
    - Support virtual environments and pip packages for Python
    - Support libraries hosted on GitHub or CDNs for JavaScript
- * Native support for n-dimentional arrays and tensors
+ * Native support for n-dimensional arrays and tensors
    - Support ndarrays from Numpy or Numjs for data exchange
    - Support Tensorflow.js and native Tensorflow for deep learning
  * Rendering multi-dimensional data in 3D with webGL, Three.js etc.
@@ -33,7 +33,7 @@ Imjoy consists of **two main components**
 
 ![imjoy-plugin-development](assets/imjoy-architecture.png ':size=800')
 
- The Python Plugin Engine is connected with the ImJoy Web App through websockets
+ The Python Plugin Engine is connected with the ImJoy Web App through websockets,
  and communicates with a customised remote procedure calls (RPC) based on [socket.io](https://github.com/miguelgrinberg/python-socketio).
 
  ### Choose a plugin environment
@@ -315,7 +315,7 @@ These flags allow to specify how ImJoy instances are handled by the Interface an
 For more information we refer to the dedicated section on [plugin run time behaviour](development?id=controlling-run-time-behaviour-of-native-python-plugins).
 
 * `single-instance` (**for python plugins only**). Python engine will only run a single plugin process even if
-  plugin is called from different browsers or workspacess. In this case, the different ImJoy instances will share
+  plugin is called from different browsers or workspaces. In this case, the different ImJoy instances will share
   the same plugin process. This is especially useful when your plugin need to occupy limited resources such as GPU.
 
 * `allow-detach` (**for python plugins only**). Allows the plugin process to detach from the user interface. This means
@@ -369,7 +369,7 @@ Array with names of other ImJoy plugins which the current plugin depends on.
 They will be installed automatically during installation. To define a dependency use the following format: 1) for dependencies without tag `REPOSITORY:PLUGIN_NAME` or `PLUGIN_URL`, e.g.: `oeway/ImJoy-Plugins:Image Window`; 2) or with specified tag: `REPOSITORY:PLUGIN_NAME@TAG` or `PLUGIN_URL@TAG`, e.g.: `oeway/ImJoy-Plugins:Unet Segmentation@GPU`. In this case, a hash tag `GPU` is used to specify the tag for the plugin named `Unet Segmentation` hosted on GitHub repository `oeway/ImJoy-Plugin` (https://github.com/oeway/ImJoy-Plugins). If the plugin is not hosted on GitHub or the GitHub repository is not formatted as a ImJoy plugin repository (meaning there is no `manifest.imjoy.json` file defined in the root of the repository), you can use the url directly, e.g.: `https://github.com/oeway/ImJoy-Demo-Plugins/blob/master/repository/3dDemos.imjoy.html` (tags can be added with `@TAG`).
 
 #### defaults
-(**for window plugin only:**) defines an object of default values. 
+(**for window plugin only:**) defines an object of default values.
 
 For example, you can specify the default window size by setting `"defaults": {"w": 10, "h": 7}`.
 
@@ -784,7 +784,10 @@ We provide additional fields in `ctx` that allow to track, maintain and reconstr
  Importantly, `_workflow_id`, `_variables`, `_op` and `_source_op` can be used to implement interactivity between plugins, meaning if the user changed a state in one of the result window, the downstream workflow will be updated automatically.
 
 ### Run-time behaviour of native Python plugins
-You can control the run-time behaviour of a Python plugin process with the `flags` field in the `<config>` block. Next we provide next nomenclature and additional explanations to explain the different options you have to control how the Python processes running on the plugin engine interact with the ImJoy interface.
+You can control the run-time behaviour of a Python plugin process with the `flags`
+field in the `<config>` block. The following nomenclature will be used to to describe
+how to control the way Python processes running on the plugin engine interact
+with the ImJoy interface.
 
 * **Interface**: web interface of ImJoy. You can have ImJoy running on multiple browser windows, i.e. multiple interfaces.
 * **Plugin Engine**: running in the background to execute Python code from different Python plugins.
@@ -797,11 +800,11 @@ You can control the run-time behaviour of a Python plugin process with the `flag
 
 Below we describe the three main run-time behaviour of python plugins:
 * By **default** (none of the flags is set), each ImJoy instance has its own process on the plugin engine. If you close the interface, you will kill the process.
-* The **`single-instance`** flag will allow only one process to run for the entire plugin engine. For plugins with the same name and tag, then the `single-instance` means that they access the same process. 
+* The **`single-instance`** flag will allow only one process to run for the entire plugin engine. For plugins with the same name and tag, then the `single-instance` means that they access the same process.
 
 * The **`allow-detach`** flag means that the process is not killed when its ImJoy instance is closed. For instance, this allows to perform long computational tasks in the background which don't require additional user feedback and which terminate autonomously. Can also be used to protect a long computational tasks again browser instabilities. If you want to be able to attach to a detached process, your can reconnect from the same browser and workspace, or have the `single-instance` flag which works despite connecting from different browser and workspace.
 
-When imjoy is trying to reconnect a previously detached plugin process, `resume()` will be called if it was defined in the plugin class, otherwise call `setup()` as usual. Notice that when `resume` is present, `setup` won't be called during the reattachment.
+When ImJoy is trying to reconnect a previously detached plugin process, `resume()` will be called if it was defined in the plugin class, otherwise call `setup()` as usual. Notice that when `resume` is present, `setup` won't be called during the reattachment.
 
 This is how the `flags` option looks like in the `<config>` block:
 ```json

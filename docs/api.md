@@ -175,14 +175,15 @@ in JavaScript, but the api functions are called in similar fashion in Python.
 await api.alert(message)
 ```
 
-Shows an alert dialog with a message to the user. 
+Shows an alert dialog with a message to the user.
 
 **Arguments**
 <!--****[TODO] add instructions about customizable parameters **-->
 
 For plain text:
 
-* **message**: String. Contains the message to be displayed. HTML tags can be used in the message, but only limited to a restricted set of tags and css, more details can be found [here](api?id=sanitized-html-and-css).
+* **message**: String. Contains the message to be displayed. HTML tags can be used in the message,
+but only limited to a restricted set of tags and css, more details can be found [here](api?id=sanitized-html-and-css).
 
 For HTML:
 
@@ -200,10 +201,10 @@ await api.alert('hello world')
 ### api.prompt
 
 ```javascript
-const anwser = await api.prompt(question, default_anwser)
+const answer = await api.prompt(question, default_answer)
 ```
 
-Shows a prompt to ask the user input.
+Shows a prompt to ask the user for input.
 
 **Arguments**
 <!--****[TODO] add instructions about customizable parameters **-->
@@ -216,17 +217,17 @@ For HTML:
 
 * **question**: Object. It contains the following fields:
   - **content**: Contains the question to be displayed. HTML tags can be used in the message, but only limited to a restricted set of tags and css, more details can be found [here](api?id=sanitized-html-and-css).
-  - **placeholder**: The default anwser of the question
+  - **placeholder**: The default answer of the question
   - **title**: The title of the dialog
 
-* **default_anwser** (optional): String. Contains the default anwser to the question.
+* **default_answer** (optional): String. Contains the default answer to the question.
 
 **Returns**
-* **anwser**: Boolean. The anwser from the user.
+* **answer**: Boolean. The answer from the user.
 
 **Example**
 ```javascript
-const anwser = await api.prompt('What is your name?')
+const answer = await api.prompt('What is your name?')
 ```
 <!--****[TODO] add example **-->
 
@@ -399,7 +400,7 @@ Inside the window plugin, `this.close`, `this.onClose`, `this.focus`, `this.resi
 
 #### ** JavaScript **
 ```javascript
-// win is the object retured from api.createWindow
+// win is the object returned from api.createWindow
 await win.run({'data': {'image': ...}})
 
 // set `onClose` callback
@@ -1018,7 +1019,7 @@ Upload a file to a upload url.
 It contains the following fields:
   - **url** : String. The url to the remote file (get from `api.getFileUrl`).
   - **method** (optional): String. The request method, default value: 'GET'.
-  - **responseType** (optional): String. The default response type, default value: 'blob'. 
+  - **responseType** (optional): String. The default response type, default value: 'blob'.
 
 **Returns**
 * **fileInfo**. Object (JavaScript) or dictionary (Python). The downloaded file.
@@ -1357,4 +1358,3 @@ For security reasons, HTML and CSS provided to shown in the ImJoy main interface
 Currently allowed HTML tags are: `a`, `img`, `p`, `div`, `span`, `br`, `b`, `i`, `u`, `hr`, `h1`, `h2`, `h3`, `h4`, `h5`.
 Further, the following CSS styles are allowed: `border`, `margin`, `padding`.
 These restriction are imposed to prevent XSS attacks.
-
