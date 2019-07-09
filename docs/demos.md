@@ -1,4 +1,4 @@
-# Demos
+# Demo plugins
 Here we provide several demo plugins which you try out by click on the links. Once you installed the plugins, you can inspect the code of the provided plugins
 by clicking on the symbol left of the plugin name and selecting `Edit`.
 

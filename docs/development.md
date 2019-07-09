@@ -21,7 +21,7 @@ The following list illustrates key features of the plugin system in ImJoy:
 ### ImJoy architecture
 Imjoy consists of **two main components**
 
- 1.  The **ImJoy Web App**. The core part of ImJoy which runs in the browser across different OS and devices. It provide a flexible plugin system with workflow and window managments. Plugins can be developed in JavaScript or in Python and saved directly in the browser database. Web plugins are running inside `iframe` or `webworker`, therefore developers can in principle use any frontend framework or javascript libraries independently for each plugin. 
+ 1.  The **ImJoy Web App**. The core part of ImJoy which runs in the browser across different OS and devices. It provide a flexible plugin system with workflow and window managments. Plugins can be developed in JavaScript or in Python are saved directly in the browser database. Web plugins are running inside a `iframe` or a `webworker`, therefore developers can in principle use any frontend framework or javascript libraries independently for each plugin. 
 
  2.  Optionally, the **Plugin Engine** for running computational tasks in CPython to taking advantage of the power of native hardware (e.g. GPU) and software libraries (e.g.: numpy, Tensorflow, PyTorch etc.). Under the hood, it's a python package ([GitHub](https://github.com/oeway/ImJoy-Engine)) runs in the background and connect to the ImJoy Web App through websocket. It uses [conda](https://conda.io/) to manage software packages (not only Python, but also C++, Java etc.) and virtual environments. Developers can then add `conda` or `pypi` packages as requirements to the plugin, and they can be automatically resolved by the plugin engine. Similarily, developers can use any Python library or even non-python libary in Python plugins.
      
@@ -547,7 +547,7 @@ Some **important considerations**:
     ```
 
 #### Install Python package from GitHub
-If your python module has a working `setup.py` file, you can also use it directly from Github without uploading to Python Package Index ([PyPI](https://pypi.org)). The way to do is to provide a URL to your github repo with PyPI format. Several excellent resources exist to explain this step,
+If your python module has a working `setup.py` file, you can also use it directly from Github without uploading to Python Package Index ([PyPI](https://pypi.org)). The way to do it is to provide a URL to your github repo with PyPI format described below. Several excellent resources exist to explain this step,
 such as [this one](https://packaging.python.org/tutorials/packaging-projects/).
 
 The general syntax is shown below with parameters indicated in `{}`:
@@ -583,7 +583,7 @@ pip install git+https://github.com/{username}/{reponame}@{tagname}#egg={reponame
 
 For an example, we refer [here](http://localhost:8000/docs#/development?id=repo-with-setuppy).
 
-### Typical scenarios
+### Typical scenarios for plugin requirements
 Here we describe typically encountered scenarios to add requirements for public
 or your own libraries.
 
@@ -601,7 +601,7 @@ For example, to add `scipy` with version 1.0, you can specify
 The `pip` command can install a package and its dependencies from a GitHub repository,
 when the `setup.py` is present.
 
-Example: the GitHub repository `myRepo` is hosted on the account `mUsername` and
+Example: the GitHub repository `myRepo` is hosted on the account `myUserName` and
 the latest Git tag is `v0.1.1`. You can then add this repository
 ```json
 "requirements": "pip:git+https://github.com/myUserName/myRepo@v0.1.1#egg=myRepo"
@@ -625,7 +625,7 @@ are required by the package. For more details see [here](https://pip.pypa.io/en/
 Usually, you will add this repository to your workspace. You can then install
 the requirements, and also directly import the project directly from a folder.
 
-Example, the GitHub repository `myRepo` is hosted on the account `mUsername`.
+Example, the GitHub repository `myRepo` is hosted on the account `myUserName`.
 To add this repository to the plugin workspace, and install the requirements:
  ```json
  "requirements": ["repo:https://github.com/myUserName/myRepo", "cmd: pip install -r myRepo/requirements.txt"]
@@ -642,7 +642,7 @@ from  ... import ...
 The yaml file `environment.yml` defines a virtual environment with conda and pip
 dependencies. A detailed description file format can be found [here](https://conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#create-env-file-manually).
 
-Example, the GitHub repository `myRepo` is hosted on the account `mUsername`.
+Example, the GitHub repository `myRepo` is hosted on the account `myUserName`.
 You can add the repo with
 ```json
 "requirements": ["repo:https://github.com/myUserName/myRepo"]
@@ -1174,7 +1174,7 @@ examples for the different approaches below.
 For more advanced purposes, you can use define a user interface with the [**window plugin**](development?id=ltconfiggt-block). Such an interface is designed with web technology (HTML, JavaScript and CSS) and thus provides maximum flexibility. Further, such an interface can communicate with another plugin, e.g. a Python worker that performs the actual analysis. For more details, have a look at the dedicated demo below.
 
 
-### Python plugin displaying a chart
+### EXAMPLE 1: Displaying a chart from Python
 In this demo, we show how data generated in a **Python plugin** can be displayed in a window plugin. The plugin interface you can slightly change the data that is generated (you can change the number of data-points) and how the graph is actually displayed: either it is rendered with one of three JavaScript libraries, or the plot is generated with Matplotlib and saved as png and then shown.
 
 
@@ -1226,7 +1226,7 @@ with open(name_plot, 'rb') as f:
     api.createWindow(type='imjoy/image', w=12, h=15, data={"src": imgurl})
 ```
 
-### User interface calling Python worker
+### EXAMPLE 2: User interface calling Python worker
 In this demo, we show how to use a **window** plugin to defined a user interface, and how this interface can interact with a **Python worker** plugin to perform calculations.
 
 You can install this plugin from this
@@ -1300,4 +1300,6 @@ Communication between the window and Python plugin is achieved by the ImJoy API 
 **Python calculations, storage and callback**
 
 Let's have a look at the Python function `calc_results`. It receives the JavaScript dictionary, extracts all necessary parameters and perform the desired calculation. Then it stores the data with `self.x_values = x`. Lastly, invokes the callback function to print in the main window with `callback_fun(...)`. Here the parameters are again passed as a dictionary. Please note, the **numpy** arrays are not supported, and the data has therefore be transformed to a list.
+
+### More example plugins can be found in [Demos](demos)
 
