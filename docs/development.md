@@ -11,7 +11,7 @@ The following list illustrates key features of the plugin system in ImJoy:
    - Support concurrent API calls using `async/await` syntax
    - Support virtual environments and pip packages for Python
    - Support libraries hosted on GitHub or CDNs for JavaScript
- * Native support for n-dimentional arrays and tensors
+ * Native support for n-dimensional arrays and tensors
    - Support ndarrays from Numpy or Numjs for data exchange
    - Support Tensorflow.js and native Tensorflow for deep learning
  * Rendering multi-dimensional data in 3D with webGL, Three.js etc.
@@ -27,7 +27,7 @@ Imjoy consists of **two main components**
      
 ![imjoy-plugin-development](assets/imjoy-architecture.png ':size=800')
 
- The Plugin Engine is connected with the ImJoy Web App through websockets
+ The Plugin Engine is connected with the ImJoy Web App through websockets, 
  and communicates with a customised remote procedure calls (RPC) based on [socket.io](https://github.com/miguelgrinberg/python-socketio).
 
 ### ImJoy code editor and developer tools
@@ -333,7 +333,7 @@ These flags allow to specify how ImJoy instances are handled by the Interface an
 For more information we refer to the dedicated section on [plugin run time behaviour](development?id=controlling-run-time-behaviour-of-native-python-plugins).
 
 * `single-instance` (**for python plugins only**). Python engine will only run a single plugin process even if
-  plugin is called from different browsers or workspacess. In this case, the different ImJoy instances will share
+  plugin is called from different browsers or workspaces. In this case, the different ImJoy instances will share
   the same plugin process. This is especially useful when your plugin need to occupy limited resources such as GPU.
 
 * `allow-detach` (**for python plugins only**). Allows the plugin process to detach from the user interface. This means
@@ -876,7 +876,7 @@ Below we describe the three execution flags for controlling the execution of pyt
 
 * The **`allow-detach`** flag means that the process is not killed when its ImJoy instance is closed. For instance, this allows to perform long computational tasks in the background which don't require additional user feedback and which terminate autonomously. Can also be used to protect a long computational tasks again browser instabilities. If you want to be able to attach to a detached process, your can reconnect from the same browser and workspace, or have the `single-instance` flag which works despite connecting from different browser and workspace.
 
-When imjoy is trying to reconnect a previously detached plugin process, `resume()` will be called if it was defined in the plugin class, otherwise call `setup()` as usual. Notice that when `resume` is present, `setup` won't be called during the reattachment.
+When ImJoy is trying to reconnect a previously detached plugin process, `resume()` will be called if it was defined in the plugin class, otherwise call `setup()` as usual. Notice that when `resume` is present, `setup` won't be called during the reattachment.
 
 This is how the `flags` option looks like in the `<config>` block:
 ```json
