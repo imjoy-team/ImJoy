@@ -1821,7 +1821,6 @@ export default {
     }
   },
   beforeDestroy() {
-    // console.log('terminating plugins')
     this.pm.destroy();
     this.em.destroy();
   },
@@ -2217,7 +2216,7 @@ export default {
 
       return [
         {
-          loader_key: "Code Editor",
+          loader_key: "Code Editor (file)",
           schema: ajv.compile({
             properties: {
               name: { type: "string", pattern: ".*\\.imjoy.html$" },
@@ -2228,7 +2227,7 @@ export default {
           loader: code_loader,
         },
         {
-          loader_key: "Code Editor",
+          loader_key: "Code Editor (url)",
           schema: ajv.compile({
             properties: {
               url: { type: "string", pattern: ".*\\.imjoy.html$" },
@@ -2281,6 +2280,7 @@ export default {
         if (this.max_window_buttons > 9) this.max_window_buttons = 9;
       }
       this.wm.resizeAll();
+      this.$forceUpdate();
     },
     showEngineConnection(show, engine) {
       // if(message && resolve && reject){
@@ -2696,12 +2696,10 @@ export default {
       }
     },
     loadFiles(selected_files) {
-      console.log(selected_files);
       if (selected_files.length === 1) {
         const file = selected_files[0];
         const loaders = this.wm.getDataLoaders(file);
         const keys = Object.keys(loaders);
-        console.log(selected_files, loaders, keys);
         if (keys.length === 1) {
           try {
             return this.wm.registered_loaders[loaders[keys[0]]](file);
