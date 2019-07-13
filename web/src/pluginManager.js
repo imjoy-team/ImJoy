@@ -794,7 +794,7 @@ export class PluginManager {
                 config.origin = sp[0] + ":" + sp[1].split("@")[0];
             }
             // add a new tag
-            config.origin = config.origin + "@" + config.tag;
+            // config.origin = config.origin + "@" + config.tag;
           }
           config._id =
             (config.name && config.name.replace(/ /g, "_")) || randId();
