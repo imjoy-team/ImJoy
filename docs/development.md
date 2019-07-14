@@ -21,7 +21,7 @@ The following list illustrates key features of the plugin system in ImJoy:
 ### ImJoy architecture
 Imjoy consists of **two main components**
 
- 1.  The **ImJoy Web App**. The core part of ImJoy which runs in the browser across different OS and devices. It provide a flexible plugin system with workflow and window managments. Plugins can be developed in JavaScript or in Python are saved directly in the browser database. Web plugins are running inside a `iframe` or a `webworker`, therefore developers can in principle use any frontend framework or javascript libraries independently for each plugin. 
+ 1.  The **ImJoy Web App**. The core part of ImJoy which runs in the browser across different OS and devices. It provides a flexible plugin system with workflow and window managments. Plugins can be developed in different programming languages including JavaScript and Python. Plugins with their source code can be organized into workspaces and stored in the browser database. Web plugins are running in an `iframe` or `webworker`, therefore developers can in principle use any frontend framework or javascript library independently for each plugin. 
 
  2.  Optionally, the **Plugin Engine** for running computational tasks in CPython to taking advantage of the power of native hardware (e.g. GPU) and software libraries (e.g.: numpy, Tensorflow, PyTorch etc.). Under the hood, it's a python package ([GitHub](https://github.com/oeway/ImJoy-Engine)) runs in the background and connect to the ImJoy Web App through websocket. It uses [conda](https://conda.io/) to manage software packages (not only Python, but also C++, Java etc.) and virtual environments. Developers can then add `conda` or `pypi` packages as requirements to the plugin, and they can be automatically resolved by the plugin engine. Similarily, developers can use any Python library or even non-python libary in Python plugins.
      
@@ -114,7 +114,7 @@ a `window` plugin will not be loaded until the actual plugin is created with `ap
 
 
 ### Web Python
-Running python code and scientific libraries entirely in the browser. ImJoy uses [pyodide](https://github.com/iodide-project/pyodide/) to run python plugins, it support running Python3 code with scientific libraries (including numpy, scipy, scikit-learn etc.) through WebAssembly.
+it supports running python code and scientific libraries entirely in the browser. ImJoy uses [pyodide](https://github.com/iodide-project/pyodide/) to run python plugins, it support running Python3 code with scientific libraries (including numpy, scipy, scikit-learn etc.) through WebAssembly.
 
 
 ### Native Python

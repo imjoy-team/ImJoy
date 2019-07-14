@@ -1,6 +1,5 @@
 # Demo plugins
-Here we provide several demo plugins which you try out by click on the links. Once you installed the plugins, you can inspect the code of the provided plugins
-by clicking on the symbol left of the plugin name and selecting `Edit`.
+Here we provide several demo plugins which you try out by clicking on the links. Once you have installed the plugins you can inspect the code of the provided plugins by clicking on the icon besides the plugin name and selecting `Edit`.
 
 * [Interactive Plot (basic example)](https://imjoy.io/#/app?plugin=https://gist.githubusercontent.com/oeway/b033ad375343f495dabf19242e5c04d3/raw/PlotLineChart.imjoy.html)
 
