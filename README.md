@@ -16,7 +16,7 @@ With ImJoy, delivering Deep Learning tools to the end users is simple and easy t
 its flexible plugin system and sharable plugin URL. Developer can easily add rich and interactive web interfaces to existing Python code.
 
 
-<img src="https://github.com/oeway/ImJoy/raw/master/docs/assets/imjoy-overview.jpg" width="800px"></img>
+<img src="https://github.com/oeway/ImJoy/raw/master/docs/assets/imjoy-overview.jpg" width="600px"></img>
 
 Checkout the documentation for how to get started and more details
 for how to develop ImJoy plugins: [ImJoy Docs](https://imjoy.io/docs)
@@ -47,10 +47,10 @@ for how to develop ImJoy plugins: [ImJoy Docs](https://imjoy.io/docs)
    - Support ndarrays from Numpy for data exchange
 
 
-<img src="https://github.com/oeway/ImJoy/raw/master/docs/assets/imjoy-sharing.jpg" height="600px"></img>
-
 **ImJoy greatly accelerates the development and dissemination of new tools.** You can develop plugins in ImJoy, deploy the plugin file to Github, and share the plugin URL through social networks. Users can then use it by a single click, even on a mobile phone
 
+<a href="https://imjoy.io/#/app?p=imjoy-team/example-plugins:Skin-Lesion-Analyzer 
+" target="_blank"><img src="https://github.com/oeway/ImJoy/raw/master/docs/assets/imjoy-sharing.jpg" height="500px"></img></a>
 
 
 ## Quick Start
@@ -121,6 +121,20 @@ contribute your idea, feedback, plugins and code to the project.
 
 We don't have a guideline for that yet, for now please feel free to use the [issues](https://github.com/oeway/ImJoy/issues) and fork the project.
 
+## Citation
+
+Please cite our preprint on Arxiv ([https://arxiv.org/abs/1905.13105](https://arxiv.org/abs/1905.13105)):
+
+```
+@article{ouyang2019imjoy,
+    title={ImJoy: an open-source computational platform for the deep learning era},
+    author={Wei Ouyang and Florian Mueller and Martin Hjelmare and Emma Lundberg and Christophe Zimmer},
+    year={2019},
+    eprint={1905.13105},
+    archivePrefix={arXiv},
+    primaryClass={cs.LG}
+}
+```
 
 ## License
 
