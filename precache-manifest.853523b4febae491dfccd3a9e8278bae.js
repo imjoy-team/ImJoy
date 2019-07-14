@@ -228,16 +228,16 @@ self.__precacheManifest = [
     "url": "/static/js/chunk-vendors.a4694b2b.js"
   },
   {
+    "revision": "493ef474936217113b20a6573247288a",
+    "url": "/static/vs/editor.worker.js"
+  },
+  {
     "revision": "2a3e222e6a41b32a7180e6afa3675990",
     "url": "/static/vs/html.worker.js"
   },
   {
     "revision": "b00449080615ce71a2a8a52aee9f658f",
     "url": "/static/vs/css.worker.js"
-  },
-  {
-    "revision": "493ef474936217113b20a6573247288a",
-    "url": "/static/vs/editor.worker.js"
   },
   {
     "revision": "73417c44b2e96841ed49a2bb7032e953",

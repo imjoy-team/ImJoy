@@ -200,10 +200,10 @@ await api.alert('hello world')
 ### api.prompt
 
 ```javascript
-const anwser = await api.prompt(question, default_anwser)
+const answer = await api.prompt(question, default_answer)
 ```
 
-Shows a prompt to ask the user input.
+Shows a prompt to ask the user for input.
 
 **Arguments**
 <!--****[TODO] add instructions about customizable parameters **-->
@@ -216,17 +216,17 @@ For HTML:
 
 * **question**: Object. It contains the following fields:
   - **content**: Contains the question to be displayed. HTML tags can be used in the message, but only limited to a restricted set of tags and css, more details can be found [here](api?id=sanitized-html-and-css).
-  - **placeholder**: The default anwser of the question
+  - **placeholder**: The default answer of the question
   - **title**: The title of the dialog
 
-* **default_anwser** (optional): String. Contains the default anwser to the question.
+* **default_answer** (optional): String. Contains the default answer to the question.
 
 **Returns**
-* **anwser**: Boolean. The anwser from the user.
+* **answer**: Boolean. The answer from the user.
 
 **Example**
 ```javascript
-const anwser = await api.prompt('What is your name?')
+const answer = await api.prompt('What is your name?')
 ```
 <!--****[TODO] add example **-->
 
@@ -399,7 +399,7 @@ Inside the window plugin, `this.close`, `this.onClose`, `this.focus`, `this.resi
 
 #### ** JavaScript **
 ```javascript
-// win is the object retured from api.createWindow
+// win is the object returned from api.createWindow
 await win.run({'data': {'image': ...}})
 
 // set `onClose` callback
