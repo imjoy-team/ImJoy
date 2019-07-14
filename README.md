@@ -16,7 +16,7 @@ With ImJoy, delivering Deep Learning tools to the end users is simple and easy t
 its flexible plugin system and sharable plugin URL. Developer can easily add rich and interactive web interfaces to existing Python code.
 
 
-<img src="https://github.com/oeway/ImJoy/raw/master/docs/assets/imjoy-screenshot.png" width="600px"></img>
+<img src="https://github.com/oeway/ImJoy/raw/master/docs/assets/imjoy-overview.jpg" width="800px"></img>
 
 Checkout the documentation for how to get started and more details
 for how to develop ImJoy plugins: [ImJoy Docs](https://imjoy.io/docs)
@@ -45,7 +45,12 @@ for how to develop ImJoy plugins: [ImJoy Docs](https://imjoy.io/docs)
    - Deploying your own plugin repository to Github
 * Native support for n-dimensional arrays and tensors
    - Support ndarrays from Numpy for data exchange
-   - Support Tensorflow.js and native Tensorflow for deep learning
+
+
+<img src="https://github.com/oeway/ImJoy/raw/master/docs/assets/imjoy-sharing.jpg" height="600px"></img>
+
+**ImJoy greatly accelerates the development and dissemination of new tools.** You can develop plugins in ImJoy, deploy the plugin file to Github, and share the plugin URL through social networks. Users can then use it by a single click, even on a mobile phone
+
 
 
 ## Quick Start
@@ -71,24 +76,6 @@ of the local GPU/CPU. The computational backend can also be launched on remote s
 including cloud servers on Amazon, Google Compute, or an institutional computing cluster.
 
 To learn more details about ImJoy, please go to [ImJoy Docs](https://imjoy.io/docs/).
-
-
-## ImJoy architecture
-By design, ImJoy itself provides very minimal task specific functionality.
-It provides a flexible plugin interface to support plugins to extend the user
-interface and perform computational tasks. Plugins can be designed to perform
-simple tasks such as reading tif file, or more complex tasks such as training
-a deep learning model for image segmentation.
-
-<img src="https://github.com/oeway/ImJoy/raw/master/docs/assets/imjoy-overview.png" width="800px"></img>
-
-Imjoy consists of **three parts**, each part can be extended with plugins:
-
-1. **Web User Interface**. ImJoy is a web application. This means that using ImJoy is as easy as opening a web page from [ImJoy.io](https://imjoy.io/#/app). With ubiquitousness of the web, ImJoy provides unified user experience with browsers running on different operating systems, including mobile devices. The user can install plugins, and use them from the web interface. Besides a easy-to-use minimal interface, plugins can create their own window to create rich and interactive web interface by making use of the full power of the entire HTML/CSS/JS frameworks. For example, with [D3.js](https://d3js.org/) or [Three.js](https://threejs.org/), one can easily provide powerful interactive charts or 3D visualisation plugins. For developers, the web interface is also used for writing and testing code. A stand-alone desktop application (desktopApp) is also provided.
-
-1. **Web Computational Backend**. Computational tasks can be execution directly in the web browsers. Browsers are highly optimised and  JavaScript engines such as Google Chrome V8 and Firefox Quantum can be used to perform computational tasks. The performance of JavaScript Engines are close or even better than native languages such as Java and Python ([Benchmarks](https://benchmarksgame-team.pages.debian.net/benchmarksgame/faster/node-python3.html)). With HTML5/WebGL, browser can access to GPUs, allowing transparent GPU computing with libraries such as [Tensorflow.js](https://js.tensorflow.org/). With a new web standard called [WebAssembly](https://webassembly.org/), software/libraries written in high-level languages like C/C++/Rust can be ported to run in the browser. ImJoy uses ["Pyodide"](https://github.com/iodide-project/pyodide) to run Python plugins directly in the browser. The advantage of using the web computational backend is it requires almost zero setup and can run on mobile devices. Importantly, browser provides a unified, secured and sandboxed environment with maximised security and stability.
-
-1. **Native Computational Backend**. This is supported with the installation of an additional Python module called ["ImJoy Plugin Engine"](https://github.com/oeway/ImJoy-Engine). This allows to access the entire Python ecosystem which covers most of the scientific computing applications. With [Conda](https://conda.io), ImJoy plugin engine handles the requirements of plugins automatically and provide isolate processes and virtual environments for different Python plugins. It provides maximum flexibility and has full access to the file system, GPU and other local or remote resources. The plugin engine can be launched either on the local machine, or remotely on a cloud server or a cluster to perform computationally intensive tasks, e.g. with institutional computing cluster, Amazon Cloud, or Google Compute.
 
 ## Repositories
 
