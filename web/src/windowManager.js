@@ -52,6 +52,10 @@ export class WindowManager {
   }
 
   registerInputLoader(op_key, inputs, loader) {
+    if (this.registered_inputs[op_key])
+      console.log(
+        `WARNING: input loader ${op_key} already exists, it will be replaced.`
+      );
     this.registered_inputs[op_key] = inputs;
     this.registered_loaders[op_key] = loader;
   }
