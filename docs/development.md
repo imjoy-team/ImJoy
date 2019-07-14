@@ -114,7 +114,7 @@ a `window` plugin will not be loaded until the actual plugin is created with `ap
 
 
 ### Web Python
-it supports running python code and scientific libraries entirely in the browser. ImJoy uses [pyodide](https://github.com/iodide-project/pyodide/) to run python plugins, it support running Python3 code with scientific libraries (including numpy, scipy, scikit-learn etc.) through WebAssembly.
+Running python code and scientific libraries entirely in the browser. ImJoy uses [pyodide](https://github.com/iodide-project/pyodide/) to run python plugins, it supports running Python3 code with scientific libraries (including numpy, scipy, scikit-learn etc.) through WebAssembly.
 
 
 ### Native Python
