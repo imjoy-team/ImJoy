@@ -111,7 +111,6 @@ export class ImJoy {
     } catch (e) {
       console.error(e);
     }
-    console.log("Ready!");
   }
 
   async destroy() {
