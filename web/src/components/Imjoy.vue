@@ -1396,7 +1396,6 @@
 
 <script>
 /*eslint no-unused-vars: ["error", { "argsIgnorePattern": "^_plugin$" }]*/
-import Vue from "vue";
 
 import { saveAs } from "file-saver";
 import axios from "axios";
@@ -1425,6 +1424,8 @@ import { Engine } from "../engineManager.js";
 import _ from "lodash";
 
 import { Joy } from "../joy";
+
+import Minibus from "minibus";
 
 import Ajv from "ajv";
 const ajv = new Ajv();
@@ -1520,7 +1521,8 @@ export default {
     this.imjoy_version = version;
     // mocks it for testing if not available
     this.event_bus =
-      (this.$root.$data.store && this.$root.$data.store.event_bus) || new Vue();
+      (this.$root.$data.store && this.$root.$data.store.event_bus) ||
+      Minibus.create();
     const imjoy_api = {
       alert: this.showAlert,
       prompt: this.showPrompt,
@@ -1645,7 +1647,7 @@ export default {
         }
       }
       if (insideFileDialog(e.target)) {
-        this.event_bus.$emit("drag_upload_enter");
+        this.event_bus.emit("drag_upload_enter");
       }
     });
     document.addEventListener("dragenter", e => {
@@ -1656,7 +1658,7 @@ export default {
         this.$forceUpdate();
       }
       if (insideFileDialog(e.target)) {
-        this.event_bus.$emit("drag_upload_enter");
+        this.event_bus.emit("drag_upload_enter");
       }
     });
     document.addEventListener("dragleave", e => {
@@ -1667,7 +1669,7 @@ export default {
         this.$forceUpdate();
       }
       if (!insideFileDialog(e.target)) {
-        this.event_bus.$emit("drag_upload_leave");
+        this.event_bus.emit("drag_upload_leave");
       }
     });
     const parseFiles = e => {
@@ -1735,9 +1737,9 @@ export default {
         this.workspace_dropping = false;
         this.$forceUpdate();
       } else if (insideFileDialog(e.target)) {
-        this.event_bus.$emit("drag_upload_leave");
+        this.event_bus.emit("drag_upload_leave");
         parseFiles(e).then(files => {
-          this.event_bus.$emit("drag_upload", files);
+          this.event_bus.emit("drag_upload", files);
         });
       }
     });
@@ -1757,21 +1759,21 @@ export default {
     }
   },
   mounted() {
-    this.event_bus.$on("resize", this.updateSize);
-    this.event_bus.$on("plugin_loaded", () => {
+    this.event_bus.on("resize", this.updateSize);
+    this.event_bus.on("plugin_loaded", () => {
       //update the joy workflow if new template added, TODO: preserve settings during reload
       if (this.$refs.workflow && this.$refs.workflow.setupJoy)
         this.$refs.workflow.setupJoy();
     });
-    this.event_bus.$on("op_registered", () => {
+    this.event_bus.on("op_registered", () => {
       //update the joy workflow if new template added, TODO: preserve settings during reload
       if (this.$refs.workflow && this.$refs.workflow.setupJoy)
         this.$refs.workflow.setupJoy();
     });
-    this.event_bus.$on("engine_connected", engine => {
+    this.event_bus.on("engine_connected", engine => {
       if (this.pm) this.pm.reloadPythonPlugins(engine);
     });
-    this.event_bus.$on("engine_disconnected", engine => {
+    this.event_bus.on("engine_disconnected", engine => {
       if (this.pm) this.pm.unloadPythonPlugins(engine);
     });
 
@@ -1938,10 +1940,10 @@ export default {
         }
 
         this.plugin_loaded = true;
-        this.event_bus.$emit("plugins_loaded", this.pm.plugins);
+        this.event_bus.emit("plugins_loaded", this.pm.plugins);
         try {
           const manifest = this.pm.reloadRepository();
-          this.event_bus.$emit("repositories_loaded", manifest);
+          this.event_bus.emit("repositories_loaded", manifest);
         } finally {
           if (route.query.start || route.query.s) {
             const pname = route.query.start || route.query.s;
@@ -2001,7 +2003,7 @@ export default {
                     } catch (e) {
                       console.error(`Plugin ${pname} failed to load data.`, e);
                     }
-                    this.event_bus.$off("plugin_loaded", plugin_loaded_handler);
+                    this.event_bus.off("plugin_loaded", plugin_loaded_handler);
                   }
                   // close it if it already started.
                   if (started_plugin && started_plugin.api.close) {
@@ -2013,16 +2015,16 @@ export default {
                   if (p.name !== pname) {
                     return;
                   }
-                  this.event_bus.$on("plugin_loaded", plugin_loaded_handler);
-                  this.event_bus.$off("plugin_installed", start_when_loaded);
+                  this.event_bus.on("plugin_loaded", plugin_loaded_handler);
+                  this.event_bus.off("plugin_installed", start_when_loaded);
                 };
-                this.event_bus.$on("plugin_installed", start_when_loaded);
+                this.event_bus.on("plugin_installed", start_when_loaded);
               }
             }
           }
 
           this.$nextTick(() => {
-            this.event_bus.$emit("imjoy_ready");
+            this.event_bus.emit("imjoy_ready");
           });
         }
       } catch (e) {
@@ -2249,7 +2251,7 @@ export default {
       //   this.reject_permission = reject
       //   this.showPermissionConfirmation = true
       // }
-      this.event_bus.$emit("show_engine_dialog", {
+      this.event_bus.emit("show_engine_dialog", {
         show: show,
         engine: engine,
       });

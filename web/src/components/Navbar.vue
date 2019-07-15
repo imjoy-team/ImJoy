@@ -133,10 +133,10 @@ export default {
   },
   mounted() {
     this.screenWidth = window.innerWidth;
-    this.event_bus.$on("resize", this.updateSize);
+    this.event_bus.on("resize", this.updateSize);
   },
   beforeDestroy() {
-    this.event_bus.$off("resize", this.updateSize);
+    this.event_bus.off("resize", this.updateSize);
   },
   methods: {
     updateSize(e) {

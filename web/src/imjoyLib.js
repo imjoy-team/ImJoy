@@ -9,7 +9,7 @@ import PouchDB from "pouchdb-browser";
 
 import { randId } from "./utils.js";
 
-import Vue from "vue";
+import Minibus from "minibus";
 
 export class ImJoy {
   constructor({
@@ -29,7 +29,7 @@ export class ImJoy {
         auto_compaction: true,
       });
 
-    this.event_bus = event_bus || new Vue();
+    this.event_bus = event_bus || Minibus.create();
     this.client_id = client_id || "imjoy_web_" + randId();
     this.imjoy_api = imjoy_api || {};
     this.update_ui_callback = update_ui_callback || function() {};

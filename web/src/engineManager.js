@@ -117,7 +117,7 @@ export class Engine {
         //disconnect immediately
         this.socket = null;
         this.connected = false;
-        this.event_bus.$emit("engine_disconnected", this);
+        this.event_bus.emit("engine_disconnected", this);
         this.connection = "Disconnected.";
         this.update_ui_callback();
       };
@@ -164,7 +164,7 @@ export class Engine {
                   `Successfully connected to the Plugin Engine 🚀 (${url}).`
                 );
                 // console.log('plugin engine connected.')
-                this.event_bus.$emit("engine_connected", this);
+                this.event_bus.emit("engine_connected", this);
                 this.update_ui_callback();
                 resolve();
               };
@@ -223,7 +223,7 @@ export class Engine {
             if (this.connected) {
               this.socket = null;
               this.connected = false;
-              this.event_bus.$emit("engine_disconnected", this);
+              this.event_bus.emit("engine_disconnected", this);
               this.connection = "Disconnected.";
               this.update_ui_callback();
             }

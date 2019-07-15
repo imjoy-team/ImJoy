@@ -432,7 +432,7 @@ export class PluginManager {
       selected_workspace = selected_workspace || this.selected_workspace;
       const load_ = () => {
         try {
-          this.event_bus.$emit("workspace_list_updated", this.workspace_list);
+          this.event_bus.emit("workspace_list_updated", this.workspace_list);
           this.db = new PouchDB(selected_workspace + "_workspace", {
             revs_limit: 2,
             auto_compaction: true,
@@ -820,7 +820,7 @@ export class PluginManager {
             this.showMessage(
               `Plugin "${template.name}" has been successfully installed.`
             );
-            this.event_bus.$emit("plugin_installed", template);
+            this.event_bus.emit("plugin_installed", template);
             resolve(template);
             if (!do_not_load) this.reloadPlugin(template);
           } catch (error) {
@@ -1221,7 +1221,7 @@ export class PluginManager {
         this.register(plugin, config);
         this.plugins[plugin.id] = plugin;
         this.plugin_names[plugin.name] = plugin;
-        this.event_bus.$emit("plugin_loaded", plugin);
+        this.event_bus.emit("plugin_loaded", plugin);
         resolve(plugin);
       } catch (e) {
         reject(e);
@@ -1303,7 +1303,7 @@ export class PluginManager {
           plugin.api
             .resume()
             .then(() => {
-              this.event_bus.$emit("plugin_loaded", plugin);
+              this.event_bus.emit("plugin_loaded", plugin);
               resolve(plugin);
             })
             .catch(e => {
@@ -1322,7 +1322,7 @@ export class PluginManager {
           plugin.api
             .setup()
             .then(() => {
-              this.event_bus.$emit("plugin_loaded", plugin);
+              this.event_bus.emit("plugin_loaded", plugin);
               resolve(plugin);
             })
             .catch(e => {
@@ -1846,7 +1846,7 @@ export class PluginManager {
 
       this.registered.ops[op_key] = op_config;
       this.registered.windows[config.name] = plugin.config;
-      this.event_bus.$emit("op_registered", op_config);
+      this.event_bus.emit("op_registered", op_config);
       return true;
     } catch (e) {
       console.error(e);

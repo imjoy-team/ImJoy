@@ -286,7 +286,7 @@ export default {
   mounted() {
     this.search = this.initSearch || "";
     this.containerWidth = this.$refs.container.offsetWidth;
-    this.event_bus.$on("resize", this.updateSize);
+    this.event_bus.on("resize", this.updateSize);
     this.pm = this.pluginManager;
 
     if (this.plugins) {
@@ -343,7 +343,7 @@ export default {
     }
   },
   beforeDestroy() {
-    this.event_bus.$off("resize", this.updateSize);
+    this.event_bus.off("resize", this.updateSize);
   },
   watch: {
     plugins: {

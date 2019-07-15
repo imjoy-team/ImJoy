@@ -129,9 +129,9 @@ export default {
     this.windows = this.wm && this.wm.windows;
     assert(this.windows);
     this.event_bus = this.wm.event_bus;
-    this.event_bus.$on("add_window", this.onWindowAdd);
-    this.event_bus.$on("close_window", this.onWindowClose);
-    this.event_bus.$on("resize", this.updateSize);
+    this.event_bus.on("add_window", this.onWindowAdd);
+    this.event_bus.on("close_window", this.onWindowClose);
+    this.event_bus.on("resize", this.updateSize);
   },
   mounted() {
     this.screenWidth = window.innerWidth;
@@ -150,9 +150,9 @@ export default {
     };
   },
   beforeDestroy() {
-    this.event_bus.$off("add_window", this.onWindowAdd);
-    this.event_bus.$off("close_window", this.onWindowClose);
-    this.event_bus.$off("resize", this.updateSize);
+    this.event_bus.off("add_window", this.onWindowAdd);
+    this.event_bus.off("close_window", this.onWindowClose);
+    this.event_bus.off("resize", this.updateSize);
   },
   computed: {
     gridWindows: function() {

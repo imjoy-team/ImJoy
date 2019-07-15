@@ -187,10 +187,10 @@ export default {
   created() {
     this.store = this.$root.$data.store;
     this.event_bus = this.$root.$data.store && this.$root.$data.store.event_bus;
-    if (this.event_bus) this.event_bus.$on("resize", this.updateSize);
+    if (this.event_bus) this.event_bus.on("resize", this.updateSize);
   },
   beforeDestroy() {
-    if (this.event_bus) this.event_bus.$off("resize", this.updateSize);
+    if (this.event_bus) this.event_bus.off("resize", this.updateSize);
   },
   mounted() {
     this.$el.addEventListener("touchmove", function(ev) {
