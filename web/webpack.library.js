@@ -25,10 +25,9 @@ module.exports = {
             }
         ]),
         new CopyWebpackPlugin([{
-            from: path.join(__dirname, "src/jailed/_JailedSite.js"),
-            to: path.join(__dirname, "dist/static/jailed/_JailedSite.js"),
-            toType: "file"
-        }
-    ])
+            from: path.join(__dirname, "src/jailed"),
+            to: path.join(__dirname, "dist/static/jailed"),
+            toType: "dir"
+        }])
     ]
 };
