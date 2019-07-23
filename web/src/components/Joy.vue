@@ -93,5 +93,5 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style>
-@import '../joy.css';
+@import "../joy.css";
 </style>
