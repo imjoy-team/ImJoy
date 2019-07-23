@@ -11,6 +11,10 @@ import { randId } from "./utils.js";
 
 import Minibus from "minibus";
 
+import { Joy as _Joy } from "./joy";
+
+export const Joy = _Joy;
+
 export class ImJoy {
   constructor({
     imjoy_api = null,
