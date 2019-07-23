@@ -157,6 +157,12 @@
         function closeDialog() {
             document.getElementById('dialog-container').classList.remove('active')
         }
+        function getUrlParameter(name) {
+            name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+            var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+            var results = regex.exec(location.search);
+            return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+        };
         function addWindow(title, id){
             document.getElementById('header').innerHTML =`
             <span class="chip" id="header_${id}" onclick="selectWindow('${id}')">
@@ -202,15 +208,18 @@
             imjoy.start().then(()=>{
                 windows = imjoy.wm.windows
                 console.log(imjoy)
-                axios.get('https://raw.githubusercontent.com/oeway/ImJoy-Demo-Plugins/master/demos/showDialog.imjoy.html').then((response)=>{
-                    imjoy.pm.reloadPlugin({code: response.data}).then((plugin)=>{
-                        plugin.api.run({config: {}, data: {}})
+                const p = getUrlParameter('plugin');
+                if(p){
+                    axios.get(p).then((response)=>{
+                        imjoy.pm.reloadPlugin({code: response.data}).then((plugin)=>{
+                            plugin.api.run({config: {}, data: {}})
+                        })
                     })
-                })
+                }
 
                 axios.get('https://raw.githubusercontent.com/oeway/ImJoy-Plugins/master/repository/ImageSelection.imjoy.html').then((response)=>{
                     imjoy.pm.reloadPlugin({code: response.data}).then((plugin)=>{
-                        
+                        plugin.api.run({config: {}, data: {}})
                     })
                 })
 
