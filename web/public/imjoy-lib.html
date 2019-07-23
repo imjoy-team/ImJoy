@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>ImJoy Web App</title>
+    <script src="./imjoy-lib.js"></script>
+    <link rel="stylesheet" href="https://static.imjoy.io/spectre.css/spectre.min.css">
+    <link rel="stylesheet" href="https://static.imjoy.io/spectre.css/spectre-exp.min.css">
+    <link rel="stylesheet" href="https://static.imjoy.io/spectre.css/spectre-icons.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.15.3/axios.min.js"></script>
+    <style>
+        html,
+        body {
+            height: 100%;
+            width: 100%;
+            overflow-y: hidden;
+            overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
+            -webkit-transform: translate3d(0, 0, 0);
+            /* Disables pull-to-refresh but allows overscroll glow effects. */
+            overscroll-behavior-y: contain;
+            overscroll-behavior-x: none;
+            position: fixed;
+            overflow-wrap: break-word;
+        }
+        .navbar .navbar-brand {
+            font-size: 1.2rem;
+        }
+        .whiteboard{
+            width: 100%;
+            height: calc(100% - 36px);
+        }
+        .window_container{
+            width: 100%;
+            height: 100%;
+        }
+        .site-title-small{
+            height: 32px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="modal" id="window-dialog-container">
+        <a href="#close" class="modal-overlay" aria-label="Close"></a>
+        <div class="modal-container">
+            <div class="modal-header">
+                <a href="#close" class="btn btn-clear float-right" aria-label="Close"
+                    onclick="closeDialog('window-dialog-container')"></a>
+                <div class="modal-title h5" id="window-dialog-title">Dialog</div>
+            </div>
+            <div class="modal-body">
+                <div class="content">
+         
+                </div>
+            </div>
+        </div>
+    </div>
+    <header class="navbar">
+            
+    <section class="navbar-section">
+        <img
+            class="site-title-small"
+            src="https://imjoy.io/static/img/imjoy-logo-black.svg"
+            alt="ImJoy"
+        />
+        <!-- <a href="https://imjoy.io/docs" target="_blank" class="btn btn-link">Docs</a>
+        <a href="https://github.com/oeway/ImJoy" target="_blank" class="btn btn-link">GitHub</a> -->
+    </section>
+    <section class="navbar-section" id="header" style="flex: 0 1 0;">
+         
+    </section>
+    <progress class="progress" id="progress" value="100" max="100"></progress>
+    </header>
+    
+    <div class="whiteboard" id="whiteboard">
+
+    </div>
+
+    <script>
+        var selected_window = null
+        var imjoy = null
+        var windows = null
+        var imjoy_api = {
+            showMessage: (plugin, info, duration)=>{
+                console.log(info)
+            },
+            showProgress: (plugin, progress) =>{
+                if (p < 1) progress =  progress * 100;
+                document.getElementById('progress').value = progress
+            }
+        }
+        function openDialog() {
+            document.getElementById('window-dialog-container').classList.add('active')
+        }
+        function closeDialog() {
+            document.getElementById('window-dialog-container').classList.remove('active')
+        }
+        function addWindow(title, id){
+            document.getElementById('header').innerHTML =`
+            <span class="chip" id="header_${id}" onclick="selectWindow('${id}')">
+                ${title}
+                <a href="#" onclick="removeWindow('${id}')" class="btn btn-clear" aria-label="Close" role="button"></a>
+            </span>` + document.getElementById('header').innerHTML;
+
+            document.getElementById('whiteboard').innerHTML =`
+                <div class="window_container" id="${id}"></div>
+            ` + document.getElementById('whiteboard').innerHTML;
+
+            selectWindow(id)
+        }
+        function removeWindow(id){
+            document.getElementById('header').removeChild(document.getElementById('header_'+id));
+            document.getElementById('whiteboard').removeChild(document.getElementById(id));
+        }
+
+        function selectWindow(id){
+            for(let c of document.getElementById('whiteboard').children){
+                if(c.id !== 'site-title'){
+                    c.style.display = "none";
+                }
+            } 
+
+            for(let c of document.getElementById('header').children)
+                c.classList.remove('active')
+            selected_window = id;
+            document.getElementById(id).style.display = "block";
+            document.getElementById('header_'+id).classList.add('active')
+        }
+
+        document.addEventListener('DOMContentLoaded', (event) => {
+            imjoy = new imjoyLib.ImJoy({
+                imjoy_api: imjoy_api,
+                show_message_callback: console.log,
+                show_engine_callback: console.log,
+                add_window_callback: async (w)=>{
+                    addWindow(w.name, w.iframe_container)
+                },
+                update_ui_callback: ()=>{}
+            })
+            imjoy.start().then(()=>{
+                windows = imjoy.wm.windows
+                console.log(imjoy)
+                axios.get('https://raw.githubusercontent.com/oeway/ImJoy-Plugins/master/repository/ImageAnnotator.imjoy.html').then((response)=>{
+                    console.log('===================', response)
+                    imjoy.pm.reloadPlugin({code: response.data}).then((plugin)=>{
+                        plugin.api.run()
+                    })
+                })
+                
+            })
+            .catch((e)=>{
+                console.error(e)
+                alert('Error: '+ e)
+            })
+        })
+    </script>
+</body>
+
+</html>

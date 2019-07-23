@@ -45,3 +45,39 @@ git diff-index --quiet HEAD || git commit -m "Deploy to GitHub Pages $TARGET_BRA
 
 # Now that we're all set up, we can push.
 git push $SSH_REPO $TARGET_BRANCH
+
+# ======== deploy imjoy-lib with jailed library ========
+LIB_REPO=git@github.com:oeway/lib.imjoy.io.git
+cd ../
+git clone $LIB_REPO imjoy-lib
+cd imjoy-lib
+
+# Create a new empty branch if gh-pages doesn't exist yet (should only happen on first deploy).
+git checkout master || { git checkout --orphan master; git rm -rf .; }
+
+# Clean up
+rm -rf ./*
+
+# Copy dirs and files and that we want to update.
+cp -Rf ../web/dist/static/jailed ./jailed
+cp ../web/dist/imjoy-lib.html  ./index.html
+cp ../web/dist/imjoy-lib.js  ./
+cp ../web/dist/manifest.json  ./
+cp ../web/dist/precache-*.js  ./
+cp ../web/dist/service-worker.js  ./
+cp ../web/dist/robots.txt  ./
+cp ../web/dist/version.json  ./
+cp ../web/dist/404.html  ./
+
+# Create .nojekyll to bypass Github jekyll
+touch .nojekyll
+echo "lib.imjoy.io" > CNAME
+
+# Commit the "changes", i.e. the new version.
+# The delta will show diffs between new and old versions.
+git add -A .
+git diff-index --quiet HEAD || git commit -m "Deploy to GitHub Pages $TARGET_BRANCH branch: ${SHA}"
+
+LIB_SSH_REPO=${LIB_REPO/https:\/\/github.com\//git@github.com:}
+# Now that we're all set up, we can push.
+git push $LIB_SSH_REPO master

@@ -19,8 +19,8 @@ module.exports = {
     },
     plugins: [
         new CopyWebpackPlugin([{
-                from: path.join(__dirname, "public/demo.html"),
-                to: path.join(__dirname, "dist/demo.html"),
+                from: path.join(__dirname, "public/imjoy-lib.html"),
+                to: path.join(__dirname, "dist/imjoy-lib.html"),
                 toType: "file"
             }
         ]),
