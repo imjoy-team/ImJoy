@@ -26,7 +26,7 @@ git clone $LIB_REPO imjoy-lib
 cd imjoy-lib
 
 # Create a new empty branch if gh-pages doesn't exist yet (should only happen on first deploy).
-git checkout master || { git checkout --orphan master; git rm -rf .; }
+git checkout ${LIB_TARGET_BRANCH} || { git checkout --orphan ${LIB_TARGET_BRANCH}; git rm -rf .; }
 
 # Clean up
 rm -rf ./*
@@ -48,7 +48,7 @@ echo "lib.imjoy.io" > CNAME
 # Commit the "changes", i.e. the new version.
 # The delta will show diffs between new and old versions.
 git add -A .
-git diff-index --quiet HEAD || git commit -m "Deploy to GitHub Pages master branch: ${SHA}"
+git diff-index --quiet HEAD || git commit -m "Deploy to GitHub Pages ${LIB_TARGET_BRANCH} branch: ${SHA}"
 
 # Now that we're all set up, we can push.
-git push $LIB_SSH_REPO master
+git push $LIB_SSH_REPO ${LIB_TARGET_BRANCH}
