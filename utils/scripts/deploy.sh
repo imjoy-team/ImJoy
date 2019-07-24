@@ -59,15 +59,14 @@ git checkout master || { git checkout --orphan master; git rm -rf .; }
 rm -rf ./*
 
 # Copy dirs and files and that we want to update.
-cp -Rf ../web/dist/static/jailed ./jailed
+cp -Rf ../web/dist/*  ./
+rm -rf ./static/*
+rm -rf ./docs
+rm -rf CNAME
+cp -Rf ../web/dist/static/icons ./static/icons
+cp -Rf ../web/dist/static/iconfont ./static/iconfont
+cp -Rf ../web/dist/static/jailed ./static/jailed
 cp ../web/dist/imjoy-lib.html  ./index.html
-cp ../web/dist/imjoy-lib.js  ./
-cp ../web/dist/manifest.json  ./
-cp ../web/dist/precache-*.js  ./
-cp ../web/dist/service-worker.js  ./
-cp ../web/dist/robots.txt  ./
-cp ../web/dist/version.json  ./
-cp ../web/dist/404.html  ./
 
 # Create .nojekyll to bypass Github jekyll
 touch .nojekyll
