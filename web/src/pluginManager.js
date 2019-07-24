@@ -1005,7 +1005,11 @@ export class PluginManager {
               this.installed_plugins.push(template);
               resolve(template);
               this.showMessage(`${template.name} has been successfully saved.`);
-              // this._sendToServiceWorker(template)
+              if(template.type === 'window' || template.type === 'iframe' ||template === 'web-worker'){
+                this.cacheRequirements(template.requirments).catch((e)=>{
+                  console.error(`Failed to cache requirements for ${template.name}`, e)
+                })
+              }
             })
             .catch(err => {
               this.showMessage("Failed to save the plugin.", 15);
@@ -1028,6 +1032,21 @@ export class PluginManager {
         reject(e);
       }
     });
+  }
+
+  async cacheRequirements(requirments){
+    if(requirments && requirments.length>0){
+      for(let req of requirments){
+        //remove prefix
+        if(req.startsWith('js:')) req = req.slice(3);
+        if(req.startsWith('css:')) req = req.slice(4);
+        console.log('Adding requirement to cache: ', req)
+        await this._sendToServiceWorker({
+          command: 'add',
+          url: req
+        })
+      }
+    }
   }
 
   async reloadPythonPlugins(engine) {
