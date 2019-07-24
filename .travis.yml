@@ -25,11 +25,16 @@ script:
 after_success:
   - cd ..
 deploy:
-  provider: script
-  skip_cleanup: true # do not delete the built assets
-  script: bash ./utils/scripts/deploy.sh
-  on:
-    branch: master
+  - provider: script
+    skip_cleanup: true # do not delete the built assets
+    script: bash ./utils/scripts/deploy.sh
+    on:
+      branch: master
+  - provider: script
+    skip_cleanup: true # do not delete the built assets
+    script: bash ./utils/scripts/deploy-lib.sh
+    on:
+      branch: master
 env:
   global:
   - SOURCE_BRANCH: master
