@@ -6,7 +6,7 @@
   "author": "Wei OUYANG <wei.ouyang@cri-paris.org>",
   "scripts": {
     "serve": "vue-cli-service serve --host 0.0.0.0",
-    "build": "vue-cli-service build",
+    "build": "vue-cli-service build && npm run build-lib",
     "build-lib": "webpack --config webpack.library.js --mode development && webpack --config webpack.library.js --mode production",
     "test": "vue-cli-service test:unit",
     "check-format": "prettier --check \"{src,tests}/**/**\"",

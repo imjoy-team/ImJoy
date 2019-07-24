@@ -22,7 +22,6 @@ script:
   - npm run lint
   - npm run test
   - npm run build
-  - npm run build-lib
 after_success:
   - cd ..
 deploy:

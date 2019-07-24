@@ -47,8 +47,14 @@ if (workbox) {
 
   workbox.routing.setDefaultHandler(new workbox.strategies.NetworkOnly());
 
-  self.addEventListener("message", e => {
-    if (e.data.action == "skipWaiting") self.skipWaiting();
+  self.addEventListener("message", event => {
+    if (event.data.action == "skipWaiting") self.skipWaiting();
+    if (event.data && event.data.action === 'add_cache') {
+      // Use the Cache Storage API directly,
+      // and add to the default runtime cache:
+      caches.open(workbox.core.cacheNames.runtime)
+        .then(cache => cache.add(event.data.url));
+    }
   });
 
   self.addEventListener("install", function(event) {
