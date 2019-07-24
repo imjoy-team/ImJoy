@@ -51,11 +51,9 @@ if (workbox) {
     if (e.data.action == "skipWaiting") self.skipWaiting();
   });
 
-  self.addEventListener('install', function (event) {
-      self.skipWaiting();
+  self.addEventListener("install", function(event) {
+    self.skipWaiting();
   });
 } else {
   console.log(`Workbox didn't load`);
 }
-
-
