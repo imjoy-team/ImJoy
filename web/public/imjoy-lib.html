@@ -77,6 +77,9 @@
         .site-title-small{
             height: 32px;
         }
+        .pointer{
+            cursor: pointer;
+        }
     </style>
 </head>
 
@@ -109,7 +112,12 @@
         <a href="https://github.com/oeway/ImJoy" target="_blank" class="btn btn-link">GitHub</a> -->
     </section>
     <section class="navbar-section" id="header" style="flex: 0 1 0;">
-         
+        <div class="dropdown dropdown-right">
+            <a class="btn btn-link dropdown-toggle" tabindex="0"><i class="icon icon-more-horiz"></i></a>
+            <ul class="menu" id="plugin-menu">
+                
+            </ul>
+        </div>
     </section>
     <progress class="progress" id="progress" value="100" max="100"></progress>
     </header>
@@ -203,7 +211,7 @@
         };
         function addWindow(title, id){
             document.getElementById('header').innerHTML =`
-            <span class="chip" id="header_${id}" onclick="selectWindow('${id}')">
+            <span class="chip pointer" id="header_${id}" onclick="selectWindow('${id}')">
                 ${title}
                 <a href="#" onclick="removeWindow('${id}')" class="btn btn-clear" aria-label="Close" role="button"></a>
             </span>` + document.getElementById('header').innerHTML;
@@ -233,6 +241,7 @@
             document.getElementById('header_'+id).classList.add('active')
         }
 
+        
         document.addEventListener('DOMContentLoaded', (event) => {
             imjoy = new imjoyLib.ImJoy({
                 imjoy_api: imjoy_api,
@@ -257,7 +266,6 @@
 
                 axios.get('https://raw.githubusercontent.com/oeway/ImJoy-Plugins/master/repository/ImageSelection.imjoy.html').then((response)=>{
                     imjoy.pm.reloadPlugin({code: response.data}).then((plugin)=>{
-                        plugin.api.run({config: {}, data: {}})
                     })
                 })
 
@@ -272,6 +280,16 @@
                 console.error(e)
                 alert('Error: '+ e)
             })
+
+            imjoy.event_bus.on("plugin_loaded", (plugin) => {
+                document.getElementById('plugin-menu').innerHTML = `
+                <li class="menu-item"><a href="#dropdowns" onclick="runPlugin('${plugin.name}')">${plugin.name}</a></li>
+                `+ document.getElementById('plugin-menu').innerHTML
+            })
+
+            window.runPlugin = (name) => {
+                imjoy.pm.plugin_names[name].api.run({config: {}, data: {}})
+            }
         })
     </script>
 </body>

@@ -844,7 +844,6 @@ export class PluginManager {
                 });
               }
             }
-            console.log("plugins loaded.");
             resolve();
           })
           .catch(err => {
