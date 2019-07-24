@@ -21,23 +21,22 @@ The following list illustrates key features of the plugin system in ImJoy:
 ### ImJoy architecture
 Imjoy consists of **two main components**
 
- 1.  The **ImJoy Web App**. The core part of ImJoy which runs in the browser across different OS and devices. It provides a flexible plugin system with workflow and window managments. Plugins can be developed in different programming languages including JavaScript and Python. Plugins with their source code can be organized into workspaces and stored in the browser database. Web plugins are running in an `iframe` or `webworker`, therefore developers can in principle use any frontend framework or javascript library independently for each plugin. 
+ 1.  The **ImJoy Web App**. The core part of ImJoy which runs in the browser across different OS and devices. It provides a flexible plugin system with workflow and window management. Plugins can be developed in different programming languages including JavaScript and Python. Plugins with their source code can be organized into workspaces and stored in the browser database. Web plugins are running in an `iframe` or `webworker`, therefore developers can in principle use any frontend framework or javascript library independently for each plugin.
 
- 2.  Optionally, the **Plugin Engine** for running computational tasks in CPython to taking advantage of the power of native hardware (e.g. GPU) and software libraries (e.g.: numpy, Tensorflow, PyTorch etc.). Under the hood, it's a python package ([GitHub](https://github.com/oeway/ImJoy-Engine)) runs in the background and connect to the ImJoy Web App through websocket. It uses [conda](https://conda.io/) to manage software packages (not only Python, but also C++, Java etc.) and virtual environments. Developers can then add `conda` or `pypi` packages as requirements to the plugin, and they can be automatically resolved by the plugin engine. Similarily, developers can use any Python library or even non-python libary in Python plugins.
-     
+ 2.  Optionally, the **Plugin Engine** for running computational tasks in CPython to taking advantage of the power of native hardware (e.g. GPU) and software libraries (e.g.: numpy, Tensorflow, PyTorch etc.). Under the hood, it's a python package ([GitHub](https://github.com/oeway/ImJoy-Engine)) runs in the background and connect to the ImJoy Web App through websocket. It uses [conda](https://conda.io/) to manage software packages (not only Python, but also C++, Java etc.) and virtual environments. Developers can then add `conda` or `pypi` packages as requirements to the plugin, and they can be automatically resolved by the plugin engine. Similarly, developers can use any Python library or even non-python library in Python plugins.
+
 ![imjoy-plugin-development](assets/imjoy-architecture.png ':size=800')
 
- The Plugin Engine is connected with the ImJoy Web App through websockets, 
+ The Plugin Engine is connected with the ImJoy Web App through websockets,
  and communicates with a customised remote procedure calls (RPC) based on [socket.io](https://github.com/miguelgrinberg/python-socketio).
 
 ### ImJoy code editor and developer tools
-ImJoy has full support for deveoping new plugins, you can directly write new plugin with the built-in code editor. Together with the debugging tools provided by modern browsers (e.g.: Google Chrome Developer Tools), no extra IDE or tool is needed.
+ImJoy has full support for plugin developing and you write new plugins directly
+in ImJoy with the built-in code editor. Together with the debugging tools provided by modern browsers (e.g.: Google Chrome Developer Tools; more details below), no extra IDE or tool is needed.
 
-![imjoy-code-editor](assets/imjoy-code-editor.jpg ':size=800')
 You can view and modify the plugin code for any existing plugin by clicking `Edit` from the plugin menu (the icon beside the plugin name).
 
-![chrome-developer-tools](assets/chrome-developer-tools.jpg ':size=800')
-Using the Developer Tools from Chrome
+![imjoy-code-editor](assets/imjoy-code-editor.jpg ':size=800')
 
 
 ### Getting Started
@@ -45,26 +44,29 @@ To make your first ImJoy plugin, you can click "+ PLUGINS", and choose one of th
 
 ![imjoy-plugin-types](assets/imjoy-plugin-types.png ':size=800')
 
-For example, you can select "Default Template" to make your first ImJoy plugin. After selection, a code editor will open in the ImJoy workspace. 
+For example, you can select "Default Template" to make your first ImJoy plugin. After selection, a code editor will open in the ImJoy workspace.
 
 You can then write plugin code in Javascript, you can quick browse through the code. Without changing the code, if you just save it by clicking the save icon, a new entry called "Untiled Plugin" will be added to the plugin menu.
 
-To run your plugin, you can click on the "Untitled Plugin" button. 
+To run your plugin, you can click on the "Untitled Plugin" button.
 
 If everything goes well, you will see a popup dialog with "Hello World".
 
 ![imjoy-hello-world](assets/imjoy-hello-world.jpg ':size=800')
 
-Congratulations! you just made your first ImJoy plugin. 
+Congratulations! You just made your first ImJoy plugin.
 
 Feel free to modify the code, save and run again. To understand more, please proceed further.
 
 ### Debugging
-During plugin development, errors and related information will be forwarded to show in the status bar or shown as message in the snackbar.
+During plugin development, errors and related information will be forwarded
+and shown in the status bar or as message in the snackbar.
 
-Modern browsers are often come with built-in developer tools, for example, [Chrome developer tools](https://developers.google.com/web/tools/chrome-devtools) provides all kinds of tools for debugging HTML/CSS/Javascript, network and others. It is recommended to use it for debugging web plugins. For example, you can use `console.log()`, `console.error()` etc. in JavaScript as usual, then inspect the logs and errors in the browser console. In Python plugins, the error trackback will also be forwarded to the browser console.
+Modern browsers are often come with built-in developer tools, for example, [Chrome developer tools](https://developers.google.com/web/tools/chrome-devtools) provides different tools for debugging HTML/CSS/Javascript, network and others. It is recommended to use it for debugging web plugins. For example, you can use `console.log()`, `console.error()` etc. in JavaScript as usual, then inspect the logs and errors in the browser console. In Python plugins, the error trackback will also be forwarded to the browser console.
 
-In addition to that, you can also use ImJoy API functions including `api.log()`, `api.error()`, `api.alert()`, `api.showMessage()` to show message to ImJoy app. 
+![chrome-developer-tools](assets/chrome-developer-tools.jpg ':size=800')
+
+In addition to that, you can also use ImJoy API functions including `api.log()`, `api.error()`, `api.alert()`, `api.showMessage()` to show message to ImJoy app.
 
 Specifically for Python plugin, `print()` will only be seen in the terminal where you launch the plugin engine, thus API functions are recommended for Python plugins.
 
@@ -129,7 +131,7 @@ The recommended way to use the ImJoy App is through [https://imjoy.io](https://i
 
 In Chrome for example, user can install ImJoy into [chrome://apps/](chrome://apps/) and start from the ImJoy App dashboard. Once installed, ImJoy can then run in independent browser window (without the address bar). The core part of ImJoy also supports offline, but not yet for the plugins (will be supported).
 
-You can run all the web plugins (`web-worker`, `window`, `web-python`) with the ImJoy App, however, for native plugins (`native-python`) you will need to connect to a plugin engine running locally or remotely. 
+You can run all the web plugins (`web-worker`, `window`, `web-python`) with the ImJoy App, however, for native plugins (`native-python`) you will need to connect to a plugin engine running locally or remotely.
 Here are the two options for installing the plugine engine:
 
 1. for basic users and desktop environments, the ImJoy Desktop App which includes the plugine engine can be downloaded [here](https://github.com/oeway/ImJoy-App/releases).
@@ -222,7 +224,7 @@ An url to a cover image of the plugin, it will shown up in the image installatio
 Example: `"cover":"https://imjoy.io/static/img/imjoy-card-plain.png"`.
 
 The cover image is recommended to have a aspect ratio of 16:9.
-It can be hosted inside the github repo, in that case, a `raw` url to the image should be used.
+It can be hosted inside the GitHub repo, in that case, a `raw` url to the image should be used.
 
 Multiple images can be used, by set `cover` to an array: `"cover": ["url_to_image1", "url_to_image2", "url_to_image3"]`.
 
@@ -389,7 +391,7 @@ Array with names of other ImJoy plugins which the current plugin depends on.
 They will be installed automatically during installation. To define a dependency use the following format: 1) for dependencies without tag `REPOSITORY:PLUGIN_NAME` or `PLUGIN_URL`, e.g.: `oeway/ImJoy-Plugins:Image Window`; 2) or with specified tag: `REPOSITORY:PLUGIN_NAME@TAG` or `PLUGIN_URL@TAG`, e.g.: `oeway/ImJoy-Plugins:Unet Segmentation@GPU`. In this case, a hash tag `GPU` is used to specify the tag for the plugin named `Unet Segmentation` hosted on GitHub repository `oeway/ImJoy-Plugin` (https://github.com/oeway/ImJoy-Plugins). If the plugin is not hosted on GitHub or the GitHub repository is not formatted as a ImJoy plugin repository (meaning there is no `manifest.imjoy.json` file defined in the root of the repository), you can use the url directly, e.g.: `https://github.com/oeway/ImJoy-Demo-Plugins/blob/master/repository/3dDemos.imjoy.html` (tags can be added with `@TAG`).
 
 #### defaults
-(**for window plugin only:**) defines an object of default values. 
+(**for window plugin only:**) defines an object of default values.
 
 For example, you can specify the default window size by setting `"defaults": {"w": 10, "h": 7}`.
 
@@ -834,7 +836,7 @@ with open("output.png", "rb") as f:
 ```
 
 #### Pass data through windows
-Window displayed in ImJoy can contain data, e.g. an image, so you can use it as a way to pass data from one plugin to another. 
+Window displayed in ImJoy can contain data, e.g. an image, so you can use it as a way to pass data from one plugin to another.
 
 When selecting such a window and executing a plugin (by clicking the plugin menu), the contained data will be transferred to the Python plugin.
 Importantly, if the data object contained in the window is acceptable to the plugin by matching the json schema defined by `inputs` in its `<config>`, ImJoy will pass the data contained in the window to the plugin function. The plugin can then process the data (typically within the `run` function), by accessing `ctx.data`.
@@ -874,7 +876,7 @@ You can control the execution of a Python plugin process with the `flags` field 
 
 Below we describe the three execution flags for controlling the execution of python plugins:
 * By **default** (none of the flags is set), each ImJoy instance has its own process on the plugin engine. If you close the interface, you will kill the process.
-* The **`single-instance`** flag will allow only one process to run for the entire plugin engine. For plugins with the same name and tag, then the `single-instance` means that they access the same process. 
+* The **`single-instance`** flag will allow only one process to run for the entire plugin engine. For plugins with the same name and tag, then the `single-instance` means that they access the same process.
 
 * The **`allow-detach`** flag means that the process is not killed when its ImJoy instance is closed. For instance, this allows to perform long computational tasks in the background which don't require additional user feedback and which terminate autonomously. Can also be used to protect a long computational tasks again browser instabilities. If you want to be able to attach to a detached process, your can reconnect from the same browser and workspace, or have the `single-instance` flag which works despite connecting from different browser and workspace.
 
@@ -1317,4 +1319,3 @@ The following url parameters are currently supported:
       If you are starting a window plugin, you can also set `standalone` or `fullscreen` to `1` to make the window detached from the workspace or in full screen mode. For example: `https://imjoy.io/#/app?x=123&start=AwesomeWindowPlugin&fullscreen=1`.
 
  *   `load` or `l`: define an URL for making a http GET request, this parameter should only used when you defined a startup plugin with `start` or `s`. The data fetched from the URL will be passed to the startup plugin `run(ctx)` function as `ctx.data.loaded`.
-
