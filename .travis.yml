@@ -39,3 +39,4 @@ env:
   global:
   - SOURCE_BRANCH: master
   - TARGET_BRANCH: gh-pages
+  - LIB_TARGET_BRANCH: master
