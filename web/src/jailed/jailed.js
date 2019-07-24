@@ -37,9 +37,14 @@ if (__is__node__) {
   __jailed__path__ = __dirname + "/";
 } else {
   // web
-  __jailed__path__ = `${location.protocol}//${location.hostname}${
-    location.port ? ":" + location.port : ""
-  }/static/jailed/`;
+  if (location.hostname === "localhost" || location.hostname === "127.0.0.1"){
+    __jailed__path__ = `${location.protocol}//${location.hostname}${
+      location.port ? ":" + location.port : ""
+    }/static/jailed/`;
+  }
+  else{
+    __jailed__path__ = "//lib.imjoy.io/static/jailed/";
+  }
   // var scripts = document.getElementsByTagName("script");
   // __jailed__path__ = scripts[scripts.length-1].src
   //     .split('?')[0]
@@ -173,7 +178,7 @@ var BasicConnection;
  * web-browser environment
  */
 var basicConnectionWeb = function() {
-  var perm = ["allow-scripts", "allow-forms"];
+  var perm = ["allow-scripts", "allow-forms", "allow-same-origin", "allow-modals", "allow-popups"];
 
   if (__jailed__path__.substr(0, 7).toLowerCase() == "file://") {
     // local instance requires extra permission
@@ -184,6 +189,9 @@ var basicConnectionWeb = function() {
   var sample = document.createElement("iframe");
   sample.src = __jailed__path__ + "_frame.html";
   sample.sandbox = perm.join(" ");
+  sample.allow = "midi *; geolocation *; microphone *; camera *; encrypted-media *;";
+  sample.allowfullscreen="";
+  sample.allowpaymentrequest="";
   sample.frameBorder = "0";
   sample.style.width = "100%";
   sample.style.height = "100%";
