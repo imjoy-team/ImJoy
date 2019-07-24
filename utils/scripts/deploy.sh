@@ -63,10 +63,10 @@ cp -Rf ../web/dist/*  ./
 rm -rf ./static/*
 rm -rf ./docs
 rm -rf CNAME
+rm -rf index.html
 cp -Rf ../web/dist/static/icons ./static/icons
 cp -Rf ../web/dist/static/iconfont ./static/iconfont
 cp -Rf ../web/dist/static/jailed ./static/jailed
-cp ../web/dist/imjoy-lib.html  ./index.html
 
 # Create .nojekyll to bypass Github jekyll
 touch .nojekyll
