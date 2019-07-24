@@ -344,7 +344,13 @@ var basicConnectionWeb = function() {
       if (!me._disconnected) {
         me._frame = sample.cloneNode(false);
         me._frame.src =
-          me._frame.src + "?type=" + type + "&name=" + config.name + "&workspace=" + config.workspace;
+          me._frame.src +
+          "?type=" +
+          type +
+          "&name=" +
+          config.name +
+          "&workspace=" +
+          config.workspace;
         me._frame.id = "iframe_" + id;
         if (
           type == "iframe" ||

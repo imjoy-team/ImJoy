@@ -239,15 +239,23 @@ if (plugin_mode === "web-worker") {
 }
 
 // register service worker for offline access
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', function() {
-      var workspace = getParamValue("workspace") || 'default';
-      navigator.serviceWorker.register('/plugin-service-worker.js', {scope: './'+workspace+'/'}).then(function(registration) {
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", function() {
+    var workspace = getParamValue("workspace") || "default";
+    navigator.serviceWorker
+      .register("/plugin-service-worker.js", { scope: "./" + workspace + "/" })
+      .then(
+        function(registration) {
           // Registration was successful
-          console.log('ServiceWorker registration successful with scope: ', registration.scope);
-      }, function(err) {
+          console.log(
+            "ServiceWorker registration successful with scope: ",
+            registration.scope
+          );
+        },
+        function(err) {
           // registration failed :(
-          console.log('ServiceWorker registration failed: ', err);
-      });
+          console.log("ServiceWorker registration failed: ", err);
+        }
+      );
   });
 }
