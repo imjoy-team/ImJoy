@@ -11,8 +11,10 @@ SHA=`git rev-parse --verify HEAD`
 
 # Decrypt the deploy key.
 openssl aes-256-cbc -K $encrypted_12c8071d2874_key \
-  -iv $encrypted_12c8071d2874_iv -in imjoy_lib_id_rsa.enc \
-  -out imjoy_lib_id_rsa -d
+  -iv $encrypted_12c8071d2874_iv -in utils/imjoy_deploy_keys.tar.enc \
+  -out imjoy_deploy_keys.tar -d
+
+tar xvf imjoy_deploy_keys.tar
 
 # Set the correct permission
 chmod 600 ./imjoy_lib_id_rsa
