@@ -2,11 +2,11 @@ const path = require('path');
 // const webpack = require('webpack');
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 
-module.exports = {
+module.exports = (env, argv) => ({
     entry: path.resolve(__dirname, 'src', 'imjoyLib.js'),
     output: {
         path: path.resolve(__dirname, 'dist'),
-        filename: 'imjoy-lib.js',
+        filename: argv.mode === 'production'?'imjoy-lib.min.js':'imjoy-lib.js',
         library: 'imjoyLib',
         libraryTarget:'umd'
     },
@@ -34,4 +34,4 @@ module.exports = {
                 toType: "file"
         }])
     ]
-};
+});
