@@ -11,15 +11,17 @@ SHA=`git rev-parse --verify HEAD`
 
 # Decrypt the deploy key.
 openssl aes-256-cbc -K $encrypted_12c8071d2874_key \
-  -iv $encrypted_12c8071d2874_iv -in utils/imjoy_id_rsa.enc \
-  -out imjoy_github_deploy -d
+  -iv $encrypted_12c8071d2874_iv -in utils/imjoy_deploy_keys.tar.enc \
+  -out imjoy_deploy_keys.tar -d
+
+tar xvf imjoy_deploy_keys.tar
 
 # Set the correct permission
-chmod 600 ./imjoy_github_deploy
+chmod 600 ./imjoy_id_rsa
 
 # Import the deploy key
 eval "$(ssh-agent -s)"
-ssh-add ./imjoy_github_deploy
+ssh-add ./imjoy_id_rsa
 
 # Clone the existing gh-pages for this repo into gh-pages/
 git clone $REPO gh-pages
