@@ -1,11 +1,11 @@
 self.__precacheManifest = [
   {
-    "revision": "c3adc18a95c21833ce37",
+    "revision": "641e3d664e1819fbe38a",
     "url": "/static/css/app.16a1db12.css"
   },
   {
-    "revision": "c3adc18a95c21833ce37",
-    "url": "/static/js/app.8f61eab2.js"
+    "revision": "641e3d664e1819fbe38a",
+    "url": "/static/js/app.b5436ef3.js"
   },
   {
     "revision": "b8859e2632feade2aed6",
@@ -228,19 +228,19 @@ self.__precacheManifest = [
     "url": "/static/js/chunk-vendors.a4694b2b.js"
   },
   {
-    "revision": "b00449080615ce71a2a8a52aee9f658f",
-    "url": "/static/vs/css.worker.js"
-  },
-  {
     "revision": "2a3e222e6a41b32a7180e6afa3675990",
     "url": "/static/vs/html.worker.js"
+  },
+  {
+    "revision": "b00449080615ce71a2a8a52aee9f658f",
+    "url": "/static/vs/css.worker.js"
   },
   {
     "revision": "493ef474936217113b20a6573247288a",
     "url": "/static/vs/editor.worker.js"
   },
   {
-    "revision": "73417c44b2e96841ed49a2bb7032e953",
+    "revision": "71e01c387baf58faba465577e92dbdd3",
     "url": "/index.html"
   },
   {
@@ -250,6 +250,10 @@ self.__precacheManifest = [
   {
     "revision": "e5e08310b3ee1c06ba4cb63bd0c22cea",
     "url": "/404.html"
+  },
+  {
+    "revision": "f72a36a168cce0b3c192da1101abf914",
+    "url": "/plugin-service-worker.js"
   },
   {
     "revision": "b6216d61c03e6ce0c9aea6ca7808f7ca",
@@ -628,12 +632,12 @@ self.__precacheManifest = [
     "url": "/static/vs/basic-languages/redshift/redshift.js"
   },
   {
-    "revision": "83f9d7a8568f0f86fd00bf3c21944ce8",
-    "url": "/static/vs/basic-languages/ruby/ruby.js"
-  },
-  {
     "revision": "524db18624629ebed6788b26cbf4820e",
     "url": "/static/img/perspective-hr.jpg"
+  },
+  {
+    "revision": "83f9d7a8568f0f86fd00bf3c21944ce8",
+    "url": "/static/vs/basic-languages/ruby/ruby.js"
   },
   {
     "revision": "140e93934b5c72cee447d043f514be21",

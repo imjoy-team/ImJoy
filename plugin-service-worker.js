@@ -1,6 +1,5 @@
-importScripts("/precache-manifest.4054c524dcaff937e286d655eaa70cbc.js", "https://storage.googleapis.com/workbox-cdn/releases/3.6.3/workbox-sw.js");
-
 /* eslint-disable */
+importScripts("https://storage.googleapis.com/workbox-cdn/releases/3.6.3/workbox-sw.js");
 
 if (workbox) {
   console.log(`Workbox is loaded`);
@@ -14,7 +13,7 @@ if (workbox) {
   //   debug: true
   // });
 
-  workbox.core.setCacheNameDetails({ prefix: "ImJoy.io" });
+  workbox.core.setCacheNameDetails({ prefix: "lib.imjoy.io" });
   self.__precacheManifest = self.__precacheManifest || [];
 
   workbox.precaching.suppressWarnings();
@@ -47,22 +46,6 @@ if (workbox) {
     new workbox.strategies.NetworkFirst()
   );
 
-  // badges
-  workbox.routing.registerRoute(
-    new RegExp("https://img.shields.io/.*"),
-    new workbox.strategies.NetworkFirst()
-  );
-
-  workbox.routing.registerRoute(
-    new RegExp("https://travis-ci.com/oeway/.*"),
-    new workbox.strategies.NetworkFirst()
-  );
-
-  workbox.routing.registerRoute(
-    new RegExp("https://zenodo.org/badge/.*"),
-    new workbox.strategies.NetworkFirst()
-  );
-
   workbox.routing.setDefaultHandler(new workbox.strategies.NetworkOnly());
 
   self.addEventListener("message", e => {
@@ -71,4 +54,3 @@ if (workbox) {
 } else {
   console.log(`Workbox didn't load`);
 }
-
