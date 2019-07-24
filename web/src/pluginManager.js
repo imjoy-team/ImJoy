@@ -31,6 +31,8 @@ import {
 } from "./api.js";
 
 import { Joy } from "./joy";
+import { saveAs } from "file-saver";
+import { Engine } from "./engineManager.js";
 
 import Ajv from "ajv";
 const ajv = new Ajv();
@@ -72,6 +74,10 @@ export class PluginManager {
       },
     ];
 
+    this.IMJOY_PLUGIN = {
+      _id: "IMJOY_APP",
+    };
+
     this.repository_list = [];
     this.repository_names = [];
     this.available_plugins = [];
@@ -94,6 +100,48 @@ export class PluginManager {
     };
     const api_utils_ = imjoy_api.utils;
     this.imjoy_api = {
+      alert: window && window.alert,
+      prompt: window && window.prompt,
+      confirm: window && window.confirm,
+      requestUploadUrl: this.requestUploadUrl,
+      getFileUrl: this.getFileUrl,
+      getFilePath: this.getFilePath,
+      log: (plugin, ...args) => {
+        plugin.log(...args);
+        this.update_ui_callback();
+      },
+      error: (plugin, ...args) => {
+        plugin.error(...args);
+        this.update_ui_callback();
+      },
+      progress: (plugin, value) => {
+        plugin.progress(value);
+        this.update_ui_callback();
+      },
+      exportFile(_plugin, file, name) {
+        if (typeof file === "string") {
+          file = new Blob([file], { type: "text/plain;charset=utf-8" });
+        }
+        saveAs(file, name || file._name || "file_export");
+      },
+      showDialog() {
+        throw "`api.showDialog` is not implemented.";
+      },
+      showFileDialog() {
+        throw "`api.showDialog` is not implemented.";
+      },
+      showProgress(_plugin, p) {
+        console.log("api.showProgress: ", p);
+      },
+      showStatus(_plugin, s) {
+        console.log("api.showStatus: ", s);
+      },
+      showSnackbar(_plugin, msg, duration) {
+        console.log("api.showSnackbar: ", msg, duration);
+      },
+      showMessage: (plugin, info, duration) => {
+        console.log("api.showMessage: ", info, duration);
+      },
       register: this.register,
       unregister: this.unregister,
       createWindow: this.createWindow,
@@ -117,7 +165,7 @@ export class PluginManager {
       }
     }
     // merge imjoy api
-    this.imjoy_api = _.assign({}, imjoy_api, this.imjoy_api);
+    this.imjoy_api = _.assign({}, this.imjoy_api, imjoy_api);
     // copy api utils make sure it was not overwritten
     if (api_utils_) {
       for (let k in api_utils_) {
@@ -152,6 +200,141 @@ export class PluginManager {
       navigator.serviceWorker.controller.postMessage(message, [
         messageChannel.port2,
       ]);
+    });
+  }
+
+  getFileUrl(_plugin, config) {
+    if (typeof config !== "object" || !config.path) {
+      throw "You must pass an object contains keys named `path` and `engine`";
+    }
+    _plugin = _plugin || {};
+    config.engine =
+      config.engine === undefined ? _plugin.config.engine : config.engine;
+    const engine =
+      config.engine instanceof Engine
+        ? config.engine
+        : this.em.getEngineByUrl(config.engine);
+    delete config.engine;
+    return new Promise((resolve, reject) => {
+      if (!engine) {
+        reject("Please specify an engine");
+        return;
+      }
+      if (!engine.connected) {
+        reject("Please connect to the Plugin Engine 🚀.");
+        this.showMessage("Please connect to the Plugin Engine 🚀.");
+        return;
+      }
+      engine
+        .getFileUrl(config)
+        .then(ret => {
+          ret = ret || {};
+          if (ret.success) {
+            if (_plugin.log)
+              _plugin.log(`File url created ${config.path}: ${ret.url}`);
+            resolve(ret.url);
+            this.update_ui_callback();
+          } else {
+            ret.error = ret.error || "";
+            this.showMessage(
+              `Failed to get file url for ${config.path} ${ret.error}`
+            );
+            reject(`Failed to get file url for ${config.path} ${ret.error}`);
+            this.update_ui_callback();
+          }
+        })
+        .catch(reject);
+    });
+  }
+
+  getFilePath(_plugin, config) {
+    if (typeof config !== "object" || !config.url) {
+      throw "You must pass an object contains keys named `url` and `engine`";
+    }
+    console.log(
+      "WARNING: api.uploadFileToUrl is deprecated and it will be removed soon."
+    );
+    _plugin = _plugin || {};
+    config.engine =
+      config.engine === undefined ? _plugin.config.engine : config.engine;
+    const engine =
+      config.engine instanceof Engine
+        ? config.engine
+        : this.em.getEngineByUrl(config.engine);
+    delete config.engine;
+    return new Promise((resolve, reject) => {
+      if (!engine) {
+        reject("Please specify an engine");
+        return;
+      }
+      if (!engine.connected) {
+        reject("Please connect to the Plugin Engine 🚀.");
+        this.showMessage("Please connect to the Plugin Engine 🚀.");
+        return;
+      }
+      engine
+        .getFilePath(config)
+        .then(ret => {
+          ret = ret || {};
+          if (ret.success) {
+            resolve(ret.path);
+            this.update_ui_callback();
+          } else {
+            ret.error = ret.error || "";
+            this.showMessage(
+              `Failed to get file path for ${config.url} ${ret.error}`
+            );
+            reject(`Failed to get file path for ${config.url} ${ret.error}`);
+            this.update_ui_callback();
+          }
+        })
+        .catch(reject);
+    });
+  }
+
+  requestUploadUrl(_plugin, config) {
+    if (typeof config !== "object") {
+      throw "You must pass an object contains keys named `engine` and `path` (or `dir`, optionally `overwrite`)";
+    }
+    _plugin = _plugin || this.IMJOY_PLUGIN;
+    config.engine =
+      config.engine === undefined ? _plugin.config.engine : config.engine;
+    const engine =
+      config.engine instanceof Engine
+        ? config.engine
+        : this.em.getEngineByUrl(config.engine);
+    delete config.engine;
+    return new Promise((resolve, reject) => {
+      if (!engine) {
+        reject("Please specify an engine");
+        return;
+      }
+      if (!engine.connected) {
+        reject("Please connect to the Plugin Engine 🚀.");
+        this.showMessage("Please connect to the Plugin Engine 🚀.");
+        return;
+      }
+
+      engine
+        .requestUploadUrl({
+          path: config.path,
+          overwrite: config.overwrite,
+          dir: config.dir,
+        })
+        .then(ret => {
+          ret = ret || {};
+          if (ret.success) {
+            if (_plugin.log) _plugin.log(`Uploaded url created: ${ret.url}`);
+            resolve(ret.url);
+            this.update_ui_callback();
+          } else {
+            ret.error = ret.error || "UNKNOWN";
+            this.showMessage(`Failed to request file url, Error: ${ret.error}`);
+            reject(`Failed to request file url, Error: ${ret.error}`);
+            this.update_ui_callback();
+          }
+        })
+        .catch(reject);
     });
   }
 

@@ -1531,27 +1531,11 @@ export default {
       showProgress: this.showProgress,
       showStatus: this.showStatus,
       showFileDialog: this.showFileDialog,
-      requestUploadUrl: this.requestUploadUrl,
       showSnackbar: this.showSnackbar,
       uploadFileToUrl: this.uploadFileToUrl,
       downloadFileFromUrl: this.downloadFileFromUrl,
-      getFileUrl: this.getFileUrl,
-      getFilePath: this.getFilePath,
-      exportFile: this.exportFile,
       showMessage: (plugin, info, duration) => {
         this.showMessage(info, duration);
-      },
-      log: (plugin, ...args) => {
-        plugin.log(...args);
-        this.$forceUpdate();
-      },
-      error: (plugin, ...args) => {
-        plugin.error(...args);
-        this.$forceUpdate();
-      },
-      progress: (plugin, value) => {
-        plugin.progress(value);
-        this.$forceUpdate();
       },
       utils: {
         $forceUpdate: this.$forceUpdate,
@@ -2827,6 +2811,12 @@ export default {
         throw "No plugin engine selected.";
       }
     },
+    getFileUrl(_plugin, config) {
+      return this.pm.getFileUrl(_plugin, config);
+    },
+    requestUploadUrl(_plugin, config) {
+      return this.pm.requestUploadUrl(_plugin, config);
+    },
     removeFiles(engine, path, type, recursive) {
       if (engine) {
         return engine.removeFiles(path, type, recursive);
@@ -2869,57 +2859,13 @@ export default {
         return this.$refs["file-dialog"].showDialog(_plugin, config);
       }
     },
-    requestUploadUrl(_plugin, config) {
-      if (typeof config !== "object") {
-        throw "You must pass an object contains keys named `engine` and `path` (or `dir`, optionally `overwrite`)";
-      }
-      _plugin = _plugin || this.IMJOY_PLUGIN;
-      config.engine =
-        config.engine === undefined ? _plugin.config.engine : config.engine;
-      const engine =
-        config.engine instanceof Engine
-          ? config.engine
-          : this.em.getEngineByUrl(config.engine);
-      delete config.engine;
-      return new Promise((resolve, reject) => {
-        if (!engine) {
-          reject("Please specify an engine");
-          return;
-        }
-        if (!engine.connected) {
-          reject("Please connect to the Plugin Engine 🚀.");
-          this.showMessage("Please connect to the Plugin Engine 🚀.");
-          return;
-        }
-
-        engine
-          .requestUploadUrl({
-            path: config.path,
-            overwrite: config.overwrite,
-            dir: config.dir,
-          })
-          .then(ret => {
-            ret = ret || {};
-            if (ret.success) {
-              if (_plugin.log) _plugin.log(`Uploaded url created: ${ret.url}`);
-              resolve(ret.url);
-              this.$forceUpdate();
-            } else {
-              ret.error = ret.error || "UNKNOWN";
-              this.showMessage(
-                `Failed to request file url, Error: ${ret.error}`
-              );
-              reject(`Failed to request file url, Error: ${ret.error}`);
-              this.$forceUpdate();
-            }
-          })
-          .catch(reject);
-      });
-    },
     uploadFileToUrl(_plugin, config) {
       if (typeof config !== "object" || !config.file || !config.url) {
         throw "You must pass an object contains keys named `file` and `url`";
       }
+      console.log(
+        "WARNING: api.uploadFileToUrl is deprecated and it will be removed soon."
+      );
       _plugin = _plugin || {};
       return new Promise((resolve, reject) => {
         const bodyFormData = new FormData();
@@ -2974,6 +2920,9 @@ export default {
       if (typeof config !== "object" || !config.url) {
         throw "You must pass an object contains keys named `url`";
       }
+      console.log(
+        "WARNING: api.uploadFileToUrl is deprecated and it will be removed soon."
+      );
       return new Promise((resolve, reject) => {
         this.showMessage("Downloading from " + config.url);
         let totalLength = null;
@@ -3019,96 +2968,6 @@ export default {
             reject(response.statusText);
           });
       });
-    },
-    getFileUrl(_plugin, config) {
-      if (typeof config !== "object" || !config.path) {
-        throw "You must pass an object contains keys named `path` and `engine`";
-      }
-      _plugin = _plugin || {};
-      config.engine =
-        config.engine === undefined ? _plugin.config.engine : config.engine;
-      const engine =
-        config.engine instanceof Engine
-          ? config.engine
-          : this.em.getEngineByUrl(config.engine);
-      delete config.engine;
-      return new Promise((resolve, reject) => {
-        if (!engine) {
-          reject("Please specify an engine");
-          return;
-        }
-        if (!engine.connected) {
-          reject("Please connect to the Plugin Engine 🚀.");
-          this.showMessage("Please connect to the Plugin Engine 🚀.");
-          return;
-        }
-        engine
-          .getFileUrl(config)
-          .then(ret => {
-            ret = ret || {};
-            if (ret.success) {
-              if (_plugin.log)
-                _plugin.log(`File url created ${config.path}: ${ret.url}`);
-              resolve(ret.url);
-              this.$forceUpdate();
-            } else {
-              ret.error = ret.error || "";
-              this.showMessage(
-                `Failed to get file url for ${config.path} ${ret.error}`
-              );
-              reject(`Failed to get file url for ${config.path} ${ret.error}`);
-              this.$forceUpdate();
-            }
-          })
-          .catch(reject);
-      });
-    },
-    getFilePath(_plugin, config) {
-      if (typeof config !== "object" || !config.url) {
-        throw "You must pass an object contains keys named `url` and `engine`";
-      }
-      _plugin = _plugin || {};
-      config.engine =
-        config.engine === undefined ? _plugin.config.engine : config.engine;
-      const engine =
-        config.engine instanceof Engine
-          ? config.engine
-          : this.em.getEngineByUrl(config.engine);
-      delete config.engine;
-      return new Promise((resolve, reject) => {
-        if (!engine) {
-          reject("Please specify an engine");
-          return;
-        }
-        if (!engine.connected) {
-          reject("Please connect to the Plugin Engine 🚀.");
-          this.showMessage("Please connect to the Plugin Engine 🚀.");
-          return;
-        }
-        engine
-          .getFilePath(config)
-          .then(ret => {
-            ret = ret || {};
-            if (ret.success) {
-              resolve(ret.path);
-              this.$forceUpdate();
-            } else {
-              ret.error = ret.error || "";
-              this.showMessage(
-                `Failed to get file path for ${config.url} ${ret.error}`
-              );
-              reject(`Failed to get file path for ${config.url} ${ret.error}`);
-              this.$forceUpdate();
-            }
-          })
-          .catch(reject);
-      });
-    },
-    exportFile(_plugin, file, name) {
-      if (typeof file === "string") {
-        file = new Blob([file], { type: "text/plain;charset=utf-8" });
-      }
-      saveAs(file, name || file._name || "file_export");
     },
     showProgress(_plugin, p) {
       if (p < 1) this.progress = p * 100;

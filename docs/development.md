@@ -805,7 +805,7 @@ Therefore, we provide several different ways to handle loading/saving files for 
 with or without the plugin engine.
 
  *  If the **Plugin Engine** is running, there are three api functions for **all** types of
-    plugins to access the local file system: `api.showFileDialog`, `api.getFileUrl`, `api.getFilePath`.
+    plugins to access the local file system: `api.showFileDialog`, `api.getFileUrl`, `api.requestUploadUrl`.
     Specifically for **Python plugins** running on the plugin engine, files can be directly
     loaded and written to the file system with standard python file operations.
 
