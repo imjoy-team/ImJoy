@@ -1005,10 +1005,17 @@ export class PluginManager {
               this.installed_plugins.push(template);
               resolve(template);
               this.showMessage(`${template.name} has been successfully saved.`);
-              if(template.type === 'window' || template.type === 'iframe' ||template === 'web-worker'){
-                this.cacheRequirements(template.requirments).catch((e)=>{
-                  console.error(`Failed to cache requirements for ${template.name}`, e)
-                })
+              if (
+                template.type === "window" ||
+                template.type === "iframe" ||
+                template === "web-worker"
+              ) {
+                this.cacheRequirements(template.requirments).catch(e => {
+                  console.error(
+                    `Failed to cache requirements for ${template.name}`,
+                    e
+                  );
+                });
               }
             })
             .catch(err => {
@@ -1034,17 +1041,17 @@ export class PluginManager {
     });
   }
 
-  async cacheRequirements(requirments){
-    if(requirments && requirments.length>0){
-      for(let req of requirments){
+  async cacheRequirements(requirments) {
+    if (requirments && requirments.length > 0) {
+      for (let req of requirments) {
         //remove prefix
-        if(req.startsWith('js:')) req = req.slice(3);
-        if(req.startsWith('css:')) req = req.slice(4);
-        console.log('Adding requirement to cache: ', req)
+        if (req.startsWith("js:")) req = req.slice(3);
+        if (req.startsWith("css:")) req = req.slice(4);
+        console.log("Adding requirement to cache: ", req);
         await this._sendToServiceWorker({
-          command: 'add',
-          url: req
-        })
+          command: "add",
+          url: req,
+        });
       }
     }
   }
