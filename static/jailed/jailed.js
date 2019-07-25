@@ -42,7 +42,7 @@ if (__is__node__) {
       location.port ? ":" + location.port : ""
     }/static/jailed/`;
   } else {
-    __jailed__path__ = "//lib.imjoy.io/static/jailed/";
+    __jailed__path__ = location.protocol + "//lib.imjoy.io/static/jailed/";
   }
   // var scripts = document.getElementsByTagName("script");
   // __jailed__path__ = scripts[scripts.length-1].src

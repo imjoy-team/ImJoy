@@ -1,11 +1,11 @@
 self.__precacheManifest = [
   {
-    "revision": "641e3d664e1819fbe38a",
+    "revision": "d877800fc3c9aa7796a6",
     "url": "/static/css/app.16a1db12.css"
   },
   {
-    "revision": "641e3d664e1819fbe38a",
-    "url": "/static/js/app.b5436ef3.js"
+    "revision": "d877800fc3c9aa7796a6",
+    "url": "/static/js/app.59bb24c1.js"
   },
   {
     "revision": "b8859e2632feade2aed6",
@@ -232,15 +232,15 @@ self.__precacheManifest = [
     "url": "/static/vs/css.worker.js"
   },
   {
-    "revision": "2a3e222e6a41b32a7180e6afa3675990",
-    "url": "/static/vs/html.worker.js"
-  },
-  {
     "revision": "493ef474936217113b20a6573247288a",
     "url": "/static/vs/editor.worker.js"
   },
   {
-    "revision": "71e01c387baf58faba465577e92dbdd3",
+    "revision": "2a3e222e6a41b32a7180e6afa3675990",
+    "url": "/static/vs/html.worker.js"
+  },
+  {
+    "revision": "a44dc072bb539348e308f0b980666916",
     "url": "/index.html"
   },
   {
@@ -700,6 +700,10 @@ self.__precacheManifest = [
     "url": "/static/vs/editor/editor.main.nls.de.js"
   },
   {
+    "revision": "65a437a349f6e024e14a84bdae3b94e5",
+    "url": "/static/vs/editor/editor.main.nls.es.js"
+  },
+  {
     "revision": "a8fb0f322b584b488bd572adf086cdcd",
     "url": "/static/vs/editor/editor.main.nls.fr.js"
   },
@@ -762,10 +766,6 @@ self.__precacheManifest = [
   {
     "revision": "11a854433bcc74085be053c3ab713b15",
     "url": "/static/vs/language/css/cssWorker.js"
-  },
-  {
-    "revision": "65a437a349f6e024e14a84bdae3b94e5",
-    "url": "/static/vs/editor/editor.main.nls.es.js"
   },
   {
     "revision": "51880b243dfb4c0a65c406b155e9a716",
