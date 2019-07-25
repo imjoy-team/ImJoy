@@ -1190,9 +1190,9 @@ export class PluginManager {
               if (
                 template.type === "window" ||
                 template.type === "iframe" ||
-                template === "web-worker"
+                template.type === "web-worker"
               ) {
-                this.cacheRequirements(template.requirments).catch(e => {
+                this.cacheRequirements(template.requirements).catch(e => {
                   console.error(
                     `Failed to cache requirements for ${template.name}`,
                     e
@@ -1223,9 +1223,9 @@ export class PluginManager {
     });
   }
 
-  async cacheRequirements(requirments) {
-    if (requirments && requirments.length > 0) {
-      for (let req of requirments) {
+  async cacheRequirements(requirements) {
+    if (requirements && requirements.length > 0) {
+      for (let req of requirements) {
         //remove prefix
         if (req.startsWith("js:")) req = req.slice(3);
         if (req.startsWith("css:")) req = req.slice(4);
