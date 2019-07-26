@@ -127,6 +127,7 @@ async function cacheRequirements(requirements) {
       //remove prefix
       if (req.startsWith("js:")) req = req.slice(3);
       if (req.startsWith("css:")) req = req.slice(4);
+      if (req.startsWith("cache:")) req = req.slice(6);
       console.log("Adding requirement to cache: ", req);
       await _sendToServiceWorker({
         command: "add",
@@ -164,7 +165,11 @@ var execute = async function(code) {
                 link_node.rel = "stylesheet";
                 link_node.href = code.requirements[i];
                 document.head.appendChild(link_node);
-              } else {
+              } 
+              else if(code.requirements[i].startsWith("cache:")){
+                // ignore
+              }
+              else {
                 if (code.requirements[i].startsWith("js:")) {
                   code.requirements[i] = code.requirements[i].slice(3);
                 }

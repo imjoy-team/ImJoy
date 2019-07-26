@@ -85,6 +85,7 @@ self.connection = {};
         //remove prefix
         if (req.startsWith("js:")) req = req.slice(3);
         if (req.startsWith("css:")) req = req.slice(4);
+        if (req.startsWith("cache:")) req = req.slice(6);
         console.log("Adding requirement to cache: ", req);
         await _sendToServiceWorker({
           command: "add",
@@ -115,7 +116,19 @@ self.connection = {};
                 code.requirements = [code.requirements];
               }
               for (var i = 0; i < code.requirements.length; i++) {
-                importScripts(code.requirements[i]);
+                if(code.requirements[i].startsWith("cache:")){
+                  //ignore
+                }
+                if(code.requirements[i].startsWith("css:")){
+                  throw "unable to import css in a webworker"
+                }
+                else{
+                  if (code.requirements[i].startsWith("js:")) {
+                    code.requirements[i] = code.requirements[i].slice(3);
+                  }
+                  importScripts(code.requirements[i]);
+                }
+                
               }
               cacheRequirements(code.requirements);
             } catch (e) {
