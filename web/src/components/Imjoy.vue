@@ -850,12 +850,11 @@
               </div>
             </div>
             <md-divider></md-divider>
-            <!-- <p v-if="pm.installed_plugins.length<=0">&nbsp;No plugin installed.</p> -->
             <md-empty-state
               id="plugin-empty-state"
               v-if="pm.installed_plugins.length <= 0"
               md-icon="extension"
-              md-label="No plugin installed"
+              md-label=""
               md-description=""
             >
               <md-button
@@ -1780,6 +1779,11 @@ export default {
       this.showWelcomeDialog = true;
     } else {
       this.startImJoy(this.$route).then(() => {
+        if(!this.pm.plugins || Object.keys(this.pm.plugins) <= 0){
+          this.pm.reloadPluginRecursively({uri: 'oeway/ImJoy-Plugins:Welcome'}).then(()=>{
+            this.showDialog(null, {type: 'Welcome'})
+          })
+        }
         /* global window */
         if (window.gtag) {
           // CAREFUL: DO NOT SEND ANY QUERY STRING, ONLY LOCATION AND PATH
