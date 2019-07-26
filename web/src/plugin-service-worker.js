@@ -82,7 +82,7 @@ if (workbox) {
             return fetch(request)
               .then(function(response) {
                 plugin_requirements.add(event.data.url);
-                console.log('Caching requirement: ' + event.data.url)
+                console.log("Caching requirement: " + event.data.url);
                 return cache.put(event.data.url, response);
               })
               .then(function() {
