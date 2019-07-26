@@ -8,44 +8,39 @@ if (workbox) {
    * See https://goo.gl/S9QRab
    */
 
-  // workbox.setConfig({
-  //   debug: true
-  // });
+  workbox.setConfig({
+    debug: true
+  });
 
   workbox.core.setCacheNameDetails({ prefix: "lib.imjoy.io" });
   self.__precacheManifest = self.__precacheManifest || [];
 
   workbox.precaching.suppressWarnings();
-  workbox.precaching.precacheAndRoute(self.__precacheManifest, {});
+  workbox.precaching.precacheAndRoute(self.__precacheManifest, {
+    // Ignore all URL parameters.
+    ignoreUrlParametersMatching: [/.*/],
+    ignoreURLParametersMatching: [/.*/]
+  });
 
   workbox.routing.registerRoute(
     new RegExp("/static/.*"),
-    new workbox.strategies.NetworkFirst()
-  );
-
-  //communitations
-  workbox.routing.registerRoute(
-    new RegExp("(http|https)://.*/socket.io/.*"),
-    new workbox.strategies.NetworkOnly()
+    new workbox.strategies.StaleWhileRevalidate()
   );
 
   workbox.routing.registerRoute(
     new RegExp("https://static.imjoy.io/.*"),
-    new workbox.strategies.NetworkFirst()
+    new workbox.strategies.StaleWhileRevalidate()
   );
 
-  // manifest.imjoy.json etc.
+  const plugin_requirements = new Set();
+  const matchCb = ({url, event}) => {
+    return plugin_requirements.has(url.href);
+  };
+
   workbox.routing.registerRoute(
-    new RegExp("https://raw.githubusercontent.com/.*"),
-    new workbox.strategies.NetworkFirst()
+    matchCb,
+    new workbox.strategies.StaleWhileRevalidate()
   );
-
-  workbox.routing.registerRoute(
-    new RegExp("https://gist.githubusercontent.com/.*"),
-    new workbox.strategies.NetworkFirst()
-  );
-
-  workbox.routing.setDefaultHandler(new workbox.strategies.NetworkOnly());
 
   self.addEventListener("message", event => {
     if (event.data.action == "skipWaiting") self.skipWaiting();
@@ -86,6 +81,7 @@ if (workbox) {
             var request = new Request(event.data.url, { mode: "no-cors" });
             return fetch(request)
               .then(function(response) {
+                plugin_requirements.add(event.data.url)
                 return cache.put(event.data.url, response);
               })
               .then(function() {
@@ -96,6 +92,7 @@ if (workbox) {
 
           // This command removes a request/response pair from the cache (assuming it exists).
           case "delete":
+            plugin_requirements.delete(event.data.url)
             return cache.delete(event.data.url).then(function(success) {
               event.ports[0].postMessage({
                 error: success ? null : "Item was not found in the cache.",
@@ -110,12 +107,12 @@ if (workbox) {
     }
   });
 
-  self.addEventListener("install", function(event) {
-    event.waitUntil(self.skipWaiting()); // Activate worker immediately
+  self.addEventListener('install', function(event) {
+      event.waitUntil(self.skipWaiting()); // Activate worker immediately
   });
 
-  self.addEventListener("activate", function(event) {
-    event.waitUntil(self.clients.claim()); // Become available to all pages
+  self.addEventListener('activate', function(event) {
+      event.waitUntil(self.clients.claim()); // Become available to all pages
   });
 } else {
   console.log(`Workbox didn't load`);

@@ -241,7 +241,6 @@ if (plugin_mode === "web-worker") {
 // register service worker for offline access
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", function() {
-    var workspace = getParamValue("workspace") || "default";
     navigator.serviceWorker
       .register("/plugin-service-worker.js")
       .then(
