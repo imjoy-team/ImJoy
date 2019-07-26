@@ -9,7 +9,7 @@ if (workbox) {
    */
 
   workbox.setConfig({
-    debug: true
+    debug: true,
   });
 
   workbox.core.setCacheNameDetails({ prefix: "lib.imjoy.io" });
@@ -19,7 +19,7 @@ if (workbox) {
   workbox.precaching.precacheAndRoute(self.__precacheManifest, {
     // Ignore all URL parameters.
     ignoreUrlParametersMatching: [/.*/],
-    ignoreURLParametersMatching: [/.*/]
+    ignoreURLParametersMatching: [/.*/],
   });
 
   workbox.routing.registerRoute(
@@ -33,7 +33,7 @@ if (workbox) {
   );
 
   const plugin_requirements = new Set();
-  const matchCb = ({url, event}) => {
+  const matchCb = ({ url, event }) => {
     return plugin_requirements.has(url.href);
   };
 
@@ -81,7 +81,7 @@ if (workbox) {
             var request = new Request(event.data.url, { mode: "no-cors" });
             return fetch(request)
               .then(function(response) {
-                plugin_requirements.add(event.data.url)
+                plugin_requirements.add(event.data.url);
                 return cache.put(event.data.url, response);
               })
               .then(function() {
@@ -92,7 +92,7 @@ if (workbox) {
 
           // This command removes a request/response pair from the cache (assuming it exists).
           case "delete":
-            plugin_requirements.delete(event.data.url)
+            plugin_requirements.delete(event.data.url);
             return cache.delete(event.data.url).then(function(success) {
               event.ports[0].postMessage({
                 error: success ? null : "Item was not found in the cache.",
@@ -107,12 +107,12 @@ if (workbox) {
     }
   });
 
-  self.addEventListener('install', function(event) {
-      event.waitUntil(self.skipWaiting()); // Activate worker immediately
+  self.addEventListener("install", function(event) {
+    event.waitUntil(self.skipWaiting()); // Activate worker immediately
   });
 
-  self.addEventListener('activate', function(event) {
-      event.waitUntil(self.clients.claim()); // Become available to all pages
+  self.addEventListener("activate", function(event) {
+    event.waitUntil(self.clients.claim()); // Become available to all pages
   });
 } else {
   console.log(`Workbox didn't load`);
