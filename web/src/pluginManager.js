@@ -174,35 +174,6 @@ export class PluginManager {
     }
   }
 
-  _sendToServiceWorker(message) {
-    // This wraps the message posting/response in a promise, which will resolve if the response doesn't
-    // contain an error, and reject with the error if it does. If you'd prefer, it's possible to call
-    // controller.postMessage() and set up the onmessage handler independently of a promise, but this is
-    // a convenient wrapper.
-    return new Promise(function(resolve, reject) {
-      if (!navigator.serviceWorker || !navigator.serviceWorker.register) {
-        reject("This browser doesn't support service workers");
-        return;
-      }
-      var messageChannel = new MessageChannel();
-      messageChannel.port1.onmessage = function(event) {
-        if (event.data.error) {
-          reject(event.data.error);
-        } else {
-          resolve(event.data);
-        }
-      };
-
-      // This sends the message data as well as transferring messageChannel.port2 to the service worker.
-      // The service worker can then use the transferred port to reply via postMessage(), which
-      // will in turn trigger the onmessage handler on messageChannel.port1.
-      // See https://html.spec.whatwg.org/multipage/workers.html#dom-worker-postmessage
-      navigator.serviceWorker.controller.postMessage(message, [
-        messageChannel.port2,
-      ]);
-    });
-  }
-
   getFileUrl(_plugin, config) {
     if (typeof config !== "object" || !config.path) {
       throw "You must pass an object contains keys named `path` and `engine`";
@@ -1187,18 +1158,6 @@ export class PluginManager {
               this.installed_plugins.push(template);
               resolve(template);
               this.showMessage(`${template.name} has been successfully saved.`);
-              if (
-                template.type === "window" ||
-                template.type === "iframe" ||
-                template.type === "web-worker"
-              ) {
-                this.cacheRequirements(template.requirements).catch(e => {
-                  console.error(
-                    `Failed to cache requirements for ${template.name}`,
-                    e
-                  );
-                });
-              }
             })
             .catch(err => {
               this.showMessage("Failed to save the plugin.", 15);
@@ -1221,21 +1180,6 @@ export class PluginManager {
         reject(e);
       }
     });
-  }
-
-  async cacheRequirements(requirements) {
-    if (requirements && requirements.length > 0) {
-      for (let req of requirements) {
-        //remove prefix
-        if (req.startsWith("js:")) req = req.slice(3);
-        if (req.startsWith("css:")) req = req.slice(4);
-        console.log("Adding requirement to cache: ", req);
-        await this._sendToServiceWorker({
-          command: "add",
-          url: req,
-        });
-      }
-    }
   }
 
   async reloadPythonPlugins(engine) {

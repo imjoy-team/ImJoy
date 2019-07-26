@@ -58,6 +58,50 @@ self.connection = {};
     }
   };
 
+  function _sendToServiceWorker(message) {
+    // This wraps the message posting/response in a promise, which will resolve if the response doesn't
+    // contain an error, and reject with the error if it does. If you'd prefer, it's possible to call
+    // controller.postMessage() and set up the onmessage handler independently of a promise, but this is
+    // a convenient wrapper.
+    return new Promise(function(resolve, reject) {
+      if (!navigator.serviceWorker || !navigator.serviceWorker.register) {
+        reject("This browser doesn't support service workers");
+        return;
+      }
+      var messageChannel = new MessageChannel();
+      messageChannel.port1.onmessage = function(event) {
+        if (event.data.error) {
+          reject(event.data.error);
+        } else {
+          resolve(event.data);
+        }
+      };
+
+      // This sends the message data as well as transferring messageChannel.port2 to the service worker.
+      // The service worker can then use the transferred port to reply via postMessage(), which
+      // will in turn trigger the onmessage handler on messageChannel.port1.
+      // See https://html.spec.whatwg.org/multipage/workers.html#dom-worker-postmessage
+      navigator.serviceWorker.controller.postMessage(message, [
+        messageChannel.port2,
+      ]);
+    });
+  }
+
+  async function cacheRequirements(requirements) {
+    if (requirements && requirements.length > 0) {
+      for (let req of requirements) {
+        //remove prefix
+        if (req.startsWith("js:")) req = req.slice(3);
+        if (req.startsWith("css:")) req = req.slice(4);
+        console.log("Adding requirement to cache: ", req);
+        await _sendToServiceWorker({
+          command: "add",
+          url: req,
+        });
+      }
+    }
+  }
+
   /**
    * Executes the given code in a jailed environment. For web
    * implementation, we're already jailed in the iframe and the
@@ -75,13 +119,13 @@ self.connection = {};
               typeof code.requirements === "string")
           ) {
             try {
-              if (Array.isArray(code.requirements)) {
-                for (var i = 0; i < code.requirements.length; i++) {
-                  importScripts(code.requirements[i]);
-                }
-              } else {
-                importScripts(code.requirements);
+              if (!Array.isArray(code.requirements)) {
+                code.requirements = [code.requirements];
               }
+              for (var i = 0; i < code.requirements.length; i++) {
+                importScripts(code.requirements[i]);
+              }
+              cacheRequirements(code.requirements);
             } catch (e) {
               throw "failed to import required scripts: " +
                 code.requirements.toString();
