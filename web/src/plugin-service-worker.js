@@ -32,7 +32,7 @@ if (workbox) {
     new workbox.strategies.StaleWhileRevalidate()
   );
 
-  const plugin_requirements = new Set();
+  let plugin_requirements = new Set();
   const matchCb = ({ url, event }) => {
     return plugin_requirements.has(url.href);
   };
@@ -41,6 +41,16 @@ if (workbox) {
     matchCb,
     new workbox.strategies.StaleWhileRevalidate()
   );
+
+  caches.open(workbox.core.cacheNames.runtime).then(cache => {
+    cache.keys().then(function(requests) {
+      const urls = requests.map(function(request) {
+        return request.url;
+      });
+      plugin_requirements = new Set(urls);
+      console.log("cached requirements:", plugin_requirements);
+    });
+  });
 
   self.addEventListener("message", event => {
     if (event.data.action == "skipWaiting") self.skipWaiting();
@@ -82,7 +92,7 @@ if (workbox) {
             return fetch(request)
               .then(function(response) {
                 plugin_requirements.add(event.data.url);
-                console.log("Caching requirement: " + event.data.url);
+                // console.log("Caching requirement: " + event.data.url);
                 return cache.put(event.data.url, response);
               })
               .then(function() {
@@ -116,5 +126,5 @@ if (workbox) {
     event.waitUntil(self.clients.claim()); // Become available to all pages
   });
 } else {
-  console.log(`Workbox didn't load`);
+  console.log(`Workbox didn't load (plugin service worker)`);
 }

@@ -128,7 +128,6 @@ async function cacheRequirements(requirements) {
       if (req.startsWith("js:")) req = req.slice(3);
       if (req.startsWith("css:")) req = req.slice(4);
       if (req.startsWith("cache:")) req = req.slice(6);
-      console.log("Adding requirement to cache: ", req);
       await _sendToServiceWorker({
         command: "add",
         url: req,
