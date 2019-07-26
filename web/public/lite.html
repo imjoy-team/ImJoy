@@ -80,6 +80,12 @@
         .pointer{
             cursor: pointer;
         }
+        .floating {
+            position: absolute !important;
+            left: calc(50% - 1.5rem) !important;
+            top: calc(39% - 1.5rem) !important;
+            z-index: 999;
+        }
     </style>
 </head>
 
@@ -119,9 +125,59 @@
             </div>
         </section>
         <progress class="progress" id="progress" value="100" max="100"></progress>
-        <div class="whiteboard" id="whiteboard"> </div> 
     </header>
+    <div class="loading loading-lg floating" id="loading"></div>
+    <div class="whiteboard" id="whiteboard"></div>
+
     <script>
+        function openDialog() {
+            document.getElementById('dialog-container').classList.add('active')
+        }
+
+        function closeDialog() {
+            document.getElementById('dialog-container').classList.remove('active')
+        }
+
+        function getUrlParameter(name) {
+            name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+            var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+            var results = regex.exec(location.search);
+            return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+        }
+
+        function addWindow(title, id){
+            document.getElementById('header').innerHTML =`
+            <span class="chip pointer" id="header_${id}" onclick="selectWindow('${id}')">
+                ${title}
+                <a href="#" onclick="removeWindow('${id}')" class="btn btn-clear" aria-label="Close" role="button"></a>
+            </span>` + document.getElementById('header').innerHTML;
+
+            document.getElementById('whiteboard').innerHTML =`
+                <div class="window_container" id="${id}"></div>
+            ` + document.getElementById('whiteboard').innerHTML;
+
+            selectWindow(id)
+        }
+
+        function removeWindow(id){
+            document.getElementById('header').removeChild(document.getElementById('header_'+id));
+            document.getElementById('whiteboard').removeChild(document.getElementById(id));
+        }
+
+        function selectWindow(id){
+            for(let c of document.getElementById('whiteboard').children){
+                if(c.id !== 'site-title'){
+                    c.style.display = "none";
+                }
+            } 
+
+            for(let c of document.getElementById('header').children)
+                c.classList.remove('active')
+            selected_window = id;
+            document.getElementById(id).style.display = "block";
+            document.getElementById('header_'+id).classList.add('active')
+        }
+
         var selected_window = null
         var imjoy = null
         var windows = null
@@ -139,24 +195,13 @@
                     if (config.ui) {
                         openDialog()
                         const joy_config = {
-                            // Where the Joy editor goes:
                             container:  document.getElementById('window-dialog-container'),
-
-                            // The words & ops inside the editor:
                             init: config.ui || "", //"{id:'localizationWorkflow', type:'ops'} " + // a list of ops
-                            //"<hr> {type:'save'}", // a save button!
-
-                            // Load data from URL, otherwise blank:
                             data: config.data, // || Joy.loadFromURL(),
-
-                            // Other ops to include, beyond turtle ops:
                             modules: config.modules || ["instructions", "math"],
-
                             onexecute: config.onexecute,
-                            // What to do when the user makes a change:
                             onupdate: config.onupdate,
                         };
-                        // console.log('setting up joy ', config)
                         try {
                             new imjoyLib.Joy(joy_config);
                         } catch (e) {
@@ -192,51 +237,7 @@
                 });
             },
         }
-        function openDialog() {
-            document.getElementById('dialog-container').classList.add('active')
-        }
-        function closeDialog() {
-            document.getElementById('dialog-container').classList.remove('active')
-        }
-        function getUrlParameter(name) {
-            name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
-            var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
-            var results = regex.exec(location.search);
-            return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
-        };
-        function addWindow(title, id){
-            document.getElementById('header').innerHTML =`
-            <span class="chip pointer" id="header_${id}" onclick="selectWindow('${id}')">
-                ${title}
-                <a href="#" onclick="removeWindow('${id}')" class="btn btn-clear" aria-label="Close" role="button"></a>
-            </span>` + document.getElementById('header').innerHTML;
 
-            document.getElementById('whiteboard').innerHTML =`
-                <div class="window_container" id="${id}"></div>
-            ` + document.getElementById('whiteboard').innerHTML;
-
-            selectWindow(id)
-        }
-        function removeWindow(id){
-            document.getElementById('header').removeChild(document.getElementById('header_'+id));
-            document.getElementById('whiteboard').removeChild(document.getElementById(id));
-        }
-
-        function selectWindow(id){
-            for(let c of document.getElementById('whiteboard').children){
-                if(c.id !== 'site-title'){
-                    c.style.display = "none";
-                }
-            } 
-
-            for(let c of document.getElementById('header').children)
-                c.classList.remove('active')
-            selected_window = id;
-            document.getElementById(id).style.display = "block";
-            document.getElementById('header_'+id).classList.add('active')
-        }
-
-        
         document.addEventListener('DOMContentLoaded', (event) => {
             imjoy = new imjoyLib.ImJoy({
                 imjoy_api: imjoy_api,
@@ -250,8 +251,11 @@
             imjoy.start().then(()=>{
                 windows = imjoy.wm.windows
                 console.log(imjoy)
-                const p = getUrlParameter('plugin');
+                let p = getUrlParameter('plugin');
+                p = p || prompt(`Please type a ImJoy plugin URI to start or pass it with ${window.location.href+'?plugin=XXXXX'}`);
+                p = p || 'oeway/ImJoy-Plugins:Welcome';
                 if(p){
+                    document.getElementById('loading').style.display = 'block';
                     imjoy.pm.reloadPluginRecursively({uri: p}).then(async (plugin)=>{
                         let config = {};
                         if (plugin.config.ui && plugin.config.ui.indexOf("{") > -1) {
@@ -260,10 +264,12 @@
                                 plugin.config
                             );
                         }
-                        plugin.api.run({config: config, data: {}})
+                        await plugin.api.run({config: config, data: {}})
+                        document.getElementById('loading').style.display = 'none';
                     }).catch((e)=>{
                         console.error(e)
                         alert(`failed to load the plugin, error: ${e}`)
+                        document.getElementById('loading').style.display = 'none';
                     })
                 }
             })
