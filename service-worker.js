@@ -1,4 +1,4 @@
-importScripts("/precache-manifest.0843d212113dddd5f863f80b9f8a4635.js", "https://storage.googleapis.com/workbox-cdn/releases/3.6.3/workbox-sw.js");
+importScripts("/precache-manifest.9b23a3c653505164734186e9c9048a21.js", "https://storage.googleapis.com/workbox-cdn/releases/3.6.3/workbox-sw.js");
 
 /* eslint-disable */
 
@@ -22,6 +22,11 @@ if (workbox) {
 
   workbox.routing.registerRoute(
     new RegExp("/static/.*"),
+    new workbox.strategies.NetworkFirst()
+  );
+
+  workbox.routing.registerRoute(
+    new RegExp("(http|https)://lib.imjoy.io/.*"),
     new workbox.strategies.NetworkFirst()
   );
 
@@ -67,6 +72,14 @@ if (workbox) {
 
   self.addEventListener("message", e => {
     if (e.data.action == "skipWaiting") self.skipWaiting();
+  });
+
+  self.addEventListener("install", function(event) {
+    event.waitUntil(self.skipWaiting()); // Activate worker immediately
+  });
+
+  self.addEventListener("activate", function(event) {
+    event.waitUntil(self.clients.claim()); // Become available to all pages
   });
 } else {
   console.log(`Workbox didn't load`);
