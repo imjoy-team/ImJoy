@@ -252,7 +252,7 @@
                 windows = imjoy.wm.windows
                 console.log(imjoy)
                 let p = getUrlParameter('plugin');
-                p = p || prompt(`Please type a ImJoy plugin URI to start or pass it with ${window.location.href+'?plugin=XXXXX'}`);
+                p = p || prompt(`Please type a ImJoy plugin URI to start or pass it with ${window.location.href+'?plugin=XXXXX'}`, 'oeway/ImJoy-Plugins:Welcome');
                 p = p || 'oeway/ImJoy-Plugins:Welcome';
                 if(p){
                     document.getElementById('loading').style.display = 'block';
