@@ -177,30 +177,10 @@ var BasicConnection;
  * web-browser environment
  */
 var basicConnectionWeb = function() {
-  var perm = [
-    "allow-scripts",
-    "allow-forms",
-    "allow-same-origin",
-    "allow-modals",
-    "allow-popups",
-  ];
-
-  if (
-    __jailed__path__.substr(0, 7).toLowerCase() == "file://" &&
-    perm.indexOf("allow-same-origin") <= 0
-  ) {
-    // local instance requires extra permission
-    perm.push("allow-same-origin");
-  }
-
   // frame element to be cloned
   var sample = document.createElement("iframe");
   sample.src = __jailed__path__ + "_frame.html";
-  sample.sandbox = perm.join(" ");
-  sample.allow =
-    "midi *; geolocation *; microphone *; camera *; encrypted-media *;";
-  sample.allowfullscreen = "";
-  sample.allowpaymentrequest = "";
+  sample.sandbox = "";
   sample.frameBorder = "0";
   sample.style.width = "100%";
   sample.style.height = "100%";
@@ -227,6 +207,66 @@ var basicConnectionWeb = function() {
     platformInit.whenEmitted(function() {
       if (!me._disconnected) {
         me._frame = sample.cloneNode(false);
+        var perm = [
+          "allow-scripts",
+          "allow-forms",
+          "allow-modals",
+          "allow-popups",
+        ];
+        var allows = "";
+        if (
+          __jailed__path__.substr(0, 7).toLowerCase() == "file://" &&
+          !perm.includes("allow-same-origin")
+        ) {
+          // local instance requires extra permission
+          perm.push("allow-same-origin");
+        }
+        if (config.permissions) {
+          if (
+            config.permissions.includes("midi") &&
+            !allows.includes("midi *;")
+          ) {
+            allows += "midi *;";
+          }
+          if (
+            config.permissions.includes("geolocation") &&
+            !allows.includes("geolocation *;")
+          ) {
+            allows += "geolocation *;";
+          }
+          if (
+            config.permissions.includes("microphone") &&
+            !allows.includes("microphone *;")
+          ) {
+            allows += "microphone *;";
+          }
+          if (
+            config.permissions.includes("camera") &&
+            !allows.includes("camera *;")
+          ) {
+            allows += "camera *;";
+          }
+          if (
+            config.permissions.includes("encrypted-media") &&
+            !allows.includes("encrypted-media *;")
+          ) {
+            allows += "encrypted-media *;";
+          }
+          if (
+            (allows || config.permissions.includes("same-origin")) &&
+            !perm.includes("allow-same-origin")
+          ) {
+            perm.push("allow-same-origin");
+          }
+          if (config.permissions.includes("fullscreen")) {
+            me._frame.allowfullscreen = "";
+          }
+          if (config.permissions.includes("paymentrequest")) {
+            me._frame.allowpaymentrequest = "";
+          }
+        }
+        me._frame.sandbox = perm.join(" ");
+        me._frame.allow = allows;
         me._frame.src =
           me._frame.src +
           "?type=" +
