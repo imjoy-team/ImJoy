@@ -899,6 +899,89 @@ export class PluginManager {
     return config;
   }
 
+  reloadPluginRecursively(pconfig, tag) {
+    return new Promise((resolve, reject) => {
+      let uri = typeof pconfig === "string" ? pconfig : pconfig.uri;
+      let scoped_plugins = this.available_plugins;
+      if (pconfig.scoped_plugins) {
+        scoped_plugins = pconfig.scoped_plugins;
+        delete pconfig.scoped_plugins;
+      }
+      //use the has tag in the uri if no hash tag is defined.
+      if (!uri) {
+        reject("No url found for plugin " + pconfig.name);
+        return;
+      }
+      // tag = tag || uri.split('@')[1]
+      // uri = uri.split('@')[0]
+
+      this.getPluginFromUrl(uri, scoped_plugins)
+        .then(async config => {
+          if (config.type === "native-python") {
+            const old_plugin = this.plugin_names[config.name];
+            if (old_plugin) {
+              config.engine_mode = old_plugin.config.engine_mode;
+            }
+          }
+          config.origin = pconfig.origin || uri;
+          if (!config) {
+            console.error(`Failed to fetch the plugin from "${uri}".`);
+            reject(`Failed to fetch the plugin from "${uri}".`);
+            return;
+          }
+          if (!SUPPORTED_PLUGIN_TYPES.includes(config.type)) {
+            reject("Unsupported plugin type: " + config.type);
+            return;
+          }
+          config.tag =
+            tag ||
+            (this.plugin_names[config.name] &&
+              this.plugin_names[config.name].config.tag) ||
+            config.tag;
+          if (config.tag) {
+            // remove existing tag
+            const sp = config.origin.split(":");
+            if (sp[1]) {
+              if (sp[1].split("@")[1])
+                config.origin = sp[0] + ":" + sp[1].split("@")[0];
+            }
+            // add a new tag
+            // config.origin = config.origin + "@" + config.tag;
+          }
+          config._id =
+            (config.name && config.name.replace(/ /g, "_")) || randId();
+          config.dependencies = config.dependencies || [];
+          try {
+            for (let i = 0; i < config.dependencies.length; i++) {
+              await this.reloadPluginRecursively(
+                {
+                  uri: config.dependencies[i],
+                  scoped_plugins: config.scoped_plugins || scoped_plugins,
+                },
+                null
+              );
+            }
+            this.reloadPlugin(config).then((plugin)=>{
+              resolve(plugin)
+            });
+          } catch (error) {
+            alert(
+              `Failed to load dependencies for ${config.name}: ${error}`
+            );
+            throw `Failed to load dependencies for ${config.name}: ${error}`;
+          }
+        })
+        .catch(e => {
+          console.error(e);
+          this.showMessage(
+            "Failed to download, if you download from github, please use the url to the raw file",
+            10
+          );
+          reject(e);
+        });
+    });
+  }
+
   installPlugin(pconfig, tag, do_not_load) {
     return new Promise((resolve, reject) => {
       let uri = typeof pconfig === "string" ? pconfig : pconfig.uri;
