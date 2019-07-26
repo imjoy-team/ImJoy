@@ -222,7 +222,7 @@ export class PluginManager {
     if (typeof config !== "object" || !config.url) {
       throw "You must pass an object contains keys named `url` and `engine`";
     }
-    console.log(
+    console.warn(
       "WARNING: api.uploadFileToUrl is deprecated and it will be removed soon."
     );
     _plugin = _plugin || {};
@@ -759,7 +759,6 @@ export class PluginManager {
 
   reloadPlugins(skip_native_python = false) {
     return new Promise((resolve, reject) => {
-      console.log("reloading all plugins...");
       if (this.plugins) {
         for (let k in this.plugins) {
           if (this.plugins.hasOwnProperty(k)) {

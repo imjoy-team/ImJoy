@@ -2863,7 +2863,7 @@ export default {
       if (typeof config !== "object" || !config.file || !config.url) {
         throw "You must pass an object contains keys named `file` and `url`";
       }
-      console.log(
+      console.warn(
         "WARNING: api.uploadFileToUrl is deprecated and it will be removed soon."
       );
       _plugin = _plugin || {};
@@ -2920,7 +2920,7 @@ export default {
       if (typeof config !== "object" || !config.url) {
         throw "You must pass an object contains keys named `url`";
       }
-      console.log(
+      console.warn(
         "WARNING: api.uploadFileToUrl is deprecated and it will be removed soon."
       );
       return new Promise((resolve, reject) => {
