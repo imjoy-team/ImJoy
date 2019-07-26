@@ -175,7 +175,7 @@ var execute = async function(code) {
             } else if (code.requirements[i].startsWith("js:")) {
               code.requirements[i] = code.requirements[i].slice(3);
               await importScripts(code.requirements[i]);
-            } else if(code.requirements[i].startsWith("cache:")){
+            } else if (code.requirements[i].startsWith("cache:")) {
               // ignore
             } else {
               python_packages.push(code.requirements[i]);
