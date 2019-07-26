@@ -23,6 +23,11 @@ if (workbox) {
     new workbox.strategies.NetworkFirst()
   );
 
+  workbox.routing.registerRoute(
+    new RegExp("(http|https)://lib.imjoy.io/.*"),
+    new workbox.strategies.NetworkFirst()
+  );
+
   //communitations
   workbox.routing.registerRoute(
     new RegExp("(http|https)://.*/socket.io/.*"),
