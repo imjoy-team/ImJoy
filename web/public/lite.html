@@ -68,7 +68,7 @@
         }
         .whiteboard{
             width: 100%;
-            height: calc(100% - 36px);
+            height: calc(100vh - 36px);
         }
         .window_container{
             width: 100%;
@@ -101,31 +101,26 @@
         </div>
     </div>
     <header class="navbar">
-            
-    <section class="navbar-section">
-        <img
-            class="site-title-small"
-            src="https://imjoy.io/static/img/imjoy-logo-black.svg"
-            alt="ImJoy"
-        />
-        <!-- <a href="https://imjoy.io/docs" target="_blank" class="btn btn-link">Docs</a>
-        <a href="https://github.com/oeway/ImJoy" target="_blank" class="btn btn-link">GitHub</a> -->
-    </section>
-    <section class="navbar-section" id="header" style="flex: 0 1 0;">
-        <div class="dropdown dropdown-right">
-            <a class="btn btn-link dropdown-toggle" tabindex="0"><i class="icon icon-more-horiz"></i></a>
-            <ul class="menu" id="plugin-menu">
-                
-            </ul>
-        </div>
-    </section>
-    <progress class="progress" id="progress" value="100" max="100"></progress>
+        <section class="navbar-section">
+            <img
+                class="site-title-small"
+                src="https://imjoy.io/static/img/imjoy-logo-black.svg"
+                alt="ImJoy"
+            />
+            <!-- <a href="https://imjoy.io/docs" target="_blank" class="btn btn-link">Docs</a>
+            <a href="https://github.com/oeway/ImJoy" target="_blank" class="btn btn-link">GitHub</a> -->
+        </section>
+        <section class="navbar-section" id="header" style="flex: 0 1 0;">
+            <div class="dropdown dropdown-right">
+                <a class="btn btn-link dropdown-toggle" tabindex="0"><i class="icon icon-more-horiz"></i></a>
+                <ul class="menu" id="plugin-menu">
+                    
+                </ul>
+            </div>
+        </section>
+        <progress class="progress" id="progress" value="100" max="100"></progress>
+        <div class="whiteboard" id="whiteboard"> </div> 
     </header>
-    
-    <div class="whiteboard" id="whiteboard">
-
-    </div>
-
     <script>
         var selected_window = null
         var imjoy = null
