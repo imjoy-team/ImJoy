@@ -1,16 +1,16 @@
 /* eslint-disable */
 
 if (workbox) {
-  console.log(`Workbox is loaded`);
+  console.log(`Workbox is loaded (plugin service worker)`);
   /**
    * The workboxSW.precacheAndRoute() method efficiently caches and responds to
    * requests for URLs in the manifest.
    * See https://goo.gl/S9QRab
    */
 
-  workbox.setConfig({
-    debug: true,
-  });
+  // workbox.setConfig({
+  //   debug: true,
+  // });
 
   workbox.core.setCacheNameDetails({ prefix: "lib.imjoy.io" });
   self.__precacheManifest = self.__precacheManifest || [];
@@ -82,6 +82,7 @@ if (workbox) {
             return fetch(request)
               .then(function(response) {
                 plugin_requirements.add(event.data.url);
+                console.log('Caching requirement: ' + event.data.url)
                 return cache.put(event.data.url, response);
               })
               .then(function() {
