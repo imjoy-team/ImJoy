@@ -31,7 +31,7 @@ cd imjoy-lib
 git checkout ${LIB_TARGET_BRANCH} || { git checkout --orphan ${LIB_TARGET_BRANCH}; git rm -rf .; }
 
 # Remove all existing files
-ls -A1 | xargs rm -rf
+ls -A1 | grep -v '.git' | xargs rm -rf
 
 # Copy dirs and files and that we want to update.
 cp -Rf ../web/dist/*  ./

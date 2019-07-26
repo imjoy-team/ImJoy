@@ -33,7 +33,7 @@ git config user.name "Travis CI"
 git config user.email "travis@travis-ci.org"
 
 # Remove all existing files
-ls -A1 | xargs rm -rf
+ls -A1 | grep -v '.git' | xargs rm -rf
 
 # Copy dirs and files and that we want to update.
 cp -Rf ../web/dist/* ./
