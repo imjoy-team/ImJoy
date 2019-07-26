@@ -185,10 +185,13 @@ var basicConnectionWeb = function() {
     "allow-popups",
   ];
 
-  // if (__jailed__path__.substr(0, 7).toLowerCase() == "file://") {
-  //   // local instance requires extra permission
-  //   perm.push("allow-same-origin");
-  // }
+  if (
+    __jailed__path__.substr(0, 7).toLowerCase() == "file://" &&
+    perm.indexOf("allow-same-origin") <= 0
+  ) {
+    // local instance requires extra permission
+    perm.push("allow-same-origin");
+  }
 
   // frame element to be cloned
   var sample = document.createElement("iframe");
