@@ -377,7 +377,6 @@ For more details see the dedicated [section](development?id=virtual-environments
 
 #### permissions
 For `window` plugins, the following permissions can be decleared:
- * same-origin
  * camera
  * midi
  * geolocation
@@ -385,6 +384,7 @@ For `window` plugins, the following permissions can be decleared:
  * encrypted-media
  * full-screen
  * payment-request
+ * same-origin
 
  For example, if your window plugin requires webcam access, add the following permission:
  ```

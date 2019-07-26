@@ -26,6 +26,7 @@
       :vertical-compact="true"
       :margin="[3, 3]"
       :use-css-transforms="true"
+      ref="window_grid"
     >
       <grid-item
         :key="w.id"
@@ -262,6 +263,7 @@ export default {
       w._w = w.w;
       w.h = fh;
       w.w = fw;
+      this.$refs.window_grid.layoutUpdate();
       setTimeout(() => {
         w.resize && w.resize();
         w.refresh();
@@ -277,6 +279,7 @@ export default {
       w.w = w._w || 5;
       w._w = null;
       w._h = null;
+      this.$refs.window_grid.layoutUpdate();
       setTimeout(() => {
         w.resize && w.resize();
         w.refresh();
