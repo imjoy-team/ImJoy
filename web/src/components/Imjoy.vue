@@ -1779,10 +1779,12 @@ export default {
       this.showWelcomeDialog = true;
     } else {
       this.startImJoy(this.$route).then(() => {
-        if(!this.pm.plugins || Object.keys(this.pm.plugins) <= 0){
-          this.pm.reloadPluginRecursively({uri: 'oeway/ImJoy-Plugins:Welcome'}).then(()=>{
-            this.showDialog(null, {type: 'Welcome'})
-          })
+        if (!this.pm.plugins || Object.keys(this.pm.plugins) <= 0) {
+          this.pm
+            .reloadPluginRecursively({ uri: "oeway/ImJoy-Plugins:Welcome" })
+            .then(() => {
+              this.showDialog(null, { type: "Welcome" });
+            });
         }
         /* global window */
         if (window.gtag) {
