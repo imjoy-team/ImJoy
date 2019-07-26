@@ -192,7 +192,8 @@ Defines the general properties of a plugin with several fields.
   "inputs": null,
   "outputs": null,
   "env": null,
-  "requirements": null,
+  "permissions": [],
+  "requirements": [],
   "dependencies": []
 }
 ```
@@ -373,6 +374,22 @@ The format is the same as for `inputs`.
 used to create an environment to run the plugin.
 
 For more details see the dedicated [section](development?id=virtual-environments)
+
+#### permissions
+For `window` plugins, the following permissions can be decleared:
+ * same-origin
+ * camera
+ * midi
+ * geolocation
+ * microphone
+ * encrypted-media
+ * full-screen
+ * payment-request
+
+ For example, if your window plugin requires webcam access, add the following permission:
+ ```
+ "permissions": ["camera"],
+ ```
 
 #### requirements
 Defines the plugin requirements.

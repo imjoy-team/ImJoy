@@ -258,10 +258,10 @@ var basicConnectionWeb = function() {
           ) {
             perm.push("allow-same-origin");
           }
-          if (config.permissions.includes("fullscreen")) {
+          if (config.permissions.includes("full-screen")) {
             me._frame.allowfullscreen = "";
           }
-          if (config.permissions.includes("paymentrequest")) {
+          if (config.permissions.includes("payment-request")) {
             me._frame.allowpaymentrequest = "";
           }
         }
