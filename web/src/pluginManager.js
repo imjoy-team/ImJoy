@@ -961,13 +961,11 @@ export class PluginManager {
                 null
               );
             }
-            this.reloadPlugin(config).then((plugin)=>{
-              resolve(plugin)
+            this.reloadPlugin(config).then(plugin => {
+              resolve(plugin);
             });
           } catch (error) {
-            alert(
-              `Failed to load dependencies for ${config.name}: ${error}`
-            );
+            alert(`Failed to load dependencies for ${config.name}: ${error}`);
             throw `Failed to load dependencies for ${config.name}: ${error}`;
           }
         })
