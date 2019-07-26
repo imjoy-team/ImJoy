@@ -282,7 +282,7 @@
                 document.getElementById('plugin-menu').innerHTML = ''
                 for(let pn in imjoy.pm.plugin_names){
                     document.getElementById('plugin-menu').innerHTML = `
-                    <li class="menu-item"><a href="#dropdowns" onclick="runPlugin('${pn}')">${pn}</a></li>
+                    <li class="menu-item"><a href="#" onclick="runPlugin('${pn}')">${pn}</a></li>
                     `+ document.getElementById('plugin-menu').innerHTML
                 }
             })
