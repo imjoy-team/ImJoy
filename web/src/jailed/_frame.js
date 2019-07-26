@@ -243,7 +243,7 @@ if ("serviceWorker" in navigator) {
   window.addEventListener("load", function() {
     var workspace = getParamValue("workspace") || "default";
     navigator.serviceWorker
-      .register("/plugin-service-worker.js", { scope: "./" + workspace + "/" })
+      .register("/plugin-service-worker.js")
       .then(
         function(registration) {
           // Registration was successful
