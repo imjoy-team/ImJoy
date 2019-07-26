@@ -23,6 +23,11 @@ if (workbox) {
     new workbox.strategies.NetworkFirst()
   );
 
+  workbox.routing.registerRoute(
+    new RegExp("(http|https)://lib.imjoy.io/.*"),
+    new workbox.strategies.NetworkFirst()
+  );
+
   //communitations
   workbox.routing.registerRoute(
     new RegExp("(http|https)://.*/socket.io/.*"),
@@ -65,6 +70,14 @@ if (workbox) {
 
   self.addEventListener("message", e => {
     if (e.data.action == "skipWaiting") self.skipWaiting();
+  });
+
+  self.addEventListener("install", function(event) {
+    event.waitUntil(self.skipWaiting()); // Activate worker immediately
+  });
+
+  self.addEventListener("activate", function(event) {
+    event.waitUntil(self.clients.claim()); // Become available to all pages
   });
 } else {
   console.log(`Workbox didn't load`);

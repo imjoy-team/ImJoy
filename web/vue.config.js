@@ -51,6 +51,10 @@ module.exports = {
         to: path.join(__dirname, "dist/static/jailed"),
         toType: "dir"
       },{
+        from: path.join(__dirname, "src/plugin-service-worker.js"),
+        to: path.join(__dirname, "dist/plugin-service-worker.js"),
+        toType: "file"
+      },{
         from: path.join(__dirname, "public/.nojekyll"),
         to: path.join(__dirname, "dist"),
         toType: "dir"

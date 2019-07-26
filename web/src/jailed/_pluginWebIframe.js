@@ -101,6 +101,41 @@ var importScript = function(url) {
   }
 };
 
+function _sendToServiceWorker(message) {
+  return new Promise(function(resolve, reject) {
+    if (!navigator.serviceWorker || !navigator.serviceWorker.register) {
+      reject("This browser doesn't support service workers");
+      return;
+    }
+    var messageChannel = new MessageChannel();
+    messageChannel.port1.onmessage = function(event) {
+      if (event.data.error) {
+        reject(event.data.error);
+      } else {
+        resolve(event.data);
+      }
+    };
+    navigator.serviceWorker.controller.postMessage(message, [
+      messageChannel.port2,
+    ]);
+  });
+}
+
+async function cacheRequirements(requirements) {
+  if (requirements && requirements.length > 0) {
+    for (let req of requirements) {
+      //remove prefix
+      if (req.startsWith("js:")) req = req.slice(3);
+      if (req.startsWith("css:")) req = req.slice(4);
+      if (req.startsWith("cache:")) req = req.slice(6);
+      await _sendToServiceWorker({
+        command: "add",
+        url: req,
+      });
+    }
+  }
+}
+
 // evaluates the provided string
 var execute = async function(code) {
   try {
@@ -129,6 +164,8 @@ var execute = async function(code) {
                 link_node.rel = "stylesheet";
                 link_node.href = code.requirements[i];
                 document.head.appendChild(link_node);
+              } else if (code.requirements[i].startsWith("cache:")) {
+                // ignore
               } else {
                 if (code.requirements[i].startsWith("js:")) {
                   code.requirements[i] = code.requirements[i].slice(3);
@@ -136,6 +173,7 @@ var execute = async function(code) {
                 await importScripts(code.requirements[i]);
               }
             }
+            cacheRequirements(code.requirements);
           } else {
             throw "unsupported requirements definition";
           }

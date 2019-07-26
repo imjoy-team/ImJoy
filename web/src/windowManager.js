@@ -134,7 +134,7 @@ export class WindowManager {
             this.selected_window = null;
           }
         }
-        this.event_bus.$emit("close_window", w);
+        this.event_bus.emit("close_window", w);
       };
 
       try {
@@ -167,11 +167,11 @@ export class WindowManager {
         this.selectWindow(w);
         if (this.add_window_callback) {
           this.add_window_callback(w).then(() => {
-            this.event_bus.$emit("add_window", w);
+            this.event_bus.emit("add_window", w);
             resolve(w.id);
           });
         } else {
-          this.event_bus.$emit("add_window", w);
+          this.event_bus.emit("add_window", w);
           resolve(w.id);
         }
       } catch (e) {
@@ -230,7 +230,7 @@ export class WindowManager {
     if (this.windows.length === 0) {
       this.default_window_pos.index = 0;
     }
-    //this.event_bus.$emit('close_window')
+    //this.event_bus.emit('close_window')
   }
 
   destroy() {

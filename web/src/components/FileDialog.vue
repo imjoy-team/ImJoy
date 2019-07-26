@@ -146,16 +146,16 @@ export default {
   created() {
     this.event_bus = this.$root.$data.store && this.$root.$data.store.event_bus;
     if (this.event_bus) {
-      this.event_bus.$on("drag_upload_enter", this.showDropping);
-      this.event_bus.$on("drag_upload_leave", this.hideDropping);
-      this.event_bus.$on("drag_upload", this.uploadFiles);
+      this.event_bus.on("drag_upload_enter", this.showDropping);
+      this.event_bus.on("drag_upload_leave", this.hideDropping);
+      this.event_bus.on("drag_upload", this.uploadFiles);
     }
   },
   beforeDestroy() {
     if (this.event_bus) {
-      this.event_bus.$off("drag_upload_enter", this.showDropping);
-      this.event_bus.$off("drag_upload_leave", this.hideDropping);
-      this.event_bus.$off("drag_upload", this.uploadFiles);
+      this.event_bus.off("drag_upload_enter", this.showDropping);
+      this.event_bus.off("drag_upload_leave", this.hideDropping);
+      this.event_bus.off("drag_upload", this.uploadFiles);
     }
   },
   computed: {

@@ -31,6 +31,8 @@ import {
 } from "./api.js";
 
 import { Joy } from "./joy";
+import { saveAs } from "file-saver";
+import { Engine } from "./engineManager.js";
 
 import Ajv from "ajv";
 const ajv = new Ajv();
@@ -72,6 +74,10 @@ export class PluginManager {
       },
     ];
 
+    this.IMJOY_PLUGIN = {
+      _id: "IMJOY_APP",
+    };
+
     this.repository_list = [];
     this.repository_names = [];
     this.available_plugins = [];
@@ -94,6 +100,48 @@ export class PluginManager {
     };
     const api_utils_ = imjoy_api.utils;
     this.imjoy_api = {
+      alert: window && window.alert,
+      prompt: window && window.prompt,
+      confirm: window && window.confirm,
+      requestUploadUrl: this.requestUploadUrl,
+      getFileUrl: this.getFileUrl,
+      getFilePath: this.getFilePath,
+      log: (plugin, ...args) => {
+        plugin.log(...args);
+        this.update_ui_callback();
+      },
+      error: (plugin, ...args) => {
+        plugin.error(...args);
+        this.update_ui_callback();
+      },
+      progress: (plugin, value) => {
+        plugin.progress(value);
+        this.update_ui_callback();
+      },
+      exportFile(_plugin, file, name) {
+        if (typeof file === "string") {
+          file = new Blob([file], { type: "text/plain;charset=utf-8" });
+        }
+        saveAs(file, name || file._name || "file_export");
+      },
+      showDialog() {
+        throw "`api.showDialog` is not implemented.";
+      },
+      showFileDialog() {
+        throw "`api.showDialog` is not implemented.";
+      },
+      showProgress(_plugin, p) {
+        console.log("api.showProgress: ", p);
+      },
+      showStatus(_plugin, s) {
+        console.log("api.showStatus: ", s);
+      },
+      showSnackbar(_plugin, msg, duration) {
+        console.log("api.showSnackbar: ", msg, duration);
+      },
+      showMessage: (plugin, info, duration) => {
+        console.log("api.showMessage: ", info, duration);
+      },
       register: this.register,
       unregister: this.unregister,
       createWindow: this.createWindow,
@@ -117,7 +165,7 @@ export class PluginManager {
       }
     }
     // merge imjoy api
-    this.imjoy_api = _.assign({}, imjoy_api, this.imjoy_api);
+    this.imjoy_api = _.assign({}, this.imjoy_api, imjoy_api);
     // copy api utils make sure it was not overwritten
     if (api_utils_) {
       for (let k in api_utils_) {
@@ -126,32 +174,138 @@ export class PluginManager {
     }
   }
 
-  _sendToServiceWorker(message) {
-    // This wraps the message posting/response in a promise, which will resolve if the response doesn't
-    // contain an error, and reject with the error if it does. If you'd prefer, it's possible to call
-    // controller.postMessage() and set up the onmessage handler independently of a promise, but this is
-    // a convenient wrapper.
-    return new Promise(function(resolve, reject) {
-      if (!navigator.serviceWorker || !navigator.serviceWorker.register) {
-        reject("This browser doesn't support service workers");
+  getFileUrl(_plugin, config) {
+    if (typeof config !== "object" || !config.path) {
+      throw "You must pass an object contains keys named `path` and `engine`";
+    }
+    _plugin = _plugin || {};
+    config.engine =
+      config.engine === undefined ? _plugin.config.engine : config.engine;
+    const engine =
+      config.engine instanceof Engine
+        ? config.engine
+        : this.em.getEngineByUrl(config.engine);
+    delete config.engine;
+    return new Promise((resolve, reject) => {
+      if (!engine) {
+        reject("Please specify an engine");
         return;
       }
-      var messageChannel = new MessageChannel();
-      messageChannel.port1.onmessage = function(event) {
-        if (event.data.error) {
-          reject(event.data.error);
-        } else {
-          resolve(event.data);
-        }
-      };
+      if (!engine.connected) {
+        reject("Please connect to the Plugin Engine 🚀.");
+        this.showMessage("Please connect to the Plugin Engine 🚀.");
+        return;
+      }
+      engine
+        .getFileUrl(config)
+        .then(ret => {
+          ret = ret || {};
+          if (ret.success) {
+            if (_plugin.log)
+              _plugin.log(`File url created ${config.path}: ${ret.url}`);
+            resolve(ret.url);
+            this.update_ui_callback();
+          } else {
+            ret.error = ret.error || "";
+            this.showMessage(
+              `Failed to get file url for ${config.path} ${ret.error}`
+            );
+            reject(`Failed to get file url for ${config.path} ${ret.error}`);
+            this.update_ui_callback();
+          }
+        })
+        .catch(reject);
+    });
+  }
 
-      // This sends the message data as well as transferring messageChannel.port2 to the service worker.
-      // The service worker can then use the transferred port to reply via postMessage(), which
-      // will in turn trigger the onmessage handler on messageChannel.port1.
-      // See https://html.spec.whatwg.org/multipage/workers.html#dom-worker-postmessage
-      navigator.serviceWorker.controller.postMessage(message, [
-        messageChannel.port2,
-      ]);
+  getFilePath(_plugin, config) {
+    if (typeof config !== "object" || !config.url) {
+      throw "You must pass an object contains keys named `url` and `engine`";
+    }
+    console.warn(
+      "WARNING: api.uploadFileToUrl is deprecated and it will be removed soon."
+    );
+    _plugin = _plugin || {};
+    config.engine =
+      config.engine === undefined ? _plugin.config.engine : config.engine;
+    const engine =
+      config.engine instanceof Engine
+        ? config.engine
+        : this.em.getEngineByUrl(config.engine);
+    delete config.engine;
+    return new Promise((resolve, reject) => {
+      if (!engine) {
+        reject("Please specify an engine");
+        return;
+      }
+      if (!engine.connected) {
+        reject("Please connect to the Plugin Engine 🚀.");
+        this.showMessage("Please connect to the Plugin Engine 🚀.");
+        return;
+      }
+      engine
+        .getFilePath(config)
+        .then(ret => {
+          ret = ret || {};
+          if (ret.success) {
+            resolve(ret.path);
+            this.update_ui_callback();
+          } else {
+            ret.error = ret.error || "";
+            this.showMessage(
+              `Failed to get file path for ${config.url} ${ret.error}`
+            );
+            reject(`Failed to get file path for ${config.url} ${ret.error}`);
+            this.update_ui_callback();
+          }
+        })
+        .catch(reject);
+    });
+  }
+
+  requestUploadUrl(_plugin, config) {
+    if (typeof config !== "object") {
+      throw "You must pass an object contains keys named `engine` and `path` (or `dir`, optionally `overwrite`)";
+    }
+    _plugin = _plugin || this.IMJOY_PLUGIN;
+    config.engine =
+      config.engine === undefined ? _plugin.config.engine : config.engine;
+    const engine =
+      config.engine instanceof Engine
+        ? config.engine
+        : this.em.getEngineByUrl(config.engine);
+    delete config.engine;
+    return new Promise((resolve, reject) => {
+      if (!engine) {
+        reject("Please specify an engine");
+        return;
+      }
+      if (!engine.connected) {
+        reject("Please connect to the Plugin Engine 🚀.");
+        this.showMessage("Please connect to the Plugin Engine 🚀.");
+        return;
+      }
+
+      engine
+        .requestUploadUrl({
+          path: config.path,
+          overwrite: config.overwrite,
+          dir: config.dir,
+        })
+        .then(ret => {
+          ret = ret || {};
+          if (ret.success) {
+            if (_plugin.log) _plugin.log(`Uploaded url created: ${ret.url}`);
+            resolve(ret.url);
+            this.update_ui_callback();
+          } else {
+            ret.error = ret.error || "UNKNOWN";
+            this.showMessage(`Failed to request file url, Error: ${ret.error}`);
+            reject(`Failed to request file url, Error: ${ret.error}`);
+            this.update_ui_callback();
+          }
+        })
+        .catch(reject);
     });
   }
 
@@ -432,7 +586,7 @@ export class PluginManager {
       selected_workspace = selected_workspace || this.selected_workspace;
       const load_ = () => {
         try {
-          this.event_bus.$emit("workspace_list_updated", this.workspace_list);
+          this.event_bus.emit("workspace_list_updated", this.workspace_list);
           this.db = new PouchDB(selected_workspace + "_workspace", {
             revs_limit: 2,
             auto_compaction: true,
@@ -605,7 +759,6 @@ export class PluginManager {
 
   reloadPlugins(skip_native_python = false) {
     return new Promise((resolve, reject) => {
-      console.log("reloading all plugins...");
       if (this.plugins) {
         for (let k in this.plugins) {
           if (this.plugins.hasOwnProperty(k)) {
@@ -661,7 +814,6 @@ export class PluginManager {
                 });
               }
             }
-            console.log("plugins loaded.");
             resolve();
           })
           .catch(err => {
@@ -747,6 +899,87 @@ export class PluginManager {
     return config;
   }
 
+  reloadPluginRecursively(pconfig, tag) {
+    return new Promise((resolve, reject) => {
+      let uri = typeof pconfig === "string" ? pconfig : pconfig.uri;
+      let scoped_plugins = this.available_plugins;
+      if (pconfig.scoped_plugins) {
+        scoped_plugins = pconfig.scoped_plugins;
+        delete pconfig.scoped_plugins;
+      }
+      //use the has tag in the uri if no hash tag is defined.
+      if (!uri) {
+        reject("No url found for plugin " + pconfig.name);
+        return;
+      }
+      // tag = tag || uri.split('@')[1]
+      // uri = uri.split('@')[0]
+
+      this.getPluginFromUrl(uri, scoped_plugins)
+        .then(async config => {
+          if (config.type === "native-python") {
+            const old_plugin = this.plugin_names[config.name];
+            if (old_plugin) {
+              config.engine_mode = old_plugin.config.engine_mode;
+            }
+          }
+          config.origin = pconfig.origin || uri;
+          if (!config) {
+            console.error(`Failed to fetch the plugin from "${uri}".`);
+            reject(`Failed to fetch the plugin from "${uri}".`);
+            return;
+          }
+          if (!SUPPORTED_PLUGIN_TYPES.includes(config.type)) {
+            reject("Unsupported plugin type: " + config.type);
+            return;
+          }
+          config.tag =
+            tag ||
+            (this.plugin_names[config.name] &&
+              this.plugin_names[config.name].config.tag) ||
+            config.tag;
+          if (config.tag) {
+            // remove existing tag
+            const sp = config.origin.split(":");
+            if (sp[1]) {
+              if (sp[1].split("@")[1])
+                config.origin = sp[0] + ":" + sp[1].split("@")[0];
+            }
+            // add a new tag
+            // config.origin = config.origin + "@" + config.tag;
+          }
+          config._id =
+            (config.name && config.name.replace(/ /g, "_")) || randId();
+          config.dependencies = config.dependencies || [];
+          try {
+            for (let i = 0; i < config.dependencies.length; i++) {
+              await this.reloadPluginRecursively(
+                {
+                  uri: config.dependencies[i],
+                  scoped_plugins: config.scoped_plugins || scoped_plugins,
+                },
+                null
+              );
+            }
+            this.reloadPlugin(config).then(plugin => {
+              resolve(plugin);
+            });
+          } catch (error) {
+            alert(`Failed to load dependencies for ${config.name}: ${error}`);
+            throw `Failed to load dependencies for ${config.name}: ${error}`;
+          }
+        })
+        .catch(e => {
+          console.error(e);
+          this.showMessage(
+            "Failed to download, if you download from github, please use the url to the raw file",
+            10
+          );
+          reject(e);
+        });
+    });
+  }
+
   installPlugin(pconfig, tag, do_not_load) {
     return new Promise((resolve, reject) => {
       let uri = typeof pconfig === "string" ? pconfig : pconfig.uri;
@@ -820,7 +1053,7 @@ export class PluginManager {
             this.showMessage(
               `Plugin "${template.name}" has been successfully installed.`
             );
-            this.event_bus.$emit("plugin_installed", template);
+            this.event_bus.emit("plugin_installed", template);
             resolve(template);
             if (!do_not_load) this.reloadPlugin(template);
           } catch (error) {
@@ -1005,7 +1238,6 @@ export class PluginManager {
               this.installed_plugins.push(template);
               resolve(template);
               this.showMessage(`${template.name} has been successfully saved.`);
-              // this._sendToServiceWorker(template)
             })
             .catch(err => {
               this.showMessage("Failed to save the plugin.", 15);
@@ -1221,7 +1453,7 @@ export class PluginManager {
         this.register(plugin, config);
         this.plugins[plugin.id] = plugin;
         this.plugin_names[plugin.name] = plugin;
-        this.event_bus.$emit("plugin_loaded", plugin);
+        this.event_bus.emit("plugin_loaded", plugin);
         resolve(plugin);
       } catch (e) {
         reject(e);
@@ -1303,7 +1535,7 @@ export class PluginManager {
           plugin.api
             .resume()
             .then(() => {
-              this.event_bus.$emit("plugin_loaded", plugin);
+              this.event_bus.emit("plugin_loaded", plugin);
               resolve(plugin);
             })
             .catch(e => {
@@ -1322,7 +1554,7 @@ export class PluginManager {
           plugin.api
             .setup()
             .then(() => {
-              this.event_bus.$emit("plugin_loaded", plugin);
+              this.event_bus.emit("plugin_loaded", plugin);
               resolve(plugin);
             })
             .catch(e => {
@@ -1846,7 +2078,7 @@ export class PluginManager {
 
       this.registered.ops[op_key] = op_config;
       this.registered.windows[config.name] = plugin.config;
-      this.event_bus.$emit("op_registered", op_config);
+      this.event_bus.emit("op_registered", op_config);
       return true;
     } catch (e) {
       console.error(e);

@@ -850,12 +850,11 @@
               </div>
             </div>
             <md-divider></md-divider>
-            <!-- <p v-if="pm.installed_plugins.length<=0">&nbsp;No plugin installed.</p> -->
             <md-empty-state
               id="plugin-empty-state"
               v-if="pm.installed_plugins.length <= 0"
               md-icon="extension"
-              md-label="No plugin installed"
+              md-label=""
               md-description=""
             >
               <md-button
@@ -1396,11 +1395,9 @@
 
 <script>
 /*eslint no-unused-vars: ["error", { "argsIgnorePattern": "^_plugin$" }]*/
-import Vue from "vue";
 
 import { saveAs } from "file-saver";
 import axios from "axios";
-import PouchDB from "pouchdb-browser";
 
 import WEB_WORKER_PLUGIN_TEMPLATE from "../plugins/webWorkerTemplate.imjoy.html";
 import NATIVE_PYTHON_PLUGIN_TEMPLATE from "../plugins/nativePythonTemplate.imjoy.html";
@@ -1419,17 +1416,15 @@ import {
   escapeHTML,
 } from "../utils.js";
 
-import { PluginManager } from "../pluginManager.js";
+import { ImJoy } from "../imjoyLib.js";
 
-import { WindowManager } from "../windowManager.js";
-
-import { Engine, EngineManager } from "../engineManager.js";
-
-import { FileSystemManager } from "../fileSystemManager.js";
+import { Engine } from "../engineManager.js";
 
 import _ from "lodash";
 
 import { Joy } from "../joy";
+
+import Minibus from "minibus";
 
 import Ajv from "ajv";
 const ajv = new Ajv();
@@ -1440,6 +1435,7 @@ export default {
   name: "imjoy",
   data() {
     return {
+      imjoy: null,
       pm: null, //plugin_manager
       em: null, //engine_manager
       wm: null, //window_manager
@@ -1524,7 +1520,8 @@ export default {
     this.imjoy_version = version;
     // mocks it for testing if not available
     this.event_bus =
-      (this.$root.$data.store && this.$root.$data.store.event_bus) || new Vue();
+      (this.$root.$data.store && this.$root.$data.store.event_bus) ||
+      Minibus.create();
     const imjoy_api = {
       alert: this.showAlert,
       prompt: this.showPrompt,
@@ -1533,27 +1530,11 @@ export default {
       showProgress: this.showProgress,
       showStatus: this.showStatus,
       showFileDialog: this.showFileDialog,
-      requestUploadUrl: this.requestUploadUrl,
       showSnackbar: this.showSnackbar,
       uploadFileToUrl: this.uploadFileToUrl,
       downloadFileFromUrl: this.downloadFileFromUrl,
-      getFileUrl: this.getFileUrl,
-      getFilePath: this.getFilePath,
-      exportFile: this.exportFile,
       showMessage: (plugin, info, duration) => {
         this.showMessage(info, duration);
-      },
-      log: (plugin, ...args) => {
-        plugin.log(...args);
-        this.$forceUpdate();
-      },
-      error: (plugin, ...args) => {
-        plugin.error(...args);
-        this.$forceUpdate();
-      },
-      progress: (plugin, value) => {
-        plugin.progress(value);
-        this.$forceUpdate();
       },
       utils: {
         $forceUpdate: this.$forceUpdate,
@@ -1574,44 +1555,30 @@ export default {
       }
     }
 
-    const config_db = new PouchDB("imjoy_config", {
-      revs_limit: 2,
-      auto_compaction: true,
-    });
-
     this.client_id = localStorage.getItem("imjoy_client_id");
     if (!this.client_id) {
       this.client_id = "imjoy_web_" + randId();
       localStorage.setItem("imjoy_client_id", this.client_id);
     }
 
-    this.em = new EngineManager({
+    this.imjoy = new ImJoy({
+      imjoy_api: imjoy_api,
       event_bus: this.event_bus,
-      config_db: config_db,
       show_message_callback: this.showMessage,
       show_engine_callback: (show, engine) => {
         this.showEngineConnection(show, engine);
       },
-      client_id: this.client_id,
-    });
-    this.wm = new WindowManager({
-      event_bus: this.event_bus,
-      show_message_callback: this.showMessage,
-      add_window_callback: this.addWindowCallback,
-    });
-    this.fm = new FileSystemManager();
-    this.pm = new PluginManager({
-      event_bus: this.event_bus,
-      config_db: config_db,
-      engine_manager: this.em,
-      window_manager: this.wm,
-      file_system_manager: this.fm,
-      imjoy_api: imjoy_api,
-      show_message_callback: this.showMessage,
       update_ui_callback: () => {
         this.$forceUpdate();
       },
+      add_window_callback: this.addWindowCallback,
+      client_id: this.client_id,
     });
+
+    this.pm = this.imjoy.pm;
+    this.em = this.imjoy.em;
+    this.fm = this.imjoy.fm;
+    this.wm = this.imjoy.wm;
 
     this.IMJOY_PLUGIN = {
       _id: "IMJOY_APP",
@@ -1663,7 +1630,7 @@ export default {
         }
       }
       if (insideFileDialog(e.target)) {
-        this.event_bus.$emit("drag_upload_enter");
+        this.event_bus.emit("drag_upload_enter");
       }
     });
     document.addEventListener("dragenter", e => {
@@ -1674,7 +1641,7 @@ export default {
         this.$forceUpdate();
       }
       if (insideFileDialog(e.target)) {
-        this.event_bus.$emit("drag_upload_enter");
+        this.event_bus.emit("drag_upload_enter");
       }
     });
     document.addEventListener("dragleave", e => {
@@ -1685,7 +1652,7 @@ export default {
         this.$forceUpdate();
       }
       if (!insideFileDialog(e.target)) {
-        this.event_bus.$emit("drag_upload_leave");
+        this.event_bus.emit("drag_upload_leave");
       }
     });
     const parseFiles = e => {
@@ -1753,9 +1720,9 @@ export default {
         this.workspace_dropping = false;
         this.$forceUpdate();
       } else if (insideFileDialog(e.target)) {
-        this.event_bus.$emit("drag_upload_leave");
+        this.event_bus.emit("drag_upload_leave");
         parseFiles(e).then(files => {
-          this.event_bus.$emit("drag_upload", files);
+          this.event_bus.emit("drag_upload", files);
         });
       }
     });
@@ -1775,30 +1742,33 @@ export default {
     }
   },
   mounted() {
-    this.event_bus.$on("resize", this.updateSize);
-    this.event_bus.$on("plugin_loaded", () => {
+    this.event_bus.on("resize", this.updateSize);
+    this.event_bus.on("plugin_loaded", () => {
       //update the joy workflow if new template added, TODO: preserve settings during reload
       if (this.$refs.workflow && this.$refs.workflow.setupJoy)
         this.$refs.workflow.setupJoy();
     });
-    this.event_bus.$on("op_registered", () => {
+    this.event_bus.on("op_registered", () => {
       //update the joy workflow if new template added, TODO: preserve settings during reload
       if (this.$refs.workflow && this.$refs.workflow.setupJoy)
         this.$refs.workflow.setupJoy();
     });
-    this.event_bus.$on("engine_connected", engine => {
+    this.event_bus.on("engine_connected", engine => {
       if (this.pm) this.pm.reloadPythonPlugins(engine);
     });
-    this.event_bus.$on("engine_disconnected", engine => {
+    this.event_bus.on("engine_disconnected", engine => {
       if (this.pm) this.pm.unloadPythonPlugins(engine);
     });
 
     this.updateSize({ width: window.innerWidth });
-    if (this.screenWidth > 800) {
-      this.wm.window_mode = "grid";
-    } else {
-      this.wm.window_mode = "single";
+    if (this.wm) {
+      if (this.screenWidth > 800) {
+        this.wm.window_mode = "grid";
+      } else {
+        this.wm.window_mode = "single";
+      }
     }
+
     this.is_https_mode = "https:" === location.protocol;
     // Make sure the GUI is refreshed
     setInterval(() => {
@@ -1808,7 +1778,14 @@ export default {
     if (this.welcome) {
       this.showWelcomeDialog = true;
     } else {
-      this.startImJoy().then(() => {
+      this.startImJoy(this.$route).then(() => {
+        if (!this.pm.plugins || Object.keys(this.pm.plugins) <= 0) {
+          this.pm
+            .reloadPluginRecursively({ uri: "oeway/ImJoy-Plugins:Welcome" })
+            .then(() => {
+              this.showDialog(null, { type: "Welcome" });
+            });
+        }
         /* global window */
         if (window.gtag) {
           // CAREFUL: DO NOT SEND ANY QUERY STRING, ONLY LOCATION AND PATH
@@ -1821,31 +1798,13 @@ export default {
     }
   },
   beforeDestroy() {
-    this.pm.destroy();
-    this.em.destroy();
+    this.imjoy.destroy();
   },
   methods: {
-    async startImJoy() {
-      try {
-        await this.fm.init();
-        console.log("Successfully initialized the file system.");
-      } catch (e) {
-        console.error(e);
-        this.showMessage("Failed to initialize file system: " + e.toString());
-      }
-      this.pm.init();
-      try {
-        await this.em.init();
+    async startImJoy(route) {
+      await this.imjoy.init();
 
-        console.log("Successfully initialized the engine manager.");
-      } catch (e) {
-        console.error(e);
-        this.showMessage(
-          "Failed to initialize the engine manager: " + e.toString()
-        );
-      }
-
-      const r = (this.$route.query.repo || this.$route.query.r || "").trim();
+      const r = (route.query.repo || route.query.r || "").trim();
       if (r) {
         this.plugin_url = null;
         this.init_plugin_search = null;
@@ -1867,7 +1826,7 @@ export default {
         this.showAddPluginDialog = true;
       }
 
-      const p = (this.$route.query.plugin || this.$route.query.p || "").trim();
+      const p = (route.query.plugin || route.query.p || "").trim();
       let plugin_config = null;
       if (p) {
         if (p.match(url_regex) || (p.includes("/") && p.includes(":"))) {
@@ -1880,7 +1839,7 @@ export default {
             //check if the same plugin is already installed
             if (
               !this.pm.plugin_names[plugin_config.name] ||
-              this.$route.query.upgrade ||
+              route.query.upgrade ||
               plugin_config.version !==
                 this.pm.plugin_names[plugin_config.name].config.version
             ) {
@@ -1904,7 +1863,7 @@ export default {
           this.showAddPluginDialog = true;
         }
       } else {
-        if (this.$route.query.workflow) {
+        if (route.query.workflow) {
           this.loadWorkfowFromUrl();
         }
       }
@@ -1916,17 +1875,14 @@ export default {
       this.pm.selected_repository = this.repository_list[0];
 
       try {
-        const workspace_list = await this.pm.loadWorkspaceList();
-        if (this.$route.query.start || this.$route.query.s) {
+        if (route.query.start || route.query.s) {
           this.menuVisible = false;
         } else {
           this.menuVisible = true;
         }
 
         const selected_workspace =
-          this.$route.query.workspace ||
-          this.$route.query.w ||
-          workspace_list[0];
+          route.query.workspace || route.query.w || this.pm.workspace_list[0];
         await this.pm.loadWorkspace(selected_workspace);
         await this.pm.reloadPlugins(false);
         const connections = this.em.connectAll(true);
@@ -1936,38 +1892,32 @@ export default {
           console.error(e);
         }
 
-        if (this.$route.query.engine && this.$route.query.start) {
-          const en = this.em.getEngineByUrl(this.$route.query.engine);
-          const pl = this.pm.plugin_names[this.$route.query.start];
+        if (route.query.engine && route.query.start) {
+          const en = this.em.getEngineByUrl(route.query.engine);
+          const pl = this.pm.plugin_names[route.query.start];
           if (en && pl) {
             console.log(`setting plugin engine of ${pl.name} to ${en.name}`);
             pl.engine_mode = en.id;
             pl.config.engine_mode = en.id;
           }
           if (!en) {
-            this.showMessage(
-              `Plugin engine ${this.$route.query.engine} not found.`
-            );
+            this.showMessage(`Plugin engine ${route.query.engine} not found.`);
           }
           if (!pl) {
-            this.showMessage(`Plugin ${this.$route.query.start} not found.`);
+            this.showMessage(`Plugin ${route.query.start} not found.`);
           }
         }
 
         let connection_token = null;
-        if (this.$route.query.token || this.$route.query.t) {
-          connection_token = (
-            this.$route.query.token || this.$route.query.t
-          ).trim();
-          const query = Object.assign({}, this.$route.query);
+        if (route.query.token || route.query.t) {
+          connection_token = (route.query.token || route.query.t).trim();
+          const query = Object.assign({}, route.query);
           delete query.token;
           delete query.t;
-          this.$router.replace({ query });
+          route.replace({ query });
         }
-        if (this.$route.query.engine || this.$route.query.e) {
-          const engine_url = (
-            this.$route.query.engine || this.$route.query.e
-          ).trim();
+        if (route.query.engine || route.query.e) {
+          const engine_url = (route.query.engine || route.query.e).trim();
           this.em
             .addEngine(
               { type: "default", url: engine_url, token: connection_token },
@@ -1980,21 +1930,21 @@ export default {
         }
 
         this.plugin_loaded = true;
-        this.event_bus.$emit("plugins_loaded", this.pm.plugins);
+        this.event_bus.emit("plugins_loaded", this.pm.plugins);
         try {
           const manifest = this.pm.reloadRepository();
-          this.event_bus.$emit("repositories_loaded", manifest);
+          this.event_bus.emit("repositories_loaded", manifest);
         } finally {
-          if (this.$route.query.start || this.$route.query.s) {
-            const pname = this.$route.query.start || this.$route.query.s;
+          if (route.query.start || route.query.s) {
+            const pname = route.query.start || route.query.s;
             const ps = this.pm.installed_plugins.filter(p => {
               return p.name === pname;
             });
             if (!this.showAddPluginDialog && ps.length <= 0) {
               alert(`Plugin "${pname}" cannot be started, please install it.`);
             } else {
-              const data = _clone(this.$route.query);
-              const load_data = this.$route.query.load || this.$route.query.l;
+              const data = _clone(route.query);
+              const load_data = route.query.load || route.query.l;
               if (load_data) {
                 try {
                   const response = await axios.get(load_data);
@@ -2021,13 +1971,13 @@ export default {
                   const c = _clone(template.defaults) || {};
                   c.type = pname;
                   c.name = pname;
-                  c.w = c.w || this.$route.query.w;
-                  c.h = c.h || this.$route.query.h;
+                  c.w = c.w || route.query.w;
+                  c.h = c.h || route.query.h;
                   c.tag = template.tag;
                   c.fullscreen =
-                    this.$route.query.fullscreen || c.fullscreen || false;
+                    route.query.fullscreen || c.fullscreen || false;
                   c.standalone =
-                    this.$route.query.standalone || c.standalone || false;
+                    route.query.standalone || c.standalone || false;
                   c.data = data;
                   c.config = {};
                   await this.createWindow(c);
@@ -2043,7 +1993,7 @@ export default {
                     } catch (e) {
                       console.error(`Plugin ${pname} failed to load data.`, e);
                     }
-                    this.event_bus.$off("plugin_loaded", plugin_loaded_handler);
+                    this.event_bus.off("plugin_loaded", plugin_loaded_handler);
                   }
                   // close it if it already started.
                   if (started_plugin && started_plugin.api.close) {
@@ -2055,16 +2005,16 @@ export default {
                   if (p.name !== pname) {
                     return;
                   }
-                  this.event_bus.$on("plugin_loaded", plugin_loaded_handler);
-                  this.event_bus.$off("plugin_installed", start_when_loaded);
+                  this.event_bus.on("plugin_loaded", plugin_loaded_handler);
+                  this.event_bus.off("plugin_installed", start_when_loaded);
                 };
-                this.event_bus.$on("plugin_installed", start_when_loaded);
+                this.event_bus.on("plugin_installed", start_when_loaded);
               }
             }
           }
 
           this.$nextTick(() => {
-            this.event_bus.$emit("imjoy_ready");
+            this.event_bus.emit("imjoy_ready");
           });
         }
       } catch (e) {
@@ -2271,15 +2221,17 @@ export default {
     },
     updateSize(e) {
       this.screenWidth = e.width;
-      if (this.screenWidth > 800) {
-        if (this.wm.windows.length === 0) this.wm.window_mode = "grid";
-        this.max_window_buttons = 9;
-      } else {
-        if (this.wm.windows.length === 0) this.wm.window_mode = "single";
-        this.max_window_buttons = parseInt(this.screenWidth / 36 - 4);
-        if (this.max_window_buttons > 9) this.max_window_buttons = 9;
+      if (this.wm) {
+        if (this.screenWidth > 800) {
+          if (this.wm.windows.length === 0) this.wm.window_mode = "grid";
+          this.max_window_buttons = 9;
+        } else {
+          if (this.wm.windows.length === 0) this.wm.window_mode = "single";
+          this.max_window_buttons = parseInt(this.screenWidth / 36 - 4);
+          if (this.max_window_buttons > 9) this.max_window_buttons = 9;
+        }
+        this.wm.resizeAll();
       }
-      this.wm.resizeAll();
       this.$forceUpdate();
     },
     showEngineConnection(show, engine) {
@@ -2289,7 +2241,7 @@ export default {
       //   this.reject_permission = reject
       //   this.showPermissionConfirmation = true
       // }
-      this.event_bus.$emit("show_engine_dialog", {
+      this.event_bus.emit("show_engine_dialog", {
         show: show,
         engine: engine,
       });
@@ -2865,6 +2817,12 @@ export default {
         throw "No plugin engine selected.";
       }
     },
+    getFileUrl(_plugin, config) {
+      return this.pm.getFileUrl(_plugin, config);
+    },
+    requestUploadUrl(_plugin, config) {
+      return this.pm.requestUploadUrl(_plugin, config);
+    },
     removeFiles(engine, path, type, recursive) {
       if (engine) {
         return engine.removeFiles(path, type, recursive);
@@ -2907,57 +2865,13 @@ export default {
         return this.$refs["file-dialog"].showDialog(_plugin, config);
       }
     },
-    requestUploadUrl(_plugin, config) {
-      if (typeof config !== "object") {
-        throw "You must pass an object contains keys named `engine` and `path` (or `dir`, optionally `overwrite`)";
-      }
-      _plugin = _plugin || this.IMJOY_PLUGIN;
-      config.engine =
-        config.engine === undefined ? _plugin.config.engine : config.engine;
-      const engine =
-        config.engine instanceof Engine
-          ? config.engine
-          : this.em.getEngineByUrl(config.engine);
-      delete config.engine;
-      return new Promise((resolve, reject) => {
-        if (!engine) {
-          reject("Please specify an engine");
-          return;
-        }
-        if (!engine.connected) {
-          reject("Please connect to the Plugin Engine 🚀.");
-          this.showMessage("Please connect to the Plugin Engine 🚀.");
-          return;
-        }
-
-        engine
-          .requestUploadUrl({
-            path: config.path,
-            overwrite: config.overwrite,
-            dir: config.dir,
-          })
-          .then(ret => {
-            ret = ret || {};
-            if (ret.success) {
-              if (_plugin.log) _plugin.log(`Uploaded url created: ${ret.url}`);
-              resolve(ret.url);
-              this.$forceUpdate();
-            } else {
-              ret.error = ret.error || "UNKNOWN";
-              this.showMessage(
-                `Failed to request file url, Error: ${ret.error}`
-              );
-              reject(`Failed to request file url, Error: ${ret.error}`);
-              this.$forceUpdate();
-            }
-          })
-          .catch(reject);
-      });
-    },
     uploadFileToUrl(_plugin, config) {
       if (typeof config !== "object" || !config.file || !config.url) {
         throw "You must pass an object contains keys named `file` and `url`";
       }
+      console.warn(
+        "WARNING: api.uploadFileToUrl is deprecated and it will be removed soon."
+      );
       _plugin = _plugin || {};
       return new Promise((resolve, reject) => {
         const bodyFormData = new FormData();
@@ -3012,6 +2926,9 @@ export default {
       if (typeof config !== "object" || !config.url) {
         throw "You must pass an object contains keys named `url`";
       }
+      console.warn(
+        "WARNING: api.uploadFileToUrl is deprecated and it will be removed soon."
+      );
       return new Promise((resolve, reject) => {
         this.showMessage("Downloading from " + config.url);
         let totalLength = null;
@@ -3057,96 +2974,6 @@ export default {
             reject(response.statusText);
           });
       });
-    },
-    getFileUrl(_plugin, config) {
-      if (typeof config !== "object" || !config.path) {
-        throw "You must pass an object contains keys named `path` and `engine`";
-      }
-      _plugin = _plugin || {};
-      config.engine =
-        config.engine === undefined ? _plugin.config.engine : config.engine;
-      const engine =
-        config.engine instanceof Engine
-          ? config.engine
-          : this.em.getEngineByUrl(config.engine);
-      delete config.engine;
-      return new Promise((resolve, reject) => {
-        if (!engine) {
-          reject("Please specify an engine");
-          return;
-        }
-        if (!engine.connected) {
-          reject("Please connect to the Plugin Engine 🚀.");
-          this.showMessage("Please connect to the Plugin Engine 🚀.");
-          return;
-        }
-        engine
-          .getFileUrl(config)
-          .then(ret => {
-            ret = ret || {};
-            if (ret.success) {
-              if (_plugin.log)
-                _plugin.log(`File url created ${config.path}: ${ret.url}`);
-              resolve(ret.url);
-              this.$forceUpdate();
-            } else {
-              ret.error = ret.error || "";
-              this.showMessage(
-                `Failed to get file url for ${config.path} ${ret.error}`
-              );
-              reject(`Failed to get file url for ${config.path} ${ret.error}`);
-              this.$forceUpdate();
-            }
-          })
-          .catch(reject);
-      });
-    },
-    getFilePath(_plugin, config) {
-      if (typeof config !== "object" || !config.url) {
-        throw "You must pass an object contains keys named `url` and `engine`";
-      }
-      _plugin = _plugin || {};
-      config.engine =
-        config.engine === undefined ? _plugin.config.engine : config.engine;
-      const engine =
-        config.engine instanceof Engine
-          ? config.engine
-          : this.em.getEngineByUrl(config.engine);
-      delete config.engine;
-      return new Promise((resolve, reject) => {
-        if (!engine) {
-          reject("Please specify an engine");
-          return;
-        }
-        if (!engine.connected) {
-          reject("Please connect to the Plugin Engine 🚀.");
-          this.showMessage("Please connect to the Plugin Engine 🚀.");
-          return;
-        }
-        engine
-          .getFilePath(config)
-          .then(ret => {
-            ret = ret || {};
-            if (ret.success) {
-              resolve(ret.path);
-              this.$forceUpdate();
-            } else {
-              ret.error = ret.error || "";
-              this.showMessage(
-                `Failed to get file path for ${config.url} ${ret.error}`
-              );
-              reject(`Failed to get file path for ${config.url} ${ret.error}`);
-              this.$forceUpdate();
-            }
-          })
-          .catch(reject);
-      });
-    },
-    exportFile(_plugin, file, name) {
-      if (typeof file === "string") {
-        file = new Blob([file], { type: "text/plain;charset=utf-8" });
-      }
-      saveAs(file, name || file._name || "file_export");
     },
     showProgress(_plugin, p) {
       if (p < 1) this.progress = p * 100;

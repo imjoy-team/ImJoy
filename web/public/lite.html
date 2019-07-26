@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>ImJoy-Lite</title>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="description" content="ImJoy -- Deep Learning Made Easy!">
+    <meta name="author" content="Wei OUYANG">
+    <meta name="keywords" content="Bioimaging, image processing">
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@weioyang" />
+    <meta name="twitter:creator" content="@weioyang" />
+    <meta name="twitter:image" content="https://imjoy.io/static/img/imjoy-card-plain.png" />
+    <meta property="og:url" content="https://imjoy.io" />
+    <meta property="og:title" content="ImJoy" />
+    <meta property="og:description" content="ImJoy -- Deep Learning Made Easy!" />
+    <meta property="og:image" content="https://imjoy.io/static/img/imjoy-card-plain.png" />
+    <meta name="format-detection" content="telephone=no">
+    <link rel="apple-touch-icon" sizes="57x57" href="static/icons/apple-icon-57x57.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="static/icons/apple-icon-60x60.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="static/icons/apple-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="static/icons/apple-icon-76x76.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="static/icons/apple-icon-114x114.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="static/icons/apple-icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="static/icons/apple-icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="static/icons/apple-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="static/icons/apple-icon-180x180.png">
+    <link rel="icon" type="image/png" sizes="192x192"  href="static/icons/android-icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="static/icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="static/icons/favicon-96x96.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="static/icons/favicon-16x16.png">
+    <link rel="shortcut icon" href="static/icons/favicon.ico" type="image/x-icon" />
+    <link rel="icon" href="static/icons/favicon.ico" type="image/x-icon" />
+    <link rel="apple-touch-startup-image" href="/launch.png">
+    <link rel="manifest" href="manifest.json">
+    <meta name="msapplication-TileColor" content="#f5f9ff">
+    <meta name="msapplication-TileImage" content="static/icons/ms-icon-144x144.png">
+    <meta name="theme-color" content="#f5f9ff">
+
+    <script src="./imjoy-lib.min.js"></script>
+    <link rel="stylesheet" href="./joy.css">
+    <link rel="stylesheet" href="https://static.imjoy.io/spectre.css/spectre.min.css">
+    <link rel="stylesheet" href="https://static.imjoy.io/spectre.css/spectre-exp.min.css">
+    <link rel="stylesheet" href="https://static.imjoy.io/spectre.css/spectre-icons.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.15.3/axios.min.js"></script>
+    <style>
+        html,
+        body {
+            height: 100%;
+            width: 100%;
+            overflow-y: hidden;
+            overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
+            -webkit-transform: translate3d(0, 0, 0);
+            /* Disables pull-to-refresh but allows overscroll glow effects. */
+            overscroll-behavior-y: contain;
+            overscroll-behavior-x: none;
+            position: fixed;
+            overflow-wrap: break-word;
+        }
+        .navbar .navbar-brand {
+            font-size: 1.2rem;
+        }
+        .whiteboard{
+            width: 100%;
+            height: calc(100vh - 36px);
+        }
+        .window_container{
+            width: 100%;
+            height: 100%;
+        }
+        .site-title-small{
+            height: 32px;
+        }
+        .pointer{
+            cursor: pointer;
+        }
+        .floating {
+            position: absolute !important;
+            left: calc(50% - 1.5rem) !important;
+            top: calc(39% - 1.5rem) !important;
+            z-index: 999;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="modal" id="dialog-container">
+        <a href="#close" class="modal-overlay" aria-label="Close"></a>
+        <div class="modal-container">
+            <div class="modal-header">
+                <a href="#close" class="btn btn-clear float-right" aria-label="Close"
+                    onclick="closeDialog()"></a>
+                <div class="modal-title h5" id="window-dialog-title">Dialog</div>
+            </div>
+            <div class="modal-body">
+                <div class="content">
+                    <div id="window-dialog-container">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <header class="navbar">
+        <section class="navbar-section">
+            <img
+                class="site-title-small"
+                src="https://imjoy.io/static/img/imjoy-logo-black.svg"
+                alt="ImJoy"
+            />
+            <!-- <a href="https://imjoy.io/docs" target="_blank" class="btn btn-link">Docs</a>
+            <a href="https://github.com/oeway/ImJoy" target="_blank" class="btn btn-link">GitHub</a> -->
+        </section>
+        <section class="navbar-section" id="header" style="flex: 0 1 0;">
+            <div class="dropdown dropdown-right">
+                <a class="btn btn-link dropdown-toggle" tabindex="0"><i class="icon icon-more-horiz"></i></a>
+                <ul class="menu" id="plugin-menu">
+                    
+                </ul>
+            </div>
+        </section>
+        <progress class="progress" id="progress" value="100" max="100"></progress>
+    </header>
+    <div class="loading loading-lg floating" id="loading"></div>
+    <div class="whiteboard" id="whiteboard"></div>
+
+    <script>
+        function openDialog() {
+            document.getElementById('dialog-container').classList.add('active')
+        }
+
+        function closeDialog() {
+            document.getElementById('dialog-container').classList.remove('active')
+        }
+
+        function getUrlParameter(name) {
+            name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+            var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+            var results = regex.exec(location.search);
+            return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+        }
+
+        function addWindow(title, id){
+            document.getElementById('header').innerHTML =`
+            <span class="chip pointer" id="header_${id}" onclick="selectWindow('${id}')">
+                ${title}
+                <a href="#" onclick="removeWindow('${id}')" class="btn btn-clear" aria-label="Close" role="button"></a>
+            </span>` + document.getElementById('header').innerHTML;
+
+            document.getElementById('whiteboard').innerHTML =`
+                <div class="window_container" id="${id}"></div>
+            ` + document.getElementById('whiteboard').innerHTML;
+
+            selectWindow(id)
+        }
+
+        function removeWindow(id){
+            document.getElementById('header').removeChild(document.getElementById('header_'+id));
+            document.getElementById('whiteboard').removeChild(document.getElementById(id));
+        }
+
+        function selectWindow(id){
+            for(let c of document.getElementById('whiteboard').children){
+                if(c.id !== 'site-title'){
+                    c.style.display = "none";
+                }
+            } 
+
+            for(let c of document.getElementById('header').children)
+                c.classList.remove('active')
+            selected_window = id;
+            document.getElementById(id).style.display = "block";
+            document.getElementById('header_'+id).classList.add('active')
+        }
+
+        var selected_window = null
+        var imjoy = null
+        var windows = null
+        var imjoy_api = {
+            showMessage(plugin, info, duration){
+                console.log(info)
+            },
+            showProgress(plugin, progress){
+                if (p < 1) progress =  progress * 100;
+                document.getElementById('progress').value = progress
+            },
+            showDialog(_plugin, config) {
+                return new Promise((resolve, reject) => {
+                    document.getElementById('window-dialog-container').innerHTML = '';
+                    if (config.ui) {
+                        openDialog()
+                        const joy_config = {
+                            container:  document.getElementById('window-dialog-container'),
+                            init: config.ui || "", //"{id:'localizationWorkflow', type:'ops'} " + // a list of ops
+                            data: config.data, // || Joy.loadFromURL(),
+                            modules: config.modules || ["instructions", "math"],
+                            onexecute: config.onexecute,
+                            onupdate: config.onupdate,
+                        };
+                        try {
+                            new imjoyLib.Joy(joy_config);
+                        } catch (e) {
+                            console.error("error occured when loading the workflow", e);
+                            joy_config.data = "";
+                            new imjoyLib.Joy(joy_config);
+                            throw e;
+                        }
+                 
+                    } else if (config.type) {
+                        openDialog()
+                        config.window_container = "window-dialog-container";
+                        config.standalone = true;
+                        if (config.type.startsWith("imjoy/")) {
+                            config.render = wconfig => {
+                            };
+                        }
+                        setTimeout(() => {
+                            imjoy.pm.createWindow(null, config)
+                            .then(api => {
+                                const _close = api.close;
+                                api.close = async () => {
+                                    await _close();
+                                    closeDialog();
+                                };
+                                resolve(api);
+                            })
+                            .catch(reject);
+                        }, 0);
+                    } else {
+                        alert("Unsupported dialog type.");
+                    }
+                });
+            },
+        }
+
+        document.addEventListener('DOMContentLoaded', (event) => {
+            imjoy = new imjoyLib.ImJoy({
+                imjoy_api: imjoy_api,
+                show_message_callback: console.log,
+                show_engine_callback: console.log,
+                add_window_callback: async (w)=>{
+                    addWindow(w.name, w.iframe_container)
+                },
+                update_ui_callback: ()=>{}
+            })
+            imjoy.start().then(()=>{
+                windows = imjoy.wm.windows
+                console.log(imjoy)
+                let p = getUrlParameter('plugin');
+                p = p || prompt(`Please type a ImJoy plugin URI to start or pass it with ${window.location.href+'?plugin=XXXXX'}`, 'oeway/ImJoy-Plugins:Welcome');
+                p = p || 'oeway/ImJoy-Plugins:Welcome';
+                if(p){
+                    document.getElementById('loading').style.display = 'block';
+                    imjoy.pm.reloadPluginRecursively({uri: p}).then(async (plugin)=>{
+                        let config = {};
+                        if (plugin.config.ui && plugin.config.ui.indexOf("{") > -1) {
+                            config = await imjoy.pm.imjoy_api.showDialog(
+                                plugin,
+                                plugin.config
+                            );
+                        }
+                        await plugin.api.run({config: config, data: {}})
+                        document.getElementById('loading').style.display = 'none';
+                    }).catch((e)=>{
+                        console.error(e)
+                        alert(`failed to load the plugin, error: ${e}`)
+                        document.getElementById('loading').style.display = 'none';
+                    })
+                }
+            })
+            .catch((e)=>{
+                console.error(e)
+                alert('Error: '+ e)
+            })
+
+            imjoy.event_bus.on("plugin_loaded", (plugin) => {
+                //reload the plugin menu
+                document.getElementById('plugin-menu').innerHTML = ''
+                for(let pn in imjoy.pm.plugin_names){
+                    document.getElementById('plugin-menu').innerHTML = `
+                    <li class="menu-item"><a href="#" onclick="runPlugin('${pn}')">${pn}</a></li>
+                    `+ document.getElementById('plugin-menu').innerHTML
+                }
+            })
+
+            window.runPlugin = (name) => {
+                imjoy.pm.plugin_names[name].api.run({config: {}, data: {}})
+            }
+        })
+    </script>
+</body>
+
+</html>

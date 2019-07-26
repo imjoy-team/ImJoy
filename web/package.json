@@ -1,12 +1,13 @@
 {
   "name": "ImJoy.io",
-  "version": "0.9.83",
+  "version": "0.9.84",
   "private": true,
   "description": "ImJoy -- deep learning made easy.",
   "author": "Wei OUYANG <wei.ouyang@cri-paris.org>",
   "scripts": {
     "serve": "vue-cli-service serve --host 0.0.0.0",
-    "build": "vue-cli-service build",
+    "build": "vue-cli-service build && npm run build-lib",
+    "build-lib": "webpack --config webpack.library.js --mode development && webpack --config webpack.library.js --mode production",
     "test": "vue-cli-service test:unit",
     "check-format": "prettier --check \"{src,tests}/**/**\"",
     "format": "prettier --write \"{src,tests}/**/**\"",
@@ -23,19 +24,20 @@
     "html-webpack-plugin": "^2.30.1",
     "lodash": "^4.17.10",
     "marked": "^0.6.2",
+    "minibus": "^3.1.0",
     "module": "^1.2.5",
     "monaco-editor": "^0.15.6",
     "monaco-editor-webpack-plugin": "^1.7.0",
     "pouchdb-browser": "^7.0.0",
     "register-service-worker": "^1.6.2",
     "socket.io-client": "^2.1.1",
+    "spark-md5": "^3.0.0",
     "spectre.css": "^0.5.8",
     "vue": "^2.5.17",
     "vue-grid-layout": "github:jbaysolutions/vue-grid-layout#9e13ea9",
     "vue-material": "^1.0.0-beta-11",
     "vue-router": "^3.0.1",
-    "xterm": "^3.13.1",
-    "spark-md5": "^3.0.0"
+    "xterm": "^3.13.1"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^3.1.1",
@@ -73,7 +75,8 @@
     "vue-cli-plugin-unit-karma": "^0.5.0",
     "vue-loader": "^15.4.2",
     "vue-template-compiler": "^2.5.17",
-    "webpack": "^4.0.0-beta.2"
+    "webpack": "^4.0.0-beta.2",
+    "webpack-cli": "^3.3.6"
   },
   "eslintConfig": {
     "root": true,

@@ -58,6 +58,42 @@ self.connection = {};
     }
   };
 
+  function _sendToServiceWorker(message) {
+    return new Promise(function(resolve, reject) {
+      if (!navigator.serviceWorker || !navigator.serviceWorker.register) {
+        reject("This browser doesn't support service workers");
+        return;
+      }
+      var messageChannel = new MessageChannel();
+      messageChannel.port1.onmessage = function(event) {
+        if (event.data.error) {
+          reject(event.data.error);
+        } else {
+          resolve(event.data);
+        }
+      };
+
+      navigator.serviceWorker.controller.postMessage(message, [
+        messageChannel.port2,
+      ]);
+    });
+  }
+
+  async function cacheRequirements(requirements) {
+    if (requirements && requirements.length > 0) {
+      for (let req of requirements) {
+        //remove prefix
+        if (req.startsWith("js:")) req = req.slice(3);
+        if (req.startsWith("css:")) req = req.slice(4);
+        if (req.startsWith("cache:")) req = req.slice(6);
+        await _sendToServiceWorker({
+          command: "add",
+          url: req,
+        });
+      }
+    }
+  }
+
   /**
    * Executes the given code in a jailed environment. For web
    * implementation, we're already jailed in the iframe and the
@@ -75,13 +111,23 @@ self.connection = {};
               typeof code.requirements === "string")
           ) {
             try {
-              if (Array.isArray(code.requirements)) {
-                for (var i = 0; i < code.requirements.length; i++) {
+              if (!Array.isArray(code.requirements)) {
+                code.requirements = [code.requirements];
+              }
+              for (var i = 0; i < code.requirements.length; i++) {
+                if (code.requirements[i].startsWith("cache:")) {
+                  //ignore
+                }
+                if (code.requirements[i].startsWith("css:")) {
+                  throw "unable to import css in a webworker";
+                } else {
+                  if (code.requirements[i].startsWith("js:")) {
+                    code.requirements[i] = code.requirements[i].slice(3);
+                  }
                   importScripts(code.requirements[i]);
                 }
-              } else {
-                importScripts(code.requirements);
               }
+              cacheRequirements(code.requirements);
             } catch (e) {
               throw "failed to import required scripts: " +
                 code.requirements.toString();

@@ -55,7 +55,7 @@ export default {
   mounted() {
     this.event_bus = this.$root.$data.store && this.$root.$data.store.event_bus;
     if (this.event_bus) {
-      this.event_bus.$on("plugin_loaded", this.fetchLog);
+      this.event_bus.on("plugin_loaded", this.fetchLog);
     }
     this.log_history = this.w.data.log_history;
     this.plugin_id = this.w.data.plugin_id;
@@ -63,7 +63,7 @@ export default {
   },
   beforeDestroy() {
     if (this.event_bus) {
-      this.event_bus.$off("plugin_loaded", this.fetchLog);
+      this.event_bus.off("plugin_loaded", this.fetchLog);
     }
   },
   methods: {

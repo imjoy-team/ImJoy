@@ -192,7 +192,8 @@ Defines the general properties of a plugin with several fields.
   "inputs": null,
   "outputs": null,
   "env": null,
-  "requirements": null,
+  "permissions": [],
+  "requirements": [],
   "dependencies": []
 }
 ```
@@ -374,6 +375,22 @@ used to create an environment to run the plugin.
 
 For more details see the dedicated [section](development?id=virtual-environments)
 
+#### permissions
+For `window` plugins, the following permissions can be decleared:
+ * same-origin
+ * camera
+ * midi
+ * geolocation
+ * microphone
+ * encrypted-media
+ * full-screen
+ * payment-request
+
+ For example, if your window plugin requires webcam access, add the following permission:
+ ```
+ "permissions": ["camera"],
+ ```
+
 #### requirements
 Defines the plugin requirements.
 
@@ -493,6 +510,12 @@ can be referenced as
 If the url does not end with `.js`, you need to add `js:` before it, for example:
 ```json
 "requirements": ["js:https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@0.11.2"]
+```
+
+For offline access, Javascript and CSS files will be automatically cached if added to `requirements`, 
+if you want add additional files to the offline cache, please use the `cache:` prefix. For example: 
+```json
+"requirements": ["cache:https://use.fontawesome.com/releases/v5.8.2/webfonts/fa-solid-900.woff2"]
 ```
 
 ### Web Python
@@ -807,7 +830,7 @@ Therefore, we provide several different ways to handle loading/saving files for 
 with or without the plugin engine.
 
  *  If the **Plugin Engine** is running, there are three api functions for **all** types of
-    plugins to access the local file system: `api.showFileDialog`, `api.getFileUrl`, `api.getFilePath`.
+    plugins to access the local file system: `api.showFileDialog`, `api.getFileUrl`, `api.requestUploadUrl`.
     Specifically for **Python plugins** running on the plugin engine, files can be directly
     loaded and written to the file system with standard python file operations.
 

@@ -5,6 +5,7 @@ node_modules
 docs/.DS_Store
 __websocket_relay__.js
 ./package-lock.json
+dist/*
 
 # local env files
 .env.local

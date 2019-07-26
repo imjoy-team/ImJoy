@@ -14,7 +14,7 @@ export default {
   mounted() {
     this.$nextTick(() => {
       const updateSize = () => {
-        this.$root.$data.store.event_bus.$emit("resize", {
+        this.$root.$data.store.event_bus.emit("resize", {
           height: window.innerHeight,
           width: window.innerWidth,
         });
