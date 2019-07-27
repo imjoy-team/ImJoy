@@ -117,7 +117,6 @@ if (workbox) {
       });
     }
   });
-
 } else {
   console.log(`Workbox didn't load (plugin service worker)`);
 }
