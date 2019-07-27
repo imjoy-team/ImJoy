@@ -81,7 +81,6 @@ if (workbox) {
   self.addEventListener("message", e => {
     if (e.data.action == "skipWaiting") self.skipWaiting();
   });
-
 } else {
   console.log(`Workbox didn't load`);
 }
