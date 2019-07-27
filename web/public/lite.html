@@ -248,10 +248,14 @@
                 },
                 update_ui_callback: ()=>{}
             })
-            imjoy.start().then(()=>{
+            const workspace = getUrlParameter('workspace') || getUrlParameter('w');
+            const token = getUrlParameter('token') || getUrlParameter('t');
+            const engine = getUrlParameter('engine') || getUrlParameter('e');
+
+            imjoy.start({workspace: workspace, engine: engine, token:token}).then(()=>{
                 windows = imjoy.wm.windows
-                console.log(imjoy)
-                let p = getUrlParameter('plugin');
+                console.log('ImJoy started: ', imjoy)
+                let p = getUrlParameter('plugin') || getUrlParameter('p');
                 p = p || prompt(`Please type a ImJoy plugin URI to start or pass it with ${window.location.href+'?plugin=XXXXX'}`, 'oeway/ImJoy-Plugins:Welcome');
                 p = p || 'oeway/ImJoy-Plugins:Welcome';
                 if(p){
