@@ -212,15 +212,16 @@ var basicConnectionWeb = function() {
           "allow-forms",
           "allow-modals",
           "allow-popups",
+          "allow-same-origin",
         ];
         var allows = "";
-        if (
-          __jailed__path__.substr(0, 7).toLowerCase() == "file://" &&
-          !perm.includes("allow-same-origin")
-        ) {
-          // local instance requires extra permission
-          perm.push("allow-same-origin");
-        }
+        // if (
+        //   __jailed__path__.substr(0, 7).toLowerCase() == "file://" &&
+        //   !perm.includes("allow-same-origin")
+        // ) {
+        //   // local instance requires extra permission
+        //   perm.push("allow-same-origin");
+        // }
         if (config.permissions) {
           if (
             config.permissions.includes("midi") &&
@@ -251,12 +252,6 @@ var basicConnectionWeb = function() {
             !allows.includes("encrypted-media *;")
           ) {
             allows += "encrypted-media *;";
-          }
-          if (
-            (allows || config.permissions.includes("same-origin")) &&
-            !perm.includes("allow-same-origin")
-          ) {
-            perm.push("allow-same-origin");
           }
           if (config.permissions.includes("full-screen")) {
             me._frame.allowfullscreen = "";
