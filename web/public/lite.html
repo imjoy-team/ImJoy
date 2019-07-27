@@ -80,10 +80,16 @@
         .pointer{
             cursor: pointer;
         }
+        #empty-img {
+            width: 128px;
+            position: absolute !important;
+            left: calc(50% - 64px) !important;
+            top: calc(40% - 64px) !important;
+        }
         .floating {
             position: absolute !important;
-            left: calc(50% - 1.5rem) !important;
-            top: calc(39% - 1.5rem) !important;
+            left: calc(50% - 2px) !important;
+            top: calc(39% - 20px) !important;
             z-index: 999;
         }
     </style>
@@ -127,7 +133,9 @@
         <progress class="progress" id="progress" value="100" max="100"></progress>
     </header>
     <div class="loading loading-lg floating" id="loading"></div>
-    <div class="whiteboard" id="whiteboard"></div>
+    <div class="whiteboard" id="whiteboard">
+        <img src="static/img/imjoy-io-icon.svg" id="empty-img">
+    </div>
 
     <script>
         function openDialog() {
@@ -156,12 +164,18 @@
                 <div class="window_container" id="${id}"></div>
             ` + document.getElementById('whiteboard').innerHTML;
 
+            if(document.getElementById('empty-img'))
+            document.getElementById('whiteboard').removeChild(document.getElementById('empty-img'));
+
             selectWindow(id)
         }
 
         function removeWindow(id){
             document.getElementById('header').removeChild(document.getElementById('header_'+id));
             document.getElementById('whiteboard').removeChild(document.getElementById(id));
+            if(document.getElementById('whiteboard').children.length === 0){
+                document.getElementById('whiteboard').innerHTML = `<img src="static/img/imjoy-io-icon.svg" id="empty-img">`
+            }
         }
 
         function selectWindow(id){
