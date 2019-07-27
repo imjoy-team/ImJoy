@@ -228,16 +228,16 @@ self.__precacheManifest = [
     "url": "/static/js/chunk-vendors.1c97cfae.js"
   },
   {
-    "revision": "2a3e222e6a41b32a7180e6afa3675990",
-    "url": "/static/vs/html.worker.js"
+    "revision": "b00449080615ce71a2a8a52aee9f658f",
+    "url": "/static/vs/css.worker.js"
   },
   {
     "revision": "493ef474936217113b20a6573247288a",
     "url": "/static/vs/editor.worker.js"
   },
   {
-    "revision": "b00449080615ce71a2a8a52aee9f658f",
-    "url": "/static/vs/css.worker.js"
+    "revision": "2a3e222e6a41b32a7180e6afa3675990",
+    "url": "/static/vs/html.worker.js"
   },
   {
     "revision": "eba2e5a1f6e5f87938570b298d9e2478",
@@ -340,12 +340,12 @@ self.__precacheManifest = [
     "url": "/static/icons/apple-icon-144x144.png"
   },
   {
-    "revision": "edba2cda2b6fa6c55e9c7c336d2de3b4",
-    "url": "/static/icons/apple-icon-152x152.png"
-  },
-  {
     "revision": "4efc4b6b32a094bfb5aaccbbff3ea510",
     "url": "/static/icons/apple-icon-180x180.png"
+  },
+  {
+    "revision": "edba2cda2b6fa6c55e9c7c336d2de3b4",
+    "url": "/static/icons/apple-icon-152x152.png"
   },
   {
     "revision": "4b6ff72f7ae842e59cc2f40cba35ff52",
