@@ -29,7 +29,7 @@ if (workbox) {
   );
 
   workbox.routing.registerRoute(
-    new RegExp("/.*.(html|css|js)"),
+    new RegExp("/.*\\.(html|css|js)"),
     new workbox.strategies.StaleWhileRevalidate()
   );
 
@@ -82,13 +82,6 @@ if (workbox) {
     if (e.data.action == "skipWaiting") self.skipWaiting();
   });
 
-  self.addEventListener("install", function(event) {
-    event.waitUntil(self.skipWaiting()); // Activate worker immediately
-  });
-
-  self.addEventListener("activate", function(event) {
-    event.waitUntil(self.clients.claim()); // Become available to all pages
-  });
 } else {
   console.log(`Workbox didn't load`);
 }
