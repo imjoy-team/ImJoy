@@ -597,7 +597,7 @@
         } else if (v instanceof Error) {
           console.error(v);
           bObject[k] = { __jailed_type__: "error", __value__: v.toString() };
-        } else if (typeof File !== 'undefined' && v instanceof File) {
+        } else if (typeof File !== "undefined" && v instanceof File) {
           bObject[k] = {
             __jailed_type__: "file",
             __value__: v,
