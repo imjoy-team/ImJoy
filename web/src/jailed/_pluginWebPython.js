@@ -78,11 +78,12 @@ var importScript = function(url) {
     );
   };
 
-  var failure = function() {
+  var failure = function(error) {
     parent.postMessage(
       {
         type: "importFailure",
         url: url,
+        error: error.stack || String(error),
       },
       "*"
     );
@@ -96,7 +97,7 @@ var importScript = function(url) {
   }
 
   if (error) {
-    failure();
+    failure(error);
     throw error;
   }
 };
@@ -236,7 +237,10 @@ var execute = async function(code) {
     parent.postMessage({ type: "executeSuccess" }, "*");
   } catch (e) {
     console.error("failed to execute scripts: ", code, e);
-    parent.postMessage({ type: "executeFailure", error: e.toString() }, "*");
+    parent.postMessage(
+      { type: "executeFailure", error: e.stack || String(e) },
+      "*"
+    );
   }
 };
 

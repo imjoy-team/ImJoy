@@ -49,7 +49,11 @@ self.connection = {};
     }
 
     if (error || typeof returned != "undefined") {
-      self.postMessage({ type: "importFailure", url: url, error: error });
+      self.postMessage({
+        type: "importFailure",
+        url: url,
+        error: error.stack || String(error),
+      });
       if (error) {
         throw error;
       }
@@ -167,7 +171,7 @@ self.connection = {};
       self.postMessage({ type: "executeSuccess" });
     } catch (e) {
       console.error("failed to execute scripts: ", code, e);
-      self.postMessage({ type: "executeFailure", error: e.toString() });
+      self.postMessage({ type: "executeFailure", error: e.stack || String(e) });
     }
   };
 
