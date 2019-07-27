@@ -65,7 +65,7 @@ self.connection = {};
   function _sendToServiceWorker(message) {
     return new Promise(function(resolve, reject) {
       if (!navigator.serviceWorker || !navigator.serviceWorker.register) {
-        reject("This browser doesn't support service workers");
+        reject("Service worker is not support.");
         return;
       }
       var messageChannel = new MessageChannel();
