@@ -32,6 +32,45 @@ var getParamValue = function(paramName) {
   }
 };
 
+var plugin_name = getParamValue("name");
+var plugin_mode = getParamValue("type");
+
+function _sendToServiceWorker(message) {
+  return new Promise(function(resolve, reject) {
+    if (!navigator.serviceWorker || !navigator.serviceWorker.register) {
+      reject("Service worker is not supported.");
+      return;
+    }
+    var messageChannel = new MessageChannel();
+    messageChannel.port1.onmessage = function(event) {
+      if (event.data.error) {
+        reject(event.data.error);
+      } else {
+        resolve(event.data);
+      }
+    };
+
+    navigator.serviceWorker.controller.postMessage(message, [
+      messageChannel.port2,
+    ]);
+  });
+}
+
+async function cacheRequirements(requirements) {
+  if (requirements && requirements.length > 0) {
+    for (let req of requirements) {
+      //remove prefix
+      if (req.startsWith("js:")) req = req.slice(3);
+      if (req.startsWith("css:")) req = req.slice(4);
+      if (req.startsWith("cache:")) req = req.slice(6);
+      await _sendToServiceWorker({
+        command: "add",
+        url: req,
+      });
+    }
+  }
+}
+
 /**
  * Initializes the plugin inside a web worker. May throw an exception
  * in case this was not permitted by the browser.
@@ -53,8 +92,7 @@ var initWebworkerPlugin = function() {
 
   var blobUrl = window.URL.createObjectURL(new Blob([blobCode]));
 
-  var name = getParamValue("name");
-  var worker = new Worker(blobUrl, { name: name || "plugin_webworker" });
+  var worker = new Worker(blobUrl, { name: plugin_name || "plugin_webworker" });
 
   // telling worker to load _pluginWebWorker.js (see blob code above)
   worker.postMessage({
@@ -218,7 +256,6 @@ var initIframePlugin = function() {
   );
 };
 
-var plugin_mode = getParamValue("type");
 if (plugin_mode === "web-worker") {
   try {
     initWebworkerPlugin();
@@ -247,7 +284,7 @@ if ("serviceWorker" in navigator) {
         console.log(
           "ServiceWorker registration successful with scope: ",
           registration.scope,
-          navigator.serviceWorker
+          plugin_name
         );
       },
       function(err) {
@@ -257,3 +294,22 @@ if ("serviceWorker" in navigator) {
     );
   });
 }
+
+// event listener for the plugin message
+window.addEventListener("message", function(e) {
+  var m = e.data.data;
+  if (m.type === "execute") {
+    const code = m.code;
+    if (
+      code.type == "requirements" &&
+      (plugin_mode === "iframe" ||
+        plugin_mode === "window" ||
+        plugin_mode === "web-worker")
+    ) {
+      if (!Array.isArray(code.requirements)) {
+        code.requirements = [code.requirements];
+      }
+      cacheRequirements(code.requirements);
+    }
+  }
+});
