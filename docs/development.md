@@ -511,11 +511,13 @@ If the url does not end with `.js`, you need to add `js:` before it, for example
 "requirements": ["js:https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@0.11.2"]
 ```
 
-For offline access, Javascript and CSS files will be automatically cached if added to `requirements`, 
-if you want add additional files to the offline cache, please use the `cache:` prefix. For example: 
+For offline access, Javascript and CSS files will be automatically cached if added to `requirements`.
+You can also add additional resources (e.g. images, font files) to the offline cache, for example: 
 ```json
-"requirements": ["cache:https://use.fontawesome.com/releases/v5.8.2/webfonts/fa-solid-900.woff2"]
+"requirements": ["https://use.fontawesome.com/releases/v5.8.2/webfonts/fa-solid-900.woff2"]
 ```
+
+Notice that the offline caching process won't trace the dependent resources, you will need to add them as requirements manually in order to be cached.
 
 ### Web Python
 Requirements are specified as a list of strings specifying the required python modules. For instance,
