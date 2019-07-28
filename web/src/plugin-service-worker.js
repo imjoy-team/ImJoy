@@ -86,9 +86,7 @@ if (workbox) {
           case "add":
             // If event.data.url isn't a valid URL, new Request() will throw a TypeError which will be handled
             // by the outer .catch().
-            // Hardcode {mode: 'no-cors} since the default for new Requests constructed from strings is to require
-            // CORS, and we don't have any way of knowing whether an arbitrary URL that a user entered supports CORS.
-            var request = new Request(event.data.url, { mode: "no-cors" });
+            var request = new Request(event.data.url);
             return fetch(request)
               .then(function(response) {
                 plugin_requirements.add(event.data.url);

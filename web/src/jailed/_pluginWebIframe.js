@@ -102,41 +102,6 @@ var importScript = function(url) {
   }
 };
 
-function _sendToServiceWorker(message) {
-  return new Promise(function(resolve, reject) {
-    if (!navigator.serviceWorker || !navigator.serviceWorker.register) {
-      reject("Service worker is not support.");
-      return;
-    }
-    var messageChannel = new MessageChannel();
-    messageChannel.port1.onmessage = function(event) {
-      if (event.data.error) {
-        reject(event.data.error);
-      } else {
-        resolve(event.data);
-      }
-    };
-    navigator.serviceWorker.controller.postMessage(message, [
-      messageChannel.port2,
-    ]);
-  });
-}
-
-async function cacheRequirements(requirements) {
-  if (requirements && requirements.length > 0) {
-    for (let req of requirements) {
-      //remove prefix
-      if (req.startsWith("js:")) req = req.slice(3);
-      if (req.startsWith("css:")) req = req.slice(4);
-      if (req.startsWith("cache:")) req = req.slice(6);
-      await _sendToServiceWorker({
-        command: "add",
-        url: req,
-      });
-    }
-  }
-}
-
 // evaluates the provided string
 var execute = async function(code) {
   try {
@@ -174,7 +139,6 @@ var execute = async function(code) {
                 await importScripts(code.requirements[i]);
               }
             }
-            cacheRequirements(code.requirements);
           } else {
             throw "unsupported requirements definition";
           }
