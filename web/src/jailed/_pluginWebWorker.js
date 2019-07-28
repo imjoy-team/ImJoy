@@ -98,6 +98,8 @@ self.connection = {};
                   importScripts(code.requirements[i]);
                 } else if (code.requirements[i].startsWith("cache:")) {
                   //ignore cache
+                } else if (code.requirements[i].startsWith("http")) {
+                  importScripts(code.requirements[i]);
                 } else {
                   console.log(
                     "Unprocessed requirements url: " + code.requirements[i]
