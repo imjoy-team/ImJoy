@@ -69,8 +69,12 @@ var importScript = function(url) {
     process.send({ type: "importSuccess", url: url });
   };
 
-  var fCb = function() {
-    process.send({ type: "importFailure", url: url });
+  var fCb = function(error) {
+    process.send({
+      type: "importFailure",
+      url: url,
+      error: error.stack || String(error),
+    });
   };
 
   var run = function(code) {
@@ -84,7 +88,7 @@ var importScript = function(url) {
       run(loadLocal(url));
     } catch (e) {
       printError(e.stack);
-      fCb();
+      fCb(e);
     }
   }
 };
@@ -100,8 +104,12 @@ var importScriptJailed = function(url) {
     process.send({ type: "importSuccess", url: url });
   };
 
-  var fCb = function() {
-    process.send({ type: "importFailure", url: url });
+  var fCb = function(error) {
+    process.send({
+      type: "importFailure",
+      url: url,
+      error: error.stack || String(error),
+    });
   };
 
   var run = function(code) {
@@ -115,7 +123,7 @@ var importScriptJailed = function(url) {
       run(loadLocal(url));
     } catch (e) {
       printError(e.stack);
-      fCb();
+      fCb(e);
     }
   }
 };
@@ -132,7 +140,7 @@ var execute = function(code) {
   };
 
   var fCb = function(e) {
-    process.send({ type: "executeFailure", error: e.toString() });
+    process.send({ type: "executeFailure", error: e.stack || String(e) });
   };
 
   executeJailed(code, "DYNAMIC PLUGIN", sCb, fCb);
@@ -154,7 +162,7 @@ var executeNormal = function(code, url, sCb, fCb) {
     sCb();
   } catch (e) {
     printError(e.stack);
-    fCb();
+    fCb(e);
   }
 };
 
@@ -223,7 +231,7 @@ var loadRemote = function(url, sCb, fCb) {
         "HTTP responce status code: " +
         res.statusCode;
       printError(msg);
-      fCb();
+      fCb(msg);
     } else {
       var content = "";
       res.on("end", function() {
@@ -242,7 +250,7 @@ var loadRemote = function(url, sCb, fCb) {
       .on("error", fCb);
   } catch (e) {
     printError(e.stack);
-    fCb();
+    fCb(e);
   }
 };
 
