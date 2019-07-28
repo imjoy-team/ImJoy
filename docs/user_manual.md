@@ -34,14 +34,25 @@ Imjoy consists of **three parts**, each part can be extended with plugins:
 
 1. **Native Computational Backend**. This is supported with the installation of an additional Python module called ["ImJoy Plugin Engine"](https://github.com/oeway/ImJoy-Engine). This allows to access the entire Python ecosystem which covers most of the scientific computing applications. With [Conda](https://conda.io), ImJoy plugin engine handles the requirements of plugins automatically and provide isolate processes and virtual environments for different Python plugins. It provides maximum flexibility and has full access to the file system, GPU and other local or remote resources. The plugin engine can be launched either on the local machine, or remotely on a cloud server or a cluster to perform computationally intensive tasks, e.g. with institutional computing cluster, Amazon Cloud, or Google Compute.
 
-## ImJoy App and Plugin Engine
+## ImJoy App
 
-ImJoy can be used  directly from your browser (Chrome or Firefox)
-**without any installation** as the [ImJoy Web App](https://imjoy.io/#/app)
-or as a **standalone** [ImJoy Desktop App](https://github.com/oeway/ImJoy-App/releases).
-Many plugins can be used directly, and you can already get a feeling
-for how ImJoy works.
+ImJoy can be used directly from your browser (Chrome or Firefox) as the [ImJoy Web App](https://imjoy.io/#/app).
 
+ImJoy is built with a new standard called [Progressive Web App](), which brings enhanced user experience.
+Importantly, a technique called `service worker` allow ImJoy to run and most of the plugins run without internet.
+
+While you can already benifit from the PWA support by go to https://imjoy.io with browsers including Chrome, FireFox and Safari.
+
+The recommended way to use it is to install it as PWA, for example, in Chrome you will find the "Install ImJoy.IO" option when you open https://imjoy.io:
+
+![imjoy-install-pwa](assets/imjoy-install-pwa.png ':size=600')
+
+ImJoy App support mobile devices and tablet, you can find similar install or add to home screen options on mobile browsers such as Safari on iOS and Chrome on Android.
+
+Note that even though ImJoy can run without internet, depending on particular
+plugin implementations, some plugins may still require internet access to function.
+
+# Plugin Engine
 For more advanced processing, the **Python Plugin Engine** is required. The Plugin
 Engine allows to run native Python (`native-python`) plugins. We provide two ways
 to obtain this engine:
@@ -56,125 +67,33 @@ to obtain this engine:
 Once you start the engine, it will automatically check for updates.
 
 You can then connect to the engine either from the Imjoy Web App or Desktop App.
-Click the 🚀 symbol located at the top-right corner. This will open a dialog and
-ask you for the `Plugin Engine URL` and `Connection token`.
+Click the 🚀 symbol located at the top-right corner and select `Add Plugin Engine 🚀`. This will open a dialog and
+ask you for the `Connection token` which can be obtained from your Plugin Engine window or terminal.
 
 ![imjoy-install-engine](assets/imjoy-install-engine.png ':size=600')
 
-You can keep the default `Plugin Engine URL`(`http://127.0.0.1:9527`), and go to
-your Plugin Engine dialog or terminal window to get the `Connection token`.
-
+You can choose to connect to the same computer or another computer. 
 ![imjoy-connection-token](assets/imjoy-connection-token.png ':size=600')
+
+If you choose to connect to another computer or server (e.g. on dedicated processing workstations, computational clusters, or
+the cloud), what you need is to fill in the corresponding `Plugin Engine URL` and the `Connection token`.
 
 Please note, that the connection token will be saved in the browser and you will
 not need to enter it anymore to connect to this Plugin Engine.
 **KEEP THIS TOKEN PRIVATE!!!!**
 
-## Using ImJoy offline
+### Setup a remote plugin engine
 
-The ImJoy app (web or desktop) requires by default internet access. It relies on
-different small libraries that are downloaded at each launch. You can also use the ImJoy app in
-an offline mode. In this case, all necessary files have to be downloaded first.
+By default a local plugin engine won't allow access from outside. In order to make your plugin engine accessible from outside, the easiest way is to use an existing tunnelling service which will expose your plugin engine through a secured public URL.
 
-Note that even though ImJoy can run without internet, depending on particular
-plugin implementations, some might be unusable when offline.
-
-Two options for offline usage exist:
-
-1. **Desktop app**. On the start-up screen you can choose `RUN IMJOY OFFLINE`. If
-  you press this button, the app will download all necessary files required
-  for offline use. After the initial download, you can then use ImJoy offline.
-
-2. **Web app**. If you prefer to use ImJoy in the browser, you can download all
-  necessary files via the plugin engine. For this, you need to install the latest
-  version of the [**ImJoy App**](https://github.com/oeway/ImJoy-Engine/releases).
-  You can then serve the static ImJoy web app. This requires some simple steps in
-  the  terminal:
-
-  1. Update the `$PATH` settings as also [below](#access-the-plugin-engine-from-a-command-line-interface).
-      ```bash
-      # linux and mac
-      export PATH=~/ImJoyApp/bin:$PATH
-
-      # windows
-      $env:Path = '%systemdrive%%homepath%\ImJoyApp;%systemdrive%%homepath%\ImJoyApp\Scripts;' + $env:Path;
-      ```
-  0. Execute the following command in the terminal. This will download all files
-     necessary for offline access.
-      ```bash
-      python -m imjoy --serve
-      ```
-  0. You now have your locally available ImJoy web app that your can access in your browser
-     with this url [(http://127.0.0.1:9527)](http://127.0.0.1:9527).
+There are at least several such services, for example, you can use Telebit to generate an public URL for your plugin eneing:
+1. goto https://telebit.cloud/ and follow the installation guide to install Telebit and register with your email.
+2. Once success, you will get a permenent URL (e.g.: https://shaggy-pig-23.telebit.io ) which can be used later.
+3. Now if you start your plugin engine, and run `~/telebit http 9527`
+4. You or your collabrators can then access your plugin engine remotely with engine url (e.g. https://shaggy-pig-23.telebit.io) and the connection token you get previously.
 
 
-## Access Plugin Engine from command line
-The installation of the Plugin Engine will setup an **Miniconda environment**
-located in `~/ImJoyApp`. You can access this Miniconda environment from the
-command line interface.
-
-For **Linux or MacOS**, you need to add `~/ImJoyApp/bin` to your `$PATH`:
-```bash
-export PATH=~/ImJoyApp/bin:$PATH
-
-# now you can use `conda`, `pip`, `python` provided from ~/ImJoyApp
-which conda
-
-# start the plugin engine
-python -m imjoy
-
-```
-
-For **Windows**, you can use a powershell and add the ImJoyApp to `$env.Path`:
-```bash
-$env:Path = '%systemdrive%%homepath%\ImJoyApp;%systemdrive%%homepath%\ImJoyApp\Scripts;' + $env:Path;
-
-# now you can use `conda`, `pip`, `python` provided from ~/ImJoyApp
-(Get-Command conda.exe).Path
-
-# start the plugin engine
-python -m imjoy
-```
-
-
-## Using the Plugin Engine remotely
-To perform computational intensive calculations you can launch the Plugin Engine
-remotely, e.g. on dedicated processing workstations, computational clusters, or
-the cloud. Please note that the [**ImJoy token system**](#plugin-engine) prevent
-unauthorized access.
-
-Installing and connecting to such a remote Plugin engine can
-be achieved in a few steps. You first install the plugin engine and configure it
-for command line access as [describe above](#access-the-plugin-engine-from-a-command-line-interface).
-You can launch the Plugin Engine from a terminal (e.g. by `ssh`) and specify the
-host to allow outside connections. In order to connect to the Plugin Engine,
-you will need the **connection token** and the `hostname` or the IP address
-of your remote machine. Depending on your IT security restrictions,
-you might need to contact your IT department.
-
-
-1. Install Python plugin engine on the remote computer. If this remote machine is
-  running under Linux, you can connect with SSH, and run a provided installation
-  script: `wget https://raw.githubusercontent.com/oeway/ImJoy-Engine/master/utils/Linux_Install.sh  -O - | bash`.
-  Otherwise, download it from [GitHub](https://github.com/oeway/ImJoy-App/releases).
-
-0. Update the `$PATH` settings as explained [above](#launch-the-plugin-engine-on-remote-machine).
-  For Linux or Mac, use `export PATH=~/ImJoyApp/bin:$PATH`
-
-0. Launch Python plugin engine on remote computer and allow access. We recommend
-  to login the remote server with SSH, start the plugin engine with `python -m imjoy --serve --host=0.0.0.0`.
-  By default, the host is to `127.0.0.1`, which allows only local connections. For remote access, the host is set to `0.0.0.0`.
-  The plugin engine will be launched and serve a copy of the ImJoy app through `http://YOUR_REMOTE_IP:9527`.
-  At the end of the initialisation process, it will display the **connection token**.
-  Copy it from the terminal, since you will need it in the next step. **KEEP THIS TOKEN PRIVATE!!!!**
-
-0. If you have a domain name or host name configured to your host, you can specify it by using `--base_url=YOUR_REMOTE_HOST`. For example:  `python -m imjoy --serve --host=0.0.0.0 --base_url=https://hello-imjoy.com`. With this approach, you can also configure a `https` proxy with [nginx for example](https://docs.nginx.com/nginx/admin-guide/security-controls/securing-http-traffic-upstream/), and then your will be able to use your server with `https://imjoy.io`.
-
-0. On your local machine, use your web browser to access the ImJoy app on the remote machine
-  with `http://YOUR_REMOTE_IP:9527` (instead of `https://imjoy.io` ). Then connect
-  to the plugin engine by using `http://YOUR_REMOTE_IP:9527` as host and
-  the **connection token** you get when you start the engine. If you have `base_url` configured, please replace `YOUR_REMOTE_IP` to your actual domain name or host name.
-
+The nice thing about using telebit is that you will have a fixed URL. Alternatively, you can also try with [ngrok](https://ngrok.com/) if Telebit did not work for you. Importantly, your command will be `ngrok http --host-header=rewrite 9527`. Notice that, although you can use ngrok without signup, but you will have a certain time limit and connection number.
 
 
 <!--
