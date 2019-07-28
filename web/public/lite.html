@@ -75,6 +75,7 @@
             height: 100%;
         }
         .site-title-small{
+            margin-left: 3px;
             height: 32px;
         }
         .pointer{
@@ -97,10 +98,10 @@
 
 <body>
     <div class="modal" id="dialog-container">
-        <a href="#close" class="modal-overlay" aria-label="Close"></a>
+        <a href="#" class="modal-overlay" aria-label="Close"></a>
         <div class="modal-container">
             <div class="modal-header">
-                <a href="#close" class="btn btn-clear float-right" aria-label="Close"
+                <a href="#" class="btn btn-clear float-right" aria-label="Close"
                     onclick="closeDialog()"></a>
                 <div class="modal-title h5" id="window-dialog-title">Dialog</div>
             </div>
@@ -114,11 +115,13 @@
     </div>
     <header class="navbar">
         <section class="navbar-section">
-            <img
+            <a href="/">
+                <img
                 class="site-title-small"
-                src="https://imjoy.io/static/img/imjoy-logo-black.svg"
+                src="static/img/imjoy-logo-black.svg"
                 alt="ImJoy"
-            />
+                />
+            </a>
             <!-- <a href="https://imjoy.io/docs" target="_blank" class="btn btn-link">Docs</a>
             <a href="https://github.com/oeway/ImJoy" target="_blank" class="btn btn-link">GitHub</a> -->
         </section>
@@ -164,27 +167,25 @@
                 <div class="window_container" id="${id}"></div>
             ` + document.getElementById('whiteboard').innerHTML;
 
-            if(document.getElementById('empty-img'))
-            document.getElementById('whiteboard').removeChild(document.getElementById('empty-img'));
-
             selectWindow(id)
         }
 
         function removeWindow(id){
             document.getElementById('header').removeChild(document.getElementById('header_'+id));
             document.getElementById('whiteboard').removeChild(document.getElementById(id));
-            if(document.getElementById('whiteboard').children.length === 0){
-                document.getElementById('whiteboard').innerHTML = `<img src="static/img/imjoy-io-icon.svg" id="empty-img">`
+            if(document.getElementById('whiteboard').children.length === 1){
+                document.getElementById('empty-img').style.display = 'block';
             }
         }
 
         function selectWindow(id){
+            if(!document.getElementById(id))
+            return
             for(let c of document.getElementById('whiteboard').children){
                 if(c.id !== 'site-title'){
                     c.style.display = "none";
                 }
             } 
-
             for(let c of document.getElementById('header').children)
                 c.classList.remove('active')
             selected_window = id;
@@ -270,6 +271,10 @@
                 windows = imjoy.wm.windows
                 console.log('ImJoy started: ', imjoy)
                 let p = getUrlParameter('plugin') || getUrlParameter('p');
+                if(!p && workspace){
+                    document.getElementById('loading').style.display = 'none';
+                    return
+                }
                 p = p || prompt(`Please type a ImJoy plugin URI to start or pass it with ${window.location.href+'?plugin=XXXXX'}`, 'oeway/ImJoy-Plugins:Welcome');
                 p = p || 'oeway/ImJoy-Plugins:Welcome';
                 if(p){
