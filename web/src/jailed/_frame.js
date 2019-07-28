@@ -32,6 +32,9 @@ var getParamValue = function(paramName) {
   }
 };
 
+var plugin_name = getParamValue("name");
+var plugin_mode = getParamValue("type");
+
 function _sendToServiceWorker(message) {
   return new Promise(function(resolve, reject) {
     if (!navigator.serviceWorker || !navigator.serviceWorker.register) {
@@ -89,8 +92,7 @@ var initWebworkerPlugin = function() {
 
   var blobUrl = window.URL.createObjectURL(new Blob([blobCode]));
 
-  var name = getParamValue("name");
-  var worker = new Worker(blobUrl, { name: name || "plugin_webworker" });
+  var worker = new Worker(blobUrl, { name: plugin_name || "plugin_webworker" });
 
   // telling worker to load _pluginWebWorker.js (see blob code above)
   worker.postMessage({
@@ -254,7 +256,6 @@ var initIframePlugin = function() {
   );
 };
 
-var plugin_mode = getParamValue("type");
 if (plugin_mode === "web-worker") {
   try {
     initWebworkerPlugin();
@@ -283,7 +284,7 @@ if ("serviceWorker" in navigator) {
         console.log(
           "ServiceWorker registration successful with scope: ",
           registration.scope,
-          navigator.serviceWorker
+          plugin_name
         );
       },
       function(err) {
