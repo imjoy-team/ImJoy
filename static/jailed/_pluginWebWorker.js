@@ -83,16 +83,23 @@ self.connection = {};
                 code.requirements = [code.requirements];
               }
               for (var i = 0; i < code.requirements.length; i++) {
-                if (code.requirements[i].startsWith("cache:")) {
-                  //ignore
-                }
-                if (code.requirements[i].startsWith("css:")) {
+                if (
+                  code.requirements[i].toLowerCase().endsWith(".css") ||
+                  code.requirements[i].startsWith("css:")
+                ) {
                   throw "unable to import css in a webworker";
-                } else {
+                } else if (
+                  code.requirements[i].toLowerCase().endsWith(".js") ||
+                  code.requirements[i].startsWith("js:")
+                ) {
                   if (code.requirements[i].startsWith("js:")) {
                     code.requirements[i] = code.requirements[i].slice(3);
                   }
                   importScripts(code.requirements[i]);
+                } else {
+                  console.log(
+                    "Unprocessed requirements url: " + code.requirements[i]
+                  );
                 }
               }
             } catch (e) {

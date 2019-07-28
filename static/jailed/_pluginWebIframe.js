@@ -130,13 +130,18 @@ var execute = async function(code) {
                 link_node.rel = "stylesheet";
                 link_node.href = code.requirements[i];
                 document.head.appendChild(link_node);
-              } else if (code.requirements[i].startsWith("cache:")) {
-                // ignore
-              } else {
+              } else if (
+                code.requirements[i].toLowerCase().endsWith(".js") ||
+                code.requirements[i].startsWith("js:")
+              ) {
                 if (code.requirements[i].startsWith("js:")) {
                   code.requirements[i] = code.requirements[i].slice(3);
                 }
                 await importScripts(code.requirements[i]);
+              } else {
+                console.log(
+                  "Unprocessed requirements url: " + code.requirements[i]
+                );
               }
             }
           } else {
