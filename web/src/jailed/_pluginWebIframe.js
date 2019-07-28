@@ -138,6 +138,8 @@ var execute = async function(code) {
                   code.requirements[i] = code.requirements[i].slice(3);
                 }
                 await importScripts(code.requirements[i]);
+              } else if (code.requirements[i].startsWith("cache:")) {
+                //ignore cache
               } else {
                 console.log(
                   "Unprocessed requirements url: " + code.requirements[i]

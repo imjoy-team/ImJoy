@@ -62,6 +62,7 @@ async function cacheRequirements(requirements) {
       //remove prefix
       if (req.startsWith("js:")) req = req.slice(3);
       if (req.startsWith("css:")) req = req.slice(4);
+      if (req.startsWith("cache:")) req = req.slice(6);
       if (!req.startsWith("http")) continue;
       await _sendToServiceWorker({
         command: "add",
@@ -104,6 +105,9 @@ var initWebworkerPlugin = function() {
   // initialization without exception, handling this with timeout
   var fallbackTimeout = setTimeout(function() {
     worker.terminate();
+    console.warn(
+      `Plugin ${plugin_name} failed to start as a web-worker, running in an iframe instead.`
+    );
     initIframePlugin();
   }, 2000);
 
