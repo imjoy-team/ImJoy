@@ -961,12 +961,14 @@ export class PluginManager {
                 null
               );
             }
-            this.reloadPlugin(config).then(plugin => {
-              resolve(plugin);
-            });
+            this.reloadPlugin(config)
+              .then(plugin => {
+                resolve(plugin);
+              })
+              .catch(reject);
           } catch (error) {
-            alert(`Failed to load dependencies for ${config.name}: ${error}`);
-            throw `Failed to load dependencies for ${config.name}: ${error}`;
+            //alert(`Failed to load dependencies for ${config.name}: ${error}`);
+            reject(`Failed to load dependencies for ${config.name}: ${error}`);
           }
         })
         .catch(e => {
@@ -1057,10 +1059,9 @@ export class PluginManager {
             resolve(template);
             if (!do_not_load) this.reloadPlugin(template);
           } catch (error) {
-            alert(
+            reject(
               `Failed to install dependencies for ${config.name}: ${error}`
             );
-            throw `Failed to install dependencies for ${config.name}: ${error}`;
           }
         })
         .catch(e => {

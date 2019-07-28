@@ -105,15 +105,26 @@ export class ImJoy {
     }
   }
 
-  async start(workspace) {
+  async start(config) {
     await this.init();
-    await this.pm.loadWorkspace(workspace);
-    await this.pm.reloadPlugins(false);
-    const connections = this.em.connectAll(true);
+    if (config.workspace) {
+      await this.pm.loadWorkspace(config.workspace);
+      await this.pm.reloadPlugins(false);
+    }
+
     try {
-      await connections;
+      if (config.engine) {
+        await this.em.addEngine(
+          { type: "default", url: config.engine, token: config.token },
+          false
+        );
+        await this.em.getEngineByUrl(config.engine).connect();
+      } else {
+        const connections = this.em.connectAll(true);
+        await connections;
+      }
     } catch (e) {
-      console.error(e);
+      console.error("Failed to connect the plugin engine(s)", e);
     }
   }
 
