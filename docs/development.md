@@ -511,10 +511,10 @@ If the url does not end with `.js`, you need to add `js:` before it, for example
 "requirements": ["js:https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@0.11.2"]
 ```
 
-For offline access, Javascript and CSS files will be automatically cached if added to `requirements`.
-You can also add additional resources (e.g. images, font files) to the offline cache, for example: 
+For **offline access**, Javascript and CSS files will be automatically cached if added to `requirements`.
+You can also add additional resources (e.g. images, font files) to the offline cache by using `cache:` prefix, for example: 
 ```json
-"requirements": ["https://use.fontawesome.com/releases/v5.8.2/webfonts/fa-solid-900.woff2"]
+"requirements": ["cache:https://use.fontawesome.com/releases/v5.8.2/webfonts/fa-solid-900.woff2"]
 ```
 
 Notice that the offline caching process won't trace the dependent resources, you will need to add them as requirements manually in order to be cached.
@@ -526,6 +526,8 @@ Requirements are specified as a list of strings specifying the required python m
 "requirements": ["numpy", "matplotlib"]
 ```
 By default, the packages are loaded from our static hosting on Github (https://github.com/oeway/static.imjoy.io/tree/master/docs/pyodide). Specifically for `scipy`, you need to include an absolute url: `"requirements": ["https://alpha.iodide.app/pyodide-0.10.0/scipy.js"]`.
+
+If you want to import additional js file, you need to use the `js:` prefix before the javascript url.
 
 Please note that `web-python` plugins are based on [pyodide](https://github.com/iodide-project/pyodide/)
 and only a limited number of python modules is currently supported.

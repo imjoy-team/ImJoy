@@ -174,13 +174,20 @@ var execute = async function(code) {
               link_node.href = code.requirements[i];
               document.head.appendChild(link_node);
             } else if (
-              code.requirements[i].toLowerCase().endsWith(".js") ||
+              // code.requirements[i].toLowerCase().endsWith(".js") ||
               code.requirements[i].startsWith("js:")
             ) {
               if (code.requirements[i].startsWith("js:")) {
                 code.requirements[i] = code.requirements[i].slice(3);
               }
               await importScripts(code.requirements[i]);
+            } else if (code.requirements[i].startsWith("cache:")) {
+              //ignore cache
+            } else if (
+              code.requirements[i].toLowerCase().endsWith(".js") ||
+              code.requirements[i].startsWith("package:")
+            ) {
+              python_packages.push(code.requirements[i]);
             } else if (
               code.requirements[i].startsWith("http:") ||
               code.requirements[i].startsWith("https:")
@@ -188,8 +195,6 @@ var execute = async function(code) {
               console.log(
                 "Unprocessed requirements url: " + code.requirements[i]
               );
-            } else {
-              python_packages.push(code.requirements[i]);
             }
           }
           await pyodide.loadPackage(python_packages);
