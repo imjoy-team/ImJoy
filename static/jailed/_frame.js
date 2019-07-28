@@ -62,6 +62,7 @@ async function cacheRequirements(requirements) {
       //remove prefix
       if (req.startsWith("js:")) req = req.slice(3);
       if (req.startsWith("css:")) req = req.slice(4);
+      if (req.startsWith("cache:")) req = req.slice(6);
       if (!req.startsWith("http")) continue;
       await _sendToServiceWorker({
         command: "add",
@@ -104,6 +105,9 @@ var initWebworkerPlugin = function() {
   // initialization without exception, handling this with timeout
   var fallbackTimeout = setTimeout(function() {
     worker.terminate();
+    console.warn(
+      `Plugin ${plugin_name} failed to start as a web-worker, running in an iframe instead.`
+    );
     initIframePlugin();
   }, 2000);
 
@@ -289,12 +293,7 @@ window.addEventListener("message", function(e) {
   var m = e.data.data;
   if (m.type === "execute") {
     const code = m.code;
-    if (
-      code.type == "requirements" &&
-      (plugin_mode === "iframe" ||
-        plugin_mode === "window" ||
-        plugin_mode === "web-worker")
-    ) {
+    if (code.type == "requirements") {
       if (!Array.isArray(code.requirements)) {
         code.requirements = [code.requirements];
       }

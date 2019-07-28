@@ -12,7 +12,7 @@ self.__precacheManifest = [
     "url": "static/jailed/_frame.html"
   },
   {
-    "revision": "ea5512ea5ccf7376069bc30d0d67eeac",
+    "revision": "ef8b3ae0240001ce81cdd8c7a5c3c1ab",
     "url": "static/jailed/_frame.js"
   },
   {
@@ -28,15 +28,15 @@ self.__precacheManifest = [
     "url": "static/jailed/_pluginNode.js"
   },
   {
-    "revision": "af6581f070527cc1f9b122a7d851c26e",
+    "revision": "bec7ee5292622fd586ed55cc93233b32",
     "url": "static/jailed/_pluginWebIframe.js"
   },
   {
-    "revision": "b2bb2da592620ad99e859f8620ee62d3",
+    "revision": "ed7834e08ce272be1672beaa5df5cba7",
     "url": "static/jailed/_pluginWebPython.js"
   },
   {
-    "revision": "371af655ce847e3bc17c6da1e6c31d5e",
+    "revision": "e7141647a854664055e32db6563988fb",
     "url": "static/jailed/_pluginWebWorker.js"
   },
   {
