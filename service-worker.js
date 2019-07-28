@@ -1,4 +1,4 @@
-importScripts("/precache-manifest.259fc348a7b5a3ba7b1b95f11b38ef65.js", "https://storage.googleapis.com/workbox-cdn/releases/3.6.3/workbox-sw.js");
+importScripts("/precache-manifest.b50acb205c1fb5a55f45d7c4b0f152f3.js", "https://storage.googleapis.com/workbox-cdn/releases/3.6.3/workbox-sw.js");
 
 /* eslint-disable */
 
@@ -22,12 +22,22 @@ if (workbox) {
 
   workbox.routing.registerRoute(
     new RegExp("/static/.*"),
-    new workbox.strategies.NetworkFirst()
+    new workbox.strategies.StaleWhileRevalidate()
+  );
+
+  workbox.routing.registerRoute(
+    new RegExp("/docs/.*"),
+    new workbox.strategies.StaleWhileRevalidate()
+  );
+
+  workbox.routing.registerRoute(
+    new RegExp("/.*\\.(html|css|js)"),
+    new workbox.strategies.StaleWhileRevalidate()
   );
 
   workbox.routing.registerRoute(
     new RegExp("(http|https)://lib.imjoy.io/.*"),
-    new workbox.strategies.NetworkFirst()
+    new workbox.strategies.StaleWhileRevalidate()
   );
 
   //communitations
@@ -38,7 +48,7 @@ if (workbox) {
 
   workbox.routing.registerRoute(
     new RegExp("https://static.imjoy.io/.*"),
-    new workbox.strategies.NetworkFirst()
+    new workbox.strategies.StaleWhileRevalidate()
   );
 
   // manifest.imjoy.json etc.
@@ -55,7 +65,7 @@ if (workbox) {
   // badges
   workbox.routing.registerRoute(
     new RegExp("https://img.shields.io/.*"),
-    new workbox.strategies.NetworkFirst()
+    new workbox.strategies.StaleWhileRevalidate()
   );
 
   workbox.routing.registerRoute(
@@ -65,21 +75,13 @@ if (workbox) {
 
   workbox.routing.registerRoute(
     new RegExp("https://zenodo.org/badge/.*"),
-    new workbox.strategies.NetworkFirst()
+    new workbox.strategies.StaleWhileRevalidate()
   );
 
   workbox.routing.setDefaultHandler(new workbox.strategies.NetworkOnly());
 
   self.addEventListener("message", e => {
     if (e.data.action == "skipWaiting") self.skipWaiting();
-  });
-
-  self.addEventListener("install", function(event) {
-    event.waitUntil(self.skipWaiting()); // Activate worker immediately
-  });
-
-  self.addEventListener("activate", function(event) {
-    event.waitUntil(self.clients.claim()); // Become available to all pages
   });
 } else {
   console.log(`Workbox didn't load`);

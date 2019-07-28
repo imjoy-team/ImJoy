@@ -75,15 +75,22 @@
             height: 100%;
         }
         .site-title-small{
+            margin-left: 3px;
             height: 32px;
         }
         .pointer{
             cursor: pointer;
         }
+        #empty-img {
+            width: 128px;
+            position: absolute !important;
+            left: calc(50% - 64px) !important;
+            top: calc(40% - 64px) !important;
+        }
         .floating {
             position: absolute !important;
-            left: calc(50% - 1.5rem) !important;
-            top: calc(39% - 1.5rem) !important;
+            left: calc(50% - 2px) !important;
+            top: calc(39% - 20px) !important;
             z-index: 999;
         }
     </style>
@@ -91,10 +98,10 @@
 
 <body>
     <div class="modal" id="dialog-container">
-        <a href="#close" class="modal-overlay" aria-label="Close"></a>
+        <a href="#" class="modal-overlay" aria-label="Close"></a>
         <div class="modal-container">
             <div class="modal-header">
-                <a href="#close" class="btn btn-clear float-right" aria-label="Close"
+                <a href="#" class="btn btn-clear float-right" aria-label="Close"
                     onclick="closeDialog()"></a>
                 <div class="modal-title h5" id="window-dialog-title">Dialog</div>
             </div>
@@ -108,11 +115,13 @@
     </div>
     <header class="navbar">
         <section class="navbar-section">
-            <img
+            <a href="/">
+                <img
                 class="site-title-small"
-                src="https://imjoy.io/static/img/imjoy-logo-black.svg"
+                src="static/img/imjoy-logo-black.svg"
                 alt="ImJoy"
-            />
+                />
+            </a>
             <!-- <a href="https://imjoy.io/docs" target="_blank" class="btn btn-link">Docs</a>
             <a href="https://github.com/oeway/ImJoy" target="_blank" class="btn btn-link">GitHub</a> -->
         </section>
@@ -127,7 +136,9 @@
         <progress class="progress" id="progress" value="100" max="100"></progress>
     </header>
     <div class="loading loading-lg floating" id="loading"></div>
-    <div class="whiteboard" id="whiteboard"></div>
+    <div class="whiteboard" id="whiteboard">
+        <img src="static/img/imjoy-io-icon.svg" id="empty-img">
+    </div>
 
     <script>
         function openDialog() {
@@ -162,15 +173,19 @@
         function removeWindow(id){
             document.getElementById('header').removeChild(document.getElementById('header_'+id));
             document.getElementById('whiteboard').removeChild(document.getElementById(id));
+            if(document.getElementById('whiteboard').children.length === 1){
+                document.getElementById('empty-img').style.display = 'block';
+            }
         }
 
         function selectWindow(id){
+            if(!document.getElementById(id))
+            return
             for(let c of document.getElementById('whiteboard').children){
                 if(c.id !== 'site-title'){
                     c.style.display = "none";
                 }
             } 
-
             for(let c of document.getElementById('header').children)
                 c.classList.remove('active')
             selected_window = id;
@@ -248,10 +263,18 @@
                 },
                 update_ui_callback: ()=>{}
             })
-            imjoy.start().then(()=>{
+            const workspace = getUrlParameter('workspace') || getUrlParameter('w');
+            const token = getUrlParameter('token') || getUrlParameter('t');
+            const engine = getUrlParameter('engine') || getUrlParameter('e');
+
+            imjoy.start({workspace: workspace, engine: engine, token:token}).then(()=>{
                 windows = imjoy.wm.windows
-                console.log(imjoy)
-                let p = getUrlParameter('plugin');
+                console.log('ImJoy started: ', imjoy)
+                let p = getUrlParameter('plugin') || getUrlParameter('p');
+                if(!p && workspace){
+                    document.getElementById('loading').style.display = 'none';
+                    return
+                }
                 p = p || prompt(`Please type a ImJoy plugin URI to start or pass it with ${window.location.href+'?plugin=XXXXX'}`, 'oeway/ImJoy-Plugins:Welcome');
                 p = p || 'oeway/ImJoy-Plugins:Welcome';
                 if(p){

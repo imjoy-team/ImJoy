@@ -1,11 +1,11 @@
 self.__precacheManifest = [
   {
-    "revision": "1e4e937dd885078acc6f",
+    "revision": "38f59cb6b5b22ac795f3",
     "url": "/static/css/app.84275f50.css"
   },
   {
-    "revision": "1e4e937dd885078acc6f",
-    "url": "/static/js/app.d4745faa.js"
+    "revision": "38f59cb6b5b22ac795f3",
+    "url": "/static/js/app.b3013707.js"
   },
   {
     "revision": "b8859e2632feade2aed6",
@@ -232,15 +232,15 @@ self.__precacheManifest = [
     "url": "/static/vs/css.worker.js"
   },
   {
-    "revision": "493ef474936217113b20a6573247288a",
-    "url": "/static/vs/editor.worker.js"
-  },
-  {
     "revision": "2a3e222e6a41b32a7180e6afa3675990",
     "url": "/static/vs/html.worker.js"
   },
   {
-    "revision": "eba2e5a1f6e5f87938570b298d9e2478",
+    "revision": "493ef474936217113b20a6573247288a",
+    "url": "/static/vs/editor.worker.js"
+  },
+  {
+    "revision": "986b5fff1dfffb9067f46b41ecbf0638",
     "url": "/index.html"
   },
   {
@@ -252,7 +252,7 @@ self.__precacheManifest = [
     "url": "/404.html"
   },
   {
-    "revision": "942a7676c4f36185b322641263b290e3",
+    "revision": "0d78f0602f60a69c442625bd1761c819",
     "url": "/lite.html"
   },
   {
@@ -340,12 +340,12 @@ self.__precacheManifest = [
     "url": "/static/icons/apple-icon-144x144.png"
   },
   {
-    "revision": "4efc4b6b32a094bfb5aaccbbff3ea510",
-    "url": "/static/icons/apple-icon-180x180.png"
-  },
-  {
     "revision": "edba2cda2b6fa6c55e9c7c336d2de3b4",
     "url": "/static/icons/apple-icon-152x152.png"
+  },
+  {
+    "revision": "4efc4b6b32a094bfb5aaccbbff3ea510",
+    "url": "/static/icons/apple-icon-180x180.png"
   },
   {
     "revision": "4b6ff72f7ae842e59cc2f40cba35ff52",
@@ -724,10 +724,6 @@ self.__precacheManifest = [
     "url": "/static/vs/editor/editor.main.nls.ko.js"
   },
   {
-    "revision": "a6a8191b3898b9a0ca4ee9d165c32d2e",
-    "url": "/static/vs/editor/editor.main.nls.ru.js"
-  },
-  {
     "revision": "bb56d521fd9e0ac3bcb5c468907300ea",
     "url": "/static/vs/editor/editor.main.nls.zh-cn.js"
   },
@@ -766,6 +762,10 @@ self.__precacheManifest = [
   {
     "revision": "11a854433bcc74085be053c3ab713b15",
     "url": "/static/vs/language/css/cssWorker.js"
+  },
+  {
+    "revision": "a6a8191b3898b9a0ca4ee9d165c32d2e",
+    "url": "/static/vs/editor/editor.main.nls.ru.js"
   },
   {
     "revision": "51880b243dfb4c0a65c406b155e9a716",

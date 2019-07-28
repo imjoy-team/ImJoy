@@ -49,7 +49,11 @@ self.connection = {};
     }
 
     if (error || typeof returned != "undefined") {
-      self.postMessage({ type: "importFailure", url: url, error: error });
+      self.postMessage({
+        type: "importFailure",
+        url: url,
+        error: error.stack || String(error),
+      });
       if (error) {
         throw error;
       }
@@ -61,7 +65,7 @@ self.connection = {};
   function _sendToServiceWorker(message) {
     return new Promise(function(resolve, reject) {
       if (!navigator.serviceWorker || !navigator.serviceWorker.register) {
-        reject("This browser doesn't support service workers");
+        reject("Service worker is not support.");
         return;
       }
       var messageChannel = new MessageChannel();
@@ -167,7 +171,7 @@ self.connection = {};
       self.postMessage({ type: "executeSuccess" });
     } catch (e) {
       console.error("failed to execute scripts: ", code, e);
-      self.postMessage({ type: "executeFailure", error: e.toString() });
+      self.postMessage({ type: "executeFailure", error: e.stack || String(e) });
     }
   };
 

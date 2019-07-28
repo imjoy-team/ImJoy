@@ -37,7 +37,10 @@ if (__is__node__) {
   __jailed__path__ = __dirname + "/";
 } else {
   // web
-  if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
+  if (
+    location.search.includes("debug_jailed=1") &&
+    (location.hostname === "localhost" || location.hostname === "127.0.0.1")
+  ) {
     __jailed__path__ = `${location.protocol}//${location.hostname}${
       location.port ? ":" + location.port : ""
     }/static/jailed/`;
