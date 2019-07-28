@@ -28,7 +28,7 @@ self.__precacheManifest = [
     "url": "static/jailed/_pluginNode.js"
   },
   {
-    "revision": "bec7ee5292622fd586ed55cc93233b32",
+    "revision": "338f5de11f5e94533510a4d7add6407f",
     "url": "static/jailed/_pluginWebIframe.js"
   },
   {
@@ -36,7 +36,7 @@ self.__precacheManifest = [
     "url": "static/jailed/_pluginWebPython.js"
   },
   {
-    "revision": "e7141647a854664055e32db6563988fb",
+    "revision": "fe7b7b24efd69da34f24d8f782067799",
     "url": "static/jailed/_pluginWebWorker.js"
   },
   {
