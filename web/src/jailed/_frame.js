@@ -293,12 +293,7 @@ window.addEventListener("message", function(e) {
   var m = e.data.data;
   if (m.type === "execute") {
     const code = m.code;
-    if (
-      code.type == "requirements" &&
-      (plugin_mode === "iframe" ||
-        plugin_mode === "window" ||
-        plugin_mode === "web-worker")
-    ) {
+    if (code.type == "requirements") {
       if (!Array.isArray(code.requirements)) {
         code.requirements = [code.requirements];
       }
