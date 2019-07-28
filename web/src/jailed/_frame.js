@@ -62,7 +62,6 @@ async function cacheRequirements(requirements) {
       //remove prefix
       if (req.startsWith("js:")) req = req.slice(3);
       if (req.startsWith("css:")) req = req.slice(4);
-      if (req.startsWith("cache:")) req = req.slice(6);
       await _sendToServiceWorker({
         command: "add",
         url: req,
@@ -182,17 +181,6 @@ var initWebPythonIframePlugin = function() {
   window.addEventListener("error", function() {
     currentErrorHandler();
   });
-
-  // window.loadScript(
-  //     __pyodide__path__ + 'pyodide.js',
-  //     function(){
-  //       languagePluginLoader.then(() => {
-  //         // pyodide is now ready to use...
-  //         console.log(pyodide.runPython('import sys\nsys.version'));
-  //       });
-  //     }, function(){
-  //     }
-  // );
 
   window.loadScript(
     __jailed__path__ + "_pluginWebPython.js",

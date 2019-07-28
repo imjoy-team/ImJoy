@@ -613,8 +613,8 @@
           v instanceof Date ||
           v instanceof RegExp ||
           v instanceof Blob ||
-          v instanceof FileList ||
-          v instanceof ImageData
+          (typeof FileList !== "undefined" && v instanceof FileList) ||
+          (typeof ImageData !== "undefined" && v instanceof ImageData)
         ) {
           bObject[k] = { __jailed_type__: "argument", __value__: v };
         } else if (v instanceof ArrayBuffer) {
