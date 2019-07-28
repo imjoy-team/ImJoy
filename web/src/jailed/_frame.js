@@ -62,6 +62,7 @@ async function cacheRequirements(requirements) {
       //remove prefix
       if (req.startsWith("js:")) req = req.slice(3);
       if (req.startsWith("css:")) req = req.slice(4);
+      if (!req.startsWith("http")) continue;
       await _sendToServiceWorker({
         command: "add",
         url: req,
