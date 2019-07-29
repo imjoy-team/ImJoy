@@ -1375,7 +1375,7 @@ $env:Path = '%systemdrive%%homepath%\ImJoyApp;%systemdrive%%homepath%\ImJoyApp\S
 python -m imjoy
 ```
 
-## Serve your own ImJoy app and the Plugin Engine
+## Setup your own server for ImJoy App and the Plugin Engine
 
 While you can run the plugin engine to run computation tasks, you can also use it to serve a mirrored version of ImJoy app (with the `--serve` option).
 Follow these steps, and you will be able to run ImJoy server and the plugin engine yourself:

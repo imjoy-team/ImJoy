@@ -45,14 +45,14 @@ While you can already benifit from the PWA support by go to https://imjoy.io wit
 
 The recommended way to use it is to install it as PWA, for example, in Chrome you will find the "Install ImJoy.IO" option when you open https://imjoy.io:
 
-![imjoy-install-pwa](assets/imjoy-install-pwa.png ':size=600')
+![imjoy-install-pwa](assets/imjoy-install-pwa.gif ':size=600')
 
 ImJoy App support mobile devices and tablet, you can find similar install or add to home screen options on mobile browsers such as Safari on iOS and Chrome on Android.
 
 Note that even though ImJoy can run without internet, depending on particular
 plugin implementations, some plugins may still require internet access to function.
 
-# Plugin Engine
+## Plugin Engine
 For more advanced processing, the **Python Plugin Engine** is required. The Plugin
 Engine allows to run native Python (`native-python`) plugins. We provide two ways
 to obtain this engine:
@@ -60,6 +60,7 @@ to obtain this engine:
 1.  The plugin engine is included in the ImJoy Desktop App. After installing the
     [Desktop App](https://github.com/oeway/ImJoy-App/releases), you can start the engine
     with the button `START PLUGINE ENGINE`.
+    
     ![imjoy-app-start-screen](assets/imjoy-app-start-screen.png ':size=400')
 
 2. You can download and install it with a command line script as described [here](https://github.com/oeway/ImJoy-engine).
@@ -70,10 +71,9 @@ You can then connect to the engine either from the Imjoy Web App or Desktop App.
 Click the 🚀 symbol located at the top-right corner and select `Add Plugin Engine 🚀`. This will open a dialog and
 ask you for the `Connection token` which can be obtained from your Plugin Engine window or terminal.
 
-![imjoy-install-engine](assets/imjoy-install-engine.png ':size=600')
+![imjoy-connection-token](assets/imjoy-connection-token.png ':size=400')
 
 You can choose to connect to the same computer or another computer. 
-![imjoy-connection-token](assets/imjoy-connection-token.png ':size=600')
 
 If you choose to connect to another computer or server (e.g. on dedicated processing workstations, computational clusters, or
 the cloud), what you need is to fill in the corresponding `Plugin Engine URL` and the `Connection token`.
