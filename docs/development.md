@@ -405,6 +405,9 @@ For `window` plugins, the following permissions can be decleared:
  "permissions": ["camera"],
  ```
 
+ **Notice** devices such as camera and microphone can only work when ImJoy is served as `https`, this means your plugin will work if you run it from https://imjoy.io, but it won't run if you are using your own ImJoy server served through `http`. A workaround is to run a tunneling service such as [Telebit](https://telebit.cloud) or [ngrok](https://ngrok.com) to convert your `http` url to `https`. Again, you won't need this if you use https://imjoy.io.
+
+
 #### requirements
 Defines the plugin requirements.
 
