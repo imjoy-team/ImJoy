@@ -158,6 +158,12 @@
           <md-radio v-model="url_type" value="remote"
             >Another Computer</md-radio
           >
+          <p v-if="url_type === 'remote'">
+            You may want to use
+            <a href="https://telebit.cloud/" target="_blank">Telebit</a> or
+            <a href="https://ngrok.com/" target="_blank">ngrok</a> to make your
+            plugin engine available outside your network.
+          </p>
         </div>
         <md-autocomplete
           v-if="url_type === 'remote'"

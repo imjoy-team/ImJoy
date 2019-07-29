@@ -58,6 +58,21 @@ Congratulations! You just made your first ImJoy plugin.
 
 Feel free to modify the code, save and run again. To understand more, please proceed further.
 
+If you are new to web development (Javascript, HTML, CSS etc.), you may want to take a look at a few tutorials on [W3School](https://www.w3schools.com/).
+
+Specifically, we recommend to go through the following tutorials:
+ * [HTML](https://www.w3schools.com/html/default.asp) for adding elements such as text box and buttons to the web user interface;
+ * [CSS](https://www.w3schools.com/css/default.asp) for changing the visual style of HTML elements;
+ * [Javascript](https://www.w3schools.com/js/default.asp) for operating the HTML/CSS, perform logic code and computation;
+ * [JSON](https://www.w3schools.com/js/js_json_syntax.asp) is a format we used to configure plugins.
+ * [Python](https://www.w3schools.com/python/default.asp) for perform computation tasks.
+
+An important programming style you are going to use heavily in ImJoy plugin development is Asynchronous Programming. It is a way to achieve concurency (alternative to `Processes` and `Threads`), such that you can perform mulitple operations(e.g. run independent steps in a workflow) concurrently. For more information about Asynchronous programming, we refer to a number of excellent ressources:
+
+* [Introduction to Promise in JS](https://developers.google.com/web/fundamentals/primers/promises)
+* [Async functions for JS](https://developers.google.com/web/fundamentals/primers/async-functions)
+* [Async programming in Python](http://maked.io/async-programming-in-python/)
+
 ### Debugging
 During plugin development, errors and related information will be forwarded
 and shown in the status bar or as message in the snackbar.
@@ -389,6 +404,9 @@ For `window` plugins, the following permissions can be decleared:
  ```
  "permissions": ["camera"],
  ```
+
+ **Notice** devices such as camera and microphone can only work when ImJoy is served as `https`, this means your plugin will work if you run it from https://imjoy.io, but it won't run if you are using your own ImJoy server served through `http`. A workaround is to run a tunneling service such as [Telebit](https://telebit.cloud) or [ngrok](https://ngrok.com) to convert your `http` url to `https`. Again, you won't need this if you use https://imjoy.io.
+
 
 #### requirements
 Defines the plugin requirements.
@@ -1345,3 +1363,61 @@ The following url parameters are currently supported:
       If you are starting a window plugin, you can also set `standalone` or `fullscreen` to `1` to make the window detached from the workspace or in full screen mode. For example: `https://imjoy.io/#/app?x=123&start=AwesomeWindowPlugin&fullscreen=1`.
 
  *   `load` or `l`: define an URL for making a http GET request, this parameter should only used when you defined a startup plugin with `start` or `s`. The data fetched from the URL will be passed to the startup plugin `run(ctx)` function as `ctx.data.loaded`.
+
+
+## Access Plugin Engine from command line
+The installation of the Plugin Engine will setup an **Miniconda environment**
+located in `~/ImJoyApp`. You can access this Miniconda environment from the
+command line interface.
+
+For **Linux or MacOS**, you need to add `~/ImJoyApp/bin` to your `$PATH`:
+```bash
+export PATH=~/ImJoyApp/bin:$PATH
+
+# now you can use `conda`, `pip`, `python` provided from ~/ImJoyApp
+which conda
+
+# start the plugin engine
+python -m imjoy
+
+```
+
+For **Windows**, you can use a powershell and add the ImJoyApp to `$env.Path`:
+```bash
+$env:Path = '%systemdrive%%homepath%\ImJoyApp;%systemdrive%%homepath%\ImJoyApp\Scripts;' + $env:Path;
+
+# now you can use `conda`, `pip`, `python` provided from ~/ImJoyApp
+(Get-Command conda.exe).Path
+
+# start the plugin engine
+python -m imjoy
+```
+
+## Setup your own server for ImJoy App and the Plugin Engine
+
+While you can run the plugin engine to run computation tasks, you can also use it to serve a mirrored version of ImJoy app (with the `--serve` option).
+Follow these steps, and you will be able to run ImJoy server and the plugin engine yourself:
+
+1. Install Python plugin engine on the remote computer. If this remote machine is
+  running under Linux, you can connect with SSH, and run a provided installation
+  script: `wget https://raw.githubusercontent.com/oeway/ImJoy-Engine/master/utils/Linux_Install.sh  -O - | bash`.
+  Otherwise, download it from [GitHub](https://github.com/oeway/ImJoy-App/releases).
+
+0. Update the `$PATH` settings as explained [above](#access-the-plugin-engine-from-a-command-line-interface).
+  For Linux or Mac, use `export PATH=~/ImJoyApp/bin:$PATH`
+
+0. Launch Python plugin engine on remote computer and allow access. We recommend
+  to login the remote server with SSH, start the plugin engine with `python -m imjoy --serve --host=0.0.0.0`.
+  By default, the host is to `127.0.0.1`, which allows only local connections. For remote access, the host is set to `0.0.0.0`.
+  The plugin engine will be launched and serve a copy of the ImJoy app through `http://YOUR_REMOTE_IP:9527`.
+  At the end of the initialisation process, it will display the **connection token**.
+  Copy it from the terminal, since you will need it in the next step. **KEEP THIS TOKEN PRIVATE!!!!**
+
+0. If you have a domain name or host name configured to your host, you can specify it by using `--base_url=YOUR_REMOTE_HOST`. For example:  `python -m imjoy --serve --host=0.0.0.0 --base_url=https://hello-imjoy.com`. With this approach, you can also configure a `https` proxy with [nginx for example](https://docs.nginx.com/nginx/admin-guide/security-controls/securing-http-traffic-upstream/), and then your will be able to use your server with `https://imjoy.io`.
+
+0. On your local machine, use your web browser to access the ImJoy app on the remote machine
+  with `http://YOUR_REMOTE_IP:9527` (instead of `https://imjoy.io` ). Then connect
+  to the plugin engine by using `http://YOUR_REMOTE_IP:9527` as host and
+  the **connection token** you get when you start the engine. If you have `base_url` configured, please replace `YOUR_REMOTE_IP` to your actual domain name or host name.
+
+0. Importantly, the ImJoy app served from https://imjoy.io won't be able to connect a remote plugin engine served with http. You will need to setup your own https proxy, or use an existing one such as [Telebit](https://telebit.cloud/) or [ngrok](https://ngrok.com/).
