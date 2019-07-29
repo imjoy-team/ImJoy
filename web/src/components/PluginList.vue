@@ -31,7 +31,7 @@
     <md-list class="md-triple-line md-dense">
       <div v-for="(plugin, k) in searched_plugins" :key="k">
         <md-list-item>
-          <md-avatar>
+          <md-avatar class="md-xsmall-hide">
             <md-icon v-if="plugin.icon">{{ plugin.icon }}</md-icon>
             <md-icon v-else>extension</md-icon>
           </md-avatar>
@@ -141,7 +141,7 @@
             </md-menu-content>
           </md-menu>
         </md-list-item>
-        <md-divider class="md-inset"></md-divider>
+        <md-divider></md-divider>
       </div>
     </md-list>
 
