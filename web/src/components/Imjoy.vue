@@ -1062,7 +1062,7 @@
         <md-list class="md-double-line md-dense">
           <md-list-item v-for="w in pm.workspace_list" :key="w">
             <span>{{ w }}</span>
-            <md-menu style="right: 10px;">
+            <md-menu>
               <md-button class="md-icon-button md-list-action" md-menu-trigger>
                 <md-icon class="md-primary">more_horiz</md-icon>
               </md-button>
@@ -1081,7 +1081,6 @@
               </md-menu-content>
             </md-menu>
           </md-list-item>
-          <md-divider></md-divider>
         </md-list>
       </md-dialog-content>
     </md-dialog>
@@ -3530,14 +3529,6 @@ button.md-speed-dial-target {
 
   .md-list-item-content {
     padding: 4px 4px !important;
-  }
-
-  .md-list-item-content > .md-avatar:first-child {
-    margin-right: 4px !important;
-  }
-
-  .md-button .md-icon-button .md-list-action {
-    margin-left: 3px !important;
   }
 }
 
