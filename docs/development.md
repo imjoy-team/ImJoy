@@ -58,6 +58,21 @@ Congratulations! You just made your first ImJoy plugin.
 
 Feel free to modify the code, save and run again. To understand more, please proceed further.
 
+If you are new to web development (Javascript, HTML, CSS etc.), you may want to take a look at a few tutorials on [W3School](https://www.w3schools.com/).
+
+Specifically, we recommend to go through the following tutorials:
+ * [HTML](https://www.w3schools.com/html/default.asp) for adding elements such as text box and buttons to the web user interface;
+ * [CSS](https://www.w3schools.com/css/default.asp) for changing the visual style of HTML elements;
+ * [Javascript](https://www.w3schools.com/js/default.asp) for operating the HTML/CSS, perform logic code and computation;
+ * [JSON](https://www.w3schools.com/js/js_json_syntax.asp) is a format we used to configure plugins.
+ * [Python](https://www.w3schools.com/python/default.asp) for perform computation tasks.
+
+An important programming style you are going to use heavily in ImJoy plugin development is Asynchronous Programming. It is a way to achieve concurency (alternative to `Processes` and `Threads`), such that you can perform mulitple operations(e.g. run independent steps in a workflow) concurrently. For more information about Asynchronous programming, we refer to a number of excellent ressources:
+
+* [Introduction to Promise in JS](https://developers.google.com/web/fundamentals/primers/promises)
+* [Async functions for JS](https://developers.google.com/web/fundamentals/primers/async-functions)
+* [Async programming in Python](http://maked.io/async-programming-in-python/)
+
 ### Debugging
 During plugin development, errors and related information will be forwarded
 and shown in the status bar or as message in the snackbar.

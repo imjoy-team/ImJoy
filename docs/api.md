@@ -33,13 +33,6 @@ considerations
 
 In the following list of API functions, we provided examples in `async` style. For Python 2, you can easily convert to callback style accordingly.
 
-For more information about Asynchronous programming, we refer to a number of
-excellent ressources:
-
-* [Introduction to Promise in JS](https://developers.google.com/web/fundamentals/primers/promises)
-* [Async functions for JS](https://developers.google.com/web/fundamentals/primers/async-functions)
-* [Asynchronous I/O module for Python 3+](https://docs.python.org/3/library/asyncio.html).
-
 
 ### async/await style
 This style is natively supported and recommended for Javascript and Python 3+ plugins.
