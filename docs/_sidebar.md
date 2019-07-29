@@ -4,4 +4,5 @@
 * [User Manual](user_manual.md)
 * [Development](development.md)
 * [ImJoy API](api.md)
+* [Tutorials](tutorials.md)
 * [Demos](demos.md)
