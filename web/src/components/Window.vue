@@ -251,10 +251,10 @@ export default {
   width: 100%;
   flex-direction: column;
   overflow: hidden;
-  padding-left: 2px;
-  padding-right: 2px;
-  padding-top: 2px;
-  padding-bottom: 2px;
+  padding-left: 0px;
+  padding-right: 0px;
+  padding-top: 0px;
+  padding-bottom: 0px;
 }
 
 .taller-container {
@@ -277,8 +277,8 @@ export default {
 .plugin-iframe {
   width: 100%;
   height: 100%;
-  margin: 0;
-  padding: 2px;
+  margin: 0px;
+  padding: 0px;
   flex-grow: 1;
   border: none;
 }
