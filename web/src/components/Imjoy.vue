@@ -3522,6 +3522,16 @@ button.md-speed-dial-target {
   }
 }
 
+@media screen and (max-width: 600px) {
+  .md-card-content {
+    padding: 8px !important;
+  }
+
+  .md-list-item-content {
+    padding: 4px 4px !important;
+  }
+}
+
 .md-app {
   height: 100%;
 }

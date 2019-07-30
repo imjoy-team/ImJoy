@@ -166,7 +166,7 @@ body {
 
 @media screen and (max-width: 500px) {
   .md-dialog-content {
-    padding: 16px !important;
+    padding: 8px !important;
   }
 }
 
