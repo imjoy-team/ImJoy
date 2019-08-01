@@ -197,6 +197,9 @@
               <md-menu-item @click="showSettingsDialog = true" :disabled="true">
                 <md-icon>settings</md-icon>Settings
               </md-menu-item>
+              <md-menu-item href="/lite" target="_blank" class="md-primary">
+                <md-icon>open_in_new</md-icon>ImJoy-Lite
+              </md-menu-item>
               <md-menu-item href="/docs/" target="_blank" class="md-primary">
                 <md-icon>library_books</md-icon>Documentation
               </md-menu-item>
@@ -1779,7 +1782,10 @@ export default {
       this.showWelcomeDialog = true;
     } else {
       this.startImJoy(this.$route).then(() => {
-        if (!this.pm.plugins || Object.keys(this.pm.plugins) <= 0) {
+        if (
+          !this.showAddPluginDialog &&
+          (!this.pm.plugins || Object.keys(this.pm.plugins) <= 0)
+        ) {
           this.pm
             .reloadPluginRecursively({ uri: "oeway/ImJoy-Plugins:Welcome" })
             .then(() => {
@@ -1911,10 +1917,10 @@ export default {
         let connection_token = null;
         if (route.query.token || route.query.t) {
           connection_token = (route.query.token || route.query.t).trim();
-          const query = Object.assign({}, route.query);
-          delete query.token;
-          delete query.t;
-          route.replace({ query });
+          // const query = Object.assign({}, route.query);
+          // delete query.token;
+          // delete query.t;
+          // route.replace({ query });
         }
         if (route.query.engine || route.query.e) {
           const engine_url = (route.query.engine || route.query.e).trim();
