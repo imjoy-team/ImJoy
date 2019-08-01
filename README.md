@@ -50,8 +50,7 @@ for how to develop ImJoy plugins: [ImJoy Docs](https://imjoy.io/docs)
 
 **ImJoy greatly accelerates the development and dissemination of new tools.** You can develop plugins in ImJoy, deploy the plugin file to Github, and share the plugin URL through social networks. Users can then use it by a single click, even on a mobile phone
 
-<a href="
-" target="_blank"><img src="https://github.com/oeway/ImJoy/raw/master/docs/assets/imjoy-sharing.jpg" height="500px"></img></a>
+<img src="https://github.com/oeway/ImJoy/raw/master/docs/assets/imjoy-sharing.jpg" height="500px"></img>
 
 
 ## Quick Start
