@@ -17,6 +17,8 @@ its flexible plugin system and sharable plugin URL. Developer can easily add ric
 
 <img src="https://github.com/oeway/ImJoy/raw/master/docs/assets/imjoy-overview.jpg" width="600px"></img>
 
+(https://imjoy.io/#/app?p=imjoy-team/example-plugins:Skin-Lesion-Analyzer)
+
 Checkout the documentation for how to get started and more details
 for how to develop ImJoy plugins: [ImJoy Docs](https://imjoy.io/docs)
 
