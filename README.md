@@ -52,8 +52,6 @@ for how to develop ImJoy plugins: [ImJoy Docs](https://imjoy.io/docs)
   <img src="https://github.com/oeway/ImJoy/raw/master/docs/assets/imjoy-sharing.jpg" width="500px"></img>
 </a>
 
-(Try the above link here: https://imjoy.io/#/app?p=imjoy-team/example-plugins:Skin-Lesion-Analyzer)
-
 ## Quick Start
 
 The easiest way to try ImJoy is to start with a plugin running directly in the browser.
