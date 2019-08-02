@@ -228,12 +228,12 @@ self.__precacheManifest = [
     "url": "/static/js/chunk-vendors.1c97cfae.js"
   },
   {
-    "revision": "b00449080615ce71a2a8a52aee9f658f",
-    "url": "/static/vs/css.worker.js"
-  },
-  {
     "revision": "493ef474936217113b20a6573247288a",
     "url": "/static/vs/editor.worker.js"
+  },
+  {
+    "revision": "b00449080615ce71a2a8a52aee9f658f",
+    "url": "/static/vs/css.worker.js"
   },
   {
     "revision": "2a3e222e6a41b32a7180e6afa3675990",
@@ -252,7 +252,7 @@ self.__precacheManifest = [
     "url": "/404.html"
   },
   {
-    "revision": "0d78f0602f60a69c442625bd1761c819",
+    "revision": "fe93e7e8f42b80000bbb726eb7af5537",
     "url": "/lite.html"
   },
   {
