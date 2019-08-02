@@ -201,7 +201,7 @@
                 console.log(info)
             },
             showProgress(plugin, progress){
-                if (p < 1) progress =  progress * 100;
+                if (progress < 1) progress =  progress * 100;
                 document.getElementById('progress').value = progress
             },
             showDialog(_plugin, config) {
