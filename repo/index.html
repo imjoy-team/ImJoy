@@ -114,7 +114,7 @@
           <div class="background" :style="{backgroundImage: 'url(' + plugin.cover_image + ')'}">
             <div class="mdl-card__title">
               <h3 class="mdl-card__title-text">
-                <a :href="plugin.url" style="color: #262b36">
+                <a :href="plugin.install_url" style="color: #000919c4">
                   <i v-if="plugin.icon" class="material-icons">{{plugin.icon}}</i>
                   <i v-else class="material-icons">extension</i>
                   {{ plugin.name }}
@@ -154,7 +154,7 @@
                 </button>
               </a>
               <div class="mdl-tooltip" :data-mdl-for="id + 'repo'">
-                Repository
+                source code
               </div>
 
               <a :href="plugin.install_url" :id="id + 'www'" v-if="plugin.install_url">
@@ -163,14 +163,14 @@
                 </button>
               </a>
               <div class="mdl-tooltip" :data-mdl-for="id + 'www'">
-                Website
+                Install {{plugin.name}}
               </div>
             </div>
           </div>
 
-          <div class="mdl-card__actions mdl-card--border mdl-card--bottom" v-if="plugin.description">
-          <span v-if="plugin.description"> {{ plugin.description }}</span><br>
-        </div>
+          <div class="mdl-card__actions mdl-card--border mdl-card--bottom">
+            <span v-if="plugin.description"> {{ plugin.description }}</span><br>
+          </div>
     </div>
   </li>
 </ul>
