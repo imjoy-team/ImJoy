@@ -190,9 +190,10 @@ order of these blocks does not matter, so you can shuffle the blocks.
 
 
 ### `<config>` block
-Defines the general properties of a plugin with several fields.
+Defines the general properties of a plugin with several fields in [JSON](https://www.json.org/) format.
 
-```json
+```html
+<config lang="json">
 {
   "name": "Untitled Plugin",
   "type": "web-worker",
@@ -201,7 +202,6 @@ Defines the general properties of a plugin with several fields.
   "cover": "",
   "version": "0.1.0",
   "api_version": "0.1.2",
-  "url": "",
   "description": "A plugin for image processing.",
   "icon": "extension",
   "inputs": null,
@@ -211,6 +211,28 @@ Defines the general properties of a plugin with several fields.
   "requirements": [],
   "dependencies": []
 }
+</config>
+```
+
+Alternaitvely, you can also use [YAML](https://yaml.org/) format which is more human readable.
+```html
+<config lang="yaml">
+name: Untitled Plugin
+type: web-worker
+tags: []
+ui: image processing
+cover: ''
+version: 0.1.0
+api_version: 0.1.2
+description: A plugin for image processing.
+icon: extension
+inputs: 
+outputs: 
+env: 
+permissions: []
+requirements: []
+dependencies: []
+</config>
 ```
 
 #### name
