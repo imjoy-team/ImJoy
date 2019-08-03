@@ -190,8 +190,9 @@ order of these blocks does not matter, so you can shuffle the blocks.
 
 
 ### `<config>` block
-Defines the general properties of a plugin with several fields in [JSON](https://www.json.org/) format.
+Defines the general properties of a plugin with several fields in [JSON](https://www.json.org/) or [YAML](https://yaml.org/) format which is more human readable.
 
+Config in `json` format:
 ```html
 <config lang="json">
 {
@@ -214,7 +215,7 @@ Defines the general properties of a plugin with several fields in [JSON](https:/
 </config>
 ```
 
-Alternaitvely, you can also use [YAML](https://yaml.org/) format which is more human readable.
+Config in `yaml` format:
 ```html
 <config lang="yaml">
 name: Untitled Plugin
