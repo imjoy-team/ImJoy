@@ -19,6 +19,7 @@
         ></path></svg
     ></a>
     <section class="cover show" style="background: rgb(209, 220, 239);">
+      <div id="particles-js"></div>
       <div class="cover-main">
         <!-- _coverpage.md -->
         <p>
@@ -57,7 +58,7 @@
           >
           <a href="/docs">Docs</a>
           <a href="/repo" onclick="removeWelcomePage()" target="_self"
-            >Plugin Repository</a
+            >Plugins</a
           >
           <a href="/#/app" onclick="removeWelcomePage()" target="_self"
             >Start ImJoy</a
@@ -78,6 +79,16 @@ export default {
   name: "home",
   created() {
     this.app_version = version;
+    document.addEventListener("DOMContentLoaded", function() {
+      /* particlesJS.load(@dom-id, @path-json, @callback (optional)); */
+      particlesJS.load(
+        "particles-js",
+        "static/js/particlesjs-config.json",
+        function() {
+          console.log("particles.js config loaded");
+        }
+      );
+    });
   },
 };
 </script>
@@ -89,5 +100,15 @@ export default {
 }
 .badges > a > img {
   width: unset;
+}
+
+#particles-js {
+  display: inline;
+  position: fixed;
+  pointer-events: none;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
 }
 </style>
