@@ -94,7 +94,9 @@ const app = new Vue({
     that.allLabels.sort((a, b) =>
       a.toLowerCase() < b.toLowerCase() ? -1 : 1
     );
-
+    if (!this.$refs.plugin_info_dialog.showModal) {
+      dialogPolyfill.registerDialog(this.$refs.plugin_info_dialog);
+    }
   },
   methods: {
     run(plugin) {
