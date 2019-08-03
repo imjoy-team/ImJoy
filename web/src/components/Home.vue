@@ -80,10 +80,10 @@ export default {
   created() {
     this.app_version = version;
     document.addEventListener("DOMContentLoaded", function() {
-      /* particlesJS.load(@dom-id, @path-json, @callback (optional)); */
+      /* global particlesJS */
       particlesJS.load(
         "particles-js",
-        "static/js/particlesjs-config.json",
+        "/static/js/particlesjs-config.json",
         function() {
           console.log("particles.js config loaded");
         }
