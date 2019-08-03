@@ -270,8 +270,8 @@ Multiple images can be used, by set `cover` to an array: `"cover": ["url_to_imag
 #### labels
 Defines a list of `labels` to catagrize the plugin to allow searching or filtering based on the sematic labels.
 
-#### author
-Name of the author or a list of authors.
+#### authors
+A list of the name of authors.
 
 #### license
 Name of the plugin license.
