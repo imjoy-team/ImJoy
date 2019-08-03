@@ -121,7 +121,7 @@ ul > li {
 .mdl-card--bottom {
     bottom: 0;
     left: 0;
-    min-height: 75px;
+    min-height: 60px;
     padding-top: 1rem !important;
     position: absolute;
 }
