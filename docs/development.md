@@ -266,8 +266,25 @@ It can be hosted inside the GitHub repo, in that case, a `raw` url to the image 
 
 Multiple images can be used, by set `cover` to an array: `"cover": ["url_to_image1", "url_to_image2", "url_to_image3"]`.
 
+#### labels
+Defines a list of `labels` to catagrize the plugin to allow searching or filtering based on the sematic labels.
+
+#### author
+Name of the author or a list of authors.
+
+#### license
+Name of the plugin license.
+
+#### repository
+URL for the plugin project repository
+
+#### website
+URL for the plugin project website
+
 #### tags
-List of supported tags.
+List of supported tags which configures the plugin after installed. 
+
+(Note: `tags` in ImJoy is not for classification or catagrization purposes, for that you can use `labels` instead.)
 
 Such tags provide configureable modes for plugin execution,
 e.g. if a plugin is run on a CPU or GPU. Tags can be accessed at various points in the plugin.
@@ -457,6 +474,7 @@ To make the window in standalone mode by default (in full screen and detached fr
 
 #### runnable
 Defines whether the plugin can be executed by clicking on the plugin menu (By default, all plugins are `runnable`). For helper plugins which do not run by themselves, (e.g. a `native-python` plugin can be called by a `window` plugin and do not necessarily executed by the user directly), setting `"runnable": false` would move down the plugin to the bottom of the plugin menu and made non-clickable.
+
 
 ### `<docs>` block
 Contains the documentation of the plugin and is written in Markdown language.
