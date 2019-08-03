@@ -56,7 +56,7 @@ ul>li {
 }
 
 .page-content>.mdl-grid {
-    padding-top: 3rem;
+    padding-top: 1rem;
 }
 
 .mdl-cell {
@@ -71,6 +71,7 @@ ul>li {
     z-index: 2;
     background-size: cover;
     overflow: hidden;
+    background-color: #ffffffc7;
 }
 
 .mdl-card__title {
