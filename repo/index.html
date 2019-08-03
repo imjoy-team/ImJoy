@@ -208,23 +208,25 @@
           : selected_plugin.name
       }}</h4>
       <div class="mdl-dialog__content">
+
+        <p>
+          <a class="label" :href="selected_plugin.url" target="_blank">source code</a>
+          <span class="label">
+            v{{selected_plugin.version}}
+          </span>
+          <span v-for="label in selected_plugin.allLabels" class="label">
+            {{label}}
+          </span>
+        </p>
         <p>
           <span class="mdl-chip">
             <span class="mdl-chip__text">{{selected_plugin.repo}}:{{selected_plugin.name}}</span>
           </span>
         </p>
         <p>
-          <span class="label">
-            {{selected_plugin.type}}
-          </span>
-          <span class="label">
-            {{selected_plugin.version}}
-          </span>
-        </p>
-        <p>
           {{selected_plugin.description}}
         </p>
-        <a :href="selected_plugin.url" target="_blank">source code</a>
+
       </div>
 
       <div class="mdl-dialog__actions">
