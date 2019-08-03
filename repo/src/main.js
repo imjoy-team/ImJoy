@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', function () {
   /* particlesJS.load(@dom-id, @path-json, @callback (optional)); */
   particlesJS.load('particles-js', '/static/js/particlesjs-config.json', function () {
-    console.log('callback - particles.js config loaded');
+    console.log('particles.js config loaded');
   });
 });
 
@@ -32,45 +32,61 @@ const app = new Vue({
 
     }
   },
-  created: function() {
+  created: async function() {
     const that = this;
-    const repository_url = "https://raw.githubusercontent.com/oeway/ImJoy-Plugins/master/manifest.imjoy.json"
-    fetch(repository_url)
-    .then(response => response.text())
-    .then(text => {
-      that.repo_manifest = JSON.parse(text);
-      that.plugins = that.repo_manifest.plugins;
-      that.plugins.forEach((plugin) => {
-        that.repo_manifest.uri_root = 
-        plugin.url = 'https://github.com/oeway/ImJoy-Plugins/tree/master/' + plugin.uri;
-        plugin.install_url = 'https://imjoy.io/#/app?plugin=oeway/ImJoy-Plugins:' + plugin.name;
-        plugin.allLabels = plugin.labels || [];
-        if (!!plugin.license) {
-          plugin.allLabels.push(plugin.license);
+    const repos = [
+      'oeway/ImJoy-Plugins',
+      'imjoy-team/example-plugins',
+      'oeway/ImJoy-Demo-Plugins',
+    ]
+    that.plugins = []
+    for(let repo of repos){
+      try{
+        const repository_url = `https://raw.githubusercontent.com/${repo}/master/manifest.imjoy.json`
+        const response = await fetch(repository_url)
+        const repo_manifest = JSON.parse(await response.text());
+        const plugins = repo_manifest.plugins;
+        for(let plugin of plugins){
+          plugin.repo = repo;
+          plugin.url = `https://github.com/${repo}/tree/master/${plugin.uri}`;
+          plugin.install_url = `https://imjoy.io/#/app?plugin=${repo}:plugin.name`;
         }
-        if(plugin.cover){
-          if(typeof plugin.cover === 'string'){
-            plugin.cover_image = plugin.cover
-          }
-          else if(Array.isArray(plugin.cover)){
-            plugin.cover_image = plugin.cover[0]
-          }
+        that.plugins = that.plugins.concat(plugins);
+      }
+      catch(e){
+        console.error(e)
+      }
+    }
+    that.plugins.forEach((plugin) => {
+      plugin.allLabels = plugin.labels || [];
+      if (!!plugin.license) {
+        plugin.allLabels.push(plugin.license);
+      }
+      if (!!plugin.repo) {
+        plugin.allLabels.push(plugin.repo);
+      }
+      if(plugin.cover){
+        if(typeof plugin.cover === 'string'){
+          plugin.cover_image = plugin.cover
         }
-        else{
-          plugin.cover_image = ''
+        else if(Array.isArray(plugin.cover)){
+          plugin.cover_image = plugin.cover[0]
         }
-      });
-      that.plugins.forEach((plugin) => {
-        plugin.allLabels.forEach((label) => {
-          if (that.allLabels.indexOf(label) === -1) {
-            that.allLabels.push(label);
-          }
-        });
-      });
-      that.allLabels.sort((a, b) =>
-        a.toLowerCase() < b.toLowerCase() ? -1 : 1
-      );
+      }
+      else{
+        plugin.cover_image = ''
+      }
     });
+    that.plugins.forEach((plugin) => {
+      plugin.allLabels.forEach((label) => {
+        if (that.allLabels.indexOf(label) === -1) {
+          that.allLabels.push(label);
+        }
+      });
+    });
+    that.allLabels.sort((a, b) =>
+      a.toLowerCase() < b.toLowerCase() ? -1 : 1
+    );
   },
   methods: {
     etAl: (authors) => {

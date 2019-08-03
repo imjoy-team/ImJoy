@@ -79,7 +79,17 @@
               <h5># Plugins: {{getPluginsCount()}}</h5>
               <template id="label-selector" v-if="allLabels && allLabels.length>0">
                 <div class="labels-wrapper">
-                  <p>Plugin Labels: </p>
+                  <p v-if="filters.length">
+                      Selected {{filters.length}} filter(s)
+                      <a class="label"
+                      v-if="filters.length"
+                      style="background:  rgba(33,150,243,.26); "
+                      @click="clearAllFilters"
+                      >
+                      <i class="material-icons delete">delete</i>
+                      Clear
+                    </a>
+                  </p>
                   <a v-for="label in allLabels"
                   class="label"
                   @click="addRemoveToFilters(label)"
@@ -88,18 +98,7 @@
                   >
                   {{label}}
                   <small class="label-count">{{getLabelCount(label)}}</small>
-                </a>
-                <p v-if="filters.length">
-                  Selected {{filters.length}} filters
-                  <a class="label"
-                  v-if="filters.length"
-                  style="background: #42b983; color: white"
-                  @click="clearAllFilters"
-                  >
-                  <i class="material-icons delete">delete</i>
-                  Clear
-                </a>
-              </p>
+                  </a>
             </div>
           </template>
         </div>
@@ -112,15 +111,7 @@
         >
         <div class="demo-card-wide mdl-card mdl-shadow--2dp">
           <div class="background" :style="{backgroundImage: 'url(' + plugin.cover_image + ')'}">
-            <div class="mdl-card__title">
-              <h3 class="mdl-card__title-text">
-                <a :href="plugin.install_url" style="color: #000919c4">
-                  <i v-if="plugin.icon" class="material-icons">{{plugin.icon}}</i>
-                  <i v-else class="material-icons">extension</i>
-                  {{ plugin.name }}
-                </a>
-              </h3>
-            </div>
+            
             <div class="mdl-card__supporting-text">
               <span class="authors">
                 {{ plugin.authors ? 'by ' + etAl(plugin.authors) : '' }}
@@ -169,8 +160,15 @@
           </div>
 
           <div class="mdl-card__actions mdl-card--border mdl-card--bottom">
+            <h3 class="mdl-card__title-text">
+              <a :href="plugin.install_url" style="color: #ffffff">
+                <i v-if="plugin.icon" class="material-icons">{{plugin.icon}}</i>
+                <i v-else class="material-icons">extension</i>
+                {{ plugin.name }}
+              </a>
+            </h3>
             <span v-if="plugin.description"> {{ plugin.description }}</span><br>
-          </div>
+            <!-- <span class="mdl-chip__text">{{plugin.repo}}</span></div> -->
     </div>
   </li>
 </ul>
