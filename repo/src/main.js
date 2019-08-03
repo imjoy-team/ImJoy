@@ -17,10 +17,11 @@ const app = new Vue({
   data: {
     plugins: [],
     allLabels: [],
-    filters: []
+    filters: [],
+    selected_plugin: {}
   },
   computed: {
-    filteredPlugins: function() {
+    filteredPlugins: function () {
       const covered = this.plugins.filter((plugin) => plugin.cover_image);
       const plugins = covered.concat(this.plugins.filter((plugin) => !plugin.cover_image))
 
@@ -32,7 +33,7 @@ const app = new Vue({
 
     }
   },
-  created: async function() {
+  created: async function () {
     const that = this;
     const repos = [
       'oeway/ImJoy-Plugins',
@@ -40,20 +41,20 @@ const app = new Vue({
       'oeway/ImJoy-Demo-Plugins',
     ]
     that.plugins = []
-    for(let repo of repos){
-      try{
+    for (let repo of repos) {
+      try {
         const repository_url = `https://raw.githubusercontent.com/${repo}/master/manifest.imjoy.json`
         const response = await fetch(repository_url)
         const repo_manifest = JSON.parse(await response.text());
         const plugins = repo_manifest.plugins;
-        for(let plugin of plugins){
+        for (let plugin of plugins) {
           plugin.repo = repo;
           plugin.url = `https://github.com/${repo}/tree/master/${plugin.uri}`;
-          plugin.install_url = `https://imjoy.io/#/app?plugin=${repo}:plugin.name`;
+          plugin.install_url = `/#/app?plugin=${repo}:${plugin.name}`;
+          plugin.run_url = `/lite?plugin=${repo}:${plugin.name}`;
         }
         that.plugins = that.plugins.concat(plugins);
-      }
-      catch(e){
+      } catch (e) {
         console.error(e)
       }
     }
@@ -62,18 +63,24 @@ const app = new Vue({
       if (!!plugin.license) {
         plugin.allLabels.push(plugin.license);
       }
+      if (typeof plugin.type === 'string') {
+        plugin.allLabels.push(plugin.type);
+      } else if (typeof plugin.type === 'object') {
+        plugin.allLabels.concat(Object.values(plugin.type));
+      }
       if (!!plugin.repo) {
         plugin.allLabels.push(plugin.repo);
       }
-      if(plugin.cover){
-        if(typeof plugin.cover === 'string'){
+      if (plugin.tags) {
+        plugin.allLabels.concat(plugin.tags);
+      }
+      if (plugin.cover) {
+        if (typeof plugin.cover === 'string') {
           plugin.cover_image = plugin.cover
-        }
-        else if(Array.isArray(plugin.cover)){
+        } else if (Array.isArray(plugin.cover)) {
           plugin.cover_image = plugin.cover[0]
         }
-      }
-      else{
+      } else {
         plugin.cover_image = ''
       }
     });
@@ -87,10 +94,24 @@ const app = new Vue({
     that.allLabels.sort((a, b) =>
       a.toLowerCase() < b.toLowerCase() ? -1 : 1
     );
+
   },
   methods: {
-    etAl: (authors) => {
-      if(!authors){
+    run(plugin) {
+      window.open(plugin.run_url, '_blank');
+    },
+    install(plugin) {
+      window.open(plugin.install_url, '_blank');
+    },
+    showInfo(plugin) {
+      this.selected_plugin = plugin;
+      this.$refs.plugin_info_dialog.showModal();
+    },
+    closeInfo() {
+      this.$refs.plugin_info_dialog.close();
+    },
+    etAl(authors) {
+      if (!authors) {
         return ''
       }
       if (authors.length < 3) {
@@ -99,27 +120,27 @@ const app = new Vue({
         return authors.slice(0, 3).join(", ") + " et al.";
       }
     },
-    addRemoveToFilters: function(label) {
+    addRemoveToFilters(label) {
       if (this.filters.indexOf(label) === -1) {
         this.filters.push(label);
       } else {
         this.filters = this.filters
-        .filter((x) => x !== label);
+          .filter((x) => x !== label);
       }
     },
-    checkActive: function(label) {
+    checkActive(label) {
       return this.filters.indexOf(label) > -1;
     },
-    clearAllFilters: function() {
+    clearAllFilters() {
       this.filters = [];
     },
-    getLabelCount: function(label) {
+    getLabelCount(label) {
       return this.filteredPlugins
         .filter((plugins) => plugins.allLabels.includes(label))
         .length;
 
     },
-    getPluginsCount: function(){
+    getPluginsCount() {
       return this.filteredPlugins.length
     }
   }
