@@ -56,6 +56,9 @@
             >Preprint</a
           >
           <a href="/docs">Docs</a>
+          <a href="/repo" onclick="removeWelcomePage()" target="_self"
+            >Plugin Repository</a
+          >
           <a href="/#/app" onclick="removeWelcomePage()" target="_self"
             >Start ImJoy</a
           >

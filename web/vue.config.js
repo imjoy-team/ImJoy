@@ -47,6 +47,10 @@ module.exports = {
         to: path.join(__dirname, "dist/docs"),
         toType: "dir"
       },{
+        from: path.join(__dirname, "../repo"),
+        to: path.join(__dirname, "dist/repo"),
+        toType: "dir"
+      },{
         from: path.join(__dirname, "src/jailed"),
         to: path.join(__dirname, "dist/static/jailed"),
         toType: "dir"
