@@ -241,6 +241,7 @@ footer {
 .mdl-layout__header-row {
     height: 56px;
     padding: 3px 16px 3px 10px;
+    margin-top: 3px;
 }
 
 @media screen and (max-width: 1024px){
