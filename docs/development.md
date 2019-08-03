@@ -190,9 +190,11 @@ order of these blocks does not matter, so you can shuffle the blocks.
 
 
 ### `<config>` block
-Defines the general properties of a plugin with several fields.
+Defines the general properties of a plugin with several fields in [JSON](https://www.json.org/) or [YAML](https://yaml.org/) format which is more human readable.
 
-```json
+Config in `json` format:
+```html
+<config lang="json">
 {
   "name": "Untitled Plugin",
   "type": "web-worker",
@@ -201,7 +203,6 @@ Defines the general properties of a plugin with several fields.
   "cover": "",
   "version": "0.1.0",
   "api_version": "0.1.2",
-  "url": "",
   "description": "A plugin for image processing.",
   "icon": "extension",
   "inputs": null,
@@ -211,6 +212,28 @@ Defines the general properties of a plugin with several fields.
   "requirements": [],
   "dependencies": []
 }
+</config>
+```
+
+Config in `yaml` format:
+```html
+<config lang="yaml">
+name: Untitled Plugin
+type: web-worker
+tags: []
+ui: image processing
+cover: ''
+version: 0.1.0
+api_version: 0.1.2
+description: A plugin for image processing.
+icon: extension
+inputs: 
+outputs: 
+env: 
+permissions: []
+requirements: []
+dependencies: []
+</config>
 ```
 
 #### name
@@ -244,8 +267,25 @@ It can be hosted inside the GitHub repo, in that case, a `raw` url to the image 
 
 Multiple images can be used, by set `cover` to an array: `"cover": ["url_to_image1", "url_to_image2", "url_to_image3"]`.
 
+#### labels
+Defines a list of `labels` to catagrize the plugin to allow searching or filtering based on the sematic labels.
+
+#### authors
+A list of the name of authors.
+
+#### license
+Name of the plugin license.
+
+#### repository
+URL for the plugin project repository
+
+#### website
+URL for the plugin project website
+
 #### tags
-List of supported tags.
+List of supported tags which configures the plugin after installed. 
+
+(Note: `tags` in ImJoy is not for classification or catagrization purposes, for that you can use `labels` instead.)
 
 Such tags provide configureable modes for plugin execution,
 e.g. if a plugin is run on a CPU or GPU. Tags can be accessed at various points in the plugin.
@@ -435,6 +475,7 @@ To make the window in standalone mode by default (in full screen and detached fr
 
 #### runnable
 Defines whether the plugin can be executed by clicking on the plugin menu (By default, all plugins are `runnable`). For helper plugins which do not run by themselves, (e.g. a `native-python` plugin can be called by a `window` plugin and do not necessarily executed by the user directly), setting `"runnable": false` would move down the plugin to the bottom of the plugin menu and made non-clickable.
+
 
 ### `<docs>` block
 Contains the documentation of the plugin and is written in Markdown language.
