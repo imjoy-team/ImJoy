@@ -92,8 +92,9 @@ ul>li {
 .mdl-card__supporting-text {
     color: #fff;
     padding: 0 1rem;
-    position: relative;
     z-index: 2;
+    position: absolute;
+    bottom: 82px!important;
 }
 
 .mdl-card__supporting-text>span {
@@ -119,11 +120,6 @@ ul>li {
     padding: 0;
 }
 
-.mdl-card__supporting-text {
-    position: absolute;
-    bottom: 78px;
-}
-
 .mdl-card--bottom {
     bottom: 0;
     left: 0;
@@ -146,8 +142,8 @@ ul>li {
 
 .mdl-dialog {
     width: 500px;
-    max-width: 100%;
-    max-height: 100%;
+    max-width: calc(100% - 10px);
+    max-height: calc(100% - 10px);
 }
 
 .background {

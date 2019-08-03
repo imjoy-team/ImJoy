@@ -179,7 +179,7 @@
                 }}
                     </a>
                   </h3>
-                  <span v-if="plugin.description"> {{ plugin.description }}</span><br>
+                  <span v-if="plugin.description"> {{ plugin.description.slice(0, 100) }}</span><br>
                   <!-- <span class="mdl-chip__text">{{plugin.repo}}</span></div> -->
 
                 </div>
