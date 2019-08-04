@@ -50,7 +50,7 @@
       "distance": 150,
       "color": "#448aff",
       "opacity": 0.1008530152163807,
-      "width": 1
+      "width": 0.8
     },
     "move": {
       "enable": true,
@@ -82,9 +82,9 @@
     },
     "modes": {
       "grab": {
-        "distance": 50,
+        "distance": 200,
         "line_linked": {
-          "opacity": 1
+          "opacity": 0.2
         }
       },
       "bubble": {
