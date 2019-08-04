@@ -202,7 +202,7 @@ import { saveAs } from "file-saver";
 import { PluginManager } from "../pluginManager.js";
 import axios from "axios";
 import marked from "marked";
-import DOMPurify from 'dompurify';
+import DOMPurify from "dompurify";
 import _ from "lodash";
 import { randId } from "../utils.js";
 
@@ -282,9 +282,9 @@ export default {
     marked.setOptions({
       renderer: renderer,
     });
-    this.sanitizedMarked = (mk)=>{
+    this.sanitizedMarked = mk => {
       return DOMPurify.sanitize(marked(mk));
-    }
+    };
   },
   mounted() {
     this.search = this.initSearch || "";

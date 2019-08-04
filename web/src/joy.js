@@ -8,7 +8,7 @@ VERSION 0 (the incredibly clunky first version) (sorry)
 Created by Nicky Case http://ncase.me/
 
 *****************/
-import DOMPurify from 'dompurify';
+import DOMPurify from "dompurify";
 
 // THE JOY MASTER
 function Joy(options) {

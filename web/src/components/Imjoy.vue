@@ -1417,7 +1417,7 @@ import {
   compareVersions,
   escapeHTML,
 } from "../utils.js";
-import DOMPurify from 'dompurify';
+import DOMPurify from "dompurify";
 
 import { ImJoy } from "../imjoyLib.js";
 

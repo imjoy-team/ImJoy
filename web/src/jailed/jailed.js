@@ -19,13 +19,9 @@
  *  _pluginCore.js    common plugin site protocol implementation
  */
 
-import {
-  randId,
-  assert,
-  compareVersions,
-} from "../utils.js";
+import { randId, assert, compareVersions } from "../utils.js";
 
-import DOMPurify from 'dompurify';
+import DOMPurify from "dompurify";
 
 var __jailed__path__;
 var __is__node__ =

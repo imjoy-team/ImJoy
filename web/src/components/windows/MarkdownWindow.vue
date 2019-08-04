@@ -76,7 +76,7 @@
 
 <script>
 import marked from "marked";
-import DOMPurify from 'dompurify';
+import DOMPurify from "dompurify";
 
 export default {
   name: "markdown-window",
@@ -110,9 +110,9 @@ export default {
     marked.setOptions({
       renderer: renderer,
     });
-    this.sanitizedMarked = (mk)=>{
+    this.sanitizedMarked = mk => {
       return DOMPurify.sanitize(marked(mk));
-    }
+    };
   },
   mounted() {
     this.plugin_info = this.w && this.w.data && this.w.data.plugin_info;
