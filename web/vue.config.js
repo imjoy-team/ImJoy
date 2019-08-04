@@ -51,6 +51,10 @@ module.exports = {
         to: path.join(__dirname, "dist/repo"),
         toType: "dir"
       },{
+        from: path.join(__dirname, "src/pluginParser.js"),
+        to: path.join(__dirname, "dist/static/js/pluginParser.js"),
+        toType: "file"
+      },{
         from: path.join(__dirname, "src/jailed"),
         to: path.join(__dirname, "dist/static/jailed"),
         toType: "dir"

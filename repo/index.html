@@ -42,7 +42,13 @@
   <link rel="stylesheet" href="/repo/assets/material.blue-pink.min.css" />
   <script defer src="/repo/assets/material.min.js"></script>
   <link rel="stylesheet" href="/repo/src/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <script src="/static/js/particles.js"></script>
+  <script src="/repo/assets/purify.min.js"></script>
+  <script type="module">
+    import { parseComponent } from '/static/js/pluginParser.js'
+    window.parseComponent = parseComponent;
+  </script>
 </head>
 
 <body>
@@ -78,7 +84,15 @@
             </div>
             <div class="mdl-cell--6-col mdl-cel" style="padding: 0 2rem">
               <h3>Deep Learning Made Easy!</h3>
-              <h5># Plugins: {{getPluginsCount()}}</h5>
+              <h5> # Plugins: {{getPluginsCount()}}
+                <a id="add-plugin" href="https://github.com/oeway/ImJoy-Plugins/pulls" target="_blank"
+                  class="mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab">
+                  <i class="material-icons">add</i>
+                  <div class="mdl-tooltip" data-mdl-for="add-plugin">
+                    Add your plugin to the repository by sending us a Pull Request on Github.
+                  </div>
+                </a></h5>
+
               <template id="label-selector" v-if="allLabels && allLabels.length>0">
                 <div class="labels-wrapper">
                   <p v-if="filters.length">
@@ -121,6 +135,15 @@
                     </a>
                     <div class="mdl-tooltip" :data-mdl-for="id + 'www'">
                       Install {{plugin.name}}
+                    </div>
+
+                    <a @click="share(plugin)" :id="id + 'share'">
+                      <button class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect">
+                        <i class="material-icons">share</i>
+                      </button>
+                    </a>
+                    <div class="mdl-tooltip" :data-mdl-for="id + 'share'">
+                      Share {{plugin.name}}
                     </div>
                   </div>
                 </div>
@@ -202,7 +225,7 @@
     </div>
 
     <dialog class="mdl-dialog" ref="plugin_info_dialog"
-      :style="selected_plugin.cover_image?'height: 80%; ': 'height: 400px;'">
+      :style="selected_plugin.cover_image || selected_plugin.docs?'height: 80%; ': 'height: 400px;'">
       <h4 class="mdl-dialog__title">
         <i v-if="selected_plugin.icon" class="material-icons">{{selected_plugin.icon}}</i>
         <i v-else class="material-icons">extension</i>
@@ -235,6 +258,10 @@
         </p>
         <img style="width: 100%; max-width: 100%; max-height: calc(100% - 64px);"
           :src="selected_plugin.cover_image"></img>
+
+        <div v-if="selected_plugin.docs === '@loading...'" class="mdl-spinner mdl-js-spinner is-active"></div>
+        <div v-else-if="selected_plugin.docs" v-html="selected_plugin.docs"></div>
+        <!-- <pre><code class="html" v-html="selected_plugin.source_code"></code></pre> -->
 
       </div>
 

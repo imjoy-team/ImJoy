@@ -183,7 +183,7 @@
         <div
           style="padding-left: 10px; padding-right: 5px;"
           v-if="docs && docs.trim() != ''"
-          v-html="marked(docs, { sanitize: true })"
+          v-html="sanitizedMarked(docs)"
         ></div>
         <h3 v-else>Oops, this plugin has no documentation!</h3>
       </md-dialog-content>
@@ -202,6 +202,7 @@ import { saveAs } from "file-saver";
 import { PluginManager } from "../pluginManager.js";
 import axios from "axios";
 import marked from "marked";
+import DOMPurify from "dompurify";
 import _ from "lodash";
 import { randId } from "../utils.js";
 
@@ -281,7 +282,9 @@ export default {
     marked.setOptions({
       renderer: renderer,
     });
-    this.marked = marked;
+    this.sanitizedMarked = mk => {
+      return DOMPurify.sanitize(marked(mk));
+    };
   },
   mounted() {
     this.search = this.initSearch || "";

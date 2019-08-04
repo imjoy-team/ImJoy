@@ -1415,9 +1415,9 @@ import {
   assert,
   _clone,
   compareVersions,
-  HtmlWhitelistedSanitizer,
   escapeHTML,
 } from "../utils.js";
+import DOMPurify from "dompurify";
 
 import { ImJoy } from "../imjoyLib.js";
 
@@ -1431,8 +1431,6 @@ import Minibus from "minibus";
 
 import Ajv from "ajv";
 const ajv = new Ajv();
-
-const sanitizer = new HtmlWhitelistedSanitizer(true);
 
 export default {
   name: "imjoy",
@@ -3050,7 +3048,7 @@ export default {
       } else if (typeof text === "object") {
         this.alert_config.title = text.title;
         this.alert_config.content =
-          sanitizer.sanitizeString(String(text.content)) || "undefined";
+          DOMPurify.sanitize(String(text.content)) || "undefined";
         this.alert_config.confirm_text = text.confirm_text || "OK";
       } else {
         this.alert_config.content = String(text);
@@ -3071,7 +3069,7 @@ export default {
         } else if (typeof text === "object") {
           this.prompt_config.title = text.title;
           this.prompt_config.content =
-            sanitizer.sanitizeString(String(text.content)) || "undefined";
+            DOMPurify.sanitize(String(text.content)) || "undefined";
           this.prompt_config.placeholder = text.placeholder || null;
           this.prompt_config.cancel_text = text.cancel_text || "Cancel";
           this.prompt_config.confirm_text = text.confirm_text || "OK";
@@ -3099,7 +3097,7 @@ export default {
         } else if (typeof text === "object") {
           this.confirm_config.title = text.title;
           this.confirm_config.content =
-            sanitizer.sanitizeString(String(text.content)) || "undefined";
+            DOMPurify.sanitize(String(text.content)) || "undefined";
           this.confirm_config.cancel_text = text.cancel_text || "Cancel";
           this.confirm_config.confirm_text = text.confirm_text || "OK";
         } else {
