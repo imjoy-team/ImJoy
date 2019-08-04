@@ -62,7 +62,7 @@
         <div
           style="padding-left: 10px; padding-right: 5px; overflow: auto"
           v-if="w.data && w.data.source && w.data.source.trim() != ''"
-          v-html="marked(w.data.source, { sanitize: true })"
+          v-html="sanitizedMarked(w.data.source)"
         ></div>
         <h4 v-else>
           {{ plugin_info && plugin_info.description }}
@@ -76,6 +76,8 @@
 
 <script>
 import marked from "marked";
+import DOMPurify from 'dompurify';
+
 export default {
   name: "markdown-window",
   type: "imjoy/markdown",
@@ -108,7 +110,9 @@ export default {
     marked.setOptions({
       renderer: renderer,
     });
-    this.marked = marked;
+    this.sanitizedMarked = (mk)=>{
+      return DOMPurify.sanitize(marked(mk));
+    }
   },
   mounted() {
     this.plugin_info = this.w && this.w.data && this.w.data.plugin_info;

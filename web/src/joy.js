@@ -8,8 +8,7 @@ VERSION 0 (the incredibly clunky first version) (sorry)
 Created by Nicky Case http://ncase.me/
 
 *****************/
-import { HtmlWhitelistedSanitizer } from "./utils.js";
-var sanitizer = new HtmlWhitelistedSanitizer(true);
+import DOMPurify from 'dompurify';
 
 // THE JOY MASTER
 function Joy(options) {
@@ -468,7 +467,7 @@ Joy.modify = function() {
 // Converts a string into an ENTIRE ACTOR
 Joy.initializeWithString = function(self, markup) {
   try {
-    markup = sanitizer.sanitizeString(markup);
+    markup = DOMPurify.sanitize(markup);
   } catch (e) {
     console.log("Failed to sanitize the ui string", e);
   }

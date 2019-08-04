@@ -8,7 +8,7 @@
       }
     },
     "color": {
-      "value": "#a6387b"
+      "value": "#448aff"
     },
     "shape": {
       "type": "circle",
@@ -48,9 +48,9 @@
     "line_linked": {
       "enable": true,
       "distance": 150,
-      "color": "#a6387b",
+      "color": "#448aff",
       "opacity": 0.1008530152163807,
-      "width": 0.5
+      "width": 1
     },
     "move": {
       "enable": true,
@@ -82,7 +82,7 @@
     },
     "modes": {
       "grab": {
-        "distance": 400,
+        "distance": 50,
         "line_linked": {
           "opacity": 1
         }
