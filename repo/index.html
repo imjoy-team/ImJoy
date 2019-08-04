@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>ImJoy Plugin Repository</title>
+  <meta charset="utf-8">
+  <meta name="viewport"
+    content="width=device-width, height=device-height, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="description" content="ImJoy -- Deep Learning Made Easy!">
+  <meta name="author" content="Wei OUYANG">
+  <meta name="keywords" content="Bioimaging, image processing">
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:site" content="@weioyang" />
+  <meta name="twitter:creator" content="@weioyang" />
+  <meta name="twitter:image" content="https://imjoy.io/static/img/imjoy-card-plain.png" />
+  <meta property="og:url" content="https://imjoy.io" />
+  <meta property="og:title" content="ImJoy" />
+  <meta property="og:description" content="ImJoy -- Deep Learning Made Easy!" />
+  <meta property="og:image" content="https://imjoy.io/static/img/imjoy-card-plain.png" />
+  <meta name="format-detection" content="telephone=no">
+  <link rel="apple-touch-icon" sizes="57x57" href="/static/icons/apple-icon-57x57.png">
+  <link rel="apple-touch-icon" sizes="60x60" href="/static/icons/apple-icon-60x60.png">
+  <link rel="apple-touch-icon" sizes="72x72" href="/static/icons/apple-icon-72x72.png">
+  <link rel="apple-touch-icon" sizes="76x76" href="/static/icons/apple-icon-76x76.png">
+  <link rel="apple-touch-icon" sizes="114x114" href="/static/icons/apple-icon-114x114.png">
+  <link rel="apple-touch-icon" sizes="120x120" href="/static/icons/apple-icon-120x120.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="/static/icons/apple-icon-144x144.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="/static/icons/apple-icon-152x152.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/static/icons/apple-icon-180x180.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="/static/icons/android-icon-192x192.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/static/icons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="96x96" href="/static/icons/favicon-96x96.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/static/icons/favicon-16x16.png">
+  <link rel="shortcut icon" href="/static/icons/favicon.ico" type="image/x-icon" />
+  <link rel="icon" href="/static/icons/favicon.ico" type="image/x-icon" />
+  <script src="/repo/assets/vue.js"></script>
+  <script src="/repo/assets/dialog-polyfill.min.js"></script>
+  <link rel="stylesheet" href="/repo/assets/dialog-polyfill.min.css" />
+  <link rel="stylesheet" href="/repo/assets/material.blue-pink.min.css" />
+  <script defer src="/repo/assets/material.min.js"></script>
+  <link rel="stylesheet" href="/repo/src/style.css">
+  <script src="/static/js/particles.js"></script>
+</head>
+
+<body>
+  <div id="app">
+    <!-- Always shows a header, even in smaller screens. -->
+
+    <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+      <header class="mdl-layout__header">
+        <div class="mdl-layout__header-row">
+          <a class="site-button mdl-button site-title" href="/">
+            <img class="site-title" src="/static/img/imjoy-logo-black.svg" alt="ImJoy" />
+          </a>
+          <!-- Title -->
+          <span class="mdl-layout-title">Plugin Repository</span>
+          <!-- Add spacer, to align navigation to the right -->
+          <div class="mdl-layout-spacer"></div>
+          <!-- Navigation. We hide it in small screens. -->
+
+          <a class="mdl-button mdl-layout--large-screen-only" target="_blank" href="/docs#/development">
+            <i class="material-icons">code</i>Development</a>
+          <a class="mdl-button mdl-layout--large-screen-only mdl-button--primary" href="/#/app">
+            <img src="/static/icons/favicon-32x32.png" style="width: 16px; height:16px;margin-right:3px;"></img>Start
+            ImJoy</a>
+
+        </div>
+      </header>
+      <main class="mdl-layout__content" id="particles-js">
+        <div class="page-content">
+          <!-- Your content goes here -->
+          <div class="mdl-grid">
+            <div class="mdl-cell--5-col mdl-cell" style="text-align: right">
+              <div class="illustration"></div>
+            </div>
+            <div class="mdl-cell--6-col mdl-cel" style="padding: 0 2rem">
+              <h3>Deep Learning Made Easy!</h3>
+              <h5># Plugins: {{getPluginsCount()}}</h5>
+              <template id="label-selector" v-if="allLabels && allLabels.length>0">
+                <div class="labels-wrapper">
+                  <p v-if="filters.length">
+                    Selected {{filters.length}} filter(s)
+                    <a class="label" v-if="filters.length" style="background:  rgba(33,150,243,.26); "
+                      @click="clearAllFilters">
+                      <i class="material-icons delete">delete</i>
+                      Clear
+                    </a>
+                  </p>
+                  <a v-for="label in allLabels" class="label" @click="addRemoveToFilters(label)"
+                    v-bind:class="{ active: checkActive(label) }" v-if="getLabelCount(label) > 0">
+                    {{label}}
+                    <small class="label-count">{{getLabelCount(label)}}</small>
+                  </a>
+                </div>
+              </template>
+            </div>
+          </div>
+
+
+          <ul class="mdl-grid">
+            <li class="mdl-cell mdl-cell--4-col" v-for="(plugin, id) in filteredPlugins">
+              <div class="demo-card-wide mdl-card mdl-shadow--2dp">
+                <div class="background" :style="{backgroundImage: 'url(' + plugin.thumbnail + ')'}">
+                  <div class="mdl-card__menu">
+                    <a :href="plugin.url" target="_blank" :id="id + 'repo'" v-if="plugin.url">
+                      <button class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect">
+                        <i class="material-icons">code</i>
+                      </button>
+                    </a>
+                    <div class="mdl-tooltip" :data-mdl-for="id + 'repo'">
+                      source code
+                    </div>
+
+                    <a :href="plugin.install_url" :id="id + 'www'" v-if="plugin.install_url">
+                      <button class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect">
+                        <i class="material-icons">cloud_download</i>
+                      </button>
+                    </a>
+                    <div class="mdl-tooltip" :data-mdl-for="id + 'www'">
+                      Install {{plugin.name}}
+                    </div>
+                  </div>
+                </div>
+                <div class="mdl-card__supporting-text">
+                  <span class="authors">
+                    {{ plugin.authors ? 'by ' + etAl(plugin.authors) : '' }}
+                  </span>
+                  <div class="mdl-grid">
+                    <div v-if="plugin.labels">
+                      <i class="material-icons" :id="id + 'labelIcon'">label</i>
+                      <div class="mdl-tooltip" :data-mdl-for="id + 'labelIcon'">
+                        Labels
+                      </div>
+                      <span v-for="label in plugin.labels">
+                        <a class="label" @click="addRemoveToFilters(label)"
+                          v-bind:class="{ active: checkActive(label) }">{{ label }}</a>
+                      </span>
+                    </div>
+                    <div v-if="plugin.license">
+                      <i class="material-icons" :id="id + 'labelLicense'">copyright</i>
+                      <div class="mdl-tooltip" :data-mdl-for="id + 'labelLicense'">
+                        License
+                      </div>
+                      <span>
+                        <a class="label" @click="addRemoveToFilters(plugin.license)"
+                          v-bind:class="{ active: checkActive(plugin.license) }">{{ plugin.license }}</a>
+                      </span>
+                    </div>
+                    <div v-if="plugin.type">
+                      <i class="material-icons" :id="id + 'labelType'">bookmark_border</i>
+                      <div class="mdl-tooltip" :data-mdl-for="id + 'labelType'">
+                        Type
+                      </div>
+                      <span>
+                        <a class="label" @click="addRemoveToFilters(plugin.type)"
+                          v-bind:class="{ active: checkActive(plugin.type) }">{{ plugin.type }}</a>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div class="mdl-card__actions mdl-card--border mdl-card--bottom">
+                  <h3 class="mdl-card__title-text">
+                    <a @click="showInfo(plugin)" style="color: #ffffff">
+                      <i v-if="plugin.icon" class="material-icons">{{plugin.icon}}</i>
+                      <i v-else class="material-icons">extension</i>
+                      {{
+                  plugin.type === "native-python"
+                    ? plugin.name + " 🚀"
+                    : plugin.type === "web-python" ||
+                      plugin.type === "web-python-window"
+                    ? plugin.name + " 🐍"
+                    : plugin.name
+                }}
+                    </a>
+                  </h3>
+                  <span v-if="plugin.description"> {{ plugin.description.slice(0, 100) }}</span><br>
+                  <!-- <span class="mdl-chip__text">{{plugin.repo}}</span></div> -->
+
+                </div>
+            </li>
+          </ul>
+
+          <footer class="mdl-mini-footer">
+            <div class="mdl-mini-footer__left-section">
+              <ul class="mdl-mini-footer__link-list">
+                <li><a href="https://github.com/oeway/ImJoy-Plugins" target="_blank">
+                    <img src="/static/img/github.svg" style="width: 20px; height:20px;margin-right:3px;"></img>Github
+                    Repository</a></li>
+                <li><a href="/#/about" target="_blank">
+                    <img src="/static/icons/favicon-32x32.png"
+                      style="width: 16px; height:16px;margin-right:3px;display: inline-block;"></img>About ImJoy</a>
+                </li>
+              </ul>
+            </div>
+          </footer>
+        </div>
+      </main>
+
+    </div>
+
+    <dialog class="mdl-dialog" ref="plugin_info_dialog"
+      :style="selected_plugin.cover_image?'height: 80%; ': 'height: 400px;'">
+      <h4 class="mdl-dialog__title">
+        <i v-if="selected_plugin.icon" class="material-icons">{{selected_plugin.icon}}</i>
+        <i v-else class="material-icons">extension</i>
+        {{
+              selected_plugin.type === "native-python"
+                ? selected_plugin.name + " 🚀"
+                : selected_plugin.type === "web-python" ||
+                selected_plugin.type === "web-python-window"
+                ? selected_plugin.name + " 🐍"
+                : selected_plugin.name
+            }}</h4>
+      <div class="mdl-dialog__content">
+
+        <p>
+          <a class="label" :href="selected_plugin.url" target="_blank">source code</a>
+          <span class="label">
+            v{{selected_plugin.version}}
+          </span>
+          <span v-for="label in selected_plugin.allLabels" class="label">
+            {{label}}
+          </span>
+        </p>
+        <p>
+          <span class="mdl-chip">
+            <span class="mdl-chip__text">{{selected_plugin.repo}}:{{selected_plugin.name}}</span>
+          </span>
+        </p>
+        <p>
+          {{selected_plugin.description}}
+        </p>
+        <img style="width: 100%; max-width: 100%; max-height: calc(100% - 64px);"
+          :src="selected_plugin.cover_image"></img>
+
+      </div>
+
+      <div class="mdl-dialog__actions">
+        <button type="button" class="mdl-button" @click="closeInfo()">Close</button>
+        <button type="button" class="mdl-button" v-if="selected_plugin.type!=='native-python'"
+          @click="run(selected_plugin)">Run</button>
+        <button type="button" class="mdl-button mdl-button--primary" @click="install(selected_plugin)">Install</button>
+      </div>
+    </dialog>
+
+    <!--app end-->
+  </div>
+  <script src="/repo/src/main.js"></script>
+
+</body>
+
+</html>
