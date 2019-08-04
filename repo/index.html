@@ -200,13 +200,13 @@
       </main>
 
     </div>
-    <div class="centerpoint">
-      <dialog class="mdl-dialog" ref="plugin_info_dialog"
-        :style="selected_plugin.cover_image?'height: 80%; top: 5%;': 'height: 400px; top: calc(100% - 200 px);'">
-        <h4 class="mdl-dialog__title">
-          <i v-if="selected_plugin.icon" class="material-icons">{{selected_plugin.icon}}</i>
-          <i v-else class="material-icons">extension</i>
-          {{
+
+    <dialog class="mdl-dialog" ref="plugin_info_dialog"
+      :style="selected_plugin.cover_image?'height: 80%; ': 'height: 400px;'">
+      <h4 class="mdl-dialog__title">
+        <i v-if="selected_plugin.icon" class="material-icons">{{selected_plugin.icon}}</i>
+        <i v-else class="material-icons">extension</i>
+        {{
               selected_plugin.type === "native-python"
                 ? selected_plugin.name + " 🚀"
                 : selected_plugin.type === "web-python" ||
@@ -214,39 +214,37 @@
                 ? selected_plugin.name + " 🐍"
                 : selected_plugin.name
             }}</h4>
-        <div class="mdl-dialog__content">
+      <div class="mdl-dialog__content">
 
-          <p>
-            <a class="label" :href="selected_plugin.url" target="_blank">source code</a>
-            <span class="label">
-              v{{selected_plugin.version}}
-            </span>
-            <span v-for="label in selected_plugin.allLabels" class="label">
-              {{label}}
-            </span>
-          </p>
-          <p>
-            <span class="mdl-chip">
-              <span class="mdl-chip__text">{{selected_plugin.repo}}:{{selected_plugin.name}}</span>
-            </span>
-          </p>
-          <p>
-            {{selected_plugin.description}}
-          </p>
-          <img style="width: 100%; max-width: 100%; max-height: calc(100% - 64px);"
-            :src="selected_plugin.cover_image"></img>
+        <p>
+          <a class="label" :href="selected_plugin.url" target="_blank">source code</a>
+          <span class="label">
+            v{{selected_plugin.version}}
+          </span>
+          <span v-for="label in selected_plugin.allLabels" class="label">
+            {{label}}
+          </span>
+        </p>
+        <p>
+          <span class="mdl-chip">
+            <span class="mdl-chip__text">{{selected_plugin.repo}}:{{selected_plugin.name}}</span>
+          </span>
+        </p>
+        <p>
+          {{selected_plugin.description}}
+        </p>
+        <img style="width: 100%; max-width: 100%; max-height: calc(100% - 64px);"
+          :src="selected_plugin.cover_image"></img>
 
-        </div>
+      </div>
 
-        <div class="mdl-dialog__actions">
-          <button type="button" class="mdl-button" @click="closeInfo()">Close</button>
-          <button type="button" class="mdl-button" v-if="selected_plugin.type!=='native-python'"
-            @click="run(selected_plugin)">Run</button>
-          <button type="button" class="mdl-button mdl-button--primary"
-            @click="install(selected_plugin)">Install</button>
-        </div>
-      </dialog>
-    </div>
+      <div class="mdl-dialog__actions">
+        <button type="button" class="mdl-button" @click="closeInfo()">Close</button>
+        <button type="button" class="mdl-button" v-if="selected_plugin.type!=='native-python'"
+          @click="run(selected_plugin)">Run</button>
+        <button type="button" class="mdl-button mdl-button--primary" @click="install(selected_plugin)">Install</button>
+      </div>
+    </dialog>
 
     <!--app end-->
   </div>
