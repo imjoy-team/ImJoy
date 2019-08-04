@@ -12,6 +12,29 @@ Vue.component('label-selector', {
 });
 
 
+function getThumbnail(url, tsize) {
+  return new Promise((resolve, reject) => {
+    var myCan = document.createElement('canvas');
+    var img = new Image();
+    img.src = url;
+    img.crossorigin = "anonymous";
+    img.onload = function () {
+      myCan.width = Number(tsize);
+      myCan.height = Number(tsize);
+      if (myCan.getContext) {
+        var cntxt = myCan.getContext("2d");
+        cntxt.drawImage(img, 0, 0, myCan.width, myCan.height);
+        var dataURL = myCan.toDataURL();
+        resolve(dataURL)
+      } else {
+        reject('unable to get context')
+      }
+    }
+    img.onerror = reject
+  })
+
+}
+
 const app = new Vue({
   el: '#app',
   data: {
@@ -80,6 +103,11 @@ const app = new Vue({
         } else if (Array.isArray(plugin.cover)) {
           plugin.cover_image = plugin.cover[0]
         }
+        plugin.thumbnail = plugin.cover_image;
+        // getThumbnail(plugin.cover_image, 500).then((thumbnail) => {
+        //   plugin.thumbnail = thumbnail;
+        //   that.$forceUpdate();
+        // })
       } else {
         plugin.cover_image = ''
       }

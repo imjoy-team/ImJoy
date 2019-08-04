@@ -59,10 +59,6 @@ ul>li {
     padding-top: 1rem;
 }
 
-.mdl-cell {
-    /*overflow-y: auto;*/
-}
-
 .mdl-card {
     min-height: 240px;
     margin: 0 auto;
@@ -89,12 +85,21 @@ ul>li {
     text-shadow: 0 0 5px white;
 }
 
+.mdl-dialog__actions {
+    background: white;
+    width: calc(100% - 50px);
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    margin-right: 10px;
+}
+
 .mdl-card__supporting-text {
     color: #fff;
     padding: 0 1rem;
     z-index: 2;
     position: absolute;
-    bottom: 82px!important;
+    bottom: 82px !important;
 }
 
 .mdl-card__supporting-text>span {
@@ -140,10 +145,34 @@ ul>li {
     color: white;
 }
 
+.centerpoint {
+    top: 50%;
+    left: 50%;
+    position: absolute;
+}
+
 .mdl-dialog {
-    width: 500px;
-    max-width: calc(100% - 10px);
+    position: relative;
+    width: 80%;
+    margin-left: calc(- 80%);
+    margin-top: calc(- 80%);
+    max-width: 1024px;
     max-height: calc(100% - 10px);
+    overflow: hidden;
+}
+
+.mdl-dialog__content {
+    display: block;
+    overflow: auto;
+    max-height: 100%;
+}
+
+@media screen and (max-width: 840px) {
+    .mdl-dialog {
+        width: 500px;
+        max-width: calc(100% - 10px) !important;
+        max-height: calc(100% - 10px) !important;
+    }
 }
 
 .background {
@@ -154,6 +183,7 @@ ul>li {
     color: #fff;
     position: relative;
     overflow: hidden;
+    animation-play-state: 'paused';
 }
 
 .background:before {
