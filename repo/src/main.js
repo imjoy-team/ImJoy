@@ -5,7 +5,6 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 });
 
-
 Vue.component('label-selector', {
   props: ['all-labels'],
   template: document.getElementById('label-selector'),
@@ -75,6 +74,7 @@ const app = new Vue({
           plugin.url = `https://github.com/${repo}/tree/master/${plugin.uri}`;
           plugin.install_url = `/#/app?plugin=${repo}:${plugin.name}`;
           plugin.run_url = `/lite?plugin=${repo}:${plugin.name}`;
+          plugin.source_url = `https://raw.githubusercontent.com/${repo}/master/${plugin.uri}`;
         }
         that.plugins = that.plugins.concat(plugins);
       } catch (e) {
@@ -127,15 +127,36 @@ const app = new Vue({
     }
   },
   methods: {
+    async getDocs(plugin) {
+      if (plugin.docs) return;
+      plugin.docs = '@loading...';
+      this.$forceUpdate();
+      const response = await fetch(plugin.source_url)
+      const source_code = await response.text();
+      const pluginComp = window.parseComponent(source_code);
+      const raw_docs = pluginComp.docs && pluginComp.docs[0] && pluginComp.docs[0].content;
+      if (raw_docs && window.marked && window.DOMPurify) {
+        plugin.docs = window.DOMPurify.sanitize(window.marked(raw_docs))
+        plugin.source_code = source_code;
+      } else {
+        plugin.docs = null;
+        plugin.source_code = null;
+      }
+      this.$forceUpdate();
+    },
     run(plugin) {
       window.open(plugin.run_url, '_blank');
     },
     install(plugin) {
       window.open(plugin.install_url, '_blank');
     },
+    share(plugin) {
+      prompt('Please copy and paste following URL for sharing:', 'https://imjoy.io' + plugin.install_url)
+    },
     showInfo(plugin) {
       this.selected_plugin = plugin;
       this.$refs.plugin_info_dialog.showModal();
+      this.getDocs(plugin)
     },
     closeInfo() {
       this.$refs.plugin_info_dialog.close();

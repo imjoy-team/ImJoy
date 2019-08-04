@@ -22,10 +22,30 @@ body {
     background: rgba(245, 245, 245, 0.1);
 }
 
+h1 {
+    font-size: 32px;
+}
+
 h2 {
     color: #555;
     font-weight: bold;
+    font-size: 30px;
 }
+
+
+h3 {
+    font-size: 28px;
+}
+
+
+h4 {
+    font-size: 24px;
+}
+
+h5 {
+    font-size: 22px;
+}
+
 
 a {
     /*margin-right: .5rem;*/
@@ -166,7 +186,7 @@ ul>li {
 .mdl-dialog__content {
     display: block;
     overflow: auto;
-    max-height: 100%;
+    max-height: calc(100% - 180px);
 }
 
 @media screen and (max-width: 840px) {
