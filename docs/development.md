@@ -343,7 +343,7 @@ In some cases, the ui might only contain a brief description of the op.
 This can either be plain text, or you can also specify a **link**    with `"ui": " <a href='https://imjoy.io' target='_blank'> ImJoy</a>"`. The `target='_blank'` will open this page in a new tab.
 
 
-**HTML and CSS**: for better rendering of the interface, we support **certain html tags** in the ui string. More details about allowed HTML tags and CSS can be found [here](api?id=sanitized-html-and-css).
+**HTML and CSS**: for better rendering of the interface, we support **certain html tags** in the ui string. Notice that HTML tags and CSS will be sanitized(details [here](api?id=sanitized-html-and-css)).
 
 
 **Longer forms**: to define forms with multiple lines, we support additional definitions of the `ui` string.

@@ -1253,9 +1253,9 @@ URL of the current plugin engine.
 
 ## Sanitized HTML and CSS
 
-For security reasons, HTML and CSS provided to shown in the ImJoy main interface are restricted (only for `ui` string for `<config>` block and `api.register`, the content shown in `api.alert`, `api.confirm` and `api.prompt`). Also notice that the content shown inside a `window` plugin do not have these restrictions.
+For security reasons, we used [DOMPurify](https://github.com/cure53/DOMPurify) to sanitize the HTML and CSS provided to shown in the ImJoy main interface. For example, all the markdown, `ui` string for `<config>` block and `api.register`, and the content shown in `api.alert`, `api.confirm` and `api.prompt`. 
 
-Currently allowed HTML tags are: `a`, `img`, `p`, `div`, `span`, `br`, `b`, `i`, `u`, `hr`, `h1`, `h2`, `h3`, `h4`, `h5`.
-Further, the following CSS styles are allowed: `border`, `margin`, `padding`.
-These restriction are imposed to prevent XSS attacks.
+Also notice that the content shown inside a `window` plugin do not have these restrictions.
+
+
 
