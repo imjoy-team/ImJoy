@@ -304,7 +304,13 @@ footer {
         width: 100%;
         background-position-x: center;
     }
+
+    h3 {
+        font-size: 30px;
+    }
 }
+
+
 
 @media screen and (max-width: 505px) {
     .site-title {
@@ -316,7 +322,7 @@ footer {
     }
 
     h3 {
-        font-size: 27px;
+        font-size: 24px;
     }
 
     .illustration {
@@ -357,6 +363,11 @@ footer {
     }
 }
 
+@media screen and (max-width: 325px) {
+    h3 {
+        font-size: 18px;
+    }
+}
 
 .mdl-layout-title {
     text-align: left;
