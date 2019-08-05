@@ -95,11 +95,23 @@ There are at least several such services, for example, you can use Telebit to ge
 
 The nice thing about using telebit is that you will have a fixed URL. Alternatively, you can also try with [ngrok](https://ngrok.com/) if Telebit did not work for you. Importantly, your command will be `ngrok http --host-header=rewrite 9527`. Notice that, although you can use ngrok without signup, but you will have a certain time limit and connection number.
 
+## Building a workflow
+
+Plugins within a workspace can also be composed into a workflow, where multiple plugins are chained to perform more complex data analysis and visualization tasks. 
+Note that these workflows can also be stored and shared with other users via a single URL. 
+Follow the step and you will make a simple workflow where a JavaScript plugin asking the user to provide a number is executed first, then this number is used by a second plugin to perform calculations. 
+
+ 1. click [here](https://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:Calculator&workspace=workflow-demo) to install two demo plugins.
+ 2. click `WORKFLOW` in the left panel
+ 3. press the + circled button and select `GetNumber` to add it 
+ 4. then add `Calculator`
+ 5. press the `run` button
+
+
+![imjoy-basic-workflow](assets/imjoy-basic-workflow.png ':size=800')
 
 <!--
 ## [ToDo]: Loading data to the workspace
-
-## [ToDo]: How to build workflows
 
 ## [ToDo]: How to use workspaces
 -->
