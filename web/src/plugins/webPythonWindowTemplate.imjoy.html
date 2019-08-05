@@ -18,14 +18,14 @@
   "api_version": "0.1.5",
   "env": "",
   "permissions": [],
-  "requirements": [],
+  "requirements": ["numpy"],
   "dependencies": []
 }
 </config>
 
 <script lang="python">
+import numpy as np
 from imjoy import api
-
 
 class ImJoyPlugin():
     def setup(self):

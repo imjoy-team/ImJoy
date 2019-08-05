@@ -187,6 +187,9 @@ var execute = async function(code) {
               code.requirements[i].toLowerCase().endsWith(".js") ||
               code.requirements[i].startsWith("package:")
             ) {
+              if (code.requirements[i].startsWith("package:")) {
+                code.requirements[i] = code.requirements[i].slice(8);
+              }
               python_packages.push(code.requirements[i]);
             } else if (
               code.requirements[i].startsWith("http:") ||
@@ -195,6 +198,8 @@ var execute = async function(code) {
               console.log(
                 "Unprocessed requirements url: " + code.requirements[i]
               );
+            } else {
+              python_packages.push(code.requirements[i]);
             }
           }
           await pyodide.loadPackage(python_packages);
