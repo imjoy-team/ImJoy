@@ -15,7 +15,6 @@ ImJoy runs on mobile and desktop environment cross different operating systems, 
 With ImJoy, delivering Deep Learning tools to the end users is simple and easy thanks to
 its flexible plugin system and sharable plugin URL. Developer can easily add rich and interactive web interfaces to existing Python code.
 
-
 <img src="https://github.com/oeway/ImJoy/raw/master/docs/assets/imjoy-overview.jpg" width="600px"></img>
 
 Checkout the documentation for how to get started and more details
@@ -23,7 +22,7 @@ for how to develop ImJoy plugins: [ImJoy Docs](https://imjoy.io/docs)
 
 ## Key Features of ImJoy
  * Minimal and flexible plugin powered web application
- * Server-less solution with offline support
+ * Server-less progressive web application with offline support
  * Support mobile devices
 
  * Rich and interactive user interface powered by web technologies
@@ -49,9 +48,9 @@ for how to develop ImJoy plugins: [ImJoy Docs](https://imjoy.io/docs)
 
 **ImJoy greatly accelerates the development and dissemination of new tools.** You can develop plugins in ImJoy, deploy the plugin file to Github, and share the plugin URL through social networks. Users can then use it by a single click, even on a mobile phone
 
-<a href="https://imjoy.io/#/app?p=imjoy-team/example-plugins:Skin-Lesion-Analyzer 
-" target="_blank"><img src="https://github.com/oeway/ImJoy/raw/master/docs/assets/imjoy-sharing.jpg" height="500px"></img></a>
-
+<a href="https://imjoy.io/#/app?p=imjoy-team/example-plugins:Skin-Lesion-Analyzer" target="_blank">
+  <img src="https://github.com/oeway/ImJoy/raw/master/docs/assets/imjoy-sharing.jpg" width="500px"></img>
+</a>
 
 ## Quick Start
 

@@ -197,6 +197,9 @@
               <md-menu-item @click="showSettingsDialog = true" :disabled="true">
                 <md-icon>settings</md-icon>Settings
               </md-menu-item>
+              <md-menu-item href="/lite" target="_blank" class="md-primary">
+                <md-icon>open_in_new</md-icon>ImJoy-Lite
+              </md-menu-item>
               <md-menu-item href="/docs/" target="_blank" class="md-primary">
                 <md-icon>library_books</md-icon>Documentation
               </md-menu-item>
@@ -1412,9 +1415,9 @@ import {
   assert,
   _clone,
   compareVersions,
-  HtmlWhitelistedSanitizer,
   escapeHTML,
 } from "../utils.js";
+import DOMPurify from "dompurify";
 
 import { ImJoy } from "../imjoyLib.js";
 
@@ -1428,8 +1431,6 @@ import Minibus from "minibus";
 
 import Ajv from "ajv";
 const ajv = new Ajv();
-
-const sanitizer = new HtmlWhitelistedSanitizer(true);
 
 export default {
   name: "imjoy",
@@ -1779,7 +1780,10 @@ export default {
       this.showWelcomeDialog = true;
     } else {
       this.startImJoy(this.$route).then(() => {
-        if (!this.pm.plugins || Object.keys(this.pm.plugins) <= 0) {
+        if (
+          !this.showAddPluginDialog &&
+          (!this.pm.plugins || Object.keys(this.pm.plugins) <= 0)
+        ) {
           this.pm
             .reloadPluginRecursively({ uri: "oeway/ImJoy-Plugins:Welcome" })
             .then(() => {
@@ -1911,10 +1915,10 @@ export default {
         let connection_token = null;
         if (route.query.token || route.query.t) {
           connection_token = (route.query.token || route.query.t).trim();
-          const query = Object.assign({}, route.query);
-          delete query.token;
-          delete query.t;
-          route.replace({ query });
+          // const query = Object.assign({}, route.query);
+          // delete query.token;
+          // delete query.t;
+          // route.replace({ query });
         }
         if (route.query.engine || route.query.e) {
           const engine_url = (route.query.engine || route.query.e).trim();
@@ -3044,7 +3048,7 @@ export default {
       } else if (typeof text === "object") {
         this.alert_config.title = text.title;
         this.alert_config.content =
-          sanitizer.sanitizeString(String(text.content)) || "undefined";
+          DOMPurify.sanitize(String(text.content)) || "undefined";
         this.alert_config.confirm_text = text.confirm_text || "OK";
       } else {
         this.alert_config.content = String(text);
@@ -3065,7 +3069,7 @@ export default {
         } else if (typeof text === "object") {
           this.prompt_config.title = text.title;
           this.prompt_config.content =
-            sanitizer.sanitizeString(String(text.content)) || "undefined";
+            DOMPurify.sanitize(String(text.content)) || "undefined";
           this.prompt_config.placeholder = text.placeholder || null;
           this.prompt_config.cancel_text = text.cancel_text || "Cancel";
           this.prompt_config.confirm_text = text.confirm_text || "OK";
@@ -3093,7 +3097,7 @@ export default {
         } else if (typeof text === "object") {
           this.confirm_config.title = text.title;
           this.confirm_config.content =
-            sanitizer.sanitizeString(String(text.content)) || "undefined";
+            DOMPurify.sanitize(String(text.content)) || "undefined";
           this.confirm_config.cancel_text = text.cancel_text || "Cancel";
           this.confirm_config.confirm_text = text.confirm_text || "OK";
         } else {

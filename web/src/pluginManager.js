@@ -3,6 +3,7 @@ import PouchDB from "pouchdb-browser";
 import SparkMD5 from "spark-md5";
 import axios from "axios";
 import _ from "lodash";
+import yaml from "js-yaml";
 
 import {
   _clone,
@@ -1321,7 +1322,17 @@ export class PluginManager {
     overwrite_config = overwrite_config || {};
     try {
       const pluginComp = parseComponent(code);
-      let config = JSON.parse(pluginComp.config[0].content);
+      let config;
+      if (pluginComp.config[0].attrs.lang === "yaml") {
+        config = yaml.load(pluginComp.config[0].content);
+      } else if (pluginComp.config[0].attrs.lang === "json") {
+        config = JSON.parse(pluginComp.config[0].content);
+      } else {
+        throw `Unsupported config language ${
+          pluginComp.config[0].attrs.lang
+        }, please set lang="json" or lang="yaml"`;
+      }
+
       config.scripts = [];
       for (let i = 0; i < pluginComp.script.length; i++) {
         config.scripts.push(pluginComp.script[i]);

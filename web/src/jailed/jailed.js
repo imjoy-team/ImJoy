@@ -19,13 +19,9 @@
  *  _pluginCore.js    common plugin site protocol implementation
  */
 
-import {
-  randId,
-  assert,
-  compareVersions,
-  HtmlWhitelistedSanitizer,
-} from "../utils.js";
-var sanitizer = new HtmlWhitelistedSanitizer(true);
+import { randId, assert, compareVersions } from "../utils.js";
+
+import DOMPurify from "dompurify";
 
 var __jailed__path__;
 var __is__node__ =
@@ -865,7 +861,7 @@ DynamicPlugin.prototype._connect = Plugin.prototype._connect = function() {
     if (error) me.error(error.toString());
     if (me.config.type === "window" && me.config.iframe_container) {
       const container = document.getElementById(me.config.iframe_container);
-      container.innerHTML = `<h5>Oops! failed to load the window.</h5><code>Details: ${sanitizer.sanitizeString(
+      container.innerHTML = `<h5>Oops! failed to load the window.</h5><code>Details: ${DOMPurify.sanitize(
         String(error)
       )}</code>`;
     }
