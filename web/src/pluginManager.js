@@ -1328,9 +1328,12 @@ export class PluginManager {
       } else if (pluginComp.config[0].attrs.lang === "json") {
         config = JSON.parse(pluginComp.config[0].content);
       } else {
-        throw `Unsupported config language ${
-          pluginComp.config[0].attrs.lang
-        }, please set lang="json" or lang="yaml"`;
+        config = JSON.parse(pluginComp.config[0].content);
+        if (compareVersions(config.api_version, ">", "0.1.5")) {
+          throw `Unsupported config language ${
+            pluginComp.config[0].attrs.lang
+          }, please set lang="json" or lang="yaml"`;
+        }
       }
 
       config.scripts = [];
@@ -1403,7 +1406,7 @@ export class PluginManager {
       return config;
     } catch (e) {
       console.error(e);
-      throw "Failed to parse the content of the plugin.";
+      throw `Failed to parse the plugin file, error: ${e}`;
     }
   }
 
