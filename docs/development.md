@@ -202,7 +202,7 @@ Config in `json` format:
   "ui": "image processing",
   "cover": "",
   "version": "0.1.0",
-  "api_version": "0.1.2",
+  "api_version": "0.1.6",
   "description": "A plugin for image processing.",
   "icon": "extension",
   "inputs": null,
@@ -224,7 +224,7 @@ tags: []
 ui: image processing
 cover: ''
 version: 0.1.0
-api_version: 0.1.2
+api_version: 0.1.6
 description: A plugin for image processing.
 icon: extension
 inputs: 
@@ -1462,3 +1462,9 @@ Follow these steps, and you will be able to run ImJoy server and the plugin engi
   the **connection token** you get when you start the engine. If you have `base_url` configured, please replace `YOUR_REMOTE_IP` to your actual domain name or host name.
 
 0. Importantly, the ImJoy app served from https://imjoy.io won't be able to connect a remote plugin engine served with http. You will need to setup your own https proxy, or use an existing one such as [Telebit](https://telebit.cloud/) or [ngrok](https://ngrok.com/).
+
+
+## Change log
+
+### API changes
+ * since `api_version > 0.1.6` you must specify the `lang` field for the `<config>` block, e.g.: `<config lang="json">`.

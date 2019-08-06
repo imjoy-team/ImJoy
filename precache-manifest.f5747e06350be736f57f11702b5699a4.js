@@ -1,11 +1,11 @@
 self.__precacheManifest = [
   {
-    "revision": "ab48bf83d8041fe1ffb4",
-    "url": "/static/css/app.e3f2b1b4.css"
+    "revision": "cc06e72fa269e47ab7a1",
+    "url": "/static/css/app.c77b06ff.css"
   },
   {
-    "revision": "ab48bf83d8041fe1ffb4",
-    "url": "/static/js/app.c013e065.js"
+    "revision": "cc06e72fa269e47ab7a1",
+    "url": "/static/js/app.96a85e50.js"
   },
   {
     "revision": "b8859e2632feade2aed6",
@@ -228,19 +228,19 @@ self.__precacheManifest = [
     "url": "/static/js/chunk-vendors.b80ae9cc.js"
   },
   {
-    "revision": "b00449080615ce71a2a8a52aee9f658f",
-    "url": "/static/vs/css.worker.js"
+    "revision": "2a3e222e6a41b32a7180e6afa3675990",
+    "url": "/static/vs/html.worker.js"
   },
   {
     "revision": "493ef474936217113b20a6573247288a",
     "url": "/static/vs/editor.worker.js"
   },
   {
-    "revision": "2a3e222e6a41b32a7180e6afa3675990",
-    "url": "/static/vs/html.worker.js"
+    "revision": "b00449080615ce71a2a8a52aee9f658f",
+    "url": "/static/vs/css.worker.js"
   },
   {
-    "revision": "a404bfaab430db4938d29b2473f87f9a",
+    "revision": "be8300fea2cf59861b38c28b3fef8395",
     "url": "/index.html"
   },
   {
@@ -628,12 +628,12 @@ self.__precacheManifest = [
     "url": "/static/vs/basic-languages/r/r.js"
   },
   {
-    "revision": "524db18624629ebed6788b26cbf4820e",
-    "url": "/static/img/perspective-hr.jpg"
-  },
-  {
     "revision": "b92c2339338153f248226b4fbdd625f8",
     "url": "/static/vs/basic-languages/razor/razor.js"
+  },
+  {
+    "revision": "524db18624629ebed6788b26cbf4820e",
+    "url": "/static/img/perspective-hr.jpg"
   },
   {
     "revision": "4b8f17c234aae37b8bbe106bed899ad1",
@@ -760,20 +760,20 @@ self.__precacheManifest = [
     "url": "/static/vs/language/json/jsonMode.js"
   },
   {
-    "revision": "cf05f5559129d3145d705a8df6c6fb48",
-    "url": "/static/vs/loader.js"
-  },
-  {
-    "revision": "11a854433bcc74085be053c3ab713b15",
-    "url": "/static/vs/language/css/cssWorker.js"
-  },
-  {
     "revision": "7d2a277c0d00a4bb615596ae1ab93213",
     "url": "/static/vs/language/json/jsonWorker.js"
   },
   {
     "revision": "a3f8339f361d9f2683c37abb09f8c75e",
     "url": "/static/vs/language/typescript/tsMode.js"
+  },
+  {
+    "revision": "cf05f5559129d3145d705a8df6c6fb48",
+    "url": "/static/vs/loader.js"
+  },
+  {
+    "revision": "11a854433bcc74085be053c3ab713b15",
+    "url": "/static/vs/language/css/cssWorker.js"
   },
   {
     "revision": "51880b243dfb4c0a65c406b155e9a716",

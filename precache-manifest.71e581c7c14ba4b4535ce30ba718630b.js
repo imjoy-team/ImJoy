@@ -1,10 +1,10 @@
 self.__precacheManifest = [
   {
-    "revision": "0f852a32056fe4290a36",
+    "revision": "da2f920e7edac6a55692",
     "url": "imjoy-lib.min.js"
   },
   {
-    "revision": "b32f6e73c64c8f781b0cd32fd36f9d47",
+    "revision": "2a469919f8271cf9601f81967a39f1c6",
     "url": "static/jailed/jailed.js"
   },
   {
@@ -32,7 +32,7 @@ self.__precacheManifest = [
     "url": "static/jailed/_pluginWebIframe.js"
   },
   {
-    "revision": "ed7834e08ce272be1672beaa5df5cba7",
+    "revision": "02e7132e1ac3632aba8d480fcc03a47d",
     "url": "static/jailed/_pluginWebPython.js"
   },
   {
