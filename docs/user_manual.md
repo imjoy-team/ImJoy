@@ -84,7 +84,10 @@ not need to enter it anymore to connect to this Plugin Engine.
 
 ### Setup a remote plugin engine
 
-By default a local plugin engine won't allow access from outside. In order to make your plugin engine accessible from outside, the easiest way is to use an existing tunnelling service which will expose your plugin engine through a secured public URL.
+By default a local plugin engine won't allow access from outside, and your browser won't allow imjoy.io to connect to a plugin engine served with `http` connection because it's not secured. You will need an engine URL starts with `https` if you want to connect to it. 
+
+The easiest way to encrypt your plugin engine connection is to use an existing tunnelling service which will expose your plugin engine through a secured public URL starts with `https`. 
+And that will make your plugin engine accessible from outside your network. 
 
 There are at least several such services, for example, you can use Telebit to generate an public URL for your plugin eneing:
 1. goto https://telebit.cloud/ and follow the installation guide to install Telebit and register with your email.

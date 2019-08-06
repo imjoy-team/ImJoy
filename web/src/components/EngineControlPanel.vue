@@ -159,10 +159,14 @@
             >Another Computer</md-radio
           >
           <p v-if="url_type === 'remote'">
-            You may want to use
-            <a href="https://telebit.cloud/" target="_blank">Telebit</a> or
-            <a href="https://ngrok.com/" target="_blank">ngrok</a> to make your
-            plugin engine available outside your network.
+            Notice that only `https` connection can be connected from
+            https://imjoy.io, if you don't have it, please use
+            <code>Telebit</code> or <code>ngrok</code> to make your plugin
+            engine available outside your network (<a
+              href="/docs/#/user_manual?id=setup-a-remote-plugin-engine"
+              target="_blank"
+              >more details</a
+            >).
           </p>
         </div>
         <md-autocomplete
