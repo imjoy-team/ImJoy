@@ -2924,10 +2924,10 @@ export default {
           })
           .catch(response => {
             this.showMessage(
-              `Failed to upload files, error: ${response.statusText}`
+              `Failed to upload files, error: ${response.status}`
             );
             console.error(response);
-            reject(response.statusText);
+            reject(response.status);
           });
       });
     },
