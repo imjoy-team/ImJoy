@@ -16,10 +16,6 @@ self.__precacheManifest = [
     "url": "static/jailed/_frame.js"
   },
   {
-    "revision": "813d5fce78719f37f286961fea9e5baa",
-    "url": "static/jailed/_JailedSite.js"
-  },
-  {
     "revision": "3c947349d7fe3b84b65a0501ec4958f3",
     "url": "static/jailed/_pluginCore.js"
   },
@@ -38,6 +34,10 @@ self.__precacheManifest = [
   {
     "revision": "fe7b7b24efd69da34f24d8f782067799",
     "url": "static/jailed/_pluginWebWorker.js"
+  },
+  {
+    "revision": "813d5fce78719f37f286961fea9e5baa",
+    "url": "static/jailed/_JailedSite.js"
   },
   {
     "revision": "f9bf1db80923c73a2a8aac899bae0c16",
