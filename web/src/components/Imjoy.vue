@@ -2879,7 +2879,12 @@ export default {
       _plugin = _plugin || {};
       return new Promise((resolve, reject) => {
         const bodyFormData = new FormData();
-        bodyFormData.append("file", config.file);
+        bodyFormData.append(
+          "file",
+          new Blob([config.file], {
+            type: config.file.type || "application/octet-stream",
+          })
+        );
         this.showMessage("Uploading a file to " + config.url);
         let totalLength = null;
         axios({
@@ -2919,10 +2924,10 @@ export default {
           })
           .catch(response => {
             this.showMessage(
-              `Failed to upload files, error: ${response.statusText}`
+              `Failed to upload files, error: ${response.status}`
             );
             console.error(response);
-            reject(response.statusText);
+            reject(response.status);
           });
       });
     },
