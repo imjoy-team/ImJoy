@@ -2879,7 +2879,12 @@ export default {
       _plugin = _plugin || {};
       return new Promise((resolve, reject) => {
         const bodyFormData = new FormData();
-        bodyFormData.append("file", new Blob([config.file], { type: config.file.type || 'application/octet-stream' }));
+        bodyFormData.append(
+          "file",
+          new Blob([config.file], {
+            type: config.file.type || "application/octet-stream",
+          })
+        );
         this.showMessage("Uploading a file to " + config.url);
         let totalLength = null;
         axios({
