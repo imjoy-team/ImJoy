@@ -504,9 +504,9 @@ DynamicPlugin.prototype._init = Plugin.prototype._init = function() {
 
   this.getRemoteCallStack = this._site.getRemoteCallStack;
 
-  if (this.type == "native-python") {
+  if (backend.type === "external") {
     this._sendInterface();
-  } else {
+  } else if (backend.type === "internal") {
     var sCb = function() {
       me._loadCore();
     };
@@ -515,6 +515,8 @@ DynamicPlugin.prototype._init = Plugin.prototype._init = function() {
       sCb,
       this._fCb
     );
+  } else {
+    throw `Unsupported backend type ${backend.type}`;
   }
 };
 

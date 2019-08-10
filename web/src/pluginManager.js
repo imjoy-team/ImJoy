@@ -20,6 +20,7 @@ import {
 import { parseComponent } from "./pluginParser.js";
 
 import { DynamicPlugin } from "./jailed/jailed.js";
+import { getBackendByType } from "./jailed/backends.js";
 
 import {
   REGISTER_SCHEMA,
@@ -27,7 +28,6 @@ import {
   WINDOW_SCHEMA,
   PLUGIN_SCHEMA,
   CONFIGURABLE_FIELDS,
-  SUPPORTED_PLUGIN_TYPES,
   upgradePluginAPI,
 } from "./api.js";
 
@@ -930,7 +930,7 @@ export class PluginManager {
             reject(`Failed to fetch the plugin from "${uri}".`);
             return;
           }
-          if (!SUPPORTED_PLUGIN_TYPES.includes(config.type)) {
+          if (!getBackendByType(config.type)) {
             reject("Unsupported plugin type: " + config.type);
             return;
           }
@@ -1013,7 +1013,7 @@ export class PluginManager {
             reject(`Failed to fetch the plugin from "${uri}".`);
             return;
           }
-          if (!SUPPORTED_PLUGIN_TYPES.includes(config.type)) {
+          if (!getBackendByType(config.type)) {
             reject("Unsupported plugin type: " + config.type);
             return;
           }

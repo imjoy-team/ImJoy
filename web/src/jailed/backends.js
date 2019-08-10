@@ -1,27 +1,31 @@
 import { BACKEND_SCHEMA } from "../api.js";
-import { Whenable } from "../utils.js";
+import { Whenable, assert } from "../utils.js";
 const _backends = {};
 
 function initBackends() {
   registerBackend("web-worker", {
+    type: "internal",
     name: "Web Worker",
     connection: BasicConnection,
     lang: "javascript",
   });
 
   registerBackend("iframe", {
+    type: "internal",
     name: "IFrame",
     connection: BasicConnection,
     lang: "javascript",
   });
 
   registerBackend("window", {
+    type: "internal",
     name: "Window",
     connection: BasicConnection,
     lang: "javascript",
   });
 
   registerBackend("web-python", {
+    type: "internal",
     name: "Web Python",
     connection: BasicConnection,
     lang: "web-python",
@@ -29,6 +33,7 @@ function initBackends() {
   });
 
   registerBackend("web-python-window", {
+    type: "internal",
     name: "Web Python (window)",
     connection: BasicConnection,
     lang: "web-python",
@@ -36,14 +41,31 @@ function initBackends() {
   });
 
   registerBackend("native-python", {
+    type: "external",
     name: "Native Python",
     connection: SocketioConnection,
     lang: "python",
     icon: "🚀",
   });
+
+  registerBackend("jupyter-notebook", {
+    type: "external",
+    name: "Jupyter Notebook",
+    connection: PostMessageConnection,
+    lang: "python",
+    icon: "♃",
+  });
+
+  registerBackend("collection", {
+    type: "-",
+    name: "Collection",
+    connection: null,
+    lang: "",
+    icon: "",
+  });
 }
 
-function registerBackend(type, backend) {
+export function registerBackend(type, backend) {
   if (!BACKEND_SCHEMA(backend)) {
     const error = BACKEND_SCHEMA.errors;
     console.error("Error occured during registering backend " + type, error);
@@ -87,89 +109,84 @@ class BasicConnection {
 
     var me = this;
 
-    if (!me._disconnected) {
-      me._frame = sample.cloneNode(false);
-      var perm = [
-        "allow-scripts",
-        "allow-forms",
-        "allow-modals",
-        "allow-popups",
-        "allow-same-origin",
-      ];
-      var allows = "";
-      if (config.permissions) {
-        if (
-          config.permissions.includes("midi") &&
-          !allows.includes("midi *;")
-        ) {
-          allows += "midi *;";
-        }
-        if (
-          config.permissions.includes("geolocation") &&
-          !allows.includes("geolocation *;")
-        ) {
-          allows += "geolocation *;";
-        }
-        if (
-          config.permissions.includes("microphone") &&
-          !allows.includes("microphone *;")
-        ) {
-          allows += "microphone *;";
-        }
-        if (
-          config.permissions.includes("camera") &&
-          !allows.includes("camera *;")
-        ) {
-          allows += "camera *;";
-        }
-        if (
-          config.permissions.includes("encrypted-media") &&
-          !allows.includes("encrypted-media *;")
-        ) {
-          allows += "encrypted-media *;";
-        }
-        if (config.permissions.includes("full-screen")) {
-          me._frame.allowfullscreen = "";
-        }
-        if (config.permissions.includes("payment-request")) {
-          me._frame.allowpaymentrequest = "";
-        }
+    me._frame = sample.cloneNode(false);
+    var perm = [
+      "allow-scripts",
+      "allow-forms",
+      "allow-modals",
+      "allow-popups",
+      "allow-same-origin",
+    ];
+    var allows = "";
+    if (config.permissions) {
+      if (config.permissions.includes("midi") && !allows.includes("midi *;")) {
+        allows += "midi *;";
       }
-      me._frame.sandbox = perm.join(" ");
-      me._frame.allow = allows;
-      me._frame.src =
-        me._frame.src +
-        "?type=" +
-        type +
-        "&name=" +
-        config.name +
-        "&workspace=" +
-        config.workspace;
-      me._frame.id = "iframe_" + id;
-      if (type == "iframe" || type == "window" || type == "web-python-window") {
-        if (typeof iframe_container == "string") {
-          iframe_container = document.getElementById(iframe_container);
-        }
-        if (iframe_container) {
-          me._frame.style.display = "block";
-          iframe_container.appendChild(me._frame);
-        } else {
-          document.body.appendChild(me._frame);
-        }
+      if (
+        config.permissions.includes("geolocation") &&
+        !allows.includes("geolocation *;")
+      ) {
+        allows += "geolocation *;";
+      }
+      if (
+        config.permissions.includes("microphone") &&
+        !allows.includes("microphone *;")
+      ) {
+        allows += "microphone *;";
+      }
+      if (
+        config.permissions.includes("camera") &&
+        !allows.includes("camera *;")
+      ) {
+        allows += "camera *;";
+      }
+      if (
+        config.permissions.includes("encrypted-media") &&
+        !allows.includes("encrypted-media *;")
+      ) {
+        allows += "encrypted-media *;";
+      }
+      if (config.permissions.includes("full-screen")) {
+        me._frame.allowfullscreen = "";
+      }
+      if (config.permissions.includes("payment-request")) {
+        me._frame.allowpaymentrequest = "";
+      }
+    }
+    me._frame.sandbox = perm.join(" ");
+    me._frame.allow = allows;
+    me._frame.src =
+      me._frame.src +
+      "?type=" +
+      type +
+      "&name=" +
+      config.name +
+      "&workspace=" +
+      config.workspace;
+    me._frame.id = "iframe_" + id;
+    if (type == "iframe" || type == "window" || type == "web-python-window") {
+      if (typeof iframe_container == "string") {
+        iframe_container = document.getElementById(iframe_container);
+      }
+      if (iframe_container) {
+        me._frame.style.display = "block";
+        iframe_container.appendChild(me._frame);
       } else {
         document.body.appendChild(me._frame);
       }
-      window.addEventListener("message", function(e) {
-        if (e.source === me._frame.contentWindow) {
-          if (e.data.type == "initialized") {
-            me.dedicatedThread = e.data.dedicatedThread;
-            me._init.emit();
-          } else {
-            me._messageHandler(e.data);
-          }
-        }
-      });
+    } else {
+      document.body.appendChild(me._frame);
     }
+    window.addEventListener("message", function(e) {
+      if (e.source === me._frame.contentWindow) {
+        if (e.data.type == "initialized") {
+          me.dedicatedThread = e.data.dedicatedThread;
+          me._init.emit();
+        } else {
+          me._messageHandler(e.data);
+        }
+      }
+    });
   }
 
   /**
@@ -259,7 +276,7 @@ class SocketioConnection {
     this._disconnectHandler = () => {};
     this._loggingHandler = () => {};
 
-    if (!this._disconnected && this.engine && this.engine.socket) {
+    if (this.engine && this.engine.socket) {
       const config_ = {
         api_version: config.api_version,
         flags: config.flags,
@@ -359,6 +376,64 @@ class SocketioConnection {
   whenFailed(handler) {
     this._fail.whenEmitted(handler);
   }
+}
+
+class PostMessageConnection {
+  constructor(id, type, config) {
+    assert(
+      window.top !== window.self,
+      "PostMessage Connection can only be used inside an iframe."
+    );
+    this._init = null;
+    this._fail = new Whenable();
+    this._disconnected = false;
+    this.id = id;
+    var me = this;
+
+    window.addEventListener(
+      "message",
+      function(e) {
+        if (e.source === window.parent) {
+          console.log("IMJOY: recieving message from parent", e.data);
+          if (e.data.type == "initialized") {
+            me.dedicatedThread = e.data.dedicatedThread;
+            me._init();
+          } else {
+            me._messageHandler(e.data);
+          }
+        }
+      },
+      false
+    );
+  }
+
+  whenInit(handler) {
+    this._init = handler;
+  }
+
+  whenFailed(handler) {
+    this._fail.whenEmitted(handler);
+  }
+
+  send(data, transferables) {
+    console.log("IMJOY: sending message to parent", data);
+    window.parent.postMessage(
+      { type: "message", data: data },
+      "*",
+      transferables
+    );
+  }
+
+  onMessage(handler) {
+    this._messageHandler = handler;
+  }
+
+  onDisconnect() {}
+
+  /**
+   * Disconnects the plugin (= kills the frame)
+   */
+  disconnect() {}
 }
 
 initBackends();
