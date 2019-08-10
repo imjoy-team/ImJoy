@@ -19,7 +19,8 @@
  *  _pluginCore.js    common plugin site protocol implementation
  */
 
-import { randId, assert, compareVersions } from "../utils.js";
+import { randId, assert, compareVersions, Whenable } from "../utils.js";
+import { getBackendByType } from "../jailed/backends.js";
 
 import DOMPurify from "dompurify";
 
@@ -47,79 +48,6 @@ if (__is__node__) {
   //     .slice(0, -1)
   //     .join('/')+'/static/jailed/';
 }
-
-/**
- * A special kind of event:
- *  - which can only be emitted once;
- *  - executes a set of subscribed handlers upon emission;
- *  - if a handler is subscribed after the event was emitted, it
- *    will be invoked immideately.
- *
- * Used for the events which only happen once (or do not happen at
- * all) during a single plugin lifecycle - connect, disconnect and
- * connection failure
- */
-var Whenable = function() {
-  this._emitted = false;
-  this._handlers = [];
-};
-
-/**
- * Emits the Whenable event, calls all the handlers already
- * subscribed, switches the object to the 'emitted' state (when
- * all future subscibed listeners will be immideately issued
- * instead of being stored)
- */
-Whenable.prototype.emit = function(e) {
-  if (!this._emitted) {
-    this._emitted = true;
-    this._e = e;
-    var handler;
-    while ((handler = this._handlers.pop())) {
-      setTimeout(handler.bind(null, e), 0);
-    }
-  }
-};
-
-/**
- * Saves the provided function as a handler for the Whenable
- * event. This handler will then be called upon the event emission
- * (if it has not been emitted yet), or will be scheduled for
- * immediate issue (if the event has already been emmitted before)
- *
- * @param {Function} handler to subscribe for the event
- */
-Whenable.prototype.whenEmitted = function(handler) {
-  handler = this._checkHandler(handler);
-  if (this._emitted) {
-    setTimeout(handler.bind(null, this._e), 0);
-  } else {
-    this._handlers.push(handler);
-  }
-};
-
-/**
- * Checks if the provided object is suitable for being subscribed
- * to the event (= is a function), throws an exception if not
- *
- * @param {Object} obj to check for being subscribable
- *
- * @throws {Exception} if object is not suitable for subscription
- *
- * @returns {Object} the provided object if yes
- */
-Whenable.prototype._checkHandler = function(handler) {
-  var type = typeof handler;
-  if (type != "function") {
-    var msg =
-      "A function may only be subsribed to the event, " +
-      type +
-      " was provided instead";
-    throw new Error(msg);
-  }
-
-  return handler;
-};
 
 /**
  * Initializes the library site for web environment (loads
@@ -167,393 +95,10 @@ var initWeb = function() {
   window.addEventListener("load", wload, false);
 };
 
-var BasicConnection;
-/**
- * Creates the platform-dependent BasicConnection object in the
- * web-browser environment
- */
-var basicConnectionWeb = function() {
-  // frame element to be cloned
-  var sample = document.createElement("iframe");
-  sample.src = __jailed__path__ + "_frame.html";
-  sample.sandbox = "";
-  sample.frameBorder = "0";
-  sample.style.width = "100%";
-  sample.style.height = "100%";
-  sample.style.margin = "0";
-  sample.style.padding = "0";
-  sample.style.display = "none";
-
-  /**
-   * Platform-dependent implementation of the BasicConnection
-   * object, initializes the plugin site and provides the basic
-   * messaging-based connection with it
-   *
-   * For the web-browser environment, the plugin is created as a
-   * Worker in a sandbaxed frame
-   */
-  BasicConnection = function(id, type, config) {
-    this._init = new Whenable();
-    this._fail = new Whenable();
-    this._disconnected = false;
-    this.id = id;
-    var iframe_container = config.iframe_container;
-
-    var me = this;
-    platformInit.whenEmitted(function() {
-      if (!me._disconnected) {
-        me._frame = sample.cloneNode(false);
-        var perm = [
-          "allow-scripts",
-          "allow-forms",
-          "allow-modals",
-          "allow-popups",
-          "allow-same-origin",
-        ];
-        var allows = "";
-        // if (
-        //   __jailed__path__.substr(0, 7).toLowerCase() == "file://" &&
-        //   !perm.includes("allow-same-origin")
-        // ) {
-        //   // local instance requires extra permission
-        //   perm.push("allow-same-origin");
-        // }
-        if (config.permissions) {
-          if (
-            config.permissions.includes("midi") &&
-            !allows.includes("midi *;")
-          ) {
-            allows += "midi *;";
-          }
-          if (
-            config.permissions.includes("geolocation") &&
-            !allows.includes("geolocation *;")
-          ) {
-            allows += "geolocation *;";
-          }
-          if (
-            config.permissions.includes("microphone") &&
-            !allows.includes("microphone *;")
-          ) {
-            allows += "microphone *;";
-          }
-          if (
-            config.permissions.includes("camera") &&
-            !allows.includes("camera *;")
-          ) {
-            allows += "camera *;";
-          }
-          if (
-            config.permissions.includes("encrypted-media") &&
-            !allows.includes("encrypted-media *;")
-          ) {
-            allows += "encrypted-media *;";
-          }
-          if (config.permissions.includes("full-screen")) {
-            me._frame.allowfullscreen = "";
-          }
-          if (config.permissions.includes("payment-request")) {
-            me._frame.allowpaymentrequest = "";
-          }
-        }
-        me._frame.sandbox = perm.join(" ");
-        me._frame.allow = allows;
-        me._frame.src =
-          me._frame.src +
-          "?type=" +
-          type +
-          "&name=" +
-          config.name +
-          "&workspace=" +
-          config.workspace;
-        me._frame.id = "iframe_" + id;
-        if (
-          type == "iframe" ||
-          type == "window" ||
-          type == "web-python-window"
-        ) {
-          if (typeof iframe_container == "string") {
-            iframe_container = document.getElementById(iframe_container);
-          }
-          if (iframe_container) {
-            me._frame.style.display = "block";
-            iframe_container.appendChild(me._frame);
-          } else {
-            document.body.appendChild(me._frame);
-          }
-        } else {
-          document.body.appendChild(me._frame);
-        }
-        window.addEventListener("message", function(e) {
-          if (e.source === me._frame.contentWindow) {
-            if (e.data.type == "initialized") {
-              me.dedicatedThread = e.data.dedicatedThread;
-              me._init.emit();
-            } else {
-              me._messageHandler(e.data);
-            }
-          }
-        });
-      }
-    });
-  };
-
-  /**
-   * Sets-up the handler to be called upon the BasicConnection
-   * initialization is completed.
-   *
-   * For the web-browser environment, the handler is issued when
-   * the plugin worker successfully imported and executed the
-   * _pluginWebWorker.js or _pluginWebIframe.js, and replied to
-   * the application site with the initImprotSuccess message.
-   *
-   * @param {Function} handler to be called upon connection init
-   */
-  BasicConnection.prototype.whenInit = function(handler) {
-    this._init.whenEmitted(handler);
-  };
-
-  /**
-   * Sets-up the handler to be called upon the BasicConnection
-   * failed.
-   *
-   * For the web-browser environment, the handler is issued when
-   * the plugin worker successfully imported and executed the
-   * _pluginWebWorker.js or _pluginWebIframe.js, and replied to
-   * the application site with the initImprotSuccess message.
-   *
-   * @param {Function} handler to be called upon connection init
-   */
-  BasicConnection.prototype.whenFailed = function(handler) {
-    this._fail.whenEmitted(handler);
-  };
-
-  /**
-   * Sends a message to the plugin site
-   *
-   * @param {Object} data to send
-   */
-  BasicConnection.prototype.send = function(data, transferables) {
-    this._frame.contentWindow &&
-      this._frame.contentWindow.postMessage(
-        { type: "message", data: data },
-        "*",
-        transferables
-      );
-  };
-
-  /**
-   * Adds a handler for a message received from the plugin site
-   *
-   * @param {Function} handler to call upon a message
-   */
-  BasicConnection.prototype.onMessage = function(handler) {
-    this._messageHandler = handler;
-  };
-
-  /**
-   * Adds a handler for the event of plugin disconnection
-   * (not used in case of Worker)
-   *
-   * @param {Function} handler to call upon a disconnect
-   */
-  BasicConnection.prototype.onDisconnect = function() {};
-
-  /**
-   * Disconnects the plugin (= kills the frame)
-   */
-  BasicConnection.prototype.disconnect = function() {
-    if (!this._disconnected) {
-      this._disconnected = true;
-      if (typeof this._frame != "undefined") {
-        this._frame.parentNode.removeChild(this._frame);
-      } // otherwise farme is not yet created
-    }
-  };
-};
-
-var SocketioConnection;
-/**
- * Creates the platform-dependent SocketioConnection object in the
- * web-browser environment
- */
-var SocketioConnectionWeb = function() {
-  /**
-   * Platform-dependent implementation of the BasicConnection
-   * object, initializes the plugin site and provides the basic
-   * messaging-based connection with it
-   *
-   * For the web-browser environment, the plugin is created as a
-   * Worker in a sandbaxed frame
-   */
-  SocketioConnection = function(id, type, config) {
-    this._init = new Whenable();
-    this._fail = new Whenable();
-    this._disconnected = false;
-    this.id = id;
-    this.engine = config.engine;
-    if (!this.engine) {
-      throw "connection is not established.";
-    }
-    this._disconnectHandler = () => {};
-    this._loggingHandler = () => {};
-    platformInit.whenEmitted(() => {
-      if (!this._disconnected && this.engine && this.engine.socket) {
-        const config_ = {
-          api_version: config.api_version,
-          flags: config.flags,
-          tag: config.tag,
-          workspace: config.workspace,
-          env: config.env,
-          requirements: config.requirements,
-          cmd: config.cmd,
-          name: config.name,
-          type: config.type,
-          inputs: config.inputs,
-          outputs: config.outputs,
-        };
-        // create a plugin here
-        this.engine.socket.emit(
-          "init_plugin",
-          { id: id, type: type, config: config_ },
-          result => {
-            // console.log('init_plugin: ', result)
-            this.initializing = false;
-            if (result.success) {
-              this._disconnected = false;
-              this.secret = result.secret;
-              config.work_dir = result.work_dir;
-              config.resumed = result.resumed;
-              this.engine.socket.on(
-                "message_from_plugin_" + this.secret,
-                data => {
-                  // console.log('message_from_plugin_'+this.id, data)
-                  if (data.type == "initialized") {
-                    this.dedicatedThread = data.dedicatedThread;
-                    this._init.emit();
-                  } else if (data.type == "logging") {
-                    this._loggingHandler(data.details);
-                  } else if (data.type == "disconnected") {
-                    this._disconnectHandler(data.details);
-                  } else {
-                    this._messageHandler(data);
-                  }
-                }
-              );
-              if (result.initialized) {
-                this.dedicatedThread = true;
-                this._init.emit();
-              }
-            } else {
-              this._disconnected = true;
-              console.error("failed to initialize plugin on the plugin engine");
-              this._fail.emit(
-                "failed to initialize plugin on the plugin engine"
-              );
-              throw "failed to initialize plugin on the plugin engine";
-            }
-          }
-        );
-      } else {
-        this._fail.emit("connection is not established.");
-        throw "connection is not established.";
-      }
-    });
-  };
-
-  /**
-   * Sets-up the handler to be called upon the SocketioConnection
-   * initialization is completed.
-   *
-   * For the web-browser environment, the handler is issued when
-   * the plugin worker successfully imported and executed the
-   * _pluginWebWorker.js or _pluginWebIframe.js, and replied to
-   * the application site with the initImprotSuccess message.
-   *
-   * @param {Function} handler to be called upon connection init
-   */
-  SocketioConnection.prototype.whenInit = function(handler) {
-    this._init.whenEmitted(handler);
-  };
-
-  /**
-   * Sets-up the handler to be called upon the BasicConnection
-   * failed.
-   *
-   *
-   * @param {Function} handler to be called upon connection init
-   */
-  SocketioConnection.prototype.whenFailed = function(handler) {
-    this._fail.whenEmitted(handler);
-  };
-
-  /**
-   * Sends a message to the plugin site
-   *
-   * @param {Object} data to send
-   */
-  SocketioConnection.prototype.send = function(data) {
-    if (this.engine && this.engine.socket) {
-      this.engine.socket.emit("message_to_plugin_" + this.secret, {
-        type: "message",
-        data: data,
-      });
-      // console.log('message_to_plugin_'+this.id, {type: 'message', data: data})
-    } else {
-      throw "socketio disconnected.";
-    }
-  };
-
-  /**
-   * Adds a handler for a message received from the plugin site
-   *
-   * @param {Function} handler to call upon a message
-   */
-  SocketioConnection.prototype.onMessage = function(handler) {
-    this._messageHandler = handler;
-  };
-
-  /**
-   * Adds a handler for the event of plugin disconnection
-   * (not used in case of Worker)
-   *
-   * @param {Function} handler to call upon a disconnect
-   */
-  SocketioConnection.prototype.onDisconnect = function(handler) {
-    this._disconnectHandler = handler;
-  };
-
-  /**
-   * Adds a handler for the event of plugin logging
-   * (not used in case of Worker)
-   *
-   * @param {Function} handler to call upon event logging
-   */
-  SocketioConnection.prototype.onLogging = function(handler) {
-    this._loggingHandler = handler;
-  };
-
-  /**
-   * Disconnects the plugin (= kills the frame)
-   */
-  SocketioConnection.prototype.disconnect = function() {
-    if (!this._disconnected) {
-      this._disconnected = true;
-    }
-    if (this.engine && this.engine.socket) {
-      this.engine.socket.emit("kill_plugin", { id: this.id });
-      // console.log('kill plugin '+this.id)
-    }
-    this._disconnectHandler();
-  };
-};
-
 if (__is__node__) {
   throw "nodejs is not supported.";
 } else {
   initWeb();
-  basicConnectionWeb();
-  SocketioConnectionWeb();
 }
 
 /**
@@ -565,10 +110,12 @@ if (__is__node__) {
  * plugin
  */
 var Connection = function(id, type, config) {
-  if (type == "native-python") {
-    this._platformConnection = new SocketioConnection(id, type, config);
+  const backend = getBackendByType(type);
+  if (backend) {
+    config.__jailed__path__ = __jailed__path__;
+    this._platformConnection = new backend.connection(id, type, config);
   } else {
-    this._platformConnection = new BasicConnection(id, type, config);
+    throw `Unsupported backend type (${type})`;
   }
 
   this._importCallbacks = {};
@@ -864,53 +411,56 @@ DynamicPlugin.prototype._connect = Plugin.prototype._connect = function() {
     }
     me._updateUI();
   };
-  if (
-    this.type == "native-python" &&
-    (!this.config.engine || !this.config.engine.socket)
-  ) {
-    me._fail.emit("Please connect to the Plugin Engine 🚀.");
-    me._connection = null;
-  } else {
-    me._connection = new Connection(me.id, me.type, me.config);
-    me.initializing = true;
-    me._updateUI();
-    me._connection.whenInit(function() {
-      me._init();
-    });
-    me._connection.whenFailed(function(e) {
-      me._fail.emit(e);
-    });
-    if (this.type == "native-python") {
-      me._connection._platformConnection.onLogging(function(details) {
-        if (details.type === "error") {
-          me.error(details.value);
-        } else if (details.type === "progress") {
-          me.progress(details.value);
-        } else if (details.type === "info") {
-          me.log(details.value);
-        } else {
-          console.log(details.value);
+
+  platformInit.whenEmitted(function() {
+    if (
+      me.type == "native-python" &&
+      (!me.config.engine || !me.config.engine.socket)
+    ) {
+      me._fail.emit("Please connect to the Plugin Engine 🚀.");
+      me._connection = null;
+    } else {
+      me._connection = new Connection(me.id, me.type, me.config);
+      me.initializing = true;
+      me._updateUI();
+      me._connection.whenInit(function() {
+        me._init();
+      });
+      me._connection.whenFailed(function(e) {
+        me._fail.emit(e);
+      });
+      if (me.type == "native-python") {
+        me._connection._platformConnection.onLogging(function(details) {
+          if (details.type === "error") {
+            me.error(details.value);
+          } else if (details.type === "progress") {
+            me.progress(details.value);
+          } else if (details.type === "info") {
+            me.log(details.value);
+          } else {
+            console.log(details.value);
+          }
+        });
+      }
+      me._connection.onDisconnect(function(details) {
+        if (details) {
+          if (details.success) {
+            me.log(details.message);
+          } else {
+            me.error(details.message);
+          }
         }
+        if (me._connection._platformConnection._frame) {
+          var iframe_container = document.getElementById(
+            me._connection._platformConnection._frame.id
+          );
+          iframe_container.parentNode.removeChild(iframe_container);
+        }
+        me._set_disconnected();
+        // me.terminate()
       });
     }
-    me._connection.onDisconnect(function(details) {
-      if (details) {
-        if (details.success) {
-          me.log(details.message);
-        } else {
-          me.error(details.message);
-        }
-      }
-      if (me._connection._platformConnection._frame) {
-        var iframe_container = document.getElementById(
-          me._connection._platformConnection._frame.id
-        );
-        iframe_container.parentNode.removeChild(iframe_container);
-      }
-      me._set_disconnected();
-      // me.terminate()
-    });
-  }
+  });
 };
 
 /**
@@ -918,16 +468,10 @@ DynamicPlugin.prototype._connect = Plugin.prototype._connect = function() {
  * common routines (_JailedSite.js)
  */
 DynamicPlugin.prototype._init = Plugin.prototype._init = function() {
-  var lang;
-  if (this.type == "native-python") {
-    lang = "python";
-  } else if (this.type == "web-python") {
-    lang = "web-python";
-  } else if (this.type == "web-python-window") {
-    lang = "web-python";
-  } else {
-    lang = "javascript";
-  }
+  const backend = getBackendByType(this.type);
+  assert(backend);
+  var lang = backend.lang;
+
   /*global JailedSite*/
   this._site = new JailedSite(this._connection, this.id, lang);
 

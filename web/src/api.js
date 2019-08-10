@@ -49,6 +49,15 @@ export const PLUGIN_SCHEMA = ajv.compile({
   },
 });
 
+export const BACKEND_SCHEMA = ajv.compile({
+  properties: {
+    name: { type: "string" },
+    lang: { type: "string" },
+    icon: { type: ["null", "string"] },
+    connection: {},
+  },
+});
+
 export const REGISTER_SCHEMA = ajv.compile({
   properties: {
     name: { type: "string" },
