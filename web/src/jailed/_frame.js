@@ -50,9 +50,15 @@ function _sendToServiceWorker(message) {
       }
     };
 
-    navigator.serviceWorker.controller.postMessage(message, [
-      messageChannel.port2,
-    ]);
+    if(navigator.serviceWorker && navigator.serviceWorker.controller){
+      navigator.serviceWorker.controller.postMessage(message, [
+        messageChannel.port2,
+      ]);
+    }
+    else{
+      console.warn('service worker controller is not available, message:', message)
+    }
+    
   });
 }
 
