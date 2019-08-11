@@ -394,8 +394,9 @@ class PostMessageConnection {
       "message",
       function(e) {
         if (e.source === window.parent) {
-          console.log("IMJOY: recieving message from parent", e.data);
-          if (e.data.type == "initialized") {
+          if (e.data.type == "init_plugin") {
+            console.log("initializing plugin: ", e.data.config);
+          } else if (e.data.type == "initialized") {
             me.dedicatedThread = e.data.dedicatedThread;
             me._init();
           } else {
@@ -407,7 +408,7 @@ class PostMessageConnection {
     );
 
     window.parent.postMessage(
-      { type: "message", data: { type: "init_plugin" } },
+      { type: "message", data: { type: "init_connection" } },
       "*"
     );
   }
@@ -421,7 +422,6 @@ class PostMessageConnection {
   }
 
   send(data, transferables) {
-    console.log("IMJOY: sending message to parent", data);
     window.parent.postMessage(
       { type: "message", data: data },
       "*",
