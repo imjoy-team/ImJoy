@@ -401,7 +401,7 @@ class PostMessageIO {
     window.parent.postMessage({ type: "pio_disconnect" }, "*");
   }
 
-  emit(channel, data, callback) {
+  emit(channel, data) {
     data.channel = channel;
     window.parent.postMessage(data, "*");
   }
@@ -438,7 +438,6 @@ class PostMessageConnection {
     this._fail = new Whenable();
     this._disconnected = false;
     this.id = id;
-    var me = this;
 
     const config_ = {
       api_version: config.api_version,

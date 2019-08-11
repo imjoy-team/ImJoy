@@ -62,8 +62,8 @@
     this._disconnectHandler = function() {};
     this._store = new ReferenceStore();
     this._method_refs = new ReferenceStore();
-    var me = this;
     this._connection = connection;
+    let me = this;
     this._connection.onMessage(function(data) {
       me._processMessage(data);
     });
