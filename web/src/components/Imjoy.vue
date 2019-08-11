@@ -1406,6 +1406,7 @@ import WEB_WORKER_PLUGIN_TEMPLATE from "../plugins/webWorkerTemplate.imjoy.html"
 import NATIVE_PYTHON_PLUGIN_TEMPLATE from "../plugins/nativePythonTemplate.imjoy.html";
 import WEB_PYTHON_PLUGIN_TEMPLATE from "../plugins/webPythonTemplate.imjoy.html";
 import WINDOW_PLUGIN_TEMPLATE from "../plugins/windowTemplate.imjoy.html";
+import JUPYTER_NOTEBOOK_TEMPLATE from "../plugins/jupyterNotebookTemplate.imjoy.html";
 
 import { version } from "../../package.json";
 
@@ -2015,6 +2016,19 @@ export default {
                 this.event_bus.on("plugin_installed", start_when_loaded);
               }
             }
+          }
+
+          if (route.query.jupyter_plugin) {
+            this.pm
+              .reloadPlugin({
+                code: JUPYTER_NOTEBOOK_TEMPLATE.replace(
+                  /Untitled Plugin/g,
+                  route.query.jupyter_plugin
+                ),
+              })
+              .catch(e => {
+                console.error(e);
+              });
           }
 
           this.$nextTick(() => {

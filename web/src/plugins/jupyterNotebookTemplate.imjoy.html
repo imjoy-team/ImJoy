@@ -1,0 +1,36 @@
+<docs lang="markdown">
+[TODO: write documentation for this plugin.]
+</docs>
+
+<config lang="json">
+{
+    "name": "Untitled Plugin",
+    "type": "jupyter-notebook",
+    "version": "0.1.0",
+    "api_version": "0.1.2",
+    "description": "[TODO: describe this plugin with one sentence.]",
+    "tags": [],
+    "ui": "",
+    "inputs": null,
+    "outputs": null,
+    "flags": [],
+    "icon": "extension",
+    "env": "",
+    "requirements": [],
+    "dependencies": []
+}
+</config>
+
+<script lang="python">
+from imjoy import api
+
+
+class ImJoyPlugin():
+    def setup(self):
+        api.log('initialized')
+
+    def run(self, ctx):
+        api.alert('hello world.')
+
+api.export(ImJoyPlugin())
+</script>
