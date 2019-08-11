@@ -405,6 +405,11 @@ class PostMessageConnection {
       },
       false
     );
+
+    window.parent.postMessage(
+      { type: "message", data: { type: "init_plugin" } },
+      "*"
+    );
   }
 
   whenInit(handler) {
