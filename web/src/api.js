@@ -14,16 +14,6 @@ export const CONFIGURABLE_FIELDS = [
   "cover",
 ];
 
-export const SUPPORTED_PLUGIN_TYPES = [
-  "web-worker",
-  "native-python",
-  "web-python",
-  "web-python-window",
-  "iframe",
-  "window",
-  "collection",
-];
-
 export function upgradePluginAPI(config) {
   if (compareVersions(config.api_version, "<=", "0.1.1")) {
     config.type = config.type || config.mode;
@@ -46,6 +36,16 @@ export const PLUGIN_SCHEMA = ajv.compile({
     code: { type: "string" },
     lang: { type: ["null", "string"] },
     script: { type: ["null", "string"] },
+  },
+});
+
+export const BACKEND_SCHEMA = ajv.compile({
+  properties: {
+    type: { type: "string" },
+    name: { type: "string" },
+    lang: { type: "string" },
+    icon: { type: ["null", "string"] },
+    connection: {},
   },
 });
 

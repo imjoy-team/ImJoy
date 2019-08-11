@@ -20,6 +20,7 @@ import {
 import { parseComponent } from "./pluginParser.js";
 
 import { DynamicPlugin } from "./jailed/jailed.js";
+import { getBackendByType } from "./jailed/backends.js";
 
 import {
   REGISTER_SCHEMA,
@@ -27,7 +28,6 @@ import {
   WINDOW_SCHEMA,
   PLUGIN_SCHEMA,
   CONFIGURABLE_FIELDS,
-  SUPPORTED_PLUGIN_TYPES,
   upgradePluginAPI,
 } from "./api.js";
 
@@ -930,7 +930,7 @@ export class PluginManager {
             reject(`Failed to fetch the plugin from "${uri}".`);
             return;
           }
-          if (!SUPPORTED_PLUGIN_TYPES.includes(config.type)) {
+          if (!getBackendByType(config.type)) {
             reject("Unsupported plugin type: " + config.type);
             return;
           }
@@ -1013,7 +1013,7 @@ export class PluginManager {
             reject(`Failed to fetch the plugin from "${uri}".`);
             return;
           }
-          if (!SUPPORTED_PLUGIN_TYPES.includes(config.type)) {
+          if (!getBackendByType(config.type)) {
             reject("Unsupported plugin type: " + config.type);
             return;
           }
@@ -1342,6 +1342,7 @@ export class PluginManager {
       }
       if (!config.script) {
         config.script = pluginComp.script[0].content;
+        config.lang = pluginComp.script[0].attrs.lang;
       }
       config.tag = overwrite_config.tag || (config.tags && config.tags[0]);
       // try to match the script with current tag
@@ -1383,20 +1384,7 @@ export class PluginManager {
           }
         }
       }
-      const t = config.type || config.mode;
-      if (t && t.toLowerCase().indexOf("python") > -1) {
-        config.lang = "python";
-      } else {
-        config.lang = "javascript";
-      }
-
-      //set default lang for script blocks
-      for (let i = 0; i < config.scripts.length; i++) {
-        if (!config.scripts[i].attrs.lang) {
-          config.scripts[i].attrs.lang = config.lang;
-        }
-      }
-
+      config.lang = config.lang || "javascript";
       config = upgradePluginAPI(config);
       if (!PLUGIN_SCHEMA(config)) {
         const error = PLUGIN_SCHEMA.errors;
