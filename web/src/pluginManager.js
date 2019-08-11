@@ -1342,6 +1342,7 @@ export class PluginManager {
       }
       if (!config.script) {
         config.script = pluginComp.script[0].content;
+        config.lang = pluginComp.script[0].attrs.lang;
       }
       config.tag = overwrite_config.tag || (config.tags && config.tags[0]);
       // try to match the script with current tag
@@ -1383,20 +1384,7 @@ export class PluginManager {
           }
         }
       }
-      const t = config.type || config.mode;
-      if (t && t.toLowerCase().indexOf("python") > -1) {
-        config.lang = "python";
-      } else {
-        config.lang = "javascript";
-      }
-
-      //set default lang for script blocks
-      for (let i = 0; i < config.scripts.length; i++) {
-        if (!config.scripts[i].attrs.lang) {
-          config.scripts[i].attrs.lang = config.lang;
-        }
-      }
-
+      config.lang = config.lang || "javascript";
       config = upgradePluginAPI(config);
       if (!PLUGIN_SCHEMA(config)) {
         const error = PLUGIN_SCHEMA.errors;
