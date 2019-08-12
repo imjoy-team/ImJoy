@@ -2207,7 +2207,7 @@ export default {
           loader: engine_code_loader,
         },
         {
-          loader_key: "Image",
+          loader_key: "Image (file)",
           schema: ajv.compile({
             properties: {
               type: {
@@ -2221,7 +2221,7 @@ export default {
           loader: image_loader,
         },
         {
-          loader_key: "Image",
+          loader_key: "Image (url)",
           schema: ajv.compile({
             properties: {
               url: {
