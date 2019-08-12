@@ -1,6 +1,6 @@
 self.__precacheManifest = [
   {
-    "revision": "4da2d4a7c1e3904d1212",
+    "revision": "a45eed4d424dda1cb0e2",
     "url": "imjoy-lib.min.js"
   },
   {
@@ -8,7 +8,7 @@ self.__precacheManifest = [
     "url": "static/jailed/backends.js"
   },
   {
-    "revision": "f67818d8cc37b3cbbf6f60ae47c0df6a",
+    "revision": "ad371ed98279f04cdfb95cb011a5b73c",
     "url": "static/jailed/jailed.js"
   },
   {
