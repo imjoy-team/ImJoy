@@ -584,12 +584,14 @@ DynamicPlugin.prototype._loadPlugin = async function() {
           "0.1.0"
         )
       ) {
-        await this._connection.execute({
-          type: "requirements",
-          lang: this.config.lang,
-          requirements: this.config.requirements,
-          env: this.config.env,
-        });
+        if (this.config.requirements) {
+          await this._connection.execute({
+            type: "requirements",
+            lang: this.config.lang,
+            requirements: this.config.requirements,
+            env: this.config.env,
+          });
+        }
         for (let i = 0; i < this.config.scripts.length; i++) {
           await this._connection.execute({
             type: "script",
@@ -609,17 +611,19 @@ DynamicPlugin.prototype._loadPlugin = async function() {
           main: true,
           content: this.config.scripts[0].content,
           lang: this.config.lang,
-          requirements: this.config.requirements,
+          requirements: this.config.requirements || [],
           env: this.config.env,
         });
       }
     } else {
-      await this._connection.execute({
-        type: "requirements",
-        lang: this.config.lang,
-        requirements: this.config.requirements,
-        env: this.config.env,
-      });
+      if (this.config.requirements) {
+        await this._connection.execute({
+          type: "requirements",
+          lang: this.config.lang,
+          requirements: this.config.requirements,
+          env: this.config.env,
+        });
+      }
       if (
         this.config.type === "iframe" ||
         this.config.type === "window" ||

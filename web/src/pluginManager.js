@@ -1364,6 +1364,7 @@ export class PluginManager {
       config.code = code;
       config.id = config.name.trim().replace(/ /g, "_") + "_" + randId();
       config.runnable = config.runnable === false ? false : true;
+      config.requirements = config.requirements || [];
       config.engine_mode = overwrite_config.engine_mode;
 
       for (let i = 0; i < CONFIGURABLE_FIELDS.length; i++) {
