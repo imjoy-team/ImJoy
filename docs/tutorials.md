@@ -196,7 +196,7 @@ If anything goes wrong, there is an round error icon which allows you to access 
 
 [>>>Full plugin source code](https://gist.github.com/oeway/5edb106eb9360405412bba8ebd2dbeb5/c7c98980090b3571e48b8012ad8b9c82eca1311c)
 
-### write a train function
+### Write a train function
 Let's then add a function for training, and call it when the user click the plugin menu.
 
 In the following code, we first define a `train` function, copy and paste the training part from [main.py](https://github.com/zhixuhao/unet/blob/master/main.py#L7-L18) to it. Then we call `self.train()` in the `run()` which will be called when the user click the plugin.
@@ -231,7 +231,7 @@ class ImJoyPlugin():
 
 ```
 
-![](https://dl.dropbox.com/s/moau28ivwos4vl9/tutorial-add-dependencies.gif ':size=800')
+![](https://dl.dropbox.com/s/42zweplyu26huk5/tutorial-training-unet.gif ':size=800')
 
 
 [>>>Full plugin source code](https://gist.github.com/oeway/5edb106eb9360405412bba8ebd2dbeb5/cfbf85f629c3e2258d5be27e295dd438f7f477ff)
