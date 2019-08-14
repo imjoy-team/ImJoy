@@ -1,4 +1,4 @@
-# Tutorials for users
+# Tutorials
 
 ## Building a workflow
 
@@ -15,7 +15,6 @@ Follow the step and you will make a simple workflow where a JavaScript plugin as
 
 ![imjoy-basic-workflow](assets/imjoy-basic-workflow.png ':size=800')
 
-# Tutorials for plugin developers
 ## Calling Python from Javascript
 
 ImJoy provides a remote procedure call (RPC) mechanism which enables transparent function calls between plugins.
