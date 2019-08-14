@@ -85,7 +85,7 @@ Let's first take a look at the repository on Github: https://github.com/zhixuhao
 It consists of some python files (`data.py`, `main.py`, `model.py`), an example dataset (`data/membrane`) and two Jupyter notebooks (`dataPrepare.ipynb`, `trainUnet.ipynb`).
 
 The file named `model.py` defines the U-net architecutre, and `main.py` shows how to use it, it contains the following code for training and prediction:
-```
+```python
 from model import *
 from data import *
 
@@ -130,7 +130,7 @@ Now click the "+ Plugins" button, and create a new plugin with the `🚀 Native 
 
 ### Change the plugin name and description
 We need to first give a name to our plugin and a short description by editing two fields `name` and `description` in the `<config>` block as below:
-```
+```json
 <config lang="json">
 {
   "name": "Unet-Segmentation",
@@ -158,7 +158,7 @@ Optionally, we can also create an conda virtual environment for the plugin, whic
 
 Then we will have the following `requirements` and `env` fields:
 
-```
+```json
 <config lang="json">
 {
   "name": "Unet-Segmentation",
@@ -413,7 +413,7 @@ As an example, we can login to Github, open https://github.com/zhixuhao/unet and
 
 In the plugin editor, since we have our own copy of the unet plugin repo, we can change the `requirements` to use our own unet repo:
 
-```
+```json
 <config lang="json">
 {
   ...
