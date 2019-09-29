@@ -23,7 +23,8 @@ import { DynamicPlugin } from "./jailed/jailed.js";
 import { getBackendByType } from "./jailed/backends.js";
 
 import {
-  REGISTER_SCHEMA,
+  OP_SCHEMA,
+  ENGINE_SCHEMA,
   JOY_SCHEMA,
   WINDOW_SCHEMA,
   PLUGIN_SCHEMA,
@@ -89,16 +90,7 @@ export class PluginManager {
     this.workflow_list = [];
 
     this.db = null;
-    this.plugins = {};
-    this.plugin_names = {};
-    this.registered = {
-      ops: {},
-      windows: {},
-      extensions: {},
-      inputs: {},
-      outputs: {},
-      loaders: {},
-    };
+    this.init();
     const api_utils_ = imjoy_api.utils;
     this.imjoy_api = {
       alert: window && window.alert,
@@ -329,6 +321,8 @@ export class PluginManager {
       inputs: {},
       outputs: {},
       loaders: {},
+      engines: {},
+      file_managers: {}
     };
   }
 
@@ -1465,6 +1459,17 @@ export class PluginManager {
     });
   }
 
+  // registerExtension(exts, plugin) {
+  //   for (let i = 0; i < exts.length; i++) {
+  //     exts[i] = exts[i].replace(".", "");
+  //     if (this.registered.extensions[exts[i]]) {
+  //       this.registered.extensions[exts[i]].push(plugin);
+  //     } else {
+  //       this.registered.extensions[exts[i]] = [plugin];
+  //     }
+  //   }
+  // }
+
   loadPlugin(template, rplugin) {
     template = _clone(template);
     this.validatePluginConfig(template);
@@ -1531,9 +1536,9 @@ export class PluginManager {
         if (template.type) {
           this.register(plugin, template);
         }
-        if (template.extensions && template.extensions.length > 0) {
-          this.registerExtension(template.extensions, plugin);
-        }
+        // if (template.extensions && template.extensions.length > 0) {
+        //   this.registerExtension(template.extensions, plugin);
+        // }
         if (plugin.config.resumed && plugin.api.resume) {
           plugin._log_history.push(`Resuming plugin.`);
           plugin.api
@@ -1877,8 +1882,7 @@ export class PluginManager {
     }
   }
 
-  //#################ImJoy API functions##################
-  register(plugin, config) {
+  registerOp(plugin, config) {
     try {
       if (!plugin) throw "Plugin not found.";
       config = _clone(config);
@@ -1890,8 +1894,10 @@ export class PluginManager {
       }
       config.inputs = config.inputs || null;
       config.outputs = config.outputs || null;
-      if (!REGISTER_SCHEMA(config)) {
-        const error = REGISTER_SCHEMA.errors;
+      config.run = config.run || null;
+      config.run = config.run || plugin && plugin.api && plugin.api.run;
+      if (!OP_SCHEMA(config)) {
+        const error = OP_SCHEMA.errors;
         console.error("Error occured during registering " + config.name, error);
         throw error;
       }
@@ -1920,12 +1926,8 @@ export class PluginManager {
       } else if (config.type === "iframe") {
         joy_template.tags.push("iframe");
       }
-      let run = null;
-      if (config.run && typeof config.run === "function") {
-        run = config.run;
-      } else {
-        run = plugin && plugin.api && plugin.api.run;
-      }
+      let run = config.run;
+      
       if (!plugin || !run) {
         console.log(
           "WARNING: no run function found in the config, this op won't be able to do anything: " +
@@ -2090,7 +2092,7 @@ export class PluginManager {
     }
   }
 
-  unregister(plugin, config) {
+  unregisterOp(plugin, config) {
     if (!plugin) throw "Plugin not found.";
     const plugin_name = plugin.name;
     if (!config) {
@@ -2116,6 +2118,29 @@ export class PluginManager {
       this.wm.unregisterInputLoader(op_key);
       Joy.remove(op_name);
     }
+  }
+
+  
+  registerEngine(name, config){
+    if (!ENGINE_SCHEMA(config)) {
+      const error = ENGINE_SCHEMA.errors;
+      console.error("Error occured registering engine ", config, error);
+      throw error;
+    }
+    this.registered.engines[name] = config;
+  }
+
+  unregisterEngine(){
+
+  }
+
+  //#################ImJoy API functions##################
+  register(plugin, config) {
+    this.registerOp(plugin, config)
+  }
+
+  unregister(plugin, config) {
+    this.unregisterOp(plugin, config)
   }
 
   createWindow(_plugin, wconfig) {

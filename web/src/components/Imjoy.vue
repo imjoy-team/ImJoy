@@ -2379,16 +2379,6 @@ export default {
         return !p.config.runnable;
       });
     },
-    registerExtension(exts, plugin) {
-      for (let i = 0; i < exts.length; i++) {
-        exts[i] = exts[i].replace(".", "");
-        if (this.registered.extensions[exts[i]]) {
-          this.registered.extensions[exts[i]].push(plugin);
-        } else {
-          this.registered.extensions[exts[i]] = [plugin];
-        }
-      }
-    },
     switchWorkspace(w) {
       // console.log('switch to ', w)
       if (!w || w.trim() == "") {

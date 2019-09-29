@@ -875,8 +875,8 @@ multiple times to overwrite the previous version. `api.register` can also be use
   - `name`: String. Name of op.
   - `ui`: Object (JavaScript) or dictionary (Python). Rendered interface. Defined
        with the same rule as the `ui` field in `<config>`.
-  - `run`: String, optional. Specifies the `Plugin API` function that will run when
-      the op is executed. If not specified, the `run` function of the plugin will be executed.
+  - `run`: Function, optional. Specifies the `Plugin API` function that will run when
+      the op is executed. Note that it must be a member of the plugin class or a function being exported with `api.export`. If not specified, the `run` function of the plugin will be executed.
   - `update`: String, optional. Specifies another `Plugin API` function that will run
       whenever any option in the `ui` is changed.
   - `inputs`: Object, optional. A [JSON Schema](https://json-schema.org/) which defines the inputs of this op.

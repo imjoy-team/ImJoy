@@ -1,7 +1,13 @@
 import { compareVersions } from "./utils.js";
 
 import Ajv from "ajv";
-var ajv = new Ajv();
+const ajv = new Ajv();
+
+ajv.addKeyword('instanceof', { compile: function(Class) {
+  return function(data) {
+    return data instanceof Class;
+  };
+} });
 
 export const CONFIGURABLE_FIELDS = [
   "env",
@@ -49,16 +55,6 @@ export const BACKEND_SCHEMA = ajv.compile({
   },
 });
 
-export const REGISTER_SCHEMA = ajv.compile({
-  properties: {
-    name: { type: "string" },
-    type: { type: "string" },
-    ui: { type: ["null", "string", "array", "object"] },
-    inputs: { type: ["null", "object"] },
-    outputs: { type: ["null", "object"] },
-  },
-});
-
 export const JOY_SCHEMA = ajv.compile({
   properties: {
     name: { type: "string" },
@@ -82,8 +78,29 @@ export const OP_SCHEMA = ajv.compile({
     name: { type: "string" },
     type: { type: "string" },
     ui: { type: ["null", "string", "array", "object"] },
-    run: { type: ["null", "string"] },
+    run: { instanceof: Function },
     inputs: { type: ["null", "object"] },
     outputs: { type: ["null", "object"] },
   },
 });
+
+export const ENGINE_SCHEMA = ajv.compile({
+  properties: {
+    name: { type: "string" },
+    type: { type: "string" },
+    list: { instanceof: Function},
+    start: { instanceof: Function},
+    kill: { instanceof: Function},
+    restart: { instanceof: Function}
+  },
+});
+
+export const FILE_MANAGER_SCHEMA = ajv.compile({
+  properties: {
+    name: { type: "string" },
+    type: { type: "string" },
+    list: { instanceof: Function}
+  },
+});
+
+
