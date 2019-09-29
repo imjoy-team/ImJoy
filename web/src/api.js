@@ -5,7 +5,19 @@ const ajv = new Ajv();
 
 ajv.addKeyword('instanceof', { compile: function(Class) {
   return function(data) {
-    return data instanceof Class;
+    if(Array.isArray(Class)){
+      let match = false;
+      for(let c of Class){
+        if(data instanceof c){
+          match = true
+          break;
+        }
+      }
+      return match;
+    }
+    else{
+      return data instanceof Class;
+    }
   };
 } });
 
@@ -91,7 +103,7 @@ export const ENGINE_SCHEMA = ajv.compile({
     list: { instanceof: Function},
     start: { instanceof: Function},
     kill: { instanceof: Function},
-    restart: { instanceof: Function}
+    restart: { instanceof: [Function, null]}
   },
 });
 
