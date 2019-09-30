@@ -1,34 +1,39 @@
 <template>
   <div class="engine-control-panel">
-    <md-button
-      class="md-icon-button md-primary"
-      v-if="!engineManager.engines || engineManager.engines.length == 0"
-      @click="showAddEngine()"
-    >
-      <md-icon>🚀</md-icon>
-      <md-tooltip>Connection to the Plugin Engine</md-tooltip>
-    </md-button>
     <md-menu
-      v-else
       md-size="big"
       md-direction="top-start"
       @md-closed="collapseProcesses()"
     >
-      <md-button class="md-icon-button md-primary" md-menu-trigger>
+      <md-button
+        class="md-icon-button md-primary"
+        md-menu-trigger
+        :disabled="
+          !engineManager ||
+            (engineManager.engine_factories.length == 0 &&
+              engineManager.engines.length == 0)
+        "
+      >
         <md-icon>🚀</md-icon>
         <md-tooltip>ImJoy Plugin Engines</md-tooltip>
       </md-button>
       <md-menu-content class="engine-panel">
-        <md-menu-item @click="showAddEngineDialog = true">
+        <md-menu-item
+          v-for="factory in engineManager.engine_factories"
+          :key="factory.name"
+          @click="factory.addEngine()"
+        >
           <md-button class="md-icon-button md-primary median-icon-button">
             <md-icon>add</md-icon>
           </md-button>
-
-          <span>Add Plugin Engine 🚀</span>
+          <span>Add {{ factory.name }} 🚀</span>
         </md-menu-item>
         <template v-for="engine in engineManager.engines">
           <!-- <md-divider></md-divider> -->
-          <md-menu-item @click="showInfo(engine)" :key="engine.url">
+          <md-menu-item
+            @click="showInfo(engine)"
+            :key="engine.name + engine.url"
+          >
             <md-button
               v-if="
                 engine.show_processes &&
@@ -410,7 +415,6 @@ export default {
   mounted() {
     this.event_bus.on("engine_connected", this.forceUpdate);
     this.event_bus.on("engine_disconnected", this.forceUpdate);
-    this.event_bus.on("show_engine_dialog", this.showDialog);
     if (this.is_mobile_or_tablet) {
       this.url_type = "remote";
       this.engine_url = "";
@@ -419,7 +423,6 @@ export default {
   beforeDestroy() {
     this.event_bus.off("engine_connected", this.forceUpdate);
     this.event_bus.off("engine_disconnected", this.forceUpdate);
-    this.event_bus.off("show_engine_dialog", this.showDialog);
   },
   methods: {
     showDialog(config) {
@@ -512,7 +515,7 @@ export default {
     showInfo(engine) {
       this.show_sys_info = false;
       this.selected_engine = engine;
-      this.showEngineInfoDialog = true;
+      engine.show();
     },
     openEngineUrl(url) {
       window.open(url, "_blank");

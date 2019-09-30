@@ -1567,9 +1567,6 @@ export default {
       imjoy_api: imjoy_api,
       event_bus: this.event_bus,
       show_message_callback: this.showMessage,
-      show_engine_callback: (show, engine) => {
-        this.showEngineConnection(show, engine);
-      },
       update_ui_callback: () => {
         this.$forceUpdate();
       },
@@ -1890,12 +1887,12 @@ export default {
           route.query.workspace || route.query.w || this.pm.workspace_list[0];
         await this.pm.loadWorkspace(selected_workspace);
         await this.pm.reloadPlugins(false);
-        const connections = this.em.connectAll(true);
-        try {
-          await connections;
-        } catch (e) {
-          console.error(e);
-        }
+        // const connections = this.em.connectAll(true);
+        // try {
+        //   await connections;
+        // } catch (e) {
+        //   console.error(e);
+        // }
 
         if (route.query.engine && route.query.start) {
           const en = this.em.getEngineByUrl(route.query.engine);

@@ -300,6 +300,8 @@ var Plugin = function(config, _interface, _fs_api, is_proxy) {
   this.running = false;
   this._log_history = [];
   this._onclose_callbacks = [];
+  this.backend = getBackendByType(this.type);
+  assert(this.backend);
   this._updateUI =
     (_interface && _interface.utils && _interface.utils.$forceUpdate) ||
     function() {};
@@ -338,6 +340,8 @@ var DynamicPlugin = function(config, _interface, _fs_api, is_proxy) {
   this._log_history = [];
   this._onclose_callbacks = [];
   this._is_proxy = is_proxy;
+  this.backend = getBackendByType(this.type);
+  assert(this.backend);
   this._updateUI =
     (_interface && _interface.utils && _interface.utils.$forceUpdate) ||
     function() {};
@@ -347,6 +351,7 @@ var DynamicPlugin = function(config, _interface, _fs_api, is_proxy) {
     this._disconnected = true;
     this._bindInterface(_interface);
     for (let k in _fs_api) this._initialInterface[k] = _fs_api[k];
+
     this._connect();
   }
   this._updateUI();
@@ -391,7 +396,7 @@ DynamicPlugin.prototype._connect = Plugin.prototype._connect = function() {
   this.remote = null;
   this.api = null;
 
-  this._connect = new Whenable();
+  this._connected = new Whenable();
   this._fail = new Whenable();
   this._disconnect = new Whenable();
 
@@ -414,11 +419,30 @@ DynamicPlugin.prototype._connect = Plugin.prototype._connect = function() {
 
   platformInit.whenEmitted(function() {
     if (
-      me.type == "native-python" &&
-      (!me.config.engine || !me.config.engine.socket)
+      me.backend.type == "external" &&
+      (!me.config.engine || !me.config.engine.connected)
     ) {
       me._fail.emit("Please connect to the Plugin Engine 🚀.");
       me._connection = null;
+    } else if (me.backend.type === "external" && me.config.engine) {
+      me.initializing = true;
+      me._updateUI();
+      me.config.engine
+        .startPlugin(me.config)
+        .then(remote => {
+          me.remote = remote;
+          me.api = me.remote;
+          me.api.__as_interface__ = true;
+          me.api.__id__ = me.id;
+          me._disconnected = false;
+          me.initializing = false;
+          me._updateUI();
+          me._connected.emit();
+        })
+        .catch(e => {
+          me.error(e);
+          me._set_disconnected();
+        });
     } else {
       me._connection = new Connection(me.id, me.type, me.config);
       me.initializing = true;
@@ -429,7 +453,7 @@ DynamicPlugin.prototype._connect = Plugin.prototype._connect = function() {
       me._connection.whenFailed(function(e) {
         me._fail.emit(e);
       });
-      if (me.type == "native-python") {
+      if (me.backend.type === "external") {
         me._connection._platformConnection.onLogging(function(details) {
           if (details.type === "error") {
             me.error(details.value);
@@ -468,9 +492,7 @@ DynamicPlugin.prototype._connect = Plugin.prototype._connect = function() {
  * common routines (_JailedSite.js)
  */
 DynamicPlugin.prototype._init = Plugin.prototype._init = function() {
-  const backend = getBackendByType(this.type);
-  assert(backend);
-  var lang = backend.lang;
+  var lang = this.backend.lang;
 
   /*global JailedSite*/
   this._site = new JailedSite(this._connection, this.id, lang);
@@ -504,9 +526,9 @@ DynamicPlugin.prototype._init = Plugin.prototype._init = function() {
 
   this.getRemoteCallStack = this._site.getRemoteCallStack;
 
-  if (backend.type === "external") {
+  if (this.backend.type === "external") {
     this._sendInterface();
-  } else if (backend.type === "internal") {
+  } else if (this.backend.type === "internal") {
     var sCb = function() {
       me._loadCore();
     };
@@ -516,7 +538,7 @@ DynamicPlugin.prototype._init = Plugin.prototype._init = function() {
       this._fCb
     );
   } else {
-    throw `Unsupported backend type ${backend.type}`;
+    throw `Unsupported backend type ${this.backend.type}`;
   }
 };
 
@@ -543,7 +565,7 @@ DynamicPlugin.prototype._loadCore = Plugin.prototype._loadCore = function() {
 DynamicPlugin.prototype._sendInterface = Plugin.prototype._sendInterface = function() {
   var me = this;
   this._site.onInterfaceSetAsRemote(function() {
-    if (!me._connected) {
+    if (me._disconnected) {
       me._loadPlugin();
     }
   });
@@ -571,98 +593,52 @@ Plugin.prototype._loadPlugin = function() {
  */
 DynamicPlugin.prototype._loadPlugin = async function() {
   try {
+    if (this.config.requirements) {
+      await this._connection.execute({
+        type: "requirements",
+        lang: this.config.lang,
+        requirements: this.config.requirements,
+        env: this.config.env,
+      });
+    }
     if (
-      this.config.type === "native-python" &&
-      this.config.engine &&
-      this.config.engine.engine_info
+      this.config.type === "iframe" ||
+      this.config.type === "window" ||
+      this.config.type === "web-python-window"
     ) {
-      if (
-        this.config.engine.engine_info.api_version &&
-        compareVersions(
-          this.config.engine.engine_info.api_version,
-          ">",
-          "0.1.0"
-        )
-      ) {
-        if (this.config.requirements) {
-          await this._connection.execute({
-            type: "requirements",
-            lang: this.config.lang,
-            requirements: this.config.requirements,
-            env: this.config.env,
-          });
-        }
-        for (let i = 0; i < this.config.scripts.length; i++) {
-          await this._connection.execute({
-            type: "script",
-            content: this.config.scripts[i].content,
-            lang: this.config.scripts[i].attrs.lang,
-            attrs: this.config.scripts[i].attrs,
-            src: this.config.scripts[i].attrs.src,
-          });
-        }
-      } else {
-        assert(
-          this.config.scripts.length === 1,
-          "only 1 script block is supported"
-        );
+      for (let i = 0; i < this.config.styles.length; i++) {
         await this._connection.execute({
-          type: "script",
-          main: true,
-          content: this.config.scripts[0].content,
-          lang: this.config.lang,
-          requirements: this.config.requirements || [],
-          env: this.config.env,
+          type: "style",
+          content: this.config.styles[i].content,
+          attrs: this.config.styles[i].attrs,
+          src: this.config.styles[i].attrs.src,
         });
       }
-    } else {
-      if (this.config.requirements) {
+      for (let i = 0; i < this.config.links.length; i++) {
         await this._connection.execute({
-          type: "requirements",
-          lang: this.config.lang,
-          requirements: this.config.requirements,
-          env: this.config.env,
+          type: "link",
+          rel: this.config.links[i].attrs.rel,
+          type_: this.config.links[i].attrs.type,
+          attrs: this.config.links[i].attrs,
+          href: this.config.links[i].attrs.href,
         });
       }
-      if (
-        this.config.type === "iframe" ||
-        this.config.type === "window" ||
-        this.config.type === "web-python-window"
-      ) {
-        for (let i = 0; i < this.config.styles.length; i++) {
-          await this._connection.execute({
-            type: "style",
-            content: this.config.styles[i].content,
-            attrs: this.config.styles[i].attrs,
-            src: this.config.styles[i].attrs.src,
-          });
-        }
-        for (let i = 0; i < this.config.links.length; i++) {
-          await this._connection.execute({
-            type: "link",
-            rel: this.config.links[i].attrs.rel,
-            type_: this.config.links[i].attrs.type,
-            attrs: this.config.links[i].attrs,
-            href: this.config.links[i].attrs.href,
-          });
-        }
-        for (let i = 0; i < this.config.windows.length; i++) {
-          await this._connection.execute({
-            type: "html",
-            content: this.config.windows[i].content,
-            attrs: this.config.windows[i].attrs,
-          });
-        }
-      }
-      for (let i = 0; i < this.config.scripts.length; i++) {
+      for (let i = 0; i < this.config.windows.length; i++) {
         await this._connection.execute({
-          type: "script",
-          content: this.config.scripts[i].content,
-          lang: this.config.scripts[i].attrs.lang,
-          attrs: this.config.scripts[i].attrs,
-          src: this.config.scripts[i].attrs.src,
+          type: "html",
+          content: this.config.windows[i].content,
+          attrs: this.config.windows[i].attrs,
         });
       }
+    }
+    for (let i = 0; i < this.config.scripts.length; i++) {
+      await this._connection.execute({
+        type: "script",
+        content: this.config.scripts[i].content,
+        lang: this.config.scripts[i].attrs.lang,
+        attrs: this.config.scripts[i].attrs,
+        src: this.config.scripts[i].attrs.src,
+      });
     }
     this._requestRemote();
   } catch (e) {
@@ -682,12 +658,12 @@ DynamicPlugin.prototype._requestRemote = Plugin.prototype._requestRemote = funct
   this._site.onRemoteUpdate(function() {
     me.remote = me._site.getRemote();
     me.api = me.remote;
-    me.api.__jailed_type__ = "plugin_api";
+    me.api.__as_interface__ = true;
     me.api.__id__ = me.id;
     me._disconnected = false;
     me.initializing = false;
     me._updateUI();
-    me._connect.emit();
+    me._connected.emit();
   });
 
   this._site.requestRemote();
@@ -731,7 +707,7 @@ DynamicPlugin.prototype.whenFailed = Plugin.prototype.whenFailed = function(
 DynamicPlugin.prototype.whenConnected = Plugin.prototype.whenConnected = function(
   handler
 ) {
-  this._connect.whenEmitted(handler);
+  this._connected.whenEmitted(handler);
 };
 
 /**

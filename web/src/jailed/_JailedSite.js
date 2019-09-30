@@ -39,6 +39,12 @@
     return tmp.buffer;
   };
 
+  function randId() {
+    return (
+      Date.now().toString(16) + Math.random().toString(16) + "0".repeat(16)
+    );
+  }
+
   function getKeyByValue(object, value) {
     return Object.keys(object).find(key => object[key] === value);
   }
@@ -412,7 +418,13 @@
 
           wrapped_resolve.__jailed_pairs__ = wrapped_reject;
           wrapped_reject.__jailed_pairs__ = wrapped_resolve;
-          var args = me._wrap(Array.prototype.slice.call(arguments));
+
+          var args = Array.prototype.slice.call(arguments);
+          if (name === "register" || name === "export") {
+            args = me._wrap(args, true);
+          } else {
+            args = me._wrap(args);
+          }
           var transferables = args.args.__transferables__;
           if (transferables) delete args.args.__transferables__;
           me._connection.send(
@@ -455,7 +467,7 @@
    *
    * @returns {Array} wrapped arguments
    */
-  JailedSite.prototype._encode = function(aObject) {
+  JailedSite.prototype._encode = function(aObject, as_interface) {
     var transferables = [];
     if (!aObject) {
       return aObject;
@@ -476,12 +488,17 @@
     //encode interfaces
     if (
       typeof aObject == "object" &&
-      aObject.hasOwnProperty("__id__") &&
-      aObject.__jailed_type__ == "plugin_api"
+      !Array.isArray(aObject) &&
+      (aObject.__as_interface__ || as_interface)
     ) {
       const encoded_interface = {};
+      aObject["__id__"] = aObject["__id__"] || randId();
       for (k in aObject) {
+        if (k.startsWith("_")) {
+          continue;
+        }
         v = aObject[k];
+
         if (typeof v == "function") {
           bObject[k] = {
             __jailed_type__: "plugin_interface",
@@ -489,6 +506,9 @@
             __value__: k,
             num: null,
           };
+          encoded_interface[k] = v;
+        } else {
+          bObject[k] = { __jailed_type__: "argument", __value__: v };
           encoded_interface[k] = v;
         }
       }
@@ -632,7 +652,7 @@
         }
         //TODO: support also Map and Set
         else if (typeof v == "object" || Array.isArray(v)) {
-          bObject[k] = this._encode(v);
+          bObject[k] = this._encode(v, as_interface);
           // move transferables to the top level object
           if (bObject[k].__transferables__) {
             for (var t = 0; t < bObject[k].__transferables__.length; t++) {
@@ -727,8 +747,8 @@
     }
   };
 
-  JailedSite.prototype._wrap = function(args) {
-    var wrapped = this._encode(args);
+  JailedSite.prototype._wrap = function(args, as_interface) {
+    var wrapped = this._encode(args, as_interface);
     var result = { args: wrapped };
     return result;
   };

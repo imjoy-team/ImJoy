@@ -22,7 +22,6 @@ export class ImJoy {
     client_id = null,
     config_db = null,
     show_message_callback = null,
-    show_engine_callback = null,
     update_ui_callback = null,
     add_window_callback = null,
   }) {
@@ -37,11 +36,6 @@ export class ImJoy {
     this.client_id = client_id || "imjoy_web_" + randId();
     this.imjoy_api = imjoy_api || {};
     this.update_ui_callback = update_ui_callback || function() {};
-    this.show_engine_callback =
-      show_engine_callback ||
-      function(engine) {
-        console.log("show engine: ", engine);
-      };
     this.show_message_callback =
       show_message_callback ||
       function(msg) {
@@ -57,7 +51,6 @@ export class ImJoy {
       event_bus: this.event_bus,
       config_db: this.config_db,
       show_message_callback: this.show_message_callback,
-      show_engine_callback: this.show_engine_callback,
       client_id: this.client_id,
     });
 
@@ -111,17 +104,9 @@ export class ImJoy {
       await this.pm.loadWorkspace(config.workspace);
       await this.pm.reloadPlugins(false);
     }
-
     try {
       if (config.engine) {
-        await this.em.addEngine(
-          { type: "default", url: config.engine, token: config.token },
-          false
-        );
-        await this.em.getEngineByUrl(config.engine).connect();
-      } else {
-        const connections = this.em.connectAll(true);
-        await connections;
+        await this.em.addEngineByUrl(config.engine, config.token);
       }
     } catch (e) {
       console.error("Failed to connect the plugin engine(s)", e);

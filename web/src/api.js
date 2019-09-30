@@ -3,23 +3,24 @@ import { compareVersions } from "./utils.js";
 import Ajv from "ajv";
 const ajv = new Ajv();
 
-ajv.addKeyword('instanceof', { compile: function(Class) {
-  return function(data) {
-    if(Array.isArray(Class)){
-      let match = false;
-      for(let c of Class){
-        if(data instanceof c){
-          match = true
-          break;
+ajv.addKeyword("instanceof", {
+  compile: function(Class) {
+    return function(data) {
+      if (Array.isArray(Class)) {
+        let match = false;
+        for (let c of Class) {
+          if (data instanceof c) {
+            match = true;
+            break;
+          }
         }
+        return match;
+      } else {
+        return data instanceof Class;
       }
-      return match;
-    }
-    else{
-      return data instanceof Class;
-    }
-  };
-} });
+    };
+  },
+});
 
 export const CONFIGURABLE_FIELDS = [
   "env",
@@ -96,14 +97,30 @@ export const OP_SCHEMA = ajv.compile({
   },
 });
 
+export const ENGINE_FACTORY_SCHEMA = ajv.compile({
+  properties: {
+    name: { type: "string" },
+    type: { enum: ["engine-factory"] },
+    config: { type: "object" },
+    addEngine: { instanceof: Function },
+    removeEngine: { instanceof: Function },
+  },
+});
+
 export const ENGINE_SCHEMA = ajv.compile({
   properties: {
     name: { type: "string" },
-    type: { type: "string" },
-    list: { instanceof: Function},
-    start: { instanceof: Function},
-    kill: { instanceof: Function},
-    restart: { instanceof: [Function, null]}
+    type: { enum: ["engine"] },
+    matchPlugin: { instanceof: [Function, Object] },
+    url: { type: "string" },
+    config: { type: "object" },
+    show: { instanceof: Function },
+    listPlugins: { instanceof: Function },
+    startPlugin: { instanceof: Function },
+    getPlugin: { instanceof: [Function] },
+    getInfo: { instanceof: [Function] },
+    killPlugin: { instanceof: [Function, null] },
+    restartPlugin: { instanceof: [Function, null] },
   },
 });
 
@@ -111,8 +128,6 @@ export const FILE_MANAGER_SCHEMA = ajv.compile({
   properties: {
     name: { type: "string" },
     type: { type: "string" },
-    list: { instanceof: Function}
+    list: { instanceof: Function },
   },
 });
-
-

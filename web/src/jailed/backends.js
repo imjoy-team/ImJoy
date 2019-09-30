@@ -98,6 +98,7 @@ class BasicConnection {
     this.id = id;
     var iframe_container = config.iframe_container;
     var sample = document.createElement("iframe");
+    this._loggingHandler = () => {};
     sample.src = config.__jailed__path__ + "_frame.html";
     sample.sandbox = "";
     sample.frameBorder = "0";
@@ -233,6 +234,9 @@ class BasicConnection {
       );
   }
 
+  onLogging(handler) {
+    this._loggingHandler = handler;
+  }
   /**
    * Adds a handler for a message received from the plugin site
    *

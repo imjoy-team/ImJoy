@@ -25,6 +25,7 @@ import { getBackendByType } from "./jailed/backends.js";
 import {
   OP_SCHEMA,
   ENGINE_SCHEMA,
+  ENGINE_FACTORY_SCHEMA,
   JOY_SCHEMA,
   WINDOW_SCHEMA,
   PLUGIN_SCHEMA,
@@ -322,7 +323,8 @@ export class PluginManager {
       outputs: {},
       loaders: {},
       engines: {},
-      file_managers: {}
+      engine_factories: {},
+      file_managers: {},
     };
   }
 
@@ -1432,7 +1434,7 @@ export class PluginManager {
       // create a proxy plugin
       const plugin = new DynamicPlugin(tconfig, _interface, this.fm.api, true);
       plugin.api = {
-        __jailed_type__: "plugin_api",
+        __as_interface__: true,
         __id__: plugin.id,
         setup: async () => {},
         run: async my => {
@@ -1487,7 +1489,7 @@ export class PluginManager {
       config.engine_mode = template.engine_mode || "auto";
 
       if (template.type === "native-python") {
-        const engine = this.em.getEngine(config.engine_mode);
+        const engine = this.em.findEngine(template);
         if (!engine || !engine.connected) {
           console.error("Please connect to the Plugin Engine 🚀.");
           config.engine = null;
@@ -1497,7 +1499,9 @@ export class PluginManager {
       } else {
         config.engine = null;
       }
+
       const tconfig = _.assign({}, template, config);
+
       tconfig.workspace = this.selected_workspace;
       const _interface = _.assign(
         {
@@ -1578,12 +1582,10 @@ export class PluginManager {
               });
             });
         } else {
-          this.showMessage(
+          console.warn(
             `No "setup()" function is defined in plugin "${plugin.name}".`
           );
-          reject(
-            `No "setup()" function is defined in plugin "${plugin.name}".`
-          );
+          resolve(plugin);
         }
       });
       plugin.whenFailed(e => {
@@ -1895,7 +1897,7 @@ export class PluginManager {
       config.inputs = config.inputs || null;
       config.outputs = config.outputs || null;
       config.run = config.run || null;
-      config.run = config.run || plugin && plugin.api && plugin.api.run;
+      config.run = config.run || (plugin && plugin.api && plugin.api.run);
       if (!OP_SCHEMA(config)) {
         const error = OP_SCHEMA.errors;
         console.error("Error occured during registering " + config.name, error);
@@ -1927,12 +1929,8 @@ export class PluginManager {
         joy_template.tags.push("iframe");
       }
       let run = config.run;
-      
+
       if (!plugin || !run) {
-        console.log(
-          "WARNING: no run function found in the config, this op won't be able to do anything: " +
-            config.name
-        );
         joy_template.onexecute = () => {
           plugin.log("WARNING: no run function defined.");
         };
@@ -2099,10 +2097,10 @@ export class PluginManager {
       if (plugin.ops && Object.keys(plugin.ops).length > 0) {
         for (let k in plugin.ops) {
           const op = plugin.ops[k];
-          if (op.name) this.unregister(plugin, op.name);
+          if (op.name) this.unregisterOp(plugin, op.name);
         }
       }
-      if (plugin.name) this.unregister(plugin, plugin.name);
+      if (plugin.name) this.unregisterOp(plugin, plugin.name);
       return;
     } else {
       const op_name = typeof config === "string" ? config : config.name;
@@ -2120,27 +2118,45 @@ export class PluginManager {
     }
   }
 
-  
-  registerEngine(name, config){
-    if (!ENGINE_SCHEMA(config)) {
-      const error = ENGINE_SCHEMA.errors;
-      console.error("Error occured registering engine ", config, error);
-      throw error;
-    }
-    this.registered.engines[name] = config;
-  }
-
-  unregisterEngine(){
-
-  }
-
   //#################ImJoy API functions##################
   register(plugin, config) {
-    this.registerOp(plugin, config)
+    if (config.type === "engine") {
+      if (!ENGINE_SCHEMA(config)) {
+        const error = ENGINE_SCHEMA.errors;
+        console.error("Error occured registering engine ", config, error);
+        throw error;
+      }
+      this.em.register(config);
+      this.registered.engines[config.name] = config;
+      plugin.onClose(() => {
+        this.em.unregister(config);
+      });
+    } else if (config.type === "engine-factory") {
+      if (!ENGINE_FACTORY_SCHEMA(config)) {
+        const error = ENGINE_FACTORY_SCHEMA.errors;
+        console.error(
+          "Error occured registering engine factory",
+          config,
+          error
+        );
+        throw error;
+      }
+      this.em.registerFactory(config);
+      this.registered.engine_factories[config.name] = config;
+      plugin.onClose(() => {
+        this.em.unregisterFactory(config);
+      });
+    } else {
+      this.registerOp(plugin, config);
+    }
   }
 
-  unregister(plugin, config) {
-    this.unregisterOp(plugin, config)
+  unregister(config) {
+    if (config.type === "engine") {
+      this.em.unregister(config);
+    } else {
+      this.unregisterOp(config);
+    }
   }
 
   createWindow(_plugin, wconfig) {
@@ -2165,7 +2181,7 @@ export class PluginManager {
           wconfig.render(wconfig);
 
           const window_plugin_apis = {
-            __jailed_type__: "plugin_api",
+            __as_interface__: true,
             __id__: wconfig.id,
             run: config => {
               for (let k in config) {
@@ -2186,7 +2202,7 @@ export class PluginManager {
             setTimeout(() => {
               wconfig.refresh();
               const window_plugin_apis = {
-                __jailed_type__: "plugin_api",
+                __as_interface__: true,
                 __id__: wid,
                 run: new_config => {
                   for (let k in new_config) {
