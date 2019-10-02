@@ -113,7 +113,7 @@ var Connection = function(id, type, config) {
   const backend = getBackendByType(type);
   if (backend) {
     config.__jailed__path__ = __jailed__path__;
-    this._platformConnection = new backend.connection(id, type, config);
+    this._platformConnection = new BasicConnection(id, type, config);
   } else {
     throw `Unsupported backend type (${type})`;
   }
@@ -301,7 +301,6 @@ var Plugin = function(config, _interface, _fs_api, is_proxy) {
   this._log_history = [];
   this._onclose_callbacks = [];
   this.backend = getBackendByType(this.type);
-  assert(this.backend);
   this._updateUI =
     (_interface && _interface.utils && _interface.utils.$forceUpdate) ||
     function() {};
@@ -315,6 +314,191 @@ var Plugin = function(config, _interface, _fs_api, is_proxy) {
   }
   this._updateUI();
 };
+
+/**
+ * Platform-dependent implementation of the BasicConnection
+ * object, initializes the plugin site and provides the basic
+ * messaging-based connection with it
+ *
+ * For the web-browser environment, the plugin is created as a
+ * Worker in a sandbaxed frame
+ */
+class BasicConnection {
+  constructor(id, type, config) {
+    this._init = new Whenable();
+    this._fail = new Whenable();
+    this._disconnected = false;
+    this.id = id;
+    var iframe_container = config.iframe_container;
+    var sample = document.createElement("iframe");
+    this._loggingHandler = () => {};
+    sample.src = config.__jailed__path__ + "_frame.html";
+    sample.sandbox = "";
+    sample.frameBorder = "0";
+    sample.style.width = "100%";
+    sample.style.height = "100%";
+    sample.style.margin = "0";
+    sample.style.padding = "0";
+    sample.style.display = "none";
+
+    var me = this;
+
+    me._frame = sample.cloneNode(false);
+    var perm = [
+      "allow-scripts",
+      "allow-forms",
+      "allow-modals",
+      "allow-popups",
+      "allow-same-origin",
+    ];
+    var allows = "";
+    if (config.permissions) {
+      if (config.permissions.includes("midi") && !allows.includes("midi *;")) {
+        allows += "midi *;";
+      }
+      if (
+        config.permissions.includes("geolocation") &&
+        !allows.includes("geolocation *;")
+      ) {
+        allows += "geolocation *;";
+      }
+      if (
+        config.permissions.includes("microphone") &&
+        !allows.includes("microphone *;")
+      ) {
+        allows += "microphone *;";
+      }
+      if (
+        config.permissions.includes("camera") &&
+        !allows.includes("camera *;")
+      ) {
+        allows += "camera *;";
+      }
+      if (
+        config.permissions.includes("encrypted-media") &&
+        !allows.includes("encrypted-media *;")
+      ) {
+        allows += "encrypted-media *;";
+      }
+      if (config.permissions.includes("full-screen")) {
+        me._frame.allowfullscreen = "";
+      }
+      if (config.permissions.includes("payment-request")) {
+        me._frame.allowpaymentrequest = "";
+      }
+    }
+    me._frame.sandbox = perm.join(" ");
+    me._frame.allow = allows;
+    me._frame.src =
+      me._frame.src +
+      "?type=" +
+      type +
+      "&name=" +
+      config.name +
+      "&workspace=" +
+      config.workspace;
+    me._frame.id = "iframe_" + id;
+    if (type == "iframe" || type == "window" || type == "web-python-window") {
+      if (typeof iframe_container == "string") {
+        iframe_container = document.getElementById(iframe_container);
+      }
+      if (iframe_container) {
+        me._frame.style.display = "block";
+        iframe_container.appendChild(me._frame);
+      } else {
+        document.body.appendChild(me._frame);
+      }
+    } else {
+      document.body.appendChild(me._frame);
+    }
+    window.addEventListener("message", function(e) {
+      if (e.source === me._frame.contentWindow) {
+        if (e.data.type == "initialized") {
+          me.dedicatedThread = e.data.dedicatedThread;
+          me._init.emit();
+        } else {
+          me._messageHandler(e.data);
+        }
+      }
+    });
+  }
+
+  /**
+   * Sets-up the handler to be called upon the BasicConnection
+   * initialization is completed.
+   *
+   * For the web-browser environment, the handler is issued when
+   * the plugin worker successfully imported and executed the
+   * _pluginWebWorker.js or _pluginWebIframe.js, and replied to
+   * the application site with the initImprotSuccess message.
+   *
+   * @param {Function} handler to be called upon connection init
+   */
+  whenInit(handler) {
+    this._init.whenEmitted(handler);
+  }
+
+  /**
+   * Sets-up the handler to be called upon the BasicConnection
+   * failed.
+   *
+   * For the web-browser environment, the handler is issued when
+   * the plugin worker successfully imported and executed the
+   * _pluginWebWorker.js or _pluginWebIframe.js, and replied to
+   * the application site with the initImprotSuccess message.
+   *
+   * @param {Function} handler to be called upon connection init
+   */
+  whenFailed(handler) {
+    this._fail.whenEmitted(handler);
+  }
+
+  /**
+   * Sends a message to the plugin site
+   *
+   * @param {Object} data to send
+   */
+  send(data, transferables) {
+    this._frame.contentWindow &&
+      this._frame.contentWindow.postMessage(
+        { type: "message", data: data },
+        "*",
+        transferables
+      );
+  }
+
+  onLogging(handler) {
+    this._loggingHandler = handler;
+  }
+  /**
+   * Adds a handler for a message received from the plugin site
+   *
+   * @param {Function} handler to call upon a message
+   */
+  onMessage(handler) {
+    this._messageHandler = handler;
+  }
+
+  /**
+   * Adds a handler for the event of plugin disconnection
+   * (not used in case of Worker)
+   *
+   * @param {Function} handler to call upon a disconnect
+   */
+  onDisconnect() {}
+
+  /**
+   * Disconnects the plugin (= kills the frame)
+   */
+  disconnect() {
+    if (!this._disconnected) {
+      this._disconnected = true;
+      if (typeof this._frame != "undefined") {
+        this._frame.parentNode.removeChild(this._frame);
+      } // otherwise farme is not yet created
+    }
+  }
+}
 
 /**
  * DynamicPlugin constructor, represents a plugin initialized by a
@@ -341,7 +525,6 @@ var DynamicPlugin = function(config, _interface, _fs_api, is_proxy) {
   this._onclose_callbacks = [];
   this._is_proxy = is_proxy;
   this.backend = getBackendByType(this.type);
-  assert(this.backend);
   this._updateUI =
     (_interface && _interface.utils && _interface.utils.$forceUpdate) ||
     function() {};
@@ -418,13 +601,14 @@ DynamicPlugin.prototype._connect = Plugin.prototype._connect = function() {
   };
 
   platformInit.whenEmitted(function() {
-    if (
-      me.backend.type == "external" &&
-      (!me.config.engine || !me.config.engine.connected)
-    ) {
-      me._fail.emit("Please connect to the Plugin Engine 🚀.");
-      me._connection = null;
-    } else if (me.backend.type === "external" && me.config.engine) {
+    if (!me.backend) {
+      if (!me.config.engine || !me.config.engine.connected) {
+        me._fail.emit("Please connect to the Plugin Engine 🚀.");
+        me._connection = null;
+        me.error("Please connect to the Plugin Engine 🚀.");
+        me._set_disconnected();
+        return;
+      }
       me.initializing = true;
       me._updateUI();
       me.config.engine
@@ -443,6 +627,18 @@ DynamicPlugin.prototype._connect = Plugin.prototype._connect = function() {
           me.error(e);
           me._set_disconnected();
         });
+
+      // me._connection._platformConnection.onLogging(function(details) {
+      //   if (details.type === "error") {
+      //     me.error(details.value);
+      //   } else if (details.type === "progress") {
+      //     me.progress(details.value);
+      //   } else if (details.type === "info") {
+      //     me.log(details.value);
+      //   } else {
+      //     console.log(details.value);
+      //   }
+      // });
     } else {
       me._connection = new Connection(me.id, me.type, me.config);
       me.initializing = true;
@@ -453,19 +649,7 @@ DynamicPlugin.prototype._connect = Plugin.prototype._connect = function() {
       me._connection.whenFailed(function(e) {
         me._fail.emit(e);
       });
-      if (me.backend.type === "external") {
-        me._connection._platformConnection.onLogging(function(details) {
-          if (details.type === "error") {
-            me.error(details.value);
-          } else if (details.type === "progress") {
-            me.progress(details.value);
-          } else if (details.type === "info") {
-            me.log(details.value);
-          } else {
-            console.log(details.value);
-          }
-        });
-      }
+
       me._connection.onDisconnect(function(details) {
         if (details) {
           if (details.success) {
@@ -525,21 +709,14 @@ DynamicPlugin.prototype._init = Plugin.prototype._init = function() {
   });
 
   this.getRemoteCallStack = this._site.getRemoteCallStack;
-
-  if (this.backend.type === "external") {
-    this._sendInterface();
-  } else if (this.backend.type === "internal") {
-    var sCb = function() {
-      me._loadCore();
-    };
-    this._connection.importScript(
-      __jailed__path__ + "_JailedSite.js",
-      sCb,
-      this._fCb
-    );
-  } else {
-    throw `Unsupported backend type ${this.backend.type}`;
-  }
+  var sCb = function() {
+    me._loadCore();
+  };
+  this._connection.importScript(
+    __jailed__path__ + "_JailedSite.js",
+    sCb,
+    this._fCb
+  );
 };
 
 /**

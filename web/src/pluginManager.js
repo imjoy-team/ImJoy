@@ -1488,13 +1488,10 @@ export class PluginManager {
       config._id = template._id;
       config.engine_mode = template.engine_mode || "auto";
 
-      if (template.type === "native-python") {
-        const engine = this.em.findEngine(template);
-        if (!engine || !engine.connected) {
+      if (!getBackendByType(template.type)) {
+        config.engine = this.em.findEngine(template);
+        if (!config.engine || !config.engine.connected) {
           console.error("Please connect to the Plugin Engine 🚀.");
-          config.engine = null;
-        } else {
-          config.engine = engine;
         }
       } else {
         config.engine = null;
@@ -2118,9 +2115,14 @@ export class PluginManager {
     }
   }
 
+  registerPlugin(plugin, config) {}
+
+  unregisterPlugin(plugin, config) {}
+
   //#################ImJoy API functions##################
   register(plugin, config) {
-    if (config.type === "engine") {
+    if (config.type === "plugin") {
+    } else if (config.type === "engine") {
       if (!ENGINE_SCHEMA(config)) {
         const error = ENGINE_SCHEMA.errors;
         console.error("Error occured registering engine ", config, error);

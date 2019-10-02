@@ -111,7 +111,7 @@ export const ENGINE_SCHEMA = ajv.compile({
   properties: {
     name: { type: "string" },
     type: { enum: ["engine"] },
-    matchPlugin: { instanceof: [Function, Object] },
+    pluginType: { type: "string" },
     url: { type: "string" },
     config: { type: "object" },
     show: { instanceof: Function },

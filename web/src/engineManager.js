@@ -21,13 +21,7 @@ export class EngineManager {
   findEngine(plugin_config) {
     const matched = [];
     const egs = this.engines.filter(engine => {
-      let matched = true;
-      for (let k in engine.matchPlugin) {
-        if (engine.matchPlugin[k] !== plugin_config[k]) {
-          matched = false;
-        }
-      }
-      return matched;
+      return engine.pluginType === plugin_config.type;
     });
 
     if (!egs || egs.length <= 0) {
