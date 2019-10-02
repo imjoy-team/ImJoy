@@ -59,7 +59,6 @@ const app = new Vue({
     const that = this;
     const repos = [
       'oeway/ImJoy-Plugins',
-      'imjoy-team/example-plugins',
       'oeway/ImJoy-Demo-Plugins',
     ]
     that.plugins = []
