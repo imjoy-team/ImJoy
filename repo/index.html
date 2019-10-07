@@ -189,7 +189,7 @@
                     <a @click="showInfo(plugin)" style="color: #ffffff">
                       <i v-if="plugin.icon" class="material-icons">{{plugin.icon}}</i>
                       <i v-else class="material-icons">extension</i>
-                      {{ plugin.name + " " + plugin.type_icon }}
+                      {{ plugin.name + " " + plugin.badges }}
                     </a>
                   </h3>
                   <span v-if="plugin.description"> {{ plugin.description.slice(0, 100) }}</span><br>
@@ -224,7 +224,7 @@
       <h4 class="mdl-dialog__title">
         <i v-if="selected_plugin.icon" class="material-icons">{{selected_plugin.icon}}</i>
         <i v-else class="material-icons">extension</i>
-        {{ selected_plugin.name + " " + selected_plugin.type_icon }}</h4>
+        {{ selected_plugin.name + " " + selected_plugin.badges }}</h4>
       <div class="mdl-dialog__content">
 
         <p>

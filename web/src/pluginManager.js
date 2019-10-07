@@ -143,6 +143,7 @@ export class PluginManager {
       createWindow: this.createWindow,
       run: this.runPlugin,
       call: this.callPlugin,
+      getPlugins: this.getPlugins,
       getPlugin: this.getPlugin,
       setConfig: this.setPluginConfig,
       getConfig: this.getPluginConfig,
@@ -1348,11 +1349,21 @@ export class PluginManager {
       }
       const backend = getBackendByType(config.type);
       if (backend) {
-        config.type_icon = backend.icon || "";
+        config.badges = backend.icon || "";
         config.engine_mode = null;
       } else {
-        config.type_icon = "🚀";
+        config.badges = "🚀";
         config.engine_mode = overwrite_config.engine_mode || "auto";
+      }
+      if (
+        config.flags &&
+        (config.flags.indexOf("engine") >= 0 ||
+          config.flags.indexOf("engine-factory") >= 0)
+      ) {
+        config.badges = config.badges + "⚙";
+      }
+      if (config.flags && config.flags.indexOf("file-manager") >= 0) {
+        config.badges = config.badges + "📁";
       }
       return config;
     } catch (e) {
@@ -1418,7 +1429,7 @@ export class PluginManager {
           c.data = (my && my.data) || {};
           c.config = (my && my.config) || {};
           c.id = my && my.id;
-          return await this.createWindow(null, c);
+          await this.createWindow(null, c);
         },
       };
       try {
@@ -1550,7 +1561,6 @@ export class PluginManager {
               this.showMessage(`<${template.name}>: ${e}`, 15);
               reject(e);
               plugin.terminate().then(() => {
-                console.log("=====terminated...");
                 this.update_ui_callback();
               });
             });
@@ -2324,6 +2334,16 @@ export class PluginManager {
     } else {
       throw `plugin with type ${plugin_name} not found.`;
     }
+  }
+
+  async getPlugins(_plugin) {
+    const ps = {};
+    for (let k in this.plugin_names) {
+      if (this.plugin_names[k] === _plugin) continue;
+      ps[k] = this.plugin_names[k].api;
+    }
+    console.log(ps);
+    return ps;
   }
 
   async getPlugin(_plugin, plugin_name) {

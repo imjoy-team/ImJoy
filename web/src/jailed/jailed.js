@@ -603,7 +603,12 @@ DynamicPlugin.prototype._connect = function() {
       me.initializing = true;
       me._updateUI();
       me.engine
-        .startPlugin(me.config)
+        .startPlugin({
+          ...me.config,
+          terminate: () => {
+            me.terminate();
+          },
+        })
         .then(remote => {
           me.remote = remote;
           me.api = me.remote;

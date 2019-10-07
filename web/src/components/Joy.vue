@@ -50,6 +50,7 @@ export default {
         this.config.data = this.joy.top.data;
       }
       this.$nextTick(() => {
+        if (!this.$refs.editor) return;
         this.$refs.editor.innerHTML = "";
         const joy_config = {
           // Where the Joy editor goes:

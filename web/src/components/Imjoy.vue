@@ -622,7 +622,7 @@
                     : runOp(plugin.ops[plugin.name])
                 "
               >
-                {{ plugin.config.name + " " + plugin.config.type_icon }}
+                {{ plugin.config.name + " " + plugin.config.badges }}
               </md-button>
               <div class="floating-right-buttons">
                 <md-button
@@ -798,7 +798,7 @@
                   :disabled="!plugin.engine || !plugin._disconnected"
                   @click="connectPlugin(plugin)"
                 >
-                  {{ plugin.config.name + " " + plugin.config.type_icon }}
+                  {{ plugin.config.name + " " + plugin.config.badges }}
                 </md-button>
                 <div class="floating-right-buttons">
                   <md-button
@@ -1239,7 +1239,7 @@
                     plugin4install.icon
                   }}</md-icon
                   ><md-icon v-else>extension</md-icon>
-                  {{ plugin4install.type_icon }}
+                  {{ plugin4install.badges }}
                 </h2>
               </div>
               <div
@@ -1854,12 +1854,6 @@ export default {
           route.query.workspace || route.query.w || this.pm.workspace_list[0];
         await this.pm.loadWorkspace(selected_workspace);
         await this.pm.reloadPlugins();
-        // const connections = this.em.connectAll(true);
-        // try {
-        //   await connections;
-        // } catch (e) {
-        //   console.error(e);
-        // }
 
         if (route.query.engine && route.query.start) {
           const en = this.em.getEngineByUrl(route.query.engine);
@@ -2992,13 +2986,13 @@ export default {
         this.alert_config.title = null;
         this.alert_config.content = escapeHTML(text).replace(/\n/g, "<br>");
         this.alert_config.confirm_text = "OK";
-      } else if (typeof text === "object") {
+      } else if (typeof text === "object" && text.title && text.content) {
         this.alert_config.title = text.title;
         this.alert_config.content =
           DOMPurify.sanitize(String(text.content)) || "undefined";
         this.alert_config.confirm_text = text.confirm_text || "OK";
       } else {
-        this.alert_config.content = String(text);
+        this.alert_config.content = JSON.stringify(text);
       }
 
       this.alert_config.show = true;
@@ -3013,7 +3007,7 @@ export default {
           this.prompt_config.placeholder = defaultText;
           this.prompt_config.cancel_text = "Cancel";
           this.prompt_config.confirm_text = "OK";
-        } else if (typeof text === "object") {
+        } else if (typeof text === "object" && text.title && text.content) {
           this.prompt_config.title = text.title;
           this.prompt_config.content =
             DOMPurify.sanitize(String(text.content)) || "undefined";
@@ -3041,7 +3035,7 @@ export default {
           this.confirm_config.content = escapeHTML(text).replace(/\n/g, "<br>");
           this.confirm_config.cancel_text = "Cancel";
           this.confirm_config.confirm_text = "OK";
-        } else if (typeof text === "object") {
+        } else if (typeof text === "object" && text.title && text.content) {
           this.confirm_config.title = text.title;
           this.confirm_config.content =
             DOMPurify.sanitize(String(text.content)) || "undefined";
