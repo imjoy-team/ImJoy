@@ -313,13 +313,17 @@ export default {
         this.options.return_object === undefined
           ? true
           : this.options.return_object;
-      if (this.options.file_manager) {
-        this.show_all_file_managers = false;
-        this.selected_file_manager = this.options.file_manager;
-      } else {
-        this.show_all_file_managers = true;
-        this.selected_file_manager = this.file_managers[0];
-      }
+      this.$nextTick(() => {
+        if (this.options.file_manager) {
+          this.show_all_file_managers = false;
+          this.selected_file_manager = this.options.file_manager;
+        } else {
+          this.show_all_file_managers = true;
+          this.selected_file_manager = this.file_managers[0];
+        }
+        this.refreshList();
+      });
+
       if (this.options.type != "file" && this.options.root) {
         this.file_tree_selection = this.options.root;
       } else {

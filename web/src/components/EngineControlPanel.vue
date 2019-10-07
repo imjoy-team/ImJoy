@@ -30,7 +30,7 @@
         </md-menu-item>
         <template v-for="engine in engineManager.engines">
           <md-divider :key="engine.url + '_start_divider'"></md-divider>
-          <md-menu-item :key="engine.name + engine.url">
+          <md-menu-item v-if="engine.connected" :key="engine.name + engine.url">
             <span
               class="md-list-item-content"
               style="cursor: pointer;"
@@ -46,10 +46,14 @@
               <span>{{ engine.name }}</span>
             </span>
           </md-menu-item>
-          <!-- <md-menu-item v-else @click.stop="engine.connect(false)" :key="engine.url">
+          <md-menu-item
+            v-else
+            @click.stop="engine.connect(false)"
+            :key="engine.url"
+          >
             <md-icon>sync_disabled</md-icon> {{ engine.name }}
             <md-tooltip>Connect to {{ engine.name }} </md-tooltip>
-          </md-menu-item> -->
+          </md-menu-item>
           <template v-if="engine.connected && engine.show_processes">
             <md-menu-item
               @click="showInfo(engine)"

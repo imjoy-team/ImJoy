@@ -27,11 +27,13 @@ export class EngineManager {
     }
 
     if (plugin_config.engine_mode === "auto") {
-      return egs[0];
+      return egs.filter(eg => {
+        return eg.connected;
+      })[0];
     }
 
     return egs.filter(eg => {
-      eg.name === plugin_config.engine_mode;
+      return eg.name === plugin_config.engine_mode;
     })[0];
   }
 
@@ -51,14 +53,13 @@ export class EngineManager {
         break;
       }
     }
+    engine.connected = false;
 
     if (engine.getEngineInfo) {
       engine.getEngineInfo().then(engine_info => {
         engine.engine_info = engine_info;
       });
     }
-
-    engine.connected = false;
     const check_connectivity = async () => {
       if (engine.getEngineStatus) {
         try {
@@ -70,18 +71,22 @@ export class EngineManager {
         this.event_bus.emit("engine_connected", engine);
       } else if (engine.connected && !live) {
         this.event_bus.emit("engine_disconnected", engine);
+        for (let p of engine._plugins) {
+          p.terminate();
+        }
+        // clearInterval(timerId);
       }
       engine.connected = live;
     };
-    check_connectivity();
-    setInterval(check_connectivity, 3000);
 
     engine._plugins = [];
     engine.registerPlugin = p => {
       engine._plugins.push(p);
     };
-
     this.engines.push(engine);
+    engine.connect();
+    check_connectivity();
+    setInterval(check_connectivity, 3000);
   }
 
   unregister(engine) {

@@ -352,16 +352,15 @@
               </md-button>
               <md-menu-content>
                 <md-menu-item
-                  v-for="manager in fm.fileManagers"
-                  :key="manager.name"
+                  v-if="fm && fm.fileManagers.length > 0"
                   @click="
-                    showFileManagerDialog(manager);
+                    showFileManagerDialog();
                     files_expand = false;
                   "
                   class="md-button"
                 >
-                  <md-icon>add_to_queue</md-icon>{{ manager.name }}
-                  <md-tooltip>Load files through {{ manager.name }}</md-tooltip>
+                  <md-icon>add_to_queue</md-icon>File Manager
+                  <md-tooltip>Load files through file manager</md-tooltip>
                 </md-menu-item>
                 <md-menu-item
                   @click="
@@ -551,7 +550,7 @@
                     >
                       <md-icon>delete_forever</md-icon>Remove
                     </md-menu-item>
-                    <div v-if="plugin.engine">
+                    <div v-if="plugin.config.engine_mode">
                       <md-divider></md-divider>
                       <md-menu-item @click="switchEngine(plugin, 'auto')">
                         <md-icon v-if="plugin.config.engine_mode === 'auto'"
@@ -568,20 +567,21 @@
                       </md-menu-item>
                       <md-menu-item
                         v-for="engine in em.engines"
-                        :key="engine.id"
+                        :key="engine.name"
                         @click="switchEngine(plugin, engine)"
                       >
                         <md-icon
                           v-if="
-                            plugin.config.engine_mode === engine.id ||
-                              (plugin.engine && plugin.engine.id === engine.id)
+                            plugin.config.engine_mode === engine.name ||
+                              (plugin.engine &&
+                                plugin.engine.name === engine.name)
                           "
                           >radio_button_checked</md-icon
                         >
                         <md-icon v-else>radio_button_unchecked</md-icon>
                         <span
                           :class="
-                            plugin.engine && plugin.engine.id === engine.id
+                            plugin.engine && plugin.engine.name === engine.name
                               ? 'bold'
                               : ''
                           "
@@ -1860,8 +1860,8 @@ export default {
           const pl = this.pm.plugin_names[route.query.start];
           if (en && pl) {
             console.log(`setting plugin engine of ${pl.name} to ${en.name}`);
-            pl.engine_mode = en.id;
-            pl.config.engine_mode = en.id;
+            pl.engine_mode = en.name;
+            pl.config.engine_mode = en.name;
           }
           if (!en) {
             this.showMessage(`Plugin engine ${route.query.engine} not found.`);
@@ -2240,7 +2240,7 @@ export default {
       }
     },
     switchEngine(plugin, engine) {
-      plugin.config.engine_mode = (engine && engine.id) || "auto";
+      plugin.config.engine_mode = (engine && engine.name) || "auto";
       this.pm
         .savePlugin(plugin.config)
         .then(p => {
@@ -2382,11 +2382,10 @@ export default {
       this.status_text = info;
       this.$forceUpdate();
     },
-    showFileManagerDialog(manager) {
+    showFileManagerDialog() {
       this.showFileDialog(this.IMJOY_PLUGIN, {
         uri_type: "url",
         root: "./",
-        file_manager: manager,
       })
         .then(selection => {
           if (this.screenWidth <= 800) {
@@ -2772,11 +2771,17 @@ export default {
           typeof config.engine === "string"
             ? this.em.getEngineByUrl(config.engine)
             : config.engine;
+
         if (!config.file_manager && config.engine) {
           config.file_manager = this.fm.getFileManagerByUrl(config.engine.url);
         }
-        this.selected_file_managers = [config.file_manager];
-        assert(config.file_manager, "No file manager is selected.");
+        if (config.file_manager) {
+          this.selected_file_managers = [config.file_manager];
+        } else {
+          this.selected_file_managers = this.fm.fileManagers;
+        }
+
+        // assert(config.file_manager, "No file manager is selected.");
         config.root =
           config.root || (_plugin.config && _plugin.config.work_dir);
         if (!_plugin.engine) {
@@ -2801,7 +2806,11 @@ export default {
 
         return this.$refs["file-dialog"].showDialog(_plugin, config);
       } else {
-        this.selected_file_managers = [config.file_manager];
+        if (config.file_manager) {
+          this.selected_file_managers = [config.file_manager];
+        } else {
+          this.selected_file_managers = this.fm.fileManagers;
+        }
         return this.$refs["file-dialog"].showDialog(_plugin, config);
       }
     },

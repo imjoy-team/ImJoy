@@ -158,6 +158,8 @@ export const ENGINE_SCHEMA = ajv.compile({
     pluginType: { type: "string" },
     url: { type: "string" },
     config: { type: "object" },
+    connect: { instanceof: Function },
+    disconnect: { instanceof: Function },
     listPlugins: { instanceof: Function },
     startPlugin: { instanceof: Function },
     getPlugin: { instanceof: Function },
@@ -179,5 +181,6 @@ export const FILE_MANAGER_SCHEMA = ajv.compile({
     getFile: { instanceof: Function },
     putFile: { instanceof: Function },
     removeFile: { instanceof: Function },
+    heartbeat: { instanceof: Function },
   },
 });
