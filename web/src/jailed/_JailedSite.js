@@ -160,6 +160,15 @@
           _interface.onRefresh = cb => {
             this._remote.onRefresh(cb);
           };
+          _interface.on = (name, cb) => {
+            this._remote.on(name, cb);
+          };
+          _interface.off = (name, cb) => {
+            this._remote.off(name, cb);
+          };
+          _interface.emit = (name, data) => {
+            this._remote.emit(name, data);
+          };
           _interface.refresh = () => {
             this._remote.refresh();
           };
@@ -420,7 +429,7 @@
           wrapped_reject.__jailed_pairs__ = wrapped_resolve;
 
           var args = Array.prototype.slice.call(arguments);
-          if (name === "register" || name === "export") {
+          if (name === "register" || name === "export" || name === "on") {
             args = me._wrap(args, true);
           } else {
             args = me._wrap(args);
@@ -522,10 +531,28 @@
       return bObject;
     }
 
+    if (as_interface) {
+      aObject["__id__"] = aObject["__id__"] || randId();
+      this._plugin_interfaces[aObject["__id__"]] =
+        this._plugin_interfaces[aObject["__id__"]] || {};
+    }
     for (k in aObject) {
       if (isarray || aObject.hasOwnProperty(k)) {
         v = aObject[k];
         if (typeof v == "function") {
+          if (as_interface) {
+            const encoded_interface = this._plugin_interfaces[
+              aObject["__id__"]
+            ];
+            bObject[k] = {
+              __jailed_type__: "plugin_interface",
+              __plugin_id__: aObject["__id__"],
+              __value__: k,
+              num: null,
+            };
+            encoded_interface[k] = v;
+            continue;
+          }
           let interfaceFuncName = null;
           for (var name in this._interface) {
             if (this._interface.hasOwnProperty(name)) {

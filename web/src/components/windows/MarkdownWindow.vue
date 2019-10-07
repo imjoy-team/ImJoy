@@ -46,11 +46,7 @@
             <h2>
               <md-icon v-if="plugin_info.icon">{{ plugin_info.icon }}</md-icon
               ><md-icon v-else>extension</md-icon>
-              {{
-                plugin_info.type === "native-python"
-                  ? plugin_info.name + " 🚀"
-                  : plugin_info.name
-              }}
+              {{ plugin_info.name + " " + plugin_info.type_icon }}
             </h2>
           </div>
           <div class="md-toolbar-section-end">

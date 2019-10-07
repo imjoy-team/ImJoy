@@ -36,14 +36,7 @@
             <md-icon v-else>extension</md-icon>
           </md-avatar>
           <div class="md-list-item-text">
-            <span>{{
-              plugin.type === "native-python"
-                ? plugin.name + " 🚀"
-                : plugin.type === "web-python" ||
-                  plugin.type === "web-python-window"
-                ? plugin.name + " 🐍"
-                : plugin.name
-            }}</span>
+            <span>{{ plugin.type_icon }}</span>
             <p>{{ plugin.description }}</p>
             <p>
               <span v-for="tag in plugin.tags" :key="tag">{{ tag }}, </span>

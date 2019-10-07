@@ -29,45 +29,39 @@
           <span>Add {{ factory.name }} 🚀</span>
         </md-menu-item>
         <template v-for="engine in engineManager.engines">
-          <!-- <md-divider></md-divider> -->
-          <md-menu-item
-            @click="showInfo(engine)"
-            :key="engine.name + engine.url"
-          >
-            <md-button
-              v-if="
-                engine.show_processes &&
-                  engine.plugin_processes &&
-                  engine.plugin_processes.length > 0
+          <md-divider :key="engine.url + '_start_divider'"></md-divider>
+          <md-menu-item :key="engine.name + engine.url">
+            <span
+              class="md-list-item-content"
+              style="cursor: pointer;"
+              @click.stop="
+                engine.show_processes ? hide(engine) : expand(engine)
               "
-              @click.stop="hide(engine)"
-              class="md-icon-button md-primary median-icon-button"
             >
-              <md-icon>remove</md-icon>
-            </md-button>
-            <md-button
-              v-else
-              @click.stop="expand(engine)"
-              class="md-icon-button  median-icon-button"
-              :class="engine.connected ? 'md-primary md-raised' : ''"
-              :disabled="!engine.connected"
-            >
-              <md-icon v-if="engine.connected">autorenew</md-icon>
-              <md-icon v-else>sync_disabled</md-icon>
-              <md-tooltip
-                >Show plugin processes or terminal of the engine.</md-tooltip
+              <md-icon v-if="engine.show_processes">remove</md-icon>
+              <md-icon v-else-if="engine.connected" class="md-primary"
+                >autorenew</md-icon
               >
-            </md-button>
-            <span>&nbsp;{{ engine.name }}</span>
+              <md-icon v-else>sync_disabled</md-icon>
+              <span>{{ engine.name }}</span>
+            </span>
           </md-menu-item>
           <!-- <md-menu-item v-else @click.stop="engine.connect(false)" :key="engine.url">
             <md-icon>sync_disabled</md-icon> {{ engine.name }}
             <md-tooltip>Connect to {{ engine.name }} </md-tooltip>
           </md-menu-item> -->
           <template v-if="engine.connected && engine.show_processes">
-            <md-divider :key="engine.url + '_start_divider'"></md-divider>
             <md-menu-item
-              v-show="engine.plugin_processes"
+              @click="showInfo(engine)"
+              :key="engine.url + '_show_info'"
+            >
+              &nbsp;&nbsp;<md-button class="md-icon-button">
+                <md-icon>info</md-icon>
+              </md-button>
+              About Engine
+            </md-menu-item>
+            <md-menu-item
+              v-show="engine.engine_status.plugin_processes"
               @click="startTerminal(engine)"
               :key="engine.url + '_start_terminal'"
             >
@@ -77,8 +71,8 @@
               Open terminal
             </md-menu-item>
             <md-menu-item
-              v-show="engine.plugin_processes"
-              v-for="p in engine.plugin_processes"
+              v-show="engine.engine_status.plugin_processes"
+              v-for="p in engine.engine_status.plugin_processes"
               :key="p.pid"
             >
               &nbsp;&nbsp;<md-button
@@ -90,7 +84,7 @@
               {{ p.name }} (#{{ p.pid }})
             </md-menu-item>
             <md-menu-item
-              v-if="!engine.plugin_processes"
+              v-if="!engine.engine_status.plugin_processes"
               :key="engine.url + '_processes'"
             >
               <md-button>
@@ -99,11 +93,11 @@
             </md-menu-item>
             <md-menu-item
               :disabled="true"
-              v-if="engine.plugin_num > 1"
+              v-if="engine.engine_status.plugin_num > 1"
               :key="engine.url + '_running_plugins'"
             >
               &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;<span
-                >Running Plugins: {{ engine.plugin_num }}
+                >Running Plugins: {{ engine.engine_status.plugin_num }}
               </span>
               <md-button
                 @click.stop="kill(engine)"
@@ -357,8 +351,8 @@
           <md-divider></md-divider>
           <ul>
             <li
-              v-show="selected_engine.plugin_processes"
-              v-for="p in selected_engine.plugin_processes"
+              v-show="selected_engine.engine_status.plugin_processes"
+              v-for="p in selected_engine.engine_status.plugin_processes"
               :key="p.pid"
             >
               &nbsp;<md-button
@@ -369,15 +363,18 @@
               </md-button>
               {{ p.name }} (#{{ p.pid }})
             </li>
-            <li v-if="!selected_engine.plugin_processes">
+            <li v-if="!selected_engine.engine_status.plugin_processes">
               <md-button>
                 <div class="loading loading-lg"></div>
               </md-button>
             </li>
-            <li :disabled="true" v-if="selected_engine.plugin_num > 1">
+            <li
+              :disabled="true"
+              v-if="selected_engine.engine_status.plugin_num > 1"
+            >
               <md-button @click.stop="kill(selected_engine)" class="md-accent ">
                 <md-icon>clear</md-icon> Kill All ({{
-                  selected_engine.plugin_num
+                  selected_engine.engine_status.plugin_num
                 }}
                 Running Plugins)
               </md-button>
@@ -413,17 +410,12 @@ export default {
     this.event_bus = this.$root.$data.store && this.$root.$data.store.event_bus;
   },
   mounted() {
-    this.event_bus.on("engine_connected", this.forceUpdate);
-    this.event_bus.on("engine_disconnected", this.forceUpdate);
     if (this.is_mobile_or_tablet) {
       this.url_type = "remote";
       this.engine_url = "";
     }
   },
-  beforeDestroy() {
-    this.event_bus.off("engine_connected", this.forceUpdate);
-    this.event_bus.off("engine_disconnected", this.forceUpdate);
-  },
+  beforeDestroy() {},
   methods: {
     showDialog(config) {
       if (!config.engine) {
@@ -448,15 +440,14 @@ export default {
       engine.show_processes = false;
       this.$forceUpdate();
     },
-    update(engine) {
-      engine.plugin_processes = null;
+    async update(engine) {
+      engine.engine_status.plugin_processes = null;
       this.$forceUpdate();
-      engine.updateEngineStatus().finally(() => {
-        this.$forceUpdate();
-      });
+      engine.engine_status = await engine.getEngineStatus();
+      this.$forceUpdate();
     },
     kill(engine, p) {
-      engine.plugin_processes = null;
+      engine.engine_status.plugin_processes = null;
       engine.killPluginProcess(p).finally(() => {
         this.update(engine);
       });
@@ -515,7 +506,7 @@ export default {
     showInfo(engine) {
       this.show_sys_info = false;
       this.selected_engine = engine;
-      engine.show();
+      this.showEngineInfoDialog = true;
     },
     openEngineUrl(url) {
       window.open(url, "_blank");

@@ -3,7 +3,7 @@ import { WindowManager } from "./windowManager.js";
 
 import { EngineManager } from "./engineManager.js";
 
-import { FileSystemManager } from "./fileSystemManager.js";
+import { FileSystemManager, FileManager } from "./fileSystemManager.js";
 
 import PouchDB from "pouchdb-browser";
 
@@ -60,14 +60,19 @@ export class ImJoy {
       add_window_callback: this.add_window_callback,
     });
 
-    this.fm = new FileSystemManager();
+    this.fsm = new FileSystemManager();
+
+    this.fm = new FileManager({
+      event_bus: this.event_bus,
+    });
 
     this.pm = new PluginManager({
       event_bus: this.event_bus,
       config_db: this.config_db,
       engine_manager: this.em,
       window_manager: this.wm,
-      file_system_manager: this.fm,
+      file_system_manager: this.fsm,
+      file_manager: this.fm,
       imjoy_api: this.imjoy_api,
       show_message_callback: this.show_message_callback,
       update_ui_callback: this.update_ui_callback,
@@ -76,7 +81,7 @@ export class ImJoy {
 
   async init() {
     try {
-      await this.fm.init();
+      await this.fsm.init();
       console.log("Successfully initialized the file system.");
     } catch (e) {
       console.error(e);
@@ -84,11 +89,11 @@ export class ImJoy {
         "Failed to initialize file system: " + e.toString()
       );
     }
+    await this.fm.init();
     await this.pm.init();
     await this.pm.loadWorkspaceList();
     try {
       await this.em.init();
-
       console.log("Successfully initialized the engine manager.");
     } catch (e) {
       console.error(e);
@@ -102,7 +107,7 @@ export class ImJoy {
     await this.init();
     if (config.workspace) {
       await this.pm.loadWorkspace(config.workspace);
-      await this.pm.reloadPlugins(false);
+      await this.pm.reloadPlugins();
     }
     try {
       if (config.engine) {

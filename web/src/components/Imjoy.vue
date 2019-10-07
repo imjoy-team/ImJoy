@@ -352,15 +352,16 @@
               </md-button>
               <md-menu-content>
                 <md-menu-item
+                  v-for="manager in fm.fileManagers"
+                  :key="manager.name"
                   @click="
-                    showEngineFileDialog();
+                    showFileManagerDialog(manager);
                     files_expand = false;
                   "
-                  :disabled="em.engines.length <= 0"
                   class="md-button"
                 >
-                  <md-icon>add_to_queue</md-icon>Open Engine File
-                  <md-tooltip>Load files through Plugin Engine</md-tooltip>
+                  <md-icon>add_to_queue</md-icon>{{ manager.name }}
+                  <md-tooltip>Load files through {{ manager.name }}</md-tooltip>
                 </md-menu-item>
                 <md-menu-item
                   @click="
@@ -550,7 +551,7 @@
                     >
                       <md-icon>delete_forever</md-icon>Remove
                     </md-menu-item>
-                    <div v-if="plugin.config.type === 'native-python'">
+                    <div v-if="plugin.engine">
                       <md-divider></md-divider>
                       <md-menu-item @click="switchEngine(plugin, 'auto')">
                         <md-icon v-if="plugin.config.engine_mode === 'auto'"
@@ -573,16 +574,14 @@
                         <md-icon
                           v-if="
                             plugin.config.engine_mode === engine.id ||
-                              (plugin.config.engine &&
-                                plugin.config.engine.id === engine.id)
+                              (plugin.engine && plugin.engine.id === engine.id)
                           "
                           >radio_button_checked</md-icon
                         >
                         <md-icon v-else>radio_button_unchecked</md-icon>
                         <span
                           :class="
-                            plugin.config.engine &&
-                            plugin.config.engine.id === engine.id
+                            plugin.engine && plugin.engine.id === engine.id
                               ? 'bold'
                               : ''
                           "
@@ -612,27 +611,18 @@
                 :class="
                   plugin.running
                     ? 'busy-plugin'
-                    : plugin._disconnected && plugin.type === 'native-python'
+                    : plugin._disconnected && plugin.engine
                     ? 'md-accent'
                     : 'md-primary'
                 "
-                :disabled="
-                  plugin._disconnected && plugin.type != 'native-python'
-                "
+                :disabled="plugin._disconnected && !plugin.engine"
                 @click="
                   plugin._disconnected
                     ? connectPlugin(plugin)
                     : runOp(plugin.ops[plugin.name])
                 "
               >
-                {{
-                  plugin.type === "native-python"
-                    ? plugin.name + " 🚀"
-                    : plugin.type === "web-python" ||
-                      plugin.type === "web-python-window"
-                    ? plugin.name + " 🐍"
-                    : plugin.name
-                }}
+                {{ plugin.config.name + " " + plugin.config.type_icon }}
               </md-button>
               <div class="floating-right-buttons">
                 <md-button
@@ -801,20 +791,14 @@
                   :class="
                     plugin.running
                       ? 'busy-plugin'
-                      : plugin._disconnected && plugin.type === 'native-python'
+                      : plugin._disconnected && plugin.engine
                       ? 'md-accent'
                       : ''
                   "
-                  :disabled="
-                    plugin.type != 'native-python' || !plugin._disconnected
-                  "
+                  :disabled="!plugin.engine || !plugin._disconnected"
                   @click="connectPlugin(plugin)"
                 >
-                  {{
-                    plugin.type === "native-python"
-                      ? plugin.name + " 🚀"
-                      : plugin.name
-                  }}
+                  {{ plugin.config.name + " " + plugin.config.type_icon }}
                 </md-button>
                 <div class="floating-right-buttons">
                   <md-button
@@ -950,12 +934,7 @@
     <file-dialog
       id="engine-file-dialog"
       ref="file-dialog"
-      :engines="em.engines"
-      :remove-files="removeFiles"
-      :list-files="listFiles"
-      :get-file-url="getFileUrl"
-      :request-upload-url="requestUploadUrl"
-      :download-file-from-url="downloadFileFromUrl"
+      :file_managers="selected_file_managers"
       :upload-file-to-url="uploadFileToUrl"
     ></file-dialog>
     <md-dialog
@@ -1260,11 +1239,7 @@
                     plugin4install.icon
                   }}</md-icon
                   ><md-icon v-else>extension</md-icon>
-                  {{
-                    plugin4install.type === "native-python"
-                      ? plugin4install.name + " 🚀"
-                      : plugin4install.name
-                  }}
+                  {{ plugin4install.type_icon }}
                 </h2>
               </div>
               <div
@@ -1401,7 +1376,6 @@
 
 import { saveAs } from "file-saver";
 import axios from "axios";
-
 import WEB_WORKER_PLUGIN_TEMPLATE from "../plugins/webWorkerTemplate.imjoy.html";
 import NATIVE_PYTHON_PLUGIN_TEMPLATE from "../plugins/nativePythonTemplate.imjoy.html";
 import WEB_PYTHON_PLUGIN_TEMPLATE from "../plugins/webPythonTemplate.imjoy.html";
@@ -1421,8 +1395,6 @@ import {
 import DOMPurify from "dompurify";
 
 import { ImJoy } from "../imjoyLib.js";
-
-import { Engine } from "../engineManager.js";
 
 import _ from "lodash";
 
@@ -1495,6 +1467,7 @@ export default {
       alert_config: { show: false },
       confirm_config: { show: false, confirm: () => {}, cancel: () => {} },
       prompt_config: { show: false, confirm: () => {}, cancel: () => {} },
+      selected_file_managers: [],
     };
   },
   watch: {
@@ -1576,6 +1549,7 @@ export default {
 
     this.pm = this.imjoy.pm;
     this.em = this.imjoy.em;
+    this.fsm = this.imjoy.fsm;
     this.fm = this.imjoy.fm;
     this.wm = this.imjoy.wm;
 
@@ -1752,13 +1726,6 @@ export default {
       if (this.$refs.workflow && this.$refs.workflow.setupJoy)
         this.$refs.workflow.setupJoy();
     });
-    this.event_bus.on("engine_connected", engine => {
-      if (this.pm) this.pm.reloadPythonPlugins(engine);
-    });
-    this.event_bus.on("engine_disconnected", engine => {
-      if (this.pm) this.pm.unloadPythonPlugins(engine);
-    });
-
     this.updateSize({ width: window.innerWidth });
     if (this.wm) {
       if (this.screenWidth > 800) {
@@ -1886,7 +1853,7 @@ export default {
         const selected_workspace =
           route.query.workspace || route.query.w || this.pm.workspace_list[0];
         await this.pm.loadWorkspace(selected_workspace);
-        await this.pm.reloadPlugins(false);
+        await this.pm.reloadPlugins();
         // const connections = this.em.connectAll(true);
         // try {
         //   await connections;
@@ -2302,12 +2269,8 @@ export default {
     },
     connectPlugin(plugin) {
       if (plugin._disconnected) {
-        if (
-          plugin.type === "native-python" &&
-          plugin.config.engine &&
-          !plugin.config.engine.connected
-        ) {
-          plugin.config.engine.connect();
+        if (plugin.engine && !plugin.engine.connected) {
+          plugin.engine.connect();
         } else {
           this.pm.reloadPlugin(plugin.config);
         }
@@ -2319,6 +2282,7 @@ export default {
       this.downloading_plugin = true;
       try {
         const config = await this.pm.getPluginFromUrl(plugin_url);
+
         if (this.pm.plugin_names[config.name]) {
           if (
             compareVersions(
@@ -2424,10 +2388,11 @@ export default {
       this.status_text = info;
       this.$forceUpdate();
     },
-    showEngineFileDialog() {
+    showFileManagerDialog(manager) {
       this.showFileDialog(this.IMJOY_PLUGIN, {
         uri_type: "url",
         root: "./",
+        file_manager: manager,
       })
         .then(selection => {
           if (this.screenWidth <= 800) {
@@ -2586,18 +2551,7 @@ export default {
       this.pm.unloadPlugin(plugin);
     },
     startTerminal(engine) {
-      const w = {
-        name: "Terminal " + engine.url,
-        type: "imjoy/terminal",
-        config: {},
-        w: 25,
-        h: 20,
-        standalone: false,
-        data: {
-          engine: engine,
-        },
-      };
-      this.createWindow(w);
+      engine.startTerminal();
     },
     editPlugin(pid) {
       const plugin = this.pm.plugins[pid];
@@ -2815,38 +2769,23 @@ export default {
       this.show_snackbar = true;
       this.$forceUpdate();
     },
-    listFiles(engine, path, type, recursive) {
-      if (engine) {
-        return engine.listFiles(path, type, recursive);
-      } else {
-        throw "No plugin engine selected.";
-      }
-    },
-    getFileUrl(_plugin, config) {
-      return this.pm.getFileUrl(_plugin, config);
-    },
-    requestUploadUrl(_plugin, config) {
-      return this.pm.requestUploadUrl(_plugin, config);
-    },
-    removeFiles(engine, path, type, recursive) {
-      if (engine) {
-        return engine.removeFiles(path, type, recursive);
-      } else {
-        throw "No plugin engine selected.";
-      }
-    },
     showFileDialog(_plugin, config) {
       config = config || {};
       if (_plugin && _plugin.id) {
         config.engine =
-          config.engine === undefined ? _plugin.config.engine : config.engine;
+          config.engine === undefined ? _plugin.engine : config.engine;
         config.engine =
-          config.engine instanceof Engine
-            ? config.engine
-            : this.em.getEngineByUrl(config.engine);
+          typeof config.engine === "string"
+            ? this.em.getEngineByUrl(config.engine)
+            : config.engine;
+        if (!config.file_manager && config.engine) {
+          config.file_manager = this.fm.getFileManagerByUrl(config.engine.url);
+        }
+        this.selected_file_managers = [config.file_manager];
+        assert(config.file_manager, "No file manager is selected.");
         config.root =
           config.root || (_plugin.config && _plugin.config.work_dir);
-        if (_plugin.type != "native-python") {
+        if (!_plugin.engine) {
           config.uri_type = config.uri_type || "url";
         } else {
           config.uri_type = config.uri_type || "path";
@@ -2865,8 +2804,10 @@ export default {
           config.return_object =
             config.return_object === undefined ? true : config.return_object;
         }
+
         return this.$refs["file-dialog"].showDialog(_plugin, config);
       } else {
+        this.selected_file_managers = [config.file_manager];
         return this.$refs["file-dialog"].showDialog(_plugin, config);
       }
     },

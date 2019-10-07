@@ -95,7 +95,7 @@ export default {
     model: Object,
     selected: [String, Array],
     root: { type: String, default: "." },
-    engine: Object,
+    file_manager: Object,
   },
   data: function() {
     return {
@@ -116,7 +116,11 @@ export default {
     load(m) {
       this.$emit(
         "load",
-        m || { target: this.model, path: this.root, engine: this.engine }
+        m || {
+          target: this.model,
+          path: this.root,
+          file_manager: this.file_manager,
+        }
       );
       this.max_files = DEFAULT_MAX;
     },

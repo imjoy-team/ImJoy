@@ -33,6 +33,50 @@ export const CONFIGURABLE_FIELDS = [
   "cover",
 ];
 
+const _backends = {
+  "web-worker": {
+    type: "internal",
+    name: "Web Worker",
+    lang: "javascript",
+  },
+  iframe: {
+    type: "internal",
+    name: "IFrame",
+    lang: "javascript",
+  },
+  window: {
+    type: "internal",
+    name: "Window",
+    lang: "javascript",
+  },
+  "web-python": {
+    type: "internal",
+    name: "Web Python",
+    lang: "web-python",
+    icon: "🐍",
+  },
+  "web-python-window": {
+    type: "internal",
+    name: "Web Python (window)",
+    lang: "web-python",
+    icon: "🐍",
+  },
+  collection: {
+    type: "-",
+    name: "Collection",
+    lang: "",
+    icon: "",
+  },
+};
+
+export function getBackends() {
+  return _backends;
+}
+
+export function getBackendByType(type) {
+  return _backends[type];
+}
+
 export function upgradePluginAPI(config) {
   if (compareVersions(config.api_version, "<=", "0.1.1")) {
     config.type = config.type || config.mode;
@@ -114,12 +158,14 @@ export const ENGINE_SCHEMA = ajv.compile({
     pluginType: { type: "string" },
     url: { type: "string" },
     config: { type: "object" },
-    show: { instanceof: Function },
     listPlugins: { instanceof: Function },
     startPlugin: { instanceof: Function },
-    getPlugin: { instanceof: [Function] },
-    getInfo: { instanceof: [Function] },
+    getPlugin: { instanceof: Function },
+    getEngineStatus: { instanceof: Function },
+    getEngineInfo: { instanceof: [Function, null] },
+    heartbeat: { instanceof: Function },
     killPlugin: { instanceof: [Function, null] },
+    killPluginProcess: { instanceof: [Function, null] },
     restartPlugin: { instanceof: [Function, null] },
   },
 });
@@ -127,7 +173,11 @@ export const ENGINE_SCHEMA = ajv.compile({
 export const FILE_MANAGER_SCHEMA = ajv.compile({
   properties: {
     name: { type: "string" },
-    type: { type: "string" },
-    list: { instanceof: Function },
+    type: { enum: ["file-manager"] },
+    url: { type: "string" },
+    listFiles: { instanceof: Function },
+    getFile: { instanceof: Function },
+    putFile: { instanceof: Function },
+    removeFile: { instanceof: Function },
   },
 });

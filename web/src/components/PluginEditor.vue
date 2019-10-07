@@ -110,7 +110,7 @@
             this.editor &&
               window &&
               window.config &&
-              window.config.type === 'native-python' &&
+              window.config.engine_mode &&
               window.engine_manager
           "
         >

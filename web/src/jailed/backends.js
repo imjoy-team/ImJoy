@@ -1,64 +1,4 @@
-import { BACKEND_SCHEMA } from "../api.js";
 import { Whenable, assert } from "../utils.js";
-const _backends = {};
-
-function initBackends() {
-  registerBackend("web-worker", {
-    type: "internal",
-    name: "Web Worker",
-    lang: "javascript",
-  });
-
-  registerBackend("iframe", {
-    type: "internal",
-    name: "IFrame",
-    lang: "javascript",
-  });
-
-  registerBackend("window", {
-    type: "internal",
-    name: "Window",
-    lang: "javascript",
-  });
-
-  registerBackend("web-python", {
-    type: "internal",
-    name: "Web Python",
-    lang: "web-python",
-    icon: "🐍",
-  });
-
-  registerBackend("web-python-window", {
-    type: "internal",
-    name: "Web Python (window)",
-    lang: "web-python",
-    icon: "🐍",
-  });
-
-  registerBackend("collection", {
-    type: "-",
-    name: "Collection",
-    lang: "",
-    icon: "",
-  });
-}
-
-export function registerBackend(type, backend) {
-  if (!BACKEND_SCHEMA(backend)) {
-    const error = BACKEND_SCHEMA.errors;
-    console.error("Error occured during registering backend " + type, error);
-    throw error;
-  }
-  _backends[type] = backend;
-}
-
-export function getBackends() {
-  return _backends;
-}
-
-export function getBackendByType(type) {
-  return _backends[type];
-}
 
 class SocketioConnection {
   constructor(id, type, config) {
@@ -301,5 +241,3 @@ class PostMessageConnection {
    */
   disconnect() {}
 }
-
-initBackends();

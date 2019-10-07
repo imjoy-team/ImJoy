@@ -92,6 +92,42 @@ export class WindowManager {
   }
 
   setupCallbacks(w) {
+    w._callbacks = {};
+    w.on = (name, handler) => {
+      if (w._callbacks[name]) {
+        w._callbacks[name].push(handler);
+      } else {
+        w._callbacks[name] = [handler];
+      }
+    };
+    w.off = (name, handler) => {
+      if (w._callbacks[name]) {
+        if (handler) {
+          const handlers = w._callbacks[name];
+          const idx = handlers.indexOf(handler);
+          if (idx >= 0) {
+            handlers.splice(idx, 1);
+          } else {
+            console.warn(`callback ${name} does not exist.`);
+          }
+        } else {
+          delete w._callbacks[name];
+        }
+      } else {
+        console.warn(`callback ${name} does not exist.`);
+      }
+    };
+    w.emit = (name, data) => {
+      if (w._callbacks[name]) {
+        for (let cb of w._callbacks[name]) {
+          try {
+            cb(data);
+          } catch (e) {
+            console.error(e);
+          }
+        }
+      }
+    };
     w._refresh_callbacks = [];
     w.onRefresh = handler => {
       w._refresh_callbacks.push(handler);

@@ -20,12 +20,13 @@ import {
 import { parseComponent } from "./pluginParser.js";
 
 import { DynamicPlugin } from "./jailed/jailed.js";
-import { getBackendByType } from "./jailed/backends.js";
+import { getBackendByType } from "./api.js";
 
 import {
   OP_SCHEMA,
   ENGINE_SCHEMA,
   ENGINE_FACTORY_SCHEMA,
+  FILE_MANAGER_SCHEMA,
   JOY_SCHEMA,
   WINDOW_SCHEMA,
   PLUGIN_SCHEMA,
@@ -35,7 +36,6 @@ import {
 
 import { Joy } from "./joy";
 import { saveAs } from "file-saver";
-import { Engine } from "./engineManager.js";
 
 import Ajv from "ajv";
 const ajv = new Ajv();
@@ -47,6 +47,7 @@ export class PluginManager {
     engine_manager = null,
     window_manager = null,
     file_system_manager = null,
+    file_manager = null,
     imjoy_api = {},
     show_message_callback = null,
     update_ui_callback = null,
@@ -54,7 +55,8 @@ export class PluginManager {
     this.event_bus = event_bus;
     this.em = engine_manager;
     this.wm = window_manager;
-    this.fm = file_system_manager;
+    this.fsm = file_system_manager;
+    this.fm = file_manager;
     this.config_db = config_db;
     assert(this.event_bus, "event bus is not available");
     assert(this.em, "engine manager is not available");
@@ -166,6 +168,17 @@ export class PluginManager {
         this.imjoy_api.utils[k] = api_utils_[k];
       }
     }
+
+    this.event_bus.on("engine_connected", () => {
+      for (let k in this.plugins) {
+        if (this.plugins.hasOwnProperty(k)) {
+          const plugin = this.plugins[k];
+          if (plugin.config.engine_mode && !plugin.engine) {
+            this.reloadPlugin(plugin);
+          }
+        }
+      }
+    });
   }
 
   getFileUrl(_plugin, config) {
@@ -174,11 +187,11 @@ export class PluginManager {
     }
     _plugin = _plugin || {};
     config.engine =
-      config.engine === undefined ? _plugin.config.engine : config.engine;
+      config.engine === undefined ? _plugin.engine : config.engine;
     const engine =
-      config.engine instanceof Engine
-        ? config.engine
-        : this.em.getEngineByUrl(config.engine);
+      typeof config.engine === "string"
+        ? this.em.getEngineByUrl(config.engine)
+        : config.engine;
     delete config.engine;
     return new Promise((resolve, reject) => {
       if (!engine) {
@@ -221,11 +234,11 @@ export class PluginManager {
     );
     _plugin = _plugin || {};
     config.engine =
-      config.engine === undefined ? _plugin.config.engine : config.engine;
+      config.engine === undefined ? _plugin.engine : config.engine;
     const engine =
-      config.engine instanceof Engine
-        ? config.engine
-        : this.em.getEngineByUrl(config.engine);
+      typeof config.engine === "string"
+        ? this.em.getEngineByUrl(config.engine)
+        : config.engine;
     delete config.engine;
     return new Promise((resolve, reject) => {
       if (!engine) {
@@ -263,11 +276,11 @@ export class PluginManager {
     }
     _plugin = _plugin || this.IMJOY_PLUGIN;
     config.engine =
-      config.engine === undefined ? _plugin.config.engine : config.engine;
+      config.engine === undefined ? _plugin.engine : config.engine;
     const engine =
-      config.engine instanceof Engine
-        ? config.engine
-        : this.em.getEngineByUrl(config.engine);
+      typeof config.engine === "string"
+        ? this.em.getEngineByUrl(config.engine)
+        : config.engine;
     delete config.engine;
     return new Promise((resolve, reject) => {
       if (!engine) {
@@ -754,7 +767,7 @@ export class PluginManager {
     }
   }
 
-  reloadPlugins(skip_native_python = false) {
+  reloadPlugins() {
     return new Promise((resolve, reject) => {
       if (this.plugins) {
         for (let k in this.plugins) {
@@ -802,9 +815,6 @@ export class PluginManager {
                 }
                 config.installed = true;
                 this.installed_plugins.push(config);
-                if (skip_native_python && config.type === "native-python") {
-                  continue;
-                }
                 this.reloadPlugin(config).catch(e => {
                   console.error(config, e);
                   this.showMessage(`<${config.name}>: ${e}`);
@@ -914,7 +924,7 @@ export class PluginManager {
 
       this.getPluginFromUrl(uri, scoped_plugins)
         .then(async config => {
-          if (config.type === "native-python") {
+          if (config.engine_mode) {
             const old_plugin = this.plugin_names[config.name];
             if (old_plugin) {
               config.engine_mode = old_plugin.config.engine_mode;
@@ -997,7 +1007,7 @@ export class PluginManager {
 
       this.getPluginFromUrl(uri, scoped_plugins)
         .then(async config => {
-          if (config.type === "native-python") {
+          if (config.engine_mode) {
             const old_plugin = this.plugin_names[config.name];
             if (old_plugin) {
               config.engine_mode = old_plugin.config.engine_mode;
@@ -1170,6 +1180,9 @@ export class PluginManager {
   reloadPlugin(pconfig) {
     return new Promise((resolve, reject) => {
       try {
+        if (pconfig instanceof DynamicPlugin) {
+          pconfig = pconfig.config;
+        }
         this.unloadPlugin(pconfig, true);
         const template = this.parsePluginCode(pconfig.code, {
           engine_mode: pconfig.engine_mode,
@@ -1260,60 +1273,6 @@ export class PluginManager {
     });
   }
 
-  async reloadPythonPlugins(engine) {
-    for (let p of this.installed_plugins) {
-      if (p.type !== "native-python") {
-        continue;
-      }
-      try {
-        if (p.engine_mode === engine.id) {
-          await this.reloadPlugin(p);
-        } else if (!p.engine_mode || p.engine_mode === "auto") {
-          const running_plugins =
-            Object.values(this.plugins).filter(pl => {
-              return pl.name === p.name;
-            }) || [];
-
-          const running_plugin = running_plugins[0];
-          if (
-            running_plugin &&
-            (!running_plugin.config.engine ||
-              (!running_plugin.initializing && running_plugin._disconnected))
-          ) {
-            await this.reloadPlugin(p);
-          } else if (!running_plugin) {
-            await this.reloadPlugin(p);
-          }
-        }
-      } catch (e) {
-        console.error(e);
-        continue;
-      }
-    }
-  }
-
-  async unloadPythonPlugins(engine) {
-    for (let k in this.plugins) {
-      if (this.plugins.hasOwnProperty(k)) {
-        const plugin = this.plugins[k];
-        if (
-          plugin.type === "native-python" &&
-          plugin.config.engine === engine
-        ) {
-          if (
-            plugin.config.engine_mode === "auto" &&
-            plugin._disconnected &&
-            plugin.code
-          ) {
-            await this.reloadPlugin(plugin);
-          } else {
-            this.unloadPlugin(plugin, false);
-          }
-        }
-      }
-    }
-  }
-
   parsePluginCode(code, overwrite_config) {
     overwrite_config = overwrite_config || {};
     try {
@@ -1361,7 +1320,6 @@ export class PluginManager {
       config.id = config.name.trim().replace(/ /g, "_") + "_" + randId();
       config.runnable = config.runnable === false ? false : true;
       config.requirements = config.requirements || [];
-      config.engine_mode = overwrite_config.engine_mode;
 
       for (let i = 0; i < CONFIGURABLE_FIELDS.length; i++) {
         const obj = config[CONFIGURABLE_FIELDS[i]];
@@ -1387,6 +1345,14 @@ export class PluginManager {
         const error = PLUGIN_SCHEMA.errors;
         console.error("Invalid plugin config: " + config.name, error);
         throw error;
+      }
+      const backend = getBackendByType(config.type);
+      if (backend) {
+        config.type_icon = backend.icon || "";
+        config.engine_mode = null;
+      } else {
+        config.type_icon = "🚀";
+        config.engine_mode = overwrite_config.engine_mode || "auto";
       }
       return config;
     } catch (e) {
@@ -1432,7 +1398,13 @@ export class PluginManager {
       );
 
       // create a proxy plugin
-      const plugin = new DynamicPlugin(tconfig, _interface, this.fm.api, true);
+      const plugin = new DynamicPlugin(
+        tconfig,
+        _interface,
+        this.fsm.api,
+        null,
+        true
+      );
       plugin.api = {
         __as_interface__: true,
         __id__: plugin.id,
@@ -1486,15 +1458,13 @@ export class PluginManager {
         config.initialized = true;
       }
       config._id = template._id;
-      config.engine_mode = template.engine_mode || "auto";
 
+      let engine = null;
       if (!getBackendByType(template.type)) {
-        config.engine = this.em.findEngine(template);
-        if (!config.engine || !config.engine.connected) {
+        engine = this.em.findEngine(template);
+        if (!engine || !engine.connected) {
           console.error("Please connect to the Plugin Engine 🚀.");
         }
-      } else {
-        config.engine = null;
       }
 
       const tconfig = _.assign({}, template, config);
@@ -1504,11 +1474,16 @@ export class PluginManager {
         {
           TAG: tconfig.tag,
           WORKSPACE: this.selected_workspace,
-          ENGINE_URL: (config.engine && config.engine.url) || undefined,
+          ENGINE_URL: (engine && engine.url) || undefined,
         },
         this.imjoy_api
       );
-      const plugin = new DynamicPlugin(tconfig, _interface, this.fm.api);
+      const plugin = new DynamicPlugin(
+        tconfig,
+        _interface,
+        this.fsm.api,
+        engine
+      );
       plugin._log_history.push(
         `Loading plugin ${plugin.id} (TAG=${_interface.TAG}, WORKSPACE=${
           _interface.WORKSPACE
@@ -1575,6 +1550,7 @@ export class PluginManager {
               this.showMessage(`<${template.name}>: ${e}`, 15);
               reject(e);
               plugin.terminate().then(() => {
+                console.log("=====terminated...");
                 this.update_ui_callback();
               });
             });
@@ -1655,12 +1631,21 @@ export class PluginManager {
       imjoy_api.onResize = (_, handler) => {
         pconfig.onResize(handler);
       };
+      imjoy_api.on = (_, name, handler) => {
+        pconfig.on(name, handler);
+      };
+      imjoy_api.off = (_, name, handler) => {
+        pconfig.off(name, handler);
+      };
+      imjoy_api.emit = (_, name, data) => {
+        pconfig.emit(name, data);
+      };
 
       const _interface = _.assign(
         { TAG: tconfig.tag, WORKSPACE: this.selected_workspace },
         imjoy_api
       );
-      const plugin = new DynamicPlugin(tconfig, _interface, this.fm.api);
+      const plugin = new DynamicPlugin(tconfig, _interface, this.fsm.api);
 
       plugin.whenConnected(() => {
         if (!pconfig.standalone && pconfig.focus) pconfig.focus();
@@ -1678,7 +1663,9 @@ export class PluginManager {
             plugin.api.resize = pconfig.resize;
             plugin.api.onRefresh = pconfig.onRefresh;
             plugin.api.onResize = pconfig.onResize;
-
+            plugin.api.on = pconfig.on;
+            plugin.api.off = pconfig.off;
+            plugin.api.emit = pconfig.emit;
             //asuming the data._op is passed from last op
             pconfig.data = pconfig.data || {};
             pconfig.data._source_op = pconfig.data && pconfig.data._op;
@@ -2115,14 +2102,13 @@ export class PluginManager {
     }
   }
 
-  registerPlugin(plugin, config) {}
-
-  unregisterPlugin(plugin, config) {}
-
   //#################ImJoy API functions##################
   register(plugin, config) {
-    if (config.type === "plugin") {
-    } else if (config.type === "engine") {
+    if (config.type === "engine") {
+      assert(
+        plugin.config.flags && plugin.config.flags.indexOf("engine") >= 0,
+        "Please add `engine` to `config.flags` before registering an engine."
+      );
       if (!ENGINE_SCHEMA(config)) {
         const error = ENGINE_SCHEMA.errors;
         console.error("Error occured registering engine ", config, error);
@@ -2134,6 +2120,11 @@ export class PluginManager {
         this.em.unregister(config);
       });
     } else if (config.type === "engine-factory") {
+      assert(
+        plugin.config.flags &&
+          plugin.config.flags.indexOf("engine-factory") >= 0,
+        "Please add `engine-factory` to `config.flags` before registering an engine factory."
+      );
       if (!ENGINE_FACTORY_SCHEMA(config)) {
         const error = ENGINE_FACTORY_SCHEMA.errors;
         console.error(
@@ -2148,6 +2139,17 @@ export class PluginManager {
       plugin.onClose(() => {
         this.em.unregisterFactory(config);
       });
+    } else if (config.type === "file-manager") {
+      assert(
+        plugin.config.flags && plugin.config.flags.indexOf("file-manager") >= 0,
+        "Please add `file-manager` to `config.flags` before registering a file manager."
+      );
+      if (!FILE_MANAGER_SCHEMA(config)) {
+        const error = FILE_MANAGER_SCHEMA.errors;
+        console.error("Error occured registering file manager", config, error);
+        throw error;
+      }
+      this.fm.register(config);
     } else {
       this.registerOp(plugin, config);
     }
@@ -2156,6 +2158,10 @@ export class PluginManager {
   unregister(config) {
     if (config.type === "engine") {
       this.em.unregister(config);
+    } else if (config.type === "engine-factory") {
+      this.em.unregisterFactory(config);
+    } else if (config.type === "file-manager") {
+      this.fm.unregister(config);
     } else {
       this.unregisterOp(config);
     }
@@ -2197,6 +2203,9 @@ export class PluginManager {
             onRefresh: wconfig.onRefresh,
             resize: wconfig.resize,
             onResize: wconfig.onResize,
+            on: wconfig.on,
+            off: wconfig.off,
+            emit: wconfig.emit,
           };
           resolve(window_plugin_apis);
         } else {
@@ -2218,6 +2227,9 @@ export class PluginManager {
                 onRefresh: wconfig.onRefresh,
                 resize: wconfig.resize,
                 onResize: wconfig.onResize,
+                on: wconfig.on,
+                off: wconfig.off,
+                emit: wconfig.emit,
               };
               resolve(window_plugin_apis);
             }, 0);

@@ -1,4 +1,3 @@
-import io from "socket.io-client";
 import { randId, assert } from "./utils.js";
 
 export class EngineManager {
@@ -19,7 +18,6 @@ export class EngineManager {
   }
 
   findEngine(plugin_config) {
-    const matched = [];
     const egs = this.engines.filter(engine => {
       return engine.pluginType === plugin_config.type;
     });
@@ -53,26 +51,44 @@ export class EngineManager {
         break;
       }
     }
-    setInterval(async () => {
-      if (engine.getInfo) {
+
+    if (engine.getEngineInfo) {
+      engine.getEngineInfo().then(engine_info => {
+        engine.engine_info = engine_info;
+      });
+    }
+
+    engine.connected = false;
+    const check_connectivity = async () => {
+      if (engine.getEngineStatus) {
         try {
-          engine.engine_info = await engine.getInfo();
-          if (engine.engine_info) {
-            engine.connected = true;
-          } else {
-            engine.connected = false;
-          }
-        } catch (e) {
-          engine.connected = false;
-        }
+          engine.engine_status = await engine.getEngineStatus();
+        } catch (e) {}
       }
-    }, 3000);
+      const live = await engine.heartbeat();
+      if (!engine.connected && live) {
+        this.event_bus.emit("engine_connected", engine);
+      } else if (engine.connected && !live) {
+        this.event_bus.emit("engine_disconnected", engine);
+      }
+      engine.connected = live;
+    };
+    check_connectivity();
+    setInterval(check_connectivity, 3000);
+
+    engine._plugins = [];
+    engine.registerPlugin = p => {
+      engine._plugins.push(p);
+    };
 
     this.engines.push(engine);
   }
 
   unregister(engine) {
     const index = this.engines.indexOf(engine);
+    for (let p of engine._plugins) {
+      p.terminate();
+    }
     if (index > -1) {
       this.engines.splice(index, 1);
     }

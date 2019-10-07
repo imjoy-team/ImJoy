@@ -19,8 +19,8 @@
  *  _pluginCore.js    common plugin site protocol implementation
  */
 
-import { randId, assert, compareVersions, Whenable } from "../utils.js";
-import { getBackendByType } from "../jailed/backends.js";
+import { randId, Whenable } from "../utils.js";
+import { getBackendByType } from "../api.js";
 
 import DOMPurify from "dompurify";
 
@@ -507,7 +507,7 @@ class BasicConnection {
  * @param {String} code of the plugin
  * @param {Object} _interface to provide to the plugin
  */
-var DynamicPlugin = function(config, _interface, _fs_api, is_proxy) {
+var DynamicPlugin = function(config, _interface, _fs_api, engine, is_proxy) {
   this.config = config;
   if (!this.config.script) {
     throw "you must specify the script for the plugin to run.";
@@ -525,6 +525,7 @@ var DynamicPlugin = function(config, _interface, _fs_api, is_proxy) {
   this._onclose_callbacks = [];
   this._is_proxy = is_proxy;
   this.backend = getBackendByType(this.type);
+  this.engine = engine;
   this._updateUI =
     (_interface && _interface.utils && _interface.utils.$forceUpdate) ||
     function() {};
@@ -540,19 +541,9 @@ var DynamicPlugin = function(config, _interface, _fs_api, is_proxy) {
   this._updateUI();
 };
 /**
- * Set the plugin engine
- */
-DynamicPlugin.prototype.setEngine = Plugin.prototype.setEngine = function(
-  engine
-) {
-  this.config.engine = engine;
-};
-/**
  * Bind the first argument of all the interface functions to this plugin
  */
-DynamicPlugin.prototype._bindInterface = Plugin.prototype._bindInterface = function(
-  _interface
-) {
+DynamicPlugin.prototype._bindInterface = function(_interface) {
   _interface = _interface || {};
   this._initialInterface = {};
   // bind this plugin to api functions
@@ -575,7 +566,7 @@ DynamicPlugin.prototype._bindInterface = Plugin.prototype._bindInterface = funct
 /**
  * Creates the connection to the plugin site
  */
-DynamicPlugin.prototype._connect = Plugin.prototype._connect = function() {
+DynamicPlugin.prototype._connect = function() {
   this.remote = null;
   this.api = null;
 
@@ -602,7 +593,7 @@ DynamicPlugin.prototype._connect = Plugin.prototype._connect = function() {
 
   platformInit.whenEmitted(function() {
     if (!me.backend) {
-      if (!me.config.engine || !me.config.engine.connected) {
+      if (!me.engine || !me.engine.connected) {
         me._fail.emit("Please connect to the Plugin Engine 🚀.");
         me._connection = null;
         me.error("Please connect to the Plugin Engine 🚀.");
@@ -611,7 +602,7 @@ DynamicPlugin.prototype._connect = Plugin.prototype._connect = function() {
       }
       me.initializing = true;
       me._updateUI();
-      me.config.engine
+      me.engine
         .startPlugin(me.config)
         .then(remote => {
           me.remote = remote;
@@ -622,6 +613,7 @@ DynamicPlugin.prototype._connect = Plugin.prototype._connect = function() {
           me.initializing = false;
           me._updateUI();
           me._connected.emit();
+          me.engine.registerPlugin(me);
         })
         .catch(e => {
           me.error(e);
@@ -675,7 +667,7 @@ DynamicPlugin.prototype._connect = Plugin.prototype._connect = function() {
  * Creates the Site object for the plugin, and then loads the
  * common routines (_JailedSite.js)
  */
-DynamicPlugin.prototype._init = Plugin.prototype._init = function() {
+DynamicPlugin.prototype._init = function() {
   var lang = this.backend.lang;
 
   /*global JailedSite*/
@@ -722,7 +714,7 @@ DynamicPlugin.prototype._init = Plugin.prototype._init = function() {
 /**
  * Loads the core scirpt into the plugin
  */
-DynamicPlugin.prototype._loadCore = Plugin.prototype._loadCore = function() {
+DynamicPlugin.prototype._loadCore = function() {
   var me = this;
   var sCb = function() {
     me._sendInterface();
@@ -739,7 +731,7 @@ DynamicPlugin.prototype._loadCore = Plugin.prototype._loadCore = function() {
  * Sends to the remote site a signature of the interface provided
  * upon the Plugin creation
  */
-DynamicPlugin.prototype._sendInterface = Plugin.prototype._sendInterface = function() {
+DynamicPlugin.prototype._sendInterface = function() {
   var me = this;
   this._site.onInterfaceSetAsRemote(function() {
     if (me._disconnected) {
@@ -748,20 +740,6 @@ DynamicPlugin.prototype._sendInterface = Plugin.prototype._sendInterface = funct
   });
 
   this._site.setInterface(this._initialInterface);
-};
-
-/**
- * Loads the plugin body (loads the plugin url in case of the
- * Plugin)
- */
-Plugin.prototype._loadPlugin = function() {
-  this._requestRemote();
-  var me = this;
-  var sCb = function() {
-    me._requestRemote();
-  };
-
-  this._connection.importJailedScript(this._path, sCb, this._fCb);
 };
 
 /**
@@ -830,7 +808,7 @@ DynamicPlugin.prototype._loadPlugin = async function() {
  * (meaning both the plugin and the application can use the
  * interfaces provided to each other)
  */
-DynamicPlugin.prototype._requestRemote = Plugin.prototype._requestRemote = function() {
+DynamicPlugin.prototype._requestRemote = function() {
   var me = this;
   this._site.onRemoteUpdate(function() {
     me.remote = me._site.getRemote();
@@ -851,15 +829,15 @@ DynamicPlugin.prototype._requestRemote = Plugin.prototype._requestRemote = funct
  * (subprocess in Node.js or a subworker in browser) and therefore
  * will not hang up on the infinite loop in the untrusted code
  */
-DynamicPlugin.prototype.hasDedicatedThread = Plugin.prototype.hasDedicatedThread = function() {
+DynamicPlugin.prototype.hasDedicatedThread = function() {
   return this._connection.hasDedicatedThread();
 };
 
 /**
  * Disconnects the plugin immideately
  */
-DynamicPlugin.prototype.disconnect = Plugin.prototype.disconnect = function() {
-  this._connection.disconnect();
+DynamicPlugin.prototype.disconnect = function() {
+  if (this._connection) this._connection.disconnect();
   this._disconnect.emit();
 };
 
@@ -869,9 +847,7 @@ DynamicPlugin.prototype.disconnect = Plugin.prototype.disconnect = function() {
  *
  * @param {Function} handler to be issued upon disconnect
  */
-DynamicPlugin.prototype.whenFailed = Plugin.prototype.whenFailed = function(
-  handler
-) {
+DynamicPlugin.prototype.whenFailed = function(handler) {
   this._fail.whenEmitted(handler);
 };
 
@@ -881,9 +857,7 @@ DynamicPlugin.prototype.whenFailed = Plugin.prototype.whenFailed = function(
  *
  * @param {Function} handler to be issued upon connection
  */
-DynamicPlugin.prototype.whenConnected = Plugin.prototype.whenConnected = function(
-  handler
-) {
+DynamicPlugin.prototype.whenConnected = function(handler) {
   this._connected.whenEmitted(handler);
 };
 
@@ -893,34 +867,31 @@ DynamicPlugin.prototype.whenConnected = Plugin.prototype.whenConnected = functio
  *
  * @param {Function} handler to be issued upon connection failure
  */
-DynamicPlugin.prototype.whenDisconnected = Plugin.prototype.whenDisconnected = function(
-  handler
-) {
+DynamicPlugin.prototype.whenDisconnected = function(handler) {
   this._disconnect.whenEmitted(handler);
 };
 
-DynamicPlugin.prototype._set_disconnected = Plugin.prototype._set_disconnected = function() {
+DynamicPlugin.prototype._set_disconnected = function() {
   this._disconnected = true;
   this.running = false;
   this.initializing = false;
+  this.engine = null;
   this._updateUI();
 };
 
-DynamicPlugin.prototype.terminate = Plugin.prototype.terminate = async function() {
+DynamicPlugin.prototype.terminate = async function() {
   if (this._disconnected) {
     this._set_disconnected();
     return;
   }
-
   try {
     await Promise.all(this._onclose_callbacks.map(item => item()));
   } catch (e) {
     console.error(e);
   }
-
   try {
     if (this.api && this.api.exit && typeof this.api.exit == "function") {
-      await this.api.exit();
+      this.api.exit();
     }
   } catch (e) {
     console.error("error occured when terminating the plugin", e);
@@ -937,11 +908,11 @@ DynamicPlugin.prototype.terminate = Plugin.prototype.terminate = async function(
   }
 };
 
-DynamicPlugin.prototype.onClose = Plugin.prototype.onClose = function(cb) {
+DynamicPlugin.prototype.onClose = function(cb) {
   this._onclose_callbacks.push(cb);
 };
 
-DynamicPlugin.prototype.log = Plugin.prototype.log = function(msg) {
+DynamicPlugin.prototype.log = function(msg) {
   if (typeof msg === "object") {
     this._log_history.push(msg);
     console.log(`Plugin ${this.id}:`, msg);
@@ -953,14 +924,14 @@ DynamicPlugin.prototype.log = Plugin.prototype.log = function(msg) {
   }
 };
 
-DynamicPlugin.prototype.error = Plugin.prototype.error = function() {
+DynamicPlugin.prototype.error = function() {
   const args = Array.prototype.slice.call(arguments).join(" ");
   this._log_history._error = args.slice(0, 100);
   this._log_history.push({ type: "error", value: args });
   console.error(`Error in Plugin ${this.id}: ${args}`);
 };
 
-DynamicPlugin.prototype.progress = Plugin.prototype.progress = function(p) {
+DynamicPlugin.prototype.progress = function(p) {
   if (p < 1) this._progress = p * 100;
   else this._progress = p;
 };
