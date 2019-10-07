@@ -1745,6 +1745,18 @@ export default {
       this.showWelcomeDialog = true;
     } else {
       this.startImJoy(this.$route).then(() => {
+        if (!this.pm.plugin_names["ImJoy-Engine"]) {
+          console.log("Loading ImJoy-Engine from Gist...");
+          this.pm
+            .reloadPluginRecursively({
+              uri:
+                "https://gist.githubusercontent.com/oeway/e9282f27d9446bd4536a2a64018624c5/raw/ImJoy-Engine.imjoy.html",
+            })
+            .then(() => {
+              console.log("ImJoy-Engine loaded.");
+            });
+        }
+
         if (
           !this.showAddPluginDialog &&
           (!this.pm.plugins || Object.keys(this.pm.plugins) <= 0)
