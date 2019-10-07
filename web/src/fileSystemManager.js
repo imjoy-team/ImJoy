@@ -101,18 +101,12 @@ export class FileManager {
         break;
       }
     }
-    manager.connected = true;
+    manager.connected = false;
     const check_connectivity = async () => {
-      const live = await manager.heartbeat();
-      if (manager.connected && !live) {
-        this.unregister(manager);
-        clearInterval(timerId);
-      }
-      manager.connected = live;
+      manager.connected = await manager.heartbeat();
     };
     check_connectivity();
-    const timerId = setInterval(check_connectivity, 3000);
-
+    setInterval(check_connectivity, 3000);
     this.fileManagers.push(manager);
   }
 
