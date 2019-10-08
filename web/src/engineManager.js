@@ -68,15 +68,18 @@ export class EngineManager {
       }
       const live = await engine.heartbeat();
       if (!engine.connected && live) {
+        engine.connected = true;
         this.event_bus.emit("engine_connected", engine);
       } else if (engine.connected && !live) {
+        engine.connected = false;
         this.event_bus.emit("engine_disconnected", engine);
         for (let p of engine._plugins) {
           p.terminate();
         }
         // clearInterval(timerId);
+      } else {
+        engine.connected = live;
       }
-      engine.connected = live;
     };
 
     engine._plugins = [];
