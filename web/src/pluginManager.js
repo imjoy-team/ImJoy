@@ -2165,7 +2165,8 @@ export class PluginManager {
     }
   }
 
-  unregister(config) {
+  unregister(plugin, config) {
+    config = config || plugin;
     if (config.type === "engine") {
       this.em.unregister(config);
     } else if (config.type === "engine-factory") {
@@ -2173,7 +2174,7 @@ export class PluginManager {
     } else if (config.type === "file-manager") {
       this.fm.unregister(config);
     } else {
-      this.unregisterOp(config);
+      this.unregisterOp(plugin, config);
     }
   }
 

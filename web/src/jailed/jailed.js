@@ -34,7 +34,11 @@ if (__is__node__) {
   __jailed__path__ = __dirname + "/";
 } else {
   // web
-  if (location.hostname === "localhost" || location.hostname === "127.0.0.1" || location.hostname.startsWith("deploy-preview-")) {
+  if (
+    location.hostname === "localhost" ||
+    location.hostname === "127.0.0.1" ||
+    location.hostname.startsWith("deploy-preview-")
+  ) {
     __jailed__path__ = `${location.protocol}//${location.hostname}${
       location.port ? ":" + location.port : ""
     }/static/jailed/`;
