@@ -1273,7 +1273,14 @@ export class PluginManager {
       }
     });
   }
-
+  getBadges(p) {
+    const backend = getBackendByType(p.type);
+    if (backend) {
+      return backend.icon || "";
+    } else {
+      return "🚀";
+    }
+  }
   parsePluginCode(code, overwrite_config) {
     overwrite_config = overwrite_config || {};
     try {
@@ -1348,11 +1355,10 @@ export class PluginManager {
         throw error;
       }
       const backend = getBackendByType(config.type);
+      config.badges = this.getBadges(config);
       if (backend) {
-        config.badges = backend.icon || "";
         config.engine_mode = null;
       } else {
-        config.badges = "🚀";
         config.engine_mode = overwrite_config.engine_mode || "auto";
       }
       if (
@@ -1859,6 +1865,7 @@ export class PluginManager {
                 p.uri = manifest.uri_root + "/" + p.uri;
               }
               p._id = p._id || p.name.replace(/ /g, "_");
+              p.badges = this.getBadges(p);
             }
             resolve(manifest);
           } else {

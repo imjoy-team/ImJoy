@@ -36,7 +36,7 @@
             <md-icon v-else>extension</md-icon>
           </md-avatar>
           <div class="md-list-item-text">
-            <span>{{ plugin.badges }}</span>
+            <span>{{ plugin.name + " " + plugin.badges }}</span>
             <p>{{ plugin.description }}</p>
             <p>
               <span v-for="tag in plugin.tags" :key="tag">{{ tag }}, </span>
