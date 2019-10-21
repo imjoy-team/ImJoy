@@ -354,7 +354,7 @@
    * @param {Array} names list of function names
    */
   JailedSite.prototype._setRemote = function(api) {
-    this._remote = { ndarray: this._ndarray };
+    this._remote = {};
     var i, name, data;
     for (i = 0; i < api.length; i++) {
       name = api[i].name;
@@ -467,8 +467,8 @@
     //skip if already encoded
     if (
       typeof aObject == "object" &&
-      aObject.hasOwnProperty("__jailed_type__") &&
-      aObject.hasOwnProperty("__value__")
+      aObject.__jailed_type__ &&
+      aObject.__value__
     ) {
       return aObject;
     }
@@ -476,20 +476,23 @@
     //encode interfaces
     if (
       typeof aObject == "object" &&
-      aObject.hasOwnProperty("__id__") &&
+      aObject.__id__ &&
       aObject.__jailed_type__ == "plugin_api"
     ) {
       const encoded_interface = {};
       for (k in aObject) {
-        v = aObject[k];
-        if (typeof v == "function") {
-          bObject[k] = {
-            __jailed_type__: "plugin_interface",
-            __plugin_id__: aObject["__id__"],
-            __value__: k,
-            num: null,
-          };
-          encoded_interface[k] = v;
+        if (k === "hasOwnProperty") continue;
+        if (aObject.hasOwnProperty(k)) {
+          v = aObject[k];
+          if (typeof v == "function") {
+            bObject[k] = {
+              __jailed_type__: "plugin_interface",
+              __plugin_id__: aObject["__id__"],
+              __value__: k,
+              num: null,
+            };
+            encoded_interface[k] = v;
+          }
         }
       }
       this._plugin_interfaces[aObject["__id__"]] = encoded_interface;
@@ -503,6 +506,7 @@
     }
 
     for (k in aObject) {
+      if (k === "hasOwnProperty") continue;
       if (isarray || aObject.hasOwnProperty(k)) {
         v = aObject[k];
         if (typeof v == "function") {
