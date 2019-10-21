@@ -354,7 +354,7 @@
    * @param {Array} names list of function names
    */
   JailedSite.prototype._setRemote = function(api) {
-    this._remote = {};
+    this._remote = { ndarray: this._ndarray };
     var i, name, data;
     for (i = 0; i < api.length; i++) {
       name = api[i].name;
