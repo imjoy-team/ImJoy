@@ -1340,4 +1340,9 @@ Follow these steps, and you will be able to run ImJoy server and the plugin engi
 ## Change log
 
 ### API changes
+
+#### api_version: 0.1.6
+ * added new api functions `api.getPlugins`,  `api.getFileManager`, `api.getEngine`, `api.getEngineFactory`
+ * `api.getFileUrl` is deprecated, call `file_manager = await api.getFilemanager('http://...');` and then access them with `file_manager.getFileUrl`.
+ * `api.requestUploadUrl` is deprecated, call `file_manager = await api.getFilemanager('http://...');` and then access them with `file_manager.requestUploadUrl`.
  * since `api_version > 0.1.6` you must specify the `lang` field for the `<config>` block, e.g.: `<config lang="json">`.

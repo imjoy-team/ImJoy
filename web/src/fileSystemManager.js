@@ -94,7 +94,10 @@ export class FileManager {
     return null;
   }
 
-  register(manager) {
+  register(manager_) {
+    const manager = Object.assign({}, manager_);
+    //backup the manager api
+    manager.api = manager_;
     for (let i = 0; i < this.fileManagers.length; i++) {
       if (this.fileManagers[i].name === manager.name) {
         this.fileManagers.splice(i, 1);

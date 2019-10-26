@@ -698,6 +698,9 @@ sigma = await api.getConfig('sigma')
 [Try yourself in the setConfig example >>](https://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:setConfig&w=examples)
 
 ### api.getFileUrl
+
+*** WARNING: `api.getFileUrl` is deprecated since `api_version > 0.6.1`, please use `api.getFileManger` instead.
+
 ```python
 file_url = await api.getFileUrl(config)
 ```
@@ -794,6 +797,91 @@ await pluginX.funcX()
 ```
 [Try yourself >>](https://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:getPlugin&w=examples)
 
+
+
+### api.getEngine
+```javascript
+engine = await api.getEngine(engine_url)
+```
+
+Gets the API object of an plugin engine.
+
+**Arguments**
+
+* **engine_url**: String. URL of the plugin engine.
+
+**Returns**
+* **engine**: Object. An engine object which can be used to access the engine API functions.
+
+**Example**
+
+Get the API of the engine (url = `https://127.0.0.1:2957`), and access its functions:
+
+```javascript
+engine = await api.getEngine("https://127.0.0.1:2957")
+await engine.disconnect()
+```
+
+### api.getEngineFactory
+```javascript
+engine_factory = await api.getEngineFactory(engine_factory_name)
+```
+
+Gets the API object of an plugin engine factory.
+
+**Arguments**
+
+* **engine_factory_name**: String. Name of the plugin engine factory.
+
+**Returns**
+* **engine_factory**: Object. An plugin engine factory object which can be used to access the engine API functions.
+
+**Example**
+
+Get the API of the plugin engine factory (name = `ImJoy-Engine`), and access its functions:
+
+```javascript
+engine_factory = await api.getEngineFactory("ImJoy-Engine")
+await engine_factory.addEngine()
+```
+
+
+### api.getFileManager
+```javascript
+file_manager = await api.getFileManager(file_manager_url)
+```
+
+Gets the API object of an file manager.
+
+Note: since `api_version > 0.6.1`, `api.getFileUrl` and `api.requestUploadUrl` are deprecated, the replacement solution is to use `api.getFileManager` to get the file manager first, and access `getFileUrl` and `requestUploadUrl` from the returned file manager object.
+
+**Arguments**
+
+* **file_manager_url**: String. URL of the file manager.
+
+**Returns**
+* **file_manager**: Object. An file manager object which can be used to access the file manager API functions.
+
+**Example**
+
+Get the API of the file manager (url = `https://127.0.0.1:2957`), and access its functions:
+
+```javascript
+file_manager = await api.getFileManager("https://127.0.0.1:2957")
+await file_manager.listFiles()
+```
+
+Get file URL for downloading (replacement of `api.getFileUrl`)
+```javascript
+file_manager = await api.getFileManager("https://127.0.0.1:2957")
+await file_manager.getFileUrl({'path': './data/output.png'})
+```
+
+Request file URL for uploading (replacement of `api.requestUploadUrl`)
+```javascript
+file_manager = await api.getFileManager("https://127.0.0.1:2957")
+await file_manager.requestUploadUrl({'path': './data/input.png'})
+```
 
 ### api.log
 
@@ -915,6 +1003,9 @@ update_lut(ctx) {
 
 
 ### api.requestUploadUrl
+
+***WARNING: `api.requestUploadUrl` is deprecated since `api_version > 0.6.1`, please use `api.getFileManger` instead.***
+
 ```python
 upload_url = await api.requestUploadUrl(config)
 ```

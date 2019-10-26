@@ -46,7 +46,10 @@ export class EngineManager {
     return null;
   }
 
-  register(engine) {
+  register(engine_) {
+    const engine = Object.assign({}, engine_);
+    //backup the engine api
+    engine.api = engine_;
     for (let i = 0; i < this.engines.length; i++) {
       if (this.engines[i].name === engine.name) {
         this.engines.splice(i, 1);
@@ -102,7 +105,10 @@ export class EngineManager {
     }
   }
 
-  registerFactory(factory) {
+  registerFactory(factory_) {
+    const factory = Object.assign({}, factory_);
+    //backup the factory api
+    factory.api = factory_;
     for (let i = 0; i < this.engine_factories.length; i++) {
       if (this.engine_factories[i].name === factory.name) {
         this.engine_factories.splice(i, 1);

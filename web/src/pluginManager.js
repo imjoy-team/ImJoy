@@ -143,8 +143,11 @@ export class PluginManager {
       createWindow: this.createWindow,
       run: this.runPlugin,
       call: this.callPlugin,
-      getPlugins: this.getPlugins,
+      // getPlugins: this.getPlugins,
       getPlugin: this.getPlugin,
+      getFileManager: this.getFileManager,
+      getEngineFactory: this.getEngineFactory,
+      getEngine: this.getEngine,
       setConfig: this.setPluginConfig,
       getConfig: this.getPluginConfig,
       getAttachment: this.getAttachment,
@@ -183,137 +186,67 @@ export class PluginManager {
   }
 
   getFileUrl(_plugin, config) {
+    console.warn(
+      "`api.getFileUrl` is deprecated, please use `api.getFileManager` (https://imjoy.io/docs/#/api?id=apigetfilemanager) and access `getFileUrl` from the file manager."
+    );
     if (typeof config !== "object" || !config.path) {
       throw "You must pass an object contains keys named `path` and `engine`";
     }
-    _plugin = _plugin || {};
-    config.engine =
-      config.engine === undefined ? _plugin.engine : config.engine;
-    const engine =
-      typeof config.engine === "string"
-        ? this.em.getEngineByUrl(config.engine)
-        : config.engine;
-    delete config.engine;
-    return new Promise((resolve, reject) => {
-      if (!engine) {
-        reject("Please specify an engine");
-        return;
-      }
-      if (!engine.connected) {
-        reject("Please connect to the Plugin Engine 🚀.");
-        this.showMessage("Please connect to the Plugin Engine 🚀.");
-        return;
-      }
-      engine
-        .getFileUrl(config)
-        .then(ret => {
-          ret = ret || {};
-          if (ret.success) {
-            if (_plugin.log)
-              _plugin.log(`File url created ${config.path}: ${ret.url}`);
-            resolve(ret.url);
-            this.update_ui_callback();
-          } else {
-            ret.error = ret.error || "";
-            this.showMessage(
-              `Failed to get file url for ${config.path} ${ret.error}`
-            );
-            reject(`Failed to get file url for ${config.path} ${ret.error}`);
-            this.update_ui_callback();
-          }
-        })
-        .catch(reject);
-    });
-  }
+    _plugin = _plugin || this.IMJOY_PLUGIN;
 
-  getFilePath(_plugin, config) {
-    if (typeof config !== "object" || !config.url) {
-      throw "You must pass an object contains keys named `url` and `engine`";
+    if (config.engine) {
+      console.warn(
+        "The `engine` option for `api.getFileUrl` is deprecated, please use `file_manager` instead of `engine`."
+      );
+      config.file_manager = config.engine;
+      delete config.engine;
     }
-    console.warn(
-      "WARNING: api.uploadFileToUrl is deprecated and it will be removed soon."
-    );
-    _plugin = _plugin || {};
-    config.engine =
-      config.engine === undefined ? _plugin.engine : config.engine;
-    const engine =
-      typeof config.engine === "string"
-        ? this.em.getEngineByUrl(config.engine)
-        : config.engine;
-    delete config.engine;
-    return new Promise((resolve, reject) => {
-      if (!engine) {
-        reject("Please specify an engine");
-        return;
-      }
-      if (!engine.connected) {
-        reject("Please connect to the Plugin Engine 🚀.");
-        this.showMessage("Please connect to the Plugin Engine 🚀.");
-        return;
-      }
-      engine
-        .getFilePath(config)
-        .then(ret => {
-          ret = ret || {};
-          if (ret.success) {
-            resolve(ret.path);
-            this.update_ui_callback();
-          } else {
-            ret.error = ret.error || "";
-            this.showMessage(
-              `Failed to get file path for ${config.url} ${ret.error}`
-            );
-            reject(`Failed to get file path for ${config.url} ${ret.error}`);
-            this.update_ui_callback();
-          }
-        })
-        .catch(reject);
-    });
+    const manager = this.fm.getFileManagerByUrl(config.file_manager);
+
+    if (!manager) {
+      throw "Please specify a file manager via the `file_manager` option.";
+    }
+
+    if (!manager.connected) {
+      this.showMessage(`File manager (${manager.url}) is not connected.`);
+      throw `File manager (${manager.url}) is not connected.`;
+    }
+
+    return manager.getFileUrl(config);
   }
 
   requestUploadUrl(_plugin, config) {
+    console.warn(
+      "`api.requestUploadUrl` is deprecated, please use `api.getFileManager` (https://imjoy.io/docs/#/api?id=apigetfilemanager) and access `requestUploadUrl` from the file manager."
+    );
     if (typeof config !== "object") {
       throw "You must pass an object contains keys named `engine` and `path` (or `dir`, optionally `overwrite`)";
     }
-    _plugin = _plugin || this.IMJOY_PLUGIN;
-    config.engine =
-      config.engine === undefined ? _plugin.engine : config.engine;
-    const engine =
-      typeof config.engine === "string"
-        ? this.em.getEngineByUrl(config.engine)
-        : config.engine;
-    delete config.engine;
-    return new Promise((resolve, reject) => {
-      if (!engine) {
-        reject("Please specify an engine");
-        return;
-      }
-      if (!engine.connected) {
-        reject("Please connect to the Plugin Engine 🚀.");
-        this.showMessage("Please connect to the Plugin Engine 🚀.");
-        return;
-      }
 
-      engine
-        .requestUploadUrl({
-          path: config.path,
-          overwrite: config.overwrite,
-          dir: config.dir,
-        })
-        .then(ret => {
-          ret = ret || {};
-          if (ret.success) {
-            if (_plugin.log) _plugin.log(`Uploaded url created: ${ret.url}`);
-            resolve(ret.url);
-            this.update_ui_callback();
-          } else {
-            ret.error = ret.error || "UNKNOWN";
-            this.showMessage(`Failed to request file url, Error: ${ret.error}`);
-            reject(`Failed to request file url, Error: ${ret.error}`);
-            this.update_ui_callback();
-          }
-        })
-        .catch(reject);
+    _plugin = _plugin || this.IMJOY_PLUGIN;
+
+    if (config.engine) {
+      console.warn(
+        "The `engine` option for `api.requestUploadUrl` is deprecated, please use `file_manager` instead of `engine`."
+      );
+      config.file_manager = config.engine;
+      delete config.engine;
+    }
+    const manager = this.fm.getFileManagerByUrl(config.file_manager);
+
+    if (!manager) {
+      throw "Please specify a file manager via the `file_manager` option.";
+    }
+
+    if (!manager.connected) {
+      this.showMessage(`File manager (${manager.url}) is not connected.`);
+      throw `File manager (${manager.url}) is not connected.`;
+    }
+
+    return manager.requestUploadUrl({
+      path: config.path,
+      overwrite: config.overwrite,
+      dir: config.dir,
     });
   }
 
@@ -938,7 +871,11 @@ export class PluginManager {
             return;
           }
           if (!getBackendByType(config.type)) {
-            console.warn(`Installed plugin ${config.name} with unsupported plugin type: ${config.type}`);
+            console.warn(
+              `Installed plugin ${config.name} with unsupported plugin type: ${
+                config.type
+              }`
+            );
           }
           config.tag =
             tag ||
@@ -1020,7 +957,11 @@ export class PluginManager {
             return;
           }
           if (!getBackendByType(config.type)) {
-            console.warn(`Installed plugin ${config.name} with unsupported plugin type: ${config.type}`);
+            console.warn(
+              `Installed plugin ${config.name} with unsupported plugin type: ${
+                config.type
+              }`
+            );
           }
           config.tag =
             tag ||
@@ -2345,10 +2286,16 @@ export class PluginManager {
   }
 
   async getPlugins(_plugin) {
-    const ps = {};
-    for (let k in this.plugin_names) {
-      if (this.plugin_names[k] === _plugin) continue;
-      ps[k] = this.plugin_names[k].api;
+    const ps = [];
+    for (let k in this.plugins) {
+      if (this.plugins.hasOwnProperty(k)) {
+        // if (this.plugins[k] === _plugin) continue;
+        ps.push({
+          name: this.plugins[k].name,
+          config: this.plugins[k].config,
+          api: this.plugins[k].api,
+        });
+      }
     }
     console.log(ps);
     return ps;
@@ -2360,6 +2307,33 @@ export class PluginManager {
       return target_plugin.api;
     } else {
       throw `plugin with type ${plugin_name} not found.`;
+    }
+  }
+
+  async getFileManager(_plugin, file_manager_url) {
+    const manager = this.fm.getFileManagerByUrl(file_manager_url);
+    if (manager) {
+      return manager.api;
+    } else {
+      throw `file manager with url ${file_manager_url} not found.`;
+    }
+  }
+
+  async getEngine(_plugin, engine_url) {
+    const engine = this.em.getEngineByUrl(engine_url);
+    if (engine) {
+      return engine.api;
+    } else {
+      throw `engine with url ${engine_url} not found.`;
+    }
+  }
+
+  async getEngineFactory(_plugin, factory_name) {
+    const factory = this.em.getFactory(factory_name);
+    if (factory) {
+      return factory.api;
+    } else {
+      throw `engine factory with name ${factory_name} not found.`;
     }
   }
 
