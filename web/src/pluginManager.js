@@ -938,8 +938,7 @@ export class PluginManager {
             return;
           }
           if (!getBackendByType(config.type)) {
-            reject("Unsupported plugin type: " + config.type);
-            return;
+            console.warn(`Installed plugin ${config.name} with unsupported plugin type: ${config.type}`);
           }
           config.tag =
             tag ||
@@ -1021,8 +1020,7 @@ export class PluginManager {
             return;
           }
           if (!getBackendByType(config.type)) {
-            reject("Unsupported plugin type: " + config.type);
-            return;
+            console.warn(`Installed plugin ${config.name} with unsupported plugin type: ${config.type}`);
           }
           config.tag =
             tag ||

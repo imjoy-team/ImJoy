@@ -1239,7 +1239,7 @@
                     plugin4install.icon
                   }}</md-icon
                   ><md-icon v-else>extension</md-icon>
-                  {{ plugin4install.badges }}
+                  {{ plugin4install.name + " " + plugin4install.badges }}
                 </h2>
               </div>
               <div
@@ -3007,7 +3007,7 @@ export default {
         this.alert_config.title = null;
         this.alert_config.content = escapeHTML(text).replace(/\n/g, "<br>");
         this.alert_config.confirm_text = "OK";
-      } else if (typeof text === "object" && text.title && text.content) {
+      } else if (typeof text === "object" && text.content) {
         this.alert_config.title = text.title;
         this.alert_config.content =
           DOMPurify.sanitize(String(text.content)) || "undefined";
@@ -3028,7 +3028,7 @@ export default {
           this.prompt_config.placeholder = defaultText;
           this.prompt_config.cancel_text = "Cancel";
           this.prompt_config.confirm_text = "OK";
-        } else if (typeof text === "object" && text.title && text.content) {
+        } else if (typeof text === "object" && text.content) {
           this.prompt_config.title = text.title;
           this.prompt_config.content =
             DOMPurify.sanitize(String(text.content)) || "undefined";
@@ -3056,7 +3056,7 @@ export default {
           this.confirm_config.content = escapeHTML(text).replace(/\n/g, "<br>");
           this.confirm_config.cancel_text = "Cancel";
           this.confirm_config.confirm_text = "OK";
-        } else if (typeof text === "object" && text.title && text.content) {
+        } else if (typeof text === "object" && text.content) {
           this.confirm_config.title = text.title;
           this.confirm_config.content =
             DOMPurify.sanitize(String(text.content)) || "undefined";
