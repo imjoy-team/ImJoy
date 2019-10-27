@@ -188,7 +188,7 @@
     for (var name in this._interface) {
       if (this._interface.hasOwnProperty(name)) {
         if (name.startsWith("_")) continue;
-        if (typeof this._interface[name] == "function") {
+        if (typeof this._interface[name] === "function") {
           names.push({ name: name, data: null });
         } else {
           var data = this._interface[name];
@@ -196,7 +196,7 @@
             var data2 = {};
             for (var k in data) {
               if (data.hasOwnProperty(k)) {
-                if (typeof data[k] == "function") {
+                if (typeof data[k] === "function") {
                   data2[k] = "**@@FUNCTION@@**:" + k;
                 } else {
                   data2[k] = data[k];
@@ -217,7 +217,7 @@
     for (var i = 0; i < functions.length; i++) {
       var name_ = functions[i];
       if (name_.startsWith("_")) continue;
-      if (typeof this._interface[name_] == "function") {
+      if (typeof this._interface[name_] === "function") {
         names.push({ name: name_, data: null });
       }
     }
@@ -379,7 +379,7 @@
           var data2 = {};
           for (var key in data) {
             if (data.hasOwnProperty(key)) {
-              if (data[key] == "**@@FUNCTION@@**:" + key) {
+              if (data[key] === "**@@FUNCTION@@**:" + key) {
                 data2[key] = this._genRemoteMethod(name + "." + key);
               } else {
                 data2[key] = data[key];
@@ -487,9 +487,9 @@
     bObject = isarray ? [] : {};
     //skip if already encoded
     if (
-      typeof aObject == "object" &&
-      aObject.hasOwnProperty("__jailed_type__") &&
-      aObject.hasOwnProperty("__value__")
+      typeof aObject === "object" &&
+      aObject.__jailed_type__ &&
+      aObject.__value__
     ) {
       return aObject;
     }
@@ -503,22 +503,25 @@
       const encoded_interface = {};
       aObject["__id__"] = aObject["__id__"] || randId();
       for (k in aObject) {
-        if (k.startsWith("_")) {
-          continue;
-        }
-        v = aObject[k];
+        if (k === "hasOwnProperty") continue;
+        if (aObject.hasOwnProperty(k)) {
+          if (k.startsWith("_")) {
+            continue;
+          }
+          v = aObject[k];
 
-        if (typeof v == "function") {
-          bObject[k] = {
-            __jailed_type__: "plugin_interface",
-            __plugin_id__: aObject["__id__"],
-            __value__: k,
-            num: null,
-          };
-          encoded_interface[k] = v;
-        } else {
-          bObject[k] = { __jailed_type__: "argument", __value__: v };
-          encoded_interface[k] = v;
+          if (typeof v == "function") {
+            bObject[k] = {
+              __jailed_type__: "plugin_interface",
+              __plugin_id__: aObject["__id__"],
+              __value__: k,
+              num: null,
+            };
+            encoded_interface[k] = v;
+          } else {
+            bObject[k] = { __jailed_type__: "argument", __value__: v };
+            encoded_interface[k] = v;
+          }
         }
       }
       this._plugin_interfaces[aObject["__id__"]] = encoded_interface;
@@ -537,6 +540,7 @@
         this._plugin_interfaces[aObject["__id__"]] || {};
     }
     for (k in aObject) {
+      if (k === "hasOwnProperty") continue;
       if (isarray || aObject.hasOwnProperty(k)) {
         v = aObject[k];
         if (typeof v == "function") {
@@ -711,21 +715,21 @@
       aObject.hasOwnProperty("__jailed_type__") &&
       aObject.hasOwnProperty("__value__")
     ) {
-      if (aObject.__jailed_type__ == "callback") {
+      if (aObject.__jailed_type__ === "callback") {
         bObject = this._genRemoteCallback(callbackId, aObject.num, withPromise);
-      } else if (aObject.__jailed_type__ == "interface") {
+      } else if (aObject.__jailed_type__ === "interface") {
         bObject =
           this._remote[aObject.__value__] ||
           this._genRemoteMethod(aObject.__value__);
-      } else if (aObject.__jailed_type__ == "plugin_interface") {
+      } else if (aObject.__jailed_type__ === "plugin_interface") {
         bObject = this._genRemoteMethod(
           aObject.__value__,
           aObject.__plugin_id__
         );
-      } else if (aObject.__jailed_type__ == "ndarray") {
+      } else if (aObject.__jailed_type__ === "ndarray") {
         /*global nj tf*/
         //create build array/tensor if used in the plugin
-        if (this.id == "__plugin__" && typeof nj != "undefined" && nj.array) {
+        if (this.id === "__plugin__" && typeof nj != "undefined" && nj.array) {
           if (Array.isArray(aObject.__value__)) {
             aObject.__value__ = aObject.__value__.reduce(_appendBuffer);
           }
@@ -733,7 +737,7 @@
             .array(aObject.__value__, aObject.__dtype__)
             .reshape(aObject.__shape__);
         } else if (
-          this.id == "__plugin__" &&
+          this.id === "__plugin__" &&
           typeof tf != "undefined" &&
           tf.Tensor
         ) {
@@ -749,13 +753,13 @@
           //keep it as regular if transfered to the main app
           bObject = aObject;
         }
-      } else if (aObject.__jailed_type__ == "error") {
+      } else if (aObject.__jailed_type__ === "error") {
         bObject = new Error(aObject.__value__);
-      } else if (aObject.__jailed_type__ == "file") {
+      } else if (aObject.__jailed_type__ === "file") {
         bObject = aObject.__value__;
         //patch relativePath
         bObject.relativePath = aObject.__relative_path__;
-      } else if (aObject.__jailed_type__ == "argument") {
+      } else if (aObject.__jailed_type__ === "argument") {
         bObject = aObject.__value__;
       }
       return bObject;
@@ -765,7 +769,7 @@
       for (k in aObject) {
         if (isarray || aObject.hasOwnProperty(k)) {
           v = aObject[k];
-          if (typeof v == "object" || Array.isArray(v)) {
+          if (typeof v === "object" || Array.isArray(v)) {
             bObject[k] = this._decode(v, callbackId, withPromise);
           }
         }
