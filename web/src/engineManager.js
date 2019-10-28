@@ -92,6 +92,8 @@ export class EngineManager {
   }
 
   unregister(engine) {
+    engine = this.getEngineByUrl(engine.url);
+    if (!engine) throw `Engine ${engine.url} not found.`;
     const index = this.engines.indexOf(engine);
     for (let p of engine._plugins) {
       p.terminate();
@@ -115,6 +117,7 @@ export class EngineManager {
   }
 
   unregisterFactory(factory) {
+    factory = this.getFactory(factory.name);
     const index = this.engine_factories.indexOf(factory);
     if (index > -1) {
       this.engine_factories.splice(index, 1);

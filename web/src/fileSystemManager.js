@@ -114,6 +114,7 @@ export class FileManager {
   }
 
   unregister(manager) {
+    manager = this.getFileManagerByUrl(manager.url);
     const index = this.fileManagers.indexOf(manager);
     if (index > -1) {
       this.fileManagers.splice(index, 1);
