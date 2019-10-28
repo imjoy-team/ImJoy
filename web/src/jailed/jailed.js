@@ -549,7 +549,7 @@ var DynamicPlugin = function(config, _interface, _fs_api, engine, is_proxy) {
  */
 DynamicPlugin.prototype._bindInterface = function(_interface) {
   _interface = _interface || {};
-  this._initialInterface = {};
+  this._initialInterface = { __as_interface__: true };
   // bind this plugin to api functions
   for (var k in _interface) {
     if (typeof _interface[k] === "function") {
@@ -607,12 +607,15 @@ DynamicPlugin.prototype._connect = function() {
       me.initializing = true;
       me._updateUI();
       me.engine
-        .startPlugin({
-          ...me.config,
-          terminate: () => {
-            me.terminate();
+        .startPlugin(
+          {
+            ...me.config,
+            terminate: () => {
+              me.terminate();
+            },
           },
-        })
+          me._initialInterface
+        )
         .then(remote => {
           me.remote = remote;
           me.api = me.remote;

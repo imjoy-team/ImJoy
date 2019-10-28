@@ -201,10 +201,12 @@ export class PluginManager {
       config.file_manager = config.engine;
       delete config.engine;
     }
-    const manager = this.fm.getFileManagerByUrl(config.file_manager);
-
-    if (!manager) {
+    if (!config.file_manager) {
       throw "Please specify a file manager via the `file_manager` option.";
+    }
+    const manager = this.fm.getFileManagerByUrl(config.file_manager);
+    if (!manager) {
+      throw `File manager ${config.file_manager} not found`;
     }
 
     if (!manager.connected) {
@@ -232,10 +234,12 @@ export class PluginManager {
       config.file_manager = config.engine;
       delete config.engine;
     }
-    const manager = this.fm.getFileManagerByUrl(config.file_manager);
-
-    if (!manager) {
+    if (!config.file_manager) {
       throw "Please specify a file manager via the `file_manager` option.";
+    }
+    const manager = this.fm.getFileManagerByUrl(config.file_manager);
+    if (!manager) {
+      throw `File manager ${config.file_manager} not found`;
     }
 
     if (!manager.connected) {

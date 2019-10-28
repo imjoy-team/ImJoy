@@ -189,7 +189,7 @@
       if (this._interface.hasOwnProperty(name)) {
         if (name.startsWith("_")) continue;
         if (typeof this._interface[name] === "function") {
-          names.push({ name: name, data: null });
+          names.push({ name: name, data: null, type: "function" });
         } else {
           var data = this._interface[name];
           if (data !== null && typeof data === "object") {
@@ -203,9 +203,9 @@
                 }
               }
             }
-            names.push({ name: name, data: data2 });
+            names.push({ name: name, data: data2, type: "object" });
           } else if (Object(data) !== data) {
-            names.push({ name: name, data: data });
+            names.push({ name: name, data: data, type: "data" });
           }
         }
       }
@@ -370,11 +370,14 @@
    */
   JailedSite.prototype._setRemote = function(api) {
     this._remote = { ndarray: this._ndarray };
-    var i, name, data;
+    var i, name, data, type;
     for (i = 0; i < api.length; i++) {
       name = api[i].name;
       data = api[i].data;
-      if (data) {
+      type = api[i].type;
+      if (type === "data") {
+        this._remote[name] = data;
+      } else if (data) {
         if (typeof data === "object") {
           var data2 = {};
           for (var key in data) {
@@ -476,6 +479,45 @@
    *
    * @returns {Array} wrapped arguments
    */
+
+  JailedSite.prototype._encode_interface = function(aObject, bObject) {
+    var v, k;
+    const encoded_interface = {};
+    aObject["__id__"] = aObject["__id__"] || randId();
+    for (k in aObject) {
+      if (k === "hasOwnProperty") continue;
+      if (aObject.hasOwnProperty(k)) {
+        if (k.startsWith("_")) {
+          continue;
+        }
+        v = aObject[k];
+
+        if (typeof v == "function") {
+          bObject[k] = {
+            __jailed_type__: "plugin_interface",
+            __plugin_id__: aObject["__id__"],
+            __value__: k,
+            num: null,
+          };
+          encoded_interface[k] = v;
+        } else if (Object(v) !== v) {
+          bObject[k] = { __jailed_type__: "argument", __value__: v };
+          encoded_interface[k] = v;
+        } else if (typeof v === "object") {
+          bObject[k] = Array.isArray(v) ? [] : {};
+          this._encode_interface(v, bObject[k]);
+        }
+      }
+    }
+    this._plugin_interfaces[aObject["__id__"]] = encoded_interface;
+
+    if (aObject.onClose) {
+      aObject.onClose(() => {
+        delete this._plugin_interfaces[aObject["__id__"]];
+      });
+    }
+  };
+
   JailedSite.prototype._encode = function(aObject, as_interface) {
     var transferables = [];
     if (!aObject) {
@@ -500,37 +542,7 @@
       !Array.isArray(aObject) &&
       (aObject.__as_interface__ || as_interface)
     ) {
-      const encoded_interface = {};
-      aObject["__id__"] = aObject["__id__"] || randId();
-      for (k in aObject) {
-        if (k === "hasOwnProperty") continue;
-        if (aObject.hasOwnProperty(k)) {
-          if (k.startsWith("_")) {
-            continue;
-          }
-          v = aObject[k];
-
-          if (typeof v == "function") {
-            bObject[k] = {
-              __jailed_type__: "plugin_interface",
-              __plugin_id__: aObject["__id__"],
-              __value__: k,
-              num: null,
-            };
-            encoded_interface[k] = v;
-          } else {
-            bObject[k] = { __jailed_type__: "argument", __value__: v };
-            encoded_interface[k] = v;
-          }
-        }
-      }
-      this._plugin_interfaces[aObject["__id__"]] = encoded_interface;
-
-      if (aObject.onClose) {
-        aObject.onClose(() => {
-          delete this._plugin_interfaces[aObject["__id__"]];
-        });
-      }
+      this._encode_interface(aObject, bObject);
       return bObject;
     }
 
@@ -543,7 +555,7 @@
       if (k === "hasOwnProperty") continue;
       if (isarray || aObject.hasOwnProperty(k)) {
         v = aObject[k];
-        if (typeof v == "function") {
+        if (typeof v === "function") {
           if (as_interface) {
             const encoded_interface = this._plugin_interfaces[
               aObject["__id__"]
