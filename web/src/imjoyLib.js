@@ -109,13 +109,6 @@ export class ImJoy {
       await this.pm.loadWorkspace(config.workspace);
       await this.pm.reloadPlugins();
     }
-    try {
-      if (config.engine) {
-        await this.em.addEngineByUrl(config.engine, config.token);
-      }
-    } catch (e) {
-      console.error("Failed to connect the plugin engine(s)", e);
-    }
   }
 
   async destroy() {

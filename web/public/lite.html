@@ -266,7 +266,7 @@
             const token = getUrlParameter('token') || getUrlParameter('t');
             const engine = getUrlParameter('engine') || getUrlParameter('e');
 
-            imjoy.start({workspace: workspace, engine: engine, token:token}).then(()=>{
+            imjoy.start({workspace: workspace}).then(async ()=>{
                 windows = imjoy.wm.windows
                 console.log('ImJoy started: ', imjoy)
                 let p = getUrlParameter('plugin') || getUrlParameter('p');
@@ -274,6 +274,27 @@
                     document.getElementById('loading').style.display = 'none';
                     return
                 }
+
+                if (engine) {
+                    try{
+                        console.log("Loading ImJoy-Engine from Gist...");
+                        await imjoy.pm
+                        .reloadPluginRecursively({
+                        uri:
+                            "https://gist.githubusercontent.com/oeway/e9282f27d9446bd4536a2a64018624c5/raw/ImJoy-Engine.imjoy.html",
+                        })
+                        console.log("ImJoy-Engine loaded.");
+                        const factory = imjoy.em.getFactory('ImJoy-Engine')
+                        await factory.addEngine({url: engine, token: token})
+                        console.log('plugin engine added:', url)
+                    }
+                    catch(e){
+                        console.error(e)
+                        alert(`Failed to connect to the engine: ${e}`)
+                    }
+                    
+                }
+                
                 p = p || prompt(`Please type a ImJoy plugin URI to start or pass it with ${window.location.href+'?plugin=XXXXX'}`, 'oeway/ImJoy-Plugins:Welcome');
                 p = p || 'oeway/ImJoy-Plugins:Welcome';
                 if(p){

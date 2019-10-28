@@ -13,10 +13,6 @@ export class EngineManager {
 
   async init() {}
 
-  addEngineByUrl(url, token) {
-    console.log("adding engine: ", url, token);
-  }
-
   findEngine(plugin_config) {
     const egs = this.engines.filter(engine => {
       return engine.pluginType === plugin_config.type;
