@@ -2959,6 +2959,7 @@ export default {
         this.plugin_dialog_config = null;
         this.plugin_dialog_promise = null;
         if (config.ui) {
+          config.ui = this.pm.normalizeUI(config.ui);
           this.plugin_dialog_config = config;
           this.showPluginDialog = true;
           this.plugin_dialog_promise = [
