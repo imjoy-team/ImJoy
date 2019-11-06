@@ -949,6 +949,9 @@
         v-if="plugin_dialog_config && plugin_dialog_config.name"
         >{{ plugin_dialog_config.name }}</md-dialog-title
       >
+      <md-dialog-title v-else>{{
+        plugin_dialog_window_config.name
+      }}</md-dialog-title>
       <md-dialog-actions
         v-if="!plugin_dialog_config || !plugin_dialog_config.ui"
       >
