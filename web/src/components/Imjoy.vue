@@ -937,6 +937,7 @@
       :file_managers="selected_file_managers"
       :upload-file-to-url="uploadFileToUrl"
     ></file-dialog>
+
     <md-dialog
       :class="
         plugin_dialog_config && plugin_dialog_config.ui ? '' : 'window-dialog'
@@ -949,12 +950,10 @@
         v-if="plugin_dialog_config && plugin_dialog_config.name"
         >{{ plugin_dialog_config.name }}</md-dialog-title
       >
-      <md-dialog-title v-else>{{
-        plugin_dialog_window_config.name
-      }}</md-dialog-title>
       <md-dialog-actions
         v-if="!plugin_dialog_config || !plugin_dialog_config.ui"
       >
+        {{ plugin_dialog_window_config && plugin_dialog_window_config.name }}
         <md-button
           class="md-primary"
           v-if="
@@ -990,7 +989,10 @@
           class="window-dialog-container-position"
         >
           <window
-            v-if="plugin_dialog_window_config"
+            v-if="
+              plugin_dialog_window_config &&
+                plugin_dialog_window_config.type.startsWith('imjoy/')
+            "
             :w="plugin_dialog_window_config"
             :withDragHandle="false"
             @close="closePluginDialog(true)"
@@ -1464,6 +1466,7 @@ export default {
       max_window_buttons: 9,
       installing: false,
       plugin_dialog_window_config: null,
+      current_dialog_window_config: null,
       latest_version: null,
       is_latest_version: false,
       checking: false,
@@ -2989,6 +2992,7 @@ export default {
           setTimeout(() => {
             this.createWindow(config)
               .then(api => {
+                this.plugin_dialog_window_config = config;
                 const _close = api.close;
                 this.plugin_dialog_promise = [api.close, api.close];
                 api.close = async () => {
@@ -3238,8 +3242,8 @@ export default {
   margin: 0px;
   min-width: 200px;
   min-height: 500px;
-  width: 95%;
-  height: 95%;
+  width: 100%;
+  height: 100%;
   max-width: 1000px;
   max-height: 900px;
 }
@@ -3567,8 +3571,8 @@ button.md-speed-dial-target {
 }
 
 .fullscreen-dialog {
-  width: calc(100vw - 40px);
-  height: calc(100vh - 145px);
+  width: calc(100%);
+  height: calc(100%);
   margin: 0;
   padding: 0;
   flex-grow: 1;
