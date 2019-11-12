@@ -158,12 +158,12 @@ export default {
   computed: {
     gridWindows: function() {
       return this.windows.filter(w => {
-        return !w.standalone && this.mode === "grid";
+        return !w.dialog && !w.standalone && this.mode === "grid";
       });
     },
     standaloneWindows: function() {
       return this.windows.filter(w => {
-        return this.mode !== "grid" || w.standalone;
+        return !w.dialog && (this.mode !== "grid" || w.standalone);
       });
     },
   },

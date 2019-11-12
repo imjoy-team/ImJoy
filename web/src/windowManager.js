@@ -152,7 +152,7 @@ export class WindowManager {
 
     w.close = async () => {
       let close_timer = setTimeout(() => {
-        this.showMessage("Force quitting the window due to timeout.");
+        console.warn("Force quitting the window due to timeout.");
         forceClose();
       }, 5000);
 
@@ -189,7 +189,7 @@ export class WindowManager {
       try {
         w.id = w.id || w.name + randId();
         w.loaders = this.getDataLoaders(w.data);
-        this.generateGridPosition(w);
+        if (!w.dialog) this.generateGridPosition(w);
         if (w.standalone) {
           w.h = 0;
           w.w = 0;

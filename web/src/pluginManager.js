@@ -1542,33 +1542,6 @@ export class PluginManager {
     });
   }
 
-  normalizeUI(ui) {
-    if (!ui) {
-      return "";
-    }
-    let normui = "";
-    if (Array.isArray(ui)) {
-      for (let it of ui) {
-        if (typeof it === "string") normui = normui + it + "<br>";
-        else if (typeof it === "object") {
-          for (let k in it) {
-            if (typeof it[k] === "string")
-              normui = normui + k + ": " + it[k] + "<br>";
-            else normui = normui + k + ": " + JSON.stringify(it[k]) + "<br>";
-          }
-        } else normui = normui + JSON.stringify(it) + "<br>";
-      }
-    } else if (typeof ui === "object") {
-      throw "ui can not be an object, you can only use a string or an array.";
-    } else if (typeof ui === "string") {
-      normui = ui.trim();
-    } else {
-      normui = "";
-      console.log("Warining: removing ui string.");
-    }
-    return normui;
-  }
-
   renderWindow(pconfig) {
     return new Promise((resolve, reject) => {
       const tconfig = _.assign({}, pconfig.plugin, pconfig);
@@ -1836,7 +1809,6 @@ export class PluginManager {
       config = _clone(config);
       config.name = config.name || plugin.name;
       config.show_panel = config.show_panel || false;
-      config.ui = this.normalizeUI(config.ui);
       if (plugin.name === config.name) {
         config.ui = config.ui || plugin.config.description;
       }
@@ -2143,61 +2115,31 @@ export class PluginManager {
       if (wconfig.type && wconfig.type.startsWith("imjoy/")) {
         wconfig.id = "imjoy_" + randId();
         wconfig.window_type = wconfig.type;
-
-        if (
-          wconfig.window_container === "window-dialog-container" &&
-          wconfig.render
-        ) {
-          this.wm.setupCallbacks(wconfig);
-          wconfig.render(wconfig);
-
-          const window_plugin_apis = {
-            __as_interface__: true,
-            __id__: wconfig.id,
-            run: config => {
-              for (let k in config) {
-                wconfig[k] = config[k];
-              }
-            },
-            focus: wconfig.focus,
-            close: wconfig.close,
-            onClose: wconfig.onClose,
-            refresh: wconfig.refresh,
-            onRefresh: wconfig.onRefresh,
-            resize: wconfig.resize,
-            onResize: wconfig.onResize,
-            on: wconfig.on,
-            off: wconfig.off,
-            emit: wconfig.emit,
-          };
-          resolve(window_plugin_apis);
-        } else {
-          this.wm.addWindow(wconfig).then(wid => {
-            setTimeout(() => {
-              wconfig.refresh();
-              const window_plugin_apis = {
-                __as_interface__: true,
-                __id__: wid,
-                run: new_config => {
-                  for (let k in new_config) {
-                    wconfig[k] = new_config[k];
-                  }
-                },
-                focus: wconfig.focus,
-                close: wconfig.close,
-                onClose: wconfig.onClose,
-                refresh: wconfig.refresh,
-                onRefresh: wconfig.onRefresh,
-                resize: wconfig.resize,
-                onResize: wconfig.onResize,
-                on: wconfig.on,
-                off: wconfig.off,
-                emit: wconfig.emit,
-              };
-              resolve(window_plugin_apis);
-            }, 0);
-          });
-        }
+        this.wm.addWindow(wconfig).then(wid => {
+          setTimeout(() => {
+            wconfig.refresh();
+            const window_plugin_apis = {
+              __as_interface__: true,
+              __id__: wid,
+              run: new_config => {
+                for (let k in new_config) {
+                  wconfig[k] = new_config[k];
+                }
+              },
+              focus: wconfig.focus,
+              close: wconfig.close,
+              onClose: wconfig.onClose,
+              refresh: wconfig.refresh,
+              onRefresh: wconfig.onRefresh,
+              resize: wconfig.resize,
+              onResize: wconfig.onResize,
+              on: wconfig.on,
+              off: wconfig.off,
+              emit: wconfig.emit,
+            };
+            resolve(window_plugin_apis);
+          }, 0);
+        });
       } else {
         const window_config = this.registered.windows[wconfig.type];
         if (!window_config) {

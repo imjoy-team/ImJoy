@@ -118,7 +118,7 @@
           <md-button
             @click="wm.selectWindow(w)"
             :disabled="wm.selected_window === w"
-            v-for="(w, i) in wm.windows.slice(0, max_window_buttons)"
+            v-for="(w, i) in windows.slice(0, max_window_buttons)"
             :key="w.id"
             class="md-icon-button"
           >
@@ -127,7 +127,7 @@
               w.name.slice(0, 30) + "(#" + w.index + ")"
             }}</md-tooltip>
           </md-button>
-          <md-menu v-if="wm.windows.length > max_window_buttons">
+          <md-menu v-if="windows.length > max_window_buttons">
             <md-button
               v-if="max_window_buttons >= 9"
               class="md-icon-button md-primary"
@@ -142,7 +142,7 @@
               <md-menu-item
                 @click="wm.selectWindow(w)"
                 :disabled="wm.selected_window === w"
-                v-for="w in wm.windows.slice(max_window_buttons)"
+                v-for="w in windows.slice(max_window_buttons)"
                 :key="w.id"
               >
                 <span>{{ w.name.slice(0, 30) + "(#" + w.index + ")" }}</span
@@ -159,7 +159,7 @@
               </md-menu-item>
             </md-menu-content>
           </md-menu>
-          <md-menu v-if="wm.window_mode === 'grid' && wm.windows.length > 0">
+          <md-menu v-if="wm.window_mode === 'grid' && windows.length > 0">
             <md-button class="md-icon-button md-primary" md-menu-trigger>
               <md-icon>picture_in_picture</md-icon>
               <md-tooltip>Workspace</md-tooltip>
@@ -940,73 +940,37 @@
 
     <md-dialog
       :class="
-        plugin_dialog_config && plugin_dialog_config.ui ? '' : 'window-dialog'
+        dialog_window_config.fullscreen || dialog_window_config.standalone
+          ? 'fullscreen-dialog'
+          : 'normal-dialog'
       "
+      class="window-dialog-container noselect"
+      :style="{
+        height: dialog_auto_height,
+        width: '800px',
+      }"
       :md-active.sync="showPluginDialog"
-      :md-click-outside-to-close="false"
+      :md-click-outside-to-close="true"
       :md-close-on-esc="false"
     >
-      <md-dialog-title
-        v-if="plugin_dialog_config && plugin_dialog_config.name"
-        >{{ plugin_dialog_config.name }}</md-dialog-title
-      >
-      <md-dialog-actions
-        v-if="!plugin_dialog_config || !plugin_dialog_config.ui"
-      >
-        {{ plugin_dialog_window_config && plugin_dialog_window_config.name }}
-        <md-button
-          class="md-primary"
-          v-if="
-            plugin_dialog_window_config &&
-              !plugin_dialog_window_config.fullscreen
-          "
-          @click="plugin_dialog_window_config.fullscreen = true"
-          ><md-icon>fullscreen</md-icon></md-button
-        >
-        <md-button class="md-accent" @click="closePluginDialog(true)"
-          ><md-icon>clear</md-icon></md-button
-        >
-      </md-dialog-actions>
-      <md-dialog-content class="position-relative">
-        <div v-if="plugin_dialog_config && plugin_dialog_config.ui">
-          <joy
-            :config="plugin_dialog_config"
-            :showHeader="false"
-            :controlButtons="false"
-            ref="plugin_dialog_joy"
-          ></joy>
-        </div>
-        <div
-          v-else
-          id="window-dialog-container"
-          :class="
-            plugin_dialog_window_config &&
-            (plugin_dialog_window_config.fullscreen ||
-              plugin_dialog_window_config.standalone)
-              ? 'fullscreen-dialog'
-              : 'normal-dialog'
-          "
-          class="window-dialog-container-position"
-        >
-          <window
-            v-if="
-              plugin_dialog_window_config &&
-                plugin_dialog_window_config.type.startsWith('imjoy/')
-            "
-            :w="plugin_dialog_window_config"
-            :withDragHandle="false"
-            @close="closePluginDialog(true)"
-          ></window>
-        </div>
-      </md-dialog-content>
-      <md-dialog-actions v-if="plugin_dialog_config && plugin_dialog_config.ui">
-        <md-button class="md-primary" @click="closePluginDialog(true)"
-          >OK</md-button
-        >
-        <md-button class="md-primary" @click="closePluginDialog(false)"
-          >Cancel</md-button
-        >
-      </md-dialog-actions>
+      <window
+        v-for="w in dialogWindows"
+        :key="w.id + '_dialog'"
+        :w="w"
+        :withDragHandle="false"
+        @close="closePluginDialog(w)"
+        @fullscreen="
+          dialog_window_config.fullscreen = true;
+          w.fullscreen = true;
+          $forceUpdate();
+        "
+        @normalsize="
+          dialog_window_config.fullscreen = false;
+          w.fullscreen = false;
+          $forceUpdate();
+        "
+      ></window>
+      <!-- </md-dialog-content> -->
     </md-dialog>
 
     <md-dialog
@@ -1465,8 +1429,8 @@ export default {
       workspace_dropping: false,
       max_window_buttons: 9,
       installing: false,
-      plugin_dialog_window_config: null,
-      current_dialog_window_config: null,
+      dialog_auto_height: "100%",
+      dialog_window_config: {},
       latest_version: null,
       is_latest_version: false,
       checking: false,
@@ -1495,6 +1459,16 @@ export default {
       } else {
         return null;
       }
+    },
+    dialogWindows: function() {
+      return this.wm.windows.filter(w => {
+        return w.dialog;
+      });
+    },
+    windows: function() {
+      return this.wm.windows.filter(w => {
+        return !w.dialog;
+      });
     },
   },
   created() {
@@ -2217,10 +2191,10 @@ export default {
       this.screenWidth = e.width;
       if (this.wm) {
         if (this.screenWidth > 800) {
-          if (this.wm.windows.length === 0) this.wm.window_mode = "grid";
+          if (this.windows.length === 0) this.wm.window_mode = "grid";
           this.max_window_buttons = 9;
         } else {
-          if (this.wm.windows.length === 0) this.wm.window_mode = "single";
+          if (this.windows.length === 0) this.wm.window_mode = "single";
           this.max_window_buttons = parseInt(this.screenWidth / 36 - 4);
           if (this.max_window_buttons > 9) this.max_window_buttons = 9;
         }
@@ -2604,19 +2578,6 @@ export default {
       };
       this.createWindow(w);
     },
-    closePluginDialog(ok) {
-      this.showPluginDialog = false;
-      this.plugin_dialog_window_config = null;
-      if (this.plugin_dialog_promise) {
-        let [resolve, reject] = this.plugin_dialog_promise;
-        if (ok) {
-          resolve();
-        } else {
-          reject();
-        }
-        this.plugin_dialog_promise = null;
-      }
-    },
     loadFiles(selected_files) {
       if (selected_files.length === 1) {
         const file = selected_files[0];
@@ -2960,54 +2921,44 @@ export default {
       }
     },
     showDialog(_plugin, config) {
-      assert(config, "Please pass config to showDialog.");
+      config.dialog = true;
+      config.type = config.type || "imjoy/joy";
+      this.showPluginDialog = true;
+      this.dialog_window_config.fullscreen =
+        config.fullscreen || config.standalone || false;
       return new Promise((resolve, reject) => {
-        this.plugin_dialog_config = null;
-        this.plugin_dialog_promise = null;
-        if (config.ui) {
-          config.ui = this.pm.normalizeUI(config.ui);
-          this.plugin_dialog_config = config;
-          this.showPluginDialog = true;
-          this.plugin_dialog_promise = [
-            () => {
-              if (this.$refs.plugin_dialog_joy.joy) {
-                resolve(this.$refs.plugin_dialog_joy.joy.get_config());
-              } else {
-                reject("joy not found.");
-              }
-            },
-            reject,
-          ];
-        } else if (config.type) {
-          config.window_container = "window-dialog-container";
-          config.standalone = true;
-          this.plugin_dialog_window_config = null;
-          if (config.type.startsWith("imjoy/")) {
-            config.render = wconfig => {
-              this.plugin_dialog_window_config = wconfig;
-              this.$forceUpdate();
-            };
-          }
-          this.showPluginDialog = true;
-          setTimeout(() => {
-            this.createWindow(config)
-              .then(api => {
-                this.plugin_dialog_window_config = config;
-                const _close = api.close;
-                this.plugin_dialog_promise = [api.close, api.close];
-                api.close = async () => {
-                  await _close();
-                  this.showPluginDialog = false;
-                  this.plugin_dialog_promise = null;
-                };
-                resolve(api);
-              })
-              .catch(reject);
-          }, 0);
-        } else {
-          this.showMessage("Unsupported dialog type.");
+        for (let w of this.dialogWindows) {
+          w.close();
         }
+        this.pm
+          .createWindow(_plugin, config)
+          .then(api => {
+            api.on("window_size_changed", rect => {
+              this.dialog_auto_height = `${rect.height + 40}px`;
+              this.$forceUpdate();
+            });
+            if (config.type === "imjoy/joy") {
+              config.ok = () => {
+                this.closePluginDialog(config);
+                resolve(config.get_config());
+              };
+              config.cancel = () => {
+                this.closePluginDialog(config);
+                resolve();
+              };
+            } else {
+              resolve(api);
+            }
+          })
+          .catch(reject);
       });
+    },
+    async closePluginDialog(w) {
+      await w.close();
+      this.dialogWindows.forEach(w => {
+        w.close();
+      });
+      this.showPluginDialog = false;
     },
     showAlert(_plugin, text) {
       console.log("alert: ", text);
@@ -3248,11 +3199,16 @@ export default {
   max-height: 900px;
 }
 
-#window-dialog-container {
+.window-dialog-container {
   height: 100%;
   width: 100%;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
   z-index: 11 !important;
 }
+
 .md-card {
   /* width: 100%; */
   /* height: 300px; */
@@ -3562,8 +3518,10 @@ button.md-speed-dial-target {
 }
 
 .normal-dialog {
-  width: 100%;
-  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  min-height: 80px;
+  min-width: 100px;
   margin: 0;
   padding: 0;
   flex-grow: 1;
@@ -3571,8 +3529,10 @@ button.md-speed-dial-target {
 }
 
 .fullscreen-dialog {
-  width: calc(100%);
-  height: calc(100%);
+  max-width: 100%;
+  max-height: 100%;
+  min-width: 100%;
+  min-height: 100%;
   margin: 0;
   padding: 0;
   flex-grow: 1;

@@ -9,14 +9,14 @@
       }"
       md-alignment="space-between"
       @click.native="selectWindow(w, $event)"
-      @dblclick.native="w._h && w._w ? normalSize(w) : fullScreen(w)"
+      @dblclick.native="w.fullscreen ? normalSize(w) : fullScreen(w)"
     >
       <md-button class="md-icon-button md-accent no-drag" @click="close(w)">
         <md-icon>close</md-icon>
         <md-tooltip>Close window</md-tooltip>
       </md-button>
       <div class="window-title noselect">
-        {{ w.name.slice(0, 30) + "(#" + w.index + ")" }}
+        {{ w.name.slice(0, 30) + "(#" + (w.index || "") + ")" }}
       </div>
       <div class="no-drag">
         <md-menu
@@ -79,6 +79,7 @@
     >
       <div class="loading loading-lg floating" v-show="w.loading"></div>
       <component
+        ref="window-content"
         v-if="componentNames[w.type] && w.type.startsWith('imjoy/')"
         :is="componentNames[w.type]"
         :w="w"
@@ -86,6 +87,7 @@
       />
       <md-empty-state
         v-else-if="w.type.startsWith('imjoy/')"
+        ref="window-content"
         md-icon="hourglass_empty"
         md-label="IMJOY.IO"
         md-description=""
@@ -157,6 +159,19 @@ export default {
       this.w.resize(entries[0].contentRect);
     });
     ro.observe(this.$el);
+
+    if (this.$refs["window-content"]) {
+      const ro2 = new ResizeObserver(() => {
+        setTimeout(() => {
+          if (this.$refs["window-content"])
+            this.w.emit(
+              "window_size_changed",
+              this.$refs["window-content"].$el.getBoundingClientRect()
+            );
+        }, 500);
+      });
+      ro2.observe(this.$refs["window-content"].$el);
+    }
   },
   beforeDestroy() {
     this.w.closed = true;

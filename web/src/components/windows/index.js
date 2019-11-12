@@ -9,3 +9,5 @@ export { default as FilesWindow } from "./FilesWindow.vue";
 export { default as UrlListWindow } from "./UrlListWindow.vue";
 export { default as ImageCompareWindow } from "./ImageCompareWindow.vue";
 export { default as TerminalWindow } from "./TerminalWindow.vue";
+export { default as JoyWindow } from "./JoyWindow.vue";
+export { default as SchemaIOWindow } from "./SchemaIOWindow.vue";
