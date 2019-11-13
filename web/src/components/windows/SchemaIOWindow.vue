@@ -113,6 +113,7 @@ export default {
         this.ioPanels.push(this.w.data);
       }
     }
+    this.$emit("init");
   },
   methods: {
     async onSubmit(e, callback, model) {

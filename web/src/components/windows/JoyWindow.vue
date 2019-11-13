@@ -43,6 +43,7 @@ export default {
       this.plugin_dialog_config = this.w;
       this.w.get_config = () => this.$refs.plugin_dialog_joy.joy.get_config();
     }
+    this.$emit("init");
   },
   methods: {
     getConfig() {

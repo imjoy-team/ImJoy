@@ -82,6 +82,7 @@ export default {
     window.onresize = fit2screen;
     this.w.onResize(fit2screen);
     this.w.onRefresh(fit2screen);
+    this.$emit("init");
   },
   beforeDestroy() {},
   methods: {

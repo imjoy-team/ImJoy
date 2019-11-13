@@ -56,6 +56,8 @@ export default {
         this.$refs.compare.handleResize();
       }, 0);
     });
+
+    this.$emit("init");
   },
 };
 </script>

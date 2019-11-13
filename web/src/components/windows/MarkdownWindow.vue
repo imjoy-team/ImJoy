@@ -112,6 +112,7 @@ export default {
   },
   mounted() {
     this.plugin_info = this.w && this.w.data && this.w.data.plugin_info;
+    this.$emit("init");
   },
 };
 </script>

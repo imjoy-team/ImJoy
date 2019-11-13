@@ -92,12 +92,15 @@ export class WindowManager {
   }
 
   setupCallbacks(w) {
-    w._callbacks = {};
-    w.on = (name, handler) => {
+    w._callbacks = w._callbacks || {};
+    w.on = (name, handler, fire_if_emitted) => {
       if (w._callbacks[name]) {
         w._callbacks[name].push(handler);
       } else {
         w._callbacks[name] = [handler];
+      }
+      if (fire_if_emitted && w._callbacks[name].emitted) {
+        handler(w._callbacks[name].emitted_data);
       }
     };
     w.off = (name, handler) => {
@@ -126,6 +129,11 @@ export class WindowManager {
             console.error(e);
           }
         }
+      } else {
+        // if no handler set, store the data
+        w._callbacks[name] = [];
+        w._callbacks[name].emitted = true;
+        w._callbacks[name].emitted_data = data;
       }
     };
     w._refresh_callbacks = [];

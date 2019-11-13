@@ -2116,29 +2116,34 @@ export class PluginManager {
         wconfig.id = "imjoy_" + randId();
         wconfig.window_type = wconfig.type;
         this.wm.addWindow(wconfig).then(wid => {
-          setTimeout(() => {
-            wconfig.refresh();
-            const window_plugin_apis = {
-              __as_interface__: true,
-              __id__: wid,
-              run: new_config => {
-                for (let k in new_config) {
-                  wconfig[k] = new_config[k];
-                }
-              },
-              focus: wconfig.focus,
-              close: wconfig.close,
-              onClose: wconfig.onClose,
-              refresh: wconfig.refresh,
-              onRefresh: wconfig.onRefresh,
-              resize: wconfig.resize,
-              onResize: wconfig.onResize,
-              on: wconfig.on,
-              off: wconfig.off,
-              emit: wconfig.emit,
-            };
-            resolve(window_plugin_apis);
-          }, 0);
+          wconfig.on(
+            "ready",
+            () => {
+              wconfig.refresh();
+              wconfig.api = wconfig.api || {};
+              wconfig.api = Object.assign(wconfig.api, {
+                __as_interface__: true,
+                __id__: wid,
+                run: new_config => {
+                  for (let k in new_config) {
+                    wconfig[k] = new_config[k];
+                  }
+                },
+                focus: wconfig.focus,
+                close: wconfig.close,
+                onClose: wconfig.onClose,
+                refresh: wconfig.refresh,
+                onRefresh: wconfig.onRefresh,
+                resize: wconfig.resize,
+                onResize: wconfig.onResize,
+                on: wconfig.on,
+                off: wconfig.off,
+                emit: wconfig.emit,
+              });
+              resolve(wconfig.api);
+            },
+            true
+          );
         });
       } else {
         const window_config = this.registered.windows[wconfig.type];

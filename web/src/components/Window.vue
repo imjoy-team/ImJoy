@@ -84,6 +84,7 @@
         :is="componentNames[w.type]"
         :w="w"
         :loaders="loaders"
+        @init="setAPI"
       />
       <md-empty-state
         v-else-if="w.type.startsWith('imjoy/')"
@@ -159,19 +160,21 @@ export default {
       this.w.resize(entries[0].contentRect);
     });
     ro.observe(this.$el);
-
-    if (this.$refs["window-content"]) {
-      const ro2 = new ResizeObserver(() => {
-        setTimeout(() => {
-          if (this.$refs["window-content"])
-            this.w.emit(
-              "window_size_changed",
-              this.$refs["window-content"].$el.getBoundingClientRect()
-            );
-        }, 500);
-      });
-      ro2.observe(this.$refs["window-content"].$el);
-    }
+    setTimeout(() => {
+      if (this.$refs["window-content"]) {
+        const comp = this.$refs["window-content"];
+        const ro2 = new ResizeObserver(() => {
+          setTimeout(() => {
+            if (comp.$el)
+              this.w.emit(
+                "window_size_changed",
+                comp.$el.getBoundingClientRect()
+              );
+          }, 500);
+        });
+        ro2.observe(comp.$el);
+      }
+    }, 100);
   },
   beforeDestroy() {
     this.w.closed = true;
@@ -191,6 +194,23 @@ export default {
     },
   },
   methods: {
+    setAPI() {
+      const comp = this.$refs["window-content"];
+      if (comp) {
+        this.w.api = this.w.api || {};
+        for (let k in comp) {
+          if (
+            comp.hasOwnProperty(k) &&
+            !k.startsWith("$") &&
+            !k.startsWith("_") &&
+            typeof comp[k] === "function"
+          ) {
+            this.w.api[k] = comp[k];
+          }
+        }
+      }
+      this.w.emit("ready");
+    },
     refresh() {
       this.$forceUpdate();
     },
