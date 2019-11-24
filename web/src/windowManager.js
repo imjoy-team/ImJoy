@@ -93,7 +93,8 @@ export class WindowManager {
 
   setupCallbacks(w) {
     w._callbacks = w._callbacks || {};
-    w.on = (name, handler, fire_if_emitted) => {
+    w.api = w.api || {};
+    w.api.on = (name, handler, fire_if_emitted) => {
       if (w._callbacks[name]) {
         w._callbacks[name].push(handler);
       } else {
@@ -103,7 +104,7 @@ export class WindowManager {
         handler(w._callbacks[name].emitted_data);
       }
     };
-    w.off = (name, handler) => {
+    w.api.off = (name, handler) => {
       if (w._callbacks[name]) {
         if (handler) {
           const handlers = w._callbacks[name];
@@ -120,49 +121,55 @@ export class WindowManager {
         console.warn(`callback ${name} does not exist.`);
       }
     };
-    w.emit = (name, data) => {
-      if (w._callbacks[name]) {
-        for (let cb of w._callbacks[name]) {
-          try {
-            cb(data);
-          } catch (e) {
-            console.error(e);
+    w.api.emit = (name, data) => {
+      return new Promise(async (resolve, reject) => {
+        const errors = [];
+        try {
+          if (w._callbacks[name]) {
+            for (let cb of w._callbacks[name]) {
+              try {
+                await cb(data !== undefined ? data : undefined);
+              } catch (e) {
+                errors.push(e);
+                console.error(e);
+              }
+            }
+          } else {
+            // if no handler set, store the data
+            w._callbacks[name] = [];
+            w._callbacks[name].emitted = true;
+            w._callbacks[name].emitted_data = data;
           }
+          if (errors.length <= 0) {
+            resolve();
+          } else {
+            reject(errors);
+          }
+        } catch (e) {
+          reject(e);
         }
-      } else {
-        // if no handler set, store the data
-        w._callbacks[name] = [];
-        w._callbacks[name].emitted = true;
-        w._callbacks[name].emitted_data = data;
-      }
+      });
     };
     w._refresh_callbacks = [];
-    w.onRefresh = handler => {
-      w._refresh_callbacks.push(handler);
-    };
-    w.refresh = async () => {
+    w.api.refresh = w.refresh = async () => {
       await Promise.all(w._refresh_callbacks.map(item => item()));
     };
 
     w._resize_callbacks = [];
-    w.onResize = handler => {
-      w._resize_callbacks.push(handler);
-    };
-    w.resize = async contentRect => {
+    w.api.resize = w.resize = async contentRect => {
       contentRect = contentRect || (w.$el && w.$el.getBoundingClientRect());
-      await Promise.all(w._resize_callbacks.map(item => item(contentRect)));
+      w.api.emit("resize", contentRect);
     };
 
-    w._close_callbacks = [];
-    w.onClose = handler => {
-      w._close_callbacks.push(handler);
+    w.api.focus = w.focus = () => {
+      w.api.emit("focus");
     };
 
-    w.close = async () => {
+    w.api.close = w.close = async () => {
       let close_timer = setTimeout(() => {
         console.warn("Force quitting the window due to timeout.");
         forceClose();
-      }, 5000);
+      }, 500);
 
       const forceClose = () => {
         const index = this.windows.indexOf(w);
@@ -180,15 +187,15 @@ export class WindowManager {
         }
         this.event_bus.emit("close_window", w);
       };
-
-      try {
-        await Promise.all(w._close_callbacks.map(item => item()));
-      } catch (e) {
-        console.log(e);
-      } finally {
-        clearTimeout(close_timer);
-        forceClose();
-      }
+      w.api
+        .emit("close")
+        .catch(es => {
+          console.error(es);
+        })
+        .finally(() => {
+          clearTimeout(close_timer);
+          forceClose();
+        });
     };
   }
 

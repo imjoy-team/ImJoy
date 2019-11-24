@@ -954,19 +954,19 @@
       :md-close-on-esc="false"
     >
       <window
-        v-for="w in dialogWindows"
-        :key="w.id + '_dialog'"
-        :w="w"
+        v-if="dialogWindows[0]"
+        :key="dialogWindows[0].id + '_dialog'"
+        :w="dialogWindows[0]"
         :withDragHandle="false"
-        @close="closePluginDialog(w)"
+        @close="closePluginDialog(dialogWindows[0])"
         @fullscreen="
           dialog_window_config.fullscreen = true;
-          w.fullscreen = true;
+          dialogWindows[0].fullscreen = true;
           $forceUpdate();
         "
         @normalsize="
           dialog_window_config.fullscreen = false;
-          w.fullscreen = false;
+          dialogWindows[0].fullscreen = false;
           $forceUpdate();
         "
       ></window>
@@ -1461,9 +1461,11 @@ export default {
       }
     },
     dialogWindows: function() {
-      return this.wm.windows.filter(w => {
-        return w.dialog;
-      });
+      return this.wm.windows
+        .filter(w => {
+          return w.dialog;
+        })
+        .reverse();
     },
     windows: function() {
       return this.wm.windows.filter(w => {
@@ -1813,7 +1815,7 @@ export default {
             }
           } catch (e) {
             console.error(e);
-            await this.showAlert(null, "Error: " + e);
+            await this.showAlert(null, e);
           }
         } else {
           this.plugin_url = null;
@@ -2004,7 +2006,7 @@ export default {
           return;
         }
         try {
-          w.onRefresh(() => {
+          w.api.on("refresh", () => {
             this.$forceUpdate();
           });
           //move refresh to next tick
@@ -2924,19 +2926,25 @@ export default {
       config.dialog = true;
       config.type = config.type || "imjoy/joy";
       this.showPluginDialog = true;
+      this.dialog_auto_height = "50%";
       this.dialog_window_config.fullscreen =
         config.fullscreen || config.standalone || false;
       return new Promise((resolve, reject) => {
-        for (let w of this.dialogWindows) {
-          w.close();
-        }
         this.pm
           .createWindow(_plugin, config)
           .then(api => {
-            api.on("window_size_changed", rect => {
-              this.dialog_auto_height = `${rect.height + 40}px`;
-              this.$forceUpdate();
-            });
+            api.on(
+              "window_size_changed",
+              rect => {
+                if (rect) {
+                  this.dialog_auto_height = `${rect.height + 40}px`;
+                  this.$forceUpdate();
+                } else {
+                  throw "empty event: window_size_changed";
+                }
+              },
+              true
+            );
             if (config.type === "imjoy/joy") {
               config.ok = () => {
                 this.closePluginDialog(config);
@@ -2950,7 +2958,11 @@ export default {
               resolve(api);
             }
           })
-          .catch(reject);
+          .catch(e => {
+            this.showAlert(null, e);
+            this.showPluginDialog = false;
+            reject(e);
+          });
       });
     },
     async closePluginDialog(w) {

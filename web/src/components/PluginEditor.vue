@@ -205,12 +205,12 @@ export default {
       },
     });
 
-    this.window.onRefresh(() => {
+    this.window.api.on("refresh", () => {
       this.editor.layout();
     });
 
     if (this.window) {
-      this.window.onResize(() => {
+      this.window.api.on("resize", () => {
         this.$nextTick(this.updateSize);
       });
     }

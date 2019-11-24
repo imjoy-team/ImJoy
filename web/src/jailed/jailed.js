@@ -300,10 +300,10 @@ var Plugin = function(config, _interface, _fs_api, is_proxy) {
   this.type = config.type || "web-worker";
   this._path = config.url;
   this._disconnected = true;
+  this.terminating = false;
   this.initializing = false;
   this.running = false;
   this._log_history = [];
-  this._onclose_callbacks = [];
   this.backend = getBackendByType(this.type);
   this._updateUI =
     (_interface && _interface.utils && _interface.utils.$forceUpdate) ||
@@ -526,7 +526,7 @@ var DynamicPlugin = function(config, _interface, _fs_api, engine, is_proxy) {
   this.initializing = false;
   this.running = false;
   this._log_history = [];
-  this._onclose_callbacks = [];
+  this._callbacks = config._callbacks || {};
   this._is_proxy = is_proxy;
   this.backend = getBackendByType(this.type);
   this.engine = engine;
@@ -552,18 +552,22 @@ DynamicPlugin.prototype._bindInterface = function(_interface) {
   this._initialInterface = { __as_interface__: true };
   // bind this plugin to api functions
   for (var k in _interface) {
-    if (typeof _interface[k] === "function") {
-      this._initialInterface[k] = _interface[k].bind(null, this);
-    } else if (typeof _interface[k] === "object") {
-      var utils = {};
-      for (var u in _interface[k]) {
-        if (typeof _interface[k][u] === "function") {
-          utils[u] = _interface[k][u].bind(null, this);
+    if (_interface.hasOwnProperty(k)) {
+      if (typeof _interface[k] === "function") {
+        this._initialInterface[k] = _interface[k].bind(null, this);
+      } else if (typeof _interface[k] === "object") {
+        var utils = {};
+        for (var u in _interface[k]) {
+          if (_interface[k].hasOwnProperty(u)) {
+            if (typeof _interface[k][u] === "function") {
+              utils[u] = _interface[k][u].bind(null, this);
+            }
+          }
         }
+        this._initialInterface[k] = utils;
+      } else {
+        this._initialInterface[k] = _interface[k];
       }
-      this._initialInterface[k] = utils;
-    } else {
-      this._initialInterface[k] = _interface[k];
     }
   }
 };
@@ -887,6 +891,7 @@ DynamicPlugin.prototype._set_disconnected = function() {
   this._disconnected = true;
   this.running = false;
   this.initializing = false;
+  this.terminating = false;
   this.engine = null;
   this._updateUI();
 };
@@ -896,8 +901,15 @@ DynamicPlugin.prototype.terminate = async function() {
     this._set_disconnected();
     return;
   }
+  //prevent call loop
+  if (this.terminating) {
+    return;
+  } else {
+    this.terminating = true;
+  }
+
   try {
-    await Promise.all(this._onclose_callbacks.map(item => item()));
+    this.emit("close");
   } catch (e) {
     console.error(e);
   }
@@ -920,8 +932,61 @@ DynamicPlugin.prototype.terminate = async function() {
   }
 };
 
-DynamicPlugin.prototype.onClose = function(cb) {
-  this._onclose_callbacks.push(cb);
+DynamicPlugin.prototype.on = function(name, handler, fire_if_emitted) {
+  if (this._callbacks[name]) {
+    this._callbacks[name].push(handler);
+  } else {
+    this._callbacks[name] = [handler];
+  }
+  if (fire_if_emitted && this._callbacks[name].emitted) {
+    handler(this._callbacks[name].emitted_data);
+  }
+};
+DynamicPlugin.prototype.off = function(name, handler) {
+  if (this._callbacks[name]) {
+    if (handler) {
+      const handlers = this._callbacks[name];
+      const idx = handlers.indexOf(handler);
+      if (idx >= 0) {
+        handlers.splice(idx, 1);
+      } else {
+        console.warn(`callback ${name} does not exist.`);
+      }
+    } else {
+      delete this._callbacks[name];
+    }
+  } else {
+    console.warn(`callback ${name} does not exist.`);
+  }
+};
+DynamicPlugin.prototype.emit = function(name, data) {
+  return new Promise(async (resolve, reject) => {
+    const errors = [];
+    try {
+      if (this._callbacks[name]) {
+        for (let cb of this._callbacks[name]) {
+          try {
+            await cb(data !== undefined ? data : undefined);
+          } catch (e) {
+            errors.push(e);
+            console.error(e);
+          }
+        }
+      } else {
+        // if no handler set, store the data
+        this._callbacks[name] = [];
+        this._callbacks[name].emitted = true;
+        this._callbacks[name].emitted_data = data;
+      }
+      if (errors.length <= 0) {
+        resolve();
+      } else {
+        reject(errors);
+      }
+    } catch (e) {
+      reject(e);
+    }
+  });
 };
 
 DynamicPlugin.prototype.log = function(msg) {

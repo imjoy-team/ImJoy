@@ -151,7 +151,12 @@ export class PluginManager {
       setConfig: this.setPluginConfig,
       getConfig: this.getPluginConfig,
       getAttachment: this.getAttachment,
-      onClose: this.onClose,
+      onClose: (plugin, cb) => {
+        console.warn(
+          '`api.onClose` is deprecated, please use `api.on("close", ...)` instead.'
+        );
+        plugin.on("close", cb);
+      },
       utils: {},
     };
     // bind this to api functions
@@ -1547,33 +1552,24 @@ export class PluginManager {
       const tconfig = _.assign({}, pconfig.plugin, pconfig);
       tconfig.workspace = this.selected_workspace;
       const imjoy_api = _.assign({}, this.imjoy_api);
-      imjoy_api.focus = () => {
-        pconfig.focus();
-      };
-      imjoy_api.close = () => {
-        pconfig.close();
-      };
-      imjoy_api.refresh = () => {
-        pconfig.refresh();
-      };
-      imjoy_api.resize = () => {
-        pconfig.resize();
-      };
-      imjoy_api.onRefresh = (_, handler) => {
-        pconfig.onRefresh(handler);
-      };
-      imjoy_api.onResize = (_, handler) => {
-        pconfig.onResize(handler);
-      };
-      imjoy_api.on = (_, name, handler) => {
-        pconfig.on(name, handler);
-      };
-      imjoy_api.off = (_, name, handler) => {
-        pconfig.off(name, handler);
-      };
-      imjoy_api.emit = (_, name, data) => {
-        pconfig.emit(name, data);
-      };
+      for (let k in pconfig.api) {
+        if (pconfig.api.hasOwnProperty(k)) {
+          imjoy_api[k] = function() {
+            var args = Array.prototype.slice.call(arguments, 1);
+            pconfig.api[k].apply(pconfig, args);
+          };
+        }
+      }
+
+      // imjoy_api.on = (_, name, handler) => {
+      //   pconfig.api.on(name, handler);
+      // };
+      // imjoy_api.off = (_, name, handler) => {
+      //   pconfig.api.off(name, handler);
+      // };
+      // imjoy_api.emit = (_, name, data) => {
+      //   pconfig.api.emit(name, data);
+      // };
 
       const _interface = _.assign(
         { TAG: tconfig.tag, WORKSPACE: this.selected_workspace },
@@ -1591,15 +1587,6 @@ export class PluginManager {
         plugin.api
           .setup()
           .then(() => {
-            plugin.api.focus = pconfig.focus;
-            plugin.api.close = pconfig.close;
-            plugin.api.refresh = pconfig.refresh;
-            plugin.api.resize = pconfig.resize;
-            plugin.api.onRefresh = pconfig.onRefresh;
-            plugin.api.onResize = pconfig.onResize;
-            plugin.api.on = pconfig.on;
-            plugin.api.off = pconfig.off;
-            plugin.api.emit = pconfig.emit;
             //asuming the data._op is passed from last op
             pconfig.data = pconfig.data || {};
             pconfig.data._source_op = pconfig.data && pconfig.data._op;
@@ -2050,7 +2037,7 @@ export class PluginManager {
       }
       this.em.register(config);
       this.registered.engines[config.name] = config;
-      plugin.onClose(() => {
+      plugin.on("close", () => {
         this.em.unregister(config);
       });
     } else if (config.type === "engine-factory") {
@@ -2070,7 +2057,7 @@ export class PluginManager {
       }
       this.em.registerFactory(config);
       this.registered.engine_factories[config.name] = config;
-      plugin.onClose(() => {
+      plugin.on("close", () => {
         this.em.unregisterFactory(config);
       });
     } else if (config.type === "file-manager") {
@@ -2116,7 +2103,7 @@ export class PluginManager {
         wconfig.id = "imjoy_" + randId();
         wconfig.window_type = wconfig.type;
         this.wm.addWindow(wconfig).then(wid => {
-          wconfig.on(
+          wconfig.api.on(
             "ready",
             () => {
               wconfig.refresh();
@@ -2131,14 +2118,8 @@ export class PluginManager {
                 },
                 focus: wconfig.focus,
                 close: wconfig.close,
-                onClose: wconfig.onClose,
                 refresh: wconfig.refresh,
-                onRefresh: wconfig.onRefresh,
                 resize: wconfig.resize,
-                onResize: wconfig.onResize,
-                on: wconfig.on,
-                off: wconfig.off,
-                emit: wconfig.emit,
               });
               resolve(wconfig.api);
             },
@@ -2149,11 +2130,11 @@ export class PluginManager {
         const window_config = this.registered.windows[wconfig.type];
         if (!window_config) {
           console.error(
-            "no plugin registered for window type: " + wconfig.type,
+            "No plugin registered for window type: " + wconfig.type,
             this.registered.windows
           );
-          reject("no plugin registered for window type: " + wconfig.type);
-          throw "no plugin registered for window type: " + wconfig.type;
+          reject("No plugin registered for window type: " + wconfig.type);
+          throw "No plugin registered for window type: " + wconfig.type;
         }
         const pconfig = wconfig;
         //generate a new window id
@@ -2182,12 +2163,19 @@ export class PluginManager {
           throw error;
         }
         if (pconfig.window_container) {
-          this.wm.setupCallbacks(wconfig);
+          this.wm.setupCallbacks(pconfig);
           setTimeout(() => {
             this.renderWindow(pconfig)
               .then(wplugin => {
-                pconfig.refresh();
-                pconfig.onClose(async () => {
+                if (!pconfig.$el) {
+                  throw "element is not ready";
+                }
+                wplugin.api.emit(
+                  "window_size_changed",
+                  pconfig.$el.getBoundingClientRect()
+                );
+                wplugin.api.refresh();
+                wplugin.api.on("close", async () => {
                   await wplugin.terminate();
                 });
 
@@ -2202,7 +2190,11 @@ export class PluginManager {
               pconfig.refresh();
               this.renderWindow(pconfig)
                 .then(wplugin => {
-                  pconfig.onClose(async () => {
+                  pconfig.api.emit(
+                    "window_size_changed",
+                    pconfig.$el.getBoundingClientRect()
+                  );
+                  pconfig.api.on("close", async () => {
                     await wplugin.terminate();
                   });
                   pconfig.loading = false;
@@ -2333,10 +2325,6 @@ export class PluginManager {
     } else {
       return null;
     }
-  }
-
-  onClose(_plugin, cb) {
-    _plugin.onClose(cb);
   }
 
   async checkPluginUpdate(plugin) {

@@ -146,27 +146,28 @@ export default {
   mounted() {
     if (this.w) {
       this.w.$el = this.$el;
-      this.w.onRefresh(() => {
+      this.w.api.on("refresh", () => {
         this.refresh();
       });
-      this.w.focus = () => {
+      this.w.api.on("focus", () => {
         if (!this.w.standalone) this.$el.scrollIntoView(true);
-      };
+      });
       if (this.w.fullscreen) {
         this.fullScreen(this.w);
       }
     }
     const ro = new ResizeObserver(entries => {
-      this.w.resize(entries[0].contentRect);
+      this.w.api.emit("resize", entries[0].contentRect);
     });
     ro.observe(this.$el);
+
     setTimeout(() => {
       if (this.$refs["window-content"]) {
         const comp = this.$refs["window-content"];
         const ro2 = new ResizeObserver(() => {
           setTimeout(() => {
             if (comp.$el)
-              this.w.emit(
+              this.w.api.emit(
                 "window_size_changed",
                 comp.$el.getBoundingClientRect()
               );
@@ -181,13 +182,16 @@ export default {
   },
   watch: {
     w() {
-      this.w.onRefresh(() => {
+      this.w.api.on("refresh", () => {
         this.refresh();
       });
-      this.w.focus = () => {
+      this.w.api.on("focus", () => {
         if (!this.w.standalone) this.$el.scrollIntoView(true);
-      };
-      this.w.focus();
+      });
+      this.w.api.on("fullscreen", () => {
+        this.fullScreen(this.w);
+      });
+      if (!this.w.standalone) this.$el.scrollIntoView(true);
       if (this.w.fullscreen) {
         this.fullScreen(this.w);
       }
@@ -209,7 +213,7 @@ export default {
           }
         }
       }
-      this.w.emit("ready");
+      this.w.api.emit("ready");
     },
     refresh() {
       this.$forceUpdate();

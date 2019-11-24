@@ -145,20 +145,11 @@
       ) {
         if (window && window.__imjoy_plugin_type__ === "window") {
           // these functions will be exposed as window plugin api
-          _interface.onClose = cb => {
-            this._remote.onClose(cb);
-          };
           _interface.close = () => {
             this._remote.close();
           };
-          _interface.onResize = cb => {
-            this._remote.onResize(cb);
-          };
           _interface.resize = () => {
             this._remote.resize();
-          };
-          _interface.onRefresh = cb => {
-            this._remote.onRefresh(cb);
           };
           _interface.on = (name, cb) => {
             this._remote.on(name, cb);
@@ -171,6 +162,10 @@
           };
           _interface.refresh = () => {
             this._remote.refresh();
+          };
+          // deprecated
+          _interface.onClose = (name, cb) => {
+            this._remote.onClose(name, cb);
           };
         }
       }
@@ -275,6 +270,7 @@
               resolve(result);
             }
           } catch (e) {
+            console.error(e, method);
             reject(e);
           }
         } else {
@@ -306,6 +302,7 @@
               resolve(result);
             }
           } catch (e) {
+            console.error(e, method);
             reject(e);
           }
         } else {
@@ -511,8 +508,8 @@
     }
     this._plugin_interfaces[aObject["__id__"]] = encoded_interface;
 
-    if (aObject.onClose) {
-      aObject.onClose(() => {
+    if (aObject.on) {
+      aObject.on("close", () => {
         delete this._plugin_interfaces[aObject["__id__"]];
       });
     }

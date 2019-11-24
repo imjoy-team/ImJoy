@@ -265,7 +265,7 @@ export default {
       w.w = fw;
       this.$refs.window_grid.layoutUpdate();
       setTimeout(() => {
-        w.resize && w.resize();
+        w.resize();
         w.refresh();
         w.focus();
       }, 500);
@@ -281,7 +281,7 @@ export default {
       w._h = null;
       this.$refs.window_grid.layoutUpdate();
       setTimeout(() => {
-        w.resize && w.resize();
+        w.resize();
         w.refresh();
         w.focus();
       }, 500);

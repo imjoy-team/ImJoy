@@ -65,23 +65,24 @@ export default {
     this.$nextTick(() => {
       this.fitToscreen();
     });
-    this.w.on("write", data => {
+    this.w.api.on("write", data => {
       this.term.write(data);
     });
-    this.w.on("error", error => {
+    this.w.api.on("error", error => {
       this.error = error;
     });
     this.term.on("key", key => {
-      this.w.emit("key", key);
+      this.w.api.emit("key", key);
     });
     this.term.on("paste", data => {
-      this.w.emit("paste", data);
+      this.w.api.emit("paste", data);
     });
     const wait_ms = 50;
     const fit2screen = debounce(this.fitToscreen, wait_ms);
-    window.onresize = fit2screen;
-    this.w.onResize(fit2screen);
-    this.w.onRefresh(fit2screen);
+    window.addEventListener("resize", fit2screen);
+    document.addEventListener("orientationchange", fit2screen);
+    this.w.api.on("resize", fit2screen);
+    this.w.api.on("refresh", fit2screen);
     this.$emit("init");
   },
   beforeDestroy() {},
@@ -91,7 +92,7 @@ export default {
       this.$forceUpdate();
       this.$nextTick(() => {
         this.term.fit();
-        this.w.emit("fit", {
+        this.w.api.emit("fit", {
           cols: this.term.cols,
           rows: this.term.rows,
         });
