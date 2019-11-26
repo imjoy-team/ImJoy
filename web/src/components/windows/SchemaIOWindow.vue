@@ -1,49 +1,54 @@
 <!-- taken from https://vuejsexamples.com/responsive-image-content-comparison-slider-built-with-vue/ -->
 <template>
   <div class="schema-io">
-    <div class="panel panel-default" v-for="item in ioPanels" :key="item.id">
+    <div v-for="item in ioPanels" :key="item.id">
       <template v-if="item.type === 'form'">
-        <div class="panel-heading">{{ item.title }}</div>
-        <div class="panel-body">
-          <p v-if="item.description">{{ item.description }}</p>
-          <vue-form-generator
-            :schema="item.schema"
-            :model="item.data"
-            :options="item.options"
-          ></vue-form-generator>
-          <div class="button-container-padding">
-            <input
-              type="button"
-              class="submit-button"
-              v-for="val in item.buttons"
-              :key="val.name"
-              :value="val.name"
-              @click="onSubmit($event, val.event_id, item.data)"
-            />
-          </div>
-        </div>
+        <div class="panel-heading" v-if="item.title">{{ item.title }}</div>
+
+        <div
+          style="padding-left: 1px; padding-right: 1px; padding-bottom: 10px; overflow: auto"
+          v-if="item.description"
+          v-html="sanitizedMarked(item.description)"
+        ></div>
+        <vue-form-generator
+          :schema="item.schema"
+          :model="item.data"
+          :options="item.options"
+        ></vue-form-generator>
+
+        <md-button
+          :class="val.class"
+          v-for="val in item.buttons"
+          :key="val.label"
+          @click="onSubmit($event, val.event_id, item.data)"
+        >
+          {{ val.label }}
+        </md-button>
       </template>
 
       <template v-if="item.type === 'vega'">
-        <div class="panel-heading">{{ item.title }}</div>
-        <div class="panel-body overflow-auto">
-          <p v-if="item.description">{{ item.description }}</p>
+        <div class="panel-heading" v-if="item.title">{{ item.title }}</div>
+        <div class="overflow-auto">
+          <div
+            style="padding-left: 1px; padding-right: 1px; padding-bottom: 10px; overflow: auto"
+            v-if="item.description"
+            v-html="sanitizedMarked(item.description)"
+          ></div>
           <vega
             :schema="item.schema"
             :options="item.options"
             :ref="item.id"
           ></vega>
           <br />
-          <div class="button-container-padding">
-            <input
-              type="button"
-              class="submit-button"
-              v-for="val in item.buttons"
-              :key="val.name"
-              :value="val.name"
-              @click="onSubmit($event, val.event_id, item.data)"
-            />
-          </div>
+
+          <md-button
+            :class="val.class"
+            v-for="val in item.buttons"
+            :key="val.label"
+            @click="onSubmit($event, val.event_id, item.data)"
+          >
+            {{ val.label }}
+          </md-button>
         </div>
       </template>
     </div>
@@ -56,6 +61,8 @@ import "vue-form-generator/dist/vfg.css";
 import Vue from "vue";
 import * as vega from "vega";
 import vegaEmbed from "vega-embed";
+import marked from "marked";
+import DOMPurify from "dompurify";
 
 Vue.use(VueFormGenerator);
 Vue.component("vega", {
@@ -117,6 +124,36 @@ export default {
     }
     this.$emit("init");
   },
+  created() {
+    //open link in a new tab
+    const renderer = new marked.Renderer();
+    renderer.link = function(href, title, text) {
+      var link = marked.Renderer.prototype.link.call(this, href, title, text);
+      return link.replace("<a", "<a target='_blank' ");
+    };
+    marked.setOptions({
+      renderer: renderer,
+    });
+    DOMPurify.addHook("afterSanitizeAttributes", function(node) {
+      // set all elements owning target to target=_blank
+      if ("target" in node) {
+        node.setAttribute("target", "_blank");
+        // prevent https://www.owasp.org/index.php/Reverse_Tabnabbing
+        node.setAttribute("rel", "noopener noreferrer");
+      }
+    });
+    DOMPurify.addHook("afterSanitizeAttributes", function(node) {
+      // set all elements owning target to target=_blank
+      if ("target" in node) {
+        node.setAttribute("target", "_blank");
+        // prevent https://www.owasp.org/index.php/Reverse_Tabnabbing
+        node.setAttribute("rel", "noopener noreferrer");
+      }
+    });
+    this.sanitizedMarked = mk => {
+      return DOMPurify.sanitize(marked(mk));
+    };
+  },
   methods: {
     async onSubmit(e, event_id, model) {
       e.preventDefault();
@@ -158,8 +195,11 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style>
+.schema-io {
+  padding: 20px;
+}
+
 .panel {
-  margin-bottom: 20px;
   background-color: #fff;
   border: 1px solid transparent;
   border-radius: 4px;
@@ -181,16 +221,6 @@ export default {
 }
 .field-checklist .wrapper {
   width: 100%;
-}
-.submit-button {
-  padding: 10px 20px;
-  font-size: 1.1em;
-  border: 1px solid #448aff;
-  color: white;
-  background-color: #448aff;
-  border-radius: 4px;
-  cursor: pointer;
-  margin-right: 10px;
 }
 .button-container-padding {
   padding: 10px 15px;

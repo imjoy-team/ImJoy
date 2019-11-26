@@ -275,6 +275,14 @@ export default {
     marked.setOptions({
       renderer: renderer,
     });
+    DOMPurify.addHook("afterSanitizeAttributes", function(node) {
+      // set all elements owning target to target=_blank
+      if ("target" in node) {
+        node.setAttribute("target", "_blank");
+        // prevent https://www.owasp.org/index.php/Reverse_Tabnabbing
+        node.setAttribute("rel", "noopener noreferrer");
+      }
+    });
     this.sanitizedMarked = mk => {
       return DOMPurify.sanitize(marked(mk));
     };
