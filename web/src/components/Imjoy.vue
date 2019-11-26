@@ -1074,7 +1074,7 @@
     <md-dialog
       class="plugin-dialog"
       :md-active.sync="showAddPluginDialog"
-      :md-click-outside-to-close="false"
+      :md-click-outside-to-close="true"
     >
       <md-dialog-title
         >{{
