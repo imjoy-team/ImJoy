@@ -164,8 +164,8 @@
             this._remote.refresh();
           };
           // deprecated
-          _interface.onClose = (name, cb) => {
-            this._remote.onClose(name, cb);
+          _interface.onClose = cb => {
+            this._remote.onClose(cb);
           };
         }
       }

@@ -166,10 +166,11 @@ export class WindowManager {
     };
 
     w.api.close = w.close = async () => {
+      // TODO: handle close gracefully
       let close_timer = setTimeout(() => {
         console.warn("Force quitting the window due to timeout.");
         forceClose();
-      }, 500);
+      }, 2000);
 
       const forceClose = () => {
         const index = this.windows.indexOf(w);
@@ -187,15 +188,15 @@ export class WindowManager {
         }
         this.event_bus.emit("close_window", w);
       };
-      w.api
-        .emit("close")
-        .catch(es => {
-          console.error(es);
-        })
-        .finally(() => {
-          clearTimeout(close_timer);
-          forceClose();
-        });
+      try {
+        //TODO: figure out why it's not closing if we await the emit function
+        w.api.emit("close");
+      } catch (es) {
+        console.error(es);
+      } finally {
+        forceClose();
+        clearTimeout(close_timer);
+      }
     };
   }
 
@@ -224,6 +225,10 @@ export class WindowManager {
         } else {
           this.event_bus.emit("add_window", w);
           resolve(w.id);
+        }
+        //hack for testing
+        if (w.__test__mode__) {
+          w.api.emit("ready");
         }
       } catch (e) {
         reject(e);

@@ -177,7 +177,8 @@ export class PluginManager {
         this.imjoy_api.utils[k] = api_utils_[k];
       }
     }
-
+    //expose api to window for debugging
+    window.api = this.imjoy_api;
     this.event_bus.on("engine_connected", () => {
       for (let k in this.plugins) {
         if (this.plugins.hasOwnProperty(k)) {
@@ -2102,30 +2103,29 @@ export class PluginManager {
       if (wconfig.type && wconfig.type.startsWith("imjoy/")) {
         wconfig.id = "imjoy_" + randId();
         wconfig.window_type = wconfig.type;
-        this.wm.addWindow(wconfig).then(wid => {
-          wconfig.api.on(
-            "ready",
-            () => {
-              wconfig.refresh();
-              wconfig.api = wconfig.api || {};
-              wconfig.api = Object.assign(wconfig.api, {
-                __as_interface__: true,
-                __id__: wid,
-                run: new_config => {
-                  for (let k in new_config) {
-                    wconfig[k] = new_config[k];
-                  }
-                },
-                focus: wconfig.focus,
-                close: wconfig.close,
-                refresh: wconfig.refresh,
-                resize: wconfig.resize,
-              });
-              resolve(wconfig.api);
-            },
-            true
-          );
-        });
+        this.wm
+          .addWindow(wconfig)
+          .then(wid => {
+            wconfig.api.on(
+              "ready",
+              () => {
+                wconfig.refresh();
+                wconfig.api = wconfig.api || {};
+                wconfig.api = Object.assign(wconfig.api, {
+                  __as_interface__: true,
+                  __id__: wid,
+                  run: new_config => {
+                    for (let k in new_config) {
+                      wconfig[k] = new_config[k];
+                    }
+                  },
+                });
+                resolve(wconfig.api);
+              },
+              true
+            );
+          })
+          .catch(reject);
       } else {
         const window_config = this.registered.windows[wconfig.type];
         if (!window_config) {
@@ -2167,9 +2167,6 @@ export class PluginManager {
           setTimeout(() => {
             this.renderWindow(pconfig)
               .then(wplugin => {
-                if (!pconfig.$el) {
-                  throw "element is not ready";
-                }
                 wplugin.api.emit(
                   "window_size_changed",
                   pconfig.$el.getBoundingClientRect()
@@ -2178,7 +2175,6 @@ export class PluginManager {
                 wplugin.api.on("close", async () => {
                   await wplugin.terminate();
                 });
-
                 resolve(wplugin.api);
               })
               .catch(reject);
@@ -2190,10 +2186,6 @@ export class PluginManager {
               pconfig.refresh();
               this.renderWindow(pconfig)
                 .then(wplugin => {
-                  pconfig.api.emit(
-                    "window_size_changed",
-                    pconfig.$el.getBoundingClientRect()
-                  );
                   pconfig.api.on("close", async () => {
                     await wplugin.terminate();
                   });

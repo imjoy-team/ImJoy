@@ -386,7 +386,7 @@ To close the created window, call `win.close()`.
 
 To scroll to the window in the ImJoy workspace, call `win.focus()`.
 
-Inside the window plugin, `this.close`, `this.onClose`, `this.focus`, `this.resize`, `this.onResize` can be used.
+Inside the window plugin, `api.close`, `api.on`, `api.emit`, `api.focus`, `api.resize` can be used.
 
 <!-- tabs:start -->
 
@@ -395,8 +395,8 @@ Inside the window plugin, `this.close`, `this.onClose`, `this.focus`, `this.resi
 // win is the object returned from api.createWindow
 await win.run({'data': {'image': ...}})
 
-// set `onClose` callback
-win.onClose(()=>{
+// set `on-close` callback
+win.on('close', ()=>{
   console.log('closing window.')
 })
 ```
@@ -424,11 +424,11 @@ await win.run({'data': {'image': ...}})
 # or named arguments
 await win.run(data={'image': ...})
 
-# set `onClose` callback
+# set `on-close` callback
 def close_callback():
     print('closing window.')
 
-win.onClose(close_callback)
+win.on('close', close_callback)
 ```
 <!-- tabs:end -->
 

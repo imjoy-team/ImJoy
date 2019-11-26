@@ -909,7 +909,7 @@ DynamicPlugin.prototype.terminate = async function() {
   }
 
   try {
-    this.emit("close");
+    await this.emit("close");
   } catch (e) {
     console.error(e);
   }
