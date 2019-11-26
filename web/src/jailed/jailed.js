@@ -915,7 +915,7 @@ DynamicPlugin.prototype.terminate = async function() {
   }
   try {
     if (this.api && this.api.exit && typeof this.api.exit == "function") {
-      this.api.exit();
+      await this.api.exit();
     }
   } catch (e) {
     console.error("error occured when terminating the plugin", e);

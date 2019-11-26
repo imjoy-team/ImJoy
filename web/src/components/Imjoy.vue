@@ -2948,6 +2948,7 @@ export default {
             api.on("close", () => {
               this.showPluginDialog = false;
             });
+
             if (config.type === "imjoy/joy") {
               config.ok = () => {
                 this.closePluginDialog(config);

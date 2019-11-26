@@ -386,7 +386,7 @@ To close the created window, call `win.close()`.
 
 To scroll to the window in the ImJoy workspace, call `win.focus()`.
 
-Inside the window plugin, `api.close`, `api.on`, `api.emit`, `api.focus`, `api.resize` can be used.
+Inside the window plugin, `this.close`, `this.on`, `this.emit`, `this.focus`, `this.resize` can be used.
 
 <!-- tabs:start -->
 

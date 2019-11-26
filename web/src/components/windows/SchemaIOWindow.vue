@@ -18,7 +18,7 @@
               v-for="val in item.buttons"
               :key="val.name"
               :value="val.name"
-              @click="onSubmit($event, val.callback, item.data)"
+              @click="onSubmit($event, val.event_id, item.data)"
             />
           </div>
         </div>
@@ -41,7 +41,7 @@
               v-for="val in item.buttons"
               :key="val.name"
               :value="val.name"
-              @click="onSubmit($event, val.callback, item.data)"
+              @click="onSubmit($event, val.event_id, item.data)"
             />
           </div>
         </div>
@@ -108,7 +108,9 @@ export default {
   mounted() {
     if (this.w.data) {
       if (Array.isArray(this.w.data)) {
-        this.ioPanels.push(this.w.data);
+        for (let pd of this.w.data) {
+          this.ioPanels.push(pd);
+        }
       } else {
         this.ioPanels.push(this.w.data);
       }
@@ -116,9 +118,28 @@ export default {
     this.$emit("init");
   },
   methods: {
-    async onSubmit(e, callback, model) {
+    async onSubmit(e, event_id, model) {
       e.preventDefault();
-      await callback(model);
+      this.w.api.emit(event_id, model);
+    },
+    append(data) {
+      if (Array.isArray(data)) {
+        for (let pd of data) {
+          this.ioPanels.push(pd);
+        }
+      } else {
+        this.ioPanels.push(data);
+      }
+    },
+    remove(id) {
+      this.ioPanels.filter((item, i) => {
+        if (item.id === id) {
+          this.ioPanels.splice(i, 1);
+        }
+      });
+    },
+    append_data_point(id, dataName, data) {
+      this.$refs[id][0].updateView(dataName, data);
     },
   },
 };
