@@ -2926,7 +2926,7 @@ export default {
       config.dialog = true;
       config.type = config.type || "imjoy/joy";
       this.showPluginDialog = true;
-      this.dialog_auto_height = "50%";
+      this.dialog_auto_height = "500px";
       this.dialog_window_config.fullscreen =
         config.fullscreen || config.standalone || false;
       return new Promise((resolve, reject) => {
