@@ -2936,12 +2936,8 @@ export default {
             api.on(
               "window_size_changed",
               rect => {
-                if (rect) {
-                  this.dialog_auto_height = `${rect.height + 40}px`;
-                  this.$forceUpdate();
-                } else {
-                  throw "empty event: window_size_changed";
-                }
+                this.dialog_auto_height = `${rect.height + 40}px`;
+                this.$forceUpdate();
               },
               true
             );
