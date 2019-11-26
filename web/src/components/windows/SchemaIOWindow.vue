@@ -138,8 +138,19 @@ export default {
         }
       });
     },
-    append_data_point(id, dataName, data) {
+    appendDataPoint(id, dataName, data) {
       this.$refs[id][0].updateView(dataName, data);
+    },
+    getData(id) {
+      if (id) {
+        return this.ioPanels[id].data;
+      } else {
+        const d = {};
+        for (let k in this.ioPanels) {
+          d[k] = this.ioPanels[k].data;
+        }
+        return d;
+      }
     },
   },
 };
