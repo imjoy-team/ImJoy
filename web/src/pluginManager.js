@@ -179,11 +179,16 @@ export class PluginManager {
     }
     //expose api to window for debugging
     window.api = this.imjoy_api;
-    this.event_bus.on("engine_connected", () => {
+    this.event_bus.on("engine_connected", engine => {
       for (let k in this.plugins) {
         if (this.plugins.hasOwnProperty(k)) {
           const plugin = this.plugins[k];
-          if (plugin.config.engine_mode && !plugin.engine) {
+          if (
+            plugin.config.engine_mode &&
+            (!plugin.engine ||
+              plugin.engine === engine ||
+              plugin.config.engine_mode === engine.name)
+          ) {
             this.reloadPlugin(plugin);
           }
         }
@@ -2173,6 +2178,7 @@ export class PluginManager {
                 );
                 wplugin.api.refresh();
                 wplugin.api.on("close", async () => {
+                  this.event_bus.emit("closing_window_plugin", wplugin);
                   await wplugin.terminate();
                 });
                 resolve(wplugin.api);
@@ -2187,6 +2193,7 @@ export class PluginManager {
               this.renderWindow(pconfig)
                 .then(wplugin => {
                   pconfig.api.on("close", async () => {
+                    this.event_bus.emit("closing_window_plugin", wplugin);
                     await wplugin.terminate();
                   });
                   pconfig.loading = false;

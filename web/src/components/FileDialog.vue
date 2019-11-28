@@ -202,10 +202,17 @@ export default {
             console.log("skipping file: " + files[i].relativePath);
             continue;
           }
-          await this.upload(
-            files[i],
-            `Uploading ${i + 1}/${files.length}: ${files[i].name}`
-          );
+          if (this.selected_file_manager.putFile) {
+            await this.selected_file_manager.putFile(
+              files[i],
+              `Uploading ${i + 1}/${files.length}: ${files[i].name}`
+            );
+          } else {
+            await this.upload(
+              files[i],
+              `Uploading ${i + 1}/${files.length}: ${files[i].name}`
+            );
+          }
         }
       } catch (e) {
         this.status_text =

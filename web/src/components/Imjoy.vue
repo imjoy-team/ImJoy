@@ -944,7 +944,7 @@
           ? 'fullscreen-dialog'
           : 'normal-dialog'
       "
-      class="window-dialog-container noselect"
+      class="window-dialog-container"
       :style="{
         height: dialog_auto_height,
         width: '800px',
@@ -1708,6 +1708,11 @@ export default {
       if (this.$refs.workflow && this.$refs.workflow.setupJoy)
         this.$refs.workflow.setupJoy();
     });
+    this.event_bus.on("closing_window_plugin", wplugin => {
+      if (this.dialogWindows[0] && this.dialogWindows[0].plugin === wplugin) {
+        this.showPluginDialog = false;
+      }
+    });
     this.updateSize({ width: window.innerWidth });
     if (this.wm) {
       if (this.screenWidth > 800) {
@@ -1746,7 +1751,10 @@ export default {
           this.pm
             .reloadPluginRecursively({ uri: "oeway/ImJoy-Plugins:Welcome" })
             .then(() => {
-              this.showDialog(null, { type: "Welcome" });
+              this.showDialog(null, {
+                type: "Welcome",
+                name: "Welcome to ImJoy",
+              });
             });
         }
         /* global window */
