@@ -1732,6 +1732,18 @@ export default {
       this.showWelcomeDialog = true;
     } else {
       this.startImJoy(this.$route).then(() => {
+        if (!this.pm.plugin_names["Jupyter-Engine-Manager"]) {
+          console.log("Loading Jupyter-Engine-Manager from Gist...");
+          this.pm
+            .reloadPluginRecursively({
+              uri:
+                "https://gist.githubusercontent.com/oeway/7c7a3f07622839b690e2ed0383727a72/raw/Jupyter-Engine.imjoy.html",
+            })
+            .then(() => {
+              console.log("Jupyter-Engine-Manager loaded.");
+            });
+        }
+
         if (!this.pm.plugin_names["ImJoy-Engine-Manager"]) {
           console.log("Loading ImJoy-Engine-Manager from Gist...");
           this.pm
@@ -1740,17 +1752,7 @@ export default {
                 "https://gist.githubusercontent.com/oeway/e9282f27d9446bd4536a2a64018624c5/raw/ImJoy-Engine.imjoy.html",
             })
             .then(() => {
-              console.log("ImJoy-Engine loaded.");
-            });
-        }
-        if (!this.pm.plugin_names["Jupyter-Engine-Manager"]) {
-          this.pm
-            .reloadPluginRecursively({
-              uri:
-                "https://gist.githubusercontent.com/oeway/7c7a3f07622839b690e2ed0383727a72/raw/Jupyter-Engine.imjoy.html",
-            })
-            .then(() => {
-              console.log("Jupyter-Engine loaded.");
+              console.log("ImJoy-Engine-Manager loaded.");
             });
         }
 
@@ -2944,7 +2946,7 @@ export default {
       config.dialog = true;
       config.type = config.type || "imjoy/joy";
       this.showPluginDialog = true;
-      this.dialog_auto_height = "500px";
+      this.dialog_auto_height = "700px";
       this.dialog_window_config.fullscreen =
         config.fullscreen || config.standalone || false;
       return new Promise((resolve, reject) => {
