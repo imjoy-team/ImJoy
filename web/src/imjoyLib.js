@@ -3,7 +3,7 @@ import { WindowManager } from "./windowManager.js";
 
 import { EngineManager } from "./engineManager.js";
 
-import { FileSystemManager } from "./fileSystemManager.js";
+import { FileSystemManager, FileManager } from "./fileSystemManager.js";
 
 import PouchDB from "pouchdb-browser";
 
@@ -22,7 +22,6 @@ export class ImJoy {
     client_id = null,
     config_db = null,
     show_message_callback = null,
-    show_engine_callback = null,
     update_ui_callback = null,
     add_window_callback = null,
   }) {
@@ -37,11 +36,6 @@ export class ImJoy {
     this.client_id = client_id || "imjoy_web_" + randId();
     this.imjoy_api = imjoy_api || {};
     this.update_ui_callback = update_ui_callback || function() {};
-    this.show_engine_callback =
-      show_engine_callback ||
-      function(engine) {
-        console.log("show engine: ", engine);
-      };
     this.show_message_callback =
       show_message_callback ||
       function(msg) {
@@ -57,7 +51,6 @@ export class ImJoy {
       event_bus: this.event_bus,
       config_db: this.config_db,
       show_message_callback: this.show_message_callback,
-      show_engine_callback: this.show_engine_callback,
       client_id: this.client_id,
     });
 
@@ -67,14 +60,19 @@ export class ImJoy {
       add_window_callback: this.add_window_callback,
     });
 
-    this.fm = new FileSystemManager();
+    this.fsm = new FileSystemManager();
+
+    this.fm = new FileManager({
+      event_bus: this.event_bus,
+    });
 
     this.pm = new PluginManager({
       event_bus: this.event_bus,
       config_db: this.config_db,
       engine_manager: this.em,
       window_manager: this.wm,
-      file_system_manager: this.fm,
+      file_system_manager: this.fsm,
+      file_manager: this.fm,
       imjoy_api: this.imjoy_api,
       show_message_callback: this.show_message_callback,
       update_ui_callback: this.update_ui_callback,
@@ -83,7 +81,7 @@ export class ImJoy {
 
   async init() {
     try {
-      await this.fm.init();
+      await this.fsm.init();
       console.log("Successfully initialized the file system.");
     } catch (e) {
       console.error(e);
@@ -91,11 +89,11 @@ export class ImJoy {
         "Failed to initialize file system: " + e.toString()
       );
     }
+    await this.fm.init();
     await this.pm.init();
     await this.pm.loadWorkspaceList();
     try {
       await this.em.init();
-
       console.log("Successfully initialized the engine manager.");
     } catch (e) {
       console.error(e);
@@ -109,22 +107,7 @@ export class ImJoy {
     await this.init();
     if (config.workspace) {
       await this.pm.loadWorkspace(config.workspace);
-      await this.pm.reloadPlugins(false);
-    }
-
-    try {
-      if (config.engine) {
-        await this.em.addEngine(
-          { type: "default", url: config.engine, token: config.token },
-          false
-        );
-        await this.em.getEngineByUrl(config.engine).connect();
-      } else {
-        const connections = this.em.connectAll(true);
-        await connections;
-      }
-    } catch (e) {
-      console.error("Failed to connect the plugin engine(s)", e);
+      await this.pm.reloadPlugins();
     }
   }
 

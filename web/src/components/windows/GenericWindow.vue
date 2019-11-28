@@ -64,6 +64,9 @@ export default {
       },
     },
   },
+  mounted() {
+    this.$emit("init");
+  },
   methods: {
     dataSummary(w) {
       if (Array.isArray(w.data)) {

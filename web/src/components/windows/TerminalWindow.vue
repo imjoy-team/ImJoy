@@ -46,14 +46,11 @@ export default {
   data() {
     return {
       error: false,
-      disconnected: false,
-      engine: null,
       window_height: "500px",
     };
   },
   created() {},
   mounted() {
-    this.engine = this.w.data.engine;
     Terminal.applyAddon(fullscreen);
     Terminal.applyAddon(fit);
     Terminal.applyAddon(webLinks);
@@ -68,86 +65,37 @@ export default {
     this.$nextTick(() => {
       this.fitToscreen();
     });
-    if (this.engine && this.engine.connected) {
-      this.start();
-    } else {
-      term.write("Engine is not connected.\r\n");
-      this.engine.socket.on("connect", this.start);
-      this.engine.socket.on("disconnect", this.disconnect);
-    }
+    this.w.api.on("write", data => {
+      this.term.write(data);
+    });
+    this.w.api.on("error", error => {
+      this.error = error;
+    });
+    this.term.on("key", key => {
+      this.w.api.emit("key", key);
+    });
+    this.term.on("paste", data => {
+      this.w.api.emit("paste", data);
+    });
+    const wait_ms = 50;
+    const fit2screen = debounce(this.fitToscreen, wait_ms);
+    window.addEventListener("resize", fit2screen);
+    document.addEventListener("orientationchange", fit2screen);
+    this.w.api.on("resize", fit2screen);
+    this.w.api.on("refresh", fit2screen);
+    this.$emit("init");
   },
-  beforeDestroy() {
-    if (this.engine && this.engine.socket) {
-      this.engine.socket.removeListener("terminal_output", this.write_terminal);
-      this.engine.socket.removeListener("connect", this.start);
-      this.engine.socket.removeListener("disconnect", this.disconnect);
-    }
-  },
+  beforeDestroy() {},
   methods: {
-    disconnect() {
-      this.term.write("\r\nDisconnected from the plugin engine.\r\n");
-    },
-    start() {
-      if (this.engine && this.engine.socket) {
-        this.engine.socket.emit("start_terminal", {}, ret => {
-          if (ret && ret.success) {
-            this.term.write(ret.message + "\r\n");
-            this.error = null;
-            this.term.on("key", key => {
-              this.engine.socket.emit(
-                "terminal_input",
-                { input: key },
-                error => {
-                  if (error) {
-                    this.error = true;
-                  } else {
-                    this.error = false;
-                  }
-                }
-              );
-            });
-            this.term.on("paste", data => {
-              this.engine.socket.emit("terminal_input", { input: data });
-            });
-            this.engine.socket.on("terminal_output", this.write_terminal);
-            this.disconnected = false;
-            this.$forceUpdate();
-          } else {
-            this.term.write("\r\nFailed to start terminal.\r\n");
-            this.error = true;
-            this.disconnected = true;
-            this.$forceUpdate();
-          }
-          const wait_ms = 50;
-          const fit2screen = debounce(this.fitToscreen, wait_ms);
-          window.onresize = fit2screen;
-          this.w.onResize(fit2screen);
-          this.w.onRefresh(fit2screen);
-        });
-      } else {
-        this.term.write(
-          "\r\nCannot start terminal because engine is not connected.\r\n"
-        );
-        this.error = true;
-        console.error("cannot start terminal because engine is not connected.");
-      }
-    },
-    write_terminal(data) {
-      this.term.write(data.output);
-    },
     fitToscreen() {
       this.window_height = this.$el.clientHeight + "px";
       this.$forceUpdate();
       this.$nextTick(() => {
         this.term.fit();
-        if (this.engine && this.engine.socket) {
-          this.engine.socket.emit("terminal_window_resize", {
-            cols: this.term.cols,
-            rows: this.term.rows,
-          });
-        } else {
-          console.error("engine is not connected.");
-        }
+        this.w.api.emit("fit", {
+          cols: this.term.cols,
+          rows: this.term.rows,
+        });
         this.$forceUpdate();
       });
     },

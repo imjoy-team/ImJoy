@@ -27,7 +27,7 @@ describe("ImJoy.vue", async () => {
   const vm = wrapper.vm; //vm of ImJoy
   const wm = vm.wm; //window_manager
   const pm = vm.pm; //plugin_manager
-  const fm = vm.fm; //file_manager
+  const fsm = vm.fsm; //file_manager
 
   before(function(done) {
     this.timeout(10000);
@@ -148,7 +148,7 @@ describe("ImJoy.vue", async () => {
   }).timeout(20000);
 
   it("should write and read file", done => {
-    fm.init().then(fs => {
+    fsm.init().then(fs => {
       var c = "New File Contents";
       fs.writeFile("/tmp/test.txt", c, function(err) {
         if (err) {

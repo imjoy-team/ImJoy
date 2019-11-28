@@ -20,10 +20,13 @@ import {
 import { parseComponent } from "./pluginParser.js";
 
 import { DynamicPlugin } from "./jailed/jailed.js";
-import { getBackendByType } from "./jailed/backends.js";
+import { getBackendByType } from "./api.js";
 
 import {
-  REGISTER_SCHEMA,
+  OP_SCHEMA,
+  ENGINE_SCHEMA,
+  ENGINE_FACTORY_SCHEMA,
+  FILE_MANAGER_SCHEMA,
   JOY_SCHEMA,
   WINDOW_SCHEMA,
   PLUGIN_SCHEMA,
@@ -33,7 +36,6 @@ import {
 
 import { Joy } from "./joy";
 import { saveAs } from "file-saver";
-import { Engine } from "./engineManager.js";
 
 import Ajv from "ajv";
 const ajv = new Ajv();
@@ -45,6 +47,7 @@ export class PluginManager {
     engine_manager = null,
     window_manager = null,
     file_system_manager = null,
+    file_manager = null,
     imjoy_api = {},
     show_message_callback = null,
     update_ui_callback = null,
@@ -52,7 +55,8 @@ export class PluginManager {
     this.event_bus = event_bus;
     this.em = engine_manager;
     this.wm = window_manager;
-    this.fm = file_system_manager;
+    this.fsm = file_system_manager;
+    this.fm = file_manager;
     this.config_db = config_db;
     assert(this.event_bus, "event bus is not available");
     assert(this.em, "engine manager is not available");
@@ -89,16 +93,7 @@ export class PluginManager {
     this.workflow_list = [];
 
     this.db = null;
-    this.plugins = {};
-    this.plugin_names = {};
-    this.registered = {
-      ops: {},
-      windows: {},
-      extensions: {},
-      inputs: {},
-      outputs: {},
-      loaders: {},
-    };
+    this.init();
     const api_utils_ = imjoy_api.utils;
     this.imjoy_api = {
       alert: window && window.alert,
@@ -148,11 +143,20 @@ export class PluginManager {
       createWindow: this.createWindow,
       run: this.runPlugin,
       call: this.callPlugin,
+      // getPlugins: this.getPlugins,
       getPlugin: this.getPlugin,
+      getFileManager: this.getFileManager,
+      getEngineFactory: this.getEngineFactory,
+      getEngine: this.getEngine,
       setConfig: this.setPluginConfig,
       getConfig: this.getPluginConfig,
       getAttachment: this.getAttachment,
-      onClose: this.onClose,
+      onClose: (plugin, cb) => {
+        console.warn(
+          '`api.onClose` is deprecated, please use `api.on("close", ...)` instead.'
+        );
+        plugin.on("close", cb);
+      },
       utils: {},
     };
     // bind this to api functions
@@ -173,140 +177,91 @@ export class PluginManager {
         this.imjoy_api.utils[k] = api_utils_[k];
       }
     }
+    //expose api to window for debugging
+    window.api = this.imjoy_api;
+    this.event_bus.on("engine_connected", engine => {
+      for (let k in this.plugins) {
+        if (this.plugins.hasOwnProperty(k)) {
+          const plugin = this.plugins[k];
+          if (
+            plugin.config.engine_mode &&
+            (!plugin.engine ||
+              plugin.engine === engine ||
+              plugin.config.engine_mode === engine.name)
+          ) {
+            this.reloadPlugin(plugin);
+          }
+        }
+      }
+    });
   }
 
   getFileUrl(_plugin, config) {
+    console.warn(
+      "`api.getFileUrl` is deprecated, please use `api.getFileManager` (https://imjoy.io/docs/#/api?id=apigetfilemanager) and access `getFileUrl` from the file manager."
+    );
     if (typeof config !== "object" || !config.path) {
       throw "You must pass an object contains keys named `path` and `engine`";
     }
-    _plugin = _plugin || {};
-    config.engine =
-      config.engine === undefined ? _plugin.config.engine : config.engine;
-    const engine =
-      config.engine instanceof Engine
-        ? config.engine
-        : this.em.getEngineByUrl(config.engine);
-    delete config.engine;
-    return new Promise((resolve, reject) => {
-      if (!engine) {
-        reject("Please specify an engine");
-        return;
-      }
-      if (!engine.connected) {
-        reject("Please connect to the Plugin Engine 🚀.");
-        this.showMessage("Please connect to the Plugin Engine 🚀.");
-        return;
-      }
-      engine
-        .getFileUrl(config)
-        .then(ret => {
-          ret = ret || {};
-          if (ret.success) {
-            if (_plugin.log)
-              _plugin.log(`File url created ${config.path}: ${ret.url}`);
-            resolve(ret.url);
-            this.update_ui_callback();
-          } else {
-            ret.error = ret.error || "";
-            this.showMessage(
-              `Failed to get file url for ${config.path} ${ret.error}`
-            );
-            reject(`Failed to get file url for ${config.path} ${ret.error}`);
-            this.update_ui_callback();
-          }
-        })
-        .catch(reject);
-    });
-  }
+    _plugin = _plugin || this.IMJOY_PLUGIN;
 
-  getFilePath(_plugin, config) {
-    if (typeof config !== "object" || !config.url) {
-      throw "You must pass an object contains keys named `url` and `engine`";
+    if (config.engine) {
+      console.warn(
+        "The `engine` option for `api.getFileUrl` is deprecated, please use `file_manager` instead of `engine`."
+      );
+      config.file_manager = config.engine;
+      delete config.engine;
     }
-    console.warn(
-      "WARNING: api.uploadFileToUrl is deprecated and it will be removed soon."
-    );
-    _plugin = _plugin || {};
-    config.engine =
-      config.engine === undefined ? _plugin.config.engine : config.engine;
-    const engine =
-      config.engine instanceof Engine
-        ? config.engine
-        : this.em.getEngineByUrl(config.engine);
-    delete config.engine;
-    return new Promise((resolve, reject) => {
-      if (!engine) {
-        reject("Please specify an engine");
-        return;
-      }
-      if (!engine.connected) {
-        reject("Please connect to the Plugin Engine 🚀.");
-        this.showMessage("Please connect to the Plugin Engine 🚀.");
-        return;
-      }
-      engine
-        .getFilePath(config)
-        .then(ret => {
-          ret = ret || {};
-          if (ret.success) {
-            resolve(ret.path);
-            this.update_ui_callback();
-          } else {
-            ret.error = ret.error || "";
-            this.showMessage(
-              `Failed to get file path for ${config.url} ${ret.error}`
-            );
-            reject(`Failed to get file path for ${config.url} ${ret.error}`);
-            this.update_ui_callback();
-          }
-        })
-        .catch(reject);
-    });
+    if (!config.file_manager) {
+      throw "Please specify a file manager via the `file_manager` option.";
+    }
+    const manager = this.fm.getFileManagerByUrl(config.file_manager);
+    if (!manager) {
+      throw `File manager ${config.file_manager} not found`;
+    }
+
+    if (!manager.connected) {
+      this.showMessage(`File manager (${manager.url}) is not connected.`);
+      throw `File manager (${manager.url}) is not connected.`;
+    }
+
+    return manager.getFileUrl(config);
   }
 
   requestUploadUrl(_plugin, config) {
+    console.warn(
+      "`api.requestUploadUrl` is deprecated, please use `api.getFileManager` (https://imjoy.io/docs/#/api?id=apigetfilemanager) and access `requestUploadUrl` from the file manager."
+    );
     if (typeof config !== "object") {
       throw "You must pass an object contains keys named `engine` and `path` (or `dir`, optionally `overwrite`)";
     }
-    _plugin = _plugin || this.IMJOY_PLUGIN;
-    config.engine =
-      config.engine === undefined ? _plugin.config.engine : config.engine;
-    const engine =
-      config.engine instanceof Engine
-        ? config.engine
-        : this.em.getEngineByUrl(config.engine);
-    delete config.engine;
-    return new Promise((resolve, reject) => {
-      if (!engine) {
-        reject("Please specify an engine");
-        return;
-      }
-      if (!engine.connected) {
-        reject("Please connect to the Plugin Engine 🚀.");
-        this.showMessage("Please connect to the Plugin Engine 🚀.");
-        return;
-      }
 
-      engine
-        .requestUploadUrl({
-          path: config.path,
-          overwrite: config.overwrite,
-          dir: config.dir,
-        })
-        .then(ret => {
-          ret = ret || {};
-          if (ret.success) {
-            if (_plugin.log) _plugin.log(`Uploaded url created: ${ret.url}`);
-            resolve(ret.url);
-            this.update_ui_callback();
-          } else {
-            ret.error = ret.error || "UNKNOWN";
-            this.showMessage(`Failed to request file url, Error: ${ret.error}`);
-            reject(`Failed to request file url, Error: ${ret.error}`);
-            this.update_ui_callback();
-          }
-        })
-        .catch(reject);
+    _plugin = _plugin || this.IMJOY_PLUGIN;
+
+    if (config.engine) {
+      console.warn(
+        "The `engine` option for `api.requestUploadUrl` is deprecated, please use `file_manager` instead of `engine`."
+      );
+      config.file_manager = config.engine;
+      delete config.engine;
+    }
+    if (!config.file_manager) {
+      throw "Please specify a file manager via the `file_manager` option.";
+    }
+    const manager = this.fm.getFileManagerByUrl(config.file_manager);
+    if (!manager) {
+      throw `File manager ${config.file_manager} not found`;
+    }
+
+    if (!manager.connected) {
+      this.showMessage(`File manager (${manager.url}) is not connected.`);
+      throw `File manager (${manager.url}) is not connected.`;
+    }
+
+    return manager.requestUploadUrl({
+      path: config.path,
+      overwrite: config.overwrite,
+      dir: config.dir,
     });
   }
 
@@ -329,6 +284,9 @@ export class PluginManager {
       inputs: {},
       outputs: {},
       loaders: {},
+      engines: {},
+      engine_factories: {},
+      file_managers: {},
     };
   }
 
@@ -758,7 +716,7 @@ export class PluginManager {
     }
   }
 
-  reloadPlugins(skip_native_python = false) {
+  reloadPlugins() {
     return new Promise((resolve, reject) => {
       if (this.plugins) {
         for (let k in this.plugins) {
@@ -806,9 +764,6 @@ export class PluginManager {
                 }
                 config.installed = true;
                 this.installed_plugins.push(config);
-                if (skip_native_python && config.type === "native-python") {
-                  continue;
-                }
                 this.reloadPlugin(config).catch(e => {
                   console.error(config, e);
                   this.showMessage(`<${config.name}>: ${e}`);
@@ -918,7 +873,7 @@ export class PluginManager {
 
       this.getPluginFromUrl(uri, scoped_plugins)
         .then(async config => {
-          if (config.type === "native-python") {
+          if (config.engine_mode) {
             const old_plugin = this.plugin_names[config.name];
             if (old_plugin) {
               config.engine_mode = old_plugin.config.engine_mode;
@@ -931,8 +886,11 @@ export class PluginManager {
             return;
           }
           if (!getBackendByType(config.type)) {
-            reject("Unsupported plugin type: " + config.type);
-            return;
+            console.warn(
+              `Installed plugin ${config.name} with unsupported plugin type: ${
+                config.type
+              }`
+            );
           }
           config.tag =
             tag ||
@@ -1001,7 +959,7 @@ export class PluginManager {
 
       this.getPluginFromUrl(uri, scoped_plugins)
         .then(async config => {
-          if (config.type === "native-python") {
+          if (config.engine_mode) {
             const old_plugin = this.plugin_names[config.name];
             if (old_plugin) {
               config.engine_mode = old_plugin.config.engine_mode;
@@ -1014,8 +972,11 @@ export class PluginManager {
             return;
           }
           if (!getBackendByType(config.type)) {
-            reject("Unsupported plugin type: " + config.type);
-            return;
+            console.warn(
+              `Installed plugin ${config.name} with unsupported plugin type: ${
+                config.type
+              }`
+            );
           }
           config.tag =
             tag ||
@@ -1174,6 +1135,9 @@ export class PluginManager {
   reloadPlugin(pconfig) {
     return new Promise((resolve, reject) => {
       try {
+        if (pconfig instanceof DynamicPlugin) {
+          pconfig = pconfig.config;
+        }
         this.unloadPlugin(pconfig, true);
         const template = this.parsePluginCode(pconfig.code, {
           engine_mode: pconfig.engine_mode,
@@ -1263,61 +1227,14 @@ export class PluginManager {
       }
     });
   }
-
-  async reloadPythonPlugins(engine) {
-    for (let p of this.installed_plugins) {
-      if (p.type !== "native-python") {
-        continue;
-      }
-      try {
-        if (p.engine_mode === engine.id) {
-          await this.reloadPlugin(p);
-        } else if (!p.engine_mode || p.engine_mode === "auto") {
-          const running_plugins =
-            Object.values(this.plugins).filter(pl => {
-              return pl.name === p.name;
-            }) || [];
-
-          const running_plugin = running_plugins[0];
-          if (
-            running_plugin &&
-            (!running_plugin.config.engine ||
-              (!running_plugin.initializing && running_plugin._disconnected))
-          ) {
-            await this.reloadPlugin(p);
-          } else if (!running_plugin) {
-            await this.reloadPlugin(p);
-          }
-        }
-      } catch (e) {
-        console.error(e);
-        continue;
-      }
+  getBadges(p) {
+    const backend = getBackendByType(p.type);
+    if (backend) {
+      return backend.icon || "";
+    } else {
+      return "🚀";
     }
   }
-
-  async unloadPythonPlugins(engine) {
-    for (let k in this.plugins) {
-      if (this.plugins.hasOwnProperty(k)) {
-        const plugin = this.plugins[k];
-        if (
-          plugin.type === "native-python" &&
-          plugin.config.engine === engine
-        ) {
-          if (
-            plugin.config.engine_mode === "auto" &&
-            plugin._disconnected &&
-            plugin.code
-          ) {
-            await this.reloadPlugin(plugin);
-          } else {
-            this.unloadPlugin(plugin, false);
-          }
-        }
-      }
-    }
-  }
-
   parsePluginCode(code, overwrite_config) {
     overwrite_config = overwrite_config || {};
     try {
@@ -1365,7 +1282,6 @@ export class PluginManager {
       config.id = config.name.trim().replace(/ /g, "_") + "_" + randId();
       config.runnable = config.runnable === false ? false : true;
       config.requirements = config.requirements || [];
-      config.engine_mode = overwrite_config.engine_mode;
 
       for (let i = 0; i < CONFIGURABLE_FIELDS.length; i++) {
         const obj = config[CONFIGURABLE_FIELDS[i]];
@@ -1391,6 +1307,23 @@ export class PluginManager {
         const error = PLUGIN_SCHEMA.errors;
         console.error("Invalid plugin config: " + config.name, error);
         throw error;
+      }
+      const backend = getBackendByType(config.type);
+      config.badges = this.getBadges(config);
+      if (backend) {
+        config.engine_mode = null;
+      } else {
+        config.engine_mode = overwrite_config.engine_mode || "auto";
+      }
+      if (
+        config.flags &&
+        (config.flags.indexOf("engine") >= 0 ||
+          config.flags.indexOf("engine-factory") >= 0)
+      ) {
+        config.badges = config.badges + "⚙";
+      }
+      if (config.flags && config.flags.indexOf("file-manager") >= 0) {
+        config.badges = config.badges + "📁";
       }
       return config;
     } catch (e) {
@@ -1436,9 +1369,15 @@ export class PluginManager {
       );
 
       // create a proxy plugin
-      const plugin = new DynamicPlugin(tconfig, _interface, this.fm.api, true);
+      const plugin = new DynamicPlugin(
+        tconfig,
+        _interface,
+        this.fsm.api,
+        null,
+        true
+      );
       plugin.api = {
-        __jailed_type__: "plugin_api",
+        __as_interface__: true,
         __id__: plugin.id,
         setup: async () => {},
         run: async my => {
@@ -1450,7 +1389,7 @@ export class PluginManager {
           c.data = (my && my.data) || {};
           c.config = (my && my.config) || {};
           c.id = my && my.id;
-          return await this.createWindow(null, c);
+          await this.createWindow(null, c);
         },
       };
       try {
@@ -1464,6 +1403,17 @@ export class PluginManager {
       }
     });
   }
+
+  // registerExtension(exts, plugin) {
+  //   for (let i = 0; i < exts.length; i++) {
+  //     exts[i] = exts[i].replace(".", "");
+  //     if (this.registered.extensions[exts[i]]) {
+  //       this.registered.extensions[exts[i]].push(plugin);
+  //     } else {
+  //       this.registered.extensions[exts[i]] = [plugin];
+  //     }
+  //   }
+  // }
 
   loadPlugin(template, rplugin) {
     template = _clone(template);
@@ -1479,30 +1429,34 @@ export class PluginManager {
         config.initialized = true;
       }
       config._id = template._id;
-      config.engine_mode = template.engine_mode || "auto";
 
-      if (template.type === "native-python") {
-        const engine = this.em.getEngine(config.engine_mode);
+      let engine = null;
+      if (!getBackendByType(template.type)) {
+        engine = this.em.findEngine(template);
         if (!engine || !engine.connected) {
-          console.error("Please connect to the Plugin Engine 🚀.");
-          config.engine = null;
+          console.error("Please connect to the Plugin Engine 🚀");
         } else {
-          config.engine = engine;
+          this.showMessage(`Connected to 🚀 ${engine.name}`);
         }
-      } else {
-        config.engine = null;
       }
+
       const tconfig = _.assign({}, template, config);
+
       tconfig.workspace = this.selected_workspace;
       const _interface = _.assign(
         {
           TAG: tconfig.tag,
           WORKSPACE: this.selected_workspace,
-          ENGINE_URL: (config.engine && config.engine.url) || undefined,
+          ENGINE_URL: (engine && engine.url) || undefined,
         },
         this.imjoy_api
       );
-      const plugin = new DynamicPlugin(tconfig, _interface, this.fm.api);
+      const plugin = new DynamicPlugin(
+        tconfig,
+        _interface,
+        this.fsm.api,
+        engine
+      );
       plugin._log_history.push(
         `Loading plugin ${plugin.id} (TAG=${_interface.TAG}, WORKSPACE=${
           _interface.WORKSPACE
@@ -1531,9 +1485,9 @@ export class PluginManager {
         if (template.type) {
           this.register(plugin, template);
         }
-        if (template.extensions && template.extensions.length > 0) {
-          this.registerExtension(template.extensions, plugin);
-        }
+        // if (template.extensions && template.extensions.length > 0) {
+        //   this.registerExtension(template.extensions, plugin);
+        // }
         if (plugin.config.resumed && plugin.api.resume) {
           plugin._log_history.push(`Resuming plugin.`);
           plugin.api
@@ -1573,12 +1527,10 @@ export class PluginManager {
               });
             });
         } else {
-          this.showMessage(
+          console.warn(
             `No "setup()" function is defined in plugin "${plugin.name}".`
           );
-          reject(
-            `No "setup()" function is defined in plugin "${plugin.name}".`
-          );
+          resolve(plugin);
         }
       });
       plugin.whenFailed(e => {
@@ -1601,62 +1553,35 @@ export class PluginManager {
     });
   }
 
-  normalizeUI(ui) {
-    if (!ui) {
-      return "";
-    }
-    let normui = "";
-    if (Array.isArray(ui)) {
-      for (let it of ui) {
-        if (typeof it === "string") normui = normui + it + "<br>";
-        else if (typeof it === "object") {
-          for (let k in it) {
-            if (typeof it[k] === "string")
-              normui = normui + k + ": " + it[k] + "<br>";
-            else normui = normui + k + ": " + JSON.stringify(it[k]) + "<br>";
-          }
-        } else normui = normui + JSON.stringify(it) + "<br>";
-      }
-    } else if (typeof ui === "object") {
-      throw "ui can not be an object, you can only use a string or an array.";
-    } else if (typeof ui === "string") {
-      normui = ui.trim();
-    } else {
-      normui = "";
-      console.log("Warining: removing ui string.");
-    }
-    return normui;
-  }
-
   renderWindow(pconfig) {
     return new Promise((resolve, reject) => {
       const tconfig = _.assign({}, pconfig.plugin, pconfig);
       tconfig.workspace = this.selected_workspace;
       const imjoy_api = _.assign({}, this.imjoy_api);
-      imjoy_api.focus = () => {
-        pconfig.focus();
-      };
-      imjoy_api.close = () => {
-        pconfig.close();
-      };
-      imjoy_api.refresh = () => {
-        pconfig.refresh();
-      };
-      imjoy_api.resize = () => {
-        pconfig.resize();
-      };
-      imjoy_api.onRefresh = (_, handler) => {
-        pconfig.onRefresh(handler);
-      };
-      imjoy_api.onResize = (_, handler) => {
-        pconfig.onResize(handler);
-      };
+      for (let k in pconfig.api) {
+        if (pconfig.api.hasOwnProperty(k)) {
+          imjoy_api[k] = function() {
+            var args = Array.prototype.slice.call(arguments, 1);
+            pconfig.api[k].apply(pconfig, args);
+          };
+        }
+      }
+
+      // imjoy_api.on = (_, name, handler) => {
+      //   pconfig.api.on(name, handler);
+      // };
+      // imjoy_api.off = (_, name, handler) => {
+      //   pconfig.api.off(name, handler);
+      // };
+      // imjoy_api.emit = (_, name, data) => {
+      //   pconfig.api.emit(name, data);
+      // };
 
       const _interface = _.assign(
         { TAG: tconfig.tag, WORKSPACE: this.selected_workspace },
         imjoy_api
       );
-      const plugin = new DynamicPlugin(tconfig, _interface, this.fm.api);
+      const plugin = new DynamicPlugin(tconfig, _interface, this.fsm.api);
 
       plugin.whenConnected(() => {
         if (!pconfig.standalone && pconfig.focus) pconfig.focus();
@@ -1668,13 +1593,6 @@ export class PluginManager {
         plugin.api
           .setup()
           .then(() => {
-            plugin.api.focus = pconfig.focus;
-            plugin.api.close = pconfig.close;
-            plugin.api.refresh = pconfig.refresh;
-            plugin.api.resize = pconfig.resize;
-            plugin.api.onRefresh = pconfig.onRefresh;
-            plugin.api.onResize = pconfig.onResize;
-
             //asuming the data._op is passed from last op
             pconfig.data = pconfig.data || {};
             pconfig.data._source_op = pconfig.data && pconfig.data._op;
@@ -1856,6 +1774,7 @@ export class PluginManager {
                 p.uri = manifest.uri_root + "/" + p.uri;
               }
               p._id = p._id || p.name.replace(/ /g, "_");
+              p.badges = this.getBadges(p);
             }
             resolve(manifest);
           } else {
@@ -1877,21 +1796,21 @@ export class PluginManager {
     }
   }
 
-  //#################ImJoy API functions##################
-  register(plugin, config) {
+  registerOp(plugin, config) {
     try {
       if (!plugin) throw "Plugin not found.";
       config = _clone(config);
       config.name = config.name || plugin.name;
       config.show_panel = config.show_panel || false;
-      config.ui = this.normalizeUI(config.ui);
       if (plugin.name === config.name) {
         config.ui = config.ui || plugin.config.description;
       }
       config.inputs = config.inputs || null;
       config.outputs = config.outputs || null;
-      if (!REGISTER_SCHEMA(config)) {
-        const error = REGISTER_SCHEMA.errors;
+      config.run = config.run || null;
+      config.run = config.run || (plugin && plugin.api && plugin.api.run);
+      if (!OP_SCHEMA(config)) {
+        const error = OP_SCHEMA.errors;
         console.error("Error occured during registering " + config.name, error);
         throw error;
       }
@@ -1920,17 +1839,9 @@ export class PluginManager {
       } else if (config.type === "iframe") {
         joy_template.tags.push("iframe");
       }
-      let run = null;
-      if (config.run && typeof config.run === "function") {
-        run = config.run;
-      } else {
-        run = plugin && plugin.api && plugin.api.run;
-      }
+      let run = config.run;
+
       if (!plugin || !run) {
-        console.log(
-          "WARNING: no run function found in the config, this op won't be able to do anything: " +
-            config.name
-        );
         joy_template.onexecute = () => {
           plugin.log("WARNING: no run function defined.");
         };
@@ -2090,17 +2001,17 @@ export class PluginManager {
     }
   }
 
-  unregister(plugin, config) {
+  unregisterOp(plugin, config) {
     if (!plugin) throw "Plugin not found.";
     const plugin_name = plugin.name;
     if (!config) {
       if (plugin.ops && Object.keys(plugin.ops).length > 0) {
         for (let k in plugin.ops) {
           const op = plugin.ops[k];
-          if (op.name) this.unregister(plugin, op.name);
+          if (op.name) this.unregisterOp(plugin, op.name);
         }
       }
-      if (plugin.name) this.unregister(plugin, plugin.name);
+      if (plugin.name) this.unregisterOp(plugin, plugin.name);
       return;
     } else {
       const op_name = typeof config === "string" ? config : config.name;
@@ -2118,6 +2029,72 @@ export class PluginManager {
     }
   }
 
+  //#################ImJoy API functions##################
+  register(plugin, config) {
+    if (config.type === "engine") {
+      assert(
+        plugin.config.flags && plugin.config.flags.indexOf("engine") >= 0,
+        "Please add `engine` to `config.flags` before registering an engine."
+      );
+      if (!ENGINE_SCHEMA(config)) {
+        const error = ENGINE_SCHEMA.errors;
+        console.error("Error occured registering engine ", config, error);
+        throw error;
+      }
+      this.em.register(config);
+      this.registered.engines[config.name] = config;
+      plugin.on("close", () => {
+        this.em.unregister(config);
+      });
+    } else if (config.type === "engine-factory") {
+      assert(
+        plugin.config.flags &&
+          plugin.config.flags.indexOf("engine-factory") >= 0,
+        "Please add `engine-factory` to `config.flags` before registering an engine factory."
+      );
+      if (!ENGINE_FACTORY_SCHEMA(config)) {
+        const error = ENGINE_FACTORY_SCHEMA.errors;
+        console.error(
+          "Error occured registering engine factory",
+          config,
+          error
+        );
+        throw error;
+      }
+      this.em.registerFactory(config);
+      this.registered.engine_factories[config.name] = config;
+      plugin.on("close", () => {
+        this.em.unregisterFactory(config);
+      });
+    } else if (config.type === "file-manager") {
+      assert(
+        plugin.config.flags && plugin.config.flags.indexOf("file-manager") >= 0,
+        "Please add `file-manager` to `config.flags` before registering a file manager."
+      );
+      if (!FILE_MANAGER_SCHEMA(config)) {
+        const error = FILE_MANAGER_SCHEMA.errors;
+        console.error("Error occured registering file manager", config, error);
+        throw error;
+      }
+      this.fm.register(config);
+    } else {
+      this.registerOp(plugin, config);
+    }
+  }
+
+  unregister(plugin, config) {
+    config = config || plugin;
+    if (config.type === "engine") {
+      this.em.unregister(config);
+    } else if (config.type === "engine-factory") {
+      this.em.unregisterFactory(config);
+    } else if (config.type === "file-manager") {
+      this.fm.unregister(config);
+    } else {
+      this.unregisterOp(plugin, config);
+    }
+  }
+
   createWindow(_plugin, wconfig) {
     return new Promise((resolve, reject) => {
       wconfig.data = wconfig.data || null;
@@ -2131,64 +2108,38 @@ export class PluginManager {
       if (wconfig.type && wconfig.type.startsWith("imjoy/")) {
         wconfig.id = "imjoy_" + randId();
         wconfig.window_type = wconfig.type;
-
-        if (
-          wconfig.window_container === "window-dialog-container" &&
-          wconfig.render
-        ) {
-          this.wm.setupCallbacks(wconfig);
-          wconfig.render(wconfig);
-
-          const window_plugin_apis = {
-            __jailed_type__: "plugin_api",
-            __id__: wconfig.id,
-            run: config => {
-              for (let k in config) {
-                wconfig[k] = config[k];
-              }
-            },
-            focus: wconfig.focus,
-            close: wconfig.close,
-            onClose: wconfig.onClose,
-            refresh: wconfig.refresh,
-            onRefresh: wconfig.onRefresh,
-            resize: wconfig.resize,
-            onResize: wconfig.onResize,
-          };
-          resolve(window_plugin_apis);
-        } else {
-          this.wm.addWindow(wconfig).then(wid => {
-            setTimeout(() => {
-              wconfig.refresh();
-              const window_plugin_apis = {
-                __jailed_type__: "plugin_api",
-                __id__: wid,
-                run: new_config => {
-                  for (let k in new_config) {
-                    wconfig[k] = new_config[k];
-                  }
-                },
-                focus: wconfig.focus,
-                close: wconfig.close,
-                onClose: wconfig.onClose,
-                refresh: wconfig.refresh,
-                onRefresh: wconfig.onRefresh,
-                resize: wconfig.resize,
-                onResize: wconfig.onResize,
-              };
-              resolve(window_plugin_apis);
-            }, 0);
-          });
-        }
+        this.wm
+          .addWindow(wconfig)
+          .then(wid => {
+            wconfig.api.on(
+              "ready",
+              () => {
+                wconfig.refresh();
+                wconfig.api = wconfig.api || {};
+                wconfig.api = Object.assign(wconfig.api, {
+                  __as_interface__: true,
+                  __id__: wid,
+                  run: new_config => {
+                    for (let k in new_config) {
+                      wconfig[k] = new_config[k];
+                    }
+                  },
+                });
+                resolve(wconfig.api);
+              },
+              true
+            );
+          })
+          .catch(reject);
       } else {
         const window_config = this.registered.windows[wconfig.type];
         if (!window_config) {
           console.error(
-            "no plugin registered for window type: " + wconfig.type,
+            "No plugin registered for window type: " + wconfig.type,
             this.registered.windows
           );
-          reject("no plugin registered for window type: " + wconfig.type);
-          throw "no plugin registered for window type: " + wconfig.type;
+          reject("No plugin registered for window type: " + wconfig.type);
+          throw "No plugin registered for window type: " + wconfig.type;
         }
         const pconfig = wconfig;
         //generate a new window id
@@ -2217,15 +2168,19 @@ export class PluginManager {
           throw error;
         }
         if (pconfig.window_container) {
-          this.wm.setupCallbacks(wconfig);
+          this.wm.setupCallbacks(pconfig);
           setTimeout(() => {
             this.renderWindow(pconfig)
               .then(wplugin => {
-                pconfig.refresh();
-                pconfig.onClose(async () => {
+                wplugin.api.emit(
+                  "window_size_changed",
+                  pconfig.$el.getBoundingClientRect()
+                );
+                wplugin.api.refresh();
+                wplugin.api.on("close", async () => {
+                  this.event_bus.emit("closing_window_plugin", wplugin);
                   await wplugin.terminate();
                 });
-
                 resolve(wplugin.api);
               })
               .catch(reject);
@@ -2237,7 +2192,8 @@ export class PluginManager {
               pconfig.refresh();
               this.renderWindow(pconfig)
                 .then(wplugin => {
-                  pconfig.onClose(async () => {
+                  pconfig.api.on("close", async () => {
+                    this.event_bus.emit("closing_window_plugin", wplugin);
                     await wplugin.terminate();
                   });
                   pconfig.loading = false;
@@ -2271,12 +2227,55 @@ export class PluginManager {
     }
   }
 
+  async getPlugins(_plugin) {
+    const ps = [];
+    for (let k in this.plugins) {
+      if (this.plugins.hasOwnProperty(k)) {
+        // if (this.plugins[k] === _plugin) continue;
+        ps.push({
+          name: this.plugins[k].name,
+          config: this.plugins[k].config,
+          api: this.plugins[k].api,
+        });
+      }
+    }
+    console.log(ps);
+    return ps;
+  }
+
   async getPlugin(_plugin, plugin_name) {
     const target_plugin = this.plugin_names[plugin_name];
     if (target_plugin) {
       return target_plugin.api;
     } else {
       throw `plugin with type ${plugin_name} not found.`;
+    }
+  }
+
+  async getFileManager(_plugin, file_manager_url) {
+    const manager = this.fm.getFileManagerByUrl(file_manager_url);
+    if (manager) {
+      return manager.api;
+    } else {
+      throw `file manager with url ${file_manager_url} not found.`;
+    }
+  }
+
+  async getEngine(_plugin, engine_url) {
+    const engine = this.em.getEngineByUrl(engine_url);
+    if (engine) {
+      return engine.api;
+    } else {
+      throw `engine with url ${engine_url} not found.`;
+    }
+  }
+
+  async getEngineFactory(_plugin, factory_name) {
+    const factory = this.em.getFactory(factory_name);
+    if (factory) {
+      return factory.api;
+    } else {
+      throw `engine factory with name ${factory_name} not found.`;
     }
   }
 
@@ -2325,10 +2324,6 @@ export class PluginManager {
     } else {
       return null;
     }
-  }
-
-  onClose(_plugin, cb) {
-    _plugin.onClose(cb);
   }
 
   async checkPluginUpdate(plugin) {

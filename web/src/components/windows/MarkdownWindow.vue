@@ -46,11 +46,7 @@
             <h2>
               <md-icon v-if="plugin_info.icon">{{ plugin_info.icon }}</md-icon
               ><md-icon v-else>extension</md-icon>
-              {{
-                plugin_info.type === "native-python"
-                  ? plugin_info.name + " 🚀"
-                  : plugin_info.name
-              }}
+              {{ plugin_info.name + " " + plugin_info.badges }}
             </h2>
           </div>
           <div class="md-toolbar-section-end">
@@ -110,12 +106,21 @@ export default {
     marked.setOptions({
       renderer: renderer,
     });
+    DOMPurify.addHook("afterSanitizeAttributes", function(node) {
+      // set all elements owning target to target=_blank
+      if ("target" in node) {
+        node.setAttribute("target", "_blank");
+        // prevent https://www.owasp.org/index.php/Reverse_Tabnabbing
+        node.setAttribute("rel", "noopener noreferrer");
+      }
+    });
     this.sanitizedMarked = mk => {
       return DOMPurify.sanitize(marked(mk));
     };
   },
   mounted() {
     this.plugin_info = this.w && this.w.data && this.w.data.plugin_info;
+    this.$emit("init");
   },
 };
 </script>

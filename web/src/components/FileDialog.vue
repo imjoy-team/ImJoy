@@ -19,25 +19,25 @@
     <md-dialog-content>
       <md-button
         style="text-transform: none;"
-        v-show="show_all_engines && engine.connected"
-        :key="engine.id"
-        v-for="engine in engines"
-        :class="selected_engine === engine ? 'md-raised' : ''"
-        @click="selectEngine(engine)"
+        v-show="show_all_file_managers && file_manager.connected"
+        :key="file_manager.id"
+        v-for="file_manager in file_managers"
+        :class="selected_file_manager === file_manager ? 'md-raised' : ''"
+        @click="selectFileManager(file_manager)"
       >
-        {{ engine.name }}
+        {{ file_manager.name }}
       </md-button>
       <div class="loading-info">
         <h5 v-if="dropping">Drop files to upload to {{ root }}</h5>
       </div>
       <ul
-        :disabled="!selected_engine || !selected_engine.connected"
+        :disabled="!selected_file_manager || !selected_file_manager.connected"
         :class="dropping ? 'dropping-files' : ''"
-        v-if="selected_engine && file_tree"
+        v-if="selected_file_manager && file_tree"
       >
         <file-item
           :model="file_tree"
-          :engine="selected_engine"
+          :file_manager="selected_file_manager"
           :root="root"
           :selected="file_tree_selection"
           @load="loadFile"
@@ -48,10 +48,10 @@
       </ul>
       <div
         class="loading loading-lg"
-        v-else-if="selected_engine && selected_engine.connected"
+        v-else-if="selected_file_manager && selected_file_manager.connected"
       ></div>
       <p v-else>
-        No plugin engine is available.
+        No file manager is available.
       </p>
     </md-dialog-content>
 
@@ -116,14 +116,8 @@
 export default {
   name: "file-dialog",
   props: {
-    getFileUrl: Function,
-    listFiles: Function,
-    removeFiles: Function,
-    mode: String,
-    engines: Array,
-    requestUploadUrl: Function,
+    file_managers: Array,
     uploadFileToUrl: Function,
-    downloadFileFromUrl: Function,
   },
   data: function() {
     return {
@@ -135,8 +129,8 @@ export default {
       file_tree: null,
       resolve: null,
       reject: null,
-      selected_engine: null,
-      show_all_engines: true,
+      selected_file_manager: null,
+      show_all_file_managers: true,
       dropping: false,
       loading: false,
       status_text: "Drag and drop here to upload files",
@@ -159,17 +153,17 @@ export default {
     }
   },
   computed: {
-    no_engine_available: function() {
-      if (!this.engines) return true;
+    no_file_manager_available: function() {
+      if (!this.file_managers) return true;
       else {
-        let engine_available = false;
-        for (let engine of this.engines) {
-          if (engine.connected) {
-            engine_available = true;
+        let file_manager_available = false;
+        for (let file_manager of this.file_managers) {
+          if (file_manager.connected) {
+            file_manager_available = true;
             break;
           }
         }
-        return !engine_available;
+        return !file_manager_available;
       }
     },
   },
@@ -178,12 +172,12 @@ export default {
       if (!this.show_) {
         return;
       }
-      this.status_text = "requesting upload url from the engine...";
-      const url = await this.requestUploadUrl(null, {
+      this.status_text = "requesting upload url from the file_manager...";
+      const url = await this.selected_file_manager.requestUploadUrl({
         dir: this.root,
         path: f.relativePath,
         overwrite: true,
-        engine: this.selected_engine.url,
+        file_manager: this.selected_file_manager.url,
       });
       console.log("loading file to url", url);
       this.status_text = progress_text;
@@ -208,10 +202,17 @@ export default {
             console.log("skipping file: " + files[i].relativePath);
             continue;
           }
-          await this.upload(
-            files[i],
-            `Uploading ${i + 1}/${files.length}: ${files[i].name}`
-          );
+          if (this.selected_file_manager.putFile) {
+            await this.selected_file_manager.putFile(
+              files[i],
+              `Uploading ${i + 1}/${files.length}: ${files[i].name}`
+            );
+          } else {
+            await this.upload(
+              files[i],
+              `Uploading ${i + 1}/${files.length}: ${files[i].name}`
+            );
+          }
         }
       } catch (e) {
         this.status_text =
@@ -249,34 +250,29 @@ export default {
       this.$forceUpdate();
     },
     refreshList() {
-      this.listFiles(
-        this.selected_engine,
-        this.root,
-        this.options.type,
-        this.options.recursive
-      ).then(tree => {
-        this.root = tree.path;
-        this.file_tree = tree;
-        this.$forceUpdate();
-      });
+      this.selected_file_manager
+        .listFiles(this.root, this.options.type, this.options.recursive)
+        .then(tree => {
+          this.root = tree.path;
+          this.file_tree = tree;
+          this.$forceUpdate();
+        });
     },
     go() {
       const path = prompt("Go to the folder", this.root);
       if (!path || path == this.root) return;
-      this.listFiles(this.selected_engine, path, "dir", false)
+      this.selected_file_manager
+        .listFiles(path, "dir", false)
         .then(tree => {
           this.root = tree.path;
           this.file_tree = tree;
-          this.listFiles(
-            this.selected_engine,
-            tree.path,
-            this.options.type,
-            this.options.recursive
-          ).then(tree => {
-            this.root = tree.path;
-            this.file_tree = tree;
-            this.$forceUpdate();
-          });
+          this.selected_file_manager
+            .listFiles(tree.path, this.options.type, this.options.recursive)
+            .then(tree => {
+              this.root = tree.path;
+              this.file_tree = tree;
+              this.$forceUpdate();
+            });
           this.$forceUpdate();
         })
         .catch(e => {
@@ -289,16 +285,13 @@ export default {
           this.go();
           return;
         }
-        this.listFiles(
-          this.selected_engine,
-          f.path,
-          this.options.type,
-          this.options.recursive
-        ).then(tree => {
-          this.root = tree.path;
-          this.file_tree = tree;
-          this.$forceUpdate();
-        });
+        this.selected_file_manager
+          .listFiles(f.path, this.options.type, this.options.recursive)
+          .then(tree => {
+            this.root = tree.path;
+            this.file_tree = tree;
+            this.$forceUpdate();
+          });
       } else {
         this.show_ = false;
         if (
@@ -327,13 +320,17 @@ export default {
         this.options.return_object === undefined
           ? true
           : this.options.return_object;
-      if (this.options.engine) {
-        this.show_all_engines = false;
-        this.selected_engine = this.options.engine;
-      } else {
-        this.show_all_engines = true;
-        this.selected_engine = this.engines[Object.keys(this.engines)[0]];
-      }
+      this.$nextTick(() => {
+        if (this.options.file_manager) {
+          this.show_all_file_managers = false;
+          this.selected_file_manager = this.options.file_manager;
+        } else {
+          this.show_all_file_managers = true;
+          this.selected_file_manager = this.file_managers[0];
+        }
+        this.refreshList();
+      });
+
       if (this.options.type != "file" && this.options.root) {
         this.file_tree_selection = this.options.root;
       } else {
@@ -344,7 +341,10 @@ export default {
           // user selected
           this.resolve = path => {
             if (this.options.return_object) {
-              resolve2({ path: path, engine: this.selected_engine.url });
+              resolve2({
+                path: path,
+                file_manager: this.selected_file_manager.url,
+              });
             } else {
               resolve2(path);
             }
@@ -369,15 +369,16 @@ export default {
           // user selected
           this.resolve = paths => {
             if (typeof paths === "string") {
-              this.getFileUrl(_plugin, {
-                path: paths,
-                engine: this.selected_engine.url,
-              })
+              this.selected_file_manager
+                .getFileUrl({
+                  path: paths,
+                  file_manager: this.selected_file_manager.url,
+                })
                 .then(url => {
                   if (this.options.return_object) {
                     resolve2({
                       url: url,
-                      engine: this.selected_engine.url,
+                      file_manager: this.selected_file_manager.url,
                       path: paths,
                     });
                   } else {
@@ -389,9 +390,9 @@ export default {
               const ps = [];
               for (let path of paths) {
                 ps.push(
-                  this.getFileUrl(_plugin, {
+                  this.selected_file_manager.getFileUrl({
                     path: path,
-                    engine: this.selected_engine.url,
+                    file_manager: this.selected_file_manager.url,
                   })
                 );
               }
@@ -400,7 +401,7 @@ export default {
                   if (this.options.return_object) {
                     resolve2({
                       url: urls,
-                      engine: this.selected_engine.url,
+                      file_manager: this.selected_file_manager.url,
                       path: paths,
                     });
                   } else {
@@ -414,32 +415,32 @@ export default {
           reject2("unsupported uri_type: " + this.options.uri_type);
         }
         this.root = this.options.root;
-        if (this.show_all_engines) {
-          for (let e of this.engines) {
+        if (this.show_all_file_managers) {
+          for (let e of this.file_managers) {
             if (e.connected) {
-              this.selectEngine(e);
+              this.selectFileManager(e);
               break;
             }
           }
         } else {
-          this.selectEngine(this.selected_engine);
+          this.selectFileManager(this.selected_file_manager);
         }
         this.dropping = false;
         this.loading_progress = 0;
         this.status_text = "Drag and drop here to upload files";
       });
     },
-    selectEngine(engine) {
+    selectFileManager(file_manager) {
       return new Promise((resolve, reject) => {
-        this.selected_engine = engine;
+        this.selected_file_manager = file_manager;
         this.file_tree = null;
         this.$forceUpdate();
-        this.listFiles(
-          this.selected_engine,
-          this.options.root,
-          this.options.type,
-          this.options.recursive
-        )
+        this.selected_file_manager
+          .listFiles(
+            this.options.root,
+            this.options.type,
+            this.options.recursive
+          )
           .then(tree => {
             this.root = tree.path;
             this.file_tree = tree;
@@ -464,8 +465,7 @@ export default {
         this.file_tree_selection = null;
         this.file_tree_selection_info = null;
         for (let f of files) {
-          await this.removeFiles(
-            this.selected_engine,
+          await this.selected_file_manager.removeFiles(
             f.path,
             f.target.type,
             this.options.recursive
@@ -503,10 +503,10 @@ export default {
       if (!this.show_) {
         return;
       }
-      this.status_text = "requesting upload url from the engine...";
-      const url = await this.getFileUrl(null, {
+      this.status_text = "requesting upload url from the file_manager...";
+      const url = await this.selected_file_manager.getFileUrl({
         path: f.path,
-        engine: this.selected_engine,
+        file_manager: this.selected_file_manager,
       });
       this.status_text = progress_text;
       const anchor = document.createElement("a");

@@ -33,6 +33,7 @@ module.exports = {
       }
   },
   configureWebpack: {
+    devtool: 'source-map',
     module: {
       // for supressing webpack warnings
       exprContextCritical: false

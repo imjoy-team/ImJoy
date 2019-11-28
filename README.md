@@ -6,7 +6,9 @@
 
 ## ImJoy - Deep Learning Made Easy!
 
-**New**: Preprint on Arxiv: [https://arxiv.org/abs/1905.13105](https://arxiv.org/abs/1905.13105)
+**New**: The ImJoy paper is out on Nature Methods, [check it out](https://doi.org/10.1038/s41592-019-0627-0).
+
+**New**: We are working actively on supporting Jupyter notebook based engines, ImJoy now comes with a `Jupyter Engine Manager`, which enables running Python plugins via [MyBinder.org](https://mybinder.org) or your own Jupyter notebook server. With the preview version, you will be able to try and test ImJoy Python plugins without additional setup. Stay tuned, more enhanced features will come soon.
 
 ImJoy is a plugin powered hybrid computing platform for deploying deep learning applications such as advanced image analysis tools.
 
@@ -32,7 +34,7 @@ for how to develop ImJoy plugins: [ImJoy Docs](https://imjoy.io/docs)
  * Isolated workspaces for grouping plugins
  * Self-contained plugin prototyping and development
    - Built-in code editor, no extra IDE is needed for development
- * Powerful computational backend powered by the Python ecosystem
+ * Powerful and extendable computational backends for browser, local and cloud computing
    - Support Javascript, native Python and web Python
    - Concurrent plugin execution through asynchronous programming
    - Run Python plugins in the browser with Webassembly
@@ -73,6 +75,9 @@ the GUI locally in your browser, and perform computational tasks with Python.
 These computations can be performed on your computer utilising the full power
 of the local GPU/CPU. The computational backend can also be launched on remote servers
 including cloud servers on Amazon, Google Compute, or an institutional computing cluster.
+
+Previously, running Python plugins will require the installation of Plugin Engine. However, now we have added an experimental support for running Python plugin via the servers provided by MyBinder.org.
+So you an try for example [DeepBindScan](https://imjoy.io/#/app?plugin=oeway/ImJoy-Plugins:DeepBindScan) without any installation.
 
 To learn more details about ImJoy, please go to [ImJoy Docs](https://imjoy.io/docs/).
 

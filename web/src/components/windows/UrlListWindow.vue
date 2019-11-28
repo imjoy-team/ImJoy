@@ -25,6 +25,9 @@ export default {
       },
     },
   },
+  mounted() {
+    this.$emit("init");
+  },
 };
 </script>
 

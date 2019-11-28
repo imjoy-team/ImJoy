@@ -89,6 +89,7 @@ export default {
     this.$nextTick(() => {
       this.handleResize();
     });
+    this.$emit("init");
   },
   methods: {
     handleInput(e) {

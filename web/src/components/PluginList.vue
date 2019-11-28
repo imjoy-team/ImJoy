@@ -36,14 +36,7 @@
             <md-icon v-else>extension</md-icon>
           </md-avatar>
           <div class="md-list-item-text">
-            <span>{{
-              plugin.type === "native-python"
-                ? plugin.name + " 🚀"
-                : plugin.type === "web-python" ||
-                  plugin.type === "web-python-window"
-                ? plugin.name + " 🐍"
-                : plugin.name
-            }}</span>
+            <span>{{ plugin.name + " " + plugin.badges }}</span>
             <p>{{ plugin.description }}</p>
             <p>
               <span v-for="tag in plugin.tags" :key="tag">{{ tag }}, </span>
@@ -281,6 +274,14 @@ export default {
     };
     marked.setOptions({
       renderer: renderer,
+    });
+    DOMPurify.addHook("afterSanitizeAttributes", function(node) {
+      // set all elements owning target to target=_blank
+      if ("target" in node) {
+        node.setAttribute("target", "_blank");
+        // prevent https://www.owasp.org/index.php/Reverse_Tabnabbing
+        node.setAttribute("rel", "noopener noreferrer");
+      }
     });
     this.sanitizedMarked = mk => {
       return DOMPurify.sanitize(marked(mk));

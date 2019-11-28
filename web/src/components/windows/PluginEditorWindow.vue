@@ -31,6 +31,7 @@ export default {
     if (this.w.data.engine_file_obj) {
       this.$refs.code_editor.openEngineFile(this.w.data.engine_file_obj);
     }
+    this.$emit("init");
   },
   methods: {
     dataSummary(w) {

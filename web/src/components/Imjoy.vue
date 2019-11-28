@@ -118,7 +118,7 @@
           <md-button
             @click="wm.selectWindow(w)"
             :disabled="wm.selected_window === w"
-            v-for="(w, i) in wm.windows.slice(0, max_window_buttons)"
+            v-for="(w, i) in windows.slice(0, max_window_buttons)"
             :key="w.id"
             class="md-icon-button"
           >
@@ -127,7 +127,7 @@
               w.name.slice(0, 30) + "(#" + w.index + ")"
             }}</md-tooltip>
           </md-button>
-          <md-menu v-if="wm.windows.length > max_window_buttons">
+          <md-menu v-if="windows.length > max_window_buttons">
             <md-button
               v-if="max_window_buttons >= 9"
               class="md-icon-button md-primary"
@@ -142,7 +142,7 @@
               <md-menu-item
                 @click="wm.selectWindow(w)"
                 :disabled="wm.selected_window === w"
-                v-for="w in wm.windows.slice(max_window_buttons)"
+                v-for="w in windows.slice(max_window_buttons)"
                 :key="w.id"
               >
                 <span>{{ w.name.slice(0, 30) + "(#" + w.index + ")" }}</span
@@ -159,7 +159,7 @@
               </md-menu-item>
             </md-menu-content>
           </md-menu>
-          <md-menu v-if="wm.window_mode === 'grid' && wm.windows.length > 0">
+          <md-menu v-if="wm.window_mode === 'grid' && windows.length > 0">
             <md-button class="md-icon-button md-primary" md-menu-trigger>
               <md-icon>picture_in_picture</md-icon>
               <md-tooltip>Workspace</md-tooltip>
@@ -352,15 +352,15 @@
               </md-button>
               <md-menu-content>
                 <md-menu-item
+                  v-if="fm && fm.fileManagers.length > 0"
                   @click="
-                    showEngineFileDialog();
+                    showFileManagerDialog();
                     files_expand = false;
                   "
-                  :disabled="em.engines.length <= 0"
                   class="md-button"
                 >
-                  <md-icon>add_to_queue</md-icon>Open Engine File
-                  <md-tooltip>Load files through Plugin Engine</md-tooltip>
+                  <md-icon>add_to_queue</md-icon>File Manager
+                  <md-tooltip>Load files through file manager</md-tooltip>
                 </md-menu-item>
                 <md-menu-item
                   @click="
@@ -550,7 +550,7 @@
                     >
                       <md-icon>delete_forever</md-icon>Remove
                     </md-menu-item>
-                    <div v-if="plugin.config.type === 'native-python'">
+                    <div v-if="plugin.config.engine_mode">
                       <md-divider></md-divider>
                       <md-menu-item @click="switchEngine(plugin, 'auto')">
                         <md-icon v-if="plugin.config.engine_mode === 'auto'"
@@ -567,22 +567,21 @@
                       </md-menu-item>
                       <md-menu-item
                         v-for="engine in em.engines"
-                        :key="engine.id"
+                        :key="engine.name"
                         @click="switchEngine(plugin, engine)"
                       >
                         <md-icon
                           v-if="
-                            plugin.config.engine_mode === engine.id ||
-                              (plugin.config.engine &&
-                                plugin.config.engine.id === engine.id)
+                            plugin.config.engine_mode === engine.name ||
+                              (plugin.engine &&
+                                plugin.engine.name === engine.name)
                           "
                           >radio_button_checked</md-icon
                         >
                         <md-icon v-else>radio_button_unchecked</md-icon>
                         <span
                           :class="
-                            plugin.config.engine &&
-                            plugin.config.engine.id === engine.id
+                            plugin.engine && plugin.engine.name === engine.name
                               ? 'bold'
                               : ''
                           "
@@ -612,27 +611,18 @@
                 :class="
                   plugin.running
                     ? 'busy-plugin'
-                    : plugin._disconnected && plugin.type === 'native-python'
+                    : plugin._disconnected && plugin.engine
                     ? 'md-accent'
                     : 'md-primary'
                 "
-                :disabled="
-                  plugin._disconnected && plugin.type != 'native-python'
-                "
+                :disabled="plugin._disconnected && !plugin.engine"
                 @click="
                   plugin._disconnected
                     ? connectPlugin(plugin)
                     : runOp(plugin.ops[plugin.name])
                 "
               >
-                {{
-                  plugin.type === "native-python"
-                    ? plugin.name + " 🚀"
-                    : plugin.type === "web-python" ||
-                      plugin.type === "web-python-window"
-                    ? plugin.name + " 🐍"
-                    : plugin.name
-                }}
+                {{ plugin.config.name + " " + plugin.config.badges }}
               </md-button>
               <div class="floating-right-buttons">
                 <md-button
@@ -801,20 +791,14 @@
                   :class="
                     plugin.running
                       ? 'busy-plugin'
-                      : plugin._disconnected && plugin.type === 'native-python'
+                      : plugin._disconnected && plugin.engine
                       ? 'md-accent'
                       : ''
                   "
-                  :disabled="
-                    plugin.type != 'native-python' || !plugin._disconnected
-                  "
+                  :disabled="!plugin.engine || !plugin._disconnected"
                   @click="connectPlugin(plugin)"
                 >
-                  {{
-                    plugin.type === "native-python"
-                      ? plugin.name + " 🚀"
-                      : plugin.name
-                  }}
+                  {{ plugin.config.name + " " + plugin.config.badges }}
                 </md-button>
                 <div class="floating-right-buttons">
                   <md-button
@@ -950,79 +934,43 @@
     <file-dialog
       id="engine-file-dialog"
       ref="file-dialog"
-      :engines="em.engines"
-      :remove-files="removeFiles"
-      :list-files="listFiles"
-      :get-file-url="getFileUrl"
-      :request-upload-url="requestUploadUrl"
-      :download-file-from-url="downloadFileFromUrl"
+      :file_managers="selected_file_managers"
       :upload-file-to-url="uploadFileToUrl"
     ></file-dialog>
+
     <md-dialog
       :class="
-        plugin_dialog_config && plugin_dialog_config.ui ? '' : 'window-dialog'
+        dialog_window_config.fullscreen || dialog_window_config.standalone
+          ? 'fullscreen-dialog'
+          : 'normal-dialog'
       "
+      class="window-dialog-container"
+      :style="{
+        height: dialog_auto_height,
+        width: '800px',
+      }"
       :md-active.sync="showPluginDialog"
-      :md-click-outside-to-close="false"
+      :md-click-outside-to-close="true"
       :md-close-on-esc="false"
     >
-      <md-dialog-title
-        v-if="plugin_dialog_config && plugin_dialog_config.name"
-        >{{ plugin_dialog_config.name }}</md-dialog-title
-      >
-      <md-dialog-actions
-        v-if="!plugin_dialog_config || !plugin_dialog_config.ui"
-      >
-        <md-button
-          class="md-primary"
-          v-if="
-            plugin_dialog_window_config &&
-              !plugin_dialog_window_config.fullscreen
-          "
-          @click="plugin_dialog_window_config.fullscreen = true"
-          ><md-icon>fullscreen</md-icon></md-button
-        >
-        <md-button class="md-accent" @click="closePluginDialog(true)"
-          ><md-icon>clear</md-icon></md-button
-        >
-      </md-dialog-actions>
-      <md-dialog-content class="position-relative">
-        <div v-if="plugin_dialog_config && plugin_dialog_config.ui">
-          <joy
-            :config="plugin_dialog_config"
-            :showHeader="false"
-            :controlButtons="false"
-            ref="plugin_dialog_joy"
-          ></joy>
-        </div>
-        <div
-          v-else
-          id="window-dialog-container"
-          :class="
-            plugin_dialog_window_config &&
-            (plugin_dialog_window_config.fullscreen ||
-              plugin_dialog_window_config.standalone)
-              ? 'fullscreen-dialog'
-              : 'normal-dialog'
-          "
-          class="window-dialog-container-position"
-        >
-          <window
-            v-if="plugin_dialog_window_config"
-            :w="plugin_dialog_window_config"
-            :withDragHandle="false"
-            @close="closePluginDialog(true)"
-          ></window>
-        </div>
-      </md-dialog-content>
-      <md-dialog-actions v-if="plugin_dialog_config && plugin_dialog_config.ui">
-        <md-button class="md-primary" @click="closePluginDialog(true)"
-          >OK</md-button
-        >
-        <md-button class="md-primary" @click="closePluginDialog(false)"
-          >Cancel</md-button
-        >
-      </md-dialog-actions>
+      <window
+        v-if="dialogWindows[0]"
+        :key="dialogWindows[0].id + '_dialog'"
+        :w="dialogWindows[0]"
+        :withDragHandle="false"
+        @close="closePluginDialog(dialogWindows[0])"
+        @fullscreen="
+          dialog_window_config.fullscreen = true;
+          dialogWindows[0].fullscreen = true;
+          $forceUpdate();
+        "
+        @normalsize="
+          dialog_window_config.fullscreen = false;
+          dialogWindows[0].fullscreen = false;
+          $forceUpdate();
+        "
+      ></window>
+      <!-- </md-dialog-content> -->
     </md-dialog>
 
     <md-dialog
@@ -1126,7 +1074,7 @@
     <md-dialog
       class="plugin-dialog"
       :md-active.sync="showAddPluginDialog"
-      :md-click-outside-to-close="false"
+      :md-click-outside-to-close="true"
     >
       <md-dialog-title
         >{{
@@ -1260,11 +1208,7 @@
                     plugin4install.icon
                   }}</md-icon
                   ><md-icon v-else>extension</md-icon>
-                  {{
-                    plugin4install.type === "native-python"
-                      ? plugin4install.name + " 🚀"
-                      : plugin4install.name
-                  }}
+                  {{ plugin4install.name + " " + plugin4install.badges }}
                 </h2>
               </div>
               <div
@@ -1401,7 +1345,6 @@
 
 import { saveAs } from "file-saver";
 import axios from "axios";
-
 import WEB_WORKER_PLUGIN_TEMPLATE from "../plugins/webWorkerTemplate.imjoy.html";
 import NATIVE_PYTHON_PLUGIN_TEMPLATE from "../plugins/nativePythonTemplate.imjoy.html";
 import WEB_PYTHON_PLUGIN_TEMPLATE from "../plugins/webPythonTemplate.imjoy.html";
@@ -1421,8 +1364,6 @@ import {
 import DOMPurify from "dompurify";
 
 import { ImJoy } from "../imjoyLib.js";
-
-import { Engine } from "../engineManager.js";
 
 import _ from "lodash";
 
@@ -1488,13 +1429,15 @@ export default {
       workspace_dropping: false,
       max_window_buttons: 9,
       installing: false,
-      plugin_dialog_window_config: null,
+      dialog_auto_height: "100%",
+      dialog_window_config: {},
       latest_version: null,
       is_latest_version: false,
       checking: false,
       alert_config: { show: false },
       confirm_config: { show: false, confirm: () => {}, cancel: () => {} },
       prompt_config: { show: false, confirm: () => {}, cancel: () => {} },
+      selected_file_managers: [],
     };
   },
   watch: {
@@ -1516,6 +1459,18 @@ export default {
       } else {
         return null;
       }
+    },
+    dialogWindows: function() {
+      return this.wm.windows
+        .filter(w => {
+          return w.dialog;
+        })
+        .reverse();
+    },
+    windows: function() {
+      return this.wm.windows.filter(w => {
+        return !w.dialog;
+      });
     },
   },
   created() {
@@ -1567,9 +1522,6 @@ export default {
       imjoy_api: imjoy_api,
       event_bus: this.event_bus,
       show_message_callback: this.showMessage,
-      show_engine_callback: (show, engine) => {
-        this.showEngineConnection(show, engine);
-      },
       update_ui_callback: () => {
         this.$forceUpdate();
       },
@@ -1579,6 +1531,7 @@ export default {
 
     this.pm = this.imjoy.pm;
     this.em = this.imjoy.em;
+    this.fsm = this.imjoy.fsm;
     this.fm = this.imjoy.fm;
     this.wm = this.imjoy.wm;
 
@@ -1755,13 +1708,11 @@ export default {
       if (this.$refs.workflow && this.$refs.workflow.setupJoy)
         this.$refs.workflow.setupJoy();
     });
-    this.event_bus.on("engine_connected", engine => {
-      if (this.pm) this.pm.reloadPythonPlugins(engine);
+    this.event_bus.on("closing_window_plugin", wplugin => {
+      if (this.dialogWindows[0] && this.dialogWindows[0].plugin === wplugin) {
+        this.showPluginDialog = false;
+      }
     });
-    this.event_bus.on("engine_disconnected", engine => {
-      if (this.pm) this.pm.unloadPythonPlugins(engine);
-    });
-
     this.updateSize({ width: window.innerWidth });
     if (this.wm) {
       if (this.screenWidth > 800) {
@@ -1781,6 +1732,30 @@ export default {
       this.showWelcomeDialog = true;
     } else {
       this.startImJoy(this.$route).then(() => {
+        if (!this.pm.plugin_names["Jupyter-Engine-Manager"]) {
+          console.log("Loading Jupyter-Engine-Manager from Gist...");
+          this.pm
+            .reloadPluginRecursively({
+              uri:
+                "https://gist.githubusercontent.com/oeway/7c7a3f07622839b690e2ed0383727a72/raw/Jupyter-Engine.imjoy.html",
+            })
+            .then(() => {
+              console.log("Jupyter-Engine-Manager loaded.");
+            });
+        }
+
+        if (!this.pm.plugin_names["ImJoy-Engine-Manager"]) {
+          console.log("Loading ImJoy-Engine-Manager from Gist...");
+          this.pm
+            .reloadPluginRecursively({
+              uri:
+                "https://gist.githubusercontent.com/oeway/e9282f27d9446bd4536a2a64018624c5/raw/ImJoy-Engine.imjoy.html",
+            })
+            .then(() => {
+              console.log("ImJoy-Engine-Manager loaded.");
+            });
+        }
+
         if (
           !this.showAddPluginDialog &&
           (!this.pm.plugins || Object.keys(this.pm.plugins) <= 0)
@@ -1788,7 +1763,10 @@ export default {
           this.pm
             .reloadPluginRecursively({ uri: "oeway/ImJoy-Plugins:Welcome" })
             .then(() => {
-              this.showDialog(null, { type: "Welcome" });
+              this.showDialog(null, {
+                type: "Welcome",
+                name: "Welcome to ImJoy",
+              });
             });
         }
         /* global window */
@@ -1857,7 +1835,7 @@ export default {
             }
           } catch (e) {
             console.error(e);
-            await this.showAlert(null, "Error: " + e);
+            await this.showAlert(null, e);
           }
         } else {
           this.plugin_url = null;
@@ -1889,21 +1867,15 @@ export default {
         const selected_workspace =
           route.query.workspace || route.query.w || this.pm.workspace_list[0];
         await this.pm.loadWorkspace(selected_workspace);
-        await this.pm.reloadPlugins(false);
-        const connections = this.em.connectAll(true);
-        try {
-          await connections;
-        } catch (e) {
-          console.error(e);
-        }
+        await this.pm.reloadPlugins();
 
         if (route.query.engine && route.query.start) {
           const en = this.em.getEngineByUrl(route.query.engine);
           const pl = this.pm.plugin_names[route.query.start];
           if (en && pl) {
             console.log(`setting plugin engine of ${pl.name} to ${en.name}`);
-            pl.engine_mode = en.id;
-            pl.config.engine_mode = en.id;
+            pl.engine_mode = en.name;
+            pl.config.engine_mode = en.name;
           }
           if (!en) {
             this.showMessage(`Plugin engine ${route.query.engine} not found.`);
@@ -2054,7 +2026,7 @@ export default {
           return;
         }
         try {
-          w.onRefresh(() => {
+          w.api.on("refresh", () => {
             this.$forceUpdate();
           });
           //move refresh to next tick
@@ -2241,10 +2213,10 @@ export default {
       this.screenWidth = e.width;
       if (this.wm) {
         if (this.screenWidth > 800) {
-          if (this.wm.windows.length === 0) this.wm.window_mode = "grid";
+          if (this.windows.length === 0) this.wm.window_mode = "grid";
           this.max_window_buttons = 9;
         } else {
-          if (this.wm.windows.length === 0) this.wm.window_mode = "single";
+          if (this.windows.length === 0) this.wm.window_mode = "single";
           this.max_window_buttons = parseInt(this.screenWidth / 36 - 4);
           if (this.max_window_buttons > 9) this.max_window_buttons = 9;
         }
@@ -2282,7 +2254,7 @@ export default {
       }
     },
     switchEngine(plugin, engine) {
-      plugin.config.engine_mode = (engine && engine.id) || "auto";
+      plugin.config.engine_mode = (engine && engine.name) || "auto";
       this.pm
         .savePlugin(plugin.config)
         .then(p => {
@@ -2305,12 +2277,8 @@ export default {
     },
     connectPlugin(plugin) {
       if (plugin._disconnected) {
-        if (
-          plugin.type === "native-python" &&
-          plugin.config.engine &&
-          !plugin.config.engine.connected
-        ) {
-          plugin.config.engine.connect();
+        if (plugin.engine && !plugin.engine.connected) {
+          plugin.engine.connect();
         } else {
           this.pm.reloadPlugin(plugin.config);
         }
@@ -2322,6 +2290,7 @@ export default {
       this.downloading_plugin = true;
       try {
         const config = await this.pm.getPluginFromUrl(plugin_url);
+
         if (this.pm.plugin_names[config.name]) {
           if (
             compareVersions(
@@ -2379,16 +2348,6 @@ export default {
         return !p.config.runnable;
       });
     },
-    registerExtension(exts, plugin) {
-      for (let i = 0; i < exts.length; i++) {
-        exts[i] = exts[i].replace(".", "");
-        if (this.registered.extensions[exts[i]]) {
-          this.registered.extensions[exts[i]].push(plugin);
-        } else {
-          this.registered.extensions[exts[i]] = [plugin];
-        }
-      }
-    },
     switchWorkspace(w) {
       // console.log('switch to ', w)
       if (!w || w.trim() == "") {
@@ -2437,7 +2396,7 @@ export default {
       this.status_text = info;
       this.$forceUpdate();
     },
-    showEngineFileDialog() {
+    showFileManagerDialog() {
       this.showFileDialog(this.IMJOY_PLUGIN, {
         uri_type: "url",
         root: "./",
@@ -2599,18 +2558,7 @@ export default {
       this.pm.unloadPlugin(plugin);
     },
     startTerminal(engine) {
-      const w = {
-        name: "Terminal " + engine.url,
-        type: "imjoy/terminal",
-        config: {},
-        w: 25,
-        h: 20,
-        standalone: false,
-        data: {
-          engine: engine,
-        },
-      };
-      this.createWindow(w);
+      engine.startTerminal();
     },
     editPlugin(pid) {
       const plugin = this.pm.plugins[pid];
@@ -2651,19 +2599,6 @@ export default {
         },
       };
       this.createWindow(w);
-    },
-    closePluginDialog(ok) {
-      this.showPluginDialog = false;
-      this.plugin_dialog_window_config = null;
-      if (this.plugin_dialog_promise) {
-        let [resolve, reject] = this.plugin_dialog_promise;
-        if (ok) {
-          resolve();
-        } else {
-          reject();
-        }
-        this.plugin_dialog_promise = null;
-      }
     },
     loadFiles(selected_files) {
       if (selected_files.length === 1) {
@@ -2828,38 +2763,29 @@ export default {
       this.show_snackbar = true;
       this.$forceUpdate();
     },
-    listFiles(engine, path, type, recursive) {
-      if (engine) {
-        return engine.listFiles(path, type, recursive);
-      } else {
-        throw "No plugin engine selected.";
-      }
-    },
-    getFileUrl(_plugin, config) {
-      return this.pm.getFileUrl(_plugin, config);
-    },
-    requestUploadUrl(_plugin, config) {
-      return this.pm.requestUploadUrl(_plugin, config);
-    },
-    removeFiles(engine, path, type, recursive) {
-      if (engine) {
-        return engine.removeFiles(path, type, recursive);
-      } else {
-        throw "No plugin engine selected.";
-      }
-    },
     showFileDialog(_plugin, config) {
       config = config || {};
       if (_plugin && _plugin.id) {
         config.engine =
-          config.engine === undefined ? _plugin.config.engine : config.engine;
+          config.engine === undefined ? _plugin.engine : config.engine;
         config.engine =
-          config.engine instanceof Engine
-            ? config.engine
-            : this.em.getEngineByUrl(config.engine);
+          typeof config.engine === "string"
+            ? this.em.getEngineByUrl(config.engine)
+            : config.engine;
+
+        if (!config.file_manager && config.engine) {
+          config.file_manager = this.fm.getFileManagerByUrl(config.engine.url);
+        }
+        if (config.file_manager) {
+          this.selected_file_managers = [config.file_manager];
+        } else {
+          this.selected_file_managers = this.fm.fileManagers;
+        }
+
+        // assert(config.file_manager, "No file manager is selected.");
         config.root =
           config.root || (_plugin.config && _plugin.config.work_dir);
-        if (_plugin.type != "native-python") {
+        if (!_plugin.engine) {
           config.uri_type = config.uri_type || "url";
         } else {
           config.uri_type = config.uri_type || "path";
@@ -2878,8 +2804,14 @@ export default {
           config.return_object =
             config.return_object === undefined ? true : config.return_object;
         }
+
         return this.$refs["file-dialog"].showDialog(_plugin, config);
       } else {
+        if (config.file_manager) {
+          this.selected_file_managers = [config.file_manager];
+        } else {
+          this.selected_file_managers = this.fm.fileManagers;
+        }
         return this.$refs["file-dialog"].showDialog(_plugin, config);
       }
     },
@@ -3011,52 +2943,54 @@ export default {
       }
     },
     showDialog(_plugin, config) {
-      assert(config, "Please pass config to showDialog.");
+      config.dialog = true;
+      config.type = config.type || "imjoy/joy";
+      this.showPluginDialog = true;
+      this.dialog_auto_height = "700px";
+      this.dialog_window_config.fullscreen =
+        config.fullscreen || config.standalone || false;
       return new Promise((resolve, reject) => {
-        this.plugin_dialog_config = null;
-        this.plugin_dialog_promise = null;
-        if (config.ui) {
-          this.plugin_dialog_config = config;
-          this.showPluginDialog = true;
-          this.plugin_dialog_promise = [
-            () => {
-              if (this.$refs.plugin_dialog_joy.joy) {
-                resolve(this.$refs.plugin_dialog_joy.joy.get_config());
-              } else {
-                reject("joy not found.");
-              }
-            },
-            reject,
-          ];
-        } else if (config.type) {
-          config.window_container = "window-dialog-container";
-          config.standalone = true;
-          this.plugin_dialog_window_config = null;
-          if (config.type.startsWith("imjoy/")) {
-            config.render = wconfig => {
-              this.plugin_dialog_window_config = wconfig;
-              this.$forceUpdate();
-            };
-          }
-          this.showPluginDialog = true;
-          setTimeout(() => {
-            this.createWindow(config)
-              .then(api => {
-                const _close = api.close;
-                this.plugin_dialog_promise = [api.close, api.close];
-                api.close = async () => {
-                  await _close();
-                  this.showPluginDialog = false;
-                  this.plugin_dialog_promise = null;
-                };
-                resolve(api);
-              })
-              .catch(reject);
-          }, 0);
-        } else {
-          this.showMessage("Unsupported dialog type.");
-        }
+        this.pm
+          .createWindow(_plugin, config)
+          .then(api => {
+            api.on(
+              "window_size_changed",
+              rect => {
+                this.dialog_auto_height = `${rect.height + 40}px`;
+                this.$forceUpdate();
+              },
+              true
+            );
+            api.on("close", () => {
+              this.showPluginDialog = false;
+            });
+
+            if (config.type === "imjoy/joy") {
+              config.ok = () => {
+                this.closePluginDialog(config);
+                resolve(config.get_config());
+              };
+              config.cancel = () => {
+                this.closePluginDialog(config);
+                resolve();
+              };
+            } else {
+              resolve(api);
+            }
+          })
+          .catch(e => {
+            this.showAlert(null, e);
+            this.showPluginDialog = false;
+            reject(e);
+          });
       });
+    },
+    async closePluginDialog(w) {
+      await w.close();
+      this.dialogWindows.forEach(w => {
+        w.close();
+      });
+      this.showPluginDialog = false;
     },
     showAlert(_plugin, text) {
       console.log("alert: ", text);
@@ -3064,13 +2998,13 @@ export default {
         this.alert_config.title = null;
         this.alert_config.content = escapeHTML(text).replace(/\n/g, "<br>");
         this.alert_config.confirm_text = "OK";
-      } else if (typeof text === "object") {
+      } else if (typeof text === "object" && text.content) {
         this.alert_config.title = text.title;
         this.alert_config.content =
           DOMPurify.sanitize(String(text.content)) || "undefined";
         this.alert_config.confirm_text = text.confirm_text || "OK";
       } else {
-        this.alert_config.content = String(text);
+        this.alert_config.content = JSON.stringify(text);
       }
 
       this.alert_config.show = true;
@@ -3085,7 +3019,7 @@ export default {
           this.prompt_config.placeholder = defaultText;
           this.prompt_config.cancel_text = "Cancel";
           this.prompt_config.confirm_text = "OK";
-        } else if (typeof text === "object") {
+        } else if (typeof text === "object" && text.content) {
           this.prompt_config.title = text.title;
           this.prompt_config.content =
             DOMPurify.sanitize(String(text.content)) || "undefined";
@@ -3113,7 +3047,7 @@ export default {
           this.confirm_config.content = escapeHTML(text).replace(/\n/g, "<br>");
           this.confirm_config.cancel_text = "Cancel";
           this.confirm_config.confirm_text = "OK";
-        } else if (typeof text === "object") {
+        } else if (typeof text === "object" && text.content) {
           this.confirm_config.title = text.title;
           this.confirm_config.content =
             DOMPurify.sanitize(String(text.content)) || "undefined";
@@ -3291,17 +3225,22 @@ export default {
   margin: 0px;
   min-width: 200px;
   min-height: 500px;
-  width: 95%;
-  height: 95%;
+  width: 100%;
+  height: 100%;
   max-width: 1000px;
   max-height: 900px;
 }
 
-#window-dialog-container {
+.window-dialog-container {
   height: 100%;
   width: 100%;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
   z-index: 11 !important;
 }
+
 .md-card {
   /* width: 100%; */
   /* height: 300px; */
@@ -3611,8 +3550,10 @@ button.md-speed-dial-target {
 }
 
 .normal-dialog {
-  width: 100%;
-  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  min-height: 80px;
+  min-width: 100px;
   margin: 0;
   padding: 0;
   flex-grow: 1;
@@ -3620,8 +3561,10 @@ button.md-speed-dial-target {
 }
 
 .fullscreen-dialog {
-  width: calc(100vw - 40px);
-  height: calc(100vh - 145px);
+  max-width: 100%;
+  max-height: 100%;
+  min-width: 100%;
+  min-height: 100%;
   margin: 0;
   padding: 0;
   flex-grow: 1;

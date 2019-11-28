@@ -110,7 +110,7 @@
             this.editor &&
               window &&
               window.config &&
-              window.config.type === 'native-python' &&
+              window.config.engine_mode &&
               window.engine_manager
           "
         >
@@ -205,12 +205,12 @@ export default {
       },
     });
 
-    this.window.onRefresh(() => {
+    this.window.api.on("refresh", () => {
       this.editor.layout();
     });
 
     if (this.window) {
-      this.window.onResize(() => {
+      this.window.api.on("resize", () => {
         this.$nextTick(this.updateSize);
       });
     }

@@ -60,6 +60,7 @@ export default {
     this.log_history = this.w.data.log_history;
     this.plugin_id = this.w.data.plugin_id;
     this.plugin_name = this.w.data.plugin_name;
+    this.$emit("init");
   },
   beforeDestroy() {
     if (this.event_bus) {

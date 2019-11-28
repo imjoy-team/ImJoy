@@ -1,7 +1,26 @@
 import { compareVersions } from "./utils.js";
 
 import Ajv from "ajv";
-var ajv = new Ajv();
+const ajv = new Ajv();
+
+ajv.addKeyword("instanceof", {
+  compile: function(Class) {
+    return function(data) {
+      if (Array.isArray(Class)) {
+        let match = false;
+        for (let c of Class) {
+          if (data instanceof c) {
+            match = true;
+            break;
+          }
+        }
+        return match;
+      } else {
+        return data instanceof Class;
+      }
+    };
+  },
+});
 
 export const CONFIGURABLE_FIELDS = [
   "env",
@@ -13,6 +32,50 @@ export const CONFIGURABLE_FIELDS = [
   "flags",
   "cover",
 ];
+
+const _backends = {
+  "web-worker": {
+    type: "internal",
+    name: "Web Worker",
+    lang: "javascript",
+  },
+  iframe: {
+    type: "internal",
+    name: "IFrame",
+    lang: "javascript",
+  },
+  window: {
+    type: "internal",
+    name: "Window",
+    lang: "javascript",
+  },
+  "web-python": {
+    type: "internal",
+    name: "Web Python",
+    lang: "web-python",
+    icon: "🐍",
+  },
+  "web-python-window": {
+    type: "internal",
+    name: "Web Python (window)",
+    lang: "web-python",
+    icon: "🐍",
+  },
+  collection: {
+    type: "-",
+    name: "Collection",
+    lang: "",
+    icon: "",
+  },
+};
+
+export function getBackends() {
+  return _backends;
+}
+
+export function getBackendByType(type) {
+  return _backends[type];
+}
 
 export function upgradePluginAPI(config) {
   if (compareVersions(config.api_version, "<=", "0.1.1")) {
@@ -49,16 +112,6 @@ export const BACKEND_SCHEMA = ajv.compile({
   },
 });
 
-export const REGISTER_SCHEMA = ajv.compile({
-  properties: {
-    name: { type: "string" },
-    type: { type: "string" },
-    ui: { type: ["null", "string", "array", "object"] },
-    inputs: { type: ["null", "object"] },
-    outputs: { type: ["null", "object"] },
-  },
-});
-
 export const JOY_SCHEMA = ajv.compile({
   properties: {
     name: { type: "string" },
@@ -82,8 +135,52 @@ export const OP_SCHEMA = ajv.compile({
     name: { type: "string" },
     type: { type: "string" },
     ui: { type: ["null", "string", "array", "object"] },
-    run: { type: ["null", "string"] },
+    run: { instanceof: Function },
     inputs: { type: ["null", "object"] },
     outputs: { type: ["null", "object"] },
+  },
+});
+
+export const ENGINE_FACTORY_SCHEMA = ajv.compile({
+  properties: {
+    name: { type: "string" },
+    type: { enum: ["engine-factory"] },
+    config: { type: "object" },
+    addEngine: { instanceof: Function },
+    removeEngine: { instanceof: Function },
+  },
+});
+
+export const ENGINE_SCHEMA = ajv.compile({
+  properties: {
+    name: { type: "string" },
+    type: { enum: ["engine"] },
+    pluginType: { type: "string" },
+    url: { type: "string" },
+    config: { type: "object" },
+    connect: { instanceof: Function },
+    disconnect: { instanceof: Function },
+    listPlugins: { instanceof: Function },
+    startPlugin: { instanceof: Function },
+    getPlugin: { instanceof: Function },
+    getEngineStatus: { instanceof: Function },
+    getEngineInfo: { instanceof: [Function, null] },
+    heartbeat: { instanceof: Function },
+    killPlugin: { instanceof: [Function, null] },
+    killPluginProcess: { instanceof: [Function, null] },
+    restartPlugin: { instanceof: [Function, null] },
+  },
+});
+
+export const FILE_MANAGER_SCHEMA = ajv.compile({
+  properties: {
+    name: { type: "string" },
+    type: { enum: ["file-manager"] },
+    url: { type: "string" },
+    listFiles: { instanceof: Function },
+    getFile: { instanceof: Function },
+    putFile: { instanceof: Function },
+    removeFile: { instanceof: Function },
+    heartbeat: { instanceof: Function },
   },
 });

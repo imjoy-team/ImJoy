@@ -92,33 +92,85 @@ export class WindowManager {
   }
 
   setupCallbacks(w) {
-    w._refresh_callbacks = [];
-    w.onRefresh = handler => {
-      w._refresh_callbacks.push(handler);
+    w._callbacks = w._callbacks || {};
+    w.api = w.api || {};
+    w.api.on = (name, handler, fire_if_emitted) => {
+      if (w._callbacks[name]) {
+        w._callbacks[name].push(handler);
+      } else {
+        w._callbacks[name] = [handler];
+      }
+      if (fire_if_emitted && w._callbacks[name].emitted) {
+        handler(w._callbacks[name].emitted_data);
+      }
     };
-    w.refresh = async () => {
+    w.api.off = (name, handler) => {
+      if (w._callbacks[name]) {
+        if (handler) {
+          const handlers = w._callbacks[name];
+          const idx = handlers.indexOf(handler);
+          if (idx >= 0) {
+            handlers.splice(idx, 1);
+          } else {
+            console.warn(`callback ${name} does not exist.`);
+          }
+        } else {
+          delete w._callbacks[name];
+        }
+      } else {
+        console.warn(`callback ${name} does not exist.`);
+      }
+    };
+    w.api.emit = (name, data) => {
+      return new Promise(async (resolve, reject) => {
+        const errors = [];
+        try {
+          if (w._callbacks[name]) {
+            for (let cb of w._callbacks[name]) {
+              try {
+                await cb(data !== undefined ? data : undefined);
+              } catch (e) {
+                errors.push(e);
+                console.error(e);
+              }
+            }
+          } else {
+            // if no handler set, store the data
+            w._callbacks[name] = [];
+            w._callbacks[name].emitted = true;
+            w._callbacks[name].emitted_data = data;
+          }
+          if (errors.length <= 0) {
+            resolve();
+          } else {
+            reject(errors);
+          }
+        } catch (e) {
+          reject(e);
+        }
+      });
+    };
+    w._refresh_callbacks = [];
+    w.api.refresh = w.refresh = async () => {
       await Promise.all(w._refresh_callbacks.map(item => item()));
     };
 
     w._resize_callbacks = [];
-    w.onResize = handler => {
-      w._resize_callbacks.push(handler);
-    };
-    w.resize = async contentRect => {
+    w.api.resize = w.resize = async contentRect => {
       contentRect = contentRect || (w.$el && w.$el.getBoundingClientRect());
-      await Promise.all(w._resize_callbacks.map(item => item(contentRect)));
+      w.api.emit("resize", contentRect);
     };
 
-    w._close_callbacks = [];
-    w.onClose = handler => {
-      w._close_callbacks.push(handler);
+    w.api.focus = w.focus = () => {
+      w.api.emit("focus");
     };
 
-    w.close = async () => {
+    w.api.close = w.close = async () => {
+      // TODO: handle close gracefully
       let close_timer = setTimeout(() => {
-        this.showMessage("Force quitting the window due to timeout.");
+        console.warn("Force quitting the window due to timeout.");
         forceClose();
-      }, 5000);
+      }, 2000);
 
       const forceClose = () => {
         const index = this.windows.indexOf(w);
@@ -136,14 +188,14 @@ export class WindowManager {
         }
         this.event_bus.emit("close_window", w);
       };
-
       try {
-        await Promise.all(w._close_callbacks.map(item => item()));
-      } catch (e) {
-        console.log(e);
+        //TODO: figure out why it's not closing if we await the emit function
+        w.api.emit("close");
+      } catch (es) {
+        console.error(es);
       } finally {
-        clearTimeout(close_timer);
         forceClose();
+        clearTimeout(close_timer);
       }
     };
   }
@@ -153,7 +205,7 @@ export class WindowManager {
       try {
         w.id = w.id || w.name + randId();
         w.loaders = this.getDataLoaders(w.data);
-        this.generateGridPosition(w);
+        if (!w.dialog) this.generateGridPosition(w);
         if (w.standalone) {
           w.h = 0;
           w.w = 0;
@@ -173,6 +225,10 @@ export class WindowManager {
         } else {
           this.event_bus.emit("add_window", w);
           resolve(w.id);
+        }
+        //hack for testing
+        if (w.__test__mode__) {
+          w.api.emit("ready");
         }
       } catch (e) {
         reject(e);

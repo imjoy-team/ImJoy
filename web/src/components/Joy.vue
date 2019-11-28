@@ -45,18 +45,45 @@ export default {
     editSource() {
       this.$emit("edit", this.config);
     },
+    normalizeUI(ui) {
+      if (!ui) {
+        return "";
+      }
+      let normui = "";
+      if (Array.isArray(ui)) {
+        for (let it of ui) {
+          if (typeof it === "string") normui = normui + it + "<br>";
+          else if (typeof it === "object") {
+            for (let k in it) {
+              if (typeof it[k] === "string")
+                normui = normui + k + ": " + it[k] + "<br>";
+              else normui = normui + k + ": " + JSON.stringify(it[k]) + "<br>";
+            }
+          } else normui = normui + JSON.stringify(it) + "<br>";
+        }
+      } else if (typeof ui === "object") {
+        throw "ui can not be an object, you can only use a string or an array.";
+      } else if (typeof ui === "string") {
+        normui = ui.trim();
+      } else {
+        normui = "";
+        console.log("Warining: removing ui string.");
+      }
+      return normui;
+    },
     setupJoy(reset) {
       if (!reset && this.joy) {
         this.config.data = this.joy.top.data;
       }
       this.$nextTick(() => {
+        if (!this.$refs.editor) return;
         this.$refs.editor.innerHTML = "";
         const joy_config = {
           // Where the Joy editor goes:
           container: this.$refs.editor,
 
           // The words & ops inside the editor:
-          init: this.config.ui || "", //"{id:'localizationWorkflow', type:'ops'} " + // a list of ops
+          init: this.normalizeUI(this.config.ui) || "", //"{id:'localizationWorkflow', type:'ops'} " + // a list of ops
           //"<hr> {type:'save'}", // a save button!
 
           // Load data from URL, otherwise blank:

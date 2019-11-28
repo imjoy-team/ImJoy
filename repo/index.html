@@ -189,14 +189,7 @@
                     <a @click="showInfo(plugin)" style="color: #ffffff">
                       <i v-if="plugin.icon" class="material-icons">{{plugin.icon}}</i>
                       <i v-else class="material-icons">extension</i>
-                      {{
-                  plugin.type === "native-python"
-                    ? plugin.name + " 🚀"
-                    : plugin.type === "web-python" ||
-                      plugin.type === "web-python-window"
-                    ? plugin.name + " 🐍"
-                    : plugin.name
-                }}
+                      {{ plugin.name + " " + plugin.badges }}
                     </a>
                   </h3>
                   <span v-if="plugin.description"> {{ plugin.description.slice(0, 100) }}</span><br>
@@ -231,14 +224,7 @@
       <h4 class="mdl-dialog__title">
         <i v-if="selected_plugin.icon" class="material-icons">{{selected_plugin.icon}}</i>
         <i v-else class="material-icons">extension</i>
-        {{
-              selected_plugin.type === "native-python"
-                ? selected_plugin.name + " 🚀"
-                : selected_plugin.type === "web-python" ||
-                selected_plugin.type === "web-python-window"
-                ? selected_plugin.name + " 🐍"
-                : selected_plugin.name
-            }}</h4>
+        {{ selected_plugin.name + " " + selected_plugin.badges }}</h4>
       <div class="mdl-dialog__content">
 
         <p>
@@ -269,7 +255,7 @@
 
       <div class="mdl-dialog__actions">
         <button type="button" class="mdl-button" @click="closeInfo()">Close</button>
-        <button type="button" class="mdl-button" v-if="selected_plugin.type!=='native-python'"
+        <button type="button" class="mdl-button" v-if="!selected_plugin.engine_mode"
           @click="run(selected_plugin)">Run</button>
         <button type="button" class="mdl-button mdl-button--primary" @click="install(selected_plugin)">Install</button>
       </div>

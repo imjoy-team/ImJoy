@@ -20,12 +20,8 @@ export default {
         });
       };
       updateSize();
-      // window.addEventListener('resize', updateSize);
-      document.addEventListener(
-        "orientationchange",
-        (window.onresize = updateSize)
-      );
-
+      window.addEventListener("resize", updateSize);
+      document.addEventListener("orientationchange", updateSize);
       // hide animation
       const element = document.getElementById("welcome-page");
       if (element) element.parentNode.removeChild(element);
