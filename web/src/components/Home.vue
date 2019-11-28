@@ -53,7 +53,9 @@
           >&nbsp;
         </p>
         <p>
-          <a href="https://www.nature.com/articles/s41592-019-0627-0" target="_blank"
+          <a
+            href="https://www.nature.com/articles/s41592-019-0627-0"
+            target="_blank"
             >Publication</a
           >
           <a href="/docs">Docs</a>
