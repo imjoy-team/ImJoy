@@ -386,7 +386,7 @@ To close the created window, call `win.close()`.
 
 To scroll to the window in the ImJoy workspace, call `win.focus()`.
 
-Inside the window plugin, `this.close`, `this.onClose`, `this.focus`, `this.resize`, `this.onResize` can be used.
+Inside the window plugin, `this.close`, `this.on`, `this.emit`, `this.focus`, `this.resize` can be used.
 
 <!-- tabs:start -->
 
@@ -395,8 +395,8 @@ Inside the window plugin, `this.close`, `this.onClose`, `this.focus`, `this.resi
 // win is the object returned from api.createWindow
 await win.run({'data': {'image': ...}})
 
-// set `onClose` callback
-win.onClose(()=>{
+// set `on-close` callback
+win.on('close', ()=>{
   console.log('closing window.')
 })
 ```
@@ -424,11 +424,11 @@ await win.run({'data': {'image': ...}})
 # or named arguments
 await win.run(data={'image': ...})
 
-# set `onClose` callback
+# set `on-close` callback
 def close_callback():
     print('closing window.')
 
-win.onClose(close_callback)
+win.on('close', close_callback)
 ```
 <!-- tabs:end -->
 
@@ -698,6 +698,9 @@ sigma = await api.getConfig('sigma')
 [Try yourself in the setConfig example >>](https://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:setConfig&w=examples)
 
 ### api.getFileUrl
+
+*** WARNING: `api.getFileUrl` is deprecated since `api_version > 0.6.1`, please use `api.getFileManger` instead.
+
 ```python
 file_url = await api.getFileUrl(config)
 ```
@@ -795,6 +798,91 @@ await pluginX.funcX()
 [Try yourself >>](https://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:getPlugin&w=examples)
 
 
+
+### api.getEngine
+```javascript
+engine = await api.getEngine(engine_url)
+```
+
+Gets the API object of an plugin engine.
+
+**Arguments**
+
+* **engine_url**: String. URL of the plugin engine.
+
+**Returns**
+* **engine**: Object. An engine object which can be used to access the engine API functions.
+
+**Example**
+
+Get the API of the engine (url = `https://127.0.0.1:2957`), and access its functions:
+
+```javascript
+engine = await api.getEngine("https://127.0.0.1:2957")
+await engine.disconnect()
+```
+
+### api.getEngineFactory
+```javascript
+engine_factory = await api.getEngineFactory(engine_factory_name)
+```
+
+Gets the API object of an plugin engine factory.
+
+**Arguments**
+
+* **engine_factory_name**: String. Name of the plugin engine factory.
+
+**Returns**
+* **engine_factory**: Object. An plugin engine factory object which can be used to access the engine API functions.
+
+**Example**
+
+Get the API of the plugin engine factory (name = `ImJoy-Engine`), and access its functions:
+
+```javascript
+engine_factory = await api.getEngineFactory("ImJoy-Engine")
+await engine_factory.addEngine()
+```
+
+
+### api.getFileManager
+```javascript
+file_manager = await api.getFileManager(file_manager_url)
+```
+
+Gets the API object of an file manager.
+
+Note: since `api_version > 0.6.1`, `api.getFileUrl` and `api.requestUploadUrl` are deprecated, the replacement solution is to use `api.getFileManager` to get the file manager first, and access `getFileUrl` and `requestUploadUrl` from the returned file manager object.
+
+**Arguments**
+
+* **file_manager_url**: String. URL of the file manager.
+
+**Returns**
+* **file_manager**: Object. An file manager object which can be used to access the file manager API functions.
+
+**Example**
+
+Get the API of the file manager (url = `https://127.0.0.1:2957`), and access its functions:
+
+```javascript
+file_manager = await api.getFileManager("https://127.0.0.1:2957")
+await file_manager.listFiles()
+```
+
+Get file URL for downloading (replacement of `api.getFileUrl`)
+```javascript
+file_manager = await api.getFileManager("https://127.0.0.1:2957")
+await file_manager.getFileUrl({'path': './data/output.png'})
+```
+
+Request file URL for uploading (replacement of `api.requestUploadUrl`)
+```javascript
+file_manager = await api.getFileManager("https://127.0.0.1:2957")
+await file_manager.requestUploadUrl({'path': './data/input.png'})
+```
+
 ### api.log
 
 ```javascript
@@ -875,8 +963,8 @@ multiple times to overwrite the previous version. `api.register` can also be use
   - `name`: String. Name of op.
   - `ui`: Object (JavaScript) or dictionary (Python). Rendered interface. Defined
        with the same rule as the `ui` field in `<config>`.
-  - `run`: String, optional. Specifies the `Plugin API` function that will run when
-      the op is executed. If not specified, the `run` function of the plugin will be executed.
+  - `run`: Function, optional. Specifies the `Plugin API` function that will run when
+      the op is executed. Note that it must be a member of the plugin class or a function being exported with `api.export`. If not specified, the `run` function of the plugin will be executed.
   - `update`: String, optional. Specifies another `Plugin API` function that will run
       whenever any option in the `ui` is changed.
   - `inputs`: Object, optional. A [JSON Schema](https://json-schema.org/) which defines the inputs of this op.
@@ -915,6 +1003,9 @@ update_lut(ctx) {
 
 
 ### api.requestUploadUrl
+
+***WARNING: `api.requestUploadUrl` is deprecated since `api_version > 0.6.1`, please use `api.getFileManger` instead.***
+
 ```python
 upload_url = await api.requestUploadUrl(config)
 ```

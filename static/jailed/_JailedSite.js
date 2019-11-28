@@ -39,6 +39,12 @@
     return tmp.buffer;
   };
 
+  function randId() {
+    return (
+      Date.now().toString(16) + Math.random().toString(16) + "0".repeat(16)
+    );
+  }
+
   function getKeyByValue(object, value) {
     return Object.keys(object).find(key => object[key] === value);
   }
@@ -139,23 +145,27 @@
       ) {
         if (window && window.__imjoy_plugin_type__ === "window") {
           // these functions will be exposed as window plugin api
-          _interface.onClose = cb => {
-            this._remote.onClose(cb);
-          };
           _interface.close = () => {
             this._remote.close();
-          };
-          _interface.onResize = cb => {
-            this._remote.onResize(cb);
           };
           _interface.resize = () => {
             this._remote.resize();
           };
-          _interface.onRefresh = cb => {
-            this._remote.onRefresh(cb);
+          _interface.on = (name, cb) => {
+            this._remote.on(name, cb);
+          };
+          _interface.off = (name, cb) => {
+            this._remote.off(name, cb);
+          };
+          _interface.emit = (name, data) => {
+            this._remote.emit(name, data);
           };
           _interface.refresh = () => {
             this._remote.refresh();
+          };
+          // deprecated
+          _interface.onClose = cb => {
+            this._remote.onClose(cb);
           };
         }
       }
@@ -174,7 +184,7 @@
       if (this._interface.hasOwnProperty(name)) {
         if (name.startsWith("_")) continue;
         if (typeof this._interface[name] === "function") {
-          names.push({ name: name, data: null });
+          names.push({ name: name, data: null, type: "function" });
         } else {
           var data = this._interface[name];
           if (data !== null && typeof data === "object") {
@@ -188,9 +198,9 @@
                 }
               }
             }
-            names.push({ name: name, data: data2 });
+            names.push({ name: name, data: data2, type: "object" });
           } else if (Object(data) !== data) {
-            names.push({ name: name, data: data });
+            names.push({ name: name, data: data, type: "data" });
           }
         }
       }
@@ -260,6 +270,7 @@
               resolve(result);
             }
           } catch (e) {
+            console.error(e, method);
             reject(e);
           }
         } else {
@@ -291,6 +302,7 @@
               resolve(result);
             }
           } catch (e) {
+            console.error(e, method);
             reject(e);
           }
         } else {
@@ -355,11 +367,14 @@
    */
   JailedSite.prototype._setRemote = function(api) {
     this._remote = { ndarray: this._ndarray };
-    var i, name, data;
+    var i, name, data, type;
     for (i = 0; i < api.length; i++) {
       name = api[i].name;
       data = api[i].data;
-      if (data) {
+      type = api[i].type;
+      if (type === "data") {
+        this._remote[name] = data;
+      } else if (data) {
         if (typeof data === "object") {
           var data2 = {};
           for (var key in data) {
@@ -412,7 +427,13 @@
 
           wrapped_resolve.__jailed_pairs__ = wrapped_reject;
           wrapped_reject.__jailed_pairs__ = wrapped_resolve;
-          var args = me._wrap(Array.prototype.slice.call(arguments));
+
+          var args = Array.prototype.slice.call(arguments);
+          if (name === "register" || name === "export" || name === "on") {
+            args = me._wrap(args, true);
+          } else {
+            args = me._wrap(args);
+          }
           var transferables = args.args.__transferables__;
           if (transferables) delete args.args.__transferables__;
           me._connection.send(
@@ -455,7 +476,46 @@
    *
    * @returns {Array} wrapped arguments
    */
-  JailedSite.prototype._encode = function(aObject) {
+
+  JailedSite.prototype._encode_interface = function(aObject, bObject) {
+    var v, k;
+    const encoded_interface = {};
+    aObject["__id__"] = aObject["__id__"] || randId();
+    for (k in aObject) {
+      if (k === "hasOwnProperty") continue;
+      if (aObject.hasOwnProperty(k)) {
+        if (k.startsWith("_")) {
+          continue;
+        }
+        v = aObject[k];
+
+        if (typeof v == "function") {
+          bObject[k] = {
+            __jailed_type__: "plugin_interface",
+            __plugin_id__: aObject["__id__"],
+            __value__: k,
+            num: null,
+          };
+          encoded_interface[k] = v;
+        } else if (Object(v) !== v) {
+          bObject[k] = { __jailed_type__: "argument", __value__: v };
+          encoded_interface[k] = v;
+        } else if (typeof v === "object") {
+          bObject[k] = Array.isArray(v) ? [] : {};
+          this._encode_interface(v, bObject[k]);
+        }
+      }
+    }
+    this._plugin_interfaces[aObject["__id__"]] = encoded_interface;
+
+    if (aObject.on) {
+      aObject.on("close", () => {
+        delete this._plugin_interfaces[aObject["__id__"]];
+      });
+    }
+  };
+
+  JailedSite.prototype._encode = function(aObject, as_interface) {
     var transferables = [];
     if (!aObject) {
       return aObject;
@@ -475,16 +535,28 @@
 
     //encode interfaces
     if (
-      typeof aObject === "object" &&
-      aObject.__id__ &&
-      aObject.__jailed_type__ === "plugin_api"
+      typeof aObject == "object" &&
+      !Array.isArray(aObject) &&
+      (aObject.__as_interface__ || as_interface)
     ) {
-      const encoded_interface = {};
-      for (k in aObject) {
-        if (k === "hasOwnProperty") continue;
-        if (aObject.hasOwnProperty(k)) {
-          v = aObject[k];
-          if (typeof v === "function") {
+      this._encode_interface(aObject, bObject);
+      return bObject;
+    }
+
+    if (as_interface) {
+      aObject["__id__"] = aObject["__id__"] || randId();
+      this._plugin_interfaces[aObject["__id__"]] =
+        this._plugin_interfaces[aObject["__id__"]] || {};
+    }
+    for (k in aObject) {
+      if (k === "hasOwnProperty") continue;
+      if (isarray || aObject.hasOwnProperty(k)) {
+        v = aObject[k];
+        if (typeof v === "function") {
+          if (as_interface) {
+            const encoded_interface = this._plugin_interfaces[
+              aObject["__id__"]
+            ];
             bObject[k] = {
               __jailed_type__: "plugin_interface",
               __plugin_id__: aObject["__id__"],
@@ -492,24 +564,8 @@
               num: null,
             };
             encoded_interface[k] = v;
+            continue;
           }
-        }
-      }
-      this._plugin_interfaces[aObject["__id__"]] = encoded_interface;
-
-      if (aObject.onClose) {
-        aObject.onClose(() => {
-          delete this._plugin_interfaces[aObject["__id__"]];
-        });
-      }
-      return bObject;
-    }
-
-    for (k in aObject) {
-      if (k === "hasOwnProperty") continue;
-      if (isarray || aObject.hasOwnProperty(k)) {
-        v = aObject[k];
-        if (typeof v === "function") {
           let interfaceFuncName = null;
           for (var name in this._interface) {
             if (this._interface.hasOwnProperty(name)) {
@@ -635,8 +691,8 @@
           bObject[k] = { __jailed_type__: "argument", __value__: v };
         }
         //TODO: support also Map and Set
-        else if (typeof v === "object" || Array.isArray(v)) {
-          bObject[k] = this._encode(v);
+        else if (typeof v == "object" || Array.isArray(v)) {
+          bObject[k] = this._encode(v, as_interface);
           // move transferables to the top level object
           if (bObject[k].__transferables__) {
             for (var t = 0; t < bObject[k].__transferables__.length; t++) {
@@ -731,8 +787,8 @@
     }
   };
 
-  JailedSite.prototype._wrap = function(args) {
-    var wrapped = this._encode(args);
+  JailedSite.prototype._wrap = function(args, as_interface) {
+    var wrapped = this._encode(args, as_interface);
     var result = { args: wrapped };
     return result;
   };

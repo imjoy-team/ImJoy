@@ -19,8 +19,8 @@
  *  _pluginCore.js    common plugin site protocol implementation
  */
 
-import { randId, assert, compareVersions, Whenable } from "../utils.js";
-import { getBackendByType } from "../jailed/backends.js";
+import { randId, Whenable } from "../utils.js";
+import { getBackendByType } from "../api.js";
 
 import DOMPurify from "dompurify";
 
@@ -34,7 +34,11 @@ if (__is__node__) {
   __jailed__path__ = __dirname + "/";
 } else {
   // web
-  if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
+  if (
+    location.hostname === "localhost" ||
+    location.hostname === "127.0.0.1" ||
+    location.hostname.startsWith("deploy-preview-")
+  ) {
     __jailed__path__ = `${location.protocol}//${location.hostname}${
       location.port ? ":" + location.port : ""
     }/static/jailed/`;
@@ -113,7 +117,7 @@ var Connection = function(id, type, config) {
   const backend = getBackendByType(type);
   if (backend) {
     config.__jailed__path__ = __jailed__path__;
-    this._platformConnection = new backend.connection(id, type, config);
+    this._platformConnection = new BasicConnection(id, type, config);
   } else {
     throw `Unsupported backend type (${type})`;
   }
@@ -296,10 +300,11 @@ var Plugin = function(config, _interface, _fs_api, is_proxy) {
   this.type = config.type || "web-worker";
   this._path = config.url;
   this._disconnected = true;
+  this.terminating = false;
   this.initializing = false;
   this.running = false;
   this._log_history = [];
-  this._onclose_callbacks = [];
+  this.backend = getBackendByType(this.type);
   this._updateUI =
     (_interface && _interface.utils && _interface.utils.$forceUpdate) ||
     function() {};
@@ -315,13 +320,198 @@ var Plugin = function(config, _interface, _fs_api, is_proxy) {
 };
 
 /**
+ * Platform-dependent implementation of the BasicConnection
+ * object, initializes the plugin site and provides the basic
+ * messaging-based connection with it
+ *
+ * For the web-browser environment, the plugin is created as a
+ * Worker in a sandbaxed frame
+ */
+class BasicConnection {
+  constructor(id, type, config) {
+    this._init = new Whenable();
+    this._fail = new Whenable();
+    this._disconnected = false;
+    this.id = id;
+    var iframe_container = config.iframe_container;
+    var sample = document.createElement("iframe");
+    this._loggingHandler = () => {};
+    sample.src = config.__jailed__path__ + "_frame.html";
+    sample.sandbox = "";
+    sample.frameBorder = "0";
+    sample.style.width = "100%";
+    sample.style.height = "100%";
+    sample.style.margin = "0";
+    sample.style.padding = "0";
+    sample.style.display = "none";
+
+    var me = this;
+
+    me._frame = sample.cloneNode(false);
+    var perm = [
+      "allow-scripts",
+      "allow-forms",
+      "allow-modals",
+      "allow-popups",
+      "allow-same-origin",
+    ];
+    var allows = "";
+    if (config.permissions) {
+      if (config.permissions.includes("midi") && !allows.includes("midi *;")) {
+        allows += "midi *;";
+      }
+      if (
+        config.permissions.includes("geolocation") &&
+        !allows.includes("geolocation *;")
+      ) {
+        allows += "geolocation *;";
+      }
+      if (
+        config.permissions.includes("microphone") &&
+        !allows.includes("microphone *;")
+      ) {
+        allows += "microphone *;";
+      }
+      if (
+        config.permissions.includes("camera") &&
+        !allows.includes("camera *;")
+      ) {
+        allows += "camera *;";
+      }
+      if (
+        config.permissions.includes("encrypted-media") &&
+        !allows.includes("encrypted-media *;")
+      ) {
+        allows += "encrypted-media *;";
+      }
+      if (config.permissions.includes("full-screen")) {
+        me._frame.allowfullscreen = "";
+      }
+      if (config.permissions.includes("payment-request")) {
+        me._frame.allowpaymentrequest = "";
+      }
+    }
+    me._frame.sandbox = perm.join(" ");
+    me._frame.allow = allows;
+    me._frame.src =
+      me._frame.src +
+      "?type=" +
+      type +
+      "&name=" +
+      config.name +
+      "&workspace=" +
+      config.workspace;
+    me._frame.id = "iframe_" + id;
+    if (type == "iframe" || type == "window" || type == "web-python-window") {
+      if (typeof iframe_container == "string") {
+        iframe_container = document.getElementById(iframe_container);
+      }
+      if (iframe_container) {
+        me._frame.style.display = "block";
+        iframe_container.appendChild(me._frame);
+      } else {
+        document.body.appendChild(me._frame);
+      }
+    } else {
+      document.body.appendChild(me._frame);
+    }
+    window.addEventListener("message", function(e) {
+      if (e.source === me._frame.contentWindow) {
+        if (e.data.type == "initialized") {
+          me.dedicatedThread = e.data.dedicatedThread;
+          me._init.emit();
+        } else {
+          me._messageHandler(e.data);
+        }
+      }
+    });
+  }
+
+  /**
+   * Sets-up the handler to be called upon the BasicConnection
+   * initialization is completed.
+   *
+   * For the web-browser environment, the handler is issued when
+   * the plugin worker successfully imported and executed the
+   * _pluginWebWorker.js or _pluginWebIframe.js, and replied to
+   * the application site with the initImprotSuccess message.
+   *
+   * @param {Function} handler to be called upon connection init
+   */
+  whenInit(handler) {
+    this._init.whenEmitted(handler);
+  }
+
+  /**
+   * Sets-up the handler to be called upon the BasicConnection
+   * failed.
+   *
+   * For the web-browser environment, the handler is issued when
+   * the plugin worker successfully imported and executed the
+   * _pluginWebWorker.js or _pluginWebIframe.js, and replied to
+   * the application site with the initImprotSuccess message.
+   *
+   * @param {Function} handler to be called upon connection init
+   */
+  whenFailed(handler) {
+    this._fail.whenEmitted(handler);
+  }
+
+  /**
+   * Sends a message to the plugin site
+   *
+   * @param {Object} data to send
+   */
+  send(data, transferables) {
+    this._frame.contentWindow &&
+      this._frame.contentWindow.postMessage(
+        { type: "message", data: data },
+        "*",
+        transferables
+      );
+  }
+
+  onLogging(handler) {
+    this._loggingHandler = handler;
+  }
+  /**
+   * Adds a handler for a message received from the plugin site
+   *
+   * @param {Function} handler to call upon a message
+   */
+  onMessage(handler) {
+    this._messageHandler = handler;
+  }
+
+  /**
+   * Adds a handler for the event of plugin disconnection
+   * (not used in case of Worker)
+   *
+   * @param {Function} handler to call upon a disconnect
+   */
+  onDisconnect() {}
+
+  /**
+   * Disconnects the plugin (= kills the frame)
+   */
+  disconnect() {
+    if (!this._disconnected) {
+      this._disconnected = true;
+      if (typeof this._frame != "undefined") {
+        this._frame.parentNode.removeChild(this._frame);
+      } // otherwise farme is not yet created
+    }
+  }
+}
+
+/**
  * DynamicPlugin constructor, represents a plugin initialized by a
  * string containing the code to be executed
  *
  * @param {String} code of the plugin
  * @param {Object} _interface to provide to the plugin
  */
-var DynamicPlugin = function(config, _interface, _fs_api, is_proxy) {
+var DynamicPlugin = function(config, _interface, _fs_api, engine, is_proxy) {
   this.config = config;
   if (!this.config.script) {
     throw "you must specify the script for the plugin to run.";
@@ -336,8 +526,10 @@ var DynamicPlugin = function(config, _interface, _fs_api, is_proxy) {
   this.initializing = false;
   this.running = false;
   this._log_history = [];
-  this._onclose_callbacks = [];
+  this._callbacks = config._callbacks || {};
   this._is_proxy = is_proxy;
+  this.backend = getBackendByType(this.type);
+  this.engine = engine;
   this._updateUI =
     (_interface && _interface.utils && _interface.utils.$forceUpdate) ||
     function() {};
@@ -347,51 +539,46 @@ var DynamicPlugin = function(config, _interface, _fs_api, is_proxy) {
     this._disconnected = true;
     this._bindInterface(_interface);
     for (let k in _fs_api) this._initialInterface[k] = _fs_api[k];
+
     this._connect();
   }
   this._updateUI();
 };
 /**
- * Set the plugin engine
- */
-DynamicPlugin.prototype.setEngine = Plugin.prototype.setEngine = function(
-  engine
-) {
-  this.config.engine = engine;
-};
-/**
  * Bind the first argument of all the interface functions to this plugin
  */
-DynamicPlugin.prototype._bindInterface = Plugin.prototype._bindInterface = function(
-  _interface
-) {
+DynamicPlugin.prototype._bindInterface = function(_interface) {
   _interface = _interface || {};
-  this._initialInterface = {};
+  this._initialInterface = { __as_interface__: true };
   // bind this plugin to api functions
   for (var k in _interface) {
-    if (typeof _interface[k] === "function") {
-      this._initialInterface[k] = _interface[k].bind(null, this);
-    } else if (typeof _interface[k] === "object") {
-      var utils = {};
-      for (var u in _interface[k]) {
-        if (typeof _interface[k][u] === "function") {
-          utils[u] = _interface[k][u].bind(null, this);
+    if (_interface.hasOwnProperty(k)) {
+      if (typeof _interface[k] === "function") {
+        this._initialInterface[k] = _interface[k].bind(null, this);
+      } else if (typeof _interface[k] === "object") {
+        var utils = {};
+        for (var u in _interface[k]) {
+          if (_interface[k].hasOwnProperty(u)) {
+            if (typeof _interface[k][u] === "function") {
+              utils[u] = _interface[k][u].bind(null, this);
+            }
+          }
         }
+        this._initialInterface[k] = utils;
+      } else {
+        this._initialInterface[k] = _interface[k];
       }
-      this._initialInterface[k] = utils;
-    } else {
-      this._initialInterface[k] = _interface[k];
     }
   }
 };
 /**
  * Creates the connection to the plugin site
  */
-DynamicPlugin.prototype._connect = Plugin.prototype._connect = function() {
+DynamicPlugin.prototype._connect = function() {
   this.remote = null;
   this.api = null;
 
-  this._connect = new Whenable();
+  this._connected = new Whenable();
   this._fail = new Whenable();
   this._disconnect = new Whenable();
 
@@ -413,12 +600,53 @@ DynamicPlugin.prototype._connect = Plugin.prototype._connect = function() {
   };
 
   platformInit.whenEmitted(function() {
-    if (
-      me.type == "native-python" &&
-      (!me.config.engine || !me.config.engine.socket)
-    ) {
-      me._fail.emit("Please connect to the Plugin Engine 🚀.");
-      me._connection = null;
+    if (!me.backend) {
+      if (!me.engine || !me.engine.connected) {
+        me._fail.emit("Please connect to the Plugin Engine 🚀.");
+        me._connection = null;
+        me.error("Please connect to the Plugin Engine 🚀.");
+        me._set_disconnected();
+        return;
+      }
+      me.initializing = true;
+      me._updateUI();
+      me.engine
+        .startPlugin(
+          {
+            ...me.config,
+            terminate: () => {
+              me.terminate();
+            },
+          },
+          me._initialInterface
+        )
+        .then(remote => {
+          me.remote = remote;
+          me.api = me.remote;
+          me.api.__as_interface__ = true;
+          me.api.__id__ = me.id;
+          me._disconnected = false;
+          me.initializing = false;
+          me._updateUI();
+          me._connected.emit();
+          me.engine.registerPlugin(me);
+        })
+        .catch(e => {
+          me.error(e);
+          me._set_disconnected();
+        });
+
+      // me._connection._platformConnection.onLogging(function(details) {
+      //   if (details.type === "error") {
+      //     me.error(details.value);
+      //   } else if (details.type === "progress") {
+      //     me.progress(details.value);
+      //   } else if (details.type === "info") {
+      //     me.log(details.value);
+      //   } else {
+      //     console.log(details.value);
+      //   }
+      // });
     } else {
       me._connection = new Connection(me.id, me.type, me.config);
       me.initializing = true;
@@ -429,19 +657,7 @@ DynamicPlugin.prototype._connect = Plugin.prototype._connect = function() {
       me._connection.whenFailed(function(e) {
         me._fail.emit(e);
       });
-      if (me.type == "native-python") {
-        me._connection._platformConnection.onLogging(function(details) {
-          if (details.type === "error") {
-            me.error(details.value);
-          } else if (details.type === "progress") {
-            me.progress(details.value);
-          } else if (details.type === "info") {
-            me.log(details.value);
-          } else {
-            console.log(details.value);
-          }
-        });
-      }
+
       me._connection.onDisconnect(function(details) {
         if (details) {
           if (details.success) {
@@ -467,10 +683,8 @@ DynamicPlugin.prototype._connect = Plugin.prototype._connect = function() {
  * Creates the Site object for the plugin, and then loads the
  * common routines (_JailedSite.js)
  */
-DynamicPlugin.prototype._init = Plugin.prototype._init = function() {
-  const backend = getBackendByType(this.type);
-  assert(backend);
-  var lang = backend.lang;
+DynamicPlugin.prototype._init = function() {
+  var lang = this.backend.lang;
 
   /*global JailedSite*/
   this._site = new JailedSite(this._connection, this.id, lang);
@@ -503,27 +717,20 @@ DynamicPlugin.prototype._init = Plugin.prototype._init = function() {
   });
 
   this.getRemoteCallStack = this._site.getRemoteCallStack;
-
-  if (backend.type === "external") {
-    this._sendInterface();
-  } else if (backend.type === "internal") {
-    var sCb = function() {
-      me._loadCore();
-    };
-    this._connection.importScript(
-      __jailed__path__ + "_JailedSite.js",
-      sCb,
-      this._fCb
-    );
-  } else {
-    throw `Unsupported backend type ${backend.type}`;
-  }
+  var sCb = function() {
+    me._loadCore();
+  };
+  this._connection.importScript(
+    __jailed__path__ + "_JailedSite.js",
+    sCb,
+    this._fCb
+  );
 };
 
 /**
  * Loads the core scirpt into the plugin
  */
-DynamicPlugin.prototype._loadCore = Plugin.prototype._loadCore = function() {
+DynamicPlugin.prototype._loadCore = function() {
   var me = this;
   var sCb = function() {
     me._sendInterface();
@@ -540,10 +747,10 @@ DynamicPlugin.prototype._loadCore = Plugin.prototype._loadCore = function() {
  * Sends to the remote site a signature of the interface provided
  * upon the Plugin creation
  */
-DynamicPlugin.prototype._sendInterface = Plugin.prototype._sendInterface = function() {
+DynamicPlugin.prototype._sendInterface = function() {
   var me = this;
   this._site.onInterfaceSetAsRemote(function() {
-    if (!me._connected) {
+    if (me._disconnected) {
       me._loadPlugin();
     }
   });
@@ -552,117 +759,57 @@ DynamicPlugin.prototype._sendInterface = Plugin.prototype._sendInterface = funct
 };
 
 /**
- * Loads the plugin body (loads the plugin url in case of the
- * Plugin)
- */
-Plugin.prototype._loadPlugin = function() {
-  this._requestRemote();
-  var me = this;
-  var sCb = function() {
-    me._requestRemote();
-  };
-
-  this._connection.importJailedScript(this._path, sCb, this._fCb);
-};
-
-/**
  * Loads the plugin body (executes the code in case of the
  * DynamicPlugin)
  */
 DynamicPlugin.prototype._loadPlugin = async function() {
   try {
+    if (this.config.requirements) {
+      await this._connection.execute({
+        type: "requirements",
+        lang: this.config.lang,
+        requirements: this.config.requirements,
+        env: this.config.env,
+      });
+    }
     if (
-      this.config.type === "native-python" &&
-      this.config.engine &&
-      this.config.engine.engine_info
+      this.config.type === "iframe" ||
+      this.config.type === "window" ||
+      this.config.type === "web-python-window"
     ) {
-      if (
-        this.config.engine.engine_info.api_version &&
-        compareVersions(
-          this.config.engine.engine_info.api_version,
-          ">",
-          "0.1.0"
-        )
-      ) {
-        if (this.config.requirements) {
-          await this._connection.execute({
-            type: "requirements",
-            lang: this.config.lang,
-            requirements: this.config.requirements,
-            env: this.config.env,
-          });
-        }
-        for (let i = 0; i < this.config.scripts.length; i++) {
-          await this._connection.execute({
-            type: "script",
-            content: this.config.scripts[i].content,
-            lang: this.config.scripts[i].attrs.lang,
-            attrs: this.config.scripts[i].attrs,
-            src: this.config.scripts[i].attrs.src,
-          });
-        }
-      } else {
-        assert(
-          this.config.scripts.length === 1,
-          "only 1 script block is supported"
-        );
+      for (let i = 0; i < this.config.styles.length; i++) {
         await this._connection.execute({
-          type: "script",
-          main: true,
-          content: this.config.scripts[0].content,
-          lang: this.config.lang,
-          requirements: this.config.requirements || [],
-          env: this.config.env,
+          type: "style",
+          content: this.config.styles[i].content,
+          attrs: this.config.styles[i].attrs,
+          src: this.config.styles[i].attrs.src,
         });
       }
-    } else {
-      if (this.config.requirements) {
+      for (let i = 0; i < this.config.links.length; i++) {
         await this._connection.execute({
-          type: "requirements",
-          lang: this.config.lang,
-          requirements: this.config.requirements,
-          env: this.config.env,
+          type: "link",
+          rel: this.config.links[i].attrs.rel,
+          type_: this.config.links[i].attrs.type,
+          attrs: this.config.links[i].attrs,
+          href: this.config.links[i].attrs.href,
         });
       }
-      if (
-        this.config.type === "iframe" ||
-        this.config.type === "window" ||
-        this.config.type === "web-python-window"
-      ) {
-        for (let i = 0; i < this.config.styles.length; i++) {
-          await this._connection.execute({
-            type: "style",
-            content: this.config.styles[i].content,
-            attrs: this.config.styles[i].attrs,
-            src: this.config.styles[i].attrs.src,
-          });
-        }
-        for (let i = 0; i < this.config.links.length; i++) {
-          await this._connection.execute({
-            type: "link",
-            rel: this.config.links[i].attrs.rel,
-            type_: this.config.links[i].attrs.type,
-            attrs: this.config.links[i].attrs,
-            href: this.config.links[i].attrs.href,
-          });
-        }
-        for (let i = 0; i < this.config.windows.length; i++) {
-          await this._connection.execute({
-            type: "html",
-            content: this.config.windows[i].content,
-            attrs: this.config.windows[i].attrs,
-          });
-        }
-      }
-      for (let i = 0; i < this.config.scripts.length; i++) {
+      for (let i = 0; i < this.config.windows.length; i++) {
         await this._connection.execute({
-          type: "script",
-          content: this.config.scripts[i].content,
-          lang: this.config.scripts[i].attrs.lang,
-          attrs: this.config.scripts[i].attrs,
-          src: this.config.scripts[i].attrs.src,
+          type: "html",
+          content: this.config.windows[i].content,
+          attrs: this.config.windows[i].attrs,
         });
       }
+    }
+    for (let i = 0; i < this.config.scripts.length; i++) {
+      await this._connection.execute({
+        type: "script",
+        content: this.config.scripts[i].content,
+        lang: this.config.scripts[i].attrs.lang,
+        attrs: this.config.scripts[i].attrs,
+        src: this.config.scripts[i].attrs.src,
+      });
     }
     this._requestRemote();
   } catch (e) {
@@ -677,17 +824,17 @@ DynamicPlugin.prototype._loadPlugin = async function() {
  * (meaning both the plugin and the application can use the
  * interfaces provided to each other)
  */
-DynamicPlugin.prototype._requestRemote = Plugin.prototype._requestRemote = function() {
+DynamicPlugin.prototype._requestRemote = function() {
   var me = this;
   this._site.onRemoteUpdate(function() {
     me.remote = me._site.getRemote();
     me.api = me.remote;
-    me.api.__jailed_type__ = "plugin_api";
+    me.api.__as_interface__ = true;
     me.api.__id__ = me.id;
     me._disconnected = false;
     me.initializing = false;
     me._updateUI();
-    me._connect.emit();
+    me._connected.emit();
   });
 
   this._site.requestRemote();
@@ -698,15 +845,15 @@ DynamicPlugin.prototype._requestRemote = Plugin.prototype._requestRemote = funct
  * (subprocess in Node.js or a subworker in browser) and therefore
  * will not hang up on the infinite loop in the untrusted code
  */
-DynamicPlugin.prototype.hasDedicatedThread = Plugin.prototype.hasDedicatedThread = function() {
+DynamicPlugin.prototype.hasDedicatedThread = function() {
   return this._connection.hasDedicatedThread();
 };
 
 /**
  * Disconnects the plugin immideately
  */
-DynamicPlugin.prototype.disconnect = Plugin.prototype.disconnect = function() {
-  this._connection.disconnect();
+DynamicPlugin.prototype.disconnect = function() {
+  if (this._connection) this._connection.disconnect();
   this._disconnect.emit();
 };
 
@@ -716,9 +863,7 @@ DynamicPlugin.prototype.disconnect = Plugin.prototype.disconnect = function() {
  *
  * @param {Function} handler to be issued upon disconnect
  */
-DynamicPlugin.prototype.whenFailed = Plugin.prototype.whenFailed = function(
-  handler
-) {
+DynamicPlugin.prototype.whenFailed = function(handler) {
   this._fail.whenEmitted(handler);
 };
 
@@ -728,10 +873,8 @@ DynamicPlugin.prototype.whenFailed = Plugin.prototype.whenFailed = function(
  *
  * @param {Function} handler to be issued upon connection
  */
-DynamicPlugin.prototype.whenConnected = Plugin.prototype.whenConnected = function(
-  handler
-) {
-  this._connect.whenEmitted(handler);
+DynamicPlugin.prototype.whenConnected = function(handler) {
+  this._connected.whenEmitted(handler);
 };
 
 /**
@@ -740,31 +883,36 @@ DynamicPlugin.prototype.whenConnected = Plugin.prototype.whenConnected = functio
  *
  * @param {Function} handler to be issued upon connection failure
  */
-DynamicPlugin.prototype.whenDisconnected = Plugin.prototype.whenDisconnected = function(
-  handler
-) {
+DynamicPlugin.prototype.whenDisconnected = function(handler) {
   this._disconnect.whenEmitted(handler);
 };
 
-DynamicPlugin.prototype._set_disconnected = Plugin.prototype._set_disconnected = function() {
+DynamicPlugin.prototype._set_disconnected = function() {
   this._disconnected = true;
   this.running = false;
   this.initializing = false;
+  this.terminating = false;
+  this.engine = null;
   this._updateUI();
 };
 
-DynamicPlugin.prototype.terminate = Plugin.prototype.terminate = async function() {
+DynamicPlugin.prototype.terminate = async function() {
   if (this._disconnected) {
     this._set_disconnected();
     return;
   }
+  //prevent call loop
+  if (this.terminating) {
+    return;
+  } else {
+    this.terminating = true;
+  }
 
   try {
-    await Promise.all(this._onclose_callbacks.map(item => item()));
+    await this.emit("close");
   } catch (e) {
     console.error(e);
   }
-
   try {
     if (this.api && this.api.exit && typeof this.api.exit == "function") {
       await this.api.exit();
@@ -784,11 +932,64 @@ DynamicPlugin.prototype.terminate = Plugin.prototype.terminate = async function(
   }
 };
 
-DynamicPlugin.prototype.onClose = Plugin.prototype.onClose = function(cb) {
-  this._onclose_callbacks.push(cb);
+DynamicPlugin.prototype.on = function(name, handler, fire_if_emitted) {
+  if (this._callbacks[name]) {
+    this._callbacks[name].push(handler);
+  } else {
+    this._callbacks[name] = [handler];
+  }
+  if (fire_if_emitted && this._callbacks[name].emitted) {
+    handler(this._callbacks[name].emitted_data);
+  }
+};
+DynamicPlugin.prototype.off = function(name, handler) {
+  if (this._callbacks[name]) {
+    if (handler) {
+      const handlers = this._callbacks[name];
+      const idx = handlers.indexOf(handler);
+      if (idx >= 0) {
+        handlers.splice(idx, 1);
+      } else {
+        console.warn(`callback ${name} does not exist.`);
+      }
+    } else {
+      delete this._callbacks[name];
+    }
+  } else {
+    console.warn(`callback ${name} does not exist.`);
+  }
+};
+DynamicPlugin.prototype.emit = function(name, data) {
+  return new Promise(async (resolve, reject) => {
+    const errors = [];
+    try {
+      if (this._callbacks[name]) {
+        for (let cb of this._callbacks[name]) {
+          try {
+            await cb(data !== undefined ? data : undefined);
+          } catch (e) {
+            errors.push(e);
+            console.error(e);
+          }
+        }
+      } else {
+        // if no handler set, store the data
+        this._callbacks[name] = [];
+        this._callbacks[name].emitted = true;
+        this._callbacks[name].emitted_data = data;
+      }
+      if (errors.length <= 0) {
+        resolve();
+      } else {
+        reject(errors);
+      }
+    } catch (e) {
+      reject(e);
+    }
+  });
 };
 
-DynamicPlugin.prototype.log = Plugin.prototype.log = function(msg) {
+DynamicPlugin.prototype.log = function(msg) {
   if (typeof msg === "object") {
     this._log_history.push(msg);
     console.log(`Plugin ${this.id}:`, msg);
@@ -800,14 +1001,14 @@ DynamicPlugin.prototype.log = Plugin.prototype.log = function(msg) {
   }
 };
 
-DynamicPlugin.prototype.error = Plugin.prototype.error = function() {
+DynamicPlugin.prototype.error = function() {
   const args = Array.prototype.slice.call(arguments).join(" ");
   this._log_history._error = args.slice(0, 100);
   this._log_history.push({ type: "error", value: args });
   console.error(`Error in Plugin ${this.id}: ${args}`);
 };
 
-DynamicPlugin.prototype.progress = Plugin.prototype.progress = function(p) {
+DynamicPlugin.prototype.progress = function(p) {
   if (p < 1) this._progress = p * 100;
   else this._progress = p;
 };

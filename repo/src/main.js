@@ -34,6 +34,43 @@ function getThumbnail(url, tsize) {
 
 }
 
+
+const _backends = {
+  "web-worker": {
+    type: "internal",
+    name: "Web Worker",
+    lang: "javascript",
+  },
+  iframe: {
+    type: "internal",
+    name: "IFrame",
+    lang: "javascript",
+  },
+  window: {
+    type: "internal",
+    name: "Window",
+    lang: "javascript",
+  },
+  "web-python": {
+    type: "internal",
+    name: "Web Python",
+    lang: "web-python",
+    icon: "🐍",
+  },
+  "web-python-window": {
+    type: "internal",
+    name: "Web Python (window)",
+    lang: "web-python",
+    icon: "🐍",
+  },
+  collection: {
+    type: "-",
+    name: "Collection",
+    lang: "",
+    icon: "",
+  },
+};
+
 const app = new Vue({
   el: '#app',
   data: {
@@ -109,6 +146,12 @@ const app = new Vue({
         // })
       } else {
         plugin.cover_image = ''
+      }
+      if(_backends[plugin.type]){
+        plugin.badges = _backends[plugin.type].icon || '';
+      }
+      else{
+        plugin.badges = '🚀'
       }
     });
     that.plugins.forEach((plugin) => {
