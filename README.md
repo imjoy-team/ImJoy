@@ -6,7 +6,7 @@
 
 ## ImJoy - Deep Learning Made Easy!
 
-**New**: The ImJoy paper is out on Nature Methods, [check it out](https://doi.org/10.1038/s41592-019-0627-0).
+**New**: The ImJoy paper is out on Nature Methods, [check it out](https://www.nature.com/articles/s41592-019-0627-0).
 
 **New**: We are working actively on supporting Jupyter notebook based engines, ImJoy now comes with a `Jupyter Engine Manager`, which enables running Python plugins via [MyBinder.org](https://mybinder.org) or your own Jupyter notebook server. With the preview version, you will be able to try and test ImJoy Python plugins without additional setup. Stay tuned, more enhanced features will come soon.
 
@@ -76,8 +76,8 @@ These computations can be performed on your computer utilising the full power
 of the local GPU/CPU. The computational backend can also be launched on remote servers
 including cloud servers on Amazon, Google Compute, or an institutional computing cluster.
 
-Previously, running Python plugins will require the installation of Plugin Engine. However, now we have added an experimental support for running Python plugin via the servers provided by MyBinder.org.
-So you an try for example [DeepBindScan](https://imjoy.io/#/app?plugin=oeway/ImJoy-Plugins:DeepBindScan) without any installation.
+Previously, running Python plugins would require installation of the Plugin Engine. However, now we have added experimental support for running Python plugins via the servers provided by MyBinder.org.
+You can try for example the [DeepBindScan](https://imjoy.io/#/app?plugin=oeway/ImJoy-Plugins:DeepBindScan) plugin without any installation.
 
 To learn more details about ImJoy, please go to [ImJoy Docs](https://imjoy.io/docs/).
 
@@ -127,17 +127,10 @@ We don't have a guideline for that yet, for now please feel free to use the [iss
 
 ## Citation
 
-Please cite our preprint on Arxiv ([https://arxiv.org/abs/1905.13105](https://arxiv.org/abs/1905.13105)):
+Please cite our paper on Nature Methods ([https://www.nature.com/articles/s41592-019-0627-0](https://www.nature.com/articles/s41592-019-0627-0)):
 
 ```
-@article{ouyang2019imjoy,
-    title={ImJoy: an open-source computational platform for the deep learning era},
-    author={Wei Ouyang and Florian Mueller and Martin Hjelmare and Emma Lundberg and Christophe Zimmer},
-    year={2019},
-    eprint={1905.13105},
-    archivePrefix={arXiv},
-    primaryClass={cs.LG}
-}
+Ouyang, W., Mueller, F., Hjelmare, M. et al. ImJoy: an open-source computational platform for the deep learning era. Nat Methods (2019) doi:10.1038/s41592-019-0627-0
 ```
 
 ## License
