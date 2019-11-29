@@ -56,7 +56,7 @@
           </md-menu-item>
           <template v-if="engine.connected && engine.show_processes">
             <md-menu-item
-              @click="showInfo(engine)"
+              @click="showAbout(engine)"
               :key="engine.url + '_show_info'"
             >
               &nbsp;&nbsp;<md-button class="md-icon-button">
@@ -507,10 +507,14 @@ export default {
     resetEngine(engine) {
       engine.resetEngine();
     },
-    showInfo(engine) {
-      this.show_sys_info = false;
-      this.selected_engine = engine;
-      this.showEngineInfoDialog = true;
+    showAbout(engine) {
+      if (engine.about) {
+        engine.about();
+      } else {
+        this.show_sys_info = false;
+        this.selected_engine = engine;
+        this.showEngineInfoDialog = true;
+      }
     },
     openEngineUrl(url) {
       window.open(url, "_blank");

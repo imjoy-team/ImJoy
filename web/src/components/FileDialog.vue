@@ -205,6 +205,7 @@ export default {
           if (this.selected_file_manager.putFile) {
             await this.selected_file_manager.putFile(
               files[i],
+              this.root,
               `Uploading ${i + 1}/${files.length}: ${files[i].name}`
             );
           } else {

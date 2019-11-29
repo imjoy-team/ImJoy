@@ -1,7 +1,11 @@
 <template>
   <div class="terminal-window">
-    <md-button v-if="error" @click="start()">
-      <md-icon>restore</md-icon> Restart Terminal
+    <md-button
+      v-for="b in this.buttons || []"
+      @click="button_click(b)"
+      :key="b.event_id"
+    >
+      <md-icon v-if="b.icon">{{ b.icon }}</md-icon> {{ b.label }}
     </md-button>
     <div
       ref="terminal_container"
@@ -47,6 +51,7 @@ export default {
     return {
       error: false,
       window_height: "500px",
+      buttons: [],
     };
   },
   created() {},
@@ -77,12 +82,17 @@ export default {
     this.term.on("paste", data => {
       this.w.api.emit("paste", data);
     });
+    this.w.api.on("show_buttons", buttons => {
+      this.buttons = buttons;
+      this.$forceUpdate();
+    });
     const wait_ms = 50;
     const fit2screen = debounce(this.fitToscreen, wait_ms);
     window.addEventListener("resize", fit2screen);
     document.addEventListener("orientationchange", fit2screen);
     this.w.api.on("resize", fit2screen);
     this.w.api.on("refresh", fit2screen);
+    this.buttons = this.w.data.buttons || [];
     this.$emit("init");
   },
   beforeDestroy() {},
@@ -98,6 +108,9 @@ export default {
         });
         this.$forceUpdate();
       });
+    },
+    button_click(button) {
+      this.w.api.emit("button_clicked", button);
     },
   },
 };
