@@ -225,11 +225,7 @@ export default {
 .button-container-padding {
   padding: 10px 15px;
 }
-a {
-  font-size: 1.2em;
-  text-decoration: none;
-  color: #448aff;
-}
+
 .overflow-auto {
   overflow: auto;
 }
