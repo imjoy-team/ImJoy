@@ -1,11 +1,11 @@
 self.__precacheManifest = [
   {
-    "revision": "1fe2c2ef269ca8faca08",
-    "url": "/static/css/app.a30257f5.css"
+    "revision": "798942929b1e80d43d99",
+    "url": "/static/css/app.21645cba.css"
   },
   {
-    "revision": "1fe2c2ef269ca8faca08",
-    "url": "/static/js/app.d14cff3b.js"
+    "revision": "798942929b1e80d43d99",
+    "url": "/static/js/app.3b728066.js"
   },
   {
     "revision": "b8859e2632feade2aed6",
@@ -228,6 +228,10 @@ self.__precacheManifest = [
     "url": "/static/js/chunk-vendors.87003fbf.js"
   },
   {
+    "revision": "821dd06611f8497a59e8cee99dbeac0e",
+    "url": "/static/vs/css.worker.js"
+  },
+  {
     "revision": "d10204c6d610178f9c2643845f648c0e",
     "url": "/static/vs/html.worker.js"
   },
@@ -236,11 +240,7 @@ self.__precacheManifest = [
     "url": "/static/vs/editor.worker.js"
   },
   {
-    "revision": "821dd06611f8497a59e8cee99dbeac0e",
-    "url": "/static/vs/css.worker.js"
-  },
-  {
-    "revision": "ca4b534b3791adaba4b2d6a57a2c6686",
+    "revision": "e540ba9791650aaa3c7e3a66c7ed9b40",
     "url": "/index.html"
   },
   {
@@ -636,6 +636,14 @@ self.__precacheManifest = [
     "url": "/static/img/perspective-hr.jpg"
   },
   {
+    "revision": "4b8f17c234aae37b8bbe106bed899ad1",
+    "url": "/static/vs/basic-languages/redis/redis.js"
+  },
+  {
+    "revision": "90afcd78e12772f3abac47ce83714ea4",
+    "url": "/static/vs/basic-languages/redshift/redshift.js"
+  },
+  {
     "revision": "83f9d7a8568f0f86fd00bf3c21944ce8",
     "url": "/static/vs/basic-languages/ruby/ruby.js"
   },
@@ -760,20 +768,12 @@ self.__precacheManifest = [
     "url": "/static/vs/language/typescript/tsMode.js"
   },
   {
-    "revision": "4b8f17c234aae37b8bbe106bed899ad1",
-    "url": "/static/vs/basic-languages/redis/redis.js"
-  },
-  {
-    "revision": "90afcd78e12772f3abac47ce83714ea4",
-    "url": "/static/vs/basic-languages/redshift/redshift.js"
+    "revision": "cf05f5559129d3145d705a8df6c6fb48",
+    "url": "/static/vs/loader.js"
   },
   {
     "revision": "11a854433bcc74085be053c3ab713b15",
     "url": "/static/vs/language/css/cssWorker.js"
-  },
-  {
-    "revision": "cf05f5559129d3145d705a8df6c6fb48",
-    "url": "/static/vs/loader.js"
   },
   {
     "revision": "51880b243dfb4c0a65c406b155e9a716",
