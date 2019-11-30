@@ -950,7 +950,7 @@
         width: '800px',
       }"
       :md-active.sync="showPluginDialog"
-      :md-click-outside-to-close="true"
+      :md-click-outside-to-close="false"
       :md-close-on-esc="false"
     >
       <window
