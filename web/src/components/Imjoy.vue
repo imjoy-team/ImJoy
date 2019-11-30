@@ -479,7 +479,6 @@
                     class="md-icon-button"
                     :class="plugin.running ? 'md-accent' : ''"
                     md-menu-trigger
-                    @click.right="logPlugin(plugin)"
                   >
                     <md-progress-spinner
                       v-if="plugin.initializing || plugin.terminating"
@@ -614,11 +613,12 @@
                     : 'md-primary'
                 "
                 :disabled="plugin._disconnected && !plugin.engine"
-                @click="
+                @click.exact="
                   plugin._disconnected
                     ? connectPlugin(plugin)
                     : runOp(plugin.ops[plugin.name])
                 "
+                @click.right.exact="logPlugin(plugin)"
               >
                 {{ plugin.config.name + " " + plugin.config.badges }}
               </md-button>
@@ -690,8 +690,8 @@
                   class="joy-run-button md-primary op-button"
                   :class="plugin.running ? 'md-accent' : 'md-primary'"
                   :disabled="plugin._disconnected"
-                  @click="runOp(op)"
-                  @click.right="logPlugin(plugin)"
+                  @click.exact="runOp(op)"
+                  @click.right.exact="logPlugin(plugin)"
                 >
                   {{ op.name }}
                 </md-button>
@@ -722,7 +722,6 @@
                       class="md-icon-button"
                       :class="plugin.running ? 'md-accent' : ''"
                       md-menu-trigger
-                      @click.right="logPlugin(plugin)"
                     >
                       <md-progress-spinner
                         v-if="plugin.initializing || plugin.terminating"
@@ -796,7 +795,8 @@
                       : ''
                   "
                   :disabled="!plugin.engine || !plugin._disconnected"
-                  @click="connectPlugin(plugin)"
+                  @click.exact="connectPlugin(plugin)"
+                  @click.right.exact="logPlugin(plugin)"
                 >
                   {{ plugin.config.name + " " + plugin.config.badges }}
                 </md-button>
