@@ -479,6 +479,7 @@
                     class="md-icon-button"
                     :class="plugin.running ? 'md-accent' : ''"
                     md-menu-trigger
+                    @click.right="logPlugin(plugin)"
                   >
                     <md-progress-spinner
                       v-if="plugin.initializing || plugin.terminating"
@@ -722,6 +723,7 @@
                       class="md-icon-button"
                       :class="plugin.running ? 'md-accent' : ''"
                       md-menu-trigger
+                      @click.right="logPlugin(plugin)"
                     >
                       <md-progress-spinner
                         v-if="plugin.initializing || plugin.terminating"
