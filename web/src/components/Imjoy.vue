@@ -479,9 +479,10 @@
                     class="md-icon-button"
                     :class="plugin.running ? 'md-accent' : ''"
                     md-menu-trigger
+                    @click.right="logPlugin(plugin)"
                   >
                     <md-progress-spinner
-                      v-if="plugin.initializing"
+                      v-if="plugin.initializing || plugin.terminating"
                       class="md-accent"
                       :md-diameter="20"
                       md-mode="indeterminate"
@@ -543,10 +544,7 @@
                     </md-menu-item>
                     <md-menu-item
                       class="md-accent"
-                      @click="
-                        plugin2_remove = plugin;
-                        showRemoveConfirmation = true;
-                      "
+                      @click="removePlugin(plugin)"
                     >
                       <md-icon>delete_forever</md-icon>Remove
                     </md-menu-item>
@@ -668,7 +666,10 @@
               <md-progress-bar
                 md-mode="determinate"
                 v-if="
-                  (plugin.running || plugin.initializing) && plugin._progress
+                  (plugin.running ||
+                    plugin.initializing ||
+                    plugin.terminating) &&
+                    plugin._progress
                 "
                 :md-value="plugin._progress"
               ></md-progress-bar>
@@ -690,6 +691,7 @@
                   :class="plugin.running ? 'md-accent' : 'md-primary'"
                   :disabled="plugin._disconnected"
                   @click="runOp(op)"
+                  @click.right="logPlugin(plugin)"
                 >
                   {{ op.name }}
                 </md-button>
@@ -720,9 +722,10 @@
                       class="md-icon-button"
                       :class="plugin.running ? 'md-accent' : ''"
                       md-menu-trigger
+                      @click.right="logPlugin(plugin)"
                     >
                       <md-progress-spinner
-                        v-if="plugin.initializing"
+                        v-if="plugin.initializing || plugin.terminating"
                         class="md-accent"
                         :md-diameter="20"
                         md-mode="indeterminate"
@@ -776,10 +779,7 @@
                       </md-menu-item>
                       <md-menu-item
                         class="md-accent"
-                        @click="
-                          plugin2_remove = plugin;
-                          showRemoveConfirmation = true;
-                        "
+                        @click="removePlugin(plugin)"
                       >
                         <md-icon>delete_forever</md-icon>Remove
                       </md-menu-item>
@@ -872,19 +872,6 @@
         ></whiteboard>
       </md-app-content>
     </md-app>
-    <md-dialog-confirm
-      :md-active.sync="showRemoveConfirmation"
-      md-title="Removing Plugin"
-      md-content="Do you really want to <strong>delete</strong> this plugin"
-      md-confirm-text="Yes"
-      md-cancel-text="Cancel"
-      @md-cancel="showRemoveConfirmation = false"
-      @md-confirm="
-        pm.removePlugin(plugin2_remove);
-        plugin2_remove = null;
-        showRemoveConfirmation = false;
-      "
-    />
 
     <md-snackbar
       id="api-snackbar"
@@ -1035,21 +1022,6 @@
         </md-list>
       </md-dialog-content>
     </md-dialog>
-    <md-dialog-confirm
-      :md-active.sync="showPermissionConfirmation"
-      md-title="Confirmation Required"
-      :md-content="permission_message"
-      md-confirm-text="Deny"
-      md-cancel-text="Allow"
-      @md-cancel="
-        showPermissionConfirmation = false;
-        processPermission(true);
-      "
-      @md-confirm="
-        showPermissionConfirmation = false;
-        processPermission(false);
-      "
-    />
 
     <md-dialog
       style="max-width: 800px; width: 100%; height: 100%;"
@@ -1391,16 +1363,10 @@ export default {
       showSettingsDialog: false,
       showAboutDialog: false,
       showAddPluginDialog: false,
-      showRemoveConfirmation: false,
-      showPermissionConfirmation: false,
       permission_message: "No permission message.",
       share_url_message: "No url",
       resolve_permission: null,
       reject_permission: null,
-      plugin_dialog_config: null,
-      plugin_dialog_promise: {},
-      plugin2_remove: null,
-      is_https_mode: true,
       plugin_url: null,
       downloading_plugin: false,
       downloading_error: "",
@@ -1722,7 +1688,6 @@ export default {
       }
     }
 
-    this.is_https_mode = "https:" === location.protocol;
     // Make sure the GUI is refreshed
     setInterval(() => {
       this.$forceUpdate();
@@ -2225,12 +2190,6 @@ export default {
       this.$forceUpdate();
     },
     showEngineConnection(show, engine) {
-      // if(message && resolve && reject){
-      //   this.permission_message = message
-      //   this.resolve_permission = resolve
-      //   this.reject_permission = reject
-      //   this.showPermissionConfirmation = true
-      // }
       this.event_bus.emit("show_engine_dialog", {
         show: show,
         engine: engine,
@@ -2556,6 +2515,18 @@ export default {
     },
     unloadPlugin(plugin) {
       this.pm.unloadPlugin(plugin);
+    },
+    removePlugin(plugin) {
+      this.showConfirm(null, {
+        title: "Removing Plugin",
+        content: "Do you really want to <strong>delete</strong> this plugin",
+        confirm_text: "Yes",
+      }).then(yes => {
+        if (yes) this.pm.removePlugin(plugin);
+      });
+    },
+    logPlugin(plugin) {
+      console.log(plugin, this.pm, this.em, this.fm);
     },
     startTerminal(engine) {
       engine.startTerminal();

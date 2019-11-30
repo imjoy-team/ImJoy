@@ -183,13 +183,28 @@ export class PluginManager {
       for (let k in this.plugins) {
         if (this.plugins.hasOwnProperty(k)) {
           const plugin = this.plugins[k];
+          if (plugin.engine === engine) {
+            this.reloadPlugin(plugin);
+          }
           if (
-            plugin.config.engine_mode &&
-            (!plugin.engine ||
-              plugin.engine === engine ||
-              plugin.config.engine_mode === engine.name)
+            plugin.config.engine_mode === "auto" &&
+            (plugin._disconnected || plugin.terminating)
           ) {
             this.reloadPlugin(plugin);
+          }
+
+          if (plugin.config.engine_mode === engine.name) {
+            this.reloadPlugin(plugin);
+          }
+        }
+      }
+    });
+    this.event_bus.on("engine_disconnected", engine => {
+      for (let k in this.plugins) {
+        if (this.plugins.hasOwnProperty(k)) {
+          const plugin = this.plugins[k];
+          if (plugin.engine === engine) {
+            this.unloadPlugin(plugin);
           }
         }
       }
@@ -1464,7 +1479,14 @@ export class PluginManager {
       );
       if (_interface.ENGINE_URL)
         plugin._log_history.push(`ENGINE_URL=${_interface.ENGINE_URL}`);
+
+      const plugin_loading_timer = setTimeout(() => {
+        plugin.terminate();
+        reject(`Plugin ${plugin.name} failed to load in 10s.`);
+      }, 60000);
+
       plugin.whenConnected(() => {
+        clearTimeout(plugin_loading_timer);
         if (!plugin.api) {
           console.error("Error occured when loading plugin.");
           this.showMessage("Error occured when loading plugin.");
@@ -1534,6 +1556,7 @@ export class PluginManager {
         }
       });
       plugin.whenFailed(e => {
+        clearTimeout(plugin_loading_timer);
         plugin.error(e);
         if (e) {
           this.showMessage(`<${template.name}>: ${e}`);
@@ -2030,7 +2053,7 @@ export class PluginManager {
   }
 
   //#################ImJoy API functions##################
-  register(plugin, config) {
+  async register(plugin, config) {
     if (config.type === "engine") {
       assert(
         plugin.config.flags && plugin.config.flags.indexOf("engine") >= 0,
@@ -2041,7 +2064,7 @@ export class PluginManager {
         console.error("Error occured registering engine ", config, error);
         throw error;
       }
-      this.em.register(config);
+      await this.em.register(config);
       this.registered.engines[config.name] = config;
       plugin.on("close", () => {
         this.em.unregister(config);
@@ -2076,7 +2099,7 @@ export class PluginManager {
         console.error("Error occured registering file manager", config, error);
         throw error;
       }
-      this.fm.register(config);
+      await this.fm.register(config);
     } else {
       this.registerOp(plugin, config);
     }
