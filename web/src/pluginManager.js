@@ -179,27 +179,31 @@ export class PluginManager {
     }
     //expose api to window for debugging
     window.api = this.imjoy_api;
-    this.event_bus.on("engine_connected", engine => {
+    this.event_bus.on("engine_connected", async engine => {
       for (let k in this.plugins) {
         if (this.plugins.hasOwnProperty(k)) {
           const plugin = this.plugins[k];
-          if (plugin.engine === engine) {
-            this.reloadPlugin(plugin);
-          }
-          if (
-            plugin.config.engine_mode === "auto" &&
-            (plugin._disconnected || plugin.terminating)
-          ) {
-            this.reloadPlugin(plugin);
-          }
+          try {
+            if (plugin.engine === engine) {
+              await this.reloadPlugin(plugin);
+            }
+            if (
+              plugin.config.engine_mode === "auto" &&
+              (plugin._disconnected || plugin.terminating)
+            ) {
+              await this.reloadPlugin(plugin);
+            }
 
-          if (plugin.config.engine_mode === engine.name) {
-            this.reloadPlugin(plugin);
+            if (plugin.config.engine_mode === engine.name) {
+              await this.reloadPlugin(plugin);
+            }
+          } catch (e) {
+            this.showMessage(e);
           }
         }
       }
     });
-    this.event_bus.on("engine_disconnected", engine => {
+    this.event_bus.on("engine_disconnected", async engine => {
       for (let k in this.plugins) {
         if (this.plugins.hasOwnProperty(k)) {
           const plugin = this.plugins[k];
@@ -1482,8 +1486,8 @@ export class PluginManager {
 
       const plugin_loading_timer = setTimeout(() => {
         plugin.terminate();
-        reject(`Plugin ${plugin.name} failed to load in 10s.`);
-      }, 60000);
+        reject(`Plugin ${plugin.name} failed to load in 180s.`);
+      }, 180000);
 
       plugin.whenConnected(() => {
         clearTimeout(plugin_loading_timer);
