@@ -621,6 +621,15 @@ DynamicPlugin.prototype._connect = function() {
           me._initialInterface
         )
         .then(remote => {
+          // check if the plugin is terminated during startup
+          if (!me.engine) {
+            console.warn(
+              "Plugin " + me.id + " is ready, but it was termianted."
+            );
+            if (me.engine && me.engine.killPlugin)
+              me.engine.killPlugin(me.config);
+            return;
+          }
           me.remote = remote;
           me.api = me.remote;
           me.api.__as_interface__ = true;
@@ -896,30 +905,14 @@ DynamicPlugin.prototype._set_disconnected = function() {
   this._updateUI();
 };
 
-DynamicPlugin.prototype.terminate = async function() {
+DynamicPlugin.prototype.terminate = async function(force) {
   if (this._disconnected) {
     this._set_disconnected();
     return;
   }
-  //prevent call loop
-  if (this.terminating) {
-    return;
-  } else {
-    this.terminating = true;
-  }
-
-  try {
-    await this.emit("close");
-  } catch (e) {
-    console.error(e);
-  }
-  try {
-    if (this.api && this.api.exit && typeof this.api.exit == "function") {
-      await this.api.exit();
-    }
-  } catch (e) {
-    console.error("error occured when terminating the plugin", e);
-  } finally {
+  const disconnectAll = () => {
+    if (this.engine && this.engine.killPlugin)
+      this.engine.killPlugin(this.config);
     this._set_disconnected();
     if (this._site) {
       this._site.disconnect();
@@ -929,6 +922,35 @@ DynamicPlugin.prototype.terminate = async function() {
       this._connection.disconnect();
       this._connection = null;
     }
+  };
+  //prevent call loop
+  if (this.terminating) {
+    return;
+  } else {
+    this.terminating = true;
+    setTimeout(() => {
+      console.warn(
+        `Plugin termination takes more than 5s, force quiting ${this.id}!`
+      );
+      if (this.terminating) disconnectAll();
+    }, 5000);
+  }
+  try {
+    await this.emit("close");
+  } catch (e) {
+    console.error(e);
+  }
+  if (force) {
+    disconnectAll();
+  }
+  try {
+    if (this.api && this.api.exit && typeof this.api.exit == "function") {
+      await this.api.exit();
+    }
+  } catch (e) {
+    console.error("error occured when terminating the plugin", e);
+  } finally {
+    disconnectAll();
   }
 };
 
