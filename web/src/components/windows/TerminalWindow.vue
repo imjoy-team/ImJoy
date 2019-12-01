@@ -102,6 +102,7 @@ export default {
       this.window_height = this.$el.clientHeight + "px";
       this.$forceUpdate();
       this.$nextTick(() => {
+        this.term.focus();
         this.term.fit();
         this.w.api.emit("fit", {
           cols: this.term.cols,
