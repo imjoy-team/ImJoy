@@ -94,7 +94,7 @@ export class FileManager {
     return null;
   }
 
-  register(manager_) {
+  async register(manager_) {
     const manager = Object.assign({}, manager_);
     //backup the manager api
     manager.api = manager_;
@@ -108,8 +108,8 @@ export class FileManager {
     const check_connectivity = async () => {
       manager.connected = await manager.heartbeat();
     };
-    check_connectivity();
-    setInterval(check_connectivity, 3000);
+    await check_connectivity();
+    manager.heart_beat_timer = setInterval(check_connectivity, 10000);
     this.fileManagers.push(manager);
   }
 
@@ -118,6 +118,9 @@ export class FileManager {
     const index = this.fileManagers.indexOf(manager);
     if (index > -1) {
       this.fileManagers.splice(index, 1);
+    }
+    if (manager.heart_beat_timer) {
+      clearInterval(manager.heart_beat_timer);
     }
   }
 

@@ -48,12 +48,12 @@ export default {
   mounted() {
     this.w.api.on("resize", () => {
       setTimeout(() => {
-        this.$refs.compare.handleResize();
+        this.$refs.compare && this.$refs.compare.handleResize();
       }, 0);
     });
     this.w.api.on("refresh", () => {
       setTimeout(() => {
-        this.$refs.compare.handleResize();
+        this.$refs.compare && this.$refs.compare.handleResize();
       }, 0);
     });
 

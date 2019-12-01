@@ -42,7 +42,7 @@ export class EngineManager {
     return null;
   }
 
-  register(engine_) {
+  async register(engine_) {
     const engine = Object.assign({}, engine_);
     //backup the engine api
     engine.api = engine_;
@@ -53,18 +53,14 @@ export class EngineManager {
       }
     }
     engine.connected = false;
-
+    engine.engine_status = engine.engine_status || {};
     if (engine.getEngineInfo) {
       engine.getEngineInfo().then(engine_info => {
         engine.engine_info = engine_info;
       });
     }
+
     const check_connectivity = async () => {
-      if (engine.getEngineStatus) {
-        try {
-          engine.engine_status = await engine.getEngineStatus();
-        } catch (e) {}
-      }
       const live = await engine.heartbeat();
       if (!engine.connected && live) {
         engine.connected = true;
@@ -87,8 +83,8 @@ export class EngineManager {
     };
     this.engines.push(engine);
     engine.connect();
-    check_connectivity();
-    setInterval(check_connectivity, 3000);
+    await check_connectivity();
+    engine.heartbeat_timer = setInterval(check_connectivity, 5000);
   }
 
   unregister(engine) {
@@ -101,6 +97,8 @@ export class EngineManager {
     if (index > -1) {
       this.engines.splice(index, 1);
     }
+    if (engine.heartbeat_timer) clearInterval(engine.heartbeat_timer);
+    this.event_bus.emit("engine_disconnected", engine);
   }
 
   registerFactory(factory_) {

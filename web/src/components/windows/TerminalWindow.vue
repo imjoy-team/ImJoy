@@ -82,6 +82,7 @@ export default {
     this.term.on("paste", data => {
       this.w.api.emit("paste", data);
     });
+    this.term.focus();
     this.w.api.on("show_buttons", buttons => {
       this.buttons = buttons;
       this.$forceUpdate();
@@ -101,6 +102,7 @@ export default {
       this.window_height = this.$el.clientHeight + "px";
       this.$forceUpdate();
       this.$nextTick(() => {
+        this.term.focus();
         this.term.fit();
         this.w.api.emit("fit", {
           cols: this.term.cols,
