@@ -95,7 +95,7 @@ Currently, ImJoy consists of the following repositories:
 ## Documentation, questions and feedback
 
 1. We provide a detailed [ImJoy Docs](https://imjoy.io/docs/). This includes
-   a section with [frequently asked questions](user_manual?id=faqs).
+   a section with [frequently asked questions](https://imjoy.io/docs/#/user_manual?id=faqs).
 2. For further help and questions for how to use ImJoy and process data with ImJoy, you can post on [image.sc](https://forum.image.sc/tags/imjoy).
 3. To report bugs or suggest enhancements for ImJoy itself, please file a GitHub issue.
 
