@@ -135,7 +135,7 @@ describe("ImJoy.vue", async () => {
     expect(typeof plugin.api.run).to.equal("function");
     await plugin.api.run({});
     plugin.terminate();
-  }).timeout(20000);
+  }).timeout(100000);
 
   it("should load the new web-python-window plugin", async () => {
     const code = _.clone(WEB_PYTHON_WINDOW_PLUGIN_TEMPLATE);
