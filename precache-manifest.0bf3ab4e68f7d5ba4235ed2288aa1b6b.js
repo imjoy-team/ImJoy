@@ -228,6 +228,10 @@ self.__precacheManifest = [
     "url": "/static/js/chunk-vendors.87003fbf.js"
   },
   {
+    "revision": "d10204c6d610178f9c2643845f648c0e",
+    "url": "/static/vs/html.worker.js"
+  },
+  {
     "revision": "821dd06611f8497a59e8cee99dbeac0e",
     "url": "/static/vs/css.worker.js"
   },
@@ -236,16 +240,8 @@ self.__precacheManifest = [
     "url": "/static/vs/editor.worker.js"
   },
   {
-    "revision": "d10204c6d610178f9c2643845f648c0e",
-    "url": "/static/vs/html.worker.js"
-  },
-  {
     "revision": "6a5949831ebd7b11c895fbffc1f89cd9",
     "url": "/index.html"
-  },
-  {
-    "revision": "d41d8cd98f00b204e9800998ecf8427e",
-    "url": "/.nojekyll"
   },
   {
     "revision": "e5e08310b3ee1c06ba4cb63bd0c22cea",
@@ -276,6 +272,10 @@ self.__precacheManifest = [
     "url": "/static/iconfont/material-icons.css"
   },
   {
+    "revision": "d41d8cd98f00b204e9800998ecf8427e",
+    "url": "/.nojekyll"
+  },
+  {
     "revision": "e79bfd88537def476913f3ed52f4f4b3",
     "url": "/static/iconfont/MaterialIcons-Regular.eot"
   },
@@ -300,12 +300,12 @@ self.__precacheManifest = [
     "url": "/static/iconfont/MaterialIcons-Regular.woff2"
   },
   {
-    "revision": "74139811f0c508b3cbd5ea285c643950",
-    "url": "/static/iconfont/README.md"
-  },
-  {
     "revision": "cc19fd84e6a224e2e569cc62f1a6ff97",
     "url": "/static/icons/android-icon-144x144.png"
+  },
+  {
+    "revision": "74139811f0c508b3cbd5ea285c643950",
+    "url": "/static/iconfont/README.md"
   },
   {
     "revision": "0580fd867305e330cffb8d6facd2465a",
@@ -336,12 +336,12 @@ self.__precacheManifest = [
     "url": "/static/icons/apple-icon-120x120.png"
   },
   {
-    "revision": "cc19fd84e6a224e2e569cc62f1a6ff97",
-    "url": "/static/icons/apple-icon-144x144.png"
-  },
-  {
     "revision": "edba2cda2b6fa6c55e9c7c336d2de3b4",
     "url": "/static/icons/apple-icon-152x152.png"
+  },
+  {
+    "revision": "cc19fd84e6a224e2e569cc62f1a6ff97",
+    "url": "/static/icons/apple-icon-144x144.png"
   },
   {
     "revision": "4efc4b6b32a094bfb5aaccbbff3ea510",
@@ -365,27 +365,27 @@ self.__precacheManifest = [
   },
   {
     "revision": "77d9f96585bb42dcb73f56bc7cc594a4",
-    "url": "/static/icons/apple-icon-precomposed.png"
-  },
-  {
-    "revision": "77d9f96585bb42dcb73f56bc7cc594a4",
     "url": "/static/icons/apple-icon.png"
   },
   {
-    "revision": "653d077300a12f09a69caeea7a8947f8",
-    "url": "/static/icons/browserconfig.xml"
+    "revision": "77d9f96585bb42dcb73f56bc7cc594a4",
+    "url": "/static/icons/apple-icon-precomposed.png"
   },
   {
     "revision": "90a7b93bdd8acaa5cb221740e98415a0",
     "url": "/static/icons/favicon-16x16.png"
   },
   {
-    "revision": "d765755b7bd60885245ab699a2dd77b3",
-    "url": "/static/icons/favicon-32x32.png"
+    "revision": "653d077300a12f09a69caeea7a8947f8",
+    "url": "/static/icons/browserconfig.xml"
   },
   {
     "revision": "51eee4c6a2cbff5e6d149f82d12699a2",
     "url": "/static/icons/favicon-96x96.png"
+  },
+  {
+    "revision": "d765755b7bd60885245ab699a2dd77b3",
+    "url": "/static/icons/favicon-32x32.png"
   },
   {
     "revision": "cc19fd84e6a224e2e569cc62f1a6ff97",
@@ -428,12 +428,12 @@ self.__precacheManifest = [
     "url": "/static/img/github-white.svg"
   },
   {
-    "revision": "f0d21da3f74ffbbcc644dafd7b957e57",
-    "url": "/static/img/github.svg"
-  },
-  {
     "revision": "6927c75e85be261a4e36e189576c505d",
     "url": "/static/img/imjoy-card-plain.png"
+  },
+  {
+    "revision": "f0d21da3f74ffbbcc644dafd7b957e57",
+    "url": "/static/img/github.svg"
   },
   {
     "revision": "5729dc069431278b12e8100500dff158",
@@ -616,12 +616,12 @@ self.__precacheManifest = [
     "url": "/static/vs/basic-languages/powershell/powershell.js"
   },
   {
-    "revision": "d5640717dc546aafcc787f05295b67c6",
-    "url": "/static/vs/basic-languages/pug/pug.js"
-  },
-  {
     "revision": "dfac870c87495c0f35ba304467696027",
     "url": "/static/vs/basic-languages/python/python.js"
+  },
+  {
+    "revision": "d5640717dc546aafcc787f05295b67c6",
+    "url": "/static/vs/basic-languages/pug/pug.js"
   },
   {
     "revision": "3280ee19a752f6d59079f279d3655fed",

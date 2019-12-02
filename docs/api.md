@@ -168,7 +168,7 @@ in JavaScript, but the api functions are called in similar fashion in Python.
 await api.alert(message)
 ```
 
-Shows an alert dialog with a message to the user. 
+Shows an alert dialog with a message to the user.
 
 **Arguments**
 <!--****[TODO] add instructions about customizable parameters **-->
@@ -699,7 +699,7 @@ sigma = await api.getConfig('sigma')
 
 ### api.getFileUrl
 
-*** WARNING: `api.getFileUrl` is deprecated since `api_version > 0.6.1`, please use `api.getFileManger` instead.
+*** WARNING: `api.getFileUrl` is deprecated since `api_version > 0.1.6`, please use `api.getFileManger` instead.
 
 ```python
 file_url = await api.getFileUrl(config)
@@ -853,7 +853,7 @@ file_manager = await api.getFileManager(file_manager_url)
 
 Gets the API object of an file manager.
 
-Note: since `api_version > 0.6.1`, `api.getFileUrl` and `api.requestUploadUrl` are deprecated, the replacement solution is to use `api.getFileManager` to get the file manager first, and access `getFileUrl` and `requestUploadUrl` from the returned file manager object.
+Note: since `api_version > 0.1.6`, `api.getFileUrl` and `api.requestUploadUrl` are deprecated, the replacement solution is to use `api.getFileManager` to get the file manager first, and access `getFileUrl` and `requestUploadUrl` from the returned file manager object.
 
 **Arguments**
 
@@ -1004,7 +1004,7 @@ update_lut(ctx) {
 
 ### api.requestUploadUrl
 
-***WARNING: `api.requestUploadUrl` is deprecated since `api_version > 0.6.1`, please use `api.getFileManger` instead.***
+***WARNING: `api.requestUploadUrl` is deprecated since `api_version > 0.1.6`, please use `api.getFileManger` instead.***
 
 ```python
 upload_url = await api.requestUploadUrl(config)
@@ -1344,7 +1344,7 @@ URL of the current plugin engine.
 
 ## Sanitized HTML and CSS
 
-For security reasons, we used [DOMPurify](https://github.com/cure53/DOMPurify) to sanitize the HTML and CSS provided to shown in the ImJoy main interface. For example, all the markdown, `ui` string for `<config>` block and `api.register`, and the content shown in `api.alert`, `api.confirm` and `api.prompt`. 
+For security reasons, we used [DOMPurify](https://github.com/cure53/DOMPurify) to sanitize the HTML and CSS provided to shown in the ImJoy main interface. For example, all the markdown, `ui` string for `<config>` block and `api.register`, and the content shown in `api.alert`, `api.confirm` and `api.prompt`.
 
 Also notice that the content shown inside a `window` plugin do not have these restrictions.
 
