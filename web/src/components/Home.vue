@@ -53,11 +53,7 @@
           >&nbsp;
         </p>
         <p>
-          <a
-            href="https://rdcu.be/bYbGO"
-            target="_blank"
-            >Publication</a
-          >
+          <a href="https://rdcu.be/bYbGO" target="_blank">Publication</a>
           <a href="/docs">Docs</a>
           <a href="/repo" onclick="removeWelcomePage()" target="_self"
             >Plugins</a
