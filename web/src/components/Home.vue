@@ -54,7 +54,7 @@
         </p>
         <p>
           <a
-            href="https://www.nature.com/articles/s41592-019-0627-0"
+            href="https://rdcu.be/bYbGO"
             target="_blank"
             >Publication</a
           >
