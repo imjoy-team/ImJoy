@@ -1702,7 +1702,7 @@ export default {
           this.pm
             .reloadPluginRecursively({
               uri:
-                "https://jupyter-engine-manager.netlify.com/jupyter-engine-manager.imjoy.html",
+                "https://imjoy-team.github.io/jupyter-engine-manager/jupyter-engine-manager.imjoy.html",
             })
             .then(() => {
               console.log("Jupyter-Engine-Manager loaded.");
