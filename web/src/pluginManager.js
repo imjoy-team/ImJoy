@@ -1485,8 +1485,9 @@ export class PluginManager {
         plugin._log_history.push(`ENGINE_URL=${_interface.ENGINE_URL}`);
 
       const plugin_loading_timer = setTimeout(() => {
-        plugin.terminate();
-        reject(`Plugin ${plugin.name} failed to load in 180s.`);
+        // plugin.terminate();
+        plugin.initializing = false;
+        console.warn(`Plugin ${plugin.name} failed to load in 180s.`);
       }, 180000);
 
       plugin.whenConnected(() => {
