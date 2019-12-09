@@ -1698,11 +1698,11 @@ export default {
     } else {
       this.startImJoy(this.$route).then(() => {
         if (!this.pm.plugin_names["Jupyter-Engine-Manager"]) {
-          console.log("Loading Jupyter-Engine-Manager from Gist...");
+          console.log("Loading Jupyter-Engine-Manager...");
           this.pm
             .reloadPluginRecursively({
               uri:
-                "https://gist.githubusercontent.com/oeway/7c7a3f07622839b690e2ed0383727a72/raw/Jupyter-Engine.imjoy.html",
+                "https://imjoy-team.github.io/jupyter-engine-manager/Jupyter-Engine-Manager.imjoy.html",
             })
             .then(() => {
               console.log("Jupyter-Engine-Manager loaded.");
@@ -1710,11 +1710,11 @@ export default {
         }
 
         if (!this.pm.plugin_names["ImJoy-Engine-Manager"]) {
-          console.log("Loading ImJoy-Engine-Manager from Gist...");
+          console.log("Loading ImJoy-Engine-Manager...");
           this.pm
             .reloadPluginRecursively({
               uri:
-                "https://gist.githubusercontent.com/oeway/e9282f27d9446bd4536a2a64018624c5/raw/ImJoy-Engine.imjoy.html",
+                "https://oeway.github.io/ImJoy-Engine/ImJoy-Engine-Manager.imjoy.html",
             })
             .then(() => {
               console.log("ImJoy-Engine-Manager loaded.");

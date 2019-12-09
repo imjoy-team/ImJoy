@@ -6,9 +6,13 @@
 
 ## ImJoy - Deep Learning Made Easy!
 
-**New**: The ImJoy paper is out on Nature Methods, [check it out](https://www.nature.com/articles/s41592-019-0627-0).
+---
+
+**New**: The ImJoy paper is out [on Nature Methods](https://www.nature.com/articles/s41592-019-0627-0), check it out via the [free link](https://rdcu.be/bYbGO).
 
 **New**: We are working actively on supporting Jupyter notebook based engines, ImJoy now comes with a `Jupyter Engine Manager`, which enables running Python plugins via [MyBinder.org](https://mybinder.org) or your own Jupyter notebook server. With the preview version, you will be able to try and test ImJoy Python plugins without additional setup. Stay tuned, more enhanced features will come soon.
+
+---
 
 ImJoy is a plugin powered hybrid computing platform for deploying deep learning applications such as advanced image analysis tools.
 
@@ -127,11 +131,10 @@ We don't have a guideline for that yet, for now please feel free to use the [iss
 
 ## Citation
 
-Please cite our paper on Nature Methods ([https://www.nature.com/articles/s41592-019-0627-0](https://www.nature.com/articles/s41592-019-0627-0)):
+Please cite our paper on Nature Methods ([https://www.nature.com/articles/s41592-019-0627-0](https://www.nature.com/articles/s41592-019-0627-0), free access: https://rdcu.be/bYbGO ):
 
-```
-Ouyang, W., Mueller, F., Hjelmare, M. et al. ImJoy: an open-source computational platform for the deep learning era. Nat Methods (2019) doi:10.1038/s41592-019-0627-0
-```
+`Ouyang, W., Mueller, F., Hjelmare, M. et al. ImJoy: an open-source computational platform for the deep learning era. Nat Methods (2019) doi:10.1038/s41592-019-0627-0`
+
 
 ## License
 
