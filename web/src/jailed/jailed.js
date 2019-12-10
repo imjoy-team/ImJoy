@@ -283,43 +283,6 @@ Connection.prototype.disconnect = function() {
 };
 
 /**
- * Plugin constructor, represents a plugin initialized by a script
- * with the given path
- *
- * @param {String} url of a plugin source
- * @param {Object} _interface to provide for the plugin
- */
-var Plugin = function(config, _interface, _fs_api, is_proxy) {
-  this.config = config;
-  this.id = config.id || randId();
-  this._id = config._id;
-  this.name = config.name;
-  this.type = config.type;
-  this.tag = config.tag;
-  this.tags = config.tags;
-  this.type = config.type || "web-worker";
-  this._path = config.url;
-  this._disconnected = true;
-  this.terminating = false;
-  this.initializing = false;
-  this.running = false;
-  this._log_history = [];
-  this.backend = getBackendByType(this.type);
-  this._updateUI =
-    (_interface && _interface.utils && _interface.utils.$forceUpdate) ||
-    function() {};
-  if (is_proxy) {
-    this._disconnected = false;
-  } else {
-    this._disconnected = true;
-    this._bindInterface(_interface);
-    for (let k in _fs_api) this._initialInterface[k] = _fs_api[k];
-    this._connect();
-  }
-  this._updateUI();
-};
-
-/**
  * Platform-dependent implementation of the BasicConnection
  * object, initializes the plugin site and provides the basic
  * messaging-based connection with it
