@@ -9,7 +9,7 @@
   "tags": [],
   "ui": "",
   "version": "0.1.0",
-  "api_version": "0.1.6",
+  "api_version": "0.1.7",
   "url": "",
   "description": "[TODO: describe this plugin with one sentence.]",
   "icon": "extension",
@@ -141,7 +141,8 @@ class ImJoyPlugin {
   }
 
   test_fs() {
-    const fs = api.fs
+    const fp = await api.getPlugin('BrowserFS')
+    const fs = fp.fs;
     return new Promise((resolve, reject)=>{
         function generate_random_data(size){
             var chars = 'abcdefghijklmnopqrstuvwxyz'.split('');
@@ -154,8 +155,7 @@ class ImJoyPlugin {
 
             return random_data.join('');
         }
-
-        const fs = api.fs
+  
         fs.writeFile('/tmp/test.txt', generate_random_data(100000), function(err){
         if (err){
             console.error(err);

@@ -3,6 +3,23 @@ import { compareVersions } from "./utils.js";
 import Ajv from "ajv";
 const ajv = new Ajv();
 
+export const INTERNEL_PLUGINS = {
+  BrowserFS: {
+    uri:
+      "https://gist.githubusercontent.com/oeway/68acb3e239c40ab1001c8c1bd70dba33/raw/BrowserFS.imjoy.html",
+    startup: false,
+  },
+  "Jupyter-Engine-Manager": {
+    uri:
+      "https://imjoy-team.github.io/jupyter-engine-manager/Jupyter-Engine-Manager.imjoy.html",
+    startup: true,
+  },
+  "ImJoy-Engine-Manager": {
+    uri: "https://oeway.github.io/ImJoy-Engine/ImJoy-Engine-Manager.imjoy.html",
+    startup: true,
+  },
+};
+
 ajv.addKeyword("instanceof", {
   compile: function(Class) {
     return function(data) {

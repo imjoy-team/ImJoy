@@ -20,7 +20,7 @@ import {
 import { parseComponent } from "./pluginParser.js";
 
 import { DynamicPlugin } from "./jailed/jailed.js";
-import { getBackendByType } from "./api.js";
+import { getBackendByType, INTERNEL_PLUGINS } from "./api.js";
 
 import {
   OP_SCHEMA,
@@ -1586,6 +1586,8 @@ export class PluginManager {
       const tconfig = _.assign({}, pconfig.plugin, pconfig);
       tconfig.workspace = this.selected_workspace;
       const imjoy_api = _.assign({}, this.imjoy_api);
+
+      // copy window api functions to the plugin instance
       for (let k in pconfig.api) {
         if (pconfig.api.hasOwnProperty(k)) {
           imjoy_api[k] = function() {
@@ -1594,17 +1596,6 @@ export class PluginManager {
           };
         }
       }
-
-      // imjoy_api.on = (_, name, handler) => {
-      //   pconfig.api.on(name, handler);
-      // };
-      // imjoy_api.off = (_, name, handler) => {
-      //   pconfig.api.off(name, handler);
-      // };
-      // imjoy_api.emit = (_, name, data) => {
-      //   pconfig.api.emit(name, data);
-      // };
-
       const _interface = _.assign(
         { TAG: tconfig.tag, WORKSPACE: this.selected_workspace },
         imjoy_api
@@ -2276,6 +2267,15 @@ export class PluginManager {
     if (target_plugin) {
       return target_plugin.api;
     } else {
+      if (INTERNEL_PLUGINS[plugin_name]) {
+        const p = await this.reloadPluginRecursively({
+          uri: INTERNEL_PLUGINS[plugin_name].uri,
+        }).then(() => {
+          console.log("BrowserFS loaded.");
+        });
+        return p.api;
+      }
+
       throw `plugin with type ${plugin_name} not found.`;
     }
   }

@@ -501,12 +501,12 @@ var DynamicPlugin = function(config, _interface, _fs_api, engine, is_proxy) {
   } else {
     this._disconnected = true;
     this._bindInterface(_interface);
-    
-    // use the plugin event functions if it doesn't exist (window plugins has their own event functions) 
-    if(!this._initialInterface.on) this._initialInterface.on = this.on;
-    if(!this._initialInterface.off) this._initialInterface.off = this.off;
-    if(!this._initialInterface.emit) this._initialInterface.emit = this.emit;
-    
+
+    // use the plugin event functions if it doesn't exist (window plugins has their own event functions)
+    if (!this._initialInterface.on) this._initialInterface.on = this.on;
+    if (!this._initialInterface.off) this._initialInterface.off = this.off;
+    if (!this._initialInterface.emit) this._initialInterface.emit = this.emit;
+
     for (let k in _fs_api) this._initialInterface[k] = _fs_api[k];
 
     this._connect();

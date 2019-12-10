@@ -6,6 +6,7 @@ const ArrayBufferView = Object.getPrototypeOf(
   Object.getPrototypeOf(new Uint8Array())
 ).constructor;
 
+//TODO: deprecate the file system manager, use the plugin stead
 export class FileSystemManager {
   constructor() {
     this.fs = null;
@@ -35,6 +36,9 @@ export class FileSystemManager {
           //convert arraybuffer to Buffer
           var convert = function(fn) {
             return function() {
+              console.warn(
+                'WARNING: `api.fs` is deprecated since api_version >= 0.1.7, please use `const ps = await api.getPlugin("BrowserFS"); const fs = ps.fs;` instead.'
+              );
               const args = Array.prototype.slice.call(arguments);
               const newargs = [];
               for (let arg of args) {
