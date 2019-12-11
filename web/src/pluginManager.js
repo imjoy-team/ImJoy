@@ -1851,7 +1851,7 @@ export class PluginManager {
         name: config.name,
         tags: ["op", "plugin"],
         type: op_key,
-        init: config.ui,
+        init: Joy.normalizeUI(config.ui),
       };
       // save type to tags
       if (config.type === "window") {
