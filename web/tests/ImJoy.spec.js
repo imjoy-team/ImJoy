@@ -2,6 +2,7 @@ import { expect } from "chai";
 import { shallowMount, createLocalVue } from "@vue/test-utils";
 import VueRouter from "vue-router";
 import { router_config } from "../src/router";
+import { Joy } from "../src/joy";
 import Imjoy from "@/components/Imjoy.vue";
 import _ from "lodash";
 
@@ -190,7 +191,9 @@ describe("ImJoy.vue", async () => {
         plugin1 = p1;
         expect(plugin1.name).to.equal("Test Web Worker Plugin 1");
         expect(plugin1.type).to.equal("web-worker");
-        expect(wrapper.text()).to.include("op-ui-option1");
+        expect(Joy.getTemplateByType(plugin1.name).init).to.include(
+          "op-ui-option1"
+        );
         expect(typeof plugin1.api.run).to.equal("function");
         pm.reloadPlugin({ code: _.clone(TEST_WEB_WORKER_PLUGIN_2) }).then(
           p2 => {
@@ -222,11 +225,15 @@ describe("ImJoy.vue", async () => {
     it("should register and unregister", async () => {
       expect(Object.keys(plugin1.ops).length).to.equal(1);
       expect(await plugin1.api.test_register()).to.be.true;
-      expect(wrapper.text()).to.include("apply LUT");
+      expect(Joy.getTemplateByType(plugin1.name + "/LUT").init).to.include(
+        "apply LUT"
+      );
       expect(Object.keys(plugin1.ops).length).to.equal(2);
       expect(await plugin1.api.test_unregister()).to.be.true;
       expect(Object.keys(plugin1.ops).length).to.equal(1);
-      expect(wrapper.text()).to.not.include("apply LUT");
+      // expect(function() {
+      //   Joy.getTemplateByType(plugin1.name + '/LUT');
+      // }).to.throw();
     });
 
     it("should create imjoy window", async () => {
