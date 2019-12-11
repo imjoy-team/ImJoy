@@ -1325,8 +1325,7 @@ Currently supported functions for **all plugins** are:
  * `api.utils.$forceUpdate()`: refreshes the GUI manually.
  * `api.utils.openUrl(url)`: opens an `url` in a new browser tab.
  * `api.utils.sleep(duration)`: sleeps for the indicated `duration` in seconds. Note for Python plugins, use `time.sleep` instead.)
- * `api.utils.assert(expression, error_message)`: assert an expression, typically used in a test to make sure a certain condition is met. E.g: `api.utils.assert(v === 98)`
-
+ 
 Currently supported functions for **Python plugins** are:
  * `api.utils.kill(subprocess)`: kills a `subprocess` in python.
  * `api.utils.ndarray(numpy_array)`: wrapps a ndarray `numpy_array` according to the ImJoy ndarray format.

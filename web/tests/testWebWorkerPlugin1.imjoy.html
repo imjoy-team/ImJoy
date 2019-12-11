@@ -25,6 +25,17 @@
 </config>
 
 <script lang="javascript">
+
+function assert(condition, message) {
+  if (!condition) {
+    message = message || "Assertion failed";
+    if (typeof Error !== "undefined") {
+      throw new Error(message);
+    }
+    throw message; // Fallback
+  }
+}
+
 class ImJoyPlugin {
   async setup() {
   }
@@ -34,10 +45,17 @@ class ImJoyPlugin {
   }
 
   _rpcDecode(d){
-    if(d.__rpc_dtype__ === '10x-number'){
-      return d.value / 10
+    if(d.__rpc_dtype__ === 'my_special_number'){
+      return 'adsfwe02303'
     }
     return d
+  }
+
+  async test_encoding_decoding() {
+    const p = await api.getPlugin('Test Web Worker Plugin 2')
+    const ret = await p.square(99)
+    assert(ret === 'adsfwe02303', `The anwser should have been encoded into "adsfwe02303" by _rpcDecode(), not ${ret}`)
+    return true
   }
 
   async test_register() {
@@ -119,34 +137,34 @@ class ImJoyPlugin {
 
   async test_run() {
     const ret = await api.run('Test Web Worker Plugin 2', 199)
-    api.utils.assert(ret === 199)
+    assert(ret === 199)
     return true
   }
 
   async test_call() {
     const ret = await api.call('Test Web Worker Plugin 2', 'square', 199)
-    api.utils.assert(ret === 199*199)
+    assert(ret === 199*199)
     return true
   }
 
   async test_get_plugin() {
     const p = await api.getPlugin('Test Web Worker Plugin 2')
     const ret = await p.square(199)
-    api.utils.assert(ret === 199*199)
+    assert(ret === 199*199)
     return true
   }
 
   async test_config() {
     await api.setConfig('some_secret', 123)
-    api.utils.assert(await api.getConfig('some_secret') === '123')
+    assert(await api.getConfig('some_secret') === '123')
     await api.setConfig('some_secret', 'magic word')
-    api.utils.assert(await api.getConfig('some_secret') === 'magic word')
+    assert(await api.getConfig('some_secret') === 'magic word')
     return true
   }
 
   async test_get_attachment() {
     const t = await api.getAttachment('some_text_data')
-    api.utils.assert(t.includes('hello world!'))
+    assert(t.includes('hello world!'))
     return true
   }
 

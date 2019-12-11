@@ -36,8 +36,8 @@ class ImJoyPlugin {
   }
 
   _rpcEncode(d){
-    if(typeof d === 'number'){
-      return {__rpc_dtype__: '10x-number', value: d*10}
+    if(d === 99*99){
+      return {__rpc_dtype__: 'my_special_number'}
     }
     return d
   }

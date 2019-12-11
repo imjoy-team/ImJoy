@@ -1463,6 +1463,7 @@ export default {
         $forceUpdate: this.$forceUpdate,
         openUrl: this.openUrl,
         sleep: this.sleep,
+        //TODO: deprecate assert in the next version
         assert: assert,
       },
     };
