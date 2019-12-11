@@ -161,7 +161,20 @@ describe("ImJoy.vue", async () => {
           }
           expect(err).to.be.undefined;
           expect(data).to.equal(c);
-          done();
+          fs.writeFile("/home/test.txt", c, function(err) {
+            if (err) {
+              console.error(err);
+            }
+            expect(err).to.be.undefined;
+            fs.readFile("/home/test.txt", "utf8", function(err, data) {
+              if (err) {
+                console.error(err);
+              }
+              expect(err).to.be.undefined;
+              expect(data).to.equal(c);
+              done();
+            });
+          });
         });
       });
     });
@@ -177,6 +190,7 @@ describe("ImJoy.vue", async () => {
         plugin1 = p1;
         expect(plugin1.name).to.equal("Test Web Worker Plugin 1");
         expect(plugin1.type).to.equal("web-worker");
+        expect(wrapper.text()).to.include("op-ui-option1");
         expect(typeof plugin1.api.run).to.equal("function");
         pm.reloadPlugin({ code: _.clone(TEST_WEB_WORKER_PLUGIN_2) }).then(
           p2 => {
@@ -208,9 +222,11 @@ describe("ImJoy.vue", async () => {
     it("should register and unregister", async () => {
       expect(Object.keys(plugin1.ops).length).to.equal(1);
       expect(await plugin1.api.test_register()).to.be.true;
+      expect(wrapper.text()).to.include("apply LUT");
       expect(Object.keys(plugin1.ops).length).to.equal(2);
       expect(await plugin1.api.test_unregister()).to.be.true;
       expect(Object.keys(plugin1.ops).length).to.equal(1);
+      expect(wrapper.text()).to.not.include("apply LUT");
     });
 
     it("should create imjoy window", async () => {
