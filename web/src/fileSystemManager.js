@@ -37,7 +37,7 @@ export class FileSystemManager {
           var convert = function(fn) {
             return function() {
               console.warn(
-                'WARNING: `api.fs` is deprecated since api_version >= 0.1.7, please use `const ps = await api.getPlugin("BrowserFS"); const fs = ps.fs;` instead.'
+                'WARNING: `api.fs` is deprecated since api_version >= 0.1.7, please use `const bfs_plugin = await api.getPlugin("BrowserFS"); const bfs = bfs_plugin.fs;` instead.'
               );
               const args = Array.prototype.slice.call(arguments);
               const newargs = [];
