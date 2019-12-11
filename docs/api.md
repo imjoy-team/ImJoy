@@ -1341,6 +1341,38 @@ Name of the current workspace.
 
 URL of the current plugin engine.
 
+## Experimental APIs
+
+### `_rpcEncode` and `_rpcDecode`
+Remote Procedure Calls (RPC) in ImJoy allows isolated plugins communcate via functions calls and transmit data by passing augments, however, not all the data types are supported. It only support primitive types (number, string, bytes) and basic array/list, object/dictionary. To extend the supported types, one can provide custom encoding and decoding functions (as the plugin API).
+
+
+```javascript
+class ImJoyPlugin {
+  async setup() {
+  }
+
+  async run(ctx) {
+
+  }
+
+  _rpcEncode(d){
+    if(d === 998 ){
+      return {__rpc_dtype__: 'a_special_number'}
+    }
+    else
+      return d
+  }
+
+  _rpcDecode(d){
+    if(d.__rpc_dtype__ === 'a_special_number'){
+      return 998
+    }
+  }
+}
+```
+NOTE: this only works inside plugins with `window`, `iframe`, `web-worker`, it not yet ready for e.g. `native-python`.
+
 
 ## Sanitized HTML and CSS
 
