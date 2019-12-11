@@ -6,7 +6,7 @@ const ArrayBufferView = Object.getPrototypeOf(
   Object.getPrototypeOf(new Uint8Array())
 ).constructor;
 
-//TODO: deprecate the file system manager, use the plugin stead
+//TODO: deprecate the file system manager, use the plugin instead
 export class FileSystemManager {
   constructor() {
     this.fs = null;

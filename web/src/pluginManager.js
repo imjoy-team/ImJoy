@@ -20,7 +20,7 @@ import {
 import { parseComponent } from "./pluginParser.js";
 
 import { DynamicPlugin } from "./jailed/jailed.js";
-import { getBackendByType, INTERNEL_PLUGINS } from "./api.js";
+import { getBackendByType, INTERNAL_PLUGINS } from "./api.js";
 
 import {
   OP_SCHEMA,
@@ -2267,9 +2267,9 @@ export class PluginManager {
     if (target_plugin) {
       return target_plugin.api;
     } else {
-      if (INTERNEL_PLUGINS[plugin_name]) {
+      if (INTERNAL_PLUGINS[plugin_name]) {
         const p = await this.reloadPluginRecursively({
-          uri: INTERNEL_PLUGINS[plugin_name].uri,
+          uri: INTERNAL_PLUGINS[plugin_name].uri,
         }).then(() => {
           console.log("BrowserFS loaded.");
         });

@@ -1334,7 +1334,7 @@ import {
   escapeHTML,
 } from "../utils.js";
 
-import { INTERNEL_PLUGINS } from "../api.js";
+import { INTERNAL_PLUGINS } from "../api.js";
 
 import DOMPurify from "dompurify";
 
@@ -1700,8 +1700,8 @@ export default {
       this.showWelcomeDialog = true;
     } else {
       this.startImJoy(this.$route).then(() => {
-        for (let pn in INTERNEL_PLUGINS) {
-          if (INTERNEL_PLUGINS[pn].startup) {
+        for (let pn in INTERNAL_PLUGINS) {
+          if (INTERNAL_PLUGINS[pn].startup) {
             if (!this.pm.plugin_names[pn]) {
               console.log(`Loading internal plugin "${pn}"...`);
               this.pm
