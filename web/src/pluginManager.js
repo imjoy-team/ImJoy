@@ -2053,7 +2053,7 @@ export class PluginManager {
       if (this.registered.ops[op_key]) delete this.registered.ops[op_key];
       if (plugin.ops && plugin.ops[op_name]) delete plugin.ops[op_name];
       this.wm.unregisterInputLoader(op_key);
-      Joy.remove(op_name);
+      Joy.remove(op_key);
     }
   }
 
