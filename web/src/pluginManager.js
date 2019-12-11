@@ -1842,7 +1842,7 @@ export class PluginManager {
         name: config.name,
         tags: ["op", "plugin"],
         type: op_key,
-        init: config.ui,
+        init: Joy.normalizeUI(config.ui),
       };
       // save type to tags
       if (config.type === "window") {
@@ -2044,7 +2044,7 @@ export class PluginManager {
       if (this.registered.ops[op_key]) delete this.registered.ops[op_key];
       if (plugin.ops && plugin.ops[op_name]) delete plugin.ops[op_name];
       this.wm.unregisterInputLoader(op_key);
-      Joy.remove(op_name);
+      Joy.remove(op_key);
     }
   }
 
