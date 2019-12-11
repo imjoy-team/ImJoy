@@ -33,6 +33,13 @@ class ImJoyPlugin {
     console.log('running in the plugin.')
   }
 
+  _rpcDecode(d){
+    if(d.__rpc_dtype__ === '10x-number'){
+      return d.value / 10
+    }
+    return d
+  }
+
   async test_register() {
     await api.register({
          "name": "LUT",

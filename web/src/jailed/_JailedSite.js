@@ -552,6 +552,17 @@
       if (k === "hasOwnProperty") continue;
       if (isarray || aObject.hasOwnProperty(k)) {
         v = aObject[k];
+        if (typeof this._interface._rpcEncode === "function") {
+          const encoded_obj = this._interface._rpcEncode(v);
+          if (encoded_obj && encoded_obj.__rpc_dtype__) {
+            bObject[k] = {__jailed_type__: 'custom_encoding', __value__: encoded_obj};
+            continue
+          }
+          // if the returned object does not contain __jailed_type__, assuming the object has been transformed
+          else {
+            v = encoded_obj;
+          }
+        }
         if (typeof v === "function") {
           if (as_interface) {
             const encoded_interface = this._plugin_interfaces[
@@ -724,7 +735,15 @@
       aObject.hasOwnProperty("__jailed_type__") &&
       aObject.hasOwnProperty("__value__")
     ) {
-      if (aObject.__jailed_type__ === "callback") {
+      if (aObject.__jailed_type__.startsWith("custom_encoding")) {
+        if (typeof this._interface._rpcDecode === "function") {
+          const decodedObj = this._interface._rpcDecode(aObject.__value__);
+          bObject = decodedObj;
+        }
+        else{
+          bObject = aObject;
+        }
+      } else if (aObject.__jailed_type__ === "callback") {
         bObject = this._genRemoteCallback(callbackId, aObject.num, withPromise);
       } else if (aObject.__jailed_type__ === "interface") {
         bObject =
