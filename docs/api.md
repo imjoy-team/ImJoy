@@ -1371,7 +1371,7 @@ class ImJoyPlugin {
   }
 }
 ```
-NOTE: this only works inside plugins with `window`, `iframe`, `web-worker`, it not yet ready for e.g. `native-python`.
+NOTE: this only works inside plugins with `window`, `iframe`, `web-worker`, it doesn't not work directly for e.g. `native-python` unless the coresponding plugin engine support it.
 
 
 ## Sanitized HTML and CSS
