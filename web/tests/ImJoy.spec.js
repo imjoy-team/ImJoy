@@ -232,7 +232,7 @@ describe("ImJoy.vue", async () => {
       expect(await plugin1.api.test_unregister()).to.be.true;
       expect(Object.keys(plugin1.ops).length).to.equal(1);
       expect(function() {
-        Joy.getTemplateByType(plugin1.name + '/LUT');
+        Joy.getTemplateByType(plugin1.name + "/LUT");
       }).to.throw();
     });
 
