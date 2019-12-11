@@ -1,6 +1,6 @@
 self.__precacheManifest = [
   {
-    "revision": "d79ef91b8abfcbf6be89",
+    "revision": "45d38ead082360d4ef6e",
     "url": "imjoy-lib.min.js"
   },
   {
