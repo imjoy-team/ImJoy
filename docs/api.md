@@ -1239,7 +1239,7 @@ URL of the current plugin engine.
 
 ## Internal plugins
 
-Besides the default ImJoy api, we provide a set of internally supported plugins which can be used directly. These plugins will be loaded only if the plugin is requested by other plugin via `api.getPlugin(...)`.
+Besides the default ImJoy api, we provide a set of internally supported plugins which can be used directly. These plugins will be loaded only if the plugin is requested by another plugin via `api.getPlugin(...)`.
 
 Here is a list of these internal plugins along with their api functions:
 
@@ -1249,14 +1249,7 @@ To use the `BrowserFS` plugin, you need to first call:
 
 `const bfs = await api.getPlugin('BrowserFS')` in Javascript, or `bfs = await api.getPlugin('BrowserFS')` in Python.
 
-The following documentation Assumes we have access to the plugin api via `bfs`.
-
-
-```javascript
-bfs.XXXXX(...)
-```
-
-Access the in-browser filesystem with the [Node JS filesystem API](https://nodejs.org/api/fs.html). More details about the underlying implemetation, see [BrowserFS](https://github.com/jvilk/BrowserFS), the default file system in ImJoy supports the following nodes:
+Then, you can use [Node JS filesystem API](https://nodejs.org/api/fs.html) to access the in-browser filesystem (e.g.: `bfs.readFile('/tmp/temp.txt', 'utf-8')`). For more details about the underlying implemetation, see [BrowserFS](https://github.com/jvilk/BrowserFS), the default file system in ImJoy supports the following nodes:
 
  * `/tmp`: `InMemory`, data is stored in browser memory, cleared when ImJoy is closed.
 
@@ -1267,36 +1260,44 @@ Access the in-browser filesystem with the [Node JS filesystem API](https://nodej
 <!-- tabs:start -->
 #### ** JavaScript **
 ```javascript
-bfs.writeFile('/tmp/temp.txt', 'hello world', function(err, data){
-    if (err) {
-        console.log(err);
-        return
-    }
-    console.log("Successfully Written to File.");
-    bfs.readFile('/tmp/temp.txt', 'utf8', function (err, data) {
-        if (err) {
-            console.log(err);
-            return
-        }
-        console.log('Reald from file', data)
-    });
-});
+async function test_browser_fs(){
+  const bfs = await api.getPlugin('BrowserFS')
+
+  bfs.writeFile('/tmp/temp.txt', 'hello world', function(err, data){
+      if (err) {
+          console.log(err);
+          return
+      }
+      console.log("Successfully Written to File.");
+      bfs.readFile('/tmp/temp.txt', 'utf8', function (err, data) {
+          if (err) {
+              console.log(err);
+              return
+          }
+          console.log('Read from file', data)
+      });
+  });
+}
 ```
 #### ** Python **
 ```python
-def read(err, data=None):
-    if err:
-        print(err)
-        return
 
-    def cb(err, data=None):
-        if err:
-            print(err)
-            return
-        api.log(data)
-    bfs.readFile('/tmp/temp.txt', 'utf8', cb)
+async def test_browser_fs():
+  bfs = await api.getPlugin('BrowserFS')
 
-bfs.writeFile('/tmp/temp.txt', 'hello world', read)
+  def read(err, data=None):
+      if err:
+          print(err)
+          return
+
+      def cb(err, data=None):
+          if err:
+              print(err)
+              return
+          api.log(data)
+      bfs.readFile('/tmp/temp.txt', 'utf8', cb)
+
+  bfs.writeFile('/tmp/temp.txt', 'hello world', read)
 
 ```
 <!-- tabs:end -->

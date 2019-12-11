@@ -6,7 +6,7 @@ const ajv = new Ajv();
 export const INTERNAL_PLUGINS = {
   BrowserFS: {
     uri:
-      "https://gist.githubusercontent.com/oeway/68acb3e239c40ab1001c8c1bd70dba33/raw/BrowserFS.imjoy.html",
+      "https://imjoy-team.github.io/core-plugins/BrowserFS.imjoy.html",
     startup: false,
   },
   "Jupyter-Engine-Manager": {

@@ -1341,7 +1341,7 @@ Follow these steps, and you will be able to run ImJoy server and the plugin engi
 
 ### API changes
 #### api_version: 0.1.7
- * `api.fs` has been deprecated, the browser file system is moved to a separate plugin `BrowserFS`, to use the file system, you can do `const bfs_plugin = await api.getPlugin('BrowserFS'); const bfs = bfs_plugin.fs;`, now `fs` will be equivalent to `api.fs`. Notice: the data saved with `api.fs` will not be accessible with the new API, to get access the old data, please change `api_version` in the plugin config into `0.1.6`.
+ * `api.fs` has been deprecated, the browser file system is moved to a separate plugin `BrowserFS`, to use the file system, you can do `const bfs_plugin = await api.getPlugin('BrowserFS'); const bfs = bfs_plugin.fs;`, now `fs` will be equivalent to `api.fs`. Notice: the data saved with `api.fs` will not be accessible with the new API, to get access the old data, please change `api_version` in the plugin config to `0.1.6`.
 
 
 #### api_version: 0.1.6
