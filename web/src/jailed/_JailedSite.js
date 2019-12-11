@@ -555,8 +555,11 @@
         if (typeof this._interface._rpcEncode === "function") {
           const encoded_obj = this._interface._rpcEncode(v);
           if (encoded_obj && encoded_obj.__rpc_dtype__) {
-            bObject[k] = {__jailed_type__: 'custom_encoding', __value__: encoded_obj};
-            continue
+            bObject[k] = {
+              __jailed_type__: "custom_encoding",
+              __value__: encoded_obj,
+            };
+            continue;
           }
           // if the returned object does not contain __jailed_type__, assuming the object has been transformed
           else {
@@ -739,8 +742,7 @@
         if (typeof this._interface._rpcDecode === "function") {
           const decodedObj = this._interface._rpcDecode(aObject.__value__);
           bObject = decodedObj;
-        }
-        else{
+        } else {
           bObject = aObject;
         }
       } else if (aObject.__jailed_type__ === "callback") {
