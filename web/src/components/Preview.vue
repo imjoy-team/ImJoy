@@ -388,9 +388,10 @@ export default {
   methods: {
     installPlugin(plugin4install, tag4install) {
       this.installing = true;
+      plugin4install.tag = tag4install;
       this.pm
         .savePlugin(plugin4install)
-        .then(template => {
+        .then(() => {
           this.close();
           this.$router.push({
             name: "app",
