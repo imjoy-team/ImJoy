@@ -22,6 +22,7 @@ import FileItem from "@/components/FileItem";
 import FileDialog from "@/components/FileDialog";
 import Window from "@/components/Window";
 import EngineControlPanel from "@/components/EngineControlPanel";
+import Preview from "@/components/Preview";
 import "./registerServiceWorker";
 
 Vue.config.productionTip = false;
@@ -40,6 +41,7 @@ Vue.component("plugin-editor", PluginEditor);
 Vue.component("file-item", FileItem);
 Vue.component("file-dialog", FileDialog);
 Vue.component("window", Window);
+Vue.component("preview", Preview);
 Vue.component("grid-layout", VueGridLayout.GridLayout);
 Vue.component("grid-item", VueGridLayout.GridItem);
 Vue.component("engine-control-panel", EngineControlPanel);
