@@ -16,7 +16,7 @@ self.__precacheManifest = [
     "url": "static/jailed/_frame.js"
   },
   {
-    "revision": "4971876f5219a663ccc8901946b66a62",
+    "revision": "0f5d88ba12b6aa4cdfcca807e32df6cf",
     "url": "static/jailed/_JailedSite.js"
   },
   {

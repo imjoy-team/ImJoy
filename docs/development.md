@@ -1340,7 +1340,10 @@ Follow these steps, and you will be able to run ImJoy server and the plugin engi
 ## Change log
 
 ### API changes
-
+#### api_version: 0.1.7
+ * added `_rpcEncode` and `_rpcDecode` to support custom encoding and decoding
+ * remove `api.utils.assert` because the async version is misleading
+ 
 #### api_version: 0.1.6
  * added new api functions `api.getPlugins`,  `api.getFileManager`, `api.getEngine`, `api.getEngineFactory`
  * `api.getFileUrl` is deprecated, call `file_manager = await api.getFilemanager('http://...');` and then access them with `file_manager.getFileUrl`.
