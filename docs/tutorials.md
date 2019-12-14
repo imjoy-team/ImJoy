@@ -237,13 +237,13 @@ class ImJoyPlugin():
 [>>>Full plugin source code](https://gist.github.com/oeway/5edb106eb9360405412bba8ebd2dbeb5/cfbf85f629c3e2258d5be27e295dd438f7f477ff)
 
 ### Get user input and show traininig progress
-You can use [`api.prompt`](https://imjoy.io/docs/#/api?id=apiprompt) function to get user input, for example to specify how many epochs. Similary to [`api.alert`](https://imjoy.io/docs/#/api?id=apialert) function, [`api.showProgress`](https://imjoy.io/docs/#/api?id=apishowprogress) and [`api.showStatus`](https://imjoy.io/docs/#/api?id=apishowstatus) function can be used to show the current training progress.
+You can use [`api.prompt`](https://imjoy.io/docs/#/api?id=apiprompt) function to get user input, for example to specify how many epochs. Similar to [`api.alert`](https://imjoy.io/docs/#/api?id=apialert) function, [`api.showProgress`](https://imjoy.io/docs/#/api?id=apishowprogress) and [`api.showStatus`](https://imjoy.io/docs/#/api?id=apishowstatus) function can be used to show the current training progress.
 
-Importantly, all the api functions are [`async function`](https://imjoy.io/docs/#/api?id=asynchronous-programming), which means the returned value is not the actual results, but a special object called `Promise` or `Future`, we need to explicitly wait for it to get the value. In Python, we can easily use async functions with a built-in libriary called `asyncio` (only available in Python 3) according to the following steps:
+Importantly, all the api functions are [`async function`](https://imjoy.io/docs/#/api?id=asynchronous-programming), which means the returned value is not the actual results, but a special object called `Promise` or `Future`, we need to explicitly wait for it to get the value. In Python, we can easily use async functions with a built-in library called `asyncio` (only available in Python 3) according to the following steps:
 
  1. `import asyncio`
  2. add `async` to any function which you want to call async functions, for example if you want to call `api.prompt` inside `run`, then you need to add `async` before `def run`, i.e.: `async def run(self, ctx):`
- 3. add `await` before the acutal async function you want to call and you can get the actuall value. For example, if you want to get the user input, you need to call `result = await api.prompt('How many epochs do you want to train')`.
+ 3. add `await` before the async function you want to call and you can get the actual value. For example, if you want to get the user input, you need to call `result = await api.prompt('How many epochs do you want to train')`.
 
  **This means you can only use `await` inside a function defined with `async`.**
  **`await` can be ignored if we don't want to wait for the execution or the result, e.g. api.alert('hello'), `await` is optional**
@@ -255,7 +255,7 @@ This is the `run` function if we want to get the epoch number from the user and 
 ```python
     def train(self, epochs):
         ...
-        # pass epochs to model.fit_genenerator function
+        # pass epochs to model.fit_generator function
         model.fit_generator(myGene,steps_per_epoch=300,epochs=epochs,callbacks=[model_checkpoint]
 
     async def run(self, ctx):
@@ -380,7 +380,7 @@ ImJoy provide the [`api.showFileDialog`](https://imjoy.io/docs/#/api?id=apishowf
 [>>>Full plugin source code](https://gist.github.com/oeway/5edb106eb9360405412bba8ebd2dbeb5/44cfd2d1cd6b18774df64de521ebdf80179ca57e)
 
 
-Similarily, we can add a file dialog for prediction.
+Similarly, we can add a file dialog for prediction.
 
 ```python
     async def predict(self):
@@ -404,9 +404,9 @@ Similarily, we can add a file dialog for prediction.
 
 ### Deploy the plugin to Github
 
-Now we have a plugin which allows train Unet models and make prediciton user's own data, we can deploy it to github and share it with others.
+Now we have a plugin which allows train Unet models and make prediction user's own data, we can deploy it to github and share it with others.
 
-The recommended way to do is make a deicated repository and place the plugin file directly into the Github repo.
+The recommended way to do is make a dedicated repository and place the plugin file directly into the Github repo.
 
 As an example, we can login to Github, open https://github.com/zhixuhao/unet and then click the `Fork` button which will create a copy of the unet folder under your own account. For example, we have the copy at https://github.com/imjoy-team/unet.
 
