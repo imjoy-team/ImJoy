@@ -59,7 +59,15 @@
   JailedSite = function(connection, id, lang) {
     this.id = id;
     this.lang = lang;
-    this._interface = {};
+    this._interface = {
+      // this initial setup will make sure we wait until the api is exported.
+      setup: () => {
+        return new Promise((resolve, reject) => {
+          this._interfaceSetAsRemoteHandler = resolve;
+          this._disconnectHandler = reject;
+        });
+      },
+    };
     this._plugin_interfaces = {};
     this._remote = null;
     this._remoteUpdateHandler = function() {};
