@@ -1706,7 +1706,7 @@ export default {
               console.log(`Loading internal plugin "${pn}"...`);
               this.pm
                 .reloadPluginRecursively({
-                  uri:INTERNAL_PLUGINS[pn].uri,
+                  uri: INTERNAL_PLUGINS[pn].uri,
                 })
                 .then(() => {
                   console.log(`${pn} loaded.`);
@@ -1753,15 +1753,13 @@ export default {
         this.show_plugin_store = true;
         this.show_plugin_url = false;
         this.downloading_plugin = true;
-        try{
-           this.pm.selected_repository = await this.pm
-          .addRepository(r);
-            this.downloading_plugin = false;
-        }
-        catch(e){
-            this.downloading_plugin = false;
-            this.downloading_error =
-              "Sorry, the repository URL is invalid: " + e.toString();
+        try {
+          this.pm.selected_repository = await this.pm.addRepository(r);
+          this.downloading_plugin = false;
+        } catch (e) {
+          this.downloading_plugin = false;
+          this.downloading_error =
+            "Sorry, the repository URL is invalid: " + e.toString();
         }
         this.show_plugin_templates = false;
         this.showAddPluginDialog = true;
@@ -1853,16 +1851,14 @@ export default {
         }
         if (route.query.engine || route.query.e) {
           const engine_url = (route.query.engine || route.query.e).trim();
-          try{
-            this.em
-            .addEngine(
+          try {
+            this.em.addEngine(
               { type: "default", url: engine_url, token: connection_token },
               false
-            )
-          }finally{
-              this.em.getEngineByUrl(engine_url).connect();
-              this.$forceUpdate();
-            
+            );
+          } finally {
+            this.em.getEngineByUrl(engine_url).connect();
+            this.$forceUpdate();
           }
         }
 
