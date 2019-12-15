@@ -1,6 +1,6 @@
 /* eslint-disable */
 
-if (typeof workbox !== 'undefined') {
+if (typeof workbox !== "undefined") {
   console.log(`Workbox is loaded (plugin service worker)`);
   /**
    * The workboxSW.precacheAndRoute() method efficiently caches and responds to
