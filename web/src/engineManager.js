@@ -133,7 +133,7 @@ export class EngineManager {
 
   destroy() {
     for (let e of this.engines) {
-      e.destroy();
+      this.unregister(e);
     }
   }
 }

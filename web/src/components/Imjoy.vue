@@ -1333,6 +1333,9 @@ import {
   compareVersions,
   escapeHTML,
 } from "../utils.js";
+
+import { INTERNAL_PLUGINS } from "../api.js";
+
 import DOMPurify from "dompurify";
 
 import { ImJoy } from "../imjoyLib.js";
@@ -1698,28 +1701,19 @@ export default {
       this.showWelcomeDialog = true;
     } else {
       this.startImJoy(this.$route).then(() => {
-        if (!this.pm.plugin_names["Jupyter-Engine-Manager"]) {
-          console.log("Loading Jupyter-Engine-Manager...");
-          this.pm
-            .reloadPluginRecursively({
-              uri:
-                "https://imjoy-team.github.io/jupyter-engine-manager/Jupyter-Engine-Manager.imjoy.html",
-            })
-            .then(() => {
-              console.log("Jupyter-Engine-Manager loaded.");
-            });
-        }
-
-        if (!this.pm.plugin_names["ImJoy-Engine-Manager"]) {
-          console.log("Loading ImJoy-Engine-Manager...");
-          this.pm
-            .reloadPluginRecursively({
-              uri:
-                "https://oeway.github.io/ImJoy-Engine/ImJoy-Engine-Manager.imjoy.html",
-            })
-            .then(() => {
-              console.log("ImJoy-Engine-Manager loaded.");
-            });
+        for (let pn in INTERNAL_PLUGINS) {
+          if (INTERNAL_PLUGINS[pn].startup) {
+            if (!this.pm.plugin_names[pn]) {
+              console.log(`Loading internal plugin "${pn}"...`);
+              this.pm
+                .reloadPluginRecursively({
+                  uri: INTERNAL_PLUGINS[pn].uri,
+                })
+                .then(() => {
+                  console.log(`${pn} loaded.`);
+                });
+            }
+          }
         }
 
         if (
@@ -1760,17 +1754,14 @@ export default {
         this.show_plugin_store = true;
         this.show_plugin_url = false;
         this.downloading_plugin = true;
-        this.pm
-          .addRepository(r)
-          .then(repo => {
-            this.pm.selected_repository = repo;
-            this.downloading_plugin = false;
-          })
-          .catch(e => {
-            this.downloading_plugin = false;
-            this.downloading_error =
-              "Sorry, the repository URL is invalid: " + e.toString();
-          });
+        try {
+          this.pm.selected_repository = await this.pm.addRepository(r);
+          this.downloading_plugin = false;
+        } catch (e) {
+          this.downloading_plugin = false;
+          this.downloading_error =
+            "Sorry, the repository URL is invalid: " + e.toString();
+        }
         this.show_plugin_templates = false;
         this.showAddPluginDialog = true;
       }
@@ -1861,15 +1852,15 @@ export default {
         }
         if (route.query.engine || route.query.e) {
           const engine_url = (route.query.engine || route.query.e).trim();
-          this.em
-            .addEngine(
+          try {
+            this.em.addEngine(
               { type: "default", url: engine_url, token: connection_token },
               false
-            )
-            .finally(() => {
-              this.em.getEngineByUrl(engine_url).connect();
-              this.$forceUpdate();
-            });
+            );
+          } finally {
+            this.em.getEngineByUrl(engine_url).connect();
+            this.$forceUpdate();
+          }
         }
 
         this.plugin_loaded = true;

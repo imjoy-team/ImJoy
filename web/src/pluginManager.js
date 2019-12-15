@@ -20,7 +20,7 @@ import {
 import { parseComponent } from "./pluginParser.js";
 
 import { DynamicPlugin } from "./jailed/jailed.js";
-import { getBackendByType } from "./api.js";
+import { getBackendByType, INTERNAL_PLUGINS } from "./api.js";
 
 import {
   OP_SCHEMA,
@@ -1062,28 +1062,39 @@ export class PluginManager {
       this.db
         .get(plugin_config._id)
         .then(doc => {
-          return this.db.remove(doc);
-        })
-        .then(() => {
-          for (let i = 0; i < this.installed_plugins.length; i++) {
-            if (this.installed_plugins[i].name === plugin_config.name) {
-              this.installed_plugins.splice(i, 1);
-            }
-          }
-          for (let p of this.available_plugins) {
-            if (p.name === plugin_config.name) {
-              p.installed = false;
-              p.tag = null;
-            }
-          }
-          resolve();
-          this.showMessage(`"${plugin_config.name}" has been removed.`);
-          this.unloadPlugin(plugin_config, true);
+          this.db
+            .remove(doc)
+            .then(() => {
+              for (let i = 0; i < this.installed_plugins.length; i++) {
+                if (this.installed_plugins[i].name === plugin_config.name) {
+                  this.installed_plugins.splice(i, 1);
+                }
+              }
+              for (let p of this.available_plugins) {
+                if (p.name === plugin_config.name) {
+                  p.installed = false;
+                  p.tag = null;
+                }
+              }
+              resolve();
+              this.showMessage(`"${plugin_config.name}" has been removed.`);
+              this.unloadPlugin(plugin_config, true);
+            })
+            .catch(err => {
+              this.showMessage(err.toString());
+              console.error("Failed to remove plugin: ", plugin_config, err);
+              reject(err);
+            });
         })
         .catch(err => {
-          this.showMessage(err.toString() || "Error occured.");
-          console.error("error occured when removing ", plugin_config, err);
-          reject(err);
+          this.unloadPlugin(plugin_config, true);
+          this.showMessage(`"${plugin_config.name}" has been unloaded.`);
+          console.log(
+            "Plugin does not exist in the database",
+            plugin_config,
+            err
+          );
+          resolve(err);
         });
     });
   }
@@ -1586,6 +1597,8 @@ export class PluginManager {
       const tconfig = _.assign({}, pconfig.plugin, pconfig);
       tconfig.workspace = this.selected_workspace;
       const imjoy_api = _.assign({}, this.imjoy_api);
+
+      // copy window api functions to the plugin instance
       for (let k in pconfig.api) {
         if (pconfig.api.hasOwnProperty(k)) {
           imjoy_api[k] = function() {
@@ -1594,17 +1607,6 @@ export class PluginManager {
           };
         }
       }
-
-      // imjoy_api.on = (_, name, handler) => {
-      //   pconfig.api.on(name, handler);
-      // };
-      // imjoy_api.off = (_, name, handler) => {
-      //   pconfig.api.off(name, handler);
-      // };
-      // imjoy_api.emit = (_, name, data) => {
-      //   pconfig.api.emit(name, data);
-      // };
-
       const _interface = _.assign(
         { TAG: tconfig.tag, WORKSPACE: this.selected_workspace },
         imjoy_api
@@ -2276,6 +2278,14 @@ export class PluginManager {
     if (target_plugin) {
       return target_plugin.api;
     } else {
+      if (INTERNAL_PLUGINS[plugin_name]) {
+        const p = await this.reloadPluginRecursively({
+          uri: INTERNAL_PLUGINS[plugin_name].uri,
+        });
+        console.log("BrowserFS loaded.");
+        return p.api;
+      }
+
       throw `plugin with type ${plugin_name} not found.`;
     }
   }

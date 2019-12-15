@@ -78,7 +78,7 @@ Joy.normalizeUI = function(ui) {
     normui = ui.trim();
   } else {
     normui = "";
-    console.log("Warining: removing ui string.");
+    console.log("Warning: removing ui string.");
   }
   return normui;
 };

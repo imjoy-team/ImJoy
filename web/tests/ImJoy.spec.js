@@ -148,7 +148,7 @@ describe("ImJoy.vue", async () => {
     plugin.terminate();
   }).timeout(20000);
 
-  it("should write and read file", done => {
+  it("should write and read file with api.fs", done => {
     fsm.init().then(fs => {
       var c = "New File Contents";
       fs.writeFile("/tmp/test.txt", c, function(err) {
@@ -282,7 +282,7 @@ describe("ImJoy.vue", async () => {
       expect(await plugin1.api.test_get_attachment()).to.be.true;
     });
 
-    it("should read and write with fs", async () => {
+    it("should read and write with BrowserFS plugin", async () => {
       expect(await plugin1.api.test_fs()).to.be.true;
     });
 
