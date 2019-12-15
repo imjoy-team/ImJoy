@@ -96,6 +96,17 @@ self.connection = {};
                     code.requirements[i] = code.requirements[i].slice(3);
                   }
                   importScripts(code.requirements[i]);
+                } else if (
+                  code.requirements[i].toLowerCase().endsWith(".mjs") ||
+                  code.requirements[i].startsWith("module:")
+                ) {
+                  if (code.requirements[i].startsWith("module:")) {
+                    code.requirements[i] = code.requirements[i].slice(7);
+                    eval(`import "${code.requirements[i]}"`)
+                  }
+                  else{
+                    eval(`import "${code.requirements[i]}"`)
+                  }
                 } else if (code.requirements[i].startsWith("http")) {
                   importScripts(code.requirements[i]);
                 } else if (code.requirements[i].startsWith("cache:")) {

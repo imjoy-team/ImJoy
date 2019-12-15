@@ -138,6 +138,17 @@ var execute = async function(code) {
                   code.requirements[i] = code.requirements[i].slice(3);
                 }
                 await importScripts(code.requirements[i]);
+              } else if (
+                code.requirements[i].toLowerCase().endsWith(".mjs") ||
+                code.requirements[i].startsWith("module:")
+              ) {
+                if (code.requirements[i].startsWith("module:")) {
+                  code.requirements[i] = code.requirements[i].slice(7);
+                  eval(`import "${code.requirements[i]}"`)
+                }
+                else{
+                  eval(`import "${code.requirements[i]}"`)
+                }
               } else if (code.requirements[i].startsWith("http")) {
                 await importScripts(code.requirements[i]);
               } else if (code.requirements[i].startsWith("cache:")) {
