@@ -1290,14 +1290,20 @@ export class PluginManager {
       if (!config.script) {
         config.script = pluginComp.script[0].content;
         config.lang = pluginComp.script[0].attrs.lang;
+        config.attrs = pluginComp.script[0].attrs;
       }
       config.tag = overwrite_config.tag || (config.tags && config.tags[0]);
       // try to match the script with current tag
       for (let i = 0; i < pluginComp.script.length; i++) {
         if (pluginComp.script[i].attrs.tag === config.tag) {
           config.script = pluginComp.script[i].content;
+          config.lang = pluginComp.script[i].attrs.lang;
+          config.attrs = pluginComp.script[i].attrs;
           break;
         }
+      }
+      if(config.type === 'web-worker' && config.scripts.length > 1){
+        throw "web-worker plugin can only have one script block"
       }
       config.links = pluginComp.link || null;
       config.windows = pluginComp.window || null;
