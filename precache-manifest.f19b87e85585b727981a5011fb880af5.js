@@ -1,10 +1,10 @@
 self.__precacheManifest = [
   {
-    "revision": "45d38ead082360d4ef6e",
+    "revision": "eea4ed9e8a1dda531677",
     "url": "imjoy-lib.min.js"
   },
   {
-    "revision": "a673181ab8a81b9fc77a35ac829d8a4d",
+    "revision": "bd1ef755490ff03edb0cc55793b4e734",
     "url": "static/jailed/jailed.js"
   },
   {
@@ -16,7 +16,7 @@ self.__precacheManifest = [
     "url": "static/jailed/_frame.js"
   },
   {
-    "revision": "0f5d88ba12b6aa4cdfcca807e32df6cf",
+    "revision": "2319e6b2c5053a4d57fa0494b76ce8c9",
     "url": "static/jailed/_JailedSite.js"
   },
   {

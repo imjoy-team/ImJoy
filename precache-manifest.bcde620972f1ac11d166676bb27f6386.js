@@ -1,11 +1,11 @@
 self.__precacheManifest = [
   {
-    "revision": "dbfe27077740c46e1ced",
-    "url": "/static/css/app.d46fe200.css"
+    "revision": "a392f44afc7b46b1b077",
+    "url": "/static/css/app.ff360dd6.css"
   },
   {
-    "revision": "dbfe27077740c46e1ced",
-    "url": "/static/js/app.bb893cc4.js"
+    "revision": "a392f44afc7b46b1b077",
+    "url": "/static/js/app.5fa1e3c0.js"
   },
   {
     "revision": "b8859e2632feade2aed6",
@@ -240,7 +240,7 @@ self.__precacheManifest = [
     "url": "/static/vs/html.worker.js"
   },
   {
-    "revision": "29027432095aa93e9d2c98450df9d4bc",
+    "revision": "8e6f8bed82f238471bfc5ad995627b5f",
     "url": "/index.html"
   },
   {
@@ -704,24 +704,12 @@ self.__precacheManifest = [
     "url": "/static/vs/editor/editor.main.css"
   },
   {
-    "revision": "2b6ac4494944b92db7dcfa0ce3a605ed",
-    "url": "/static/vs/editor/editor.main.nls.de.js"
-  },
-  {
-    "revision": "65a437a349f6e024e14a84bdae3b94e5",
-    "url": "/static/vs/editor/editor.main.nls.es.js"
-  },
-  {
     "revision": "a8fb0f322b584b488bd572adf086cdcd",
     "url": "/static/vs/editor/editor.main.nls.fr.js"
   },
   {
-    "revision": "6d0cbdd6e06c3e3c3eea8c05cf7918fa",
-    "url": "/static/vs/editor/editor.main.nls.it.js"
-  },
-  {
-    "revision": "7c5522016f018c3226287c88363be05b",
-    "url": "/static/vs/editor/editor.main.nls.ja.js"
+    "revision": "65a437a349f6e024e14a84bdae3b94e5",
+    "url": "/static/vs/editor/editor.main.nls.es.js"
   },
   {
     "revision": "6c2e4bbc2f1390147bb8705f79cb58e7",
@@ -774,6 +762,18 @@ self.__precacheManifest = [
   {
     "revision": "11a854433bcc74085be053c3ab713b15",
     "url": "/static/vs/language/css/cssWorker.js"
+  },
+  {
+    "revision": "2b6ac4494944b92db7dcfa0ce3a605ed",
+    "url": "/static/vs/editor/editor.main.nls.de.js"
+  },
+  {
+    "revision": "6d0cbdd6e06c3e3c3eea8c05cf7918fa",
+    "url": "/static/vs/editor/editor.main.nls.it.js"
+  },
+  {
+    "revision": "7c5522016f018c3226287c88363be05b",
+    "url": "/static/vs/editor/editor.main.nls.ja.js"
   },
   {
     "revision": "51880b243dfb4c0a65c406b155e9a716",
