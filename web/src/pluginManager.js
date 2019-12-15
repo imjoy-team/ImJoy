@@ -1880,6 +1880,7 @@ export class PluginManager {
       if (!plugin || !run) {
         joy_template.onexecute = () => {
           plugin.log("WARNING: no run function defined.");
+          this.showMessage("WARNING: no run function defined.");
         };
       } else {
         const onexecute = async my => {

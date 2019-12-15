@@ -20,13 +20,14 @@ function _htmlToElement(html) {
   return template.content.firstChild;
 }
 
-var _importScript = function(url) {
+var _importScript = function(url, ) {
   //url is URL of external file, implementationCode is the code
   //to be called from the file, location is the location to
   //insert the <script> element
   return new Promise((resolve, reject) => {
     var scriptTag = document.createElement("script");
     scriptTag.src = url;
+    scriptTag.type = "text/javascript";
     scriptTag.onload = resolve;
     scriptTag.onreadystatechange = function() {
       if (this.readyState === "loaded" || this.readyState == "complete") {
@@ -181,17 +182,6 @@ var execute = async function(code) {
                 code.requirements[i] = code.requirements[i].slice(3);
               }
               await importScripts(code.requirements[i]);
-            } else if (
-              code.requirements[i].toLowerCase().endsWith(".mjs") ||
-              code.requirements[i].startsWith("module:")
-            ) {
-              if (code.requirements[i].startsWith("module:")) {
-                code.requirements[i] = code.requirements[i].slice(7);
-                eval(`import "${code.requirements[i]}"`)
-              }
-              else{
-                eval(`import "${code.requirements[i]}"`)
-              }
             } else if (code.requirements[i].startsWith("cache:")) {
               //ignore cache
             } else if (
