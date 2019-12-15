@@ -1062,28 +1062,39 @@ export class PluginManager {
       this.db
         .get(plugin_config._id)
         .then(doc => {
-          return this.db.remove(doc);
-        })
-        .then(() => {
-          for (let i = 0; i < this.installed_plugins.length; i++) {
-            if (this.installed_plugins[i].name === plugin_config.name) {
-              this.installed_plugins.splice(i, 1);
-            }
-          }
-          for (let p of this.available_plugins) {
-            if (p.name === plugin_config.name) {
-              p.installed = false;
-              p.tag = null;
-            }
-          }
-          resolve();
-          this.showMessage(`"${plugin_config.name}" has been removed.`);
-          this.unloadPlugin(plugin_config, true);
+          this.db
+            .remove(doc)
+            .then(() => {
+              for (let i = 0; i < this.installed_plugins.length; i++) {
+                if (this.installed_plugins[i].name === plugin_config.name) {
+                  this.installed_plugins.splice(i, 1);
+                }
+              }
+              for (let p of this.available_plugins) {
+                if (p.name === plugin_config.name) {
+                  p.installed = false;
+                  p.tag = null;
+                }
+              }
+              resolve();
+              this.showMessage(`"${plugin_config.name}" has been removed.`);
+              this.unloadPlugin(plugin_config, true);
+            })
+            .catch(err => {
+              this.showMessage(err.toString());
+              console.error("Failed to remove plugin: ", plugin_config, err);
+              reject(err);
+            });
         })
         .catch(err => {
-          this.showMessage(err.toString() || "Error occured.");
-          console.error("error occured when removing ", plugin_config, err);
-          reject(err);
+          this.unloadPlugin(plugin_config, true);
+          this.showMessage(`"${plugin_config.name}" has been unloaded.`);
+          console.log(
+            "Plugin does not exist in the database",
+            plugin_config,
+            err
+          );
+          resolve(err);
         });
     });
   }
@@ -2270,9 +2281,8 @@ export class PluginManager {
       if (INTERNAL_PLUGINS[plugin_name]) {
         const p = await this.reloadPluginRecursively({
           uri: INTERNAL_PLUGINS[plugin_name].uri,
-        }).then(() => {
-          console.log("BrowserFS loaded.");
         });
+        console.log("BrowserFS loaded.");
         return p.api;
       }
 
