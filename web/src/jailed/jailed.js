@@ -924,6 +924,8 @@ DynamicPlugin.prototype.terminate = async function(force) {
 };
 
 DynamicPlugin.prototype.on = function(name, handler, fire_if_emitted) {
+  this._callbacks = this._callbacks || {};
+
   if (this._callbacks[name]) {
     this._callbacks[name].push(handler);
   } else {
