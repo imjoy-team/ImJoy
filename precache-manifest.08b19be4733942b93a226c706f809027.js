@@ -752,10 +752,6 @@ self.__precacheManifest = [
     "url": "/static/vs/language/html/htmlMode.js"
   },
   {
-    "revision": "64eaf1a4e89d2932222a028d3cdb9a3d",
-    "url": "/static/vs/language/html/htmlWorker.js"
-  },
-  {
     "revision": "729bc4c112c5dc3cd04f845dc4af1da0",
     "url": "/static/vs/language/json/jsonMode.js"
   },
@@ -770,6 +766,10 @@ self.__precacheManifest = [
   {
     "revision": "cf05f5559129d3145d705a8df6c6fb48",
     "url": "/static/vs/loader.js"
+  },
+  {
+    "revision": "64eaf1a4e89d2932222a028d3cdb9a3d",
+    "url": "/static/vs/language/html/htmlWorker.js"
   },
   {
     "revision": "11a854433bcc74085be053c3ab713b15",
