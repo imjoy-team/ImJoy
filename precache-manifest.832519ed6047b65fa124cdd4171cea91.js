@@ -232,12 +232,12 @@ self.__precacheManifest = [
     "url": "/static/vs/html.worker.js"
   },
   {
-    "revision": "821dd06611f8497a59e8cee99dbeac0e",
-    "url": "/static/vs/css.worker.js"
-  },
-  {
     "revision": "97b7155c6a256bca6fa703b15a901ee8",
     "url": "/static/vs/editor.worker.js"
+  },
+  {
+    "revision": "821dd06611f8497a59e8cee99dbeac0e",
+    "url": "/static/vs/css.worker.js"
   },
   {
     "revision": "7e6859fdad979fadff68afc7f6ddc975",
@@ -752,6 +752,10 @@ self.__precacheManifest = [
     "url": "/static/vs/language/html/htmlMode.js"
   },
   {
+    "revision": "64eaf1a4e89d2932222a028d3cdb9a3d",
+    "url": "/static/vs/language/html/htmlWorker.js"
+  },
+  {
     "revision": "729bc4c112c5dc3cd04f845dc4af1da0",
     "url": "/static/vs/language/json/jsonMode.js"
   },
@@ -766,10 +770,6 @@ self.__precacheManifest = [
   {
     "revision": "cf05f5559129d3145d705a8df6c6fb48",
     "url": "/static/vs/loader.js"
-  },
-  {
-    "revision": "64eaf1a4e89d2932222a028d3cdb9a3d",
-    "url": "/static/vs/language/html/htmlWorker.js"
   },
   {
     "revision": "11a854433bcc74085be053c3ab713b15",
