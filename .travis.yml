@@ -4,7 +4,7 @@ addons:
   firefox: latest
 language: node_js
 node_js:
-  - "13.5.0"
+  - "13.4.0"
 cache: npm
 notifications:
   email: false
