@@ -4,10 +4,8 @@ addons:
   firefox: latest
 language: node_js
 node_js:
-  - node
-cache:
-  directories:
-    - node_modules
+  - "13.3.0"
+cache: npm
 notifications:
   email: false
 before_script:
@@ -15,6 +13,7 @@ before_script:
   # - "sh -e /etc/init.d/xvfb start"
   # - sleep 3 # give xvfb some time to start
   - cd ./web
+  - npm prune
 script:
   - export NODE_OPTIONS="--max-old-space-size=4096"
   - npm run check-format
