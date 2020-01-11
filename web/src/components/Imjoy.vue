@@ -1063,6 +1063,9 @@ import {
   compareVersions,
   escapeHTML,
 } from "../utils.js";
+
+import { INTERNAL_PLUGINS } from "../api.js";
+
 import DOMPurify from "dompurify";
 
 import { ImJoy } from "../imjoyLib.js";
@@ -1177,6 +1180,7 @@ export default {
         $forceUpdate: this.$forceUpdate,
         openUrl: this.openUrl,
         sleep: this.sleep,
+        //TODO: deprecate assert in the next version
         assert: assert,
       },
     };
@@ -1388,28 +1392,19 @@ export default {
       this.showWelcomeDialog = true;
     } else {
       this.startImJoy(this.$route).then(() => {
-        if (!this.pm.plugin_names["Jupyter-Engine-Manager"]) {
-          console.log("Loading Jupyter-Engine-Manager...");
-          this.pm
-            .reloadPluginRecursively({
-              uri:
-                "https://imjoy-team.github.io/jupyter-engine-manager/Jupyter-Engine-Manager.imjoy.html",
-            })
-            .then(() => {
-              console.log("Jupyter-Engine-Manager loaded.");
-            });
-        }
-
-        if (!this.pm.plugin_names["ImJoy-Engine-Manager"]) {
-          console.log("Loading ImJoy-Engine-Manager...");
-          this.pm
-            .reloadPluginRecursively({
-              uri:
-                "https://oeway.github.io/ImJoy-Engine/ImJoy-Engine-Manager.imjoy.html",
-            })
-            .then(() => {
-              console.log("ImJoy-Engine-Manager loaded.");
-            });
+        for (let pn in INTERNAL_PLUGINS) {
+          if (INTERNAL_PLUGINS[pn].startup) {
+            if (!this.pm.plugin_names[pn]) {
+              console.log(`Loading internal plugin "${pn}"...`);
+              this.pm
+                .reloadPluginRecursively({
+                  uri: INTERNAL_PLUGINS[pn].uri,
+                })
+                .then(() => {
+                  console.log(`${pn} loaded.`);
+                });
+            }
+          }
         }
 
         if (
@@ -1565,15 +1560,15 @@ export default {
         }
         if (route.query.engine || route.query.e) {
           const engine_url = (route.query.engine || route.query.e).trim();
-          this.em
-            .addEngine(
+          try {
+            this.em.addEngine(
               { type: "default", url: engine_url, token: connection_token },
               false
-            )
-            .finally(() => {
-              this.em.getEngineByUrl(engine_url).connect();
-              this.$forceUpdate();
-            });
+            );
+          } finally {
+            this.em.getEngineByUrl(engine_url).connect();
+            this.$forceUpdate();
+          }
         }
 
         this.plugin_loaded = true;

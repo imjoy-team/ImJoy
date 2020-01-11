@@ -64,9 +64,9 @@ and image, you will be able to snap an image and perform a prediction.
 ### Digit classification
 Here, we describe how to install and use an ImJoy plugin to perform digit classification
 with TensorFlow.js. This plugin runs directly in the browser. You can train a
-convolution neural network (CNN) to recognise digits. Once the network is trained,
+convolution neural network (CNN) to recognize digits. Once the network is trained,
 you can classify hand drawn numbers. It is based on [tfjs-vis](https://github.com/tensorflow/tfjs-vis)
-- a small library for in browser visualisation for use with TensorFlow.js.
+- a small library for in browser visualization for use with TensorFlow.js.
 
 This plugin can be obtained by installing the plugin `MNIST-CNN` from
 the ImJoy plugin repository. Alternatively, you can also use this

@@ -544,111 +544,6 @@ var blob = new Blob(["Hello, world!"], {type: "text/plain;charset=utf-8"});
 api.exportFile(blob, 'hello.txt')
 ```
 
-### api.fs.* [experimental]
-```javascript
-api.fs.XXXXX(...)
-```
-
-Access the in-browser filesystem with the [Node JS filesystem API](https://nodejs.org/api/fs.html). More details about the underlying implemetation, see [BrowserFS](https://github.com/jvilk/BrowserFS), the default file system in ImJoy supports the following nodes:
-
- * `/tmp`: `InMemory`, data is stored in browser memory, cleared when ImJoy is closed.
-
- * `/home`: `IndexedDB`, data is stored in the browser IndexedDB database, can be used as persistent storage.
-
-**Examples**
-
-<!-- tabs:start -->
-#### ** JavaScript **
-```javascript
-api.fs.writeFile('/tmp/temp.txt', 'hello world', function(err, data){
-    if (err) {
-        console.log(err);
-        return
-    }
-    console.log("Successfully Written to File.");
-    api.fs.readFile('/tmp/temp.txt', 'utf8', function (err, data) {
-        if (err) {
-            console.log(err);
-            return
-        }
-        console.log('Reald from file', data)
-    });
-});
-```
-#### ** Python **
-```python
-def read(err, data=None):
-    if err:
-        print(err)
-        return
-
-    def cb(err, data=None):
-        if err:
-            print(err)
-            return
-        api.log(data)
-    api.fs.readFile('/tmp/temp.txt', 'utf8', cb)
-
-api.fs.writeFile('/tmp/temp.txt', 'hello world', read)
-
-```
-<!-- tabs:end -->
-
-
-Reading large files chunk-by-chunk in JavaScript:
-```javascript
-function generate_random_data(size){
-    var chars = 'abcdefghijklmnopqrstuvwxyz'.split('');
-    var len = chars.length;
-    var random_data = [];
-
-    while (size--) {
-        random_data.push(chars[Math.random()*len | 0]);
-    }
-
-    return random_data.join('');
-}
-
-const fs = api.fs
-fs.writeFile('/tmp/test.txt', generate_random_data(100000), function(err){
-if (err){
-    console.error(err);
-}
-fs.open('/tmp/test.txt', 'r', function(err, fd) {
-    fs.fstat(fd, function(err, stats) {
-      if(err){
-          reject(err)
-          return
-      }
-      var bufferSize = stats.size,
-          chunkSize = 512,
-          buffer = new Uint8Array(new ArrayBuffer(chunkSize)),
-          bytesRead = 0;
-
-      var stopReadding = false
-      var readCallback = function(err, bytesRead, read_buffer){
-          if(err){
-              console.log('err : ' +  err);
-              stopReadding = true
-              reject(err)
-          }
-          const bytes = read_buffer.slice(0, bytesRead)
-          console.log('new chunk:', bytes)
-      };
-      while (bytesRead < bufferSize && !stopReadding) {
-          if ((bytesRead + chunkSize) > bufferSize) {
-              chunkSize = (bufferSize - bytesRead);
-          }
-          fs.read(fd, buffer, 0, chunkSize, bytesRead, readCallback);
-          bytesRead += chunkSize;
-      }
-      fs.close(fd);
-      resolve()
-    });
-  });
-})
-```
-
 ### api.getAttachment
 ```javascript
 content = await api.getAttachment(att_name)
@@ -1325,8 +1220,7 @@ Currently supported functions for **all plugins** are:
  * `api.utils.$forceUpdate()`: refreshes the GUI manually.
  * `api.utils.openUrl(url)`: opens an `url` in a new browser tab.
  * `api.utils.sleep(duration)`: sleeps for the indicated `duration` in seconds. Note for Python plugins, use `time.sleep` instead.)
- * `api.utils.assert(expression, error_message)`: assert an expression, typically used in a test to make sure a certain condition is met. E.g: `api.utils.assert(v === 98)`
-
+ 
 Currently supported functions for **Python plugins** are:
  * `api.utils.kill(subprocess)`: kills a `subprocess` in python.
  * `api.utils.ndarray(numpy_array)`: wrapps a ndarray `numpy_array` according to the ImJoy ndarray format.
@@ -1341,6 +1235,158 @@ Name of the current workspace.
 
 URL of the current plugin engine.
 
+## Experimental APIs
+
+### `_rpcEncode` and `_rpcDecode`
+Remote Procedure Calls (RPC) in ImJoy allows isolated plugins communcate via functions calls and transmit data by passing augments, however, not all the data types are supported. It only support primitive types (number, string, bytes) and basic array/list, object/dictionary. To extend the supported types, one can provide custom encoding and decoding functions (as the plugin API).
+
+
+```javascript
+class ImJoyPlugin {
+  async setup() {
+  }
+
+  async run(ctx) {
+
+  }
+
+  _rpcEncode(d){
+    if(d === 998 ){
+      return {__rpc_dtype__: 'a_special_number'}
+    }
+    else
+      return d
+  }
+
+  _rpcDecode(d){
+    if(d.__rpc_dtype__ === 'a_special_number'){
+      return 998
+    }
+  }
+}
+```
+NOTE: this only works inside plugins with `window`, `iframe`, `web-worker`, it doesn't not work directly for e.g. `native-python` unless the coresponding plugin engine support it.
+
+
+## Internal plugins
+
+Besides the default ImJoy api, we provide a set of internally supported plugins which can be used directly. These plugins will be loaded only if the plugin is requested by another plugin via `api.getPlugin(...)`.
+
+Here is a list of these internal plugins along with their api functions:
+
+### BrowserFS
+
+To use the `BrowserFS` plugin, you need to first call:
+
+`const bfs = await api.getPlugin('BrowserFS')` in Javascript, or `bfs = await api.getPlugin('BrowserFS')` in Python.
+
+Then, you can use [Node JS filesystem API](https://nodejs.org/api/fs.html) to access the in-browser filesystem (e.g.: `bfs.readFile('/tmp/temp.txt', 'utf-8')`). For more details about the underlying implemetation, see [BrowserFS](https://github.com/jvilk/BrowserFS), the default file system in ImJoy supports the following nodes:
+
+ * `/tmp`: `InMemory`, data is stored in browser memory, cleared when ImJoy is closed.
+
+ * `/home`: `IndexedDB`, data is stored in the browser IndexedDB database, can be used as persistent storage.
+
+**Examples**
+
+<!-- tabs:start -->
+#### ** JavaScript **
+```javascript
+async function test_browser_fs(){
+  const bfs = await api.getPlugin('BrowserFS')
+
+  bfs.writeFile('/tmp/temp.txt', 'hello world', function(err, data){
+      if (err) {
+          console.log(err);
+          return
+      }
+      console.log("Successfully Written to File.");
+      bfs.readFile('/tmp/temp.txt', 'utf8', function (err, data) {
+          if (err) {
+              console.log(err);
+              return
+          }
+          console.log('Read from file', data)
+      });
+  });
+}
+```
+#### ** Python **
+```python
+
+async def test_browser_fs():
+  bfs = await api.getPlugin('BrowserFS')
+
+  def read(err, data=None):
+      if err:
+          print(err)
+          return
+
+      def cb(err, data=None):
+          if err:
+              print(err)
+              return
+          api.log(data)
+      bfs.readFile('/tmp/temp.txt', 'utf8', cb)
+
+  bfs.writeFile('/tmp/temp.txt', 'hello world', read)
+
+```
+<!-- tabs:end -->
+
+
+Reading large files chunk-by-chunk in JavaScript:
+```javascript
+function generate_random_data(size){
+    var chars = 'abcdefghijklmnopqrstuvwxyz'.split('');
+    var len = chars.length;
+    var random_data = [];
+
+    while (size--) {
+        random_data.push(chars[Math.random()*len | 0]);
+    }
+
+    return random_data.join('');
+}
+
+
+bfs.writeFile('/tmp/test.txt', generate_random_data(100000), function(err){
+if (err){
+    console.error(err);
+}
+bfs.open('/tmp/test.txt', 'r', function(err, fd) {
+    bfs.fstat(fd, function(err, stats) {
+      if(err){
+          reject(err)
+          return
+      }
+      var bufferSize = stats.size,
+          chunkSize = 512,
+          buffer = new Uint8Array(new ArrayBuffer(chunkSize)),
+          bytesRead = 0;
+
+      var stopReadding = false
+      var readCallback = function(err, bytesRead, read_buffer){
+          if(err){
+              console.log('err : ' +  err);
+              stopReadding = true
+              reject(err)
+          }
+          const bytes = read_buffer.slice(0, bytesRead)
+          console.log('new chunk:', bytes)
+      };
+      while (bytesRead < bufferSize && !stopReadding) {
+          if ((bytesRead + chunkSize) > bufferSize) {
+              chunkSize = (bufferSize - bytesRead);
+          }
+          bfs.read(fd, buffer, 0, chunkSize, bytesRead, readCallback);
+          bytesRead += chunkSize;
+      }
+      bfs.close(fd);
+      resolve()
+    });
+  });
+})
+```
 
 ## Sanitized HTML and CSS
 
