@@ -3,7 +3,7 @@ import Router from "vue-router";
 import Imjoy from "@/components/Imjoy";
 import About from "@/components/About";
 import Home from "@/components/Home";
-import Preview from "@/components/Preview";
+import PluginDialog from "@/components/PluginDialog";
 Vue.use(Router);
 
 export const router_config = {
@@ -42,7 +42,7 @@ export const router_config = {
     {
       path: "/preview",
       name: "Preview",
-      component: Preview,
+      component: PluginDialog,
     },
     {
       path: "*",

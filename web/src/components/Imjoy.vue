@@ -1042,7 +1042,7 @@
         <about></about>
       </md-dialog-content>
     </md-dialog>
-    <preview ref="preview" :plugin-manager="pm" :engine-manager="em"></preview>
+    <plugin-dialog ref="plugin_dialog" :plugin-manager="pm" :engine-manager="em"></plugin-dialog>
   </div>
 </template>
 
@@ -1408,7 +1408,7 @@ export default {
         }
 
         if (
-          !this.$refs.preview.showAddPluginDialog &&
+          !this.$refs.plugin_dialog.showAddPluginDialog &&
           (!this.pm.plugins || Object.keys(this.pm.plugins) <= 0)
         ) {
           this.pm
@@ -1582,7 +1582,7 @@ export default {
             const ps = this.pm.installed_plugins.filter(p => {
               return p.name === pname;
             });
-            if (!this.$refs.preview.showAddPluginDialog && ps.length <= 0) {
+            if (!this.$refs.plugin_dialog.showAddPluginDialog && ps.length <= 0) {
               alert(`Plugin "${pname}" cannot be started, please install it.`);
             } else {
               const data = _clone(route.query);
@@ -1604,7 +1604,7 @@ export default {
               }
               //load data
               if (
-                !this.$refs.preview.showAddPluginDialog &&
+                !this.$refs.plugin_dialog.showAddPluginDialog &&
                 (this.pm.registered.windows[pname] ||
                   pname.startsWith("imjoy/"))
               ) {

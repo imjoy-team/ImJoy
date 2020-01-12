@@ -1,5 +1,4 @@
 <template>
-  <div class="preview">
     <md-dialog
       class="plugin-dialog"
       :md-active.sync="showAddPluginDialog"
@@ -261,7 +260,6 @@
         </md-card>
       </md-dialog-content>
     </md-dialog>
-  </div>
 </template>
 
 <script>
@@ -276,7 +274,7 @@ import Minibus from "minibus";
 import { ImJoy } from "../imjoyLib.js";
 
 export default {
-  name: "preview",
+  name: "plugin-dialog",
   props: {
     pluginManager: {
       type: [PluginManager, Object],
