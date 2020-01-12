@@ -4,7 +4,7 @@ import Ajv from "ajv";
 const ajv = new Ajv();
 
 export const PLUGIN_FILE_PREVIEW_SCRIPT = `
-<script id="imjoy-file-preview">
+<script id="imjoy-plugin-preview">
 if("file:"===window.location.protocol){const e=window.open("https://imjoy.io/#/preview");window.addEventListener("message",function(o){"imjoy-app-ready"===o.data.type&&e.postMessage({type:"load-imjoy-plugin",code:document.body.innerHTML},"*")})}
 </script>
 `
