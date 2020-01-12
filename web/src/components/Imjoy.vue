@@ -529,7 +529,7 @@
                     >
                       <md-icon>share</md-icon>Share
                     </md-menu-item>
-                    <md-menu-item v-else @click="downloadPlugin(plugin.id)">
+                    <md-menu-item @click="downloadPlugin(plugin.id)">
                       <md-icon>cloud_download</md-icon>Export
                     </md-menu-item>
                     <md-menu-item @click="editPlugin(plugin.id)">
@@ -1064,7 +1064,7 @@ import {
   escapeHTML,
 } from "../utils.js";
 
-import { INTERNAL_PLUGINS } from "../api.js";
+import { INTERNAL_PLUGINS, PLUGIN_FILE_PREVIEW_SCRIPT } from "../api.js";
 
 import DOMPurify from "dompurify";
 
@@ -2154,9 +2154,19 @@ export default {
       const plugin = this.pm.plugins[pid];
       const pconfig = plugin.config;
       const filename = plugin.name + "_" + randId() + ".imjoy.html";
-      const file = new Blob([pconfig.code], {
+      
+      const config = this.pm.parsePluginCode(pconfig.code)
+      let code = pconfig.code;
+      if(config.scripts.filter((script)=>{
+        script.attrs.id === 'imjoy-plugin-preview'
+      }).length<=0){
+        code = pconfig.code + PLUGIN_FILE_PREVIEW_SCRIPT;
+      }
+      
+      const file = new Blob([code], {
         type: "text/plain;charset=utf-8",
       });
+      
       saveAs(file, filename);
     },
     updatePlugin(pid) {
