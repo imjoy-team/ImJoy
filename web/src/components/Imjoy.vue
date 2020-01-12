@@ -1042,7 +1042,11 @@
         <about></about>
       </md-dialog-content>
     </md-dialog>
-    <plugin-dialog ref="plugin_dialog" :plugin-manager="pm" :engine-manager="em"></plugin-dialog>
+    <plugin-dialog
+      ref="plugin_dialog"
+      :plugin-manager="pm"
+      :engine-manager="em"
+    ></plugin-dialog>
   </div>
 </template>
 
@@ -1582,7 +1586,10 @@ export default {
             const ps = this.pm.installed_plugins.filter(p => {
               return p.name === pname;
             });
-            if (!this.$refs.plugin_dialog.showAddPluginDialog && ps.length <= 0) {
+            if (
+              !this.$refs.plugin_dialog.showAddPluginDialog &&
+              ps.length <= 0
+            ) {
               alert(`Plugin "${pname}" cannot be started, please install it.`);
             } else {
               const data = _clone(route.query);
@@ -2154,19 +2161,21 @@ export default {
       const plugin = this.pm.plugins[pid];
       const pconfig = plugin.config;
       const filename = plugin.name + "_" + randId() + ".imjoy.html";
-      
-      const config = this.pm.parsePluginCode(pconfig.code)
+
+      const config = this.pm.parsePluginCode(pconfig.code);
       let code = pconfig.code;
-      if(config.scripts.filter((script)=>{
-        script.attrs.id === 'imjoy-plugin-preview'
-      }).length<=0){
+      if (
+        config.scripts.filter(script => {
+          script.attrs.id === "imjoy-plugin-preview";
+        }).length <= 0
+      ) {
         code = pconfig.code + PLUGIN_FILE_PREVIEW_SCRIPT;
       }
-      
+
       const file = new Blob([code], {
         type: "text/plain;charset=utf-8",
       });
-      
+
       saveAs(file, filename);
     },
     updatePlugin(pid) {
