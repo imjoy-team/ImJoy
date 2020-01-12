@@ -3,7 +3,8 @@ import { compareVersions } from "./utils.js";
 import Ajv from "ajv";
 const ajv = new Ajv();
 
-export const PLUGIN_PREVIEW_SCRIPT_URL = "https://imjoy.io/imjoy-plugin-preview.js"
+export const PLUGIN_PREVIEW_SCRIPT_URL =
+  "https://imjoy.io/imjoy-plugin-preview.js";
 export const INTERNAL_PLUGINS = {
   BrowserFS: {
     uri: "https://imjoy-team.github.io/core-plugins/BrowserFS.imjoy.html",

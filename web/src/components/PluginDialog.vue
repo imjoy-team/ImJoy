@@ -366,7 +366,10 @@ export default {
               this.$forceUpdate();
             }
           });
-          (window.parent || window.opener).postMessage({ type: "imjoy-app-ready" }, "*");
+          (window.parent || window.opener).postMessage(
+            { type: "imjoy-app-ready" },
+            "*"
+          );
         });
       }
     }

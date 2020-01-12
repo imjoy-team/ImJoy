@@ -470,7 +470,10 @@ export default {
           script.attrs.src === PLUGIN_PREVIEW_SCRIPT_URL;
         }).length <= 0
       ) {
-        code = this.codeValue + `<script src="${PLUGIN_PREVIEW_SCRIPT_URL}"></scr`+`ipt>`;
+        code =
+          this.codeValue +
+          `<script src="${PLUGIN_PREVIEW_SCRIPT_URL}"></scr` +
+          `ipt>`;
       }
 
       const file = new Blob([code], {
