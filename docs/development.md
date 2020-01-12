@@ -123,7 +123,7 @@ they do not have access to [html dom](https://www.w3schools.com/whatis/whatis_ht
 
 ### Window
 Window plugins are used to create a new web interface with HTML/CSS and JavaScript.
-They in the `iframe` mode, and it will show up as a window. The `<window>` and `<style>`
+They are created in an `iframe` mode, and they will show up as a window. The `<window>` and `<style>`
 blocks (see below) can be used to define the actual content of the window.
 
 Different from other plugins which will be loaded and initialised when ImJoy is started,
@@ -177,7 +177,7 @@ order of these blocks does not matter, so you can shuffle the blocks.
 <style lang="css">
    ** A code block in CSS format**
    (for plugins in `window` mode)
-</style lang="json">
+</style>
 
 <docs lang="markdown">
    ** A recommended code block in Markdown format with the documentation of the plugin **
@@ -814,7 +814,7 @@ Any ImJoy plugin can access `ImJoy APIs` through a predefined object called `api
 ImJoy API functions.
 
 #### Exposing plugin functions
-Most importantly, each plugin needs to export an plugin object with a set of functions, which will be registered as plugin API functions (also called `Plugin APIs`). This is done by calling `api.export` at the end of the plugin code. Once exported, these functions can then be registered in ImJoy, and can be invoked by the user from the ImJoy interface or other plugins. Importantly, `setup` and `run` are two mandatory pluign API functions which need to be defined and exported.
+Most importantly, each plugin needs to export an plugin object with a set of functions, which will be registered as plugin API functions (also called `Plugin APIs`). This is done by calling `api.export` at the end of the plugin code. Once exported, these functions can then be registered in ImJoy, and can be invoked by the user from the ImJoy interface or other plugins. Importantly, `setup` and `run` are two mandatory plugin API functions which need to be defined and exported.
 
 When exporting ImJoyPlugin class is exported with the `api.export` as proposed
 in the plugin templates, these functions (and all other functions of the ImJoy plugin class)
@@ -908,7 +908,7 @@ in browser cannot directly access your local file system, thus they provide much
 #### Exchanging data through function calls
 For small amount of data (e.g.: array, object etc.) generated during runtime, you can send them to another plugin by passing the data object as arguments during a API function call, or by returning the data object from the api function.
 
-For example, you can directly send data (<10MB) containong small numpy arrays, strings, bytes from a `native-python` plugin running in a remote plugin engine to a `window` plugin running in the browser.
+For example, you can directly send data (<10MB) containing small numpy arrays, strings, bytes from a `native-python` plugin running in a remote plugin engine to a `window` plugin running in the browser.
 
 For quick display of an small image, you can save it as png format and encode it as base64 strings which can then be directly displayed with a standard HTML `<img>` tag.
 
@@ -963,7 +963,7 @@ Below we describe the three execution flags for controlling the execution of pyt
 * By **default** (none of the flags is set), each ImJoy instance has its own process on the plugin engine. If you close the interface, you will kill the process.
 * The **`single-instance`** flag will allow only one process to run for the entire plugin engine. For plugins with the same name and tag, then the `single-instance` means that they access the same process.
 
-* The **`allow-detach`** flag means that the process is not killed when its ImJoy instance is closed. For instance, this allows to perform long computational tasks in the background which don't require additional user feedback and which terminate autonomously. Can also be used to protect a long computational tasks again browser instabilities. If you want to be able to attach to a detached process, your can reconnect from the same browser and workspace, or have the `single-instance` flag which works despite connecting from different browser and workspace.
+* The **`allow-detach`** flag means that the process is not killed when its ImJoy instance is closed. For instance, this allows to perform long computational tasks in the background which don't require additional user feedback and which terminate autonomously. Can also be used to protect a long computational tasks against browser instabilities. If you want to be able to attach to a detached process, you can reconnect from the same browser and workspace, or have the `single-instance` flag which works despite connecting from different browser and workspace.
 
 When ImJoy is trying to reconnect a previously detached plugin process, `resume()` will be called if it was defined in the plugin class, otherwise call `setup()` as usual. Notice that when `resume` is present, `setup` won't be called during the reattachment.
 
@@ -996,7 +996,7 @@ The above `<config>` block will create a plugin with two tags(`Single` and `Mult
 An important part of ImJoy is to provide a flexible way to interact with the user, to either specify input information or generate output in a rich and interactive manner.
 
 ImJoy comes with a set of basic elements such as forms and progress bars which provide a way to interact with user.
-More advanced and powerful user interfaces can be also built with customized windows where developers can ultilize web based UI library for generating controls, interactive charts or render 3D views.
+More advanced and powerful user interfaces can be also built with customized windows where developers can utilize web based UI library for generating controls, interactive charts or render 3D views.
 
 ### **Basic user input and output**
 
