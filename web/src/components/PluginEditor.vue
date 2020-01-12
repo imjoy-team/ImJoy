@@ -63,7 +63,7 @@
             >Save this plugin (Ctrl+S)</md-tooltip
           >
         </md-button>
-        <md-button @click="saveAs()" class="md-icon-button">
+        <md-button @click="downloadPlugin()" class="md-icon-button">
           <md-icon>cloud_download</md-icon>
           <md-tooltip>Export this plugin</md-tooltip>
         </md-button>
@@ -148,6 +148,7 @@ import { saveAs } from "file-saver";
 import axios from "axios";
 
 import { randId, assert } from "../utils.js";
+import { PLUGIN_FILE_PREVIEW_SCRIPT } from "../api.js";
 
 import * as monaco from "monaco-editor";
 
@@ -454,14 +455,25 @@ export default {
         }
       });
     },
-    saveAs() {
+    downloadPlugin() {
       this.codeValue = this.editor.getValue();
       this.$emit("input", this.codeValue);
       const filename =
         this.window && this.window.config && this.window.config.name
           ? this.window.config.name + "_" + randId() + ".imjoy.html"
           : "plugin_" + randId() + ".imjoy.html";
-      const file = new Blob([this.codeValue], {
+
+      const config = this.window.plugin_manager.parsePluginCode(this.codeValue);
+      let code = this.codeValue;
+      if (
+        config.scripts.filter(script => {
+          script.attrs.id === "imjoy-plugin-preview";
+        }).length <= 0
+      ) {
+        code = this.codeValue + PLUGIN_FILE_PREVIEW_SCRIPT;
+      }
+
+      const file = new Blob([code], {
         type: "text/plain;charset=utf-8",
       });
       saveAs(file, filename);
