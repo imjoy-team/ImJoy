@@ -148,7 +148,7 @@ import { saveAs } from "file-saver";
 import axios from "axios";
 
 import { randId, assert } from "../utils.js";
-import { PLUGIN_FILE_PREVIEW_SCRIPT } from "../api.js";
+import { PLUGIN_PREVIEW_SCRIPT_URL } from "../api.js";
 
 import * as monaco from "monaco-editor";
 
@@ -467,10 +467,10 @@ export default {
       let code = this.codeValue;
       if (
         config.scripts.filter(script => {
-          script.attrs.id === "imjoy-plugin-preview";
+          script.attrs.src === PLUGIN_PREVIEW_SCRIPT_URL;
         }).length <= 0
       ) {
-        code = this.codeValue + PLUGIN_FILE_PREVIEW_SCRIPT;
+        code = this.codeValue + `<script src="${PLUGIN_PREVIEW_SCRIPT_URL}"></scr`+`ipt>`;
       }
 
       const file = new Blob([code], {

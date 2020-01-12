@@ -331,7 +331,7 @@ export default {
       // {name: "Iframe(Javascript)", code: IFRAME_PLUGIN_TEMPLATE},
       { name: "Web Python", code: WEB_PYTHON_PLUGIN_TEMPLATE, icon: "🐍" },
     ];
-    if (window.opener) {
+    if (window.parent || window.opener) {
       if (!this.pm) {
         const client_id = localStorage.getItem("imjoy_client_id");
         const imjoy = new ImJoy({
@@ -351,7 +351,7 @@ export default {
           await this.pm.loadWorkspace("default");
           this.show_close = false;
           this.downloading_error = "";
-          this.downloading_plugin = false;
+          this.downloading_plugin = true;
           this.showAddPluginDialog = true;
           this.show_plugin_templates = false;
           this.show_plugin_store = false;
@@ -366,7 +366,7 @@ export default {
               this.$forceUpdate();
             }
           });
-          window.opener.postMessage({ type: "imjoy-app-ready" }, "*");
+          (window.parent || window.opener).postMessage({ type: "imjoy-app-ready" }, "*");
         });
       }
     }
