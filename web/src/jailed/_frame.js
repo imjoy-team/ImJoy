@@ -34,6 +34,7 @@ var getParamValue = function(paramName) {
 
 var plugin_name = getParamValue("name");
 var plugin_mode = getParamValue("type");
+var is_module = getParamValue("isModule");
 
 function _sendToServiceWorker(message) {
   return new Promise(function(resolve, reject) {
@@ -99,8 +100,11 @@ var initWebworkerPlugin = function() {
   ].join("\n");
 
   var blobUrl = window.URL.createObjectURL(new Blob([blobCode]));
-
-  var worker = new Worker(blobUrl, { name: plugin_name || "plugin_webworker" });
+  var worker_config = { name: plugin_name || "plugin_webworker" }
+  if(is_module){
+    worker_config.type = 'module'
+  }
+  var worker = new Worker(blobUrl, worker_config);
 
   // telling worker to load _pluginWebWorker.js (see blob code above)
   worker.postMessage({

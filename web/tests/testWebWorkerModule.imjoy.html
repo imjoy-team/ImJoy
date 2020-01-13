@@ -1,0 +1,43 @@
+<docs>
+[TODO: write documentation for this plugin.]
+</docs>
+
+<config lang="json">
+{
+    "name": "Test WebWorker Module",
+    "type": "web-worker",
+    "tags": [],
+    "ui": "",
+    "version": "0.1.0",
+    "cover": "",
+    "description": "[TODO: describe this plugin with one sentence.]",
+    "icon": "extension",
+    "inputs": null,
+    "outputs": null,
+    "api_version": "0.1.7",
+    "env": "",
+    "permissions": [],
+    "requirements": [],
+    "dependencies": []
+}
+</config>
+
+<script lang="javascript" type="module">
+import { parseComponent } from '/static/js/pluginParser.js';
+
+class ImJoyPlugin {
+    async setup() {
+        api.log('initialized')
+    }
+
+    async run(ctx) {
+        api.alert('hello world.')
+    }
+
+    test_es_module() {
+        return True
+    }
+}
+
+api.export(new ImJoyPlugin())
+</script>

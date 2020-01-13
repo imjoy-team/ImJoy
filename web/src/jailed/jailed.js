@@ -364,6 +364,14 @@ class BasicConnection {
       config.name +
       "&workspace=" +
       config.workspace;
+    
+    if(config.attrs.type === 'module'){
+      me._frame.src = me._frame.src + "&isModule=1";
+    }
+    else{
+      me._frame.src = me._frame.src + "&isModule=0";
+    }
+    
     me._frame.id = "iframe_" + id;
     if (type == "iframe" || type == "window" || type == "web-python-window") {
       if (typeof iframe_container == "string") {

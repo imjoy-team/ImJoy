@@ -16,6 +16,9 @@ import TEST_WEB_WORKER_PLUGIN_1 from "./testWebWorkerPlugin1.imjoy.html";
 import TEST_WEB_WORKER_PLUGIN_2 from "./testWebWorkerPlugin2.imjoy.html";
 import TEST_WINDOW_PLUGIN_1 from "./testWindowPlugin1.imjoy.html";
 
+import TEST_WINDOW_MODULE from "./testWindowModule.imjoy.html";
+import TEST_WEB_WORKER_MODULE from "./testWebWorkerModule.imjoy.html";
+
 describe("ImJoy.vue", async () => {
   const localVue = createLocalVue();
   localVue.use(VueRouter);
@@ -222,6 +225,25 @@ describe("ImJoy.vue", async () => {
       });
     });
 
+    it("should load window plugin written as ES Module", async ()=>{
+      const pluginw = await pm.reloadPlugin({ code: _.clone(TEST_WINDOW_MODULE) });
+      expect(pluginw.name).to.equal("Test Window Module");
+      expect(pluginw.type).to.equal("window");
+      expect(typeof pluginw.api.run).to.equal("function");
+      const wplugin = await pm.createWindow(null, {
+        name: "new window",
+        type: "Test Window Module",
+      })
+      expect(typeof wplugin.test_es_module).to.equal("function");
+    })
+
+    it("should load web-worker plugin written as ES Module", async ()=>{
+      const pluginw = await pm.reloadPlugin({ code: _.clone(TEST_WEB_WORKER_MODULE) });
+      expect(pluginw.name).to.equal("Test WebWorker Module");
+      expect(pluginw.type).to.equal("web-worker");
+      expect(typeof pluginw.api.test_es_module).to.equal("function");
+    })
+
     it("should register and unregister", async () => {
       expect(Object.keys(plugin1.ops).length).to.equal(1);
       expect(await plugin1.api.test_register()).to.be.true;
@@ -284,7 +306,7 @@ describe("ImJoy.vue", async () => {
 
     it("should read and write with BrowserFS plugin", async () => {
       expect(await plugin1.api.test_fs()).to.be.true;
-    });
+    }).timeout(100000);
 
     it("should work with custom encoding and decoding", async () => {
       expect(await plugin1.api.test_encoding_decoding()).to.be.true;
