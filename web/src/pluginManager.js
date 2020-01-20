@@ -1955,7 +1955,11 @@ export class PluginManager {
           this.registered.loaders[op_key] = async target => {
             let config = {};
             if (plugin.config && plugin.config.ui) {
-              config = await this.imjoy_api.showDialog(plugin, plugin.config);
+              config = await this.imjoy_api.showDialog(plugin, {
+                type: "imjoy/joy",
+                ui: plugin.config.ui,
+                name: plugin.config.name,
+              });
             }
             target.transfer = target.transfer || false;
             target._source_op = target._op;
