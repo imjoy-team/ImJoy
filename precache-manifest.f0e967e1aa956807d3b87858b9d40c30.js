@@ -1,11 +1,11 @@
 self.__precacheManifest = [
   {
-    "revision": "ae1c3735f7c5b479bd92",
+    "revision": "c2297fb2489aac1b53a9",
     "url": "/static/css/app.ff360dd6.css"
   },
   {
-    "revision": "ae1c3735f7c5b479bd92",
-    "url": "/static/js/app.f491f1dc.js"
+    "revision": "c2297fb2489aac1b53a9",
+    "url": "/static/js/app.94ec921c.js"
   },
   {
     "revision": "b8859e2632feade2aed6",
@@ -232,15 +232,15 @@ self.__precacheManifest = [
     "url": "/static/vs/editor.worker.js"
   },
   {
-    "revision": "d10204c6d610178f9c2643845f648c0e",
-    "url": "/static/vs/html.worker.js"
-  },
-  {
     "revision": "821dd06611f8497a59e8cee99dbeac0e",
     "url": "/static/vs/css.worker.js"
   },
   {
-    "revision": "5cce0c8c3718ba20234dee4383b2a04d",
+    "revision": "d10204c6d610178f9c2643845f648c0e",
+    "url": "/static/vs/html.worker.js"
+  },
+  {
+    "revision": "9ef82e7941dc264fd40d7ae57103738a",
     "url": "/index.html"
   },
   {
@@ -708,40 +708,32 @@ self.__precacheManifest = [
     "url": "/static/vs/editor/editor.main.nls.de.js"
   },
   {
-    "revision": "65a437a349f6e024e14a84bdae3b94e5",
-    "url": "/static/vs/editor/editor.main.nls.es.js"
-  },
-  {
-    "revision": "a8fb0f322b584b488bd572adf086cdcd",
-    "url": "/static/vs/editor/editor.main.nls.fr.js"
-  },
-  {
     "revision": "6d0cbdd6e06c3e3c3eea8c05cf7918fa",
     "url": "/static/vs/editor/editor.main.nls.it.js"
+  },
+  {
+    "revision": "65a437a349f6e024e14a84bdae3b94e5",
+    "url": "/static/vs/editor/editor.main.nls.es.js"
   },
   {
     "revision": "7c5522016f018c3226287c88363be05b",
     "url": "/static/vs/editor/editor.main.nls.ja.js"
   },
   {
-    "revision": "6c2e4bbc2f1390147bb8705f79cb58e7",
-    "url": "/static/vs/editor/editor.main.nls.js"
-  },
-  {
     "revision": "09e5a4cc32305727ff958438e4c3fad1",
     "url": "/static/vs/editor/editor.main.nls.ko.js"
   },
   {
-    "revision": "a6a8191b3898b9a0ca4ee9d165c32d2e",
-    "url": "/static/vs/editor/editor.main.nls.ru.js"
+    "revision": "6c2e4bbc2f1390147bb8705f79cb58e7",
+    "url": "/static/vs/editor/editor.main.nls.js"
   },
   {
     "revision": "bb56d521fd9e0ac3bcb5c468907300ea",
     "url": "/static/vs/editor/editor.main.nls.zh-cn.js"
   },
   {
-    "revision": "2062c186031ecda7b3c52a7de847ddc7",
-    "url": "/static/vs/editor/editor.main.nls.zh-tw.js"
+    "revision": "a6a8191b3898b9a0ca4ee9d165c32d2e",
+    "url": "/static/vs/editor/editor.main.nls.ru.js"
   },
   {
     "revision": "a14fcc89b2e121908c5cc7ec97787dfe",
@@ -774,6 +766,14 @@ self.__precacheManifest = [
   {
     "revision": "11a854433bcc74085be053c3ab713b15",
     "url": "/static/vs/language/css/cssWorker.js"
+  },
+  {
+    "revision": "2062c186031ecda7b3c52a7de847ddc7",
+    "url": "/static/vs/editor/editor.main.nls.zh-tw.js"
+  },
+  {
+    "revision": "a8fb0f322b584b488bd572adf086cdcd",
+    "url": "/static/vs/editor/editor.main.nls.fr.js"
   },
   {
     "revision": "51880b243dfb4c0a65c406b155e9a716",
