@@ -1,11 +1,11 @@
 self.__precacheManifest = [
   {
-    "revision": "ea260d1d347e1b67eb0f",
+    "revision": "ae1c3735f7c5b479bd92",
     "url": "/static/css/app.ff360dd6.css"
   },
   {
-    "revision": "ea260d1d347e1b67eb0f",
-    "url": "/static/js/app.0b53abce.js"
+    "revision": "ae1c3735f7c5b479bd92",
+    "url": "/static/js/app.f491f1dc.js"
   },
   {
     "revision": "b8859e2632feade2aed6",
@@ -228,19 +228,19 @@ self.__precacheManifest = [
     "url": "/static/js/chunk-vendors.87003fbf.js"
   },
   {
-    "revision": "821dd06611f8497a59e8cee99dbeac0e",
-    "url": "/static/vs/css.worker.js"
+    "revision": "97b7155c6a256bca6fa703b15a901ee8",
+    "url": "/static/vs/editor.worker.js"
   },
   {
     "revision": "d10204c6d610178f9c2643845f648c0e",
     "url": "/static/vs/html.worker.js"
   },
   {
-    "revision": "97b7155c6a256bca6fa703b15a901ee8",
-    "url": "/static/vs/editor.worker.js"
+    "revision": "821dd06611f8497a59e8cee99dbeac0e",
+    "url": "/static/vs/css.worker.js"
   },
   {
-    "revision": "7e6859fdad979fadff68afc7f6ddc975",
+    "revision": "5cce0c8c3718ba20234dee4383b2a04d",
     "url": "/index.html"
   },
   {
@@ -700,6 +700,18 @@ self.__precacheManifest = [
     "url": "/static/vs/basic-languages/yaml/yaml.js"
   },
   {
+    "revision": "7f6fed6512bd7e3325304a0346e02098",
+    "url": "/static/vs/editor/editor.main.css"
+  },
+  {
+    "revision": "2b6ac4494944b92db7dcfa0ce3a605ed",
+    "url": "/static/vs/editor/editor.main.nls.de.js"
+  },
+  {
+    "revision": "65a437a349f6e024e14a84bdae3b94e5",
+    "url": "/static/vs/editor/editor.main.nls.es.js"
+  },
+  {
     "revision": "a8fb0f322b584b488bd572adf086cdcd",
     "url": "/static/vs/editor/editor.main.nls.fr.js"
   },
@@ -762,18 +774,6 @@ self.__precacheManifest = [
   {
     "revision": "11a854433bcc74085be053c3ab713b15",
     "url": "/static/vs/language/css/cssWorker.js"
-  },
-  {
-    "revision": "2b6ac4494944b92db7dcfa0ce3a605ed",
-    "url": "/static/vs/editor/editor.main.nls.de.js"
-  },
-  {
-    "revision": "7f6fed6512bd7e3325304a0346e02098",
-    "url": "/static/vs/editor/editor.main.css"
-  },
-  {
-    "revision": "65a437a349f6e024e14a84bdae3b94e5",
-    "url": "/static/vs/editor/editor.main.nls.es.js"
   },
   {
     "revision": "51880b243dfb4c0a65c406b155e9a716",
