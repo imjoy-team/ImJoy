@@ -1283,20 +1283,25 @@ export class PluginManager {
         }
       }
 
-      config.scripts = [];
-      for (let i = 0; i < pluginComp.script.length; i++) {
-        config.scripts.push(pluginComp.script[i]);
-      }
       if (!config.script) {
         config.script = pluginComp.script[0].content;
         config.lang = pluginComp.script[0].attrs.lang;
       }
       config.tag = overwrite_config.tag || (config.tags && config.tags[0]);
+
+      config.scripts = [];
       // try to match the script with current tag
       for (let i = 0; i < pluginComp.script.length; i++) {
         if (pluginComp.script[i].attrs.tag === config.tag) {
           config.script = pluginComp.script[i].content;
-          break;
+        }
+
+        // exclude script with mismatched tag
+        if (
+          !pluginComp.script[i].attrs.tag ||
+          pluginComp.script[i].attrs.tag === config.tag
+        ) {
+          config.scripts.push(pluginComp.script[i]);
         }
       }
       config.links = pluginComp.link || null;
