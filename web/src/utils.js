@@ -1,4 +1,5 @@
 /*eslint no-useless-escape: "off"*/
+import axios from "axios";
 
 /**
  * A special kind of event:
@@ -1043,7 +1044,20 @@ export function githubUrlToObject(repoUrl, opts) {
 }
 
 // from: https://github.com/Elixirdoc/github-url-raw
-export function githubUrlRaw(url) {
+export async function githubUrlRaw(url) {
+  if (url.includes("gist.github.com")) {
+    const gistId = url.split("/").slice(-1)[0];
+    const response = await axios.get("https://api.github.com/gists/" + gistId);
+    if (response.status === 200) {
+      // TODO: handle multiple files, e.g.: display them all
+      const plugin_file = Object.values(response.data.files).filter(file => {
+        return file.filename.endsWith(".imjoy.html");
+      })[0];
+      return plugin_file.raw_url;
+    } else {
+      throw "Failed to fetch from Gist: " + response.statusText;
+    }
+  }
   if (!url.includes("blob") || !url.includes("github")) {
     return null;
   }
