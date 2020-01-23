@@ -1217,8 +1217,10 @@ There are **two types of URI**, depending on how your plugin is deployed:
     1. For files on **GitHub**, you just need to copy the link to the file.
        For example: `https://github.com/oeway/ImJoy-Plugins/blob/master/repository/imageRecognition.imjoy.html`.
 
-    0.  For **Gist** or other Git providers such as (GitLab), you need to obtain the `raw`
-        link of the plugin file. For example, to create a Gist link
+    0.  For **Gist** or other Git providers such as (GitLab), if there is only one file in the Gist, you can use the direct Gist link (copied from your browser address bar) or obtain the `raw`
+        link of the plugin file. For a Gist with multiple file, you need to specify the `raw` link for the plugin file you would like to use. 
+        
+        To create a Gist `raw` link:
 
         1. Go to Gist on your GitHub account [https://gist.github.com/](https://gist.github.com/)
         0. Create new Gist, specify the plugin name followed by `.imjoy.html`, and copy & paste the code of your plugin.
