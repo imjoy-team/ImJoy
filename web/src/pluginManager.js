@@ -802,8 +802,11 @@ export class PluginManager {
   async getPluginFromUrl(uri, scoped_plugins) {
     scoped_plugins = scoped_plugins || this.available_plugins;
     let selected_tag;
-    if (uri.includes("github") && uri.includes("/blob/")) {
-      uri = githubUrlRaw(uri);
+    if (
+      (uri.includes("github.com") && uri.includes("/blob/")) ||
+      uri.includes("gist.github.com")
+    ) {
+      uri = await githubUrlRaw(uri);
     }
     // if the uri format is REPO_NAME:PLUGIN_NAME
     if (!uri.startsWith("http") && uri.includes("/") && uri.includes(":")) {
