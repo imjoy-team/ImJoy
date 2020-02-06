@@ -394,7 +394,7 @@ export default {
         (plugin.config && plugin.config.type === "window") ||
         plugin.config.type === "web-python-window"
       ) {
-        this.window_plugin_id = w.__id__;
+        this.window_plugin_id = w && w.__id__;
         this.window_plugin_config = config;
       }
     },

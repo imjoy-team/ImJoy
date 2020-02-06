@@ -476,9 +476,6 @@ class BasicConnection {
  */
 var DynamicPlugin = function(config, _interface, _fs_api, engine, is_proxy) {
   this.config = config;
-  if (!this.config.script) {
-    throw "you must specify the script for the plugin to run.";
-  }
   this.id = config.id || randId();
   this._id = config._id;
   this.name = config.name;
