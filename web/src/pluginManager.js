@@ -1303,7 +1303,7 @@ export class PluginManager {
           config.scripts.push(pluginComp.script[i]);
         }
       }
-      if (!config.script && pluginComp.script.length>0) {
+      if (!config.script && pluginComp.script.length > 0) {
         config.script = pluginComp.script[0].content;
         config.lang = pluginComp.script[0].attrs.lang;
       }
