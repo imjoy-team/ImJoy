@@ -56,7 +56,7 @@
     </md-dialog-content>
 
     <md-dialog-actions>
-      <md-menu style="flex: auto;" v-if="!this.loading">
+      <md-menu style="flex: auto;">
         <md-button class="md-button md-primary" md-menu-trigger>
           <md-icon>menu</md-icon>options
         </md-button>
@@ -85,7 +85,6 @@
       </p>
       <md-button
         class="md-primary"
-        v-if="!this.loading"
         :disabled="!file_tree_selection"
         @click="
           show_ = false;
@@ -208,6 +207,7 @@ export default {
               this.root,
               `Uploading ${i + 1}/${files.length}: ${files[i].name}`
             );
+            this.status_text = `file uploaded to ${this.root}.`;
           } else {
             await this.upload(
               files[i],
@@ -466,7 +466,7 @@ export default {
         this.file_tree_selection = null;
         this.file_tree_selection_info = null;
         for (let f of files) {
-          await this.selected_file_manager.removeFiles(
+          await this.selected_file_manager.removeFile(
             f.path,
             f.target.type,
             this.options.recursive
