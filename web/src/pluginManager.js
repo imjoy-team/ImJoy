@@ -1427,7 +1427,7 @@ export class PluginManager {
           c.data = (my && my.data) || {};
           c.config = (my && my.config) || {};
           c.id = my && my.id;
-          await this.createWindow(null, c);
+          return await this.createWindow(null, c);
         },
       };
       try {
@@ -1696,7 +1696,8 @@ export class PluginManager {
     if (!my) return null;
     //conver config--> data  data-->target
     const res = {};
-    res.__jailed_type__ = my.__jailed_type__;
+    res.__as_interface__ = my.__as_interface__;
+    res.__id__ = my.__id__;
     if (my.type && my.data) {
       res.data = my.config;
       res.target = my.data;
@@ -1748,7 +1749,8 @@ export class PluginManager {
     if (!my) return null;
     my.target = my.target || {};
     const ret = {
-      __jailed_type__: my.__jailed_type__,
+      __as_interface__: my.__as_interface__,
+      __id__: my.__id__,
       _variables: my.target._variables || null,
       _op: my.target._op,
       _source_op: my.target._source_op,
@@ -1979,7 +1981,8 @@ export class PluginManager {
             const result = await plugin.api.run(this.joy2plugin(my));
             if (result) {
               const res = this.plugin2joy(result);
-              if (res) {
+              // if it's not a window
+              if (res && !res.__as_interface__) {
                 const w = {};
                 w.name = res.name || "result";
                 w.type = res.type || "imjoy/generic";

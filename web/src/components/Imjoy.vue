@@ -2687,7 +2687,7 @@ export default {
         .execute(mw.target)
         .then(my => {
           const w = this.pm.joy2plugin(my);
-          if (w && !my.__jailed_type__) {
+          if (w && !my.__as_interface__) {
             w.name = w.name || "result";
             w.type = w.type || "imjoy/generic";
             this.createWindow(w);
@@ -2797,7 +2797,7 @@ export default {
         this.showMessage("Uploading a file to " + config.url);
         let totalLength = null;
         axios({
-          method: "post" || config.method,
+          method: "post",
           url: config.url,
           data: bodyFormData,
           headers: config.headers || { "Content-Type": "multipart/form-data" },
