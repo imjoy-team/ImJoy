@@ -1286,10 +1286,6 @@ export class PluginManager {
         }
       }
 
-      if (!config.script) {
-        config.script = pluginComp.script[0].content;
-        config.lang = pluginComp.script[0].attrs.lang;
-      }
       config.tag = overwrite_config.tag || (config.tags && config.tags[0]);
 
       config.scripts = [];
@@ -1306,6 +1302,10 @@ export class PluginManager {
         ) {
           config.scripts.push(pluginComp.script[i]);
         }
+      }
+      if (!config.script && pluginComp.script.length>0) {
+        config.script = pluginComp.script[0].content;
+        config.lang = pluginComp.script[0].attrs.lang;
       }
       config.links = pluginComp.link || null;
       config.windows = pluginComp.window || null;
