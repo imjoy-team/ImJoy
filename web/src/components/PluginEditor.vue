@@ -6,10 +6,7 @@
       <input
         class="md-file"
         type="file"
-        @change="
-          lastModified = null;
-          loadCodeFromFile();
-        "
+        @change="fileSelected"
         ref="file_select"
         multiple
       />
@@ -45,7 +42,11 @@
           </md-menu-content>
         </md-menu>
 
-        <md-switch v-model="watch_file" @change="watchModeChanged">
+        <md-switch
+          v-if="code_origin || lastModified"
+          v-model="watch_file"
+          @change="watchModeChanged"
+        >
           <md-tooltip class="md-medium-hide"
             >Watch content change automatically.
           </md-tooltip>
@@ -56,7 +57,7 @@
           <md-tooltip class="md-medium-hide"
             >Run automatically when code changes.
           </md-tooltip>
-          Run
+          AotoRun
         </md-switch>
 
         <md-button @click="run()" class="md-icon-button">
@@ -310,6 +311,10 @@ export default {
               });
           });
       });
+    },
+    fileSelected() {
+      this.lastModified = null;
+      this.loadCodeFromFile();
     },
     watchModeChanged() {
       if (this.watch_file) {
