@@ -112,6 +112,8 @@
   </md-dialog>
 </template>
 <script>
+import { pathJoin } from "../utils.js";
+
 export default {
   name: "file-dialog",
   props: {
@@ -202,12 +204,13 @@ export default {
             continue;
           }
           if (this.selected_file_manager.putFile) {
+            this.status_text = `Uploading ${i + 1}/${files.length}: ${
+              files[i].name
+            }`;
             await this.selected_file_manager.putFile(
               files[i],
-              this.root,
-              `Uploading ${i + 1}/${files.length}: ${files[i].name}`
+              pathJoin(this.root, files[i].name)
             );
-            this.status_text = `file uploaded to ${this.root}.`;
           } else {
             await this.upload(
               files[i],
