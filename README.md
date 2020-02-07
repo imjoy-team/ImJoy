@@ -144,7 +144,7 @@ Please cite our paper on Nature Methods ([https://www.nature.com/articles/s41592
 
 ## Code of Conduct
 
-Help us keep the ImJoy community open and inclusive. Please read and follow our [Code of Conduct](https://github.com/oeway/ImJoy/blob/master/docs/code_of_conduct.md).
+Help us keep the ImJoy community open and inclusive. Please read and follow our [Code of Conduct](https://github.com/oeway/ImJoy/blob/master/docs/CODE_OF_CONDUCT.md).
 
 ## License
 
