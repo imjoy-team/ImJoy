@@ -14,8 +14,8 @@ self.connection = {};
    * Event lisener for the plugin message
    */
   self.addEventListener("message", function(e) {
-    var m = e.data.data;
-    switch (m.type) {
+    var m = e.data && e.data.data;
+    switch (m && m.type) {
       case "import":
       case "importJailed": // already jailed in the iframe
         importScript(m.url);

@@ -137,7 +137,7 @@ var Connection = function(id, type, config) {
   };
 
   this._platformConnection.onMessage(function(m) {
-    switch (m.type) {
+    switch (m && m.type) {
       case "message":
         me._messageHandler(m.data);
         break;

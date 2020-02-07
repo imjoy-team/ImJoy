@@ -297,8 +297,8 @@ if ("serviceWorker" in navigator) {
 
 // event listener for the plugin message
 window.addEventListener("message", function(e) {
-  var m = e.data.data;
-  if (m.type === "execute") {
+  var m = e.data && e.data.data;
+  if (m && m.type === "execute") {
     const code = m.code;
     if (code.type == "requirements") {
       if (!Array.isArray(code.requirements)) {
