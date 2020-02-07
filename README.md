@@ -142,6 +142,9 @@ Please cite our paper on Nature Methods ([https://www.nature.com/articles/s41592
 
 `Ouyang, W., Mueller, F., Hjelmare, M. et al. ImJoy: an open-source computational platform for the deep learning era. Nat Methods (2019) doi:10.1038/s41592-019-0627-0`
 
+## Code of Conduct
+
+Help us keep the ImJoy community open and inclusive. Please read and follow our [Code of Conduct](https://github.com/oeway/ImJoy/blob/master/docs/CODE_OF_CONDUCT.md).
 
 ## License
 
