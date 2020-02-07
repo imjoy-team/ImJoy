@@ -25,7 +25,7 @@ var printError = function(msg) {
  * Event lisener for the plugin message
  */
 process.on("message", function(m) {
-  switch (m.type) {
+  switch (m && m.type) {
     case "import":
       importScript(m.url);
       break;
