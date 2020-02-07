@@ -6,7 +6,10 @@
       <input
         class="md-file"
         type="file"
-        @change="loadCodeFromFile"
+        @change="
+          lastModified = null;
+          loadCodeFromFile();
+        "
         ref="file_select"
         multiple
       />
@@ -17,19 +20,9 @@
       md-elevation="1"
     >
       <div class="md-toolbar-section-start">
-        <md-switch v-model="watch_file" @change="watchModeChanged">
-          <md-tooltip>Watch content change automatically. </md-tooltip>
-          Watch
-        </md-switch>
-
-        <md-switch v-if="watch_file" v-model="run_changed_file">
-          <md-tooltip>Run automatically when code changes. </md-tooltip>
-          Run
-        </md-switch>
-
         <md-menu md-size="big">
           <md-button class="md-icon-button" md-menu-trigger>
-            <md-icon>insert_drive_file</md-icon>
+            <md-icon>folder_open</md-icon>
             <md-tooltip class="md-medium-hide">Open File</md-tooltip>
           </md-button>
 
@@ -51,6 +44,20 @@
             </md-menu-item>
           </md-menu-content>
         </md-menu>
+
+        <md-switch v-model="watch_file" @change="watchModeChanged">
+          <md-tooltip class="md-medium-hide"
+            >Watch content change automatically.
+          </md-tooltip>
+          Watch
+        </md-switch>
+
+        <md-switch v-if="watch_file" v-model="run_changed_file">
+          <md-tooltip class="md-medium-hide"
+            >Run automatically when code changes.
+          </md-tooltip>
+          Run
+        </md-switch>
 
         <md-button @click="run()" class="md-icon-button">
           <md-icon>play_arrow</md-icon>
@@ -190,6 +197,7 @@ export default {
       watching: false,
       loading: false,
       watch_timer: null,
+      lastModified: null,
     };
   },
   created() {
@@ -306,6 +314,7 @@ export default {
     watchModeChanged() {
       if (this.watch_file) {
         this.editor.updateOptions({ readOnly: true });
+        this.lastModified = null;
         this.watch_timer = setInterval(() => {
           this.watching = true;
           this.$forceUpdate();
@@ -331,13 +340,16 @@ export default {
       if (!this.$refs.file_select.files) return;
       this.code_origin = null;
       const file = this.$refs.file_select.files[0];
-
       if (file) {
         const reader = new FileReader();
         reader.onload = () => {
           try {
             const code = reader.result;
-            if (SparkMD5.hash(code) !== SparkMD5.hash(this.editor.getValue())) {
+            if (
+              this.lastModified != file.lastModified ||
+              SparkMD5.hash(code) !== SparkMD5.hash(this.editor.getValue())
+            ) {
+              this.lastModified = file.lastModified;
               this.loading = true;
               this.$forceUpdate();
               this.window.plugin_manager.parsePluginCode(code);
@@ -576,6 +588,11 @@ export default {
   z-index: 999;
   font-size: 1rem;
 }
+
+.md-switch {
+  margin-right: 3px;
+}
+
 /*
 
 .plugin-editor {
