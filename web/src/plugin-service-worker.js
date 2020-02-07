@@ -52,6 +52,24 @@ if (typeof workbox !== "undefined") {
     });
   });
 
+  var reg_match_url = /^(https?\:)\/\/(([^:\/?#]*)(?:\:([0-9]+))?)([\/]{0,1}[^?#]*)(\?[^#]*|)(#.*|)$/;
+  function parseURL(href) {
+    var match = href.match(reg_match_url);
+    return (
+      (match && {
+        href: href,
+        protocol: match[1],
+        host: match[2],
+        hostname: match[3],
+        port: match[4],
+        pathname: match[5],
+        search: match[6],
+        hash: match[7],
+      }) ||
+      {}
+    );
+  }
+
   self.addEventListener("message", event => {
     if (event.data.action == "skipWaiting") self.skipWaiting();
     if (event.data && event.data.command) {
@@ -86,6 +104,16 @@ if (typeof workbox !== "undefined") {
           case "add":
             // If event.data.url isn't a valid URL, new Request() will throw a TypeError which will be handled
             // by the outer .catch().
+
+            // do not cache localhost requests
+            const hostname = parseURL(event.data.url).hostname;
+            if (
+              !hostname ||
+              hostname === "localhost" ||
+              hostname === "127.0.0.1"
+            )
+              return;
+
             var request = new Request(event.data.url);
             return fetch(request)
               .then(function(response) {
