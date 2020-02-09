@@ -1,10 +1,12 @@
 <template>
   <div class="plugin-editor">
+    <div class="loading loading-lg floating" v-show="watching"></div>
+    <div class="floating-text" v-show="loading">Loading code...</div>
     <form v-show="false" ref="file_form">
       <input
         class="md-file"
         type="file"
-        @change="openLocalFile"
+        @change="fileSelected"
         ref="file_select"
         multiple
       />
@@ -17,7 +19,7 @@
       <div class="md-toolbar-section-start">
         <md-menu md-size="big">
           <md-button class="md-icon-button" md-menu-trigger>
-            <md-icon>insert_drive_file</md-icon>
+            <md-icon>folder_open</md-icon>
             <md-tooltip class="md-medium-hide">Open File</md-tooltip>
           </md-button>
 
@@ -40,16 +42,23 @@
           </md-menu-content>
         </md-menu>
 
-        <md-button
-          @click="load_code_from_origin()"
-          v-if="code_origin"
-          class="md-icon-button"
+        <md-switch
+          v-if="code_origin || lastModified"
+          v-model="watch_file"
+          @change="watchModeChanged"
         >
-          <md-icon>autorenew</md-icon>
           <md-tooltip class="md-medium-hide"
-            >Reload plugin source code file from the engine (Ctrl+L)</md-tooltip
-          >
-        </md-button>
+            >Watch content change automatically.
+          </md-tooltip>
+          Watch
+        </md-switch>
+
+        <md-switch v-if="watch_file" v-model="run_changed_file">
+          <md-tooltip class="md-medium-hide"
+            >Run automatically when code changes.
+          </md-tooltip>
+          AotoRun
+        </md-switch>
 
         <md-button @click="run()" class="md-icon-button">
           <md-icon>play_arrow</md-icon>
@@ -151,6 +160,8 @@ import { randId, assert } from "../utils.js";
 
 import * as monaco from "monaco-editor";
 
+import SparkMD5 from "spark-md5";
+
 window.MonacoEnvironment = {
   getWorkerUrl: function() {
     var fullPath =
@@ -182,6 +193,12 @@ export default {
       editor: null,
       saved: false,
       code_origin: null,
+      watch_file: false,
+      run_changed_file: false,
+      watching: false,
+      loading: false,
+      watch_timer: null,
+      lastModified: null,
     };
   },
   created() {
@@ -191,6 +208,9 @@ export default {
   },
   beforeDestroy() {
     if (this.event_bus) this.event_bus.off("resize", this.updateSize);
+    if (this.watch_timer) {
+      window.clearInterval(this.watch_timer);
+    }
   },
   mounted() {
     this.$el.addEventListener("touchmove", function(ev) {
@@ -231,7 +251,7 @@ export default {
     this.editor.addCommand(
       window.monaco.KeyMod.CtrlCmd | window.monaco.KeyCode.KEY_L,
       () => {
-        this.load_code_from_origin();
+        this.loadCodeFromURL();
       }
     );
   },
@@ -292,21 +312,75 @@ export default {
           });
       });
     },
-    openLocalFile(event) {
-      const file = event.target.files[0];
-      const reader = new FileReader();
-      reader.onload = () => {
-        try {
-          const code = reader.result;
-          this.window.plugin_manager.parsePluginCode(code);
-          this.editor.setValue(code);
-        } catch (e) {
-          this.window.plugin_manager.showMessage(
-            `Failed to load plugin source code, error: ${e}`
-          );
+    fileSelected() {
+      this.lastModified = null;
+      this.loadCodeFromFile();
+    },
+    watchModeChanged() {
+      if (this.watch_file) {
+        this.editor.updateOptions({ readOnly: true });
+        this.lastModified = null;
+        this.watch_timer = setInterval(() => {
+          this.watching = true;
+          this.$forceUpdate();
+          if (this.code_origin) {
+            this.loadCodeFromURL();
+          } else {
+            this.loadCodeFromFile();
+          }
+        }, 1000);
+      } else {
+        this.editor.updateOptions({ readOnly: false });
+        if (this.watch_timer) {
+          window.clearInterval(this.watch_timer);
+          this.watch_timer = null;
         }
-      };
-      reader.readAsText(file);
+        this.loading = false;
+        this.watching = false;
+        this.run_changed_file = false;
+        this.$forceUpdate();
+      }
+    },
+    loadCodeFromFile() {
+      if (!this.$refs.file_select.files) return;
+      this.code_origin = null;
+      const file = this.$refs.file_select.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = () => {
+          try {
+            const code = reader.result;
+            if (
+              this.lastModified != file.lastModified ||
+              SparkMD5.hash(code) !== SparkMD5.hash(this.editor.getValue())
+            ) {
+              this.lastModified = file.lastModified;
+              this.loading = true;
+              this.$forceUpdate();
+              this.window.plugin_manager.parsePluginCode(code);
+              this.editor.setValue(code);
+              if (this.run_changed_file) {
+                this.run();
+              }
+            }
+          } catch (e) {
+            this.window.plugin_manager.showMessage(
+              `Failed to load plugin source code, error: ${e}`
+            );
+          } finally {
+            if (this.loading) {
+              setTimeout(() => {
+                this.loading = false;
+                this.$forceUpdate();
+              }, 1000);
+            }
+          }
+        };
+        reader.onerror = e => {
+          console.error(e);
+        };
+        reader.readAsText(file);
+      }
     },
     async openEngineFile(fileObj) {
       const api = this.window.plugin_manager.imjoy_api;
@@ -320,26 +394,30 @@ export default {
             type: "file",
           }));
         this.code_origin = retObj;
-        this.load_code_from_origin();
+        this.$refs.file_select.value = "";
+        this.loadCodeFromURL();
       } catch (e) {
         this.window.plugin_manager.showMessage(
           `Failed to load plugin source code, error: ${e}`
         );
       }
     },
-    async load_code_from_origin() {
+    async loadCodeFromURL() {
+      if (!this.code_origin || !this.code_origin.url) return;
       try {
         const response = await axios.get(this.code_origin.url + "?" + randId());
         if (response && response.data) {
           const code = response.data;
-          const config = this.window.plugin_manager.parsePluginCode(code);
-          this.window.name = config.name;
-          this.editor.setValue(code);
-          this.window.plugin_manager.showMessage(
-            `Successfully loading source code from ${
-              this.code_origin.engine
-            }: ${this.code_origin.path}.`
-          );
+          if (SparkMD5.hash(code) !== SparkMD5.hash(this.editor.getValue())) {
+            this.loading = true;
+            this.$forceUpdate();
+            const config = this.window.plugin_manager.parsePluginCode(code);
+            this.window.name = config.name;
+            this.editor.setValue(code);
+            if (this.run_changed_file) {
+              this.run();
+            }
+          }
         } else {
           this.window.plugin_manager.showMessage(
             "Failed to load plugin source code."
@@ -349,6 +427,13 @@ export default {
         this.window.plugin_manager.showMessage(
           `Failed to load plugin source code, error: ${e}`
         );
+      } finally {
+        if (this.loading) {
+          setTimeout(() => {
+            this.loading = false;
+            this.$forceUpdate();
+          }, 1000);
+        }
       }
     },
     async run() {
@@ -492,6 +577,25 @@ export default {
   padding: 0px;
   min-height: 40px !important;
   height: 40px !important;
+}
+
+.floating {
+  position: absolute !important;
+  left: calc(50% - 1.5rem) !important;
+  top: calc(39% - 1.5rem) !important;
+  z-index: 999;
+}
+
+.floating-text {
+  position: absolute !important;
+  left: calc(50% - 85px) !important;
+  top: calc(42%) !important;
+  z-index: 999;
+  font-size: 1rem;
+}
+
+.md-switch {
+  margin-right: 3px;
 }
 
 /*
