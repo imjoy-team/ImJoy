@@ -563,7 +563,7 @@
                         >
                       </md-menu-item>
                       <md-menu-item
-                        v-for="engine in em.engines"
+                        v-for="engine in em.matchEngineByType(plugin.type)"
                         :key="engine.name"
                         @click="switchEngine(plugin, engine)"
                       >
@@ -1745,7 +1745,7 @@ export default {
   },
   methods: {
     async startImJoy(route) {
-      await this.imjoy.init();
+      await this.imjoy.init({ enable_evil_engine: true });
 
       const r = (route.query.repo || route.query.r || "").trim();
       if (r) {
