@@ -877,7 +877,7 @@ export class PluginManager {
     return config;
   }
 
-  reloadPluginRecursively(pconfig, tag) {
+  reloadPluginRecursively(pconfig, tag, allow_evil) {
     return new Promise((resolve, reject) => {
       let uri = typeof pconfig === "string" ? pconfig : pconfig.uri;
       let scoped_plugins = this.available_plugins;
@@ -939,10 +939,11 @@ export class PluginManager {
                   uri: config.dependencies[i],
                   scoped_plugins: config.scoped_plugins || scoped_plugins,
                 },
-                null
+                null,
+                allow_evil
               );
             }
-            this.reloadPlugin(config)
+            this.reloadPlugin(config, allow_evil)
               .then(plugin => {
                 resolve(plugin);
               })
@@ -1165,7 +1166,7 @@ export class PluginManager {
     this.update_ui_callback();
   }
 
-  reloadPlugin(pconfig) {
+  reloadPlugin(pconfig, allow_evil) {
     return new Promise((resolve, reject) => {
       try {
         if (pconfig instanceof DynamicPlugin) {
@@ -1192,7 +1193,7 @@ export class PluginManager {
         ) {
           p = this.preLoadPlugin(template);
         } else {
-          p = this.loadPlugin(template);
+          p = this.loadPlugin(template, null, allow_evil);
         }
         p.then(plugin => {
           plugin._id = pconfig._id;
@@ -1453,7 +1454,7 @@ export class PluginManager {
   //   }
   // }
 
-  loadPlugin(template, rplugin) {
+  loadPlugin(template, rplugin, allow_evil) {
     template = _clone(template);
     this.validatePluginConfig(template);
     //generate a random id for the plugin
@@ -1493,7 +1494,9 @@ export class PluginManager {
         tconfig,
         _interface,
         this.fsm.api,
-        engine
+        engine,
+        false,
+        allow_evil
       );
       plugin._log_history.push(
         `Loading plugin ${plugin.id} (TAG=${_interface.TAG}, WORKSPACE=${

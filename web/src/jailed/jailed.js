@@ -474,7 +474,14 @@ class BasicConnection {
  * @param {String} code of the plugin
  * @param {Object} _interface to provide to the plugin
  */
-var DynamicPlugin = function(config, _interface, _fs_api, engine, is_proxy) {
+var DynamicPlugin = function(
+  config,
+  _interface,
+  _fs_api,
+  engine,
+  is_proxy,
+  allow_evil
+) {
   this.config = config;
   this.id = config.id || randId();
   this._id = config._id;
@@ -490,6 +497,8 @@ var DynamicPlugin = function(config, _interface, _fs_api, engine, is_proxy) {
   this._is_proxy = is_proxy;
   this.backend = getBackendByType(this.type);
   this.engine = engine;
+  if (engine && engine._is_evil && allow_evil !== "eval is evil")
+    throw "evil engine is not allowed";
   this._updateUI =
     (_interface && _interface.utils && _interface.utils.$forceUpdate) ||
     function() {};

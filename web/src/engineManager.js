@@ -14,7 +14,7 @@ export class EngineManager {
 
   async init({ enable_evil_engine = false }) {
     if (enable_evil_engine) {
-      this.register(evil_engine);
+      this.register(evil_engine, true);
     }
   }
 
@@ -55,8 +55,21 @@ export class EngineManager {
 
   async register(engine_, disable_heartbeat) {
     const engine = Object.assign({}, engine_);
-    //backup the engine api
+    // backup the engine api
     engine.api = engine_;
+    if (engine_ === evil_engine) {
+      // make an exception for localhost debugging
+      if (
+        window.location.hostname === "127.0.0.1" ||
+        window.location.hostname === "localhost"
+      ) {
+        engine._is_evil = false;
+      } else {
+        engine._is_evil = true;
+      }
+    } else {
+      engine._is_evil = false;
+    }
     for (let i = 0; i < this.engines.length; i++) {
       if (this.engines[i].name === engine.name) {
         this.engines.splice(i, 1);

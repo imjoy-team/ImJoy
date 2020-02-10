@@ -1706,9 +1706,13 @@ export default {
             if (!this.pm.plugin_names[pn]) {
               console.log(`Loading internal plugin "${pn}"...`);
               this.pm
-                .reloadPluginRecursively({
-                  uri: INTERNAL_PLUGINS[pn].uri,
-                })
+                .reloadPluginRecursively(
+                  {
+                    uri: INTERNAL_PLUGINS[pn].uri,
+                  },
+                  null,
+                  "eval is evil"
+                )
                 .then(() => {
                   console.log(`${pn} loaded.`);
                 });
