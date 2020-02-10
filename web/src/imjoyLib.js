@@ -79,7 +79,7 @@ export class ImJoy {
     });
   }
 
-  async init({ enable_evil_engine = false }) {
+  async init() {
     try {
       await this.fsm.init();
       console.log("Successfully initialized the file system.");
@@ -93,7 +93,7 @@ export class ImJoy {
     await this.pm.init();
     await this.pm.loadWorkspaceList();
     try {
-      await this.em.init({ enable_evil_engine: enable_evil_engine });
+      await this.em.init();
       console.log("Successfully initialized the engine manager.");
     } catch (e) {
       console.error(e);

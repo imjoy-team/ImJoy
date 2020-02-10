@@ -12,10 +12,8 @@ export class EngineManager {
     this.engine_factories = [];
   }
 
-  async init({ enable_evil_engine = false }) {
-    if (enable_evil_engine) {
-      this.register(evil_engine, true);
-    }
+  async init() {
+    this.register(evil_engine, true);
   }
 
   matchEngineByType(pluginType) {

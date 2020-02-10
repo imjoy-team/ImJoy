@@ -1749,7 +1749,7 @@ export default {
   },
   methods: {
     async startImJoy(route) {
-      await this.imjoy.init({ enable_evil_engine: true });
+      await this.imjoy.init();
 
       const r = (route.query.repo || route.query.r || "").trim();
       if (r) {
