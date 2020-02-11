@@ -497,8 +497,8 @@ var DynamicPlugin = function(
   this._is_proxy = is_proxy;
   this.backend = getBackendByType(this.type);
   this.engine = engine;
-  if (engine && engine._is_evil && allow_evil !== "eval is evil")
-    throw "evil engine is not allowed";
+  this.allow_evil = allow_evil;
+
   this._updateUI =
     (_interface && _interface.utils && _interface.utils.$forceUpdate) ||
     function() {};
@@ -576,6 +576,13 @@ DynamicPlugin.prototype._connect = function() {
 
   platformInit.whenEmitted(function() {
     if (!me.backend) {
+      if (me.engine && me.engine._is_evil && me.allow_evil !== "eval is evil") {
+        me._fail.emit("Evil engine is not allowed.");
+        me._connection = null;
+        me.error("Evil engine is not allowed.");
+        me._set_disconnected();
+        return;
+      }
       if (!me.engine || !me.engine.connected) {
         me._fail.emit("Please connect to the Plugin Engine 🚀.");
         me._connection = null;

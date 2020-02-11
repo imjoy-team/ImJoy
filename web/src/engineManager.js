@@ -24,7 +24,7 @@ export class EngineManager {
 
   findEngine(plugin_config) {
     const egs = this.engines.filter(engine => {
-      return engine.pluginType === plugin_config.type;
+      return plugin_config.type && engine.pluginType === plugin_config.type;
     });
 
     if (!egs || egs.length <= 0) {
@@ -55,7 +55,7 @@ export class EngineManager {
     const engine = Object.assign({}, engine_);
     // backup the engine api
     engine.api = engine_;
-    if (engine_ === evil_engine) {
+    if (engine_ && engine_ === evil_engine) {
       // make an exception for localhost debugging
       if (
         window.location.hostname === "127.0.0.1" ||
