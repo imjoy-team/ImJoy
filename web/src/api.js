@@ -20,7 +20,7 @@ export const INTERNAL_PLUGINS = {
   "Jupyter-Notebook": {
     uri:
       "https://imjoy-team.github.io/jupyter-engine-manager/Jupyter-Notebook.imjoy.html",
-    startup: true,
+    startup: false,
   },
 };
 
