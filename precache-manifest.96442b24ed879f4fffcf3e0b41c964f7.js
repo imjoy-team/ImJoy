@@ -1,11 +1,11 @@
 self.__precacheManifest = [
   {
-    "revision": "a208bb416cf518a2339b",
-    "url": "/static/css/app.a4f3e96a.css"
+    "revision": "273d8d4220b624bd9b64",
+    "url": "/static/css/app.1ff69dcc.css"
   },
   {
-    "revision": "a208bb416cf518a2339b",
-    "url": "/static/js/app.2769e19d.js"
+    "revision": "273d8d4220b624bd9b64",
+    "url": "/static/js/app.11b1b19d.js"
   },
   {
     "revision": "b8859e2632feade2aed6",
@@ -232,15 +232,15 @@ self.__precacheManifest = [
     "url": "/static/vs/editor.worker.js"
   },
   {
-    "revision": "821dd06611f8497a59e8cee99dbeac0e",
-    "url": "/static/vs/css.worker.js"
-  },
-  {
     "revision": "d10204c6d610178f9c2643845f648c0e",
     "url": "/static/vs/html.worker.js"
   },
   {
-    "revision": "80a998920e53e3af464e2c06f86fe524",
+    "revision": "821dd06611f8497a59e8cee99dbeac0e",
+    "url": "/static/vs/css.worker.js"
+  },
+  {
+    "revision": "af75ce0916fb66da907f98cbc2567f09",
     "url": "/index.html"
   },
   {
@@ -464,6 +464,10 @@ self.__precacheManifest = [
     "url": "/static/img/imjoy-logo-black.svg"
   },
   {
+    "revision": "26dfd76132f659f0ef33a27e46307bda",
+    "url": "/static/img/imjoy-logo-white.png"
+  },
+  {
     "revision": "8e7b1b80a4458be8a27eac659447e42d",
     "url": "/static/img/imjoy-logo-white.svg"
   },
@@ -474,6 +478,10 @@ self.__precacheManifest = [
   {
     "revision": "e21b60da0b04ad426fdf5fad1142abd6",
     "url": "/static/img/loader.gif"
+  },
+  {
+    "revision": "7de1cb45793d47182017753e49d64cea",
+    "url": "/static/img/logga-KAW-300x155.png"
   },
   {
     "revision": "2ac2d65c948103772206c3906fe78b11",
@@ -532,10 +540,6 @@ self.__precacheManifest = [
     "url": "/static/vs/basic-languages/dockerfile/dockerfile.js"
   },
   {
-    "revision": "7de1cb45793d47182017753e49d64cea",
-    "url": "/static/img/logga-KAW-300x155.png"
-  },
-  {
     "revision": "e76682ef8f4b2557e753aeac4ce6df1a",
     "url": "/static/vs/basic-languages/fsharp/fsharp.js"
   },
@@ -544,8 +548,8 @@ self.__precacheManifest = [
     "url": "/static/vs/basic-languages/go/go.js"
   },
   {
-    "revision": "26dfd76132f659f0ef33a27e46307bda",
-    "url": "/static/img/imjoy-logo-white.png"
+    "revision": "741948277b00c3dbdaf2c48c3b4b21c8",
+    "url": "/static/vs/basic-languages/handlebars/handlebars.js"
   },
   {
     "revision": "eaa375ad991e2dd79a645cc02600d51c",
@@ -614,10 +618,6 @@ self.__precacheManifest = [
   {
     "revision": "d5640717dc546aafcc787f05295b67c6",
     "url": "/static/vs/basic-languages/pug/pug.js"
-  },
-  {
-    "revision": "741948277b00c3dbdaf2c48c3b4b21c8",
-    "url": "/static/vs/basic-languages/handlebars/handlebars.js"
   },
   {
     "revision": "dfac870c87495c0f35ba304467696027",
@@ -700,16 +700,8 @@ self.__precacheManifest = [
     "url": "/static/vs/basic-languages/yaml/yaml.js"
   },
   {
-    "revision": "7f6fed6512bd7e3325304a0346e02098",
-    "url": "/static/vs/editor/editor.main.css"
-  },
-  {
     "revision": "2b6ac4494944b92db7dcfa0ce3a605ed",
     "url": "/static/vs/editor/editor.main.nls.de.js"
-  },
-  {
-    "revision": "65a437a349f6e024e14a84bdae3b94e5",
-    "url": "/static/vs/editor/editor.main.nls.es.js"
   },
   {
     "revision": "a8fb0f322b584b488bd572adf086cdcd",
@@ -744,6 +736,10 @@ self.__precacheManifest = [
     "url": "/static/vs/editor/editor.main.nls.zh-tw.js"
   },
   {
+    "revision": "a14fcc89b2e121908c5cc7ec97787dfe",
+    "url": "/static/vs/language/css/cssMode.js"
+  },
+  {
     "revision": "a8422a20e7918f3a6547f85a09e590a7",
     "url": "/static/vs/language/html/htmlMode.js"
   },
@@ -756,16 +752,20 @@ self.__precacheManifest = [
     "url": "/static/vs/language/json/jsonMode.js"
   },
   {
-    "revision": "7d2a277c0d00a4bb615596ae1ab93213",
-    "url": "/static/vs/language/json/jsonWorker.js"
+    "revision": "7f6fed6512bd7e3325304a0346e02098",
+    "url": "/static/vs/editor/editor.main.css"
   },
   {
     "revision": "a3f8339f361d9f2683c37abb09f8c75e",
     "url": "/static/vs/language/typescript/tsMode.js"
   },
   {
-    "revision": "a14fcc89b2e121908c5cc7ec97787dfe",
-    "url": "/static/vs/language/css/cssMode.js"
+    "revision": "7d2a277c0d00a4bb615596ae1ab93213",
+    "url": "/static/vs/language/json/jsonWorker.js"
+  },
+  {
+    "revision": "65a437a349f6e024e14a84bdae3b94e5",
+    "url": "/static/vs/editor/editor.main.nls.es.js"
   },
   {
     "revision": "cf05f5559129d3145d705a8df6c6fb48",
