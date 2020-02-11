@@ -38,10 +38,6 @@ describe("ImJoy.vue", async () => {
     });
   });
 
-  it('should include "Deep Learning Made Easy!"', async () => {
-    expect(wrapper.text()).to.include("Deep Learning Made Easy!");
-  });
-
   it("should load default repositories", async () => {
     await pm.loadRepositoryList();
     expect(pm.repository_names).to.include("ImJoy Repository");
