@@ -563,7 +563,7 @@
                         >
                       </md-menu-item>
                       <md-menu-item
-                        v-for="engine in em.engines"
+                        v-for="engine in em.matchEngineByType(plugin.type)"
                         :key="engine.name"
                         @click="switchEngine(plugin, engine)"
                       >
@@ -1701,21 +1701,6 @@ export default {
       this.showWelcomeDialog = true;
     } else {
       this.startImJoy(this.$route).then(() => {
-        for (let pn in INTERNAL_PLUGINS) {
-          if (INTERNAL_PLUGINS[pn].startup) {
-            if (!this.pm.plugin_names[pn]) {
-              console.log(`Loading internal plugin "${pn}"...`);
-              this.pm
-                .reloadPluginRecursively({
-                  uri: INTERNAL_PLUGINS[pn].uri,
-                })
-                .then(() => {
-                  console.log(`${pn} loaded.`);
-                });
-            }
-          }
-        }
-
         if (
           !this.showAddPluginDialog &&
           (!this.pm.plugins || Object.keys(this.pm.plugins) <= 0)
@@ -1823,6 +1808,60 @@ export default {
 
         const selected_workspace =
           route.query.workspace || route.query.w || this.pm.workspace_list[0];
+
+        for (let pn in INTERNAL_PLUGINS) {
+          if (INTERNAL_PLUGINS[pn].startup) {
+            if (!this.pm.plugin_names[pn]) {
+              console.log(`Loading internal plugin "${pn}"...`);
+              this.pm
+                .reloadPluginRecursively(
+                  {
+                    uri: INTERNAL_PLUGINS[pn].uri,
+                  },
+                  null,
+                  "eval is evil"
+                )
+                .then(() => {
+                  console.log(`${pn} plugin loaded.`);
+                })
+                .catch(e => {
+                  console.error(e);
+                });
+            }
+          }
+        }
+
+        if (route.query.jupyter_plugin) {
+          const pn = "Jupyter-Notebook";
+          if (!this.pm.plugin_names[pn]) {
+            console.log(`Loading internal plugin "${pn}"...`);
+            this.pm
+              .reloadPluginRecursively(
+                {
+                  uri: INTERNAL_PLUGINS[pn].uri,
+                },
+                null,
+                "eval is evil"
+              )
+              .then(() => {
+                console.log(`${pn} plugin loaded.`);
+              })
+              .catch(e => {
+                console.error(e);
+              });
+          }
+
+          this.pm
+            .reloadPlugin({
+              code: JUPYTER_NOTEBOOK_TEMPLATE.replace(
+                /Untitled Plugin/g,
+                route.query.jupyter_plugin
+              ),
+            })
+            .catch(e => {
+              console.error(e);
+            });
+        }
         await this.pm.loadWorkspace(selected_workspace);
         await this.pm.reloadPlugins();
 
@@ -1945,19 +1984,6 @@ export default {
                 this.event_bus.on("plugin_installed", start_when_loaded);
               }
             }
-          }
-
-          if (route.query.jupyter_plugin) {
-            this.pm
-              .reloadPlugin({
-                code: JUPYTER_NOTEBOOK_TEMPLATE.replace(
-                  /Untitled Plugin/g,
-                  route.query.jupyter_plugin
-                ),
-              })
-              .catch(e => {
-                console.error(e);
-              });
           }
 
           this.$nextTick(() => {

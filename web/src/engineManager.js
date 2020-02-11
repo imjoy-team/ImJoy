@@ -1,4 +1,5 @@
 import { randId, assert } from "./utils.js";
+import { evil_engine } from "./evilEngine.js";
 
 export class EngineManager {
   constructor({ event_bus = null, config_db = null, client_id = null }) {
@@ -11,11 +12,19 @@ export class EngineManager {
     this.engine_factories = [];
   }
 
-  async init() {}
+  async init() {
+    this.register(evil_engine, true);
+  }
+
+  matchEngineByType(pluginType) {
+    return this.engines.filter(engine => {
+      return engine.pluginType === pluginType;
+    });
+  }
 
   findEngine(plugin_config) {
     const egs = this.engines.filter(engine => {
-      return engine.pluginType === plugin_config.type;
+      return plugin_config.type && engine.pluginType === plugin_config.type;
     });
 
     if (!egs || egs.length <= 0) {
@@ -42,10 +51,23 @@ export class EngineManager {
     return null;
   }
 
-  async register(engine_) {
+  async register(engine_, disable_heartbeat) {
     const engine = Object.assign({}, engine_);
-    //backup the engine api
+    // backup the engine api
     engine.api = engine_;
+    if (engine_ && engine_ === evil_engine) {
+      // make an exception for localhost debugging
+      if (
+        window.location.hostname === "127.0.0.1" ||
+        window.location.hostname === "localhost"
+      ) {
+        engine._is_evil = false;
+      } else {
+        engine._is_evil = true;
+      }
+    } else {
+      engine._is_evil = false;
+    }
     for (let i = 0; i < this.engines.length; i++) {
       if (this.engines[i].name === engine.name) {
         this.engines.splice(i, 1);
@@ -55,7 +77,7 @@ export class EngineManager {
     engine.connected = false;
     engine.engine_status = engine.engine_status || {};
     if (engine.getEngineInfo) {
-      engine.getEngineInfo().then(engine_info => {
+      Promise.resolve(engine.getEngineInfo()).then(engine_info => {
         engine.engine_info = engine_info;
       });
     }
@@ -83,8 +105,11 @@ export class EngineManager {
     };
     this.engines.push(engine);
     engine.connect();
+
     await check_connectivity();
-    engine.heartbeat_timer = setInterval(check_connectivity, 5000);
+    if (!disable_heartbeat) {
+      engine.heartbeat_timer = setInterval(check_connectivity, 5000);
+    }
   }
 
   unregister(engine) {

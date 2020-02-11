@@ -58,6 +58,7 @@ export class PluginManager {
     this.fsm = file_system_manager;
     this.fm = file_manager;
     this.config_db = config_db;
+
     assert(this.event_bus, "event bus is not available");
     assert(this.em, "engine manager is not available");
     assert(this.wm, "window manager is not available");
@@ -65,6 +66,7 @@ export class PluginManager {
 
     this.show_message_callback = show_message_callback;
     this.update_ui_callback = update_ui_callback || function() {};
+    this._allowed_evil_plugin = {};
 
     this.default_repository_list = [
       {
@@ -877,7 +879,7 @@ export class PluginManager {
     return config;
   }
 
-  reloadPluginRecursively(pconfig, tag) {
+  reloadPluginRecursively(pconfig, tag, allow_evil) {
     return new Promise((resolve, reject) => {
       let uri = typeof pconfig === "string" ? pconfig : pconfig.uri;
       let scoped_plugins = this.available_plugins;
@@ -939,10 +941,11 @@ export class PluginManager {
                   uri: config.dependencies[i],
                   scoped_plugins: config.scoped_plugins || scoped_plugins,
                 },
-                null
+                null,
+                allow_evil
               );
             }
-            this.reloadPlugin(config)
+            this.reloadPlugin(config, allow_evil)
               .then(plugin => {
                 resolve(plugin);
               })
@@ -1165,7 +1168,7 @@ export class PluginManager {
     this.update_ui_callback();
   }
 
-  reloadPlugin(pconfig) {
+  reloadPlugin(pconfig, allow_evil) {
     return new Promise((resolve, reject) => {
       try {
         if (pconfig instanceof DynamicPlugin) {
@@ -1192,7 +1195,14 @@ export class PluginManager {
         ) {
           p = this.preLoadPlugin(template);
         } else {
-          p = this.loadPlugin(template);
+          if (allow_evil === "eval is evil") {
+            this._allowed_evil_plugin[template.name] = template.code;
+          } else {
+            if (this._allowed_evil_plugin[template.name] === template.code) {
+              allow_evil = "eval is evil";
+            }
+          }
+          p = this.loadPlugin(template, null, allow_evil);
         }
         p.then(plugin => {
           plugin._id = pconfig._id;
@@ -1405,32 +1415,32 @@ export class PluginManager {
         { TAG: tconfig.tag, WORKSPACE: this.selected_workspace },
         this.imjoy_api
       );
-
-      // create a proxy plugin
-      const plugin = new DynamicPlugin(
-        tconfig,
-        _interface,
-        this.fsm.api,
-        null,
-        true
-      );
-      plugin.api = {
-        __as_interface__: true,
-        __id__: plugin.id,
-        setup: async () => {},
-        run: async my => {
-          const c = _clone(template.defaults) || {};
-          c.type = template.name;
-          c.name = template.name;
-          c.tag = template.tag;
-          // c.op = my.op
-          c.data = (my && my.data) || {};
-          c.config = (my && my.config) || {};
-          c.id = my && my.id;
-          return await this.createWindow(null, c);
-        },
-      };
       try {
+        // create a proxy plugin
+        const plugin = new DynamicPlugin(
+          tconfig,
+          _interface,
+          this.fsm.api,
+          null,
+          true
+        );
+        plugin.api = {
+          __as_interface__: true,
+          __id__: plugin.id,
+          setup: async () => {},
+          run: async my => {
+            const c = _clone(template.defaults) || {};
+            c.type = template.name;
+            c.name = template.name;
+            c.tag = template.tag;
+            // c.op = my.op
+            c.data = (my && my.data) || {};
+            c.config = (my && my.config) || {};
+            c.id = my && my.id;
+            return await this.createWindow(null, c);
+          },
+        };
+
         this.register(plugin, config);
         this.plugins[plugin.id] = plugin;
         this.plugin_names[plugin.name] = plugin;
@@ -1453,7 +1463,7 @@ export class PluginManager {
   //   }
   // }
 
-  loadPlugin(template, rplugin) {
+  loadPlugin(template, rplugin, allow_evil) {
     template = _clone(template);
     this.validatePluginConfig(template);
     //generate a random id for the plugin
@@ -1489,114 +1499,123 @@ export class PluginManager {
         },
         this.imjoy_api
       );
-      const plugin = new DynamicPlugin(
-        tconfig,
-        _interface,
-        this.fsm.api,
-        engine
-      );
-      plugin._log_history.push(
-        `Loading plugin ${plugin.id} (TAG=${_interface.TAG}, WORKSPACE=${
-          _interface.WORKSPACE
-        })`
-      );
-      if (_interface.ENGINE_URL)
-        plugin._log_history.push(`ENGINE_URL=${_interface.ENGINE_URL}`);
+      try {
+        const plugin = new DynamicPlugin(
+          tconfig,
+          _interface,
+          this.fsm.api,
+          engine,
+          false,
+          allow_evil
+        );
+        plugin._log_history.push(
+          `Loading plugin ${plugin.id} (TAG=${_interface.TAG}, WORKSPACE=${
+            _interface.WORKSPACE
+          })`
+        );
+        if (_interface.ENGINE_URL)
+          plugin._log_history.push(`ENGINE_URL=${_interface.ENGINE_URL}`);
 
-      const plugin_loading_timer = setTimeout(() => {
-        // plugin.terminate();
-        plugin.initializing = false;
-        console.warn(`Plugin ${plugin.name} failed to load in 180s.`);
-      }, 180000);
+        const plugin_loading_timer = setTimeout(() => {
+          // plugin.terminate();
+          plugin.initializing = false;
+          console.warn(`Plugin ${plugin.name} failed to load in 180s.`);
+        }, 180000);
 
-      plugin.whenConnected(() => {
-        clearTimeout(plugin_loading_timer);
-        if (!plugin.api) {
-          console.error("Error occured when loading plugin.");
-          this.showMessage("Error occured when loading plugin.");
-          reject("Error occured when loading plugin.");
-          throw "Error occured when loading plugin.";
-        }
-        plugin._log_history.push(`Plugin connected.`);
-        if (plugin._unloaded) {
-          console.log(
-            "WARNING: this plugin is ready but unloaded: " + plugin.id
+        plugin.whenConnected(() => {
+          clearTimeout(plugin_loading_timer);
+          if (!plugin.api) {
+            console.error("Error occured when loading plugin.");
+            this.showMessage("Error occured when loading plugin.");
+            reject("Error occured when loading plugin.");
+            throw "Error occured when loading plugin.";
+          }
+          plugin._log_history.push(`Plugin connected.`);
+          if (plugin._unloaded) {
+            console.log(
+              "WARNING: this plugin is ready but unloaded: " + plugin.id
+            );
+            plugin.terminate().then(() => {
+              this.update_ui_callback();
+            });
+            return;
+          }
+
+          if (template.type) {
+            this.register(plugin, template);
+          }
+          // if (template.extensions && template.extensions.length > 0) {
+          //   this.registerExtension(template.extensions, plugin);
+          // }
+          if (plugin.config.resumed && plugin.api.resume) {
+            plugin._log_history.push(`Resuming plugin.`);
+            plugin.api
+              .resume()
+              .then(() => {
+                this.event_bus.emit("plugin_loaded", plugin);
+                resolve(plugin);
+              })
+              .catch(e => {
+                console.error(
+                  "error occured when loading plugin " + template.name + ": ",
+                  e
+                );
+                this.showMessage(`<${template.name}>: ${e}`, 15);
+                reject(e);
+                plugin.terminate().then(() => {
+                  this.update_ui_callback();
+                });
+              });
+          } else if (plugin.api.setup) {
+            plugin._log_history.push(`Setting up plugin.`);
+            plugin.api
+              .setup()
+              .then(() => {
+                this.event_bus.emit("plugin_loaded", plugin);
+                resolve(plugin);
+              })
+              .catch(e => {
+                console.error(
+                  "error occured when loading plugin " + template.name + ": ",
+                  e
+                );
+                this.showMessage(`<${template.name}>: ${e}`, 15);
+                reject(e);
+                plugin.terminate().then(() => {
+                  this.update_ui_callback();
+                });
+              });
+          } else {
+            console.warn(
+              `No "setup()" function is defined in plugin "${plugin.name}".`
+            );
+            resolve(plugin);
+          }
+        });
+        plugin.whenFailed(e => {
+          clearTimeout(plugin_loading_timer);
+          plugin.error(e);
+          if (e) {
+            this.showMessage(`<${template.name}>: ${e}`);
+          } else {
+            this.showMessage(`Error occured when loading ${template.name}.`);
+          }
+          console.error(
+            "error occured when loading " + template.name + ": ",
+            e
           );
           plugin.terminate().then(() => {
             this.update_ui_callback();
           });
-          return;
-        }
-
-        if (template.type) {
-          this.register(plugin, template);
-        }
-        // if (template.extensions && template.extensions.length > 0) {
-        //   this.registerExtension(template.extensions, plugin);
-        // }
-        if (plugin.config.resumed && plugin.api.resume) {
-          plugin._log_history.push(`Resuming plugin.`);
-          plugin.api
-            .resume()
-            .then(() => {
-              this.event_bus.emit("plugin_loaded", plugin);
-              resolve(plugin);
-            })
-            .catch(e => {
-              console.error(
-                "error occured when loading plugin " + template.name + ": ",
-                e
-              );
-              this.showMessage(`<${template.name}>: ${e}`, 15);
-              reject(e);
-              plugin.terminate().then(() => {
-                this.update_ui_callback();
-              });
-            });
-        } else if (plugin.api.setup) {
-          plugin._log_history.push(`Setting up plugin.`);
-          plugin.api
-            .setup()
-            .then(() => {
-              this.event_bus.emit("plugin_loaded", plugin);
-              resolve(plugin);
-            })
-            .catch(e => {
-              console.error(
-                "error occured when loading plugin " + template.name + ": ",
-                e
-              );
-              this.showMessage(`<${template.name}>: ${e}`, 15);
-              reject(e);
-              plugin.terminate().then(() => {
-                this.update_ui_callback();
-              });
-            });
-        } else {
-          console.warn(
-            `No "setup()" function is defined in plugin "${plugin.name}".`
-          );
-          resolve(plugin);
-        }
-      });
-      plugin.whenFailed(e => {
-        clearTimeout(plugin_loading_timer);
-        plugin.error(e);
-        if (e) {
-          this.showMessage(`<${template.name}>: ${e}`);
-        } else {
-          this.showMessage(`Error occured when loading ${template.name}.`);
-        }
-        console.error("error occured when loading " + template.name + ": ", e);
-        plugin.terminate().then(() => {
-          this.update_ui_callback();
+          reject(e);
         });
+        plugin.docs = template.docs;
+        plugin.attachments = template.attachments;
+        this.plugins[plugin.id] = plugin;
+        this.plugin_names[plugin.name] = plugin;
+      } catch (e) {
         reject(e);
-      });
-      plugin.docs = template.docs;
-      plugin.attachments = template.attachments;
-      this.plugins[plugin.id] = plugin;
-      this.plugin_names[plugin.name] = plugin;
+      }
     });
   }
 
@@ -1619,76 +1638,80 @@ export class PluginManager {
         { TAG: tconfig.tag, WORKSPACE: this.selected_workspace },
         imjoy_api
       );
-      const plugin = new DynamicPlugin(tconfig, _interface, this.fsm.api);
+      try {
+        const plugin = new DynamicPlugin(tconfig, _interface, this.fsm.api);
 
-      plugin.whenConnected(() => {
-        if (!pconfig.standalone && pconfig.focus) pconfig.focus();
-        if (!plugin.api) {
-          console.error("the window plugin seems not ready.");
-          reject("the window plugin seems not ready.");
-          return;
-        }
-        plugin.api
-          .setup()
-          .then(() => {
-            //asuming the data._op is passed from last op
-            pconfig.data = pconfig.data || {};
-            pconfig.data._source_op = pconfig.data && pconfig.data._op;
-            pconfig.data._op = plugin.name;
-            pconfig.data._workflow_id =
-              pconfig.data && pconfig.data._workflow_id;
-            pconfig.plugin = plugin;
-            pconfig.update = plugin.api.run;
-            if (plugin.config.runnable && !plugin.api.run) {
-              const error_text =
-                "You must define a `run` function for " +
-                plugin.name +
-                " or set its `runnable` field to false.";
-              reject(error_text);
-              plugin.error(error_text);
-              return;
-            }
-            if (plugin.api.run) {
-              plugin.api
-                .run(this.filter4plugin(pconfig))
-                .then(result => {
-                  if (result) {
-                    for (let k in result) {
-                      pconfig[k] = result[k];
+        plugin.whenConnected(() => {
+          if (!pconfig.standalone && pconfig.focus) pconfig.focus();
+          if (!plugin.api) {
+            console.error("the window plugin seems not ready.");
+            reject("the window plugin seems not ready.");
+            return;
+          }
+          plugin.api
+            .setup()
+            .then(() => {
+              //asuming the data._op is passed from last op
+              pconfig.data = pconfig.data || {};
+              pconfig.data._source_op = pconfig.data && pconfig.data._op;
+              pconfig.data._op = plugin.name;
+              pconfig.data._workflow_id =
+                pconfig.data && pconfig.data._workflow_id;
+              pconfig.plugin = plugin;
+              pconfig.update = plugin.api.run;
+              if (plugin.config.runnable && !plugin.api.run) {
+                const error_text =
+                  "You must define a `run` function for " +
+                  plugin.name +
+                  " or set its `runnable` field to false.";
+                reject(error_text);
+                plugin.error(error_text);
+                return;
+              }
+              if (plugin.api.run) {
+                plugin.api
+                  .run(this.filter4plugin(pconfig))
+                  .then(result => {
+                    if (result) {
+                      for (let k in result) {
+                        pconfig[k] = result[k];
+                      }
                     }
-                  }
-                  resolve(plugin);
-                })
-                .catch(e => {
-                  plugin.error(
-                    `<${plugin.name}>: (${e && e.toString()} || "Error.")`
-                  );
-                  reject(e);
-                });
-            } else {
-              resolve(plugin);
-            }
-          })
-          .catch(e => {
-            plugin.error(
-              `Error occured when loading the window plugin ${
-                pconfig.name
-              }: ${e && e.toString()}`
-            );
-            plugin.terminate().then(() => {
-              this.update_ui_callback();
+                    resolve(plugin);
+                  })
+                  .catch(e => {
+                    plugin.error(
+                      `<${plugin.name}>: (${e && e.toString()} || "Error.")`
+                    );
+                    reject(e);
+                  });
+              } else {
+                resolve(plugin);
+              }
+            })
+            .catch(e => {
+              plugin.error(
+                `Error occured when loading the window plugin ${
+                  pconfig.name
+                }: ${e && e.toString()}`
+              );
+              plugin.terminate().then(() => {
+                this.update_ui_callback();
+              });
+              reject(e);
             });
-            reject(e);
-          });
-      });
-      plugin.whenFailed(e => {
-        if (!pconfig.standalone && pconfig.focus) pconfig.focus();
-        plugin.error(`Error occured when loading ${pconfig.name}: ${e}.`);
-        plugin.terminate().then(() => {
-          this.update_ui_callback();
         });
+        plugin.whenFailed(e => {
+          if (!pconfig.standalone && pconfig.focus) pconfig.focus();
+          plugin.error(`Error occured when loading ${pconfig.name}: ${e}.`);
+          plugin.terminate().then(() => {
+            this.update_ui_callback();
+          });
+          reject(e);
+        });
+      } catch (e) {
         reject(e);
-      });
+      }
     });
   }
 

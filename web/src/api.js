@@ -17,6 +17,11 @@ export const INTERNAL_PLUGINS = {
     uri: "https://oeway.github.io/ImJoy-Engine/ImJoy-Engine-Manager.imjoy.html",
     startup: true,
   },
+  "Jupyter-Notebook": {
+    uri:
+      "https://imjoy-team.github.io/jupyter-engine-manager/Jupyter-Notebook.imjoy.html",
+    startup: false,
+  },
 };
 
 ajv.addKeyword("instanceof", {

@@ -30,7 +30,10 @@
         </md-menu-item>
         <template v-for="engine in engineManager.engines">
           <md-divider :key="engine.url + '_start_divider'"></md-divider>
-          <md-menu-item v-if="engine.connected" :key="engine.name + engine.url">
+          <md-menu-item
+            v-if="engine.connected && engine.getEngineStatus"
+            :key="engine.name + engine.url"
+          >
             <span
               class="md-list-item-content"
               style="cursor: pointer;"
@@ -47,7 +50,7 @@
             </span>
           </md-menu-item>
           <md-menu-item
-            v-else
+            v-else-if="engine.getEngineStatus"
             @click.stop="engine.connect(false)"
             :key="engine.url"
           >
