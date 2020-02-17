@@ -125,8 +125,8 @@ export class EngineManager {
     this.engines.push(engine);
     await engine.connect();
 
-    await check_connectivity();
     if (engine.heartbeat) {
+      await check_connectivity();
       engine.heartbeat_timer = setInterval(check_connectivity, 5000);
     }
   }
