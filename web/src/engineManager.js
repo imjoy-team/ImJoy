@@ -13,7 +13,7 @@ export class EngineManager {
   }
 
   async init() {
-    this.register(evil_engine, true);
+    this.register(evil_engine);
   }
 
   matchEngineByType(pluginType) {
@@ -32,9 +32,13 @@ export class EngineManager {
     }
 
     if (plugin_config.engine_mode === "auto") {
-      return egs.filter(eg => {
+      const matched = egs.filter(eg => {
         return eg.connected;
-      })[0];
+      })
+      if(matched.length <=0 ){
+        return null
+      }
+      return matched[matched.length-1];
     }
 
     return egs.filter(eg => {
@@ -51,7 +55,16 @@ export class EngineManager {
     return null;
   }
 
-  async register(engine_, disable_heartbeat) {
+  getEngineByName(name) {
+    for (let e of this.engines) {
+      if (e.name === name) {
+        return e;
+      }
+    }
+    return null;
+  }
+
+  async register(engine_) {
     const engine = Object.assign({}, engine_);
     // backup the engine api
     engine.api = engine_;
@@ -68,10 +81,18 @@ export class EngineManager {
     } else {
       engine._is_evil = false;
     }
+    // make sure the name is unique
     for (let i = 0; i < this.engines.length; i++) {
-      if (this.engines[i].name === engine.name) {
-        this.engines.splice(i, 1);
-        break;
+      if (engine.name && this.engines[i].name === engine.name) {
+        debugger
+        this.unregister(engine)
+      }
+    }
+    // make sure the url is unique
+    for (let i = 0; i < this.engines.length; i++) {
+      if (engine.url && this.engines[i].url === engine.url) {
+        debugger
+        this.unregister(engine)
       }
     }
     engine.connected = false;
@@ -107,14 +128,15 @@ export class EngineManager {
     engine.connect();
 
     await check_connectivity();
-    if (!disable_heartbeat) {
+    if (engine.heartbeat) {
       engine.heartbeat_timer = setInterval(check_connectivity, 5000);
     }
   }
 
   unregister(engine) {
-    engine = this.getEngineByUrl(engine.url);
-    if (!engine) throw `Engine ${engine.url} not found.`;
+    const url = engine.url;
+    engine = this.getEngineByUrl(url);
+    if (!engine) throw `Engine ${url} not found.`;
     const index = this.engines.indexOf(engine);
     for (let p of engine._plugins) {
       p.terminate();
