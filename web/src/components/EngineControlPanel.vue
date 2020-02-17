@@ -82,7 +82,7 @@
               class="md-accent"
               :key="engine.name + '_remove_engine'"
             >
-              &nbsp;&nbsp;<md-button class="md-icon-button">
+              &nbsp;&nbsp;<md-button class="md-icon-button md-accent">
                 <md-icon>delete_forever</md-icon></md-button
               >Remove Engine
             </md-menu-item>
