@@ -84,14 +84,12 @@ export class EngineManager {
     // make sure the name is unique
     for (let i = 0; i < this.engines.length; i++) {
       if (engine.name && this.engines[i].name === engine.name) {
-        debugger;
         this.unregister(engine);
       }
     }
     // make sure the url is unique
     for (let i = 0; i < this.engines.length; i++) {
       if (engine.url && this.engines[i].url === engine.url) {
-        debugger;
         this.unregister(engine);
       }
     }
