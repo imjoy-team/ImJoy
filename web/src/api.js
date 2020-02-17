@@ -186,7 +186,7 @@ export const ENGINE_SCHEMA = ajv.compile({
     getPlugin: { instanceof: Function },
     getEngineStatus: { instanceof: Function },
     getEngineInfo: { instanceof: [Function, null] },
-    heartbeat: { instanceof: Function },
+    heartbeat: { instanceof: [Function, null] },
     killPlugin: { instanceof: [Function, null] },
     killPluginProcess: { instanceof: [Function, null] },
     restartPlugin: { instanceof: [Function, null] },
@@ -205,6 +205,6 @@ export const FILE_MANAGER_SCHEMA = ajv.compile({
     requestUploadUrl: { instanceof: Function },
     getFileUrl: { instanceof: Function },
     removeFile: { instanceof: Function },
-    heartbeat: { instanceof: Function },
+    heartbeat: { instanceof: [Function, null] },
   },
 });
