@@ -78,13 +78,13 @@
               Open terminal
             </md-menu-item>
             <md-menu-item
-              @click="
-                removeEngine(engine);
-              "
+              @click="removeEngine(engine)"
               class="md-accent"
               :key="engine.name + '_remove_engine'"
             >
-              &nbsp;&nbsp;<md-icon class="md-icon-button">delete_forever</md-icon>Remove Engine
+              &nbsp;&nbsp;<md-icon class="md-icon-button"
+                >delete_forever</md-icon
+              >Remove Engine
             </md-menu-item>
             <md-menu-item
               v-show="engine.engine_status.plugin_processes"

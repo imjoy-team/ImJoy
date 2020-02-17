@@ -132,7 +132,9 @@
             <md-option value="auto">auto</md-option>
             <md-option
               :value="e.name"
-              v-for="e in window.engine_manager.matchEngineByType(window.config.type)"
+              v-for="e in window.engine_manager.matchEngineByType(
+                window.config.type
+              )"
               :key="e.name"
               >{{ e.name }}</md-option
             >

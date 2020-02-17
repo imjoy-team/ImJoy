@@ -34,11 +34,11 @@ export class EngineManager {
     if (plugin_config.engine_mode === "auto") {
       const matched = egs.filter(eg => {
         return eg.connected;
-      })
-      if(matched.length <=0 ){
-        return null
+      });
+      if (matched.length <= 0) {
+        return null;
       }
-      return matched[matched.length-1];
+      return matched[matched.length - 1];
     }
 
     return egs.filter(eg => {
@@ -84,15 +84,15 @@ export class EngineManager {
     // make sure the name is unique
     for (let i = 0; i < this.engines.length; i++) {
       if (engine.name && this.engines[i].name === engine.name) {
-        debugger
-        this.unregister(engine)
+        debugger;
+        this.unregister(engine);
       }
     }
     // make sure the url is unique
     for (let i = 0; i < this.engines.length; i++) {
       if (engine.url && this.engines[i].url === engine.url) {
-        debugger
-        this.unregister(engine)
+        debugger;
+        this.unregister(engine);
       }
     }
     engine.connected = false;
