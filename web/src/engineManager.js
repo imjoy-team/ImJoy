@@ -123,7 +123,7 @@ export class EngineManager {
       engine._plugins.push(p);
     };
     this.engines.push(engine);
-    engine.connect();
+    await engine.connect();
 
     await check_connectivity();
     if (engine.heartbeat) {
@@ -143,6 +143,7 @@ export class EngineManager {
       this.engines.splice(index, 1);
     }
     if (engine.heartbeat_timer) clearInterval(engine.heartbeat_timer);
+    engine.connect();
     this.event_bus.emit("engine_disconnected", engine);
   }
 
