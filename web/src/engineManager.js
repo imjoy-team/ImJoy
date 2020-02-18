@@ -84,15 +84,21 @@ export class EngineManager {
     // make sure the name is unique
     for (let i = 0; i < this.engines.length; i++) {
       if (engine.name && this.engines[i].name === engine.name) {
-        debugger;
-        this.unregister(engine);
+        try {
+          this.unregister(this.engines[i]);
+        } catch (e) {
+          console.error(e);
+        }
       }
     }
     // make sure the url is unique
     for (let i = 0; i < this.engines.length; i++) {
       if (engine.url && this.engines[i].url === engine.url) {
-        debugger;
-        this.unregister(engine);
+        try {
+          this.unregister(this.engines[i]);
+        } catch (e) {
+          console.error(e);
+        }
       }
     }
     engine.connected = false;
@@ -125,10 +131,10 @@ export class EngineManager {
       engine._plugins.push(p);
     };
     this.engines.push(engine);
-    engine.connect();
+    await engine.connect();
 
-    await check_connectivity();
     if (engine.heartbeat) {
+      await check_connectivity();
       engine.heartbeat_timer = setInterval(check_connectivity, 5000);
     }
   }
@@ -145,6 +151,7 @@ export class EngineManager {
       this.engines.splice(index, 1);
     }
     if (engine.heartbeat_timer) clearInterval(engine.heartbeat_timer);
+    engine.disconnect();
     this.event_bus.emit("engine_disconnected", engine);
   }
 

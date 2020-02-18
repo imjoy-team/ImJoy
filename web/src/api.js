@@ -181,6 +181,7 @@ export const ENGINE_SCHEMA = ajv.compile({
     config: { type: "object" },
     connect: { instanceof: Function },
     disconnect: { instanceof: Function },
+    remove: { instanceof: Function },
     listPlugins: { instanceof: Function },
     startPlugin: { instanceof: Function },
     getPlugin: { instanceof: Function },

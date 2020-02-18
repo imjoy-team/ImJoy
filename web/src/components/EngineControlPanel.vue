@@ -82,8 +82,13 @@
               class="md-accent"
               :key="engine.name + '_remove_engine'"
             >
+<<<<<<< HEAD
               &nbsp;&nbsp;<md-icon class="md-icon-button"
                 >delete_forever</md-icon
+=======
+              &nbsp;&nbsp;<md-button class="md-icon-button md-accent">
+                <md-icon>delete_forever</md-icon></md-button
+>>>>>>> 74ea72eb8d6cb01211bc5585548ab66e8254a03f
               >Remove Engine
             </md-menu-item>
             <md-menu-item
@@ -497,9 +502,17 @@ export default {
         });
       }
     },
-    removeEngine(engine) {
-      this.engineManager.unregister(engine);
+    async removeEngine(engine) {
+      await this.engineManager.unregister(engine);
       this.$forceUpdate();
+      if (
+        typeof engine.remove === "function" &&
+        window.confirm(
+          "The engine has been disabled, would you like to remove it permanently?"
+        )
+      ) {
+        engine.remove();
+      }
     },
     connectEngine(engine) {
       if (!engine.connected) engine.connect();

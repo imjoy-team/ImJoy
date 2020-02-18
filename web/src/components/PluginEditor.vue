@@ -25,19 +25,19 @@
 
           <md-menu-content>
             <md-menu-item
-              @click="openEngineFile()"
-              :disabled="window.engine_manager.engines.length <= 0"
-            >
-              <md-icon>add_to_queue</md-icon>Open Engine File
-              <md-tooltip>Load files through Plugin Engine</md-tooltip>
-            </md-menu-item>
-            <md-menu-item
               @click="
                 $refs.file_form.reset();
                 $refs.file_select.click();
               "
             >
               <md-icon>insert_drive_file</md-icon>Open Local File
+            </md-menu-item>
+            <md-menu-item
+              @click="openEngineFile()"
+              :disabled="window.engine_manager.engines.length <= 0"
+            >
+              <md-icon>add_to_queue</md-icon>Open Engine File
+              <md-tooltip>Load files through Plugin Engine</md-tooltip>
             </md-menu-item>
           </md-menu-content>
         </md-menu>
@@ -360,6 +360,8 @@ export default {
               this.editor.setValue(code);
               if (this.run_changed_file) {
                 this.run();
+              } else {
+                this.save();
               }
             }
           } catch (e) {
@@ -415,6 +417,8 @@ export default {
             this.editor.setValue(code);
             if (this.run_changed_file) {
               this.run();
+            } else {
+              this.save();
             }
           }
         } else {
