@@ -106,8 +106,8 @@ export const evil_engine = {
   type: "engine",
   pluginType: "evil",
   icon: "😈",
-  name: "default eval engine",
-  url: "default-eval-engine",
+  name: "imjoy engine",
+  url: "https://imjoy.io",
   config: {},
   connect() {
     this._disconnected = false;
