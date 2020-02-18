@@ -856,7 +856,7 @@ export class PluginManager {
     if (!uri.split("?")[0].endsWith(".imjoy.html")) {
       throw 'Plugin url must be ends with ".imjoy.html"';
     }
-    // if the url has no query parameters, then add random query string to avoid browser caching
+    // If the url has no query parameter, then add random query string to avoid browser caching
     if (uri.indexOf("?") === -1) {
       uri = uri + "?" + randId();
     }
