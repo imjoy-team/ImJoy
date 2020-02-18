@@ -30,6 +30,11 @@ export default {
   mounted() {
     if (this.w.data.engine_file_obj) {
       this.$refs.code_editor.openEngineFile(this.w.data.engine_file_obj);
+    } else if (this.w.data.local_file_obj) {
+      this.$refs.code_editor.loadCodeFromFile(
+        this.w.data.local_file_obj,
+        false
+      );
     }
     this.$emit("init");
   },

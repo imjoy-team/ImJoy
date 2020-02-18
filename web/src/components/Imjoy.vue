@@ -2076,11 +2076,24 @@ export default {
       };
 
       const code_loader = file => {
-        const reader = new FileReader();
-        reader.onload = () => {
-          this.newPlugin(reader.result);
+        const w = {
+          name: "New Plugin",
+          type: "imjoy/plugin-editor",
+          config: {},
+          plugin_manager: this.pm,
+          engine_manager: this.em,
+          w: 30,
+          h: 20,
+          standalone: this.screenWidth < 1200,
+          plugin: {},
+          data: {
+            name: "new plugin",
+            id: "plugin_" + randId(),
+            code: "",
+            local_file_obj: file,
+          },
         };
-        reader.readAsText(file);
+        this.createWindow(w);
       };
 
       const engine_code_loader = engine_file_obj => {
