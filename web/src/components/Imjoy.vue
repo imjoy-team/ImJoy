@@ -1809,26 +1809,8 @@ export default {
         const selected_workspace =
           route.query.workspace || route.query.w || this.pm.workspace_list[0];
 
-        for (let pn in INTERNAL_PLUGINS) {
-          if (INTERNAL_PLUGINS[pn].startup) {
-            if (!this.pm.plugin_names[pn]) {
-              console.log(`Loading internal plugin "${pn}"...`);
-              try {
-                await this.pm.reloadPluginRecursively(
-                  {
-                    uri: INTERNAL_PLUGINS[pn].uri,
-                  },
-                  null,
-                  "eval is evil"
-                );
-
-                console.log(`${pn} plugin loaded.`);
-              } catch (e) {
-                console.error(e);
-              }
-            }
-          }
-        }
+        await this.pm.loadWorkspace(selected_workspace);
+        await this.pm.reloadPlugins();
 
         if (route.query.jupyter_plugin) {
           const pn = "Jupyter-Notebook";
@@ -1859,8 +1841,27 @@ export default {
               console.error(e);
             });
         }
-        await this.pm.loadWorkspace(selected_workspace);
-        await this.pm.reloadPlugins();
+
+        for (let pn in INTERNAL_PLUGINS) {
+          if (INTERNAL_PLUGINS[pn].startup) {
+            if (!this.pm.plugin_names[pn]) {
+              console.log(`Loading internal plugin "${pn}"...`);
+              try {
+                await this.pm.reloadPluginRecursively(
+                  {
+                    uri: INTERNAL_PLUGINS[pn].uri,
+                  },
+                  null,
+                  "eval is evil"
+                );
+
+                console.log(`${pn} plugin loaded.`);
+              } catch (e) {
+                console.error(e);
+              }
+            }
+          }
+        }
 
         if (route.query.engine && route.query.start) {
           const en = this.em.getEngineByUrl(route.query.engine);
