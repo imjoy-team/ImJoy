@@ -1842,27 +1842,6 @@ export default {
             });
         }
 
-        for (let pn in INTERNAL_PLUGINS) {
-          if (INTERNAL_PLUGINS[pn].startup) {
-            if (!this.pm.plugin_names[pn]) {
-              console.log(`Loading internal plugin "${pn}"...`);
-              try {
-                await this.pm.reloadPluginRecursively(
-                  {
-                    uri: INTERNAL_PLUGINS[pn].uri,
-                  },
-                  null,
-                  "eval is evil"
-                );
-
-                console.log(`${pn} plugin loaded.`);
-              } catch (e) {
-                console.error(e);
-              }
-            }
-          }
-        }
-
         if (route.query.engine && route.query.start) {
           const en = this.em.getEngineByUrl(route.query.engine);
           const pl = this.pm.plugin_names[route.query.start];
