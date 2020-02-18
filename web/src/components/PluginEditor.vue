@@ -200,6 +200,7 @@ export default {
       loading: false,
       watch_timer: null,
       lastModified: null,
+      local_file: null,
     };
   },
   created() {
@@ -315,18 +316,20 @@ export default {
     },
     fileSelected() {
       this.lastModified = null;
-      this.loadCodeFromFile();
+      if (!this.$refs.file_select.files) return;
+      this.local_file = this.$refs.file_select.files[0];
+      this.loadCodeFromFile(this.local_file, false);
     },
     watchModeChanged() {
       if (this.watch_file) {
         this.editor.updateOptions({ readOnly: true });
-        this.lastModified = null;
+        this.lastModified = "old";
         this.watch_timer = setInterval(() => {
           this.$forceUpdate();
           if (this.code_origin) {
             this.loadCodeFromURL();
           } else {
-            this.loadCodeFromFile();
+            this.loadCodeFromFile(this.local_file, true);
           }
         }, 1000);
       } else {
@@ -340,48 +343,56 @@ export default {
         this.$forceUpdate();
       }
     },
-    loadCodeFromFile() {
-      if (!this.$refs.file_select.files) return;
+    loadCodeFromFile(file, save) {
+      file = file || this.local_file;
+      if (!file) return;
       this.code_origin = null;
-      const file = this.$refs.file_select.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = () => {
-          try {
-            const code = reader.result;
-            if (
-              this.lastModified != file.lastModified ||
-              SparkMD5.hash(code) !== SparkMD5.hash(this.editor.getValue())
-            ) {
-              this.lastModified = file.lastModified;
-              this.loading = true;
-              this.$forceUpdate();
-              this.window.plugin_manager.parsePluginCode(code);
-              this.editor.setValue(code);
-              if (this.run_changed_file) {
-                this.run();
-              } else {
-                this.save();
-              }
-            }
-          } catch (e) {
-            this.window.plugin_manager.showMessage(
-              `Failed to load plugin source code, error: ${e}`
-            );
-          } finally {
-            if (this.loading) {
-              setTimeout(() => {
-                this.loading = false;
-                this.$forceUpdate();
-              }, 1000);
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        this.local_file = file;
+        try {
+          const code = reader.result;
+          if (
+            this.lastModified != file.lastModified ||
+            SparkMD5.hash(code) !== SparkMD5.hash(this.editor.getValue())
+          ) {
+            this.lastModified = file.lastModified;
+            this.loading = true;
+            this.$forceUpdate();
+            this.window.plugin_manager.parsePluginCode(code);
+            this.editor.setValue(code);
+            if (this.run_changed_file) {
+              this.run();
+            } else if (save) {
+              this.save();
             }
           }
-        };
-        reader.onerror = e => {
-          console.error(e);
-        };
-        reader.readAsText(file);
-      }
+        } catch (e) {
+          this.window.plugin_manager.showMessage(
+            `Failed to load plugin source code, error: ${e}`
+          );
+        } finally {
+          if (this.loading) {
+            setTimeout(() => {
+              this.loading = false;
+              this.$forceUpdate();
+            }, 1000);
+          }
+        }
+      };
+      reader.onerror = e => {
+        console.error(e);
+        this.window.plugin_manager.showMessage(
+          `Failed to load plugin source code, error: ${e}`
+        );
+        if (this.watch_timer) {
+          clearInterval(this.watch_timer);
+        }
+        this.watch_file = false;
+        this.$forceUpdate();
+      };
+      reader.readAsText(file);
     },
     async openEngineFile(fileObj) {
       const api = this.window.plugin_manager.imjoy_api;

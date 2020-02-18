@@ -1842,27 +1842,6 @@ export default {
             });
         }
 
-        for (let pn in INTERNAL_PLUGINS) {
-          if (INTERNAL_PLUGINS[pn].startup) {
-            if (!this.pm.plugin_names[pn]) {
-              console.log(`Loading internal plugin "${pn}"...`);
-              try {
-                await this.pm.reloadPluginRecursively(
-                  {
-                    uri: INTERNAL_PLUGINS[pn].uri,
-                  },
-                  null,
-                  "eval is evil"
-                );
-
-                console.log(`${pn} plugin loaded.`);
-              } catch (e) {
-                console.error(e);
-              }
-            }
-          }
-        }
-
         if (route.query.engine && route.query.start) {
           const en = this.em.getEngineByUrl(route.query.engine);
           const pl = this.pm.plugin_names[route.query.start];
@@ -2097,11 +2076,24 @@ export default {
       };
 
       const code_loader = file => {
-        const reader = new FileReader();
-        reader.onload = () => {
-          this.newPlugin(reader.result);
+        const w = {
+          name: "New Plugin",
+          type: "imjoy/plugin-editor",
+          config: {},
+          plugin_manager: this.pm,
+          engine_manager: this.em,
+          w: 30,
+          h: 20,
+          standalone: this.screenWidth < 1200,
+          plugin: {},
+          data: {
+            name: "new plugin",
+            id: "plugin_" + randId(),
+            code: "",
+            local_file_obj: file,
+          },
         };
-        reader.readAsText(file);
+        this.createWindow(w);
       };
 
       const engine_code_loader = engine_file_obj => {

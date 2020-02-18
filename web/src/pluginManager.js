@@ -791,6 +791,26 @@ export class PluginManager {
                 });
               }
             }
+            for (let pn in INTERNAL_PLUGINS) {
+              if (INTERNAL_PLUGINS[pn].startup) {
+                if (!this.plugin_names[pn]) {
+                  console.log(`Loading internal plugin "${pn}"...`);
+                  this.reloadPluginRecursively(
+                    {
+                      uri: INTERNAL_PLUGINS[pn].uri,
+                    },
+                    null,
+                    "eval is evil"
+                  )
+                    .then(() => {
+                      console.log(`${pn} plugin loaded.`);
+                    })
+                    .catch(e => {
+                      console.error(e);
+                    });
+                }
+              }
+            }
             resolve();
           })
           .catch(err => {
@@ -856,12 +876,8 @@ export class PluginManager {
     if (!uri.split("?")[0].endsWith(".imjoy.html")) {
       throw 'Plugin url must be ends with ".imjoy.html"';
     }
-    //if the file is from github or gist, then add random query string to avoid browser caching
-    if (
-      (uri.startsWith("https://raw.githubusercontent.com") ||
-        uri.startsWith("https://gist.githubusercontent.com")) &&
-      uri.indexOf("?") === -1
-    ) {
+    // If the url has no query parameter, then add random query string to avoid browser caching
+    if (uri.indexOf("?") === -1) {
       uri = uri + "?" + randId();
     }
     const response = await axios.get(uri);
