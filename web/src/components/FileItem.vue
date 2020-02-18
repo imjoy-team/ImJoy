@@ -67,7 +67,7 @@
     <ul v-if="open && isFolder">
       <file-item
         class="item"
-        v-for="model in model.children.slice(0, max_files)"
+        v-for="model in sortedFiles"
         :key="model.name"
         :root="root + '/' + model.name"
         :model="model"
@@ -107,6 +107,14 @@ export default {
   computed: {
     isFolder: function() {
       return this.model.children && this.model.children.length;
+    },
+    sortedFiles: function() {
+      function compare(a, b) {
+        if (a.name < b.name) return -1;
+        if (a.name > b.name) return 1;
+        return 0;
+      }
+      return this.model.children.slice(0, this.max_files).sort(compare);
     },
   },
   methods: {
