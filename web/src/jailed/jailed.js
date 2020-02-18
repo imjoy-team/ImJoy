@@ -609,7 +609,7 @@ DynamicPlugin.prototype._connect = function() {
               "Plugin " + me.id + " is ready, but it was termianted."
             );
             if (me.engine && me.engine.killPlugin)
-              me.engine.killPlugin(me.config);
+              me.engine.killPlugin({ id: me.config.id, name: me.config.name });
             return;
           }
           me.remote = remote;
@@ -894,7 +894,7 @@ DynamicPlugin.prototype.terminate = async function(force) {
   }
   const disconnectAll = () => {
     if (this.engine && this.engine.killPlugin)
-      this.engine.killPlugin(this.config);
+      this.engine.killPlugin({ id: this.config.id, name: this.config.name });
     this._set_disconnected();
     if (this._site) {
       this._site.disconnect();

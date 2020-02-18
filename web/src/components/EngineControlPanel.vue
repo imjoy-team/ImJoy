@@ -29,7 +29,7 @@
           <span>Add {{ factory.name }} 🚀</span>
         </md-menu-item>
         <template v-for="engine in engineManager.engines">
-          <md-divider :key="engine.url + '_start_divider'"></md-divider>
+          <md-divider :key="engine.name + '_start_divider'"></md-divider>
           <md-menu-item
             v-if="engine.connected && engine.getEngineStatus"
             :key="engine.name + engine.url"
@@ -52,7 +52,7 @@
           <md-menu-item
             v-else-if="engine.getEngineStatus"
             @click.stop="engine.connect(false)"
-            :key="engine.url"
+            :key="engine.name"
           >
             <md-icon>sync_disabled</md-icon> {{ engine.name }}
             <md-tooltip>Connect to {{ engine.name }} </md-tooltip>
@@ -60,7 +60,7 @@
           <template v-if="engine.connected && engine.show_processes">
             <md-menu-item
               @click="showAbout(engine)"
-              :key="engine.url + '_show_info'"
+              :key="engine.name + '_show_info'"
             >
               &nbsp;&nbsp;<md-button class="md-icon-button">
                 <md-icon>info</md-icon>
@@ -70,7 +70,7 @@
             <md-menu-item
               v-show="engine.engine_status.plugin_processes"
               @click="startTerminal(engine)"
-              :key="engine.url + '_start_terminal'"
+              :key="engine.name + '_start_terminal'"
             >
               &nbsp;&nbsp;<md-button class="md-icon-button">
                 <md-icon>code</md-icon>
@@ -78,9 +78,18 @@
               Open terminal
             </md-menu-item>
             <md-menu-item
+              @click="removeEngine(engine)"
+              class="md-accent"
+              :key="engine.name + '_remove_engine'"
+            >
+              &nbsp;&nbsp;<md-button class="md-icon-button md-accent">
+                <md-icon>delete_forever</md-icon></md-button
+              >Remove Engine
+            </md-menu-item>
+            <md-menu-item
               v-show="engine.engine_status.plugin_processes"
               v-for="p in engine.engine_status.plugin_processes"
-              :key="p.pid"
+              :key="engine.name + p.pid"
             >
               &nbsp;&nbsp;<md-button
                 @click.stop="kill(engine, p)"
@@ -92,7 +101,7 @@
             </md-menu-item>
             <md-menu-item
               v-if="!engine.engine_status.plugin_processes"
-              :key="engine.url + '_processes'"
+              :key="engine.name + '_processes'"
             >
               <md-button>
                 <div class="loading loading-lg"></div>
@@ -101,7 +110,7 @@
             <md-menu-item
               :disabled="true"
               v-if="engine.engine_status.plugin_num > 1"
-              :key="engine.url + '_running_plugins'"
+              :key="engine.name + '_running_plugins'"
             >
               &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;<span
                 >Running Plugins: {{ engine.engine_status.plugin_num }}
@@ -114,7 +123,7 @@
                 <md-tooltip>Kill all the running plugins</md-tooltip>
               </md-button>
             </md-menu-item>
-            <md-divider :key="engine.url + '_end_divider'"></md-divider>
+            <md-divider :key="engine.name + '_end_divider'"></md-divider>
           </template>
         </template>
       </md-menu-content>
@@ -488,9 +497,17 @@ export default {
         });
       }
     },
-    removeEngine(engine) {
-      this.engineManager.removeEngine(engine);
+    async removeEngine(engine) {
+      await this.engineManager.unregister(engine);
       this.$forceUpdate();
+      if (
+        typeof engine.remove === "function" &&
+        window.confirm(
+          "The engine has been disabled, would you like to remove it permanently?"
+        )
+      ) {
+        engine.remove();
+      }
     },
     connectEngine(engine) {
       if (!engine.connected) engine.connect();

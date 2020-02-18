@@ -155,7 +155,5 @@ export const evil_engine = {
       }
     });
   },
-  heartbeat() {
-    return true;
-  },
+  heartbeat: null,
 };

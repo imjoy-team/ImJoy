@@ -2317,10 +2317,14 @@ export class PluginManager {
       return target_plugin.api;
     } else {
       if (INTERNAL_PLUGINS[plugin_name]) {
-        const p = await this.reloadPluginRecursively({
-          uri: INTERNAL_PLUGINS[plugin_name].uri,
-        });
-        console.log("BrowserFS loaded.");
+        const p = await this.reloadPluginRecursively(
+          {
+            uri: INTERNAL_PLUGINS[plugin_name].uri,
+          },
+          null,
+          "eval is evil"
+        );
+        console.log(`${p.name} loaded.`);
         return p.api;
       }
 

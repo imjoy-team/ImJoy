@@ -1,6 +1,6 @@
 <template>
   <div class="plugin-editor">
-    <div class="loading loading-lg floating" v-show="watching"></div>
+    <div class="loading loading-lg floating" v-show="loading"></div>
     <div class="floating-text" v-show="loading">Loading code...</div>
     <form v-show="false" ref="file_form">
       <input
@@ -25,19 +25,19 @@
 
           <md-menu-content>
             <md-menu-item
-              @click="openEngineFile()"
-              :disabled="window.engine_manager.engines.length <= 0"
-            >
-              <md-icon>add_to_queue</md-icon>Open Engine File
-              <md-tooltip>Load files through Plugin Engine</md-tooltip>
-            </md-menu-item>
-            <md-menu-item
               @click="
                 $refs.file_form.reset();
                 $refs.file_select.click();
               "
             >
               <md-icon>insert_drive_file</md-icon>Open Local File
+            </md-menu-item>
+            <md-menu-item
+              @click="openEngineFile()"
+              :disabled="window.engine_manager.engines.length <= 0"
+            >
+              <md-icon>add_to_queue</md-icon>Open Engine File
+              <md-tooltip>Load files through Plugin Engine</md-tooltip>
             </md-menu-item>
           </md-menu-content>
         </md-menu>
@@ -57,7 +57,7 @@
           <md-tooltip class="md-medium-hide"
             >Run automatically when code changes.
           </md-tooltip>
-          AotoRun
+          AutoRun
         </md-switch>
 
         <md-button @click="run()" class="md-icon-button">
@@ -131,10 +131,12 @@
           >
             <md-option value="auto">auto</md-option>
             <md-option
-              :value="e.id"
-              v-for="e in window.engine_manager.engines"
-              :key="e.url"
-              >{{ e.url }}</md-option
+              :value="e.name"
+              v-for="e in window.engine_manager.matchEngineByType(
+                window.config.type
+              )"
+              :key="e.name"
+              >{{ e.name }}</md-option
             >
           </md-select>
           <md-tooltip
@@ -195,7 +197,6 @@ export default {
       code_origin: null,
       watch_file: false,
       run_changed_file: false,
-      watching: false,
       loading: false,
       watch_timer: null,
       lastModified: null,
@@ -321,7 +322,6 @@ export default {
         this.editor.updateOptions({ readOnly: true });
         this.lastModified = null;
         this.watch_timer = setInterval(() => {
-          this.watching = true;
           this.$forceUpdate();
           if (this.code_origin) {
             this.loadCodeFromURL();
@@ -336,7 +336,6 @@ export default {
           this.watch_timer = null;
         }
         this.loading = false;
-        this.watching = false;
         this.run_changed_file = false;
         this.$forceUpdate();
       }
@@ -361,6 +360,8 @@ export default {
               this.editor.setValue(code);
               if (this.run_changed_file) {
                 this.run();
+              } else {
+                this.save();
               }
             }
           } catch (e) {
@@ -416,6 +417,8 @@ export default {
             this.editor.setValue(code);
             if (this.run_changed_file) {
               this.run();
+            } else {
+              this.save();
             }
           }
         } else {
