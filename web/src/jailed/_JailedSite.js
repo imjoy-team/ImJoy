@@ -726,12 +726,16 @@
             }
             delete bObject[k].__transferables__;
           }
+        } else if (v.__as_interface__) {
+          bObject[k] = this._encode(v, true);
         } else if (typeof v === "object" && v.constructor) {
+          debugger;
           throw "Unsupported data type for transferring between the plugin and the main app: " +
             k +
             " : " +
             v.constructor.name;
         } else {
+          debugger;
           throw "Unsupported data type for transferring between the plugin and the main app: " +
             k +
             "," +
