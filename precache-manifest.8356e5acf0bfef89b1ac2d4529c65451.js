@@ -1,11 +1,11 @@
 self.__precacheManifest = [
   {
-    "revision": "273d8d4220b624bd9b64",
-    "url": "/static/css/app.1ff69dcc.css"
+    "revision": "a67bdcdb28d371da7bde",
+    "url": "/static/css/app.a610ab9c.css"
   },
   {
-    "revision": "273d8d4220b624bd9b64",
-    "url": "/static/js/app.11b1b19d.js"
+    "revision": "a67bdcdb28d371da7bde",
+    "url": "/static/js/app.5fbb0cc3.js"
   },
   {
     "revision": "b8859e2632feade2aed6",
@@ -228,10 +228,6 @@ self.__precacheManifest = [
     "url": "/static/js/chunk-vendors.06f2a3ce.js"
   },
   {
-    "revision": "97b7155c6a256bca6fa703b15a901ee8",
-    "url": "/static/vs/editor.worker.js"
-  },
-  {
     "revision": "d10204c6d610178f9c2643845f648c0e",
     "url": "/static/vs/html.worker.js"
   },
@@ -240,7 +236,11 @@ self.__precacheManifest = [
     "url": "/static/vs/css.worker.js"
   },
   {
-    "revision": "af75ce0916fb66da907f98cbc2567f09",
+    "revision": "97b7155c6a256bca6fa703b15a901ee8",
+    "url": "/static/vs/editor.worker.js"
+  },
+  {
+    "revision": "6f1fa3866149a359f6cd8ec2fb6bf6f5",
     "url": "/index.html"
   },
   {
@@ -700,8 +700,16 @@ self.__precacheManifest = [
     "url": "/static/vs/basic-languages/yaml/yaml.js"
   },
   {
+    "revision": "7f6fed6512bd7e3325304a0346e02098",
+    "url": "/static/vs/editor/editor.main.css"
+  },
+  {
     "revision": "2b6ac4494944b92db7dcfa0ce3a605ed",
     "url": "/static/vs/editor/editor.main.nls.de.js"
+  },
+  {
+    "revision": "65a437a349f6e024e14a84bdae3b94e5",
+    "url": "/static/vs/editor/editor.main.nls.es.js"
   },
   {
     "revision": "a8fb0f322b584b488bd572adf086cdcd",
@@ -752,20 +760,12 @@ self.__precacheManifest = [
     "url": "/static/vs/language/json/jsonMode.js"
   },
   {
-    "revision": "7f6fed6512bd7e3325304a0346e02098",
-    "url": "/static/vs/editor/editor.main.css"
-  },
-  {
-    "revision": "a3f8339f361d9f2683c37abb09f8c75e",
-    "url": "/static/vs/language/typescript/tsMode.js"
-  },
-  {
     "revision": "7d2a277c0d00a4bb615596ae1ab93213",
     "url": "/static/vs/language/json/jsonWorker.js"
   },
   {
-    "revision": "65a437a349f6e024e14a84bdae3b94e5",
-    "url": "/static/vs/editor/editor.main.nls.es.js"
+    "revision": "a3f8339f361d9f2683c37abb09f8c75e",
+    "url": "/static/vs/language/typescript/tsMode.js"
   },
   {
     "revision": "cf05f5559129d3145d705a8df6c6fb48",

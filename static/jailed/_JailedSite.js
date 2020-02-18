@@ -712,8 +712,11 @@
           }
           bObject[k] = { __jailed_type__: "argument", __value__: v };
         }
-        //TODO: support also Map and Set
-        else if (typeof v == "object" || Array.isArray(v)) {
+        // TODO: support also Map and Set
+        // TODO: avoid object such as DynamicPlugin instance.
+        else if (v.__as_interface__) {
+          bObject[k] = this._encode(v, true);
+        } else if (typeof v === "object" || Array.isArray(v)) {
           bObject[k] = this._encode(v, as_interface);
           // move transferables to the top level object
           if (bObject[k].__transferables__) {
@@ -722,6 +725,11 @@
             }
             delete bObject[k].__transferables__;
           }
+        } else if (typeof v === "object" && v.constructor) {
+          throw "Unsupported data type for transferring between the plugin and the main app: " +
+            k +
+            " : " +
+            v.constructor.name;
         } else {
           throw "Unsupported data type for transferring between the plugin and the main app: " +
             k +
