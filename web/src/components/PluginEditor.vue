@@ -360,6 +360,8 @@ export default {
               this.editor.setValue(code);
               if (this.run_changed_file) {
                 this.run();
+              } else {
+                this.save();
               }
             }
           } catch (e) {
@@ -415,6 +417,8 @@ export default {
             this.editor.setValue(code);
             if (this.run_changed_file) {
               this.run();
+            } else {
+              this.save();
             }
           }
         } else {
