@@ -155,6 +155,9 @@ export const evil_engine = {
         };
         return raw_on(name, promise_cb);
       };
+
+      promisify_functions(api_interface);
+
       try {
         await execute(
           {
