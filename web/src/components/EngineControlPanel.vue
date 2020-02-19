@@ -520,24 +520,22 @@ export default {
       }
     },
     async removeEngine(engine) {
-      if (
-        typeof engine.remove === "function" &&
-        window.confirm(
-          "The engine has been disabled, would you like to remove it permanently?"
-        )
-      ) {
-        await this.engineManager.removeEngine({
+      const factory = this.engineManager.getFactory(engine.factory);
+      if (factory) {
+        await factory.removeEngine({
           name: engine.name,
           url: engine.url,
         });
+      } else {
+        throw "Engine factory not found for " + engine.name;
       }
     },
-    connectEngine(engine) {
-      if (!engine.connected) engine.connect();
+    async connectEngine(engine) {
+      if (!engine.connected) await engine.connect();
       this.$forceUpdate();
     },
-    disconnectEngine(engine) {
-      if (engine.connected) engine.disconnect();
+    async disconnectEngine(engine) {
+      if (engine.connected) await engine.disconnect();
       this.$forceUpdate();
     },
     startTerminal(engine) {
