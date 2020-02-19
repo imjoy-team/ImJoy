@@ -522,10 +522,13 @@ export default {
     async removeEngine(engine) {
       const factory = this.engineManager.getFactory(engine.factory);
       if (factory) {
-        await factory.removeEngine({
+        const ret = await factory.removeEngine({
           name: engine.name,
           url: engine.url,
         });
+        if (ret) {
+          await this.engineManager.unregister(engine);
+        }
       } else {
         throw "Engine factory not found for " + engine.name;
       }
@@ -535,7 +538,10 @@ export default {
       this.$forceUpdate();
     },
     async disconnectEngine(engine) {
-      if (engine.connected) await engine.disconnect();
+      if (engine.connected) {
+        await engine.disconnect();
+        engine.connected = false;
+      }
       this.$forceUpdate();
     },
     startTerminal(engine) {

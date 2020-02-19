@@ -147,7 +147,7 @@ export class EngineManager {
     }
   }
 
-  unregister(engine) {
+  async unregister(engine) {
     const url = engine.url;
     engine = this.getEngineByUrl(url);
     if (!engine) throw `Engine ${url} not found.`;
@@ -159,7 +159,7 @@ export class EngineManager {
       this.engines.splice(index, 1);
     }
     if (engine.heartbeat_timer) clearInterval(engine.heartbeat_timer);
-    engine.disconnect();
+    await engine.disconnect();
     engine.connected = false;
     this.event_bus.emit("engine_disconnected", engine);
   }
