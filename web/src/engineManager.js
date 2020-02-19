@@ -108,15 +108,22 @@ export class EngineManager {
         engine.engine_info = engine_info;
       });
     }
+    const update_connectivity = () => {
+      if (engine.connected) {
+        this.event_bus.emit("engine_connected", engine);
+      } else {
+        this.event_bus.emit("engine_disconnected", engine);
+      }
+    };
 
     const check_connectivity = async () => {
       const live = await engine.heartbeat();
       if (!engine.connected && live) {
         engine.connected = true;
-        this.event_bus.emit("engine_connected", engine);
+        update_connectivity();
       } else if (engine.connected && !live) {
         engine.connected = false;
-        this.event_bus.emit("engine_disconnected", engine);
+        update_connectivity();
         for (let p of engine._plugins) {
           p.terminate();
         }
@@ -132,6 +139,7 @@ export class EngineManager {
     };
     this.engines.push(engine);
     engine.connected = await engine.connect();
+    update_connectivity();
 
     if (engine.heartbeat) {
       await check_connectivity();
@@ -152,7 +160,8 @@ export class EngineManager {
     }
     if (engine.heartbeat_timer) clearInterval(engine.heartbeat_timer);
     engine.disconnect();
-    this.event_bus.emit("engine_disconnected", engine);
+    engine.connected = false;
+    update_connectivity();
   }
 
   registerFactory(factory_) {

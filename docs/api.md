@@ -737,7 +737,7 @@ Get the API of the plugin engine factory (name = `ImJoy-Engine`), and access its
 
 ```javascript
 engine_factory = await api.getEngineFactory("ImJoy-Engine")
-await engine_factory.addEngine()
+await engine_factory.addEngine(config)
 ```
 
 
