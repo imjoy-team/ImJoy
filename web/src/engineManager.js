@@ -161,7 +161,7 @@ export class EngineManager {
     if (engine.heartbeat_timer) clearInterval(engine.heartbeat_timer);
     engine.disconnect();
     engine.connected = false;
-    update_connectivity();
+    this.event_bus.emit("engine_disconnected", engine);
   }
 
   registerFactory(factory_) {
