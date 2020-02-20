@@ -49,6 +49,11 @@ if (workbox) {
     new workbox.strategies.StaleWhileRevalidate()
   );
 
+  workbox.routing.registerRoute(
+    new RegExp("https://imjoy-team.github.io/.*"),
+    new workbox.strategies.StaleWhileRevalidate()
+  );
+
   // manifest.imjoy.json etc.
   workbox.routing.registerRoute(
     new RegExp("https://raw.githubusercontent.com/.*"),
