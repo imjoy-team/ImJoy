@@ -20,7 +20,8 @@ import {
 import { parseComponent } from "./pluginParser.js";
 
 import { DynamicPlugin } from "./jailed/jailed.js";
-import { getBackendByType, INTERNAL_PLUGINS } from "./api.js";
+import { getBackendByType } from "./api.js";
+import INTERNAL_PLUGINS from "./internalPlugins.json";
 
 import {
   OP_SCHEMA,

@@ -1340,7 +1340,7 @@ import {
   escapeHTML,
 } from "../utils.js";
 
-import { INTERNAL_PLUGINS } from "../api.js";
+import INTERNAL_PLUGINS from "../internalPlugins.json";
 
 import DOMPurify from "dompurify";
 
