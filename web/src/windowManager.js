@@ -74,8 +74,8 @@ export class WindowManager {
         // console.error("schema mismatch: ", data, error)
 
         if (
-          this.registered_inputs[k].schema(data) &&
-          this.registered_inputs[k].loader_key
+          this.registered_inputs[k].loader_key &&
+          this.registered_inputs[k].schema(data)
         ) {
           try {
             const loader_key = this.registered_inputs[k].loader_key;

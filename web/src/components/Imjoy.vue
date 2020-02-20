@@ -2138,10 +2138,15 @@ export default {
           loader_key: "Code Editor (file)",
           schema: ajv.compile({
             properties: {
-              name: { type: "string", pattern: ".*\\.imjoy.html$" },
+              type: { type: "string" },
+              name: {
+                type: "string",
+                pattern: ".*\\.imjoy.html$",
+                maxLength: 1024,
+              },
               size: { type: "number" },
             },
-            required: ["name", "size"],
+            required: ["name", "size", "type"],
           }),
           loader: code_loader,
         },
@@ -2149,7 +2154,12 @@ export default {
           loader_key: "Code Editor (url)",
           schema: ajv.compile({
             properties: {
-              url: { type: "string", pattern: ".*\\.imjoy.html$" },
+              type: { type: "string", enum: ["imjoy/url"] },
+              url: {
+                type: "string",
+                pattern: ".*\\.imjoy.html$",
+                maxLength: 1024,
+              },
               path: { type: "string" },
               engine: { type: "string" },
             },
@@ -2175,14 +2185,16 @@ export default {
           loader_key: "Image (url)",
           schema: ajv.compile({
             properties: {
+              type: { type: "string", enum: ["imjoy/url"] },
               url: {
                 type: "string",
+                maxLength: 1024,
                 pattern: "(.*\\.jpg|\\.jpeg|\\.png|\\.gif)$",
               },
               path: { type: "string" },
               engine: { type: "string" },
             },
-            required: ["url", "path", "engine"],
+            required: ["url", "path", "engine", "type"],
           }),
           loader: engine_image_loader,
         },
@@ -2687,7 +2699,8 @@ export default {
       this.status_text = "";
       this.progress = 0;
       let mw;
-      if (op.inputs_schema) {
+      // for performance concerns, we need to have `type` in the data
+      if (op.inputs_schema && typeof w.data.type === "string") {
         const w =
           this.wm.active_windows[this.wm.active_windows.length - 1] || {};
         if (op.inputs_schema(w.data)) {

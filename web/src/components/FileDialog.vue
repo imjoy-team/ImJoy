@@ -382,6 +382,7 @@ export default {
                 .then(url => {
                   if (this.options.return_object) {
                     resolve2({
+                      type: "imjoy/url",
                       url: url,
                       file_manager: this.selected_file_manager.url,
                       path: paths,
@@ -405,6 +406,7 @@ export default {
                 .then(urls => {
                   if (this.options.return_object) {
                     resolve2({
+                      type: "imjoy/url",
                       url: urls,
                       file_manager: this.selected_file_manager.url,
                       path: paths,
