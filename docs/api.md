@@ -1292,7 +1292,8 @@ Then, you can use [Node JS filesystem API](https://nodejs.org/api/fs.html) to ac
 #### ** JavaScript **
 ```javascript
 async function test_browser_fs(){
-  const bfs = await api.getPlugin('BrowserFS')
+  const bfs_plugin = await api.getPlugin('BrowserFS')
+  const bfs = bfs_plugin.fs
 
   bfs.writeFile('/tmp/temp.txt', 'hello world', function(err, data){
       if (err) {
@@ -1314,7 +1315,8 @@ async function test_browser_fs(){
 ```python
 
 async def test_browser_fs():
-  bfs = await api.getPlugin('BrowserFS')
+  bfs_plugin = await api.getPlugin('BrowserFS')
+  bfs = bfs_plugin.fs
 
   def read(err, data=None):
       if err:
