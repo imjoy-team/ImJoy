@@ -529,7 +529,7 @@
                     >
                       <md-icon>share</md-icon>Share
                     </md-menu-item>
-                    <md-menu-item v-else @click="downloadPlugin(plugin.id)">
+                    <md-menu-item @click="downloadPlugin(plugin.id)">
                       <md-icon>cloud_download</md-icon>Export
                     </md-menu-item>
                     <md-menu-item @click="editPlugin(plugin.id)">
@@ -764,8 +764,14 @@
                       <md-menu-item @click="showDoc(plugin.id)">
                         <md-icon>description</md-icon>Docs
                       </md-menu-item>
-                      <md-menu-item @click="sharePlugin(plugin.id)">
+                      <md-menu-item
+                        v-if="plugin.config.origin"
+                        @click="sharePlugin(plugin.id)"
+                      >
                         <md-icon>share</md-icon>Share
+                      </md-menu-item>
+                      <md-menu-item @click="downloadPlugin(plugin.id)">
+                        <md-icon>cloud_download</md-icon>Export
                       </md-menu-item>
                       <md-menu-item @click="editPlugin(plugin.id)">
                         <md-icon>edit</md-icon>Edit
@@ -786,7 +792,7 @@
                   </md-menu>
                 </md-badge>
                 <md-button
-                  class="joy-run-button"
+                  class="joy-run-button non-runnable-btn"
                   :class="
                     plugin.running
                       ? 'busy-plugin'
@@ -3566,5 +3572,9 @@ button.md-speed-dial-target {
   display: inline-block;
   margin-left: auto;
   margin-right: 0;
+}
+
+.non-runnable-btn {
+  color: rgba(113, 78, 179, 0.66) !important;
 }
 </style>
