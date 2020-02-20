@@ -218,6 +218,7 @@ export default {
             );
           }
         }
+        this.status_text = `🎉Uploaded ${files.length} files.`;
       } catch (e) {
         this.status_text =
           "Failed to upload, error:" + (e ? e.toString() : "undefined");

@@ -46,7 +46,17 @@
                 >autorenew</md-icon
               >
               <md-icon v-else>sync_disabled</md-icon>
-              <span>{{ engine.name }}</span>
+              <span>{{ engine.name.slice(0, 20) }}</span>
+              <md-button
+                v-if="engine.connected"
+                class="md-icon-button md-accent"
+                @click.stop="disconnectEngine(engine)"
+              >
+                <md-icon>clear</md-icon
+                ><md-tooltip
+                  >Disconnect engine {{ engine.name }}
+                </md-tooltip></md-button
+              >
             </span>
           </md-menu-item>
           <md-menu-item
@@ -54,8 +64,20 @@
             @click.stop="engine.connect(false)"
             :key="engine.name"
           >
-            <md-icon>sync_disabled</md-icon> {{ engine.name }}
-            <md-tooltip>Connect to {{ engine.name }} </md-tooltip>
+            <span class="md-list-item-content" style="cursor: pointer;">
+              <md-icon>sync_disabled</md-icon> {{ engine.name }}
+              <md-tooltip>Connect to {{ engine.name }} </md-tooltip>
+              <md-button
+                v-if="!engine.connected"
+                class="md-icon-button"
+                @click.stop="removeEngine(engine)"
+              >
+                <md-icon>delete_forever</md-icon>
+                <md-tooltip
+                  >Remove engine {{ engine.name.slice(0, 20) }}
+                </md-tooltip>
+              </md-button>
+            </span>
           </md-menu-item>
           <template v-if="engine.connected && engine.show_processes">
             <md-menu-item
@@ -498,23 +520,28 @@ export default {
       }
     },
     async removeEngine(engine) {
-      await this.engineManager.unregister(engine);
-      this.$forceUpdate();
-      if (
-        typeof engine.remove === "function" &&
-        window.confirm(
-          "The engine has been disabled, would you like to remove it permanently?"
-        )
-      ) {
-        engine.remove();
+      const factory = this.engineManager.getFactory(engine.factory);
+      if (factory) {
+        const ret = await factory.removeEngine({
+          name: engine.name,
+          url: engine.url,
+        });
+        if (ret) {
+          await this.engineManager.unregister(engine);
+        }
+      } else {
+        throw "Engine factory not found for " + engine.name;
       }
     },
-    connectEngine(engine) {
-      if (!engine.connected) engine.connect();
+    async connectEngine(engine) {
+      if (!engine.connected) await engine.connect();
       this.$forceUpdate();
     },
-    disconnectEngine(engine) {
-      if (engine.connected) engine.disconnect();
+    async disconnectEngine(engine) {
+      if (engine.connected) {
+        await engine.disconnect();
+        engine.connected = false;
+      }
       this.$forceUpdate();
     },
     startTerminal(engine) {
@@ -596,5 +623,9 @@ export default {
 
 p {
   margin: 0 0 0.5rem;
+}
+
+.md-list-item-content > .md-icon:first-child {
+  margin-right: 10px !important;
 }
 </style>

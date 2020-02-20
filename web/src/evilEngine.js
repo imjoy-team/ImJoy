@@ -102,6 +102,20 @@ var execute = async function(code, api_interface) {
   }
 };
 
+function promisify_functions(obj) {
+  for (let k in obj) {
+    if (typeof obj[k] === "function") {
+      // make sure it returns a promise
+      const func = obj[k];
+      if (func.constructor.name !== "AsyncFunction") {
+        obj[k] = function(...args) {
+          return Promise.resolve(func(...args));
+        };
+      }
+    }
+  }
+}
+
 export const evil_engine = {
   type: "engine",
   pluginType: "evil",
@@ -124,10 +138,26 @@ export const evil_engine = {
           `plugin ${config.name} (id=${config.id}) initialized.`,
           remote_api
         );
+        promisify_functions(remote_api);
         resolve(remote_api);
       };
       api_interface = Object.assign({}, api_interface);
-      api_interface["export"] = export_api;
+      api_interface.export = export_api;
+      const raw_register = api_interface.register;
+      api_interface.register = config => {
+        promisify_functions(config);
+        return raw_register(config);
+      };
+      const raw_on = api_interface.on;
+      api_interface.on = (name, cb) => {
+        const promise_cb = function(...args) {
+          return Promise.resolve(cb(...args));
+        };
+        return raw_on(name, promise_cb);
+      };
+
+      promisify_functions(api_interface);
+
       try {
         await execute(
           {
