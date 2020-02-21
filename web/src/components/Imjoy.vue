@@ -2075,7 +2075,7 @@ export default {
           this.createWindow({
             name: file.name,
             type: "imjoy/image",
-            data: { src: reader.result, _file: file },
+            data: { type: "imjoy/image", src: reader.result, file: file },
           });
         };
         reader.readAsDataURL(file);
@@ -2093,6 +2093,7 @@ export default {
           standalone: this.screenWidth < 1200,
           plugin: {},
           data: {
+            type: "imjoy/code",
             name: "new plugin",
             id: "plugin_" + randId(),
             code: "",
@@ -2114,6 +2115,7 @@ export default {
           standalone: this.screenWidth < 1200,
           plugin: {},
           data: {
+            type: "imjoy/code",
             name: "new plugin",
             id: "plugin_" + randId(),
             code: "",
@@ -2129,7 +2131,7 @@ export default {
         this.createWindow({
           name: file_name,
           type: "imjoy/image",
-          data: { src: engine_image_file.url },
+          data: { type: "imjoy/image", src: engine_image_file.url },
         });
       };
 
@@ -2138,10 +2140,15 @@ export default {
           loader_key: "Code Editor (file)",
           schema: ajv.compile({
             properties: {
-              name: { type: "string", pattern: ".*\\.imjoy.html$" },
+              type: { type: "string" },
+              name: {
+                type: "string",
+                pattern: ".*\\.imjoy.html$",
+                maxLength: 1024,
+              },
               size: { type: "number" },
             },
-            required: ["name", "size"],
+            required: ["name", "size", "type"],
           }),
           loader: code_loader,
         },
@@ -2149,7 +2156,12 @@ export default {
           loader_key: "Code Editor (url)",
           schema: ajv.compile({
             properties: {
-              url: { type: "string", pattern: ".*\\.imjoy.html$" },
+              type: { type: "string", enum: ["imjoy/url"] },
+              url: {
+                type: "string",
+                pattern: ".*\\.imjoy.html$",
+                maxLength: 1024,
+              },
               path: { type: "string" },
               engine: { type: "string" },
             },
@@ -2175,14 +2187,16 @@ export default {
           loader_key: "Image (url)",
           schema: ajv.compile({
             properties: {
+              type: { type: "string", enum: ["imjoy/url"] },
               url: {
                 type: "string",
+                maxLength: 1024,
                 pattern: "(.*\\.jpg|\\.jpeg|\\.png|\\.gif)$",
               },
               path: { type: "string" },
               engine: { type: "string" },
             },
-            required: ["url", "path", "engine"],
+            required: ["url", "path", "engine", "type"],
           }),
           loader: engine_image_loader,
         },
@@ -2578,6 +2592,7 @@ export default {
         standalone: this.screenWidth < 1200,
         plugin: null,
         data: {
+          type: "imjoy/code",
           name: "new plugin",
           id: "plugin_" + randId(),
           code: JSON.parse(JSON.stringify(code)),
@@ -2687,10 +2702,11 @@ export default {
       this.status_text = "";
       this.progress = 0;
       let mw;
+      // for performance concerns, we need to have `type` in the data
       if (op.inputs_schema) {
         const w =
           this.wm.active_windows[this.wm.active_windows.length - 1] || {};
-        if (op.inputs_schema(w.data)) {
+        if (w.data && op.inputs_schema(w.data)) {
           mw = this.pm.plugin2joy(w) || {};
         } else {
           mw = {};

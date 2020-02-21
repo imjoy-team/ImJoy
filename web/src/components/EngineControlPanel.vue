@@ -45,6 +45,10 @@
               <md-icon v-else-if="engine.connected" class="md-primary"
                 >autorenew</md-icon
               >
+              <div
+                v-else-if="engine.connecting"
+                class="loading loading-lg"
+              ></div>
               <md-icon v-else>sync_disabled</md-icon>
               <span>{{ engine.name.slice(0, 20) }}</span>
               <md-button
@@ -534,8 +538,16 @@ export default {
       }
     },
     async connectEngine(engine) {
-      if (!engine.connected) await engine.connect();
-      this.$forceUpdate();
+      try {
+        if (!engine.connected) {
+          engine.connecting = true;
+          await engine.connect();
+        }
+      } catch (e) {
+        console.error(e);
+      } finally {
+        engine.connecting = false;
+      }
     },
     async disconnectEngine(engine) {
       if (engine.connected) {

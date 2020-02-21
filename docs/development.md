@@ -417,6 +417,8 @@ Defines the inputs with json-schema syntax (http://json-schema.org/).
 
 For example, to define that the plugin uses png files, you can specify `"inputs": {"properties": {"type": {"enum": ["image/png"]}}, "type": "object"}` . You can also use the simplified format which assumes the inputs is an object and use json schema to describe the properties: `"inputs": {"type": {"enum": ["image/png"]}}`.
 
+Please also note that if you use a regular expression pattern in the schema to validate an string, you may want to set the `maxLength`, otherwise it will be very slow and can even crash while validating large string. For example, if we want to match an object contains `file_name` which ends with `.tiff`, we can set: `{"properties": {"file_name": {"type": "string","pattern": ".*\\.tiff$", "maxLength": 1024}}}`.
+
 #### outputs
 Defines the outputs with json-schema syntax (http://json-schema.org/).
 The format is the same as for `inputs`.
