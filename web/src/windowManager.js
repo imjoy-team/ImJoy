@@ -66,13 +66,6 @@ export class WindowManager {
   }
 
   getDataLoaders(data) {
-    if (!data.type) {
-      console.warn(
-        "Skipping getDataLoaders, no type property contained in data: ",
-        data
-      );
-      return {};
-    }
     const loaders = {};
     // find all the plugins registered for this type
     for (let k in this.registered_inputs) {

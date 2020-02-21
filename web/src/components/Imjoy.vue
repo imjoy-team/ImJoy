@@ -2592,6 +2592,7 @@ export default {
         standalone: this.screenWidth < 1200,
         plugin: null,
         data: {
+          type: "imjoy/code",
           name: "new plugin",
           id: "plugin_" + randId(),
           code: JSON.parse(JSON.stringify(code)),
