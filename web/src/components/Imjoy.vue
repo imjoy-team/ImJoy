@@ -2075,7 +2075,7 @@ export default {
           this.createWindow({
             name: file.name,
             type: "imjoy/image",
-            data: { src: reader.result, _file: file },
+            data: { type: "imjoy/image", src: reader.result, file: file },
           });
         };
         reader.readAsDataURL(file);
@@ -2093,6 +2093,7 @@ export default {
           standalone: this.screenWidth < 1200,
           plugin: {},
           data: {
+            type: "imjoy/code",
             name: "new plugin",
             id: "plugin_" + randId(),
             code: "",
@@ -2114,6 +2115,7 @@ export default {
           standalone: this.screenWidth < 1200,
           plugin: {},
           data: {
+            type: "imjoy/code",
             name: "new plugin",
             id: "plugin_" + randId(),
             code: "",
@@ -2129,7 +2131,7 @@ export default {
         this.createWindow({
           name: file_name,
           type: "imjoy/image",
-          data: { src: engine_image_file.url },
+          data: { type: "imjoy/image", src: engine_image_file.url },
         });
       };
 
@@ -2700,10 +2702,10 @@ export default {
       this.progress = 0;
       let mw;
       // for performance concerns, we need to have `type` in the data
-      if (op.inputs_schema && typeof w.data.type === "string") {
+      if (op.inputs_schema) {
         const w =
           this.wm.active_windows[this.wm.active_windows.length - 1] || {};
-        if (op.inputs_schema(w.data)) {
+        if (w.data && op.inputs_schema(w.data)) {
           mw = this.pm.plugin2joy(w) || {};
         } else {
           mw = {};

@@ -66,13 +66,17 @@ export class WindowManager {
   }
 
   getDataLoaders(data) {
+    if (!data.type) {
+      console.warn(
+        "Skipping getDataLoaders, no type property contained in data: ",
+        data
+      );
+      return {};
+    }
     const loaders = {};
     // find all the plugins registered for this type
     for (let k in this.registered_inputs) {
       if (this.registered_inputs.hasOwnProperty(k)) {
-        // const error = this.registered_inputs[k].schema.errors
-        // console.error("schema mismatch: ", data, error)
-
         if (
           this.registered_inputs[k].loader_key &&
           this.registered_inputs[k].schema(data)
