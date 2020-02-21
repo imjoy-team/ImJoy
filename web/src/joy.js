@@ -219,20 +219,6 @@ Joy.Op = function(options, parent, data) {
     }, 1); // some threading issue, i dunno
     if (!noUpdate) self.update();
   };
-  // self.switchData = function(newData) {
-  //   unwatch(self.data, _onDataChange); // unwatch old data
-  //   self.data = newData;
-  //   watch(self.data, _onDataChange); // watch new data
-  //   if (self.onDataChange) self.onDataChange(newData);
-  // };
-
-  // WATCH DATA
-  // var _myEditLock = false;
-  // var _onDataChange = function(attr, op, newValue, oldValue) {
-  //   if (_myEditLock) return; // prevent double update
-  //   if (self.onDataChange) self.onDataChange();
-  // };
-  // watch(self.data, _onDataChange);
 
   /////////////////////////////////
   // ACTOR <-> EDITOR: "WIDGETS" //
