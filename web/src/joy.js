@@ -152,9 +152,6 @@ Joy.Op = function(options, parent, data) {
     if (self.dom && self.dom.parentNode)
       self.dom.parentNode.removeChild(self.dom);
 
-    // Un-watch my data
-    // unwatch(self.data, _onDataChange);
-
     // Kill all children, too
     while (self.children.length > 0) {
       self.removeChild(self.children[0]);
