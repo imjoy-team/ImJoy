@@ -2265,10 +2265,12 @@ export class PluginManager {
           setTimeout(() => {
             this.renderWindow(pconfig)
               .then(wplugin => {
-                wplugin.api.emit(
-                  "window_size_changed",
-                  pconfig.$el.getBoundingClientRect()
-                );
+                if (pconfig.$el) {
+                  wplugin.api.emit(
+                    "window_size_changed",
+                    pconfig.$el.getBoundingClientRect()
+                  );
+                }
                 wplugin.api.refresh();
                 wplugin.api.on("close", async () => {
                   this.event_bus.emit("closing_window_plugin", wplugin);
