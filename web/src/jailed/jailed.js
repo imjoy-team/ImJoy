@@ -24,14 +24,14 @@ import { getBackendByType } from "../api.js";
 
 import DOMPurify from "dompurify";
 
-var __jailed__path__;
+var JailedConfig = {};
 var __is__node__ =
   typeof process !== "undefined" &&
   !process.browser &&
   process.release.name.search(/node|io.js/) !== -1;
 if (__is__node__) {
   // Node.js
-  __jailed__path__ = __dirname + "/";
+  JailedConfig.asset_url = __dirname + "/";
 } else {
   // web
   if (
@@ -39,14 +39,14 @@ if (__is__node__) {
     location.hostname === "127.0.0.1" ||
     location.hostname.startsWith("deploy-preview-")
   ) {
-    __jailed__path__ = `${location.protocol}//${location.hostname}${
+    JailedConfig.asset_url = `${location.protocol}//${location.hostname}${
       location.port ? ":" + location.port : ""
     }/static/jailed/`;
   } else {
-    __jailed__path__ = "https://lib.imjoy.io/static/jailed/";
+    JailedConfig.asset_url = "https://lib.imjoy.io/static/jailed/";
   }
   // var scripts = document.getElementsByTagName("script");
-  // __jailed__path__ = scripts[scripts.length-1].src
+  // JailedConfig.asset_url = scripts[scripts.length-1].src
   //     .split('?')[0]
   //     .split('/')
   //     .slice(0, -1)
@@ -92,7 +92,7 @@ var initWeb = function() {
   // var origOnload = window.onload || function(){};
   var wload = function() {
     // origOnload();
-    load(__jailed__path__ + "_JailedSite.js", function() {
+    load(JailedConfig.asset_url + "_JailedSite.js", function() {
       platformInit.emit();
     });
   };
@@ -116,7 +116,6 @@ if (__is__node__) {
 var Connection = function(id, type, config) {
   const backend = getBackendByType(type);
   if (backend) {
-    config.__jailed__path__ = __jailed__path__;
     this._platformConnection = new BasicConnection(id, type, config);
   } else {
     throw `Unsupported backend type (${type})`;
@@ -299,7 +298,7 @@ class BasicConnection {
     var iframe_container = config.iframe_container;
     var sample = document.createElement("iframe");
     this._loggingHandler = () => {};
-    sample.src = config.__jailed__path__ + "_frame.html";
+    sample.src = JailedConfig.asset_url + "_frame.html";
     sample.sandbox = "";
     sample.frameBorder = "0";
     sample.style.width = "100%";
@@ -498,6 +497,11 @@ var DynamicPlugin = function(
   this.backend = getBackendByType(this.type);
   this.engine = engine;
   this.allow_evil = allow_evil;
+
+  // normalize asset_url
+  if (!JailedConfig.asset_url.endsWith("/")) {
+    JailedConfig.asset_url = JailedConfig.asset_url + "/";
+  }
 
   this._updateUI =
     (_interface && _interface.utils && _interface.utils.$forceUpdate) ||
@@ -712,7 +716,7 @@ DynamicPlugin.prototype._init = function() {
     me._loadCore();
   };
   this._connection.importScript(
-    __jailed__path__ + "_JailedSite.js",
+    JailedConfig.asset_url + "_JailedSite.js",
     sCb,
     this._fCb
   );
@@ -728,7 +732,7 @@ DynamicPlugin.prototype._loadCore = function() {
   };
 
   this._connection.importScript(
-    __jailed__path__ + "_pluginCore.js",
+    JailedConfig.asset_url + "_pluginCore.js",
     sCb,
     this._fCb
   );
@@ -1019,4 +1023,4 @@ DynamicPlugin.prototype.progress = function(p) {
   else this._progress = p;
 };
 
-export { DynamicPlugin, Plugin };
+export { DynamicPlugin, Plugin, JailedConfig };

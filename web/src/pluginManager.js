@@ -19,7 +19,7 @@ import {
 
 import { parseComponent } from "./pluginParser.js";
 
-import { DynamicPlugin } from "./jailed/jailed.js";
+import { DynamicPlugin, JailedConfig } from "./jailed/jailed.js";
 import { getBackendByType } from "./api.js";
 import INTERNAL_PLUGINS from "./internalPlugins.json";
 
@@ -52,6 +52,7 @@ export class PluginManager {
     imjoy_api = {},
     show_message_callback = null,
     update_ui_callback = null,
+    jailed_asset_url = null,
   }) {
     this.event_bus = event_bus;
     this.em = engine_manager;
@@ -64,6 +65,8 @@ export class PluginManager {
     assert(this.em, "engine manager is not available");
     assert(this.wm, "window manager is not available");
     assert(this.config_db, "config database is not available");
+
+    if (jailed_asset_url) JailedConfig.asset_url = jailed_asset_url;
 
     this.show_message_callback = show_message_callback;
     this.update_ui_callback = update_ui_callback || function() {};
