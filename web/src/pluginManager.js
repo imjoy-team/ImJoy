@@ -795,26 +795,7 @@ export class PluginManager {
                 });
               }
             }
-            for (let pn in INTERNAL_PLUGINS) {
-              if (INTERNAL_PLUGINS[pn].startup) {
-                if (!this.plugin_names[pn]) {
-                  console.log(`Loading internal plugin "${pn}"...`);
-                  this.reloadPluginRecursively(
-                    {
-                      uri: INTERNAL_PLUGINS[pn].uri,
-                    },
-                    null,
-                    "eval is evil"
-                  )
-                    .then(() => {
-                      console.log(`${pn} plugin loaded.`);
-                    })
-                    .catch(e => {
-                      console.error(e);
-                    });
-                }
-              }
-            }
+            this.reloadInternalPlugins(true);
             resolve();
           })
           .catch(err => {
@@ -823,6 +804,30 @@ export class PluginManager {
           });
       });
     });
+  }
+
+  reloadInternalPlugins(skip_exist) {
+    for (let pn in INTERNAL_PLUGINS) {
+      if (INTERNAL_PLUGINS[pn].startup) {
+        if (skip_exist && this.plugin_names[pn]) {
+          continue;
+        }
+        console.log(`Loading internal plugin "${pn}"...`);
+        this.reloadPluginRecursively(
+          {
+            uri: INTERNAL_PLUGINS[pn].uri,
+          },
+          null,
+          "eval is evil"
+        )
+          .then(() => {
+            console.log(`${pn} plugin loaded.`);
+          })
+          .catch(e => {
+            console.error(e);
+          });
+      }
+    }
   }
 
   async getPluginFromUrl(uri, scoped_plugins) {
