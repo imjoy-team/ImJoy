@@ -1235,6 +1235,11 @@ Name of the current workspace.
 
 URL of the current plugin engine.
 
+### api.FILE_MANAGER_URL constant
+**Only available to native-python plugins**
+
+URL of the file manager registered by the current plugin engine.
+
 ## Experimental APIs
 
 ### `_rpcEncode` and `_rpcDecode`
