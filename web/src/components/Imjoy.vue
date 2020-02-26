@@ -486,11 +486,10 @@
                       :md-diameter="20"
                       md-mode="indeterminate"
                     ></md-progress-spinner>
-                    <md-icon v-else-if="plugin.config.icon">{{
-                      plugin.config.icon
-                    }}</md-icon>
-                    <md-icon v-else>extension</md-icon>
-
+                    <plugin-icon
+                      v-else
+                      :icon="plugin.config.icon"
+                    ></plugin-icon>
                     <md-tooltip v-if="screenWidth > 500">{{
                       plugin.name + ": " + plugin.config.description
                     }}</md-tooltip>
@@ -729,10 +728,10 @@
                         :md-diameter="20"
                         md-mode="indeterminate"
                       ></md-progress-spinner>
-                      <md-icon v-else-if="plugin.config.icon">{{
-                        plugin.config.icon
-                      }}</md-icon>
-                      <md-icon v-else>extension</md-icon>
+                      <plugin-icon
+                        v-else
+                        :icon="plugin.config.icon"
+                      ></plugin-icon>
                       <md-tooltip v-if="screenWidth > 500">{{
                         plugin.name + ": " + plugin.config.description
                       }}</md-tooltip>
@@ -1182,10 +1181,7 @@
             <md-toolbar md-elevation="0">
               <div>
                 <h2>
-                  <md-icon v-if="plugin4install.icon">{{
-                    plugin4install.icon
-                  }}</md-icon
-                  ><md-icon v-else>extension</md-icon>
+                  <plugin-icon :icon="plugin4install.icon"></plugin-icon>
                   {{ plugin4install.name + " " + plugin4install.badges }}
                 </h2>
               </div>

@@ -44,8 +44,7 @@
         <md-toolbar md-elevation="0">
           <div>
             <h2>
-              <md-icon v-if="plugin_info.icon">{{ plugin_info.icon }}</md-icon
-              ><md-icon v-else>extension</md-icon>
+              <plugin-icon :icon="plugin_info.icon"></plugin-icon>
               {{ plugin_info.name + " " + plugin_info.badges }}
             </h2>
           </div>
