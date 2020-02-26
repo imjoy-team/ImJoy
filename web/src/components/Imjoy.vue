@@ -1344,7 +1344,7 @@ import INTERNAL_PLUGINS from "../internalPlugins.json";
 
 import DOMPurify from "dompurify";
 
-import { ImJoy } from "../imjoyLib.js";
+import { ImJoy } from "../imjoyCore.js";
 
 import _ from "lodash";
 

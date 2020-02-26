@@ -19,7 +19,7 @@ import {
 
 import { parseComponent } from "./pluginParser.js";
 
-import { DynamicPlugin, JailedConfig } from "./jailed/jailed.js";
+import { DynamicPlugin, initializeJailed } from "./jailed/jailed.js";
 import { getBackendByType } from "./api.js";
 import INTERNAL_PLUGINS from "./internalPlugins.json";
 
@@ -64,7 +64,7 @@ export class PluginManager {
     assert(this.wm, "window manager is not available");
     assert(this.config_db, "config database is not available");
 
-    if (jailed_asset_url) JailedConfig.asset_url = jailed_asset_url;
+    this.jailed_asset_url = jailed_asset_url;
 
     this.show_message_callback = show_message_callback;
     this.update_ui_callback = update_ui_callback || function() {};
@@ -97,7 +97,6 @@ export class PluginManager {
     this.workflow_list = [];
 
     this.db = null;
-    this.init();
     const api_utils_ = imjoy_api.utils;
     this.imjoy_api = {
       alert: window && window.alert,
@@ -296,7 +295,13 @@ export class PluginManager {
     }
   }
 
-  init() {
+  async init() {
+    const config = {};
+    if (this.jailed_asset_url) {
+      config.asset_url = this.jailed_asset_url;
+    }
+    await initializeJailed(config);
+
     this.plugins = {};
     this.plugin_names = {};
     this.registered = {
@@ -740,7 +745,7 @@ export class PluginManager {
   }
 
   reloadPlugins() {
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
       if (this.plugins) {
         for (let k in this.plugins) {
           if (this.plugins.hasOwnProperty(k)) {
@@ -759,7 +764,7 @@ export class PluginManager {
           }
         }
       }
-      this.init();
+      await this.init();
       this.reloadDB().then(() => {
         this.db
           .allDocs({

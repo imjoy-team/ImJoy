@@ -3,7 +3,7 @@ import { WindowManager } from "./windowManager.js";
 
 import { EngineManager } from "./engineManager.js";
 
-import { FileManager } from "./fileSystemManager.js";
+import { FileManager } from "./fileManager.js";
 
 import PouchDB from "pouchdb-browser";
 

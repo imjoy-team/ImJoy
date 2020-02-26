@@ -25,44 +25,39 @@ import { getBackendByType } from "../api.js";
 import DOMPurify from "dompurify";
 
 var JailedConfig = {};
-var __is__node__ =
-  typeof process !== "undefined" &&
-  !process.browser &&
-  process.release.name.search(/node|io.js/) !== -1;
-if (__is__node__) {
-  // Node.js
-  JailedConfig.asset_url = __dirname + "/";
+
+// web
+if (
+  location.hostname === "localhost" ||
+  location.hostname === "127.0.0.1" ||
+  location.hostname.startsWith("deploy-preview-")
+) {
+  JailedConfig.asset_url = `${location.protocol}//${location.hostname}${
+    location.port ? ":" + location.port : ""
+  }/static/jailed/`;
 } else {
-  // web
-  if (
-    location.hostname === "localhost" ||
-    location.hostname === "127.0.0.1" ||
-    location.hostname.startsWith("deploy-preview-")
-  ) {
-    JailedConfig.asset_url = `${location.protocol}//${location.hostname}${
-      location.port ? ":" + location.port : ""
-    }/static/jailed/`;
-  } else {
-    JailedConfig.asset_url = "https://lib.imjoy.io/static/jailed/";
-  }
-  // var scripts = document.getElementsByTagName("script");
-  // JailedConfig.asset_url = scripts[scripts.length-1].src
-  //     .split('?')[0]
-  //     .split('/')
-  //     .slice(0, -1)
-  //     .join('/')+'/static/jailed/';
+  JailedConfig.asset_url = "https://lib.imjoy.io/static/jailed/";
 }
 
 /**
  * Initializes the library site for web environment (loads
  * _JailedSite.js)
  */
-var platformInit;
-var initWeb = function() {
-  // loads additional script to the application environment
-  var load = function(path, cb) {
+var platform_initialized = false;
+var initializeJailed = function(config) {
+  return new Promise((resolve, reject) => {
+    if (config) {
+      for (let k in config) {
+        JailedConfig[k] = config[k];
+      }
+    }
+    // normalize asset_url
+    if (!JailedConfig.asset_url.endsWith("/")) {
+      JailedConfig.asset_url = JailedConfig.asset_url + "/";
+    }
+    // loads additional script to the application environment
     var script = document.createElement("script");
-    script.src = path;
+    script.src = JailedConfig.asset_url + "_JailedSite.js";
 
     var clear = function() {
       script.onload = null;
@@ -73,10 +68,16 @@ var initWeb = function() {
 
     var success = function() {
       clear();
-      cb();
+      platform_initialized = true;
+      resolve();
     };
 
-    script.onerror = clear;
+    var fail = function() {
+      clear();
+      reject("Failed to load JailedSite script for jailed module.");
+    };
+
+    script.onerror = fail;
     script.onload = success;
     script.onreadystatechange = function() {
       var state = script.readyState;
@@ -86,24 +87,8 @@ var initWeb = function() {
     };
 
     document.body.appendChild(script);
-  };
-
-  platformInit = new Whenable();
-  // var origOnload = window.onload || function(){};
-  var wload = function() {
-    // origOnload();
-    load(JailedConfig.asset_url + "_JailedSite.js", function() {
-      platformInit.emit();
-    });
-  };
-  window.addEventListener("load", wload, false);
+  });
 };
-
-if (__is__node__) {
-  throw "nodejs is not supported.";
-} else {
-  initWeb();
-}
 
 /**
  * Application-site Connection object constructon, reuses the
@@ -474,6 +459,8 @@ class BasicConnection {
  * @param {Object} _interface to provide to the plugin
  */
 var DynamicPlugin = function(config, _interface, engine, is_proxy, allow_evil) {
+  if (!platform_initialized)
+    throw "Please call `initializeJailed()` before using Jailed.";
   this.config = config;
   this.id = config.id || randId();
   this._id = config._id;
@@ -490,11 +477,6 @@ var DynamicPlugin = function(config, _interface, engine, is_proxy, allow_evil) {
   this.backend = getBackendByType(this.type);
   this.engine = engine;
   this.allow_evil = allow_evil;
-
-  // normalize asset_url
-  if (!JailedConfig.asset_url.endsWith("/")) {
-    JailedConfig.asset_url = JailedConfig.asset_url + "/";
-  }
 
   this._updateUI =
     (_interface && _interface.utils && _interface.utils.$forceUpdate) ||
@@ -569,100 +551,96 @@ DynamicPlugin.prototype._connect = function() {
     me._updateUI();
   };
 
-  platformInit.whenEmitted(function() {
-    if (!me.backend) {
-      if (me.engine && me.engine._is_evil && me.allow_evil !== "eval is evil") {
-        me._fail.emit("Evil engine is not allowed.");
-        me._connection = null;
-        me.error("Evil engine is not allowed.");
-        me._set_disconnected();
-        return;
-      }
-      if (!me.engine || !me.engine.connected) {
-        me._fail.emit("Please connect to the Plugin Engine 🚀.");
-        me._connection = null;
-        me.error("Please connect to the Plugin Engine 🚀.");
-        me._set_disconnected();
-        return;
-      }
-      me.initializing = true;
-      me._updateUI();
-      me.engine
-        .startPlugin(
-          {
-            ...me.config,
-            terminate: () => {
-              me.terminate();
-            },
-          },
-          me._initialInterface
-        )
-        .then(remote => {
-          // check if the plugin is terminated during startup
-          if (!me.engine) {
-            console.warn(
-              "Plugin " + me.id + " is ready, but it was termianted."
-            );
-            if (me.engine && me.engine.killPlugin)
-              me.engine.killPlugin({ id: me.config.id, name: me.config.name });
-            return;
-          }
-          me.remote = remote;
-          me.api = me.remote;
-          me.api.__as_interface__ = true;
-          me.api.__id__ = me.id;
-          me._disconnected = false;
-          me.initializing = false;
-          me._updateUI();
-          me._connected.emit();
-          me.engine.registerPlugin(me);
-        })
-        .catch(e => {
-          me.error(e);
-          me._set_disconnected();
-        });
-
-      // me._connection._platformConnection.onLogging(function(details) {
-      //   if (details.type === "error") {
-      //     me.error(details.value);
-      //   } else if (details.type === "progress") {
-      //     me.progress(details.value);
-      //   } else if (details.type === "info") {
-      //     me.log(details.value);
-      //   } else {
-      //     console.log(details.value);
-      //   }
-      // });
-    } else {
-      me._connection = new Connection(me.id, me.type, me.config);
-      me.initializing = true;
-      me._updateUI();
-      me._connection.whenInit(function() {
-        me._init();
-      });
-      me._connection.whenFailed(function(e) {
-        me._fail.emit(e);
-      });
-
-      me._connection.onDisconnect(function(details) {
-        if (details) {
-          if (details.success) {
-            me.log(details.message);
-          } else {
-            me.error(details.message);
-          }
-        }
-        if (me._connection._platformConnection._frame) {
-          var iframe_container = document.getElementById(
-            me._connection._platformConnection._frame.id
-          );
-          iframe_container.parentNode.removeChild(iframe_container);
-        }
-        me._set_disconnected();
-        // me.terminate()
-      });
+  if (!me.backend) {
+    if (me.engine && me.engine._is_evil && me.allow_evil !== "eval is evil") {
+      me._fail.emit("Evil engine is not allowed.");
+      me._connection = null;
+      me.error("Evil engine is not allowed.");
+      me._set_disconnected();
+      return;
     }
-  });
+    if (!me.engine || !me.engine.connected) {
+      me._fail.emit("Please connect to the Plugin Engine 🚀.");
+      me._connection = null;
+      me.error("Please connect to the Plugin Engine 🚀.");
+      me._set_disconnected();
+      return;
+    }
+    me.initializing = true;
+    me._updateUI();
+    me.engine
+      .startPlugin(
+        {
+          ...me.config,
+          terminate: () => {
+            me.terminate();
+          },
+        },
+        me._initialInterface
+      )
+      .then(remote => {
+        // check if the plugin is terminated during startup
+        if (!me.engine) {
+          console.warn("Plugin " + me.id + " is ready, but it was termianted.");
+          if (me.engine && me.engine.killPlugin)
+            me.engine.killPlugin({ id: me.config.id, name: me.config.name });
+          return;
+        }
+        me.remote = remote;
+        me.api = me.remote;
+        me.api.__as_interface__ = true;
+        me.api.__id__ = me.id;
+        me._disconnected = false;
+        me.initializing = false;
+        me._updateUI();
+        me._connected.emit();
+        me.engine.registerPlugin(me);
+      })
+      .catch(e => {
+        me.error(e);
+        me._set_disconnected();
+      });
+
+    // me._connection._platformConnection.onLogging(function(details) {
+    //   if (details.type === "error") {
+    //     me.error(details.value);
+    //   } else if (details.type === "progress") {
+    //     me.progress(details.value);
+    //   } else if (details.type === "info") {
+    //     me.log(details.value);
+    //   } else {
+    //     console.log(details.value);
+    //   }
+    // });
+  } else {
+    me._connection = new Connection(me.id, me.type, me.config);
+    me.initializing = true;
+    me._updateUI();
+    me._connection.whenInit(function() {
+      me._init();
+    });
+    me._connection.whenFailed(function(e) {
+      me._fail.emit(e);
+    });
+
+    me._connection.onDisconnect(function(details) {
+      if (details) {
+        if (details.success) {
+          me.log(details.message);
+        } else {
+          me.error(details.message);
+        }
+      }
+      if (me._connection._platformConnection._frame) {
+        var iframe_container = document.getElementById(
+          me._connection._platformConnection._frame.id
+        );
+        iframe_container.parentNode.removeChild(iframe_container);
+      }
+      me._set_disconnected();
+      // me.terminate()
+    });
+  }
 };
 
 /**
@@ -1014,4 +992,4 @@ DynamicPlugin.prototype.progress = function(p) {
   else this._progress = p;
 };
 
-export { DynamicPlugin, Plugin, JailedConfig };
+export { initializeJailed, DynamicPlugin, Plugin };
