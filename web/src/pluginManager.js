@@ -99,9 +99,15 @@ export class PluginManager {
     this.db = null;
     const api_utils_ = imjoy_api.utils;
     this.imjoy_api = {
-      alert: window && window.alert,
-      prompt: window && window.prompt,
-      confirm: window && window.confirm,
+      alert: (plugin, msg) => {
+        return window.alert(msg);
+      },
+      prompt: (plugin, msg) => {
+        return window.prompt(msg);
+      },
+      confirm: (plugin, msg) => {
+        return window.confirm(msg);
+      },
       requestUploadUrl: this.requestUploadUrl,
       getFileUrl: this.getFileUrl,
       getFilePath: this.getFilePath,
