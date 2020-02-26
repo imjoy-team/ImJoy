@@ -32,8 +32,7 @@
       <div v-for="(plugin, k) in searched_plugins" :key="k">
         <md-list-item>
           <md-avatar class="md-xsmall-hide">
-            <md-icon v-if="plugin.icon">{{ plugin.icon }}</md-icon>
-            <md-icon v-else>extension</md-icon>
+            <plugin-icon :icon="plugin.icon"></plugin-icon>
           </md-avatar>
           <div class="md-list-item-text">
             <span>{{ plugin.name + " " + plugin.badges }}</span>
