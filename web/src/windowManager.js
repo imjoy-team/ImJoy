@@ -213,7 +213,7 @@ export class WindowManager {
         this.windows.push(w);
         this.window_ids[w.id] = w;
         this.setupCallbacks(w);
-        if (!w.dialog) this.selectWindow(w);
+        this.selectWindow(w, w.dialog);
         if (this.add_window_callback) {
           this.add_window_callback(w).then(() => {
             this.event_bus.emit("add_window", w);
@@ -233,20 +233,21 @@ export class WindowManager {
     });
   }
 
-  selectWindow(w) {
-    for (let i = 0; i < this.active_windows.length; i++) {
-      this.active_windows[i].selected = false;
-      if (this.active_windows[i]) this.active_windows[i].refresh();
-    }
-
-    if (this.window_mode === "single" || w.standalone) {
-      this.selected_window = w;
-    } else {
-      this.selected_window = null;
+  selectWindow(w, is_dialog) {
+    if (!is_dialog) {
+      for (let i = 0; i < this.active_windows.length; i++) {
+        this.active_windows[i].selected = false;
+        if (this.active_windows[i]) this.active_windows[i].refresh();
+      }
+      if (this.window_mode === "single" || w.standalone) {
+        this.selected_window = w;
+      } else {
+        this.selected_window = null;
+      }
+      this.active_windows = [w];
+      if (!w.standalone && w.focus) w.focus();
     }
     w.selected = true;
-    this.active_windows = [w];
-    if (!w.standalone && w.focus) w.focus();
     if (w.refresh) {
       w.refresh();
     }

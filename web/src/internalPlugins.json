@@ -5,7 +5,7 @@
   },
   "Jupyter-Engine-Manager": {
     "uri": "https://imjoy-team.github.io/jupyter-engine-manager/Jupyter-Engine-Manager.imjoy.html",
-    "startup": false
+    "startup": true
   },
   "Jupyter-Notebook": {
     "uri": "https://imjoy-team.github.io/jupyter-engine-manager/Jupyter-Notebook.imjoy.html",
