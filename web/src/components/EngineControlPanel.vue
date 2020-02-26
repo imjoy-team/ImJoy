@@ -155,97 +155,6 @@
       </md-menu-content>
     </md-menu>
     <md-dialog
-      :md-active.sync="showAddEngineDialog"
-      :md-click-outside-to-close="false"
-      :md-close-on-esc="false"
-    >
-      <md-dialog-title
-        >Add New Plugin Engine
-        <md-button
-          class="md-accent"
-          style="position:absolute; top:8px; right:5px;"
-          @click="showAddEngineDialog = false"
-          ><md-icon>clear</md-icon></md-button
-        ></md-dialog-title
-      >
-      <md-dialog-content>
-        <p>
-          Python plugins are supported by ImJoy with the ImJoy Plugin Engine.
-        </p>
-        <p>
-          If you don't have the Plugin Engine, please install it from the ImJoy
-          Desktop App.<br />
-          <md-button
-            class="md-raised"
-            target="_blank"
-            href="https://github.com/oeway/ImJoy-App/releases"
-            >Get ImJoy Desktop App</md-button
-          >
-        </p>
-        <p>
-          Alternatively, if you have Anaconda or Miniconda installed already,
-          you can run <code>pip install imjoy</code> and start with
-          <code>imjoy</code> command from your teriminal (see
-          <a target="_blank" href="https://github.com/oeway/ImJoy-Engine"
-            >ImJoy-Engine</a
-          >).
-        </p>
-        <p>
-          Once installed, please start the Plugin Engine, and enter the
-          connection token below.
-        </p>
-        <div v-if="!is_mobile_or_tablet">
-          <md-radio v-model="url_type" value="localhost">My Computer</md-radio>
-          <md-radio v-model="url_type" value="remote"
-            >Another Computer</md-radio
-          >
-          <p v-if="url_type === 'remote'">
-            Notice that only `https` connection can be connected from
-            https://imjoy.io, if you don't have it, please use
-            <code>Telebit</code> or <code>ngrok</code> to make your plugin
-            engine available outside your network (<a
-              href="/docs/#/user_manual?id=setup-a-remote-plugin-engine"
-              target="_blank"
-              >more details</a
-            >).
-          </p>
-        </div>
-        <md-autocomplete
-          v-if="url_type === 'remote'"
-          v-model="engine_url"
-          :md-options="engine_url_list"
-          @keyup.enter="addEngine()"
-          name="engine_url"
-        >
-          <label for="engine_url">Plugin Engine URL</label>
-          <span class="md-helper-text"
-            >engine url, e.g.: https://my-imjoy-plugin-engine.com</span
-          >
-        </md-autocomplete>
-        <md-field>
-          <label for="connection_token">Connection Token</label>
-          <md-input
-            type="password"
-            v-model="connection_token"
-            name="connection_token"
-            @keyup.enter="addEngine()"
-          ></md-input>
-          <span v-if="url_type === 'localhost'" class="md-helper-text"
-            >you can find the token from imjoy desktop app or terminal</span
-          >
-        </md-field>
-        <md-button class="md-primary md-raised" @click="addEngine()"
-          >Connect</md-button
-        >
-        <p>
-          If you failed to install or start the Plugin Engine, please consult
-          <a href="https://github.com/oeway/ImJoy-Engine" target="_blank"
-            >here</a
-          >, and choose the alternative solution.<br />
-        </p>
-      </md-dialog-content>
-    </md-dialog>
-    <md-dialog
       :md-active.sync="showEngineInfoDialog"
       :md-click-outside-to-close="true"
       :md-close-on-esc="true"
@@ -505,23 +414,6 @@ export default {
     },
     hideAddEngine() {
       this.showAddEngineDialog = false;
-    },
-    addEngine() {
-      if (this.url_type === "localhost") {
-        this.engineManager.addEngine({
-          type: "default",
-          name: this.local_engine_url,
-          url: this.local_engine_url,
-          token: this.connection_token,
-        });
-      } else {
-        this.engineManager.addEngine({
-          type: "default",
-          name: this.engine_url,
-          url: this.engine_url,
-          token: this.connection_token,
-        });
-      }
     },
     async removeEngine(engine) {
       const factory = this.engineManager.getFactory(engine.factory);

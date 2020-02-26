@@ -213,7 +213,7 @@ export class WindowManager {
         this.windows.push(w);
         this.window_ids[w.id] = w;
         this.setupCallbacks(w);
-        this.selectWindow(w);
+        if (!w.dialog) this.selectWindow(w);
         if (this.add_window_callback) {
           this.add_window_callback(w).then(() => {
             this.event_bus.emit("add_window", w);

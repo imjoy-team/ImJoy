@@ -19,7 +19,7 @@ import {
 
 import { parseComponent } from "./pluginParser.js";
 
-import { DynamicPlugin } from "./jailed/jailed.js";
+import { DynamicPlugin, JailedConfig } from "./jailed/jailed.js";
 import { getBackendByType } from "./api.js";
 import INTERNAL_PLUGINS from "./internalPlugins.json";
 
@@ -52,6 +52,7 @@ export class PluginManager {
     imjoy_api = {},
     show_message_callback = null,
     update_ui_callback = null,
+    jailed_asset_url = null,
   }) {
     this.event_bus = event_bus;
     this.em = engine_manager;
@@ -64,6 +65,8 @@ export class PluginManager {
     assert(this.em, "engine manager is not available");
     assert(this.wm, "window manager is not available");
     assert(this.config_db, "config database is not available");
+
+    if (jailed_asset_url) JailedConfig.asset_url = jailed_asset_url;
 
     this.show_message_callback = show_message_callback;
     this.update_ui_callback = update_ui_callback || function() {};
@@ -792,26 +795,7 @@ export class PluginManager {
                 });
               }
             }
-            for (let pn in INTERNAL_PLUGINS) {
-              if (INTERNAL_PLUGINS[pn].startup) {
-                if (!this.plugin_names[pn]) {
-                  console.log(`Loading internal plugin "${pn}"...`);
-                  this.reloadPluginRecursively(
-                    {
-                      uri: INTERNAL_PLUGINS[pn].uri,
-                    },
-                    null,
-                    "eval is evil"
-                  )
-                    .then(() => {
-                      console.log(`${pn} plugin loaded.`);
-                    })
-                    .catch(e => {
-                      console.error(e);
-                    });
-                }
-              }
-            }
+            this.reloadInternalPlugins(true);
             resolve();
           })
           .catch(err => {
@@ -820,6 +804,30 @@ export class PluginManager {
           });
       });
     });
+  }
+
+  reloadInternalPlugins(skip_exist) {
+    for (let pn in INTERNAL_PLUGINS) {
+      if (INTERNAL_PLUGINS[pn].startup) {
+        if (skip_exist && this.plugin_names[pn]) {
+          continue;
+        }
+        console.log(`Loading internal plugin "${pn}"...`);
+        this.reloadPluginRecursively(
+          {
+            uri: INTERNAL_PLUGINS[pn].uri,
+          },
+          null,
+          "eval is evil"
+        )
+          .then(() => {
+            console.log(`${pn} plugin loaded.`);
+          })
+          .catch(e => {
+            console.error(e);
+          });
+      }
+    }
   }
 
   async getPluginFromUrl(uri, scoped_plugins) {
@@ -2257,10 +2265,12 @@ export class PluginManager {
           setTimeout(() => {
             this.renderWindow(pconfig)
               .then(wplugin => {
-                wplugin.api.emit(
-                  "window_size_changed",
-                  pconfig.$el.getBoundingClientRect()
-                );
+                if (pconfig.$el) {
+                  wplugin.api.emit(
+                    "window_size_changed",
+                    pconfig.$el.getBoundingClientRect()
+                  );
+                }
                 wplugin.api.refresh();
                 wplugin.api.on("close", async () => {
                   this.event_bus.emit("closing_window_plugin", wplugin);
