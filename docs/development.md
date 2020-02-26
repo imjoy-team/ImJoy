@@ -408,9 +408,11 @@ This may cause conflicts, we therefore recommend to (1) keep the interface-relat
 
 
 #### icon
-Defines the icon used in the plugin menu.
-
-You can find different icons here https://material.io/tools/icons/ and used the specified name. Or, you can directly copy and paste Emoji, for example from [here](https://getemoji.com/).
+Defines the icon used in the plugin menu. You can choose the following formats:
+ 1. Use material icons, you can find different icons here https://material.io/tools/icons/ and used the specified name;
+ 2. You can directly copy and paste Emoji, for example from [here](https://getemoji.com/).
+ 3. Specify an URL to an image in JPEG, PNG or GIF format, recommended size: 64x64.
+ 4. If you set it as `null` or `""`, it will use `extension` in material icon.
 
 #### inputs
 Defines the inputs with json-schema syntax (http://json-schema.org/).
