@@ -379,8 +379,8 @@ def window_callback(win):
 api.createWindow({name: 'new window', type: 'Image Window', w:7, h:7, data: {image: ...}, config: {}}).then(window_callback)
 ```
 
-Use the returned object to update the window, or use `onClose` to set a callback
-function which will be called when the window is closed. Similarly, `onResize` can be used to set callbacks which will be called when the window size is changed.
+Use the returned object to update the window, or use `win.on('close', callback)` to set a callback
+function which will be called when the window is closed. Similarly, `win.on('resize', callback)` can be used to set callbacks which will be called when the window size is changed.
 
 To close the created window, call `win.close()`.
 
