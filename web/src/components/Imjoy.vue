@@ -1344,7 +1344,7 @@ import INTERNAL_PLUGINS from "../internalPlugins.json";
 
 import DOMPurify from "dompurify";
 
-import { ImJoy } from "../imjoyLib.js";
+import { ImJoy } from "../imjoyCore.js";
 
 import _ from "lodash";
 
@@ -1507,7 +1507,6 @@ export default {
 
     this.pm = this.imjoy.pm;
     this.em = this.imjoy.em;
-    this.fsm = this.imjoy.fsm;
     this.fm = this.imjoy.fm;
     this.wm = this.imjoy.wm;
 

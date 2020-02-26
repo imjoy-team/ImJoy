@@ -5,11 +5,11 @@ const {InjectManifest} = require('workbox-webpack-plugin');
 
 module.exports = (env, argv) => {
     const options = {
-        entry: path.resolve(__dirname, 'src', 'imjoyLib.js'),
+        entry: path.resolve(__dirname, 'src', 'imjoyCore.js'),
         output: {
             path: path.resolve(__dirname, 'dist'),
-            filename: argv.mode === 'production'?'imjoy-lib.min.js':'imjoy-lib.js',
-            library: 'imjoyLib',
+            filename: argv.mode === 'production'?'imjoy-core.min.js':'imjoy-core.js',
+            library: 'imjoyCore',
             libraryTarget:'umd'
         },
         resolve: {

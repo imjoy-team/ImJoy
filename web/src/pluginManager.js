@@ -19,7 +19,7 @@ import {
 
 import { parseComponent } from "./pluginParser.js";
 
-import { DynamicPlugin, JailedConfig } from "./jailed/jailed.js";
+import { DynamicPlugin, initializeJailed } from "./jailed/jailed.js";
 import { getBackendByType } from "./api.js";
 import INTERNAL_PLUGINS from "./internalPlugins.json";
 
@@ -47,7 +47,6 @@ export class PluginManager {
     config_db = null,
     engine_manager = null,
     window_manager = null,
-    file_system_manager = null,
     file_manager = null,
     imjoy_api = {},
     show_message_callback = null,
@@ -57,7 +56,6 @@ export class PluginManager {
     this.event_bus = event_bus;
     this.em = engine_manager;
     this.wm = window_manager;
-    this.fsm = file_system_manager;
     this.fm = file_manager;
     this.config_db = config_db;
 
@@ -66,7 +64,7 @@ export class PluginManager {
     assert(this.wm, "window manager is not available");
     assert(this.config_db, "config database is not available");
 
-    if (jailed_asset_url) JailedConfig.asset_url = jailed_asset_url;
+    this.jailed_asset_url = jailed_asset_url;
 
     this.show_message_callback = show_message_callback;
     this.update_ui_callback = update_ui_callback || function() {};
@@ -99,12 +97,17 @@ export class PluginManager {
     this.workflow_list = [];
 
     this.db = null;
-    this.init();
     const api_utils_ = imjoy_api.utils;
     this.imjoy_api = {
-      alert: window && window.alert,
-      prompt: window && window.prompt,
-      confirm: window && window.confirm,
+      alert: (plugin, msg) => {
+        return window.alert(msg);
+      },
+      prompt: (plugin, msg) => {
+        return window.prompt(msg);
+      },
+      confirm: (plugin, msg) => {
+        return window.confirm(msg);
+      },
       requestUploadUrl: this.requestUploadUrl,
       getFileUrl: this.getFileUrl,
       getFilePath: this.getFilePath,
@@ -298,7 +301,13 @@ export class PluginManager {
     }
   }
 
-  init() {
+  async init() {
+    const config = {};
+    if (this.jailed_asset_url) {
+      config.asset_url = this.jailed_asset_url;
+    }
+    await initializeJailed(config);
+
     this.plugins = {};
     this.plugin_names = {};
     this.registered = {
@@ -742,7 +751,7 @@ export class PluginManager {
   }
 
   reloadPlugins() {
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
       if (this.plugins) {
         for (let k in this.plugins) {
           if (this.plugins.hasOwnProperty(k)) {
@@ -761,7 +770,7 @@ export class PluginManager {
           }
         }
       }
-      this.init();
+      await this.init();
       this.reloadDB().then(() => {
         this.db
           .allDocs({
@@ -1442,13 +1451,7 @@ export class PluginManager {
       );
       try {
         // create a proxy plugin
-        const plugin = new DynamicPlugin(
-          tconfig,
-          _interface,
-          this.fsm.api,
-          null,
-          true
-        );
+        const plugin = new DynamicPlugin(tconfig, _interface, null, true);
         plugin.api = {
           __as_interface__: true,
           __id__: plugin.id,
@@ -1528,7 +1531,6 @@ export class PluginManager {
         const plugin = new DynamicPlugin(
           tconfig,
           _interface,
-          this.fsm.api,
           engine,
           false,
           allow_evil
@@ -1664,7 +1666,7 @@ export class PluginManager {
         imjoy_api
       );
       try {
-        const plugin = new DynamicPlugin(tconfig, _interface, this.fsm.api);
+        const plugin = new DynamicPlugin(tconfig, _interface);
 
         plugin.whenConnected(() => {
           if (!pconfig.standalone && pconfig.focus) pconfig.focus();

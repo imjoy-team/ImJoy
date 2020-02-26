@@ -28,7 +28,6 @@ describe("ImJoy.vue", async () => {
   const vm = wrapper.vm; //vm of ImJoy
   const wm = vm.wm; //window_manager
   const pm = vm.pm; //plugin_manager
-  const fsm = vm.fsm; //file_manager
 
   before(function(done) {
     this.timeout(10000);
@@ -143,39 +142,6 @@ describe("ImJoy.vue", async () => {
     await plugin.api.run({});
     plugin.terminate();
   }).timeout(20000);
-
-  it("should write and read file with api.fs", done => {
-    fsm.init().then(fs => {
-      var c = "New File Contents";
-      fs.writeFile("/tmp/test.txt", c, function(err) {
-        if (err) {
-          console.error(err);
-        }
-        expect(err).to.be.undefined;
-        fs.readFile("/tmp/test.txt", "utf8", function(err, data) {
-          if (err) {
-            console.error(err);
-          }
-          expect(err).to.be.undefined;
-          expect(data).to.equal(c);
-          fs.writeFile("/home/test.txt", c, function(err) {
-            if (err) {
-              console.error(err);
-            }
-            expect(err).to.be.undefined;
-            fs.readFile("/home/test.txt", "utf8", function(err, data) {
-              if (err) {
-                console.error(err);
-              }
-              expect(err).to.be.undefined;
-              expect(data).to.equal(c);
-              done();
-            });
-          });
-        });
-      });
-    });
-  });
 
   describe("Test ImJoy API", async () => {
     let plugin1;

@@ -24,81 +24,71 @@ function evalInScope(code, scope) {
 
 // evaluates the provided string
 var execute = async function(code, api_interface) {
-  try {
-    if (code.type == "requirements") {
-      if (
-        code.requirements &&
-        (Array.isArray(code.requirements) ||
-          typeof code.requirements === "string")
-      ) {
-        try {
-          code.requirements =
-            typeof code.requirements === "string"
-              ? [code.requirements]
-              : code.requirements;
-          if (Array.isArray(code.requirements)) {
-            for (var i = 0; i < code.requirements.length; i++) {
-              if (
-                code.requirements[i].toLowerCase().endsWith(".js") ||
-                code.requirements[i].startsWith("js:")
-              ) {
-                if (code.requirements[i].startsWith("js:")) {
-                  code.requirements[i] = code.requirements[i].slice(3);
-                }
-                await _importScript(code.requirements[i], {
-                  api: api_interface,
-                });
-              } else if (code.requirements[i].startsWith("http")) {
-                await _importScript(code.requirements[i], {
-                  api: api_interface,
-                });
-              } else if (code.requirements[i].startsWith("cache:")) {
-                //ignore cache
-              } else {
-                console.log(
-                  "Unprocessed requirements url: " + code.requirements[i]
-                );
+  if (code.type == "requirements") {
+    if (
+      code.requirements &&
+      (Array.isArray(code.requirements) ||
+        typeof code.requirements === "string")
+    ) {
+      try {
+        code.requirements =
+          typeof code.requirements === "string"
+            ? [code.requirements]
+            : code.requirements;
+        if (Array.isArray(code.requirements)) {
+          for (var i = 0; i < code.requirements.length; i++) {
+            if (
+              code.requirements[i].toLowerCase().endsWith(".js") ||
+              code.requirements[i].startsWith("js:")
+            ) {
+              if (code.requirements[i].startsWith("js:")) {
+                code.requirements[i] = code.requirements[i].slice(3);
               }
+              await _importScript(code.requirements[i], {
+                api: api_interface,
+              });
+            } else if (code.requirements[i].startsWith("http")) {
+              await _importScript(code.requirements[i], {
+                api: api_interface,
+              });
+            } else if (code.requirements[i].startsWith("cache:")) {
+              //ignore cache
+            } else {
+              console.log(
+                "Unprocessed requirements url: " + code.requirements[i]
+              );
             }
-          } else {
-            throw "unsupported requirements definition";
           }
-        } catch (e) {
-          throw "failed to import required scripts: " +
-            code.requirements.toString();
-        }
-      }
-    } else if (code.type == "script") {
-      if (code.src) {
-        var script_node = document.createElement("script");
-        script_node.setAttribute("type", code.attrs.type);
-        script_node.setAttribute("src", code.src);
-        document.head.appendChild(script_node);
-      } else {
-        if (
-          code.content &&
-          (!code.attrs.type || code.attrs.type === "text/javascript")
-        ) {
-          // document.addEventListener("DOMContentLoaded", function(){
-          evalInScope(code.content, { api: api_interface });
-          // });
         } else {
-          var node = document.createElement("script");
-          node.setAttribute("type", code.attrs.type);
-          node.appendChild(document.createTextNode(code.content));
-          document.body.appendChild(node);
+          throw "Unsupported requirements definition";
         }
+      } catch (e) {
+        throw `Failed to import required scripts ${code.requirements}: ${e}`;
       }
-    } else {
-      throw "unsupported code type.";
     }
-    parent.postMessage({ type: "executeSuccess" }, "*");
-  } catch (e) {
-    console.error("failed to execute scripts: ", code, e);
-    parent.postMessage(
-      { type: "executeFailure", error: e.stack || String(e) },
-      "*"
-    );
+  } else if (code.type == "script") {
+    if (code.src) {
+      var script_node = document.createElement("script");
+      script_node.setAttribute("type", code.attrs.type);
+      script_node.setAttribute("src", code.src);
+      document.head.appendChild(script_node);
+    } else {
+      if (
+        code.content &&
+        (!code.attrs.type || code.attrs.type === "text/javascript")
+      ) {
+        // document.addEventListener("DOMContentLoaded", function(){
+        evalInScope(code.content, { api: api_interface });
+        // });
+      } else {
+        var node = document.createElement("script");
+        node.setAttribute("type", code.attrs.type);
+        node.appendChild(document.createTextNode(code.content));
+        document.body.appendChild(node);
+      }
+    }
+  } else {
+    throw "unsupported code type.";
   }
 };
 

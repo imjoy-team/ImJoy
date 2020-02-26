@@ -1,5 +1,5 @@
 #!/bin/bash
-# deploy imjoy-lib with jailed library
+# deploy imjoy-core with jailed library
 set -e # Exit with nonzero exit code if anything fails
 
 cd "$(dirname "$0")/../.."
@@ -24,8 +24,8 @@ eval "$(ssh-agent -s)"
 ssh-add ./imjoy_lib_id_rsa
 
 # Clone the existing gh-pages for this repo into gh-pages/
-git clone $LIB_REPO imjoy-lib
-cd imjoy-lib
+git clone $LIB_REPO imjoy-core
+cd imjoy-core
 
 # Create a new empty branch if gh-pages doesn't exist yet (should only happen on first deploy).
 git checkout ${LIB_TARGET_BRANCH} || { git checkout --orphan ${LIB_TARGET_BRANCH}; git rm -rf .; }

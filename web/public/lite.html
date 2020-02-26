@@ -42,7 +42,7 @@
     <meta name="msapplication-TileImage" content="static/icons/ms-icon-144x144.png">
     <meta name="theme-color" content="#f5f9ff">
 
-    <script src="./imjoy-lib.min.js"></script>
+    <script src="./imjoy-core.min.js"></script>
     <link rel="stylesheet" href="./joy.css">
     <link rel="stylesheet" href="https://static.imjoy.io/spectre.css/spectre.min.css">
     <link rel="stylesheet" href="https://static.imjoy.io/spectre.css/spectre-exp.min.css">
@@ -218,11 +218,11 @@
                             onupdate: config.onupdate,
                         };
                         try {
-                            new imjoyLib.Joy(joy_config);
+                            new imjoyCore.Joy(joy_config);
                         } catch (e) {
                             console.error("error occured when loading the workflow", e);
                             joy_config.data = "";
-                            new imjoyLib.Joy(joy_config);
+                            new imjoyCore.Joy(joy_config);
                             throw e;
                         }
                  
@@ -254,7 +254,7 @@
         }
 
         document.addEventListener('DOMContentLoaded', (event) => {
-            imjoy = new imjoyLib.ImJoy({
+            imjoy = new imjoyCore.ImJoy({
                 imjoy_api: imjoy_api,
                 show_message_callback: console.log,
                 add_window_callback: async (w)=>{
