@@ -1,10 +1,10 @@
 self.__precacheManifest = [
   {
-    "revision": "d4989aed25cafe8c8125",
+    "revision": "038e20afef9e4be54da1",
     "url": "imjoy-lib.min.js"
   },
   {
-    "revision": "ed6e2fbcf93020f6c4e72b58efaffeeb",
+    "revision": "ee90e61f414056a5c054abbb76e3fbda",
     "url": "static/jailed/jailed.js"
   },
   {
@@ -12,16 +12,16 @@ self.__precacheManifest = [
     "url": "static/jailed/_frame.html"
   },
   {
-    "revision": "a8fd9bc28d8c91d1e80a51649fcc1b46",
+    "revision": "6350839803cd93cbab604a1396b82889",
     "url": "static/jailed/_frame.js"
-  },
-  {
-    "revision": "3c947349d7fe3b84b65a0501ec4958f3",
-    "url": "static/jailed/_pluginCore.js"
   },
   {
     "revision": "3861bba59c0ffe132414e978800112a8",
     "url": "static/jailed/_JailedSite.js"
+  },
+  {
+    "revision": "3c947349d7fe3b84b65a0501ec4958f3",
+    "url": "static/jailed/_pluginCore.js"
   },
   {
     "revision": "97170c9eb452d98e6489cdda29d414d9",

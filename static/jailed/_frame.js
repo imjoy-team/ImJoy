@@ -11,7 +11,7 @@
 var scripts = document.getElementsByTagName("script");
 var thisScript = scripts[scripts.length - 1];
 var parentNode = thisScript.parentNode;
-var __jailed__path__ =
+var asset_url =
   thisScript.src
     .split("?")[0]
     .split("/")
@@ -105,7 +105,7 @@ var initWebworkerPlugin = function() {
   // telling worker to load _pluginWebWorker.js (see blob code above)
   worker.postMessage({
     type: "initImport",
-    url: __jailed__path__ + "_pluginWebWorker.js",
+    url: asset_url + "_pluginWebWorker.js",
   });
 
   // mixed content warning in Chrome silently skips worker
@@ -195,7 +195,7 @@ var initWebPythonIframePlugin = function() {
   });
 
   window.loadScript(
-    __jailed__path__ + "_pluginWebPython.js",
+    asset_url + "_pluginWebPython.js",
     function() {},
     function() {}
   );
@@ -250,7 +250,7 @@ var initIframePlugin = function() {
   });
 
   window.loadScript(
-    __jailed__path__ + "_pluginWebIframe.js",
+    asset_url + "_pluginWebIframe.js",
     function() {},
     function() {}
   );
