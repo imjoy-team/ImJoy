@@ -88,6 +88,9 @@ export default {
       );
     });
   },
+  beforeDestroy() {
+    particlesJS.stop();
+  },
 };
 </script>
 
