@@ -30,7 +30,7 @@ deploy:
       branch: master
   - provider: script
     skip_cleanup: true # do not delete the built assets
-    script: bash ./utils/scripts/deploy-lib.sh
+    script: bash ./utils/scripts/deploy-core.sh
     on:
       branch: master
 env:

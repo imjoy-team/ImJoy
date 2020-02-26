@@ -8,7 +8,7 @@ module.exports = (env, argv) => {
         entry: path.resolve(__dirname, 'src', 'imjoyLib.js'),
         output: {
             path: path.resolve(__dirname, 'dist'),
-            filename: argv.mode === 'production'?'imjoy-lib.min.js':'imjoy-lib.js',
+            filename: argv.mode === 'production'?'imjoy-core.min.js':'imjoy-core.js',
             library: 'imjoyLib',
             libraryTarget:'umd'
         },

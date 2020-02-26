@@ -473,14 +473,7 @@ class BasicConnection {
  * @param {String} code of the plugin
  * @param {Object} _interface to provide to the plugin
  */
-var DynamicPlugin = function(
-  config,
-  _interface,
-  _fs_api,
-  engine,
-  is_proxy,
-  allow_evil
-) {
+var DynamicPlugin = function(config, _interface, engine, is_proxy, allow_evil) {
   this.config = config;
   this.id = config.id || randId();
   this._id = config._id;
@@ -516,8 +509,6 @@ var DynamicPlugin = function(
     if (!this._initialInterface.on) this._initialInterface.on = this.on;
     if (!this._initialInterface.off) this._initialInterface.off = this.off;
     if (!this._initialInterface.emit) this._initialInterface.emit = this.emit;
-
-    for (let k in _fs_api) this._initialInterface[k] = _fs_api[k];
 
     this._connect();
   }

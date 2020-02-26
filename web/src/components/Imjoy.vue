@@ -1507,7 +1507,6 @@ export default {
 
     this.pm = this.imjoy.pm;
     this.em = this.imjoy.em;
-    this.fsm = this.imjoy.fsm;
     this.fm = this.imjoy.fm;
     this.wm = this.imjoy.wm;
 

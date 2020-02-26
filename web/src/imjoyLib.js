@@ -3,7 +3,7 @@ import { WindowManager } from "./windowManager.js";
 
 import { EngineManager } from "./engineManager.js";
 
-import { FileSystemManager, FileManager } from "./fileSystemManager.js";
+import { FileManager } from "./fileSystemManager.js";
 
 import PouchDB from "pouchdb-browser";
 
@@ -61,8 +61,6 @@ export class ImJoy {
       add_window_callback: this.add_window_callback,
     });
 
-    this.fsm = new FileSystemManager();
-
     this.fm = new FileManager({
       event_bus: this.event_bus,
     });
@@ -72,7 +70,6 @@ export class ImJoy {
       config_db: this.config_db,
       engine_manager: this.em,
       window_manager: this.wm,
-      file_system_manager: this.fsm,
       file_manager: this.fm,
       imjoy_api: this.imjoy_api,
       show_message_callback: this.show_message_callback,
@@ -82,15 +79,6 @@ export class ImJoy {
   }
 
   async init() {
-    try {
-      await this.fsm.init();
-      console.log("Successfully initialized the file system.");
-    } catch (e) {
-      console.error(e);
-      this.show_message_callback(
-        "Failed to initialize file system: " + e.toString()
-      );
-    }
     await this.fm.init();
     await this.pm.init();
     await this.pm.loadWorkspaceList();

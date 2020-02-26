@@ -47,7 +47,6 @@ export class PluginManager {
     config_db = null,
     engine_manager = null,
     window_manager = null,
-    file_system_manager = null,
     file_manager = null,
     imjoy_api = {},
     show_message_callback = null,
@@ -57,7 +56,6 @@ export class PluginManager {
     this.event_bus = event_bus;
     this.em = engine_manager;
     this.wm = window_manager;
-    this.fsm = file_system_manager;
     this.fm = file_manager;
     this.config_db = config_db;
 
@@ -1442,13 +1440,7 @@ export class PluginManager {
       );
       try {
         // create a proxy plugin
-        const plugin = new DynamicPlugin(
-          tconfig,
-          _interface,
-          this.fsm.api,
-          null,
-          true
-        );
+        const plugin = new DynamicPlugin(tconfig, _interface, null, true);
         plugin.api = {
           __as_interface__: true,
           __id__: plugin.id,
@@ -1528,7 +1520,6 @@ export class PluginManager {
         const plugin = new DynamicPlugin(
           tconfig,
           _interface,
-          this.fsm.api,
           engine,
           false,
           allow_evil
@@ -1664,7 +1655,7 @@ export class PluginManager {
         imjoy_api
       );
       try {
-        const plugin = new DynamicPlugin(tconfig, _interface, this.fsm.api);
+        const plugin = new DynamicPlugin(tconfig, _interface);
 
         plugin.whenConnected(() => {
           if (!pconfig.standalone && pconfig.focus) pconfig.focus();
