@@ -168,7 +168,7 @@ export const ENGINE_SCHEMA = ajv.compile({
     startPlugin: { instanceof: Function },
     getPlugin: { instanceof: Function },
     getEngineStatus: { instanceof: Function },
-    getEngineInfo: { instanceof: [Function, null] },
+    getEngineConfig: { instanceof: [Function, null] },
     heartbeat: { instanceof: [Function, null] },
     killPlugin: { instanceof: [Function, null] },
     killPluginProcess: { instanceof: [Function, null] },
