@@ -2763,29 +2763,20 @@ export default {
       config = config || {};
       if (_plugin && _plugin.id) {
         if (!config.file_manager) {
-          if(config.engine && typeof config.engine === 'string'){
-            config.file_manager = this.fm.getFileManagerByUrl(config.engine);
-          }
-          // in case the plugin has an engine
-          else if(_plugin.engine){
-            config.file_manager = this.fm.getFileManagerByUrl(_plugin.engine.url);
+          if(_plugin.api.FILE_MANAGER_URL){
+            config.file_manager = this.fm.getFileManagerByUrl(_plugin.api.FILE_MANAGER_URL);
           }
         }
         else{
           if(typeof config.file_manager === 'string')
           config.file_manager = this.fm.getFileManagerByUrl(config.file_manager);
         }
-      
-        
-
         // assert(config.file_manager, "No file manager is selected.");
         config.root =
           config.root || (_plugin.config && _plugin.config.work_dir);
-        if (!_plugin.engine) {
-          config.uri_type = config.uri_type || "url";
-        } else {
-          config.uri_type = config.uri_type || "path";
-        }
+
+        config.uri_type = config.uri_type || "path";
+      
         if (config.root && typeof config.root !== "string") {
           throw "You need to specify a root with string type ";
         }
