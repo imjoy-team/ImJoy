@@ -2779,7 +2779,6 @@ export default {
           config.root || (_plugin.config && _plugin.config.work_dir);
 
         config.uri_type = config.uri_type || "path";
-
         if (config.root && typeof config.root !== "string") {
           throw "You need to specify a root with string type ";
         }
