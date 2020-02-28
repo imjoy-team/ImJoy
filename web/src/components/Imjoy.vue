@@ -2795,7 +2795,6 @@ export default {
             config.return_object === undefined ? true : config.return_object;
         }
       }
-
       if (config.file_manager && config.hide_unselected) {
         this.selected_file_managers = [config.file_manager];
       } else {
