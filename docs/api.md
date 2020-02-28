@@ -592,69 +592,6 @@ sigma = await api.getConfig('sigma')
 ```
 [Try yourself in the setConfig example >>](https://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:setConfig&w=examples)
 
-### api.getFileUrl
-
-*** WARNING: `api.getFileUrl` is deprecated since `api_version > 0.1.6`, please use `api.getFileManger` instead.
-
-```python
-file_url = await api.getFileUrl(config)
-```
-
-Generates an url to access a local file or directory path.
-
-When this function is called, a confirmation dialog will be displayed to obtain the
-user's permission. This means a JavaScript plugin cannot access the user's file system without notifying the user.
-
-If a directory is selected, it can be used to access all the files or subfolders contained in the folder.
-While this can be used to serve the entire folder, please *BE CAREFUL** when using this feature -- if the root folder or disk is selected, the entire file system will be exposed through the url. If you are running the plugin engine on a public server,  anyone knows the url will be able to access your files.
-
-The optional argument `header` describes how the url will be served. If no header
-is specified, the url is specified to be rendered in the browser, and the
-`Content-Type` will be guessed from the file name by Python library
-[mimetypes](https://docs.python.org/3/library/mimetypes.html). If `mimetypes`
-failed to guess a content type, the fallback type will be `application/octet-stream`.
-Either behavior can be changed.
-
-**Arguments**
-* **config**. Object (JavaScript) or dictionary (Python). Options for getting file URL from a absolute file path.
-It contains the following fields:
-  - **path**: String. Specifies the absolute file path to be converted.
-  - **engine**: String. the url of the plugin engine.
-  - **password** (optional): String. Password to access the file or folder
-  - **headers** (optional): String. By default, the generated url will be served
-    with the header `Content-disposition: inline; filename="XXXXXXXXX.XXX"`
-    for rendering in the browser. You can modify this header to create downloadable links,
-    or alter how the link is rendered.
-
-**Returns**
-* **file_url**: String. File path in url format.
-
-**Examples**
-
-Obtain file url with default settings
-
-```javascript
-api.getFileUrl({'path': 'data/output.png', 'engine': 'http://127.0.0.1:9527'})
-// will return something like `http://127.0.0.1:9527/file/1ba89354-ae98-457c-a53b-39a4bdd14941/output.png`.
-```
-
-Specify password to access file
-```javascript
-api.getFileUrl({'path': 'data/output.png', 'password': 'SECRET_PASSWORD', 'engine': 'http://127.0.0.1:9527'})
-// will return something like `http://127.0.0.1:9527/file/1ba89354-ae98-457c-a53b-39a4bdd14941@SECRET_PASSWORD/output.png`.
-```
-
-Specify header to create downloadable link
-```javascript
-headers={'Content-disposition': 'attachment; filename="XXXXXXXXX.XXX"'}
-api.getFileUrl({'path': 'data/output.png', 'headers': headers, 'engine': 'http://127.0.0.1:9527'})
-```
-
-Specify header for specific content type
-```javascript
-headers={'Content-disposition': 'inline; filename="XXXXXXXXX.XXX"', 'Content-Type': 'image/png'}
-api.getFileUrl({'path': 'data/output.png', 'headers': headers, 'engine': 'http://127.0.0.1:9527'})
-```
 
 ### api.getPlugin
 ```javascript
@@ -896,36 +833,6 @@ update_lut(ctx) {
 ```
 [**Try yourself >>**](https://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:register&w=examples) Compare how the ops for favourite number and animal are implemented.
 
-
-### api.requestUploadUrl
-
-***WARNING: `api.requestUploadUrl` is deprecated since `api_version > 0.1.6`, please use `api.getFileManger` instead.***
-
-```python
-upload_url = await api.requestUploadUrl(config)
-```
-
-Generates an url for upload a file to the plugin engine
-
-**Arguments**
-* **config**. Object (JavaScript) or dictionary (Python). Options for generating a url for uploading a file.
-It contains the following fields:
-  - **dir** (optional): String. If specified, `dir` can be used to define the folder which will be used to contain the uploaded file. If relative path is used, then it will relative to the current workspace folder. If not specified, the default value is the current work folder.
-  - **path** (optional): String. If specified, it will override the file name.
-
-  - **engine**: String. The engine url of the plugin engine which the file will be uploaded to. For native-python plugin, if not specified, the plugin's current engine will be used. It is required for other plugin types.
-  - **overwrite** (optional): String. If the file exists, whether overwrite it. By default, it will raise error if a file already exists.
-
-**Returns**
-* **upload_url**: String. an URL for performing upload.
-
-**Examples**
-
-Obtain url with default settings. It will return something like `http://127.0.0.1:9527/upload/1ba89354-ae98-457c-a53b-39a4bdd14941`.
-
-```javascript
-const url = await api.requestUploadUrl({'path': 'data/output.png', 'engine': 'http://127.0.0.1:9527'})
-```
 
 ### api.run
 ```javascript

@@ -2775,11 +2775,8 @@ export default {
           if(typeof config.file_manager === 'string')
           config.file_manager = this.fm.getFileManagerByUrl(config.file_manager);
         }
-        if (config.file_manager) {
-          this.selected_file_managers = [config.file_manager];
-        } else {
-          this.selected_file_managers = this.fm.fileManagers;
-        }
+      
+        
 
         // assert(config.file_manager, "No file manager is selected.");
         config.root =
@@ -2803,16 +2800,14 @@ export default {
           config.return_object =
             config.return_object === undefined ? true : config.return_object;
         }
-
-        return this.$refs["file-dialog"].showDialog(_plugin, config);
-      } else {
-        if (config.file_manager) {
-          this.selected_file_managers = [config.file_manager];
-        } else {
-          this.selected_file_managers = this.fm.fileManagers;
-        }
-        return this.$refs["file-dialog"].showDialog(_plugin, config);
       }
+  
+      if (config.file_manager && config.hide_unselected) {
+        this.selected_file_managers = [config.file_manager];
+      } else {
+        this.selected_file_managers = this.fm.fileManagers;
+      }
+      return this.$refs["file-dialog"].showDialog(_plugin, config);
     },
     uploadFileToUrl(_plugin, config) {
       if (typeof config !== "object" || !config.file || !config.url) {
