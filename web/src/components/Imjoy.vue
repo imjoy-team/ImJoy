@@ -1179,7 +1179,7 @@
           </div>
           <md-card-header>
             <md-toolbar md-elevation="0">
-              <div>
+              <div style="margin-top: 30px;margin-bottom: 30px;">
                 <h2>
                   <plugin-icon :icon="plugin4install.icon"></plugin-icon>
                   {{ plugin4install.name + " " + plugin4install.badges }}
@@ -3159,7 +3159,7 @@ export default {
 
 @media screen and (max-width: 400px) {
   .md-dialog {
-    width: 100% !important;
+    width: 99% !important;
     max-height: 100%;
     max-width: 100%;
   }
@@ -3167,19 +3167,19 @@ export default {
 
 @media screen and (max-width: 700px) {
   .plugin-dialog {
-    width: 100% !important;
+    width: 99% !important;
     max-width: 100% !important;
   }
 }
 
 @media screen and (max-width: 800px) {
   .window-dialog {
-    max-width: 100%;
+    max-width: 99%;
   }
 
   .api-dialog {
-    max-width: 100%;
-    max-height: 100%;
+    max-width: 99%;
+    max-height: 99%;
   }
 }
 
