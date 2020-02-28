@@ -2762,15 +2762,18 @@ export default {
     showFileDialog(_plugin, config) {
       config = config || {};
       if (_plugin && _plugin.id) {
-        config.engine =
-          config.engine === undefined ? _plugin.engine : config.engine;
-        config.engine =
-          typeof config.engine === "string"
-            ? this.em.getEngineByUrl(config.engine)
-            : config.engine;
-
-        if (!config.file_manager && config.engine) {
-          config.file_manager = this.fm.getFileManagerByUrl(config.engine.url);
+        if (!config.file_manager) {
+          if(config.engine && typeof config.engine === 'string'){
+            config.file_manager = this.fm.getFileManagerByUrl(config.engine);
+          }
+          // in case the plugin has an engine
+          else if(_plugin.engine){
+            config.file_manager = this.fm.getFileManagerByUrl(_plugin.engine.url);
+          }
+        }
+        else{
+          if(typeof config.file_manager === 'string')
+          config.file_manager = this.fm.getFileManagerByUrl(config.file_manager);
         }
         if (config.file_manager) {
           this.selected_file_managers = [config.file_manager];

@@ -357,7 +357,7 @@ export default {
           // if user cancelled
           this.reject = () => {
             if (this.options.return_object) {
-              resolve2(false);
+              resolve2(null);
             } else {
               reject2("User cancelled selection.");
             }
@@ -366,7 +366,7 @@ export default {
           // if user cancelled
           this.reject = () => {
             if (this.options.return_object) {
-              resolve2(false);
+              resolve2(null);
             } else {
               reject2("User cancelled selection.");
             }

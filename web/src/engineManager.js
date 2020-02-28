@@ -103,9 +103,9 @@ export class EngineManager {
     }
     engine.connected = false;
     engine.engine_status = engine.engine_status || {};
-    if (engine.getEngineInfo) {
-      Promise.resolve(engine.getEngineInfo()).then(engine_info => {
-        engine.engine_info = engine_info;
+    if (engine.getEngineConfig) {
+      Promise.resolve(engine.getEngineConfig()).then(engine_config => {
+        engine.engine_config = engine_config;
       });
     }
     const update_connectivity = () => {
