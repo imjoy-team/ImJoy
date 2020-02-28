@@ -207,4 +207,14 @@ canvas.decorationsOverviewRuler {
 .hide-badge > .md-badge {
   display: none !important;
 }
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin-bottom: 0 !important;
+  margin-top: 0 !important;
+}
 </style>

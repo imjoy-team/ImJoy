@@ -1,7 +1,7 @@
 <template>
-  <div>
+  <div class="plugin-icon">
     <md-icon v-if="!icon">extension</md-icon>
-    <img v-else-if="icon.startsWith('http')" :src="icon" />
+    <img class="icon-image" v-else-if="icon.startsWith('http')" :src="icon" />
     <md-icon v-else>{{ icon }} </md-icon>
   </div>
 </template>
@@ -17,4 +17,23 @@ export default {
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped></style>
+<style scoped>
+.plugin-icon {
+  display: inline-block;
+  vertical-align: middle;
+}
+.icon-image {
+  max-height: 46px;
+}
+@media screen and (max-width: 800px) {
+  .icon-image {
+    max-height: 30px;
+  }
+}
+
+@media screen and (max-width: 400px) {
+  .icon-image {
+    max-height: 15px;
+  }
+}
+</style>
