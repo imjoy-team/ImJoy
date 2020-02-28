@@ -960,10 +960,7 @@ Shows a file dialog to select files or directories.
 
 The function will return a promise from which you can get the file path string.
 
-Importantly, this api function **works only** if the Python plugin engine is connected,
-even if you are using it in JavaScript. The default root directory will be
-the current workspace for python plugins, and the home folder for all other plugin
-types.
+Depending on the plugin engine implementation, ImJoy will try to select the a file manager specified by the plugin engine via the `api.FILE_MANAGER_URL` constant.
 
 The file handling is different for the ImJoy app and the plugin engine. We recommend
 reading the dedicated section in the [user manual](development?id=loading-saving-data) to understand the difference.
@@ -994,7 +991,9 @@ It contains the following fields:
   - **uri_type**: String. Format of returned file path.
     - `url` (default for JavaScript plugins): <!--**[TODO]**-->
     - `path` (default for Python plugins): <!--**[TODO]**-->
-  - **engine**: String. Specify the engine url.
+  - **file_manager**: String. Specify the file manager via url, in a `native-python` plugin for example, you can get the file manager URL via `api.FILE_MANAGER_URL`.
+  
+  - **hide_unselected**: If you specified file_manager, all other file managers will still show up and if you want to hide them, set `hide_unselected` to `true`.
 
 (Please also consult [this section](api?id=input-arguments) for how arguments can be set.)
 

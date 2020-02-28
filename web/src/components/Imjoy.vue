@@ -2763,20 +2763,23 @@ export default {
       config = config || {};
       if (_plugin && _plugin.id) {
         if (!config.file_manager) {
-          if(_plugin.api.FILE_MANAGER_URL){
-            config.file_manager = this.fm.getFileManagerByUrl(_plugin.api.FILE_MANAGER_URL);
+          if (_plugin.api.FILE_MANAGER_URL) {
+            config.file_manager = this.fm.getFileManagerByUrl(
+              _plugin.api.FILE_MANAGER_URL
+            );
           }
-        }
-        else{
-          if(typeof config.file_manager === 'string')
-          config.file_manager = this.fm.getFileManagerByUrl(config.file_manager);
+        } else {
+          if (typeof config.file_manager === "string")
+            config.file_manager = this.fm.getFileManagerByUrl(
+              config.file_manager
+            );
         }
         // assert(config.file_manager, "No file manager is selected.");
         config.root =
           config.root || (_plugin.config && _plugin.config.work_dir);
 
         config.uri_type = config.uri_type || "path";
-      
+
         if (config.root && typeof config.root !== "string") {
           throw "You need to specify a root with string type ";
         }
@@ -2792,7 +2795,7 @@ export default {
             config.return_object === undefined ? true : config.return_object;
         }
       }
-  
+
       if (config.file_manager && config.hide_unselected) {
         this.selected_file_managers = [config.file_manager];
       } else {
