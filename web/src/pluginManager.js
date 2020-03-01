@@ -69,6 +69,7 @@ export class PluginManager {
     this.show_message_callback = show_message_callback;
     this.update_ui_callback = update_ui_callback || function() {};
     this._allowed_evil_plugin = {};
+    this.internal_plugins = INTERNAL_PLUGINS;
 
     this.default_repository_list = [
       {
@@ -816,15 +817,15 @@ export class PluginManager {
   }
 
   reloadInternalPlugins(skip_exist) {
-    for (let pn in INTERNAL_PLUGINS) {
-      if (INTERNAL_PLUGINS[pn].startup) {
+    for (let pn in this.internal_plugins) {
+      if (this.internal_plugins[pn].startup) {
         if (skip_exist && this.plugin_names[pn]) {
           continue;
         }
         console.log(`Loading internal plugin "${pn}"...`);
         this.reloadPluginRecursively(
           {
-            uri: INTERNAL_PLUGINS[pn].uri,
+            uri: this.internal_plugins[pn].uri,
           },
           null,
           "eval is evil"
@@ -2355,10 +2356,10 @@ export class PluginManager {
     if (target_plugin) {
       return target_plugin.api;
     } else {
-      if (INTERNAL_PLUGINS[plugin_name]) {
+      if (this.internal_plugins[plugin_name]) {
         const p = await this.reloadPluginRecursively(
           {
-            uri: INTERNAL_PLUGINS[plugin_name].uri,
+            uri: this.internal_plugins[plugin_name].uri,
           },
           null,
           "eval is evil"
