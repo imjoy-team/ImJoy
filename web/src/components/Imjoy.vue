@@ -1336,8 +1336,6 @@ import {
   escapeHTML,
 } from "../utils.js";
 
-import INTERNAL_PLUGINS from "../internalPlugins.json";
-
 import DOMPurify from "dompurify";
 
 import { ImJoy } from "../imjoyCore.js";
@@ -1820,7 +1818,7 @@ export default {
             try {
               await this.pm.reloadPluginRecursively(
                 {
-                  uri: INTERNAL_PLUGINS[pn].uri,
+                  uri: this.pm.internal_plugins[pn].uri,
                 },
                 null,
                 "eval is evil"
