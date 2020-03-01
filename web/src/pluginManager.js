@@ -101,13 +101,13 @@ export class PluginManager {
     const api_utils_ = imjoy_api.utils;
     this.imjoy_api = {
       alert: (plugin, msg) => {
-        return window.alert(msg);
+        return window.alert(msg.content || msg);
       },
       prompt: (plugin, msg) => {
-        return window.prompt(msg);
+        return window.prompt(msg.content || msg);
       },
       confirm: (plugin, msg) => {
-        return window.confirm(msg);
+        return window.confirm(msg.content || msg);
       },
       requestUploadUrl: this.requestUploadUrl,
       getFileUrl: this.getFileUrl,
