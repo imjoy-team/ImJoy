@@ -1465,7 +1465,17 @@ export class PluginManager {
             c.data = (my && my.data) || {};
             c.config = (my && my.config) || {};
             c.id = my && my.id;
-            return await this.createWindow(null, c);
+            if (c.as_dialog && this.imjoy_api.showDialog) {
+              // make sure there is a header and convert it to fullscreen dialog
+              if (c.standalone) {
+                c.fullscreen = true;
+                c.standalone = false;
+              }
+
+              return await this.imjoy_api.showDialog(null, c);
+            } else {
+              return await this.createWindow(null, c);
+            }
           },
         };
 
