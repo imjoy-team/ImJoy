@@ -477,6 +477,8 @@ Or, you can make the window in full screen mode by default with `"defaults": {"f
 
 To make the window in standalone mode by default (in full screen and detached from the workspace), you can set `"defaults": {"standalone": true}`.
 
+If you want to show the window as a dialog, then set `"defaults": {"as_dialog": true}`.
+
 #### runnable
 Defines whether the plugin can be executed by clicking on the plugin menu (By default, all plugins are `runnable`). For helper plugins which do not run by themselves, (e.g. a `native-python` plugin can be called by a `window` plugin and do not necessarily executed by the user directly), setting `"runnable": false` would move down the plugin to the bottom of the plugin menu and made non-clickable.
 
