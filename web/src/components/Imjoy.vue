@@ -1336,8 +1336,6 @@ import {
   escapeHTML,
 } from "../utils.js";
 
-import INTERNAL_PLUGINS from "../internalPlugins.json";
-
 import DOMPurify from "dompurify";
 
 import { ImJoy } from "../imjoyCore.js";
@@ -1820,7 +1818,7 @@ export default {
             try {
               await this.pm.reloadPluginRecursively(
                 {
-                  uri: INTERNAL_PLUGINS[pn].uri,
+                  uri: this.pm.internal_plugins[pn].uri,
                 },
                 null,
                 "eval is evil"
@@ -2779,7 +2777,6 @@ export default {
           config.root || (_plugin.config && _plugin.config.work_dir);
 
         config.uri_type = config.uri_type || "path";
-
         if (config.root && typeof config.root !== "string") {
           throw "You need to specify a root with string type ";
         }
@@ -2795,7 +2792,6 @@ export default {
             config.return_object === undefined ? true : config.return_object;
         }
       }
-
       if (config.file_manager && config.hide_unselected) {
         this.selected_file_managers = [config.file_manager];
       } else {
