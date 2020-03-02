@@ -1,11 +1,11 @@
 self.__precacheManifest = [
   {
-    "revision": "a629e1d62302d097178f",
-    "url": "/static/css/app.16f7dd08.css"
+    "revision": "4f523c68c01325ddd90c",
+    "url": "/static/css/app.ad5ccfe1.css"
   },
   {
-    "revision": "a629e1d62302d097178f",
-    "url": "/static/js/app.8c29c04e.js"
+    "revision": "4f523c68c01325ddd90c",
+    "url": "/static/js/app.15bdf67b.js"
   },
   {
     "revision": "b8859e2632feade2aed6",
@@ -232,15 +232,15 @@ self.__precacheManifest = [
     "url": "/static/vs/editor.worker.js"
   },
   {
-    "revision": "821dd06611f8497a59e8cee99dbeac0e",
-    "url": "/static/vs/css.worker.js"
-  },
-  {
     "revision": "d10204c6d610178f9c2643845f648c0e",
     "url": "/static/vs/html.worker.js"
   },
   {
-    "revision": "1faad0b100924d2aee4d5bbadc576f88",
+    "revision": "821dd06611f8497a59e8cee99dbeac0e",
+    "url": "/static/vs/css.worker.js"
+  },
+  {
+    "revision": "38562df361ea47b3af3021105fcca75b",
     "url": "/index.html"
   },
   {
@@ -752,20 +752,16 @@ self.__precacheManifest = [
     "url": "/static/vs/language/html/htmlMode.js"
   },
   {
-    "revision": "64eaf1a4e89d2932222a028d3cdb9a3d",
-    "url": "/static/vs/language/html/htmlWorker.js"
-  },
-  {
     "revision": "729bc4c112c5dc3cd04f845dc4af1da0",
     "url": "/static/vs/language/json/jsonMode.js"
   },
   {
-    "revision": "7d2a277c0d00a4bb615596ae1ab93213",
-    "url": "/static/vs/language/json/jsonWorker.js"
-  },
-  {
     "revision": "a3f8339f361d9f2683c37abb09f8c75e",
     "url": "/static/vs/language/typescript/tsMode.js"
+  },
+  {
+    "revision": "7d2a277c0d00a4bb615596ae1ab93213",
+    "url": "/static/vs/language/json/jsonWorker.js"
   },
   {
     "revision": "cf05f5559129d3145d705a8df6c6fb48",
@@ -774,6 +770,10 @@ self.__precacheManifest = [
   {
     "revision": "11a854433bcc74085be053c3ab713b15",
     "url": "/static/vs/language/css/cssWorker.js"
+  },
+  {
+    "revision": "64eaf1a4e89d2932222a028d3cdb9a3d",
+    "url": "/static/vs/language/html/htmlWorker.js"
   },
   {
     "revision": "51880b243dfb4c0a65c406b155e9a716",
