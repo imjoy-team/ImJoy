@@ -1542,7 +1542,7 @@ window.particlesJS.load = function(tag_id, path_config_json, callback){
 
 window.particlesJS.stop = function(){
     if (window["pJSDom"] instanceof Array && window["pJSDom"].length > 0) {
-        for (let i = 0; i < window["pJSDom"].length; i++)
+        for (let i = 0; window["pJSDom"] && i < window["pJSDom"].length; i++)
             window["pJSDom"][i].pJS.fn.vendors.destroypJS();
         window["pJSDom"] = [];
     }
