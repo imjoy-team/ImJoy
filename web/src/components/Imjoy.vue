@@ -1179,7 +1179,7 @@
           </div>
           <md-card-header>
             <md-toolbar md-elevation="0">
-              <div>
+              <div style="margin-top: 30px;margin-bottom: 30px;">
                 <h2>
                   <plugin-icon :icon="plugin4install.icon"></plugin-icon>
                   {{ plugin4install.name + " " + plugin4install.badges }}
@@ -1335,8 +1335,6 @@ import {
   compareVersions,
   escapeHTML,
 } from "../utils.js";
-
-import INTERNAL_PLUGINS from "../internalPlugins.json";
 
 import DOMPurify from "dompurify";
 
@@ -1820,7 +1818,7 @@ export default {
             try {
               await this.pm.reloadPluginRecursively(
                 {
-                  uri: INTERNAL_PLUGINS[pn].uri,
+                  uri: this.pm.internal_plugins[pn].uri,
                 },
                 null,
                 "eval is evil"
@@ -2762,30 +2760,23 @@ export default {
     showFileDialog(_plugin, config) {
       config = config || {};
       if (_plugin && _plugin.id) {
-        config.engine =
-          config.engine === undefined ? _plugin.engine : config.engine;
-        config.engine =
-          typeof config.engine === "string"
-            ? this.em.getEngineByUrl(config.engine)
-            : config.engine;
-
-        if (!config.file_manager && config.engine) {
-          config.file_manager = this.fm.getFileManagerByUrl(config.engine.url);
-        }
-        if (config.file_manager) {
-          this.selected_file_managers = [config.file_manager];
+        if (!config.file_manager) {
+          if (_plugin.api.FILE_MANAGER_URL) {
+            config.file_manager = this.fm.getFileManagerByUrl(
+              _plugin.api.FILE_MANAGER_URL
+            );
+          }
         } else {
-          this.selected_file_managers = this.fm.fileManagers;
+          if (typeof config.file_manager === "string")
+            config.file_manager = this.fm.getFileManagerByUrl(
+              config.file_manager
+            );
         }
-
         // assert(config.file_manager, "No file manager is selected.");
         config.root =
           config.root || (_plugin.config && _plugin.config.work_dir);
-        if (!_plugin.engine) {
-          config.uri_type = config.uri_type || "url";
-        } else {
-          config.uri_type = config.uri_type || "path";
-        }
+
+        config.uri_type = config.uri_type || "path";
         if (config.root && typeof config.root !== "string") {
           throw "You need to specify a root with string type ";
         }
@@ -2800,16 +2791,13 @@ export default {
           config.return_object =
             config.return_object === undefined ? true : config.return_object;
         }
-
-        return this.$refs["file-dialog"].showDialog(_plugin, config);
-      } else {
-        if (config.file_manager) {
-          this.selected_file_managers = [config.file_manager];
-        } else {
-          this.selected_file_managers = this.fm.fileManagers;
-        }
-        return this.$refs["file-dialog"].showDialog(_plugin, config);
       }
+      if (config.file_manager && config.hide_unselected) {
+        this.selected_file_managers = [config.file_manager];
+      } else {
+        this.selected_file_managers = this.fm.fileManagers;
+      }
+      return this.$refs["file-dialog"].showDialog(_plugin, config);
     },
     uploadFileToUrl(_plugin, config) {
       if (typeof config !== "object" || !config.file || !config.url) {
@@ -3159,7 +3147,7 @@ export default {
 
 @media screen and (max-width: 400px) {
   .md-dialog {
-    width: 100% !important;
+    width: 99% !important;
     max-height: 100%;
     max-width: 100%;
   }
@@ -3167,19 +3155,19 @@ export default {
 
 @media screen and (max-width: 700px) {
   .plugin-dialog {
-    width: 100% !important;
+    width: 99% !important;
     max-width: 100% !important;
   }
 }
 
 @media screen and (max-width: 800px) {
   .window-dialog {
-    max-width: 100%;
+    max-width: 99%;
   }
 
   .api-dialog {
-    max-width: 100%;
-    max-height: 100%;
+    max-width: 99%;
+    max-height: 99%;
   }
 }
 
