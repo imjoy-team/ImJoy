@@ -5,7 +5,7 @@ set -e # Exit with nonzero exit code if anything fails
 cd "$(dirname "$0")/../.."
 
 # Save some useful information
-LIB_REPO=git@github.com:oeway/lib.imjoy.io.git
+LIB_REPO=git@github.com:imjoy-team/lib.imjoy.io.git
 LIB_SSH_REPO=${LIB_REPO/https:\/\/github.com\//git@github.com:}
 SHA=`git rev-parse --verify HEAD`
 

@@ -562,7 +562,7 @@ If the url does not end with `.css`, you need to add `css:` before it, for examp
 "requirements": ["css:https://fonts.googleapis.com/icon?family=Material+Icons"]
 ```
 
-ImJoy hosts **commonly used and tested libraries** in a dedicated [GitHub repository](https://github.com/oeway/static.imjoy.io).
+ImJoy hosts **commonly used and tested libraries** in a dedicated [GitHub repository](https://github.com/imjoy-team/static.imjoy.io).
 You can refer to all files contained in the `docs` folder with a simple url: `https://static.imjoy.io` + `RelativePathInDocs`.
 
 For example, the file `FileSaver.js` in the folder `static.imjoy.io/docs/js/`
@@ -590,7 +590,7 @@ Requirements are specified as a list of strings specifying the required python m
 ```json
 "requirements": ["numpy", "matplotlib"]
 ```
-By default, the packages are loaded from our static hosting on Github (https://github.com/oeway/static.imjoy.io/tree/master/docs/pyodide). Specifically for `scipy`, you need to include an absolute url: `"requirements": ["https://alpha.iodide.app/pyodide-0.10.0/scipy.js"]`.
+By default, the packages are loaded from our static hosting on Github (https://github.com/imjoy-team/static.imjoy.io/tree/master/docs/pyodide). Specifically for `scipy`, you need to include an absolute url: `"requirements": ["https://alpha.iodide.app/pyodide-0.10.0/scipy.js"]`.
 
 If you want to import additional js file, you need to use the `js:` prefix before the javascript url.
 
