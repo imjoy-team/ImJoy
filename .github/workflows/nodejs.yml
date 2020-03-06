@@ -58,15 +58,15 @@ jobs:
           cp -Rf ./web/dist/static/jailed ./imjoy-core/static/jailed
       - name: Deploy ImJoy repo
         uses: peaceiris/actions-gh-pages@v3.5.0
-          with:
-            deploy_key: ${{ secrets.ACTIONS_DEPLOY_KEY }}
-            publish_dir: ./web/dist
-            commit_message: ${{ format('Deploy to GitHub Pages: {0}', github.sha) }}
+        with:
+          deploy_key: ${{ secrets.ACTIONS_DEPLOY_KEY }}
+          publish_dir: ./web/dist
+          commit_message: ${{ format('Deploy to GitHub Pages: {0}', github.sha) }}
       - name: Deploy imjoy.lib repo
         uses:
-          with:
-            deploy_key: ${{ secrets.ACTIONS_DEPLOY_KEY }}
-            external_repository: imjoy-team/lib.imjoy.io
-            publish_dir: ./imjoy-core
-            commit_message: ${{ format('Deployed from imjoy-team/ImJoy@{0}', github.sha) }}
-            cname: "lib.imjoy.io"
+        with:
+          deploy_key: ${{ secrets.ACTIONS_DEPLOY_KEY }}
+          external_repository: imjoy-team/lib.imjoy.io
+          publish_dir: ./imjoy-core
+          commit_message: ${{ format('Deployed from imjoy-team/ImJoy@{0}', github.sha) }}
+          cname: "lib.imjoy.io"
