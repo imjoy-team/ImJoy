@@ -23,7 +23,7 @@ Imjoy consists of **two main components**
 
  1.  The **ImJoy Web App**. The core part of ImJoy which runs in the browser across different OS and devices. It provides a flexible plugin system with workflow and window management. Plugins can be developed in different programming languages including JavaScript and Python. Plugins with their source code can be organized into workspaces and stored in the browser database. Web plugins are running in an `iframe` or `webworker`, therefore developers can in principle use any frontend framework or javascript library independently for each plugin.
 
- 2.  Optionally, the **Plugin Engine** for running computational tasks in CPython to taking advantage of the power of native hardware (e.g. GPU) and software libraries (e.g.: numpy, Tensorflow, PyTorch etc.). Under the hood, it's a python package ([GitHub](https://github.com/oeway/ImJoy-Engine)) runs in the background and connect to the ImJoy Web App through websocket. It uses [conda](https://conda.io/) to manage software packages (not only Python, but also C++, Java etc.) and virtual environments. Developers can then add `conda` or `pypi` packages as requirements to the plugin, and they can be automatically resolved by the plugin engine. Similarly, developers can use any Python library or even non-python library in Python plugins.
+ 2.  Optionally, the **Plugin Engine** for running computational tasks in CPython to taking advantage of the power of native hardware (e.g. GPU) and software libraries (e.g.: numpy, Tensorflow, PyTorch etc.). Under the hood, it's a python package ([GitHub](https://github.com/imjoy-team/imjoy-engine)) runs in the background and connect to the ImJoy Web App through websocket. It uses [conda](https://conda.io/) to manage software packages (not only Python, but also C++, Java etc.) and virtual environments. Developers can then add `conda` or `pypi` packages as requirements to the plugin, and they can be automatically resolved by the plugin engine. Similarly, developers can use any Python library or even non-python library in Python plugins.
 
 ![imjoy-plugin-development](assets/imjoy-architecture.png ':size=800')
 
@@ -149,9 +149,9 @@ In Chrome for example, user can install ImJoy into [chrome://apps/](chrome://app
 You can run all the web plugins (`web-worker`, `window`, `web-python`) with the ImJoy App, however, for native plugins (`native-python`) you will need to connect to a plugin engine running locally or remotely.
 Here are the two options for installing the plugine engine:
 
-1. for basic users and desktop environments, the ImJoy Desktop App which includes the plugine engine can be downloaded [here](https://github.com/oeway/ImJoy-App/releases).
+1. for basic users and desktop environments, the ImJoy Desktop App which includes the plugine engine can be downloaded [here](https://github.com/imjoy-team/imjoy-app/releases).
 
-2. for more advanced users and server environments, please download and install Anaconda or Miniconda with Python3, then run `pip install imjoy`. The plugin engine can then be launched through the `imjoy` command. More details are available [here](https://github.com/oeway/ImJoy-Engine/).
+2. for more advanced users and server environments, please download and install Anaconda or Miniconda with Python3, then run `pip install imjoy`. The plugin engine can then be launched through the `imjoy` command. More details are available [here](https://github.com/imjoy-team/imjoy-engine/).
 
 
 ## Plugin file format
@@ -466,7 +466,7 @@ for a detailed description.
 #### dependencies
 Array with names of other ImJoy plugins which the current plugin depends on.
 
-They will be installed automatically during installation. To define a dependency use the following format: 1) for dependencies without tag `REPOSITORY:PLUGIN_NAME` or `PLUGIN_URL`, e.g.: `oeway/ImJoy-Plugins:Image Window`; 2) or with specified tag: `REPOSITORY:PLUGIN_NAME@TAG` or `PLUGIN_URL@TAG`, e.g.: `oeway/ImJoy-Plugins:Unet Segmentation@GPU`. In this case, a hash tag `GPU` is used to specify the tag for the plugin named `Unet Segmentation` hosted on GitHub repository `oeway/ImJoy-Plugin` (https://github.com/oeway/ImJoy-Plugins). If the plugin is not hosted on GitHub or the GitHub repository is not formatted as a ImJoy plugin repository (meaning there is no `manifest.imjoy.json` file defined in the root of the repository), you can use the url directly, e.g.: `https://github.com/oeway/ImJoy-Demo-Plugins/blob/master/repository/3dDemos.imjoy.html` (tags can be added with `@TAG`).
+They will be installed automatically during installation. To define a dependency use the following format: 1) for dependencies without tag `REPOSITORY:PLUGIN_NAME` or `PLUGIN_URL`, e.g.: `imjoy-team/imjoy-plugins:Image Window`; 2) or with specified tag: `REPOSITORY:PLUGIN_NAME@TAG` or `PLUGIN_URL@TAG`, e.g.: `imjoy-team/imjoy-plugins:Unet Segmentation@GPU`. In this case, a hash tag `GPU` is used to specify the tag for the plugin named `Unet Segmentation` hosted on GitHub repository `imjoy-team/imjoy-plugins` (https://github.com/imjoy-team/imjoy-plugins). If the plugin is not hosted on GitHub or the GitHub repository is not formatted as a ImJoy plugin repository (meaning there is no `manifest.imjoy.json` file defined in the root of the repository), you can use the url directly, e.g.: `https://github.com/imjoy-team/imjoy-demo-plugins/blob/master/repository/3dDemos.imjoy.html` (tags can be added with `@TAG`).
 
 #### defaults
 (**for window plugin only:**) defines an object of default values.
@@ -562,7 +562,7 @@ If the url does not end with `.css`, you need to add `css:` before it, for examp
 "requirements": ["css:https://fonts.googleapis.com/icon?family=Material+Icons"]
 ```
 
-ImJoy hosts **commonly used and tested libraries** in a dedicated [GitHub repository](https://github.com/oeway/static.imjoy.io).
+ImJoy hosts **commonly used and tested libraries** in a dedicated [GitHub repository](https://github.com/imjoy-team/static.imjoy.io).
 You can refer to all files contained in the `docs` folder with a simple url: `https://static.imjoy.io` + `RelativePathInDocs`.
 
 For example, the file `FileSaver.js` in the folder `static.imjoy.io/docs/js/`
@@ -590,7 +590,7 @@ Requirements are specified as a list of strings specifying the required python m
 ```json
 "requirements": ["numpy", "matplotlib"]
 ```
-By default, the packages are loaded from our static hosting on Github (https://github.com/oeway/static.imjoy.io/tree/master/docs/pyodide). Specifically for `scipy`, you need to include an absolute url: `"requirements": ["https://alpha.iodide.app/pyodide-0.10.0/scipy.js"]`.
+By default, the packages are loaded from our static hosting on Github (https://github.com/imjoy-team/static.imjoy.io/tree/master/docs/pyodide). Specifically for `scipy`, you need to include an absolute url: `"requirements": ["https://alpha.iodide.app/pyodide-0.10.0/scipy.js"]`.
 
 If you want to import additional js file, you need to use the `js:` prefix before the javascript url.
 
@@ -1052,13 +1052,13 @@ The plugin code can be hosted on the web, e.g. GitHub, Gist, or Dropbox.
 ### Own ImJoy plugin repository
 You can easily create a ImJoy plugin repository for an existing GitHub project.
 
-A template project can be found [here](https://github.com/oeway/ImJoy-project-template).
+A template project can be found [here](https://github.com/imjoy-team/imjoy-project-template).
 For this, you save your ImJoy plugins in a dedicated folder, and add a
 manifest json file `manifest.imjoy.json` to the GitHub root folder.
 
 This manifest specifies which plugins are in your repository,
 and where they can be found. A skeleton of this file is shown below,
-and a full template can be found [here](https://github.com/oeway/ImJoy-project-template/blob/master/manifest.imjoy.json).
+and a full template can be found [here](https://github.com/imjoy-team/imjoy-project-template/blob/master/manifest.imjoy.json).
 ```json
 {
  "name": "NAME OF THE REPOSITORY",
@@ -1073,7 +1073,7 @@ and a full template can be found [here](https://github.com/oeway/ImJoy-project-t
 
 You can then update this manifest either **automatically** or **manually**:
 
-1.  For an **automatic update**, we provide a [node script](https://github.com/oeway/ImJoy-project-template/blob/master/update_manifest.js).
+1.  For an **automatic update**, we provide a [node script](https://github.com/imjoy-team/imjoy-project-template/blob/master/update_manifest.js).
     This script requires node.js to be executed. Then run it  with the command `node update_manifest.js` in the root folder
     containing `manifest.imjoy.json`. It will then automatically search for ImJoy plugins and
     generate the manifest.
@@ -1083,7 +1083,7 @@ You can then update this manifest either **automatically** or **manually**:
 
 2.  For a **manual update**, follow these steps:
     1. Place all plugin files in a folder in your GitHub repository.
-       For example, a folder called [imjoy-plugins](https://github.com/oeway/ImJoy-project-template/tree/master/imjoy-plugins).
+       For example, a folder called [imjoy-plugins](https://github.com/imjoy-team/imjoy-project-template/tree/master/imjoy-plugins).
     1. Modify the `manifest.imjoy.json`. For each plugin
         1. Copy & paste the content of the `<config>` block from the plugin code
            to the `plugins` block in `manifest.imjoy.json`.
@@ -1103,9 +1103,9 @@ specific plugins can be installed see the dedicated section below.
 
 ### Official ImJoy plugin repository
 The ImJoy plugin repository shown on `ImJoy.io` is served through
-[GitHub](https://github.com/oeway/ImJoy-Plugins).
+[GitHub](https://github.com/imjoy-team/imjoy-plugins).
 
-In order to deploy your plugin to the [plugin repository](https://github.com/oeway/ImJoy-Plugins),
+In order to deploy your plugin to the [plugin repository](https://github.com/imjoy-team/imjoy-plugins),
 you can fork the repository, add your plugin and send a pull request.
 Once the pull request is accepted, the user will be able to install your plugin from the plugin repository.
 
@@ -1192,7 +1192,7 @@ The easiest way to distribute plugins is by creating a url, which can be shared 
 
 The basic format is `http://imjoy.io/#/app?plugin=PLUGIN_URI`. You will need to
 replace `PLUGIN_URI` with your actual **plugin URI** (Uniform Resource Identifier).
-For example: [https://imjoy.io/#/app?plugin=https://github.com/oeway/ImJoy-Plugins/blob/master/repository/imageWindow.imjoy.html](https://imjoy.io/#/app?plugin=https://github.com/oeway/ImJoy-Plugins/blob/master/repository/imageWindow.imjoy.html). When the user click this link,
+For example: [https://imjoy.io/#/app?plugin=https://github.com/imjoy-team/imjoy-plugins/blob/master/repository/imageWindow.imjoy.html](https://imjoy.io/#/app?plugin=https://github.com/imjoy-team/imjoy-plugins/blob/master/repository/imageWindow.imjoy.html). When the user click this link,
 a plugin installation dialog will be shown which proposes to install the specified plugin.
 The user has to simply confirm by clicking `Install`.
 
@@ -1204,7 +1204,7 @@ There are **two types of URI**, depending on how your plugin is deployed:
 1.  If your plugins are deployed in a **`ImJoy Plugin Repository`** (as described above),
     you can then use a short plugin URI formatted as `GITHUB_USER_NAME/REPO_NAME:PLUGIN_NAME`.
 
-    For example, you can use `oeway/ImJoy-project-template:Untitled Plugin` to represent
+    For example, you can use `imjoy-team/imjoy-project-template:Untitled Plugin` to represent
     a plugin hosted on https://github.com/oeway/DRFNS-Lite.
 
     You can also specify the **plugin tag** by adding `@TAG` after the `PLUGIN_NAME`.
@@ -1221,7 +1221,7 @@ There are **two types of URI**, depending on how your plugin is deployed:
     how to obtain this url for different hosting platforms:
 
     1. For files on **GitHub**, you just need to copy the link to the file.
-       For example: `https://github.com/oeway/ImJoy-Plugins/blob/master/repository/imageRecognition.imjoy.html`.
+       For example: `https://github.com/imjoy-team/imjoy-plugins/blob/master/repository/imageRecognition.imjoy.html`.
 
     0.  For **Gist** or other Git providers such as (GitLab), if there is only one file in the Gist, you can use the direct Gist link (copied from your browser address bar) or obtain the `raw`
         link of the plugin file. For a Gist with multiple file, you need to specify the `raw` link for the plugin file you would like to use. 
@@ -1257,7 +1257,7 @@ The following url parameters are currently supported:
 
  *  `plugin` or `p`: show the specified plugin in the plugin management dialog as
      detailed in the section above. If the plugin with the same name and version exists, the dialog will not shown.
-     If needed, add `upgrade=1` to force show the plugin dialog. For example: `https://imjoy.io/#/app?p=oeway/ImJoy-Demo-Plugins:alert&upgrade=1`.
+     If needed, add `upgrade=1` to force show the plugin dialog. For example: `https://imjoy.io/#/app?p=imjoy-team/imjoy-demo-plugins:alert&upgrade=1`.
  *   `workspace` or `w`: name of workspace. ImJoy will switch to the specified
      workspace if it exist, or create a new one. For example, `https://imjoy.io/#/app?workspace=test`
  *   `engine` or `e`: define the url of the plugin engine. For example: `http://imjoy.io/#/app?engine=http://127.0.0.1:9527`.
@@ -1273,8 +1273,8 @@ The following url parameters are currently supported:
 
  *   `token` or `t`: define the connection token. For example: `http://imjoy.io/#/app?token=2760239c-c0a7-4a53-a01e-d6da48b949bc`
  *   `repo` or `r`: specify a ImJoy manifest file pointing to a ImJoy plugin repository (see above).
-      This can be a full repo link such as `repo=https://github.com/oeway/ImJoy-Plugins`
-      or a simplified GitHub link `repo=oeway/ImJoy-Plugins`.
+      This can be a full repo link such as `repo=https://github.com/imjoy-team/imjoy-plugins`
+      or a simplified GitHub link `repo=imjoy-team/imjoy-plugins`.
 
       If you are hosting your repo from a non-GitHub website (e.g. GitLab), please
       use the `raw` link to the `manifest.imjoy.json` file.
@@ -1322,8 +1322,8 @@ Follow these steps, and you will be able to run ImJoy server and the plugin engi
 
 1. Install Python plugin engine on the remote computer. If this remote machine is
   running under Linux, you can connect with SSH, and run a provided installation
-  script: `wget https://raw.githubusercontent.com/oeway/ImJoy-Engine/master/utils/Linux_Install.sh  -O - | bash`.
-  Otherwise, download it from [GitHub](https://github.com/oeway/ImJoy-App/releases).
+  script: `wget https://raw.githubusercontent.com/imjoy-team/imjoy-engine/master/utils/Linux_Install.sh  -O - | bash`.
+  Otherwise, download it from [GitHub](https://github.com/imjoy-team/imjoy-app/releases).
 
 0. Update the `$PATH` settings as explained [above](#access-the-plugin-engine-from-a-command-line-interface).
   For Linux or Mac, use `export PATH=~/ImJoyApp/bin:$PATH`

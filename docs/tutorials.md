@@ -6,7 +6,7 @@ Plugins within a workspace can also be composed into a workflow, where multiple 
 Note that these workflows can also be stored and shared with other users via a single URL. 
 Follow the step and you will make a simple workflow where a JavaScript plugin asking the user to provide a number is executed first, then this number is used by a second plugin to perform calculations. 
 
- 1. click [here](https://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:Calculator&workspace=workflow-demo) to install two demo plugins.
+ 1. click [here](https://imjoy.io/#/app?plugin=imjoy-team/imjoy-demo-plugins:Calculator&workspace=workflow-demo) to install two demo plugins.
  2. click `WORKFLOW` in the left panel
  3. press the + circled button and select `GetNumber` to add it 
  4. then add `Calculator`
@@ -111,7 +111,7 @@ saveResult("data/membrane/test",results)
 Importantly, we are going to port the above code in our ImJoy plugin.
 
 ### Preperation
-Before start, you will need to install the ImJoy plugin engine accroding to the instructions here: https://github.com/oeway/ImJoy-Engine , and we recommend to use Google Chrome or FireFox to perform the experiments (note: Safari won't work). 
+Before start, you will need to install the ImJoy plugin engine accroding to the instructions here: https://github.com/imjoy-team/imjoy-engine , and we recommend to use Google Chrome or FireFox to perform the experiments (note: Safari won't work). 
 
 Once installed, you need to first start the plugin engine, either through the desktop if you installed, or run `imjoy` command if you chose the command line version of the plugin engine. Either way you will get a connection token string, which we will need to use to connect from the ImJoy web app.
 
@@ -435,7 +435,7 @@ Add this url to the README file so your users can then just click and use the pl
 
 ### More examples
 
-For more advanced examples, please take a look at our plugin repository: https://github.com/oeway/ImJoy-Plugins/tree/master/repository. For example, the [CARE plugin](https://github.com/oeway/ImJoy-Plugins/blob/master/repository/CARE.imjoy.html) is similar to the Unet plugin we made in this tutorial, but can show an interactive loss chart during training.
+For more advanced examples, please take a look at our plugin repository: https://github.com/imjoy-team/imjoy-plugins/tree/master/repository. For example, the [CARE plugin](https://github.com/imjoy-team/imjoy-plugins/blob/master/repository/CARE.imjoy.html) is similar to the Unet plugin we made in this tutorial, but can show an interactive loss chart during training.
 
 
 ## Displaying a chart from Python
@@ -445,8 +445,8 @@ In this demo, we show how data generated in a **Python plugin** can be displayed
 ### Plotting with a JavaScript library
 You can install the Python plugin either to run
 
- * in the <a href="https://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:Charts PyWorker&w=demo-charts" target="_blank">**Python plugin engine**</a>
- * or with <a href="https://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:Charts WebPython&w=demo-charts" target="_blank">**web Python**</a>.
+ * in the <a href="https://imjoy.io/#/app?plugin=imjoy-team/imjoy-demo-plugins:Charts PyWorker&w=demo-charts" target="_blank">**Python plugin engine**</a>
+ * or with <a href="https://imjoy.io/#/app?plugin=imjoy-team/imjoy-demo-plugins:Charts WebPython&w=demo-charts" target="_blank">**web Python**</a>.
 
 If you select in the Python plugin one of the options `Plotly`, `C3`, or `Charts.js` the Python plugin will send the data to the **window plugin** "Charts JS window".
 This plugin was automatically installed, and provided simple example for three
@@ -469,7 +469,7 @@ The **main steps** are described below and basic data flow is illustrated by das
 
 ### Opening a chart saved as png
 Rather then sending the data, you can directly show an image in a window plugin with this
-<a href="https://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:Charts PNG&w=demo-charts" target="_blank">**demo**</a>.
+<a href="https://imjoy.io/#/app?plugin=imjoy-team/imjoy-demo-plugins:Charts PNG&w=demo-charts" target="_blank">**demo**</a>.
 
 Before getting to the actual demo, we would like to provide two important clarifications
 concerning the supported file-types and how the file-system is seen by window plugins.
@@ -494,7 +494,7 @@ with open(name_plot, 'rb') as f:
 In this demo, we show how to use a **window** plugin to defined a user interface, and how this interface can interact with a **Python** plugin to perform calculations.
 
 You can install this plugin from this
-<a href="http://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:GUI w3&w=demo-GUI" target="_blank">**link**</a>.
+<a href="http://imjoy.io/#/app?plugin=imjoy-team/imjoy-demo-plugins:GUI w3&w=demo-GUI" target="_blank">**link**</a>.
 This will install the actual interface plugin (GUI w3.css) and automatically the Python plugin (GUI PyWorker) performing the calculations. The purpose of this plugin is self-explanatory, you can open the GUI by double clicking on the plugin title. Just play around.
 
 ![imjoy-demo-gui-screenshot](assets/imjoy-demo-gui-screenshot.png ':size=800')
@@ -509,7 +509,7 @@ This demo illustrates a number of different important concepts, which we describ
 The window plugins are developed with HTML5/CSS and JavaScript. Here we provide
 only a fast overview of these languages. An excellent resource to get started with HTML, CSS and JavaScript is  [www.w3schools.com/](https://www.w3schools.com/). Other coding platforms exist to test and develop code ([playcode.io/](https://playcode.io/) or [codepen.io](https://codepen.io/)), but you can essentially use ImJoy to test your code as well.
 
-HTML5/CSS and JavaScript control the three relevant aspects of an interface. In ImJoy, these three elements are defined in one [single file](https://github.com/oeway/ImJoy-Demo-Plugins/blob/master/repository/GUI.imjoy.html), and specified in dedicated code blocks.
+HTML5/CSS and JavaScript control the three relevant aspects of an interface. In ImJoy, these three elements are defined in one [single file](https://github.com/imjoy-team/imjoy-demo-plugins/blob/master/repository/GUI.imjoy.html), and specified in dedicated code blocks.
 
 * **HTML**: structure of the page. The HTML code is in the code block designated as shown below. Please note the `<div>` element, which is required. Currently, window plugins can only have one root element.
     ```html
