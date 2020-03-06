@@ -188,7 +188,7 @@ For HTML:
 ```javascript
 await api.alert('hello world')
 ```
-[Try yourself >>](https://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:alert&w=examples)
+[Try yourself >>](https://imjoy.io/#/app?plugin=imjoy-team/imjoy-demo-plugins:alert&w=examples)
 
 ### api.prompt
 
@@ -288,7 +288,7 @@ To call a function `funcX` defined in the plugin  `PluginX` with the argument `1
 ```javascript
 await api.call("PluginX", "funcX", 1)
 ```
-[Try yourself >>](https://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:call&w=examples)
+[Try yourself >>](https://imjoy.io/#/app?plugin=imjoy-team/imjoy-demo-plugins:call&w=examples)
 
 
 ### api.createWindow
@@ -362,7 +362,7 @@ Create a simple window in JavaScript:
 ```javascript
 win = await api.createWindow({name: 'new window', type: 'Image Window', w:7, h:7, data: {image: ...}, config: {}})
 ```
-[Try yourself >>](https://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:createWindow&w=examples)
+[Try yourself >>](https://imjoy.io/#/app?plugin=imjoy-team/imjoy-demo-plugins:createWindow&w=examples)
 
 In python you can either use the `async/await` style for Python 3
 
@@ -413,7 +413,7 @@ Create a window with two images and a comparison slider.
   })
 ```
 
-[Try yourself >>](https://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:createWindowImgComp&w=examples)
+[Try yourself >>](https://imjoy.io/#/app?plugin=imjoy-team/imjoy-demo-plugins:createWindowImgComp&w=examples)
 
 #### ** Python **
 ```python
@@ -590,7 +590,7 @@ Retrieves configurations for plugin.
 ```javascript
 sigma = await api.getConfig('sigma')
 ```
-[Try yourself in the setConfig example >>](https://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:setConfig&w=examples)
+[Try yourself in the setConfig example >>](https://imjoy.io/#/app?plugin=imjoy-team/imjoy-demo-plugins:setConfig&w=examples)
 
 
 ### api.getPlugin
@@ -627,7 +627,7 @@ result = await pluginX.run()
 // Assuming that PluginX defined an API function `funcX`, you can access it with:
 await pluginX.funcX()
 ```
-[Try yourself >>](https://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:getPlugin&w=examples)
+[Try yourself >>](https://imjoy.io/#/app?plugin=imjoy-team/imjoy-demo-plugins:getPlugin&w=examples)
 
 
 
@@ -766,7 +766,7 @@ This progress bar will be displayed in the plugin menu itself. Please use
 ```javascript
 api.progress(85)
 ```
-[Try yourself >>](https://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:progress&w=examples)
+[Try yourself >>](https://imjoy.io/#/app?plugin=imjoy-team/imjoy-demo-plugins:progress&w=examples)
 
 
 ### api.register
@@ -831,7 +831,7 @@ update_lut(ctx) {
 };
 
 ```
-[**Try yourself >>**](https://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:register&w=examples) Compare how the ops for favourite number and animal are implemented.
+[**Try yourself >>**](https://imjoy.io/#/app?plugin=imjoy-team/imjoy-demo-plugins:register&w=examples) Compare how the ops for favourite number and animal are implemented.
 
 
 ### api.run
@@ -855,7 +855,7 @@ Example to call one plugin:
 ```python
 await api.run("Python Demo Plugin")
 ```
-[**Try yourself >>**](https://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:run&w=examples)
+[**Try yourself >>**](https://imjoy.io/#/app?plugin=imjoy-team/imjoy-demo-plugins:run&w=examples)
 
 Example for concurrent execution of two plugins, where the two plugins are
 executed simultaneously, but ImJoy waits for the result one after the other.
@@ -914,7 +914,7 @@ any of the field name of the `<config>` block.
 ```javascript
 api.setConfig('sigma', 928)
 ```
-[Try yourself >>](https://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:setConfig&w=examples)
+[Try yourself >>](https://imjoy.io/#/app?plugin=imjoy-team/imjoy-demo-plugins:setConfig&w=examples)
 
 
 ### api.showDialog
@@ -948,7 +948,7 @@ result = await api.showDialog({
    "ui": "Hey, please select a value for sigma: {id:'sigma', type:'choose', options:['1', '3'], placeholder: '1'}.",
 })
 ```
-[Try yourself >>](https://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:showDialog&w=examples)
+[Try yourself >>](https://imjoy.io/#/app?plugin=imjoy-team/imjoy-demo-plugins:showDialog&w=examples)
 
 
 ### api.showFileDialog
@@ -1021,7 +1021,7 @@ else{
 
 ```
 <!--**[TODO]: update this example to new api**-->
-[Try yourself >>](https://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:showFileDialog&w=examples)
+[Try yourself >>](https://imjoy.io/#/app?plugin=imjoy-team/imjoy-demo-plugins:showFileDialog&w=examples)
 
 
 ### api.showMessage
@@ -1058,7 +1058,7 @@ Updates the progress bar on the Imjoy GUI.
 ```javascript
 api.showProgress(85)
 ```
-[Try yourself >>](https://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:showProgress&w=examples)
+[Try yourself >>](https://imjoy.io/#/app?plugin=imjoy-team/imjoy-demo-plugins:showProgress&w=examples)
 
 ### api.showSnackbar
 ```javascript
@@ -1077,7 +1077,7 @@ Shows a popup message with a snackbar, and disappear in a specific amount of tim
 api.showSnackbar('processing...', 5)
 ```
 
-[Try yourself >>](https://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:showSnackbar&w=examples)
+[Try yourself >>](https://imjoy.io/#/app?plugin=imjoy-team/imjoy-demo-plugins:showSnackbar&w=examples)
 
 ### api.showStatus
 ```javascript
@@ -1095,7 +1095,7 @@ Updates the status text on the Imjoy GUI.
 api.showStatus('processing...')
 ```
 
-[Try yourself >>](https://imjoy.io/#/app?plugin=oeway/ImJoy-Demo-Plugins:showStatus&w=examples)
+[Try yourself >>](https://imjoy.io/#/app?plugin=imjoy-team/imjoy-demo-plugins:showStatus&w=examples)
 
 
 ### api.TAG constant

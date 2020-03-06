@@ -1,7 +1,7 @@
 <template>
   <div class="home">
     <a
-      href="https://github.com/oeway/ImJoy"
+      href="https://github.com/imjoy-team/ImJoy"
       class="github-corner"
       aria-label="View source on Github"
       ><svg viewBox="0 0 250 250" aria-hidden="true">
@@ -30,7 +30,7 @@
         </p>
         <h1>Deep Learning Made Easy!</h1>
         <p class="badges">
-          <a href="https://github.com/oeway/ImJoy" target="_blank"
+          <a href="https://github.com/imjoy-team/ImJoy" target="_blank"
             ><img
               :src="
                 'https://img.shields.io/badge/imjoy-v' +
@@ -41,14 +41,14 @@
           /></a>
           &nbsp;
 
-          <a href="https://travis-ci.com/oeway/ImJoy" target="_blank"
+          <a href="https://travis-ci.com/imjoy-team/ImJoy" target="_blank"
             ><img
-              src="https://travis-ci.com/oeway/ImJoy.svg?branch=master"
+              src="https://travis-ci.com/imjoy-team/ImJoy.svg?branch=master"
               alt="Travis-CI"/></a
           >&nbsp;
-          <a href="https://github.com/oeway/ImJoy" target="_blank">
+          <a href="https://github.com/imjoy-team/ImJoy" target="_blank">
             <img
-              src="https://img.shields.io/github/license/oeway/ImJoy-Engine.svg"
+              src="https://img.shields.io/github/license/imjoy-team/imjoy-engine.svg"
               alt="LICENSE"/></a
           >&nbsp;
         </p>

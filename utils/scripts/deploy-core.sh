@@ -5,7 +5,7 @@ set -e # Exit with nonzero exit code if anything fails
 cd "$(dirname "$0")/../.."
 
 # Save some useful information
-LIB_REPO=git@github.com:oeway/lib.imjoy.io.git
+LIB_REPO=git@github.com:imjoy-team/lib.imjoy.io.git
 LIB_SSH_REPO=${LIB_REPO/https:\/\/github.com\//git@github.com:}
 SHA=`git rev-parse --verify HEAD`
 
@@ -51,7 +51,7 @@ echo "lib.imjoy.io" > CNAME
 # Commit the "changes", i.e. the new version.
 # The delta will show diffs between new and old versions.
 git add -A .
-git diff-index --quiet HEAD || git commit -m "Deployed from oeway/ImJoy@${SHA}"
+git diff-index --quiet HEAD || git commit -m "Deployed from imjoy-team/ImJoy@${SHA}"
 
 # Now that we're all set up, we can push.
 git push $LIB_SSH_REPO ${LIB_TARGET_BRANCH}

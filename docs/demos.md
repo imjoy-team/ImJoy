@@ -3,7 +3,7 @@ Here we provide several demo plugins which you try out by clicking on the links.
 
 * [Interactive Plot (basic example)](https://imjoy.io/#/app?plugin=https://gist.githubusercontent.com/oeway/b033ad375343f495dabf19242e5c04d3/raw/PlotLineChart.imjoy.html)
 
-* [Image Annotator (image annotation)](https://imjoy.io/#/app?w=imjoy-examples&plugin=oeway/ImJoy-Plugins:ImageAnnotator&start=ImageAnnotator&fullscreen=1)
+* [Image Annotator (image annotation)](https://imjoy.io/#/app?w=imjoy-examples&plugin=imjoy-team/imjoy-plugins:ImageAnnotator&start=ImageAnnotator&fullscreen=1)
 
 * [HPA-UMAP (visualization)](https://imjoy.io/#/app?w=imjoy-examples&plugin=imjoy-team/example-plugins:HPA-UMAP&start=HPA-UMAP&fullscreen=1)
 
@@ -13,9 +13,9 @@ Here we provide several demo plugins which you try out by clicking on the links.
 
 * [DeepBindScan (Genomics)](https://imjoy.io/#/app?w=imjoy-examples&plugin=imjoy-team/example-plugins:DeepBindScan)
 
-* [ANNA-PALM (super-resolution)](https://imjoy.io/#/app?w=imjoy-examples&plugin=oeway/ImJoy-Plugins:ANNA-PALM)
+* [ANNA-PALM (super-resolution)](https://imjoy.io/#/app?w=imjoy-examples&plugin=imjoy-team/imjoy-plugins:ANNA-PALM)
 
-* [CARE (3D denoising)](https://imjoy.io/#/app?w=imjoy-examples&plugin=oeway/ImJoy-Plugins:CARE)
+* [CARE (3D denoising)](https://imjoy.io/#/app?w=imjoy-examples&plugin=imjoy-team/imjoy-plugins:CARE)
 
 * [DPNUnet (Segmentation)](https://imjoy.io/#/app?w=imjoy-examples&plugin=https://raw.githubusercontent.com/oeway/DPNUnet-Segmentation/master/DPNUnet.imjoy.html)
 

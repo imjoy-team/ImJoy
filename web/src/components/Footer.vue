@@ -4,7 +4,7 @@
       <md-button
         class="md-accent footer-button"
         target="_blank"
-        href="https://github.com/oeway/ImJoy/issues"
+        href="https://github.com/imjoy-team/ImJoy/issues"
         >Create an issue on Github</md-button
       >
     </div>
@@ -28,9 +28,9 @@
     <div class="md-layout md-alignment-center-center">
       <md-button
         class="footer-button"
-        href="https://github.com/oeway"
+        href="https://github.com/imjoy-team"
         target="_blank"
-        >Made by Wei OUYANG with <span class="red">❤</span></md-button
+        >Made by the ImJoy Team with <span class="red">❤</span></md-button
       >
       <md-button
         class="footer-button"

@@ -1,29 +1,29 @@
 <template>
   <div class="about">
-    <a href="https://github.com/oeway/ImJoy-Engine" target="_blank"
+    <a href="https://github.com/imjoy-team/imjoy-engine" target="_blank"
       ><img
         :src="
           'https://img.shields.io/badge/imjoy-v' + app_version + '-success.svg'
         "
         alt="ImJoy"/></a
     >&nbsp;
-    <a href="https://github.com/oeway/ImJoy-Engine" target="_blank"
+    <a href="https://github.com/imjoy-team/imjoy-engine" target="_blank"
       ><img
-        src="https://img.shields.io/badge/dynamic/json.svg?color=success&label=imjoy%20engine&prefix=v&query=version&url=https%3A%2F%2Fraw.githubusercontent.com%2Foeway%2FImJoy-Engine%2Fmaster%2Fimjoy%2FVERSION"
+        src="https://img.shields.io/badge/dynamic/json.svg?color=success&label=imjoy%20engine&prefix=v&query=version&url=https%3A%2F%2Fraw.githubusercontent.com%2Fimjoy-team%2Fimjoy-engine%2Fmaster%2Fimjoy%2FVERSION"
         alt="ImJoy-Engine"/></a
     >&nbsp;
-    <a href="https://travis-ci.com/oeway/ImJoy" target="_blank"
+    <a href="https://travis-ci.com/imjoy-team/ImJoy" target="_blank"
       ><img
-        src="https://travis-ci.com/oeway/ImJoy.svg?branch=master"
+        src="https://travis-ci.com/imjoy-team/ImJoy.svg?branch=master"
         alt="Travis-CI"/></a
     >&nbsp;
 
     <a href="https://zenodo.org/badge/latestdoi/137741898" target="_blank"
       ><img src="https://zenodo.org/badge/137741898.svg" alt="DOI"/></a
     >&nbsp;
-    <a href="https://github.com/oeway/ImJoy" target="_blank"
+    <a href="https://github.com/imjoy-team/ImJoy" target="_blank"
       ><img
-        src="https://img.shields.io/github/license/oeway/ImJoy-Engine.svg"
+        src="https://img.shields.io/github/license/imjoy-team/imjoy-engine.svg"
         alt="LICENSE"/></a
     >&nbsp;
     <br />
@@ -32,10 +32,10 @@
     <br />
     <md-button
       class="normal-text"
-      href="https://github.com/oeway"
+      href="https://github.com/imjoy-team"
       target="_blank"
       >Version: {{ app_version }} <br />
-      Made by Wei OUYANG with <span class="red">❤</span></md-button
+      Made by the ImJoy-Team with <span class="red">❤</span></md-button
     >
     <br />
     <br />

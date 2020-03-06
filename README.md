@@ -1,14 +1,14 @@
-![GitHub](https://img.shields.io/github/license/oeway/ImJoy-Engine.svg)
-[![ImJoy Version](https://img.shields.io/badge/dynamic/json.svg?color=success&label=imjoy&prefix=v&query=version&url=https://raw.githubusercontent.com/oeway/ImJoy/master/web/package.json)](https://imjoy.io/#/app) 
-[![Engine Version](https://img.shields.io/badge/dynamic/json.svg?color=success&label=imjoy%20engine&prefix=v&query=version&url=https%3A%2F%2Fraw.githubusercontent.com%2Foeway%2FImJoy-Engine%2Fmaster%2Fimjoy%2FVERSION)](https://github.com/oeway/ImJoy-Engine) 
-[![Build Status](https://travis-ci.com/oeway/ImJoy.svg?branch=master)](https://travis-ci.com/oeway/ImJoy) 
+![GitHub](https://img.shields.io/github/license/imjoy-team/imjoy-engine.svg)
+[![ImJoy Version](https://img.shields.io/badge/dynamic/json.svg?color=success&label=imjoy&prefix=v&query=version&url=https://raw.githubusercontent.com/imjoy-team/ImJoy/master/web/package.json)](https://imjoy.io/#/app) 
+[![Engine Version](https://img.shields.io/badge/dynamic/json.svg?color=success&label=imjoy%20engine&prefix=v&query=version&url=https%3A%2F%2Fraw.githubusercontent.com%2Foeway%2FImJoy-Engine%2Fmaster%2Fimjoy%2FVERSION)](https://github.com/imjoy-team/imjoy-engine) 
+[![Build Status](https://travis-ci.com/imjoy-team/ImJoy.svg?branch=master)](https://travis-ci.com/imjoy-team/ImJoy) 
 [![Netlify Status](https://api.netlify.com/api/v1/badges/3aa71748-2778-4c31-a9ea-f7fdf5445fd1/deploy-status)](https://app.netlify.com/sites/imjoy/deploys) 
 [![Join the chat at https://gitter.im/imjoy-dev/community](https://badges.gitter.im/imjoy-dev/community.svg)](https://gitter.im/imjoy-dev/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![image.sc forum](https://img.shields.io/badge/dynamic/json.svg?label=forum&url=https%3A%2F%2Fforum.image.sc%2Ftags%2Fimjoy.json&query=%24.topic_list.tags.0.topic_count&colorB=brightgreen&suffix=%20topics&logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAOCAYAAAAfSC3RAAABPklEQVR42m3SyyqFURTA8Y2BER0TDyExZ+aSPIKUlPIITFzKeQWXwhBlQrmFgUzMMFLKZeguBu5y+//17dP3nc5vuPdee6299gohUYYaDGOyyACq4JmQVoFujOMR77hNfOAGM+hBOQqB9TjHD36xhAa04RCuuXeKOvwHVWIKL9jCK2bRiV284QgL8MwEjAneeo9VNOEaBhzALGtoRy02cIcWhE34jj5YxgW+E5Z4iTPkMYpPLCNY3hdOYEfNbKYdmNngZ1jyEzw7h7AIb3fRTQ95OAZ6yQpGYHMMtOTgouktYwxuXsHgWLLl+4x++Kx1FJrjLTagA77bTPvYgw1rRqY56e+w7GNYsqX6JfPwi7aR+Y5SA+BXtKIRfkfJAYgj14tpOF6+I46c4/cAM3UhM3JxyKsxiOIhH0IO6SH/A1Kb1WBeUjbkAAAAAElFTkSuQmCC)](https://forum.image.sc/tags/imjoy)
 
 
 
-<a href="https://imjoy.io" target="_blank" ><img src="https://raw.githubusercontent.com/oeway/ImJoy/master/web/public/static/img/imjoy-logo-black.svg?sanitize=true" width="380"></img>
+<a href="https://imjoy.io" target="_blank" ><img src="https://raw.githubusercontent.com/imjoy-team/ImJoy/master/web/public/static/img/imjoy-logo-black.svg?sanitize=true" width="380"></img>
 </a>
 
 ## ImJoy - Deep Learning Made Easy!
@@ -28,7 +28,7 @@ ImJoy runs on mobile and desktop environment cross different operating systems, 
 With ImJoy, delivering Deep Learning tools to the end users is simple and easy thanks to
 its flexible plugin system and sharable plugin URL. Developer can easily add rich and interactive web interfaces to existing Python code.
 
-<img src="https://github.com/oeway/ImJoy/raw/master/docs/assets/imjoy-overview.jpg" width="600px"></img>
+<img src="https://github.com/imjoy-team/ImJoy/raw/master/docs/assets/imjoy-overview.jpg" width="600px"></img>
 
 Checkout the documentation for how to get started and more details
 for how to develop ImJoy plugins: [ImJoy Docs](https://imjoy.io/docs)
@@ -62,21 +62,21 @@ for how to develop ImJoy plugins: [ImJoy Docs](https://imjoy.io/docs)
 **ImJoy greatly accelerates the development and dissemination of new tools.** You can develop plugins in ImJoy, deploy the plugin file to Github, and share the plugin URL through social networks. Users can then use it by a single click, even on a mobile phone
 
 <a href="https://imjoy.io/#/app?p=imjoy-team/example-plugins:Skin-Lesion-Analyzer" target="_blank">
-  <img src="https://github.com/oeway/ImJoy/raw/master/docs/assets/imjoy-sharing.jpg" width="500px"></img>
+  <img src="https://github.com/imjoy-team/ImJoy/raw/master/docs/assets/imjoy-sharing.jpg" width="500px"></img>
 </a>
 
 ## Quick Start
 
 The easiest way to try ImJoy is to start with a plugin running directly in the browser.
 
-For example, you can install our `Image Recognition` plugin with [this link](https://imjoy.io/#/app?plugin=oeway/ImJoy-Plugins:Image%20Recognition&workspace=getting-started).
+For example, you can install our `Image Recognition` plugin with [this link](https://imjoy.io/#/app?plugin=imjoy-team/imjoy-plugins:Image%20Recognition&workspace=getting-started).
 Clicking the link will open the ImJoy Web App and show a dialog to confirm the
 installation of the plugin. Once installed, you can launch the plugin by clicking
 the button `Image Recognition` in the plugin menu on the left. The demo plugin
 will run a trained deep neural network model (MobileNet) to perform image
 classification (e.g. identifying an elephant in an image).
 
-<img src="https://github.com/oeway/ImJoy/raw/master/docs/assets/imjoy-predict-elephant.png" width="300px"></img>
+<img src="https://github.com/imjoy-team/ImJoy/raw/master/docs/assets/imjoy-predict-elephant.png" width="300px"></img>
 
 This plugin uses your browser as its computational backend, so all
 computation is done locally, no data will be sent to a remote server.
@@ -88,20 +88,17 @@ of the local GPU/CPU. The computational backend can also be launched on remote s
 including cloud servers on Amazon, Google Compute, or an institutional computing cluster.
 
 Previously, running Python plugins would require installation of the Plugin Engine. However, now we have added experimental support for running Python plugins via the servers provided by MyBinder.org.
-You can try for example the [DeepBindScan](https://imjoy.io/#/app?plugin=oeway/ImJoy-Plugins:DeepBindScan) plugin without any installation.
+You can try for example the [DeepBindScan](https://imjoy.io/#/app?plugin=imjoy-team/imjoy-plugins:DeepBindScan) plugin without any installation.
 
 To learn more details about ImJoy, please go to [ImJoy Docs](https://imjoy.io/docs/).
 
 ## Repositories
 
 Currently, ImJoy consists of the following repositories:
- - [ImJoy Web App (core)](https://github.com/oeway/ImJoy/) (this repository)
- - [ImJoy Plugin Engine](https://github.com/oeway/ImJoy-Engine)
- - [ImJoy Desktop App](https://github.com/oeway/ImJoy-App)
-
- - [ImJoy Plugin Repository](https://github.com/oeway/ImJoy-Plugins)
- - [ImJoy Demo Plugins](https://github.com/oeway/ImJoy-Demo-Plugins/)
- - [ImJoy Project Template](https://github.com/oeway/ImJoy-project-template)
+ - [ImJoy Web App (core)](https://github.com/imjoy-team/ImJoy/) (this repository)
+ - [ImJoy Plugin Engine](https://github.com/imjoy-team/imjoy-engine)
+ - [ImJoy Desktop App](https://github.com/imjoy-team/imjoy-app)
+ - [ImJoy Plugin Repository](https://github.com/imjoy-team/imjoy-plugins)
 
 ## Documentation, questions and feedback
 
@@ -134,7 +131,7 @@ Please star the ImJoy GitHub repository to support ImJoy.
 We would like ImJoy to be a community driven framework, everyone is welcome to
 contribute your idea, feedback, plugins and code to the project.
 
-We don't have a guideline for that yet, for now please feel free to use the [issues](https://github.com/oeway/ImJoy/issues) and fork the project.
+We don't have a guideline for that yet, for now please feel free to use the [issues](https://github.com/imjoy-team/ImJoy/issues) and fork the project.
 
 ## Citation
 
@@ -144,8 +141,8 @@ Please cite our paper on Nature Methods ([https://www.nature.com/articles/s41592
 
 ## Code of Conduct
 
-Help us keep the ImJoy community open and inclusive. Please read and follow our [Code of Conduct](https://github.com/oeway/ImJoy/blob/master/docs/CODE_OF_CONDUCT.md).
+Help us keep the ImJoy community open and inclusive. Please read and follow our [Code of Conduct](https://github.com/imjoy-team/ImJoy/blob/master/docs/CODE_OF_CONDUCT.md).
 
 ## License
 
-[MIT License](https://github.com/oeway/ImJoy/blob/master/LICENSE)
+[MIT License](https://github.com/imjoy-team/ImJoy/blob/master/LICENSE)
