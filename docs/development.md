@@ -149,7 +149,7 @@ In Chrome for example, user can install ImJoy into [chrome://apps/](chrome://app
 You can run all the web plugins (`web-worker`, `window`, `web-python`) with the ImJoy App, however, for native plugins (`native-python`) you will need to connect to a plugin engine running locally or remotely.
 Here are the two options for installing the plugine engine:
 
-1. for basic users and desktop environments, the ImJoy Desktop App which includes the plugine engine can be downloaded [here](https://github.com/imjoy-team/ImJoy-App/releases).
+1. for basic users and desktop environments, the ImJoy Desktop App which includes the plugine engine can be downloaded [here](https://github.com/imjoy-team/imjoy-app/releases).
 
 2. for more advanced users and server environments, please download and install Anaconda or Miniconda with Python3, then run `pip install imjoy`. The plugin engine can then be launched through the `imjoy` command. More details are available [here](https://github.com/imjoy-team/imjoy-engine/).
 
@@ -1323,7 +1323,7 @@ Follow these steps, and you will be able to run ImJoy server and the plugin engi
 1. Install Python plugin engine on the remote computer. If this remote machine is
   running under Linux, you can connect with SSH, and run a provided installation
   script: `wget https://raw.githubusercontent.com/imjoy-team/imjoy-engine/master/utils/Linux_Install.sh  -O - | bash`.
-  Otherwise, download it from [GitHub](https://github.com/imjoy-team/ImJoy-App/releases).
+  Otherwise, download it from [GitHub](https://github.com/imjoy-team/imjoy-app/releases).
 
 0. Update the `$PATH` settings as explained [above](#access-the-plugin-engine-from-a-command-line-interface).
   For Linux or Mac, use `export PATH=~/ImJoyApp/bin:$PATH`

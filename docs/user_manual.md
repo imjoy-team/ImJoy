@@ -58,7 +58,7 @@ Engine allows to run native Python (`native-python`) plugins. We provide two way
 to obtain this engine:
 
 1.  The plugin engine is included in the ImJoy Desktop App. After installing the
-    [Desktop App](https://github.com/imjoy-team/ImJoy-App/releases), you can start the engine
+    [Desktop App](https://github.com/imjoy-team/imjoy-app/releases), you can start the engine
     with the button `START PLUGINE ENGINE`.
     
     ![imjoy-app-start-screen](assets/imjoy-app-start-screen.png ':size=400')
