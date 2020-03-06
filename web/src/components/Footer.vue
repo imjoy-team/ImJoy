@@ -4,7 +4,7 @@
       <md-button
         class="md-accent footer-button"
         target="_blank"
-        href="https://github.com/oeway/ImJoy/issues"
+        href="https://github.com/imjoy-team/ImJoy/issues"
         >Create an issue on Github</md-button
       >
     </div>

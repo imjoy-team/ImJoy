@@ -74,12 +74,12 @@ export class PluginManager {
     this.default_repository_list = [
       {
         name: "ImJoy Repository",
-        url: "oeway/ImJoy-Plugins",
+        url: "imjoy-team/ImJoy-Plugins",
         description: "The official plugin repository provided by ImJoy.io.",
       },
       {
         name: "ImJoy Demos",
-        url: "oeway/ImJoy-Demo-Plugins",
+        url: "imjoy-team/imjoy-demo-plugins",
         description: "A set of demo plugins provided by ImJoy.io",
       },
     ];

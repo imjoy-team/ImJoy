@@ -218,7 +218,7 @@
                 <md-icon>help</md-icon>Forum
               </md-menu-item>
               <md-menu-item
-                href="https://github.com/oeway/ImJoy"
+                href="https://github.com/imjoy-team/ImJoy"
                 target="_blank"
                 class="md-primary"
               >
@@ -1705,7 +1705,7 @@ export default {
           (!this.pm.plugins || Object.keys(this.pm.plugins) <= 0)
         ) {
           this.pm
-            .reloadPluginRecursively({ uri: "oeway/ImJoy-Plugins:Welcome" })
+            .reloadPluginRecursively({ uri: "imjoy-team/ImJoy-Plugins:Welcome" })
             .then(() => {
               this.showDialog(null, {
                 type: "Welcome",

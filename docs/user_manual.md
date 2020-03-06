@@ -32,7 +32,7 @@ Imjoy consists of **three parts**, each part can be extended with plugins:
 
 1. **Web Computational Backend**. Computational tasks can be execution directly in the web browsers. Browsers are highly optimised and  JavaScript engines such as Google Chrome V8 and Firefox Quantum can be used to perform computational tasks. The performance of JavaScript Engines are close or even better than native languages such as Java and Python ([Benchmarks](https://benchmarksgame-team.pages.debian.net/benchmarksgame/faster/node-python3.html)). With HTML5/WebGL, browser can access to GPUs, allowing transparent GPU computing with libraries such as [Tensorflow.js](https://js.tensorflow.org/). With a new web standard called [WebAssembly](https://webassembly.org/), software/libraries written in high-level languages like C/C++/Rust can be ported to run in the browser. ImJoy uses ["Pyodide"](https://github.com/iodide-project/pyodide) to run Python plugins directly in the browser. The advantage of using the web computational backend is it requires almost zero setup and can run on mobile devices. Importantly, browser provides a unified, secured and sandboxed environment with maximised security and stability.
 
-1. **Native Computational Backend**. This is supported with the installation of an additional Python module called ["ImJoy Plugin Engine"](https://github.com/oeway/ImJoy-Engine). This allows to access the entire Python ecosystem which covers most of the scientific computing applications. With [Conda](https://conda.io), ImJoy plugin engine handles the requirements of plugins automatically and provide isolate processes and virtual environments for different Python plugins. It provides maximum flexibility and has full access to the file system, GPU and other local or remote resources. The plugin engine can be launched either on the local machine, or remotely on a cloud server or a cluster to perform computationally intensive tasks, e.g. with institutional computing cluster, Amazon Cloud, or Google Compute.
+1. **Native Computational Backend**. This is supported with the installation of an additional Python module called ["ImJoy Plugin Engine"](https://github.com/imjoy-team/imjoy-engine). This allows to access the entire Python ecosystem which covers most of the scientific computing applications. With [Conda](https://conda.io), ImJoy plugin engine handles the requirements of plugins automatically and provide isolate processes and virtual environments for different Python plugins. It provides maximum flexibility and has full access to the file system, GPU and other local or remote resources. The plugin engine can be launched either on the local machine, or remotely on a cloud server or a cluster to perform computationally intensive tasks, e.g. with institutional computing cluster, Amazon Cloud, or Google Compute.
 
 ## ImJoy App
 
@@ -58,12 +58,12 @@ Engine allows to run native Python (`native-python`) plugins. We provide two way
 to obtain this engine:
 
 1.  The plugin engine is included in the ImJoy Desktop App. After installing the
-    [Desktop App](https://github.com/oeway/ImJoy-App/releases), you can start the engine
+    [Desktop App](https://github.com/imjoy-team/ImJoy-App/releases), you can start the engine
     with the button `START PLUGINE ENGINE`.
     
     ![imjoy-app-start-screen](assets/imjoy-app-start-screen.png ':size=400')
 
-2. You can download and install it with a command line script as described [here](https://github.com/oeway/ImJoy-engine).
+2. You can download and install it with a command line script as described [here](https://github.com/imjoy-team/imjoy-engine).
 
 Once you start the engine, it will automatically check for updates.
 
@@ -113,7 +113,7 @@ problem. For this, you can run the following command in your terminal:
 
 ```bash
 export PATH=~/ImJoyApp/bin:$PATH
-pip install -U git+https://github.com/oeway/ImJoy-Engine#egg=imjoy
+pip install -U git+https://github.com/imjoy-team/imjoy-engine#egg=imjoy
 ```
 
 ### Use existing Python

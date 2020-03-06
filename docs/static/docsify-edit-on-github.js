@@ -10,8 +10,8 @@
 
       if (docName) {
         var editLink
-        if(docName === 'https://raw.githubusercontent.com/oeway/ImJoy/master/README.md'){
-          editLink = 'https://github.com/oeway/ImJoy/edit/master/README.md'
+        if(docName === 'https://raw.githubusercontent.com/imjoy-team/ImJoy/master/README.md'){
+          editLink = 'https://github.com/imjoy-team/ImJoy/edit/master/README.md'
         }
         else{
           editLink= docEditBase + docName

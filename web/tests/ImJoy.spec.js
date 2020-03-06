@@ -46,20 +46,20 @@ describe("ImJoy.vue", async () => {
   // it("should add and remove repositories", async () => {
   //   await pm.addRepository({
   //     name: "test",
-  //     url: "oeway/ImJoy-project-template",
+  //     url: "imjoy-team/imjoy-project-template",
   //   });
   //   expect(pm.repository_names).to.include("Project Template");
   //   await pm.removeRepository({
   //     name: "Project Template",
-  //     url: "oeway/ImJoy-project-template",
+  //     url: "imjoy-team/imjoy-project-template",
   //   });
   //   expect(pm.repository_names).to.not.include("Project Template");
   // });
 
   // it("should load a repository and install plugin from it", async () => {
-  //   await pm.reloadRepository({ url: "oeway/ImJoy-project-template" });
+  //   await pm.reloadRepository({ url: "imjoy-team/imjoy-project-template" });
   //   await pm.installPlugin(
-  //     { uri: "oeway/ImJoy-project-template:Template plugin" },
+  //     { uri: "imjoy-team/imjoy-project-template:Template plugin" },
   //     null,
   //     true
   //   );

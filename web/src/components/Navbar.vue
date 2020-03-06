@@ -36,7 +36,7 @@
             >
             <md-menu-item
               class="md-primary md-button menu-button"
-              href="https://github.com/oeway/ImJoy"
+              href="https://github.com/imjoy-team/ImJoy"
               >Source</md-menu-item
             >
             <md-menu-item class="md-primary md-button menu-button" href="/docs"
@@ -78,7 +78,7 @@
         </md-button>
         &nbsp;
         <md-button
-          href="https://github.com/oeway/ImJoy"
+          href="https://github.com/imjoy-team/ImJoy"
           class="md-accent"
           v-if="screenWidth >= 600"
           target="_blank"
