@@ -1705,7 +1705,7 @@ export default {
           (!this.pm.plugins || Object.keys(this.pm.plugins) <= 0)
         ) {
           this.pm
-            .reloadPluginRecursively({ uri: "imjoy-team/ImJoy-Plugins:Welcome" })
+            .reloadPluginRecursively({ uri: "imjoy-team/imjoy-plugins:Welcome" })
             .then(() => {
               this.showDialog(null, {
                 type: "Welcome",

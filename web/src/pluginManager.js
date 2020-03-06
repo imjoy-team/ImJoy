@@ -74,7 +74,7 @@ export class PluginManager {
     this.default_repository_list = [
       {
         name: "ImJoy Repository",
-        url: "imjoy-team/ImJoy-Plugins",
+        url: "imjoy-team/imjoy-plugins",
         description: "The official plugin repository provided by ImJoy.io.",
       },
       {

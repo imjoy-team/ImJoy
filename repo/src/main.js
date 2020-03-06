@@ -95,7 +95,7 @@ const app = new Vue({
   created: async function () {
     const that = this;
     const repos = [
-      'imjoy-team/ImJoy-Plugins',
+      'imjoy-team/imjoy-plugins',
       'imjoy-team/imjoy-demo-plugins',
     ]
     that.plugins = []

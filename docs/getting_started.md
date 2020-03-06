@@ -18,7 +18,7 @@ all the functionality needed to process data.
 
 ## Plugins
 The entire functionality of ImJoy is provided by plugins. To install new plugins
-from the [Plugin Repository](https://github.com/imjoy-team/ImJoy-Plugins), click **+ PLUGINS**.
+from the [Plugin Repository](https://github.com/imjoy-team/imjoy-plugins), click **+ PLUGINS**.
 This will show a window with all available plugins with a short description.
 A longer description can be obtained by pressing on the **...** and **Docs**.
 To install a plugin, press on the cloud button, no further confirmation is required.
@@ -46,7 +46,7 @@ with a pre-trained neural network. The plugin is ported from [mobilenet](https:/
 
 This plugin can be obtained by installing the plugin `Image Recognition` from
 the ImJoy plugin repository. Alternatively, you can also use this
-<a href="https://imjoy.io/#/app?plugin=imjoy-team/ImJoy-Plugins:Image Recognition&w=getting-started" target="_blank">**link**</a>,
+<a href="https://imjoy.io/#/app?plugin=imjoy-team/imjoy-plugins:Image Recognition&w=getting-started" target="_blank">**link**</a>,
 which will open ImJoy and provide a dialog where you can confirm the installation.
 
 Once the plugin is install, it will appear in the plugin dialog on the left.
@@ -70,7 +70,7 @@ you can classify hand drawn numbers. It is based on [tfjs-vis](https://github.co
 
 This plugin can be obtained by installing the plugin `MNIST-CNN` from
 the ImJoy plugin repository. Alternatively, you can also use this
-<a href="https://imjoy.io/#/app?plugin=imjoy-team/ImJoy-Plugins:MNIST-CNN&w=getting-started" target="_blank">**link**</a>,
+<a href="https://imjoy.io/#/app?plugin=imjoy-team/imjoy-plugins:MNIST-CNN&w=getting-started" target="_blank">**link**</a>,
 which will open ImJoy and provide a dialog where you can confirm the installation.
 
 Once the plugin is install, it will appear in the plugin dialog on the left.

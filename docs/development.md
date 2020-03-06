@@ -466,7 +466,7 @@ for a detailed description.
 #### dependencies
 Array with names of other ImJoy plugins which the current plugin depends on.
 
-They will be installed automatically during installation. To define a dependency use the following format: 1) for dependencies without tag `REPOSITORY:PLUGIN_NAME` or `PLUGIN_URL`, e.g.: `imjoy-team/ImJoy-Plugins:Image Window`; 2) or with specified tag: `REPOSITORY:PLUGIN_NAME@TAG` or `PLUGIN_URL@TAG`, e.g.: `imjoy-team/ImJoy-Plugins:Unet Segmentation@GPU`. In this case, a hash tag `GPU` is used to specify the tag for the plugin named `Unet Segmentation` hosted on GitHub repository `imjoy-team/ImJoy-Plugin` (https://github.com/imjoy-team/ImJoy-Plugins). If the plugin is not hosted on GitHub or the GitHub repository is not formatted as a ImJoy plugin repository (meaning there is no `manifest.imjoy.json` file defined in the root of the repository), you can use the url directly, e.g.: `https://github.com/imjoy-team/imjoy-demo-plugins/blob/master/repository/3dDemos.imjoy.html` (tags can be added with `@TAG`).
+They will be installed automatically during installation. To define a dependency use the following format: 1) for dependencies without tag `REPOSITORY:PLUGIN_NAME` or `PLUGIN_URL`, e.g.: `imjoy-team/imjoy-plugins:Image Window`; 2) or with specified tag: `REPOSITORY:PLUGIN_NAME@TAG` or `PLUGIN_URL@TAG`, e.g.: `imjoy-team/imjoy-plugins:Unet Segmentation@GPU`. In this case, a hash tag `GPU` is used to specify the tag for the plugin named `Unet Segmentation` hosted on GitHub repository `imjoy-team/ImJoy-Plugin` (https://github.com/imjoy-team/imjoy-plugins). If the plugin is not hosted on GitHub or the GitHub repository is not formatted as a ImJoy plugin repository (meaning there is no `manifest.imjoy.json` file defined in the root of the repository), you can use the url directly, e.g.: `https://github.com/imjoy-team/imjoy-demo-plugins/blob/master/repository/3dDemos.imjoy.html` (tags can be added with `@TAG`).
 
 #### defaults
 (**for window plugin only:**) defines an object of default values.
@@ -1103,9 +1103,9 @@ specific plugins can be installed see the dedicated section below.
 
 ### Official ImJoy plugin repository
 The ImJoy plugin repository shown on `ImJoy.io` is served through
-[GitHub](https://github.com/imjoy-team/ImJoy-Plugins).
+[GitHub](https://github.com/imjoy-team/imjoy-plugins).
 
-In order to deploy your plugin to the [plugin repository](https://github.com/imjoy-team/ImJoy-Plugins),
+In order to deploy your plugin to the [plugin repository](https://github.com/imjoy-team/imjoy-plugins),
 you can fork the repository, add your plugin and send a pull request.
 Once the pull request is accepted, the user will be able to install your plugin from the plugin repository.
 
@@ -1192,7 +1192,7 @@ The easiest way to distribute plugins is by creating a url, which can be shared 
 
 The basic format is `http://imjoy.io/#/app?plugin=PLUGIN_URI`. You will need to
 replace `PLUGIN_URI` with your actual **plugin URI** (Uniform Resource Identifier).
-For example: [https://imjoy.io/#/app?plugin=https://github.com/imjoy-team/ImJoy-Plugins/blob/master/repository/imageWindow.imjoy.html](https://imjoy.io/#/app?plugin=https://github.com/imjoy-team/ImJoy-Plugins/blob/master/repository/imageWindow.imjoy.html). When the user click this link,
+For example: [https://imjoy.io/#/app?plugin=https://github.com/imjoy-team/imjoy-plugins/blob/master/repository/imageWindow.imjoy.html](https://imjoy.io/#/app?plugin=https://github.com/imjoy-team/imjoy-plugins/blob/master/repository/imageWindow.imjoy.html). When the user click this link,
 a plugin installation dialog will be shown which proposes to install the specified plugin.
 The user has to simply confirm by clicking `Install`.
 
@@ -1221,7 +1221,7 @@ There are **two types of URI**, depending on how your plugin is deployed:
     how to obtain this url for different hosting platforms:
 
     1. For files on **GitHub**, you just need to copy the link to the file.
-       For example: `https://github.com/imjoy-team/ImJoy-Plugins/blob/master/repository/imageRecognition.imjoy.html`.
+       For example: `https://github.com/imjoy-team/imjoy-plugins/blob/master/repository/imageRecognition.imjoy.html`.
 
     0.  For **Gist** or other Git providers such as (GitLab), if there is only one file in the Gist, you can use the direct Gist link (copied from your browser address bar) or obtain the `raw`
         link of the plugin file. For a Gist with multiple file, you need to specify the `raw` link for the plugin file you would like to use. 
@@ -1273,8 +1273,8 @@ The following url parameters are currently supported:
 
  *   `token` or `t`: define the connection token. For example: `http://imjoy.io/#/app?token=2760239c-c0a7-4a53-a01e-d6da48b949bc`
  *   `repo` or `r`: specify a ImJoy manifest file pointing to a ImJoy plugin repository (see above).
-      This can be a full repo link such as `repo=https://github.com/imjoy-team/ImJoy-Plugins`
-      or a simplified GitHub link `repo=imjoy-team/ImJoy-Plugins`.
+      This can be a full repo link such as `repo=https://github.com/imjoy-team/imjoy-plugins`
+      or a simplified GitHub link `repo=imjoy-team/imjoy-plugins`.
 
       If you are hosting your repo from a non-GitHub website (e.g. GitLab), please
       use the `raw` link to the `manifest.imjoy.json` file.

@@ -295,8 +295,8 @@
                     
                 }
                 
-                p = p || prompt(`Please type a ImJoy plugin URI to start or pass it with ${window.location.href+'?plugin=XXXXX'}`, 'imjoy-team/ImJoy-Plugins:Welcome');
-                p = p || 'imjoy-team/ImJoy-Plugins:Welcome';
+                p = p || prompt(`Please type a ImJoy plugin URI to start or pass it with ${window.location.href+'?plugin=XXXXX'}`, 'imjoy-team/imjoy-plugins:Welcome');
+                p = p || 'imjoy-team/imjoy-plugins:Welcome';
                 if(p){
                     document.getElementById('loading').style.display = 'block';
                     imjoy.pm.reloadPluginRecursively({uri: p}).then(async (plugin)=>{

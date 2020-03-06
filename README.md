@@ -69,7 +69,7 @@ for how to develop ImJoy plugins: [ImJoy Docs](https://imjoy.io/docs)
 
 The easiest way to try ImJoy is to start with a plugin running directly in the browser.
 
-For example, you can install our `Image Recognition` plugin with [this link](https://imjoy.io/#/app?plugin=imjoy-team/ImJoy-Plugins:Image%20Recognition&workspace=getting-started).
+For example, you can install our `Image Recognition` plugin with [this link](https://imjoy.io/#/app?plugin=imjoy-team/imjoy-plugins:Image%20Recognition&workspace=getting-started).
 Clicking the link will open the ImJoy Web App and show a dialog to confirm the
 installation of the plugin. Once installed, you can launch the plugin by clicking
 the button `Image Recognition` in the plugin menu on the left. The demo plugin
@@ -88,7 +88,7 @@ of the local GPU/CPU. The computational backend can also be launched on remote s
 including cloud servers on Amazon, Google Compute, or an institutional computing cluster.
 
 Previously, running Python plugins would require installation of the Plugin Engine. However, now we have added experimental support for running Python plugins via the servers provided by MyBinder.org.
-You can try for example the [DeepBindScan](https://imjoy.io/#/app?plugin=imjoy-team/ImJoy-Plugins:DeepBindScan) plugin without any installation.
+You can try for example the [DeepBindScan](https://imjoy.io/#/app?plugin=imjoy-team/imjoy-plugins:DeepBindScan) plugin without any installation.
 
 To learn more details about ImJoy, please go to [ImJoy Docs](https://imjoy.io/docs/).
 
@@ -98,7 +98,7 @@ Currently, ImJoy consists of the following repositories:
  - [ImJoy Web App (core)](https://github.com/imjoy-team/ImJoy/) (this repository)
  - [ImJoy Plugin Engine](https://github.com/imjoy-team/imjoy-engine)
  - [ImJoy Desktop App](https://github.com/imjoy-team/imjoy-app)
- - [ImJoy Plugin Repository](https://github.com/imjoy-team/ImJoy-Plugins)
+ - [ImJoy Plugin Repository](https://github.com/imjoy-team/imjoy-plugins)
 
 ## Documentation, questions and feedback
 

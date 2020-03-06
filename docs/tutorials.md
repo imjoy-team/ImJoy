@@ -435,7 +435,7 @@ Add this url to the README file so your users can then just click and use the pl
 
 ### More examples
 
-For more advanced examples, please take a look at our plugin repository: https://github.com/imjoy-team/ImJoy-Plugins/tree/master/repository. For example, the [CARE plugin](https://github.com/imjoy-team/ImJoy-Plugins/blob/master/repository/CARE.imjoy.html) is similar to the Unet plugin we made in this tutorial, but can show an interactive loss chart during training.
+For more advanced examples, please take a look at our plugin repository: https://github.com/imjoy-team/imjoy-plugins/tree/master/repository. For example, the [CARE plugin](https://github.com/imjoy-team/imjoy-plugins/blob/master/repository/CARE.imjoy.html) is similar to the Unet plugin we made in this tutorial, but can show an interactive loss chart during training.
 
 
 ## Displaying a chart from Python
