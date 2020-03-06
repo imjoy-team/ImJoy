@@ -61,7 +61,8 @@ jobs:
         with:
           deploy_key: ${{ secrets.ACTIONS_DEPLOY_KEY }}
           publish_dir: ./web/dist
-          commit_message: ${{ format('Deploy to GitHub Pages: {0}', github.sha) }}
+          commit_message: |
+            ${{ format('Deploy to GitHub Pages: {0}', github.sha) }}
       - name: Deploy imjoy.lib repo
         uses:
         with:
