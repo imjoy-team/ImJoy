@@ -72,7 +72,7 @@ if (workbox) {
   );
 
   workbox.routing.registerRoute(
-    new RegExp("https://travis-ci.com/oeway/.*"),
+    new RegExp("https://travis-ci.com/imjoy-team/.*"),
     new workbox.strategies.NetworkFirst()
   );
 
