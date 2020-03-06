@@ -1,6 +1,6 @@
 {
   "BrowserFS": {
-    "uri": "https://imjoy-team.github.io/core-plugins/BrowserFS.imjoy.html",
+    "uri": "https://imjoy-team.github.io/imjoy-core-plugins/BrowserFS.imjoy.html",
     "startup": false
   },
   "Jupyter-Engine-Manager": {
