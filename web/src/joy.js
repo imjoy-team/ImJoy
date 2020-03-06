@@ -10,6 +10,7 @@ Created by Nicky Case http://ncase.me/
 *****************/
 import DOMPurify from "dompurify";
 
+var _myEditLock = false;
 // THE JOY MASTER
 function Joy(options) {
   // You can call this as "new Joy()" or just "Joy()"
