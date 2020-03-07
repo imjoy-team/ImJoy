@@ -288,10 +288,6 @@ self.__precacheManifest = [
     "url": "/static/iconfont/MaterialIcons-Regular.svg"
   },
   {
-    "revision": "a37b0c01c0baf1888ca812cc0508f6e2",
-    "url": "/static/iconfont/MaterialIcons-Regular.ttf"
-  },
-  {
     "revision": "012cf6a10129e2275d79d6adac7f3b02",
     "url": "/static/iconfont/MaterialIcons-Regular.woff"
   },
@@ -634,6 +630,10 @@ self.__precacheManifest = [
   {
     "revision": "524db18624629ebed6788b26cbf4820e",
     "url": "/static/img/perspective-hr.jpg"
+  },
+  {
+    "revision": "a37b0c01c0baf1888ca812cc0508f6e2",
+    "url": "/static/iconfont/MaterialIcons-Regular.ttf"
   },
   {
     "revision": "4b8f17c234aae37b8bbe106bed899ad1",
