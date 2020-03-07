@@ -50,8 +50,7 @@ jobs:
   deploy-imjoy:
     runs-on: ubuntu-latest
     needs: build
-    # Uncomment this before merging.
-    #if: github.ref == 'refs/heads/master'
+    if: github.ref == 'refs/heads/master'
     steps:
       - name: Load saved build output
         uses: actions/download-artifact@v1
@@ -68,8 +67,7 @@ jobs:
   deploy-imjoy-core:
     runs-on: ubuntu-latest
     needs: build
-    # Uncomment this before merging.
-    #if: github.ref == 'refs/heads/master'
+    if: github.ref == 'refs/heads/master'
     steps:
       - name: Load saved build output
         uses: actions/download-artifact@v1
