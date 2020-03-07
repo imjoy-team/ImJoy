@@ -74,7 +74,7 @@ jobs:
       - name: Deploy ImJoy repo
         uses: peaceiris/actions-gh-pages@v3.5.0
         with:
-          deploy_key: ${{ secrets.ACTIONS_DEPLOY_KEY }}
+          deploy_key: ${{ secrets.ACTION_DEPLOY_KEY }}
           publish_dir: ./web/dist
           commit_message: |
             ${{ format('Deploy to GitHub Pages: {0}', github.sha) }}
