@@ -41,10 +41,10 @@
           /></a>
           &nbsp;
 
-          <a href="https://travis-ci.com/imjoy-team/ImJoy" target="_blank"
+          <a href="https://github.com/imjoy-team/ImJoy/actions" target="_blank"
             ><img
-              src="https://travis-ci.com/imjoy-team/ImJoy.svg?branch=master"
-              alt="Travis-CI"/></a
+              src="https://github.com/imjoy-team/ImJoy/workflows/Build%20Site/badge.svg"
+              alt="Build Site"/></a
           >&nbsp;
           <a href="https://github.com/imjoy-team/ImJoy" target="_blank">
             <img

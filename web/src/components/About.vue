@@ -12,10 +12,10 @@
         src="https://img.shields.io/badge/dynamic/json.svg?color=success&label=imjoy%20engine&prefix=v&query=version&url=https%3A%2F%2Fraw.githubusercontent.com%2Fimjoy-team%2Fimjoy-engine%2Fmaster%2Fimjoy%2FVERSION"
         alt="ImJoy-Engine"/></a
     >&nbsp;
-    <a href="https://travis-ci.com/imjoy-team/ImJoy" target="_blank"
+    <a href="https://github.com/imjoy-team/ImJoy/actions" target="_blank"
       ><img
-        src="https://travis-ci.com/imjoy-team/ImJoy.svg?branch=master"
-        alt="Travis-CI"/></a
+        src="https://github.com/imjoy-team/ImJoy/workflows/Build%20Site/badge.svg"
+        alt="Build Site"/></a
     >&nbsp;
 
     <a href="https://zenodo.org/badge/latestdoi/137741898" target="_blank"
