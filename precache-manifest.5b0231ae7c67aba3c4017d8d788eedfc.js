@@ -232,12 +232,12 @@ self.__precacheManifest = [
     "url": "/static/vs/html.worker.js"
   },
   {
-    "revision": "821dd06611f8497a59e8cee99dbeac0e",
-    "url": "/static/vs/css.worker.js"
-  },
-  {
     "revision": "97b7155c6a256bca6fa703b15a901ee8",
     "url": "/static/vs/editor.worker.js"
+  },
+  {
+    "revision": "821dd06611f8497a59e8cee99dbeac0e",
+    "url": "/static/vs/css.worker.js"
   },
   {
     "revision": "872600433473cf5de8eed62aedce8908",
@@ -668,16 +668,16 @@ self.__precacheManifest = [
     "url": "/static/vs/basic-languages/shell/shell.js"
   },
   {
-    "revision": "cc74ca2b063beaffd922ac5f985525e9",
-    "url": "/static/vs/basic-languages/solidity/solidity.js"
-  },
-  {
     "revision": "1ab3a1a2606fcebadb8d1aabbde1b4ef",
     "url": "/static/vs/basic-languages/sql/sql.js"
   },
   {
     "revision": "f915a6c694e283873dd2e1b803dcfb56",
     "url": "/static/vs/basic-languages/st/st.js"
+  },
+  {
+    "revision": "cc74ca2b063beaffd922ac5f985525e9",
+    "url": "/static/vs/basic-languages/solidity/solidity.js"
   },
   {
     "revision": "bbbaa3026dfc4b11171a764cf70dd1da",
