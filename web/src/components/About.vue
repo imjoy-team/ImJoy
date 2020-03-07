@@ -50,9 +50,7 @@
     </p>
     <p>
       Ongoing development of ImJoy is mainly supported by the
-      <a
-        href="https://www.scilifelab.se/researchers/emma-lundberg/"
-        target="_blank"
+      <a href="https://cellprofiling.org/" target="_blank"
         >Cell Profiling Group</a
       >
       headed by Emma Lundberg at
