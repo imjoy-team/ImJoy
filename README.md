@@ -1,6 +1,5 @@
 ![License](https://img.shields.io/github/license/imjoy-team/imjoy-engine.svg)
 [![ImJoy Version](https://img.shields.io/badge/dynamic/json.svg?color=success&label=imjoy&prefix=v&query=version&url=https://raw.githubusercontent.com/imjoy-team/ImJoy/master/web/package.json)](https://imjoy.io/#/app) 
-[![Build Status](https://travis-ci.com/imjoy-team/ImJoy.svg?branch=master)](https://travis-ci.com/imjoy-team/ImJoy) 
 [![Build Site](https://github.com/imjoy-team/ImJoy/workflows/Build%20Site/badge.svg)](https://github.com/imjoy-team/ImJoy/actions)
 [![Netlify Status](https://api.netlify.com/api/v1/badges/3aa71748-2778-4c31-a9ea-f7fdf5445fd1/deploy-status)](https://app.netlify.com/sites/imjoy/deploys) 
 [![Join the chat at https://gitter.im/imjoy-dev/community](https://badges.gitter.im/imjoy-dev/community.svg)](https://gitter.im/imjoy-dev/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
