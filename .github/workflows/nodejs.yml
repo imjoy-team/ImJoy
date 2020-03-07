@@ -96,5 +96,5 @@ jobs:
           external_repository: imjoy-team/lib.imjoy.io
           publish_branch: master
           publish_dir: ./imjoy-core
-          commit_message: ${{ format('Deployed from imjoy-team/ImJoy@{0}', github.sha) }}
+          commit_message: Deployed from
           cname: 'lib.imjoy.io'
