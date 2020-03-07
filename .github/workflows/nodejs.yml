@@ -39,6 +39,11 @@ jobs:
         working-directory: ./web
       - run: npm run build
         working-directory: ./web
+      - name: Save build output
+        uses: actions/upload-artifact@v1
+        with:
+          name: built-output
+          path: ./web/dist
     env:
       NODE_OPTIONS: '--max-old-space-size=4096'
 
@@ -48,6 +53,11 @@ jobs:
     # Uncomment this before merging.
     #if: github.ref == 'refs/heads/master'
     steps:
+      - name: Load saved build output
+        uses: actions/download-artifact@v1
+        with:
+          name: built-output
+          path: ./web/dist
       - name: Prepare imjoy.lib deploy
         run: |
           # Copy dirs and files and that we want to update in imjoy.lib.
