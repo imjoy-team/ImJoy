@@ -1,4 +1,4 @@
-importScripts("/precache-manifest.e99357c39cec1d15abfef3f7b6200ba5.js", "https://storage.googleapis.com/workbox-cdn/releases/3.6.3/workbox-sw.js");
+importScripts("/precache-manifest.e42f30ba034678235fdd8d65917a9f95.js", "https://storage.googleapis.com/workbox-cdn/releases/3.6.3/workbox-sw.js");
 
 /* eslint-disable */
 
@@ -74,7 +74,7 @@ if (workbox) {
   );
 
   workbox.routing.registerRoute(
-    new RegExp("https://travis-ci.com/imjoy-team/.*"),
+    new RegExp("https://github.com/imjoy-team/ImJoy/.*"),
     new workbox.strategies.NetworkFirst()
   );
 
