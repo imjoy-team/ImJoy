@@ -71,14 +71,14 @@ jobs:
           cp -Rf ./web/dist/static/icons ./imjoy-core/static/icons && \
           cp -Rf ./web/dist/static/iconfont ./imjoy-core/static/iconfont && \
           cp -Rf ./web/dist/static/jailed ./imjoy-core/static/jailed
-      - name: Deploy ImJoy repo
+      - name: Deploy ImJoy to https://imjoy.io
         uses: peaceiris/actions-gh-pages@v3.5.0
         with:
           deploy_key: ${{ secrets.ACTION_DEPLOY_KEY }}
           publish_dir: ./web/dist
           commit_message: |
             ${{ format('Deploy to GitHub Pages: {0}', github.sha) }}
-      - name: Deploy imjoy.lib repo
+      - name: Deploy imjoy-core to https://lib.imjoy.io
         uses: peaceiris/actions-gh-pages@v3.5.0
         with:
           deploy_key: ${{ secrets.ACTION_DEPLOY_KEY_FOR_LIB }}
