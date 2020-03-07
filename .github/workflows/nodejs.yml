@@ -76,8 +76,7 @@ jobs:
         with:
           deploy_key: ${{ secrets.ACTION_DEPLOY_KEY }}
           publish_dir: ./web/dist
-          commit_message: |
-            ${{ format('Deploy to GitHub Pages: {0}', github.sha) }}
+          commit_message: Deploy to GitHub Pages
       - name: Deploy imjoy-core to https://lib.imjoy.io
         uses: peaceiris/actions-gh-pages@v3.5.0
         with:
