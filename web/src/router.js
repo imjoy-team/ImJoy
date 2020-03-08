@@ -41,7 +41,7 @@ export const router_config = {
     },
     {
       path: "*",
-      redirect: "/",
+      redirect: "/404.html",
     },
   ],
 };
