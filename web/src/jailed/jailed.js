@@ -569,15 +569,18 @@ DynamicPlugin.prototype._connect = function() {
     me.initializing = true;
     me._updateUI();
     me.engine
-      .startPlugin(
-        {
-          ...me.config,
-          terminate: () => {
-            me.terminate();
-          },
+      .startPlugin(me.config, {
+        ...me._initialInterface,
+        terminatePlugin() {
+          me.terminate();
         },
-        me._initialInterface
-      )
+        setPluginStatus(status) {
+          if (!me._disconnected) {
+            me.running = status.running;
+            me._updateUI();
+          }
+        },
+      })
       .then(remote => {
         // check if the plugin is terminated during startup
         if (!me.engine) {
@@ -643,18 +646,9 @@ DynamicPlugin.prototype._connect = function() {
   }
 };
 
-/**
- * Creates the Site object for the plugin, and then loads the
- * common routines (_JailedSite.js)
- */
-DynamicPlugin.prototype._init = function() {
-  var lang = this.backend.lang;
-
-  /*global JailedSite*/
-  this._site = new JailedSite(this._connection, this.id, lang);
-
+DynamicPlugin.prototype.registerSiteEvents = function(_site) {
   var me = this;
-  this._site.onDisconnect(function(details) {
+  _site.onDisconnect(function(details) {
     me._disconnect.emit();
     if (details) {
       if (details.success) {
@@ -666,19 +660,33 @@ DynamicPlugin.prototype._init = function() {
     me._set_disconnected();
   });
 
-  this._site.onRemoteReady(function() {
+  _site.onRemoteReady(function() {
     if (me.running) {
       me.running = false;
       me._updateUI();
     }
   });
 
-  this._site.onRemoteBusy(function() {
+  _site.onRemoteBusy(function() {
     if (!me._disconnected && !me.running) {
       me.running = true;
       me._updateUI();
     }
   });
+};
+
+/**
+ * Creates the Site object for the plugin, and then loads the
+ * common routines (_JailedSite.js)
+ */
+DynamicPlugin.prototype._init = function() {
+  var lang = this.backend.lang;
+
+  /*global JailedSite*/
+  this._site = new JailedSite(this._connection, this.id, lang);
+
+  var me = this;
+  this.registerSiteEvents(this._site);
 
   this.getRemoteCallStack = this._site.getRemoteCallStack;
   var sCb = function() {
