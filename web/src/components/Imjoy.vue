@@ -1319,12 +1319,8 @@
 
 import { saveAs } from "file-saver";
 import axios from "axios";
-import WEB_WORKER_PLUGIN_TEMPLATE from "../plugins/webWorkerTemplate.imjoy.html";
-import NATIVE_PYTHON_PLUGIN_TEMPLATE from "../plugins/nativePythonTemplate.imjoy.html";
-import WEB_PYTHON_PLUGIN_TEMPLATE from "../plugins/webPythonTemplate.imjoy.html";
-import WINDOW_PLUGIN_TEMPLATE from "../plugins/windowTemplate.imjoy.html";
+import { plugin_templates } from "../plugins";
 import JUPYTER_NOTEBOOK_TEMPLATE from "../plugins/jupyterNotebookTemplate.imjoy.html";
-
 import { version } from "../../package.json";
 
 import {
@@ -1338,11 +1334,9 @@ import {
 
 import DOMPurify from "dompurify";
 
-import { ImJoy } from "../imjoyCore.js";
+import { ImJoy, Joy } from "imjoy-core";
 
 import _ from "lodash";
-
-import { Joy } from "../joy";
 
 import Minibus from "minibus";
 
@@ -1497,6 +1491,7 @@ export default {
       },
       add_window_callback: this.addWindowCallback,
       client_id: this.client_id,
+      jailed_asset_url: "https://lib.imjoy.io/static/jailed/",
     });
 
     this.pm = this.imjoy.pm;
@@ -1507,30 +1502,7 @@ export default {
     this.IMJOY_PLUGIN = {
       _id: "IMJOY_APP",
     };
-    this.plugin_templates = [
-      {
-        name: "Default template",
-        code: WEB_WORKER_PLUGIN_TEMPLATE,
-        icon: "code",
-      },
-      {
-        name: "Web Worker (JS)",
-        code: WEB_WORKER_PLUGIN_TEMPLATE,
-        icon: "swap_horiz",
-      },
-      {
-        name: "Window (HTML/CSS/JS)",
-        code: WINDOW_PLUGIN_TEMPLATE,
-        icon: "picture_in_picture",
-      },
-      {
-        name: "Native Python",
-        code: NATIVE_PYTHON_PLUGIN_TEMPLATE,
-        icon: "🚀",
-      },
-      // {name: "Iframe(Javascript)", code: IFRAME_PLUGIN_TEMPLATE},
-      { name: "Web Python", code: WEB_PYTHON_PLUGIN_TEMPLATE, icon: "🐍" },
-    ];
+    this.plugin_templates = plugin_templates;
     this.workflow_joy_config = {
       expanded: true,
       name: "Workflow",

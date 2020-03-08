@@ -191,14 +191,13 @@
 
 <script>
 import { saveAs } from "file-saver";
-import { PluginManager } from "../pluginManager.js";
 import axios from "axios";
 import marked from "marked";
 import DOMPurify from "dompurify";
 import _ from "lodash";
 import { randId } from "../utils.js";
 
-import { parseComponent } from "../pluginParser.js";
+import { parseComponent } from "imjoy-core";
 
 export default {
   name: "plugin-list",
@@ -216,7 +215,7 @@ export default {
       default: null,
     },
     pluginManager: {
-      type: [PluginManager, Object],
+      type: [Object],
       default: null,
     },
     workspace: {

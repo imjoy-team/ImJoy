@@ -9,16 +9,18 @@
     "type": "git",
     "url": "git+https://github.com/imjoy-team/ImJoy.git"
   },
-  "keywords": ["ImJoy", "PWA", "Deep Learning"],
+  "keywords": [
+    "ImJoy",
+    "PWA",
+    "Deep Learning"
+  ],
   "bugs": {
     "url": "https://github.com/imjoy-team/ImJoy/issues"
   },
   "homepage": "https://imjoy.io",
   "scripts": {
     "serve": "vue-cli-service serve --host 0.0.0.0",
-    "build": "vue-cli-service build && npm run build-umd && npm run build-module",
-    "build-umd": "webpack --config webpack.library.js --mode development --filename imjoy-core.js && webpack --config webpack.library.js --mode production --filename imjoy-core.min.js",
-    "build-module": "webpack --config webpack.library.js --mode development --libraryTarget commonjs2 --filename imjoy-core.module.js && node ./prepare-core-package.js",
+    "build": "vue-cli-service build",
     "test": "vue-cli-service test:unit",
     "check-format": "prettier --check \"{src,tests}/**/**\"",
     "format": "prettier --write \"{src,tests}/**/**\"",
@@ -27,17 +29,15 @@
     "deploy": "DEPLOY_MODE=dev vue-cli-service build && node ./deploy-dev.js"
   },
   "dependencies": {
-    "ajv": "^6.6.1",
+    "ajv": "^6.9.1",
     "axios": "^0.18.0",
     "dompurify": "^1.0.11",
     "file-saver": "^1.3.3",
-    "glfx": "0.0.4",
-    "html-webpack-plugin": "^2.30.1",
+    "imjoy-core": "^0.11.3",
     "js-yaml": "^3.13.1",
     "lodash": "^4.17.10",
     "marked": "^0.6.3",
     "minibus": "^3.1.0",
-    "module": "^1.2.5",
     "monaco-editor": "^0.15.6",
     "monaco-editor-webpack-plugin": "^1.7.0",
     "pouchdb-browser": "^7.0.0",
