@@ -8,9 +8,9 @@ module.exports = (env, argv) => {
         entry: path.resolve(__dirname, 'src', 'imjoyCore.js'),
         output: {
             path: path.resolve(__dirname, 'dist'),
-            filename: argv.mode === 'production'?'imjoy-core.min.js':'imjoy-core.js',
+            filename: argv.filename || 'imjoy-core.js',
             library: 'imjoyCore',
-            libraryTarget:'umd'
+            libraryTarget: argv.libraryTarget ? argv.libraryTarget : 'umd'
         },
         resolve: {
             extensions: ['.js']

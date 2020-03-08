@@ -1,13 +1,24 @@
 {
-  "name": "ImJoy.io",
-  "version": "0.10.26",
-  "private": true,
+  "name": "imjoy",
+  "version": "0.10.27",
+  "private": false,
   "description": "ImJoy -- deep learning made easy.",
-  "author": "Wei OUYANG <wei.ouyang@cri-paris.org>",
+  "author": "imjoy-team <imjoy.team@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/imjoy-team/ImJoy.git"
+  },
+  "keywords": ["ImJoy", "PWA", "Deep Learning"],
+  "bugs": {
+    "url": "https://github.com/imjoy-team/ImJoy/issues"
+  },
+  "homepage": "https://imjoy.io",
   "scripts": {
     "serve": "vue-cli-service serve --host 0.0.0.0",
-    "build": "vue-cli-service build && npm run build-lib",
-    "build-lib": "webpack --config webpack.library.js --mode development && webpack --config webpack.library.js --mode production",
+    "build": "vue-cli-service build && npm run build-umd && npm run build-module",
+    "build-umd": "webpack --config webpack.library.js --mode development --filename imjoy-core.js && webpack --config webpack.library.js --mode production --filename imjoy-core.min.js",
+    "build-module": "webpack --config webpack.library.js --mode development --libraryTarget commonjs2 --filename imjoy-core.module.js && node ./prepare-core-package.js",
     "test": "vue-cli-service test:unit",
     "check-format": "prettier --check \"{src,tests}/**/**\"",
     "format": "prettier --write \"{src,tests}/**/**\"",
