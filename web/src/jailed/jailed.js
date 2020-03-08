@@ -568,19 +568,21 @@ DynamicPlugin.prototype._connect = function() {
     }
     me.initializing = true;
     me._updateUI();
+    const engine_utils = {
+      __as_interface__: true,
+      __id__: me.config.id + "_utils",
+      terminatePlugin() {
+        me.terminate();
+      },
+      setPluginStatus(status) {
+        if (!me._disconnected) {
+          me.running = status.running;
+          me._updateUI();
+        }
+      },
+    };
     me.engine
-      .startPlugin(me.config, {
-        ...me._initialInterface,
-        terminatePlugin() {
-          me.terminate();
-        },
-        setPluginStatus(status) {
-          if (!me._disconnected) {
-            me.running = status.running;
-            me._updateUI();
-          }
-        },
-      })
+      .startPlugin(me.config, me._initialInterface, engine_utils)
       .then(remote => {
         // check if the plugin is terminated during startup
         if (!me.engine) {
