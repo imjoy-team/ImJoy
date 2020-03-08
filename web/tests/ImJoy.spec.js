@@ -2,7 +2,7 @@ import { expect } from "chai";
 import { shallowMount, createLocalVue } from "@vue/test-utils";
 import VueRouter from "vue-router";
 import { router_config } from "../src/router";
-import { Joy } from "../src/joy";
+import { Joy } from "imjoy-core";
 import Imjoy from "@/components/Imjoy.vue";
 import _ from "lodash";
 
