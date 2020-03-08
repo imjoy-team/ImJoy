@@ -1,0 +1,24 @@
+{
+ "name": "imjoy-core",
+ "version": "0.10.27",
+ "private": false,
+ "description": "The core library for ImJoy -- a sandboxed plugin framework for computational web applications.",
+ "author": "imjoy-team <imjoy.team@gmail.com>",
+ "license": "MIT",
+ "repository": {
+  "type": "git",
+  "url": "git+https://github.com/imjoy-team/ImJoy.git"
+ },
+ "keywords": [
+  "ImJoy",
+  "PWA",
+  "Deep Learning"
+ ],
+ "bugs": {
+  "url": "https://github.com/imjoy-team/ImJoy/issues"
+ },
+ "homepage": "https://imjoy.io",
+ "scripts": {},
+ "dependencies": {},
+ "devDependencies": {}
+}
