@@ -3425,13 +3425,9 @@ button.md-speed-dial-target {
   font-size: 1.2em;
 }
 
-.joy-run-button .md-ripple {
-  justify-content: flex-start !important;
-}
-
 @media screen and (max-width: 600px) {
   .joy-run-button {
-    width: calc(100% - 105px) !important;
+    width: calc(100% - 115px) !important;
     text-transform: none;
     font-size: 1.2em;
   }
@@ -3439,7 +3435,7 @@ button.md-speed-dial-target {
 
 @media screen and (max-width: 400px) {
   .joy-run-button {
-    width: calc(100% - 70px) !important;
+    width: calc(100% - 80px) !important;
     text-transform: none;
     font-size: 1.2em;
   }

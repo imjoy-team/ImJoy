@@ -197,6 +197,13 @@ ul li {
 
 .joy-run-button .md-ripple {
   justify-content: flex-start !important;
+  padding: 4px;
+}
+
+@media screen and (max-width: 600px) {
+  .joy-run-button .md-ripple {
+    padding: 0px !important;
+  }
 }
 
 /* for code editor */
