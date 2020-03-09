@@ -255,7 +255,7 @@
                   <span v-else>ImJoyApp v{{ imjoy_version }}</span>
                 </div>
 
-                <md-tooltip>click to check updates</md-tooltip>
+                <md-tooltip>Click here to check for updates</md-tooltip>
               </md-menu-item>
               <md-menu-item
                 href="https://github.com/imjoy-team/imjoy-core"
