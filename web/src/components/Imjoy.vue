@@ -257,11 +257,13 @@
 
                 <md-tooltip>click to check updates</md-tooltip>
               </md-menu-item>
-              <md-menu-item v-if="core_badge_url">
+              <md-menu-item
+                href="https://github.com/imjoy-team/imjoy-core"
+                target="_blank"
+                v-if="core_badge_url"
+              >
                 <md-icon>toys</md-icon>
-                <div @click.stop="">
-                  <img style="width: 122px;" :src="core_badge_url" />
-                </div>
+                <img style="width: 122px;" :src="core_badge_url" />
                 <md-tooltip>ImJoy Core version: v{{ core_version }}</md-tooltip>
               </md-menu-item>
             </md-menu-content>
