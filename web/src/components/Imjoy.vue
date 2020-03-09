@@ -247,7 +247,11 @@
                     style="left: -30px"
                     class="loading loading-lg"
                   ></div>
-                  <img v-else-if="version_badge_url" :src="version_badge_url" />
+                  <img
+                    v-else-if="version_badge_url"
+                    style="width: 122px;"
+                    :src="version_badge_url"
+                  />
                   <span v-else>ImJoyApp v{{ imjoy_version }}</span>
                 </div>
 
@@ -256,7 +260,7 @@
               <md-menu-item v-if="core_badge_url">
                 <md-icon>toys</md-icon>
                 <div @click.stop="">
-                  <img :src="core_badge_url" />
+                  <img style="width: 122px;" :src="core_badge_url" />
                 </div>
                 <md-tooltip>ImJoy Core version: v{{ core_version }}</md-tooltip>
               </md-menu-item>
