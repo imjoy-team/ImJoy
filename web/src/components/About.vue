@@ -1,16 +1,22 @@
 <template>
   <div class="about">
-    <a href="https://github.com/imjoy-team/imjoy-engine" target="_blank"
+    <a href="https://github.com/imjoy-team/ImJoy" target="_blank"
       ><img
         :src="
-          'https://img.shields.io/badge/imjoy-v' + app_version + '-success.svg'
+          'https://img.shields.io/badge/ImJoyApp-v' +
+            app_version +
+            '-success.svg'
         "
         alt="ImJoy"/></a
     >&nbsp;
-    <a href="https://github.com/imjoy-team/imjoy-engine" target="_blank"
+    <a href="https://github.com/imjoy-team/imjoy-core" target="_blank"
       ><img
-        src="https://img.shields.io/badge/dynamic/json.svg?color=success&label=imjoy%20engine&prefix=v&query=version&url=https%3A%2F%2Fraw.githubusercontent.com%2Fimjoy-team%2Fimjoy-engine%2Fmaster%2Fimjoy%2FVERSION"
-        alt="ImJoy-Engine"/></a
+        :src="
+          'https://img.shields.io/badge/ImJoyCore-v' +
+            core_version +
+            '-success.svg'
+        "
+        alt="ImJoy Core"/></a
     >&nbsp;
     <a href="https://github.com/imjoy-team/ImJoy/actions" target="_blank"
       ><img
@@ -93,11 +99,13 @@
 
 <script>
 import { version } from "../../package.json";
+import { version as core_version } from "imjoy-core";
 
 export default {
   name: "about",
   created() {
     this.app_version = version;
+    this.core_version = core_version;
   },
 };
 </script>
