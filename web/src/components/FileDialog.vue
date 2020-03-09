@@ -112,7 +112,7 @@
   </md-dialog>
 </template>
 <script>
-import { utils  } from "imjoy-core";
+import { utils } from "imjoy-core";
 
 export default {
   name: "file-dialog",
