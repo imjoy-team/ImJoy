@@ -94,7 +94,6 @@
 
 <script>
 import { randId, assert } from "../utils.js";
-import { WindowManager } from "../windowManager.js";
 
 export default {
   name: "whiteboard",
@@ -106,7 +105,7 @@ export default {
       },
     },
     windowManager: {
-      type: WindowManager,
+      type: Object,
       default: function() {
         return null;
       },

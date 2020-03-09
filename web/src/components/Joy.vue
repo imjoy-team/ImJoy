@@ -7,7 +7,7 @@
 </template>
 
 <script>
-import { Joy } from "../joy";
+import { Joy } from "imjoy-core";
 export default {
   name: "joy",
   props: {

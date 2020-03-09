@@ -56,10 +56,6 @@ module.exports = {
         to: path.join(__dirname, "dist/static/js/pluginParser.js"),
         toType: "file"
       },{
-        from: path.join(__dirname, "src/jailed"),
-        to: path.join(__dirname, "dist/static/jailed"),
-        toType: "dir"
-      },{
         from: path.join(__dirname, "src/plugin-service-worker.js"),
         to: path.join(__dirname, "dist/plugin-service-worker.js"),
         toType: "file"
@@ -90,13 +86,9 @@ module.exports = {
         frameworks: ['mocha'],
         files: [
           'tests/*.spec.js',
-          { pattern: 'src/jailed/*', watched: false, included: false, served: true, nocache: false },
         ],
         preprocessors: {
           '**/*.spec.js': ['webpack', 'sourcemap']
-        },
-        proxies: {
-          "/static/jailed/": "/base/src/jailed/"
         },
 
         browsers: ['ChromeHeadlessNoSandbox', 'FirefoxHeadless'],
