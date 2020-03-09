@@ -3422,7 +3422,7 @@ button.md-speed-dial-target {
 }
 
 .joy-run-button {
-  width: calc(100% - 125px);
+  width: calc(100% - 128px);
   text-transform: none;
   font-size: 1.2em;
 }
