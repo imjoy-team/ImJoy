@@ -1323,18 +1323,11 @@ import { plugin_templates } from "../plugins";
 import JUPYTER_NOTEBOOK_TEMPLATE from "../plugins/jupyterNotebookTemplate.imjoy.html";
 import { version } from "../../package.json";
 
-import {
-  randId,
-  url_regex,
-  assert,
-  _clone,
-  compareVersions,
-  escapeHTML,
-} from "../utils.js";
-
 import DOMPurify from "dompurify";
 
-import { ImJoy, Joy } from "imjoy-core";
+import { ImJoy, Joy, utils } from "imjoy-core";
+
+import { escapeHTML, _clone, assert, url_regex, randId } from "../utils.js";
 
 import _ from "lodash";
 
@@ -1999,14 +1992,14 @@ export default {
         const obj = response.data;
         if (obj && obj.version) {
           this.latest_version = obj.version;
-          this.is_latest_version = compareVersions(
+          this.is_latest_version = utils.compareVersions(
             this.imjoy_version,
             ">=",
             obj.version
           );
           if (this.is_latest_version) {
             if (!quiet) {
-              if (compareVersions(this.imjoy_version, ">", obj.version)) {
+              if (utils.compareVersions(this.imjoy_version, ">", obj.version)) {
                 this.showMessage(
                   `🍻 Your ImJoy (v${
                     this.imjoy_version
@@ -2247,7 +2240,7 @@ export default {
 
         if (this.pm.plugin_names[config.name]) {
           if (
-            compareVersions(
+            utils.compareVersions(
               config.version,
               ">",
               this.pm.plugin_names[config.name].config.version
@@ -2255,7 +2248,7 @@ export default {
           ) {
             config._installation_text = "Upgrade";
           } else if (
-            compareVersions(
+            utils.compareVersions(
               config.version,
               "<",
               this.pm.plugin_names[config.name].config.version
@@ -2757,7 +2750,7 @@ export default {
         //TODO: remove this in the future
         if (
           _plugin.config.api_version &&
-          compareVersions(_plugin.config.api_version, "<=", "0.1.3")
+          utils.compareVersions(_plugin.config.api_version, "<=", "0.1.3")
         ) {
           config.return_object =
             config.return_object === undefined ? false : config.return_object;
