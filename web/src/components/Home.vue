@@ -33,7 +33,7 @@
           <a href="https://github.com/imjoy-team/ImJoy" target="_blank"
             ><img
               :src="
-                'https://img.shields.io/badge/imjoy-v' +
+                'https://img.shields.io/badge/ImJoy-v' +
                   app_version +
                   '-success.svg'
               "

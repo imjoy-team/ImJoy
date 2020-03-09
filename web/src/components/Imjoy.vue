@@ -227,6 +227,12 @@
               <md-menu-item @click="showAboutDialog = true" class="md-primary">
                 <md-icon>info</md-icon>About
               </md-menu-item>
+              <md-menu-item @click="restartImJoy" class="md-primary">
+                <md-icon>autorenew</md-icon>
+
+                <span>Restart ImJoy</span>
+                <md-tooltip>click to reload</md-tooltip>
+              </md-menu-item>
               <md-menu-item>
                 <md-icon v-if="latest_version && is_latest_version"
                   >check</md-icon
@@ -242,16 +248,17 @@
                     class="loading loading-lg"
                   ></div>
                   <img v-else-if="version_badge_url" :src="version_badge_url" />
-                  <span v-else>ImJoy v{{ imjoy_version }}</span>
+                  <span v-else>ImJoyApp v{{ imjoy_version }}</span>
                 </div>
 
                 <md-tooltip>click to check updates</md-tooltip>
               </md-menu-item>
-              <md-menu-item @click="restartImJoy" class="md-primary">
-                <md-icon>autorenew</md-icon>
-
-                <span>Restart ImJoy</span>
-                <md-tooltip>click to reload</md-tooltip>
+              <md-menu-item v-if="core_badge_url">
+                <md-icon>toys</md-icon>
+                <div @click.stop="">
+                  <img :src="core_badge_url" />
+                </div>
+                <md-tooltip>ImJoy Core version: v{{ core_version }}</md-tooltip>
               </md-menu-item>
             </md-menu-content>
           </md-menu>
@@ -1322,6 +1329,7 @@ import axios from "axios";
 import { plugin_templates } from "../plugins";
 import JUPYTER_NOTEBOOK_TEMPLATE from "../plugins/jupyterNotebookTemplate.imjoy.html";
 import { version } from "../../package.json";
+import { version as core_version } from "imjoy-core";
 
 import DOMPurify from "dompurify";
 
@@ -1389,6 +1397,7 @@ export default {
       dialog_window_config: {},
       latest_version: null,
       is_latest_version: false,
+      core_version: null,
       checking: false,
       alert_config: { show: false },
       confirm_config: { show: false, confirm: () => {}, cancel: () => {} },
@@ -1406,11 +1415,22 @@ export default {
       if (this.latest_version) {
         const color = this.is_latest_version ? "success" : "orange";
         return (
-          "https://img.shields.io/badge/imjoy-v" +
+          "https://img.shields.io/badge/ImJoyApp-v" +
           this.imjoy_version +
           "-" +
           color +
           ".svg"
+        );
+      } else {
+        return null;
+      }
+    },
+    core_badge_url: function() {
+      if (this.core_version) {
+        return (
+          "https://img.shields.io/badge/ImJoyCore-v" +
+          this.core_version +
+          "-success.svg"
         );
       } else {
         return null;
@@ -1431,6 +1451,7 @@ export default {
   },
   created() {
     this.imjoy_version = version;
+    this.core_version = core_version;
     // mocks it for testing if not available
     this.event_bus =
       (this.$root.$data.store && this.$root.$data.store.event_bus) ||
@@ -3395,7 +3416,7 @@ button.md-speed-dial-target {
 }
 
 .joy-run-button {
-  width: calc(100% - 120px);
+  width: calc(100% - 125px);
   text-transform: none;
   font-size: 1.2em;
 }
