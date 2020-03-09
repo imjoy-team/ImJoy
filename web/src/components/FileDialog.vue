@@ -112,7 +112,7 @@
   </md-dialog>
 </template>
 <script>
-import { pathJoin } from "../utils.js";
+import { utils } from "imjoy-core";
 
 export default {
   name: "file-dialog",
@@ -209,7 +209,7 @@ export default {
             }`;
             await this.selected_file_manager.putFile(
               files[i],
-              pathJoin(this.root, files[i].name)
+              utils.pathJoin(this.root, files[i].name)
             );
           } else {
             await this.upload(

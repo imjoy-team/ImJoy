@@ -33,7 +33,7 @@
     "axios": "^0.18.1",
     "dompurify": "^2.0.8",
     "file-saver": "^1.3.3",
-    "imjoy-core": "^0.11.3",
+    "imjoy-core": "^0.11.6",
     "js-yaml": "^3.13.1",
     "lodash": "^4.17.15",
     "marked": "^0.8.0",
@@ -75,6 +75,8 @@
     "eslint-config-prettier": "^4.2.0",
     "eslint-plugin-vue": "^5.0.0-0",
     "gh-pages": "^2.0.1",
+    "husky": "^4.2.3",
+    "lint-staged": "^10.0.8",
     "mocha": "^5.0.5",
     "mocha-webpack": "^2.0.0-beta.0",
     "postcss-import": "^11.0.0",
@@ -127,5 +129,14 @@
     "> 1%",
     "last 2 versions",
     "not ie <= 8"
-  ]
+  ],
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "{src,tests}/**/*.js": "eslint --cache --fix",
+    "{src,tests}/**/**": "prettier --write"
+  }
 }

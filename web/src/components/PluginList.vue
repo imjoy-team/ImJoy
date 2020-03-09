@@ -197,7 +197,7 @@ import DOMPurify from "dompurify";
 import _ from "lodash";
 import { randId } from "../utils.js";
 
-import { parseComponent } from "imjoy-core";
+import { parseComponent } from "../pluginParser.js";
 
 export default {
   name: "plugin-list",
