@@ -16,6 +16,15 @@ const version_file = {
   content: `{"name": "${package_json.name}", "version": "${package_json.version}", "description": "${package_json.description}"}`
 };
 
+const nojekyll_file = {
+  // path to folder in which the file will be created
+  path: path.join(__dirname, "dist"),
+  // file name
+  fileName: '.nojekyll',
+  // content of the file
+  content: ""
+};
+
 module.exports = {
   runtimeCompiler: true,
   outputDir: './dist',
@@ -41,6 +50,7 @@ module.exports = {
     },
     plugins: [
       new CreateFileWebpack(version_file),
+      new CreateFileWebpack(nojekyll_file),
       new CnameWebpackPlugin({
         domain: process.env.DEPLOY_MODE === 'dev' ? 'dev.imjoy.io' : 'imjoy.io',
       }),
@@ -56,10 +66,6 @@ module.exports = {
         from: path.join(__dirname, "src/pluginParser.js"),
         to: path.join(__dirname, "dist/static/js/pluginParser.js"),
         toType: "file"
-      },{
-        from: path.join(__dirname, "public/.nojekyll"),
-        to: path.join(__dirname, "dist"),
-        toType: "dir"
       }]),
       new MonacoWebpackPlugin({output: 'static/vs', languages: ['javascript', 'html', 'css', 'python'], features: ['accessibilityHelp', 'bracketMatching', 'caretOperations', 'clipboard', 'codeAction', 'codelens', 'colorDetector', 'comment', 'contextmenu', 'coreCommands', 'cursorUndo', 'dnd', 'find', 'folding', 'fontZoom', 'format', 'goToDefinitionCommands', 'goToDefinitionMouse', 'gotoError', 'gotoLine', 'hover', 'inPlaceReplace', 'inspectTokens', 'iPadShowKeyboard', 'linesOperations', 'links', 'multicursor', 'parameterHints', 'quickCommand', 'quickOutline', 'referenceSearch', 'rename', 'smartSelect', 'snippets', 'suggest', 'toggleHighContrast', 'toggleTabFocusMode', 'transpose', 'wordHighlighter', 'wordOperations', 'wordPartOperations']}),
       new webpack.DefinePlugin({
