@@ -479,7 +479,11 @@
               </p>
             </div>
 
-            <div v-for="plugin in sortedRunnablePlugins()" :key="plugin.name">
+            <div
+              v-for="plugin in sortedRunnablePlugins()"
+              style="display: flex;"
+              :key="plugin.name"
+            >
               <md-divider></md-divider>
               <md-badge
                 :class="plugin.update_available ? '' : 'hide-badge'"
@@ -722,6 +726,7 @@
               <div
                 v-for="plugin in sortedNonRunnablePlugins()"
                 :key="plugin.name"
+                style="display: flex;"
               >
                 <md-badge
                   :class="plugin.update_available ? '' : 'hide-badge'"
