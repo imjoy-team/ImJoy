@@ -9,7 +9,7 @@ if (workbox) {
    */
 
   workbox.setConfig({
-    debug: true,
+    debug: false,
   });
 
   const removeQuery = {
