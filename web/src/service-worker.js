@@ -51,7 +51,7 @@ if (workbox) {
 
   workbox.routing.registerRoute(
     new RegExp("https://imjoy-team.github.io/.*"),
-    new workbox.strategies.StaleWhileRevalidate()
+    new workbox.strategies.NetworkFirst()
   );
 
   // manifest.imjoy.json etc.
