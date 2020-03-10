@@ -8,14 +8,13 @@ if (workbox) {
    * See https://goo.gl/S9QRab
    */
 
-  // workbox.setConfig({
-  //   debug: true
-  // });
+  workbox.setConfig({
+    debug: true,
+  });
 
   workbox.core.setCacheNameDetails({ prefix: "ImJoy.io" });
   self.__precacheManifest = self.__precacheManifest || [];
 
-  workbox.precaching.suppressWarnings();
   workbox.precaching.precacheAndRoute(self.__precacheManifest, {});
 
   workbox.routing.registerRoute(

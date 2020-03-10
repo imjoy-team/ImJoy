@@ -2,6 +2,7 @@ var ghpages = require('gh-pages');
 ghpages.publish('dist', {
     branch: 'gh-pages',
     dotfiles: true,
+    message: 'Manually deployed.',
     repo: 'git@github.com:imjoy-team/dev.imjoy.io.git'
   },
   function(err) {
