@@ -479,255 +479,9 @@
               </p>
             </div>
 
-            <div
-              v-for="plugin in sortedRunnablePlugins()"
-              style="display: flex;"
-              :key="plugin.name"
-            >
+            <div v-for="plugin in sortedRunnablePlugins()" :key="plugin.name">
               <md-divider></md-divider>
-              <md-badge
-                :class="plugin.update_available ? '' : 'hide-badge'"
-                class="md-square md-primary"
-                md-dense
-                md-content="NEW"
-              >
-                <md-menu md-size="medium">
-                  <md-button
-                    class="md-icon-button"
-                    :class="plugin.running ? 'md-accent' : ''"
-                    md-menu-trigger
-                  >
-                    <md-progress-spinner
-                      v-if="plugin.initializing || plugin.terminating"
-                      class="md-accent"
-                      :md-diameter="20"
-                      md-mode="indeterminate"
-                    ></md-progress-spinner>
-                    <plugin-icon
-                      v-else
-                      :icon="plugin.config.icon"
-                    ></plugin-icon>
-                    <md-tooltip v-if="screenWidth > 500">{{
-                      plugin.name + ": " + plugin.config.description
-                    }}</md-tooltip>
-                  </md-button>
-
-                  <md-menu-content>
-                    <md-menu-item
-                      v-if="plugin.config.origin"
-                      @click="updatePlugin(plugin.id)"
-                      :class="plugin.update_available ? 'md-primary' : ''"
-                    >
-                      <md-icon
-                        :class="plugin.update_available ? 'md-primary' : ''"
-                        >cloud_download</md-icon
-                      >Update
-                    </md-menu-item>
-                    <md-menu-item
-                      @click="showLog(plugin)"
-                      v-if="
-                        plugin._log_history &&
-                          plugin._log_history.length > 0 &&
-                          screenWidth <= 400
-                      "
-                    >
-                      <md-icon v-if="plugin._log_history._error" class="red"
-                        >error_outline</md-icon
-                      >
-                      <md-icon v-else>info</md-icon>Log
-                    </md-menu-item>
-                    <md-menu-item @click="showDoc(plugin.id)">
-                      <md-icon>description</md-icon>Docs
-                    </md-menu-item>
-                    <md-menu-item
-                      v-if="plugin.config.origin"
-                      @click="sharePlugin(plugin.id)"
-                    >
-                      <md-icon>share</md-icon>Share
-                    </md-menu-item>
-                    <md-menu-item @click="downloadPlugin(plugin.id)">
-                      <md-icon>cloud_download</md-icon>Export
-                    </md-menu-item>
-                    <md-menu-item @click="editPlugin(plugin.id)">
-                      <md-icon>edit</md-icon>Edit
-                    </md-menu-item>
-                    <md-menu-item @click="reloadPlugin(plugin.config)">
-                      <md-icon>autorenew</md-icon>Reload
-                    </md-menu-item>
-                    <md-menu-item @click="unloadPlugin(plugin)">
-                      <md-icon>clear</md-icon>Terminate
-                    </md-menu-item>
-                    <md-menu-item
-                      class="md-accent"
-                      @click="removePlugin(plugin)"
-                    >
-                      <md-icon>delete_forever</md-icon>Remove
-                    </md-menu-item>
-                    <div v-if="plugin.config.engine_mode">
-                      <md-divider></md-divider>
-                      <md-menu-item @click="switchEngine(plugin, 'auto')">
-                        <md-icon v-if="plugin.config.engine_mode === 'auto'"
-                          >check_box</md-icon
-                        >
-                        <md-icon v-else>check_box_outline_blank</md-icon>
-
-                        <span
-                          :class="
-                            plugin.config.engine_mode === 'auto' ? 'bold' : ''
-                          "
-                          >Auto</span
-                        >
-                      </md-menu-item>
-                      <md-menu-item
-                        v-for="engine in em.matchEngineByType(plugin.type)"
-                        :key="engine.name"
-                        @click="switchEngine(plugin, engine)"
-                      >
-                        <md-icon
-                          v-if="
-                            plugin.config.engine_mode === engine.name ||
-                              (plugin.engine &&
-                                plugin.engine.name === engine.name)
-                          "
-                          >radio_button_checked</md-icon
-                        >
-                        <md-icon v-else>radio_button_unchecked</md-icon>
-                        <span
-                          :class="
-                            plugin.engine && plugin.engine.name === engine.name
-                              ? 'bold'
-                              : ''
-                          "
-                          >{{ engine.name }}</span
-                        >
-                      </md-menu-item>
-                      <md-divider></md-divider>
-                      <md-menu-item
-                        v-for="tag in plugin.config.tags"
-                        :key="tag"
-                        @click="switchTag(plugin, tag)"
-                      >
-                        <md-icon v-if="plugin.config.tag === tag"
-                          >radio_button_checked</md-icon
-                        >
-                        <md-icon v-else>radio_button_unchecked</md-icon>
-                        <span :class="plugin.config.tag === tag ? 'bold' : ''"
-                          >Tag: {{ tag }}</span
-                        >
-                      </md-menu-item>
-                    </div>
-                  </md-menu-content>
-                </md-menu>
-              </md-badge>
-              <md-button
-                class="joy-run-button"
-                :class="
-                  plugin.running
-                    ? 'busy-plugin'
-                    : plugin._disconnected && plugin.engine
-                    ? 'md-accent'
-                    : 'md-primary'
-                "
-                :disabled="plugin._disconnected && !plugin.engine"
-                @click.exact="
-                  plugin._disconnected
-                    ? connectPlugin(plugin)
-                    : runOp(plugin.ops[plugin.name])
-                "
-                @click.right.exact="logPlugin(plugin)"
-              >
-                {{ plugin.config.name + " " + plugin.config.badges }}
-              </md-button>
-              <div class="floating-right-buttons">
-                <md-button
-                  v-if="
-                    plugin._log_history &&
-                      plugin._log_history.length > 0 &&
-                      screenWidth > 400
-                  "
-                  class="md-icon-button"
-                  @click="showLog(plugin)"
-                >
-                  <md-icon v-if="plugin._log_history._error" class="red"
-                    >error_outline</md-icon
-                  >
-                  <md-icon v-else>info</md-icon>
-                  <md-tooltip
-                    v-if="
-                      plugin._log_history._error || plugin._log_history._info
-                    "
-                    >{{
-                      plugin._log_history._error || plugin._log_history._info
-                    }}</md-tooltip
-                  >
-                </md-button>
-                <md-button
-                  v-else
-                  class="md-icon-button md-xsmall-hide"
-                  disabled
-                >
-                </md-button>
-
-                <md-button
-                  class="md-icon-button"
-                  @click="
-                    plugin.panel_expanded = !plugin.panel_expanded;
-                    $forceUpdate();
-                  "
-                >
-                  <md-icon v-if="!plugin.panel_expanded">expand_more</md-icon>
-                  <md-icon v-else>expand_less</md-icon>
-                </md-button>
-              </div>
-              <md-progress-bar
-                md-mode="determinate"
-                v-if="
-                  (plugin.running ||
-                    plugin.initializing ||
-                    plugin.terminating) &&
-                    plugin._progress
-                "
-                :md-value="plugin._progress"
-              ></md-progress-bar>
-              <div
-                v-for="op in plugin.ops"
-                :key="op.plugin_id + op.name"
-                v-show="plugin.panel_expanded"
-              >
-                <md-button
-                  v-if="op.name != plugin.name"
-                  class="md-icon-button"
-                  :disabled="true"
-                >
-                  <md-icon>chevron_right</md-icon>
-                </md-button>
-                <md-button
-                  v-if="op.name != plugin.name"
-                  class="joy-run-button md-primary op-button"
-                  :class="plugin.running ? 'md-accent' : 'md-primary'"
-                  :disabled="plugin._disconnected"
-                  @click.exact="runOp(op)"
-                  @click.right.exact="logPlugin(plugin)"
-                >
-                  {{ op.name }}
-                </md-button>
-
-                <!-- <md-button class="md-icon-button" v-show="plugin.panel_expanded &&  op.name != plugin.name" @click="op.panel_expanded=!op.panel_expanded; $forceUpdate()"> -->
-                <!-- <md-icon v-if="!op.panel_expanded">expand_more</md-icon>
-                <md-icon v-else>expand_less</md-icon> -->
-                <!-- </md-button> -->
-
-                <joy :config="op" :show="plugin.panel_expanded || false"></joy>
-              </div>
-              <md-divider></md-divider>
-            </div>
-            <md-divider></md-divider>
-            <div>
-              <div
-                v-for="plugin in sortedNonRunnablePlugins()"
-                :key="plugin.name"
-                style="display: flex;"
-              >
+              <div style="display: flex;">
                 <md-badge
                   :class="plugin.update_available ? '' : 'hide-badge'"
                   class="md-square md-primary"
@@ -754,6 +508,7 @@
                         plugin.name + ": " + plugin.config.description
                       }}</md-tooltip>
                     </md-button>
+
                     <md-menu-content>
                       <md-menu-item
                         v-if="plugin.config.origin"
@@ -805,20 +560,78 @@
                       >
                         <md-icon>delete_forever</md-icon>Remove
                       </md-menu-item>
+                      <div v-if="plugin.config.engine_mode">
+                        <md-divider></md-divider>
+                        <md-menu-item @click="switchEngine(plugin, 'auto')">
+                          <md-icon v-if="plugin.config.engine_mode === 'auto'"
+                            >check_box</md-icon
+                          >
+                          <md-icon v-else>check_box_outline_blank</md-icon>
+
+                          <span
+                            :class="
+                              plugin.config.engine_mode === 'auto' ? 'bold' : ''
+                            "
+                            >Auto</span
+                          >
+                        </md-menu-item>
+                        <md-menu-item
+                          v-for="engine in em.matchEngineByType(plugin.type)"
+                          :key="engine.name"
+                          @click="switchEngine(plugin, engine)"
+                        >
+                          <md-icon
+                            v-if="
+                              plugin.config.engine_mode === engine.name ||
+                                (plugin.engine &&
+                                  plugin.engine.name === engine.name)
+                            "
+                            >radio_button_checked</md-icon
+                          >
+                          <md-icon v-else>radio_button_unchecked</md-icon>
+                          <span
+                            :class="
+                              plugin.engine &&
+                              plugin.engine.name === engine.name
+                                ? 'bold'
+                                : ''
+                            "
+                            >{{ engine.name }}</span
+                          >
+                        </md-menu-item>
+                        <md-divider></md-divider>
+                        <md-menu-item
+                          v-for="tag in plugin.config.tags"
+                          :key="tag"
+                          @click="switchTag(plugin, tag)"
+                        >
+                          <md-icon v-if="plugin.config.tag === tag"
+                            >radio_button_checked</md-icon
+                          >
+                          <md-icon v-else>radio_button_unchecked</md-icon>
+                          <span :class="plugin.config.tag === tag ? 'bold' : ''"
+                            >Tag: {{ tag }}</span
+                          >
+                        </md-menu-item>
+                      </div>
                     </md-menu-content>
                   </md-menu>
                 </md-badge>
                 <md-button
-                  class="joy-run-button non-runnable-btn"
+                  class="joy-run-button"
                   :class="
                     plugin.running
                       ? 'busy-plugin'
                       : plugin._disconnected && plugin.engine
                       ? 'md-accent'
-                      : ''
+                      : 'md-primary'
                   "
-                  :disabled="!plugin.engine || !plugin._disconnected"
-                  @click.exact="connectPlugin(plugin)"
+                  :disabled="plugin._disconnected && !plugin.engine"
+                  @click.exact="
+                    plugin._disconnected
+                      ? connectPlugin(plugin)
+                      : runOp(plugin.ops[plugin.name])
+                  "
                   @click.right.exact="logPlugin(plugin)"
                 >
                   {{ plugin.config.name + " " + plugin.config.badges }}
@@ -830,7 +643,7 @@
                         plugin._log_history.length > 0 &&
                         screenWidth > 400
                     "
-                    class="md-icon-button md-xsmall-hide"
+                    class="md-icon-button"
                     @click="showLog(plugin)"
                   >
                     <md-icon v-if="plugin._log_history._error" class="red"
@@ -852,9 +665,199 @@
                     disabled
                   >
                   </md-button>
-                  <md-button class="md-icon-button" :disabled="true">
-                    <md-icon>visibility_off</md-icon>
+
+                  <md-button
+                    class="md-icon-button"
+                    @click="
+                      plugin.panel_expanded = !plugin.panel_expanded;
+                      $forceUpdate();
+                    "
+                  >
+                    <md-icon v-if="!plugin.panel_expanded">expand_more</md-icon>
+                    <md-icon v-else>expand_less</md-icon>
                   </md-button>
+                </div>
+              </div>
+              <md-progress-bar
+                md-mode="determinate"
+                v-if="
+                  (plugin.running ||
+                    plugin.initializing ||
+                    plugin.terminating) &&
+                    plugin._progress
+                "
+                :md-value="plugin._progress"
+              ></md-progress-bar>
+              <div
+                v-for="op in plugin.ops"
+                :key="op.plugin_id + op.name"
+                v-show="plugin.panel_expanded"
+              >
+                <md-button
+                  v-if="op.name != plugin.name"
+                  class="md-icon-button"
+                  :disabled="true"
+                >
+                  <md-icon>chevron_right</md-icon>
+                </md-button>
+                <md-button
+                  v-if="op.name != plugin.name"
+                  class="joy-run-button md-primary op-button"
+                  :class="plugin.running ? 'md-accent' : 'md-primary'"
+                  :disabled="plugin._disconnected"
+                  @click.exact="runOp(op)"
+                  @click.right.exact="logPlugin(plugin)"
+                >
+                  {{ op.name }}
+                </md-button>
+
+                <!-- <md-button class="md-icon-button" v-show="plugin.panel_expanded &&  op.name != plugin.name" @click="op.panel_expanded=!op.panel_expanded; $forceUpdate()"> -->
+                <!-- <md-icon v-if="!op.panel_expanded">expand_more</md-icon>
+                <md-icon v-else>expand_less</md-icon> -->
+                <!-- </md-button> -->
+
+                <joy :config="op" :show="plugin.panel_expanded || false"></joy>
+              </div>
+              <md-divider></md-divider>
+            </div>
+            <md-divider></md-divider>
+            <div>
+              <div
+                v-for="plugin in sortedNonRunnablePlugins()"
+                :key="plugin.name"
+                style="display: flex;"
+              >
+                <div style="display: flex;">
+                  <md-badge
+                    :class="plugin.update_available ? '' : 'hide-badge'"
+                    class="md-square md-primary"
+                    md-dense
+                    md-content="NEW"
+                  >
+                    <md-menu md-size="medium">
+                      <md-button
+                        class="md-icon-button"
+                        :class="plugin.running ? 'md-accent' : ''"
+                        md-menu-trigger
+                      >
+                        <md-progress-spinner
+                          v-if="plugin.initializing || plugin.terminating"
+                          class="md-accent"
+                          :md-diameter="20"
+                          md-mode="indeterminate"
+                        ></md-progress-spinner>
+                        <plugin-icon
+                          v-else
+                          :icon="plugin.config.icon"
+                        ></plugin-icon>
+                        <md-tooltip v-if="screenWidth > 500">{{
+                          plugin.name + ": " + plugin.config.description
+                        }}</md-tooltip>
+                      </md-button>
+                      <md-menu-content>
+                        <md-menu-item
+                          v-if="plugin.config.origin"
+                          @click="updatePlugin(plugin.id)"
+                          :class="plugin.update_available ? 'md-primary' : ''"
+                        >
+                          <md-icon
+                            :class="plugin.update_available ? 'md-primary' : ''"
+                            >cloud_download</md-icon
+                          >Update
+                        </md-menu-item>
+                        <md-menu-item
+                          @click="showLog(plugin)"
+                          v-if="
+                            plugin._log_history &&
+                              plugin._log_history.length > 0 &&
+                              screenWidth <= 400
+                          "
+                        >
+                          <md-icon v-if="plugin._log_history._error" class="red"
+                            >error_outline</md-icon
+                          >
+                          <md-icon v-else>info</md-icon>Log
+                        </md-menu-item>
+                        <md-menu-item @click="showDoc(plugin.id)">
+                          <md-icon>description</md-icon>Docs
+                        </md-menu-item>
+                        <md-menu-item
+                          v-if="plugin.config.origin"
+                          @click="sharePlugin(plugin.id)"
+                        >
+                          <md-icon>share</md-icon>Share
+                        </md-menu-item>
+                        <md-menu-item @click="downloadPlugin(plugin.id)">
+                          <md-icon>cloud_download</md-icon>Export
+                        </md-menu-item>
+                        <md-menu-item @click="editPlugin(plugin.id)">
+                          <md-icon>edit</md-icon>Edit
+                        </md-menu-item>
+                        <md-menu-item @click="reloadPlugin(plugin.config)">
+                          <md-icon>autorenew</md-icon>Reload
+                        </md-menu-item>
+                        <md-menu-item @click="unloadPlugin(plugin)">
+                          <md-icon>clear</md-icon>Terminate
+                        </md-menu-item>
+                        <md-menu-item
+                          class="md-accent"
+                          @click="removePlugin(plugin)"
+                        >
+                          <md-icon>delete_forever</md-icon>Remove
+                        </md-menu-item>
+                      </md-menu-content>
+                    </md-menu>
+                  </md-badge>
+                  <md-button
+                    class="joy-run-button non-runnable-btn"
+                    :class="
+                      plugin.running
+                        ? 'busy-plugin'
+                        : plugin._disconnected && plugin.engine
+                        ? 'md-accent'
+                        : ''
+                    "
+                    :disabled="!plugin.engine || !plugin._disconnected"
+                    @click.exact="connectPlugin(plugin)"
+                    @click.right.exact="logPlugin(plugin)"
+                  >
+                    {{ plugin.config.name + " " + plugin.config.badges }}
+                  </md-button>
+                  <div class="floating-right-buttons">
+                    <md-button
+                      v-if="
+                        plugin._log_history &&
+                          plugin._log_history.length > 0 &&
+                          screenWidth > 400
+                      "
+                      class="md-icon-button md-xsmall-hide"
+                      @click="showLog(plugin)"
+                    >
+                      <md-icon v-if="plugin._log_history._error" class="red"
+                        >error_outline</md-icon
+                      >
+                      <md-icon v-else>info</md-icon>
+                      <md-tooltip
+                        v-if="
+                          plugin._log_history._error ||
+                            plugin._log_history._info
+                        "
+                        >{{
+                          plugin._log_history._error ||
+                            plugin._log_history._info
+                        }}</md-tooltip
+                      >
+                    </md-button>
+                    <md-button
+                      v-else
+                      class="md-icon-button md-xsmall-hide"
+                      disabled
+                    >
+                    </md-button>
+                    <md-button class="md-icon-button" :disabled="true">
+                      <md-icon>visibility_off</md-icon>
+                    </md-button>
+                  </div>
                 </div>
                 <md-divider></md-divider>
               </div>
@@ -3434,7 +3437,7 @@ button.md-speed-dial-target {
 
 @media screen and (max-width: 600px) {
   .joy-run-button {
-    width: calc(100% - 115px) !important;
+    width: calc(100% - 112px) !important;
     text-transform: none;
     font-size: 1.2em;
   }
