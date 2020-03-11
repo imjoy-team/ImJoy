@@ -3386,8 +3386,9 @@ button.md-speed-dial-target {
 }
 
 #plugin-menu > .md-card-content {
-  max-height: calc(100vh - 95px - 86px);
-  overflow: auto;
+  max-height: calc(100vh - 95px - 66px);
+  overflow-y: auto;
+  overflow-x: hidden;
   padding-top: 5px;
   padding-left: 6px;
   padding-right: 6px;
