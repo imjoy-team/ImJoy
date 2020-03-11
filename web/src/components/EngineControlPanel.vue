@@ -69,7 +69,7 @@
             :key="engine.name"
           >
             <span class="md-list-item-content" style="cursor: pointer;">
-              <md-icon>sync_disabled</md-icon> {{ engine.name }}
+              <md-icon>sync_disabled</md-icon> {{ engine.name.slice(0, 20) }}
               <md-tooltip>Connect to {{ engine.name }} </md-tooltip>
               <md-button
                 v-if="!engine.connected"
@@ -77,9 +77,7 @@
                 @click.stop="removeEngine(engine)"
               >
                 <md-icon>delete_forever</md-icon>
-                <md-tooltip
-                  >Remove engine {{ engine.name.slice(0, 20) }}
-                </md-tooltip>
+                <md-tooltip>Remove engine {{ engine.name }} </md-tooltip>
               </md-button>
             </span>
           </md-menu-item>
