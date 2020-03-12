@@ -599,21 +599,21 @@
                             >{{ engine.name }}</span
                           >
                         </md-menu-item>
-                        <md-divider></md-divider>
-                        <md-menu-item
-                          v-for="tag in plugin.config.tags"
-                          :key="tag"
-                          @click="switchTag(plugin, tag)"
-                        >
-                          <md-icon v-if="plugin.config.tag === tag"
-                            >radio_button_checked</md-icon
-                          >
-                          <md-icon v-else>radio_button_unchecked</md-icon>
-                          <span :class="plugin.config.tag === tag ? 'bold' : ''"
-                            >Tag: {{ tag }}</span
-                          >
-                        </md-menu-item>
                       </div>
+                      <md-divider></md-divider>
+                      <md-menu-item
+                        v-for="tag in plugin.config.tags"
+                        :key="tag"
+                        @click="switchTag(plugin, tag)"
+                      >
+                        <md-icon v-if="plugin.config.tag === tag"
+                          >radio_button_checked</md-icon
+                        >
+                        <md-icon v-else>radio_button_unchecked</md-icon>
+                        <span :class="plugin.config.tag === tag ? 'bold' : ''"
+                          >Tag: {{ tag }}</span
+                        >
+                      </md-menu-item>
                     </md-menu-content>
                   </md-menu>
                 </md-badge>
@@ -804,6 +804,62 @@
                           @click="removePlugin(plugin)"
                         >
                           <md-icon>delete_forever</md-icon>Remove
+                        </md-menu-item>
+                        <div v-if="plugin.config.engine_mode">
+                          <md-divider></md-divider>
+                          <md-menu-item @click="switchEngine(plugin, 'auto')">
+                            <md-icon v-if="plugin.config.engine_mode === 'auto'"
+                              >check_box</md-icon
+                            >
+                            <md-icon v-else>check_box_outline_blank</md-icon>
+
+                            <span
+                              :class="
+                                plugin.config.engine_mode === 'auto'
+                                  ? 'bold'
+                                  : ''
+                              "
+                              >Auto</span
+                            >
+                          </md-menu-item>
+                          <md-menu-item
+                            v-for="engine in em.matchEngineByType(plugin.type)"
+                            :key="engine.name"
+                            @click="switchEngine(plugin, engine)"
+                          >
+                            <md-icon
+                              v-if="
+                                plugin.config.engine_mode === engine.name ||
+                                  (plugin.engine &&
+                                    plugin.engine.name === engine.name)
+                              "
+                              >radio_button_checked</md-icon
+                            >
+                            <md-icon v-else>radio_button_unchecked</md-icon>
+                            <span
+                              :class="
+                                plugin.engine &&
+                                plugin.engine.name === engine.name
+                                  ? 'bold'
+                                  : ''
+                              "
+                              >{{ engine.name }}</span
+                            >
+                          </md-menu-item>
+                        </div>
+                        <md-divider></md-divider>
+                        <md-menu-item
+                          v-for="tag in plugin.config.tags"
+                          :key="tag"
+                          @click="switchTag(plugin, tag)"
+                        >
+                          <md-icon v-if="plugin.config.tag === tag"
+                            >radio_button_checked</md-icon
+                          >
+                          <md-icon v-else>radio_button_unchecked</md-icon>
+                          <span :class="plugin.config.tag === tag ? 'bold' : ''"
+                            >Tag: {{ tag }}</span
+                          >
                         </md-menu-item>
                       </md-menu-content>
                     </md-menu>
