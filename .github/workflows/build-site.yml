@@ -50,19 +50,19 @@ jobs:
   deploy-imjoy:
     runs-on: ubuntu-latest
     needs: build
-    if: github.ref == 'refs/heads/master'
+    # if: github.ref == 'refs/heads/master'
     steps:
-      - name: Load saved build output
-        uses: actions/download-artifact@v1
-        with:
-          name: built-output
-          path: ./web/dist
-      - name: Deploy ImJoy to https://imjoy.io
-        uses: peaceiris/actions-gh-pages@v3.5.0
-        with:
-          deploy_key: ${{ secrets.ACTION_DEPLOY_KEY }}
-          publish_dir: ./web/dist
-          commit_message: Deploy to GitHub Pages
+      # - name: Load saved build output
+      #   uses: actions/download-artifact@v1
+      #   with:
+      #     name: built-output
+      #     path: ./web/dist
+      # - name: Deploy ImJoy to https://imjoy.io
+      #   uses: peaceiris/actions-gh-pages@v3.5.0
+      #   with:
+      #     deploy_key: ${{ secrets.ACTION_DEPLOY_KEY }}
+      #     publish_dir: ./web/dist
+      #     commit_message: Deploy to GitHub Pages
       - name: Tag the repo if version has been updated
         uses: oeway/npm-publish-action@1.1.3
         with:
