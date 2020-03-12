@@ -63,3 +63,14 @@ jobs:
           deploy_key: ${{ secrets.ACTION_DEPLOY_KEY }}
           publish_dir: ./web/dist
           commit_message: Deploy to GitHub Pages
+      - name: Tag the repo if version has been updated
+        uses: oeway/npm-publish-action@1.1.3
+        with:
+          tag_name: "v%s"
+          tag_message: "v%s"
+          commit_pattern: "^Release (\\S+)"
+          commit_user: oeway
+          publish_with: skip
+        env:
+          GITHUB_WORKSPACE: ./web
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
