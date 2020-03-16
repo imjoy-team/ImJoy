@@ -1,4 +1,4 @@
-importScripts("/precache-manifest.1a7d5c42823cdd2feacd5592f6ef4df9.js", "https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
+importScripts("/precache-manifest.3a0a01e7de3b725d7b93e64a3a1b1b85.js", "https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 /* eslint-disable */
 
@@ -100,8 +100,6 @@ if (workbox) {
     matchCb,
     new workbox.strategies.StaleWhileRevalidate()
   );
-
-  workbox.routing.setDefaultHandler(new workbox.strategies.NetworkOnly());
 
   caches.open(workbox.core.cacheNames.runtime).then(function(cache) {
     cache.keys().then(function(requests) {
