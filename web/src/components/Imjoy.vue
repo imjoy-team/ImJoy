@@ -364,17 +364,17 @@
                 ><span class="md-xsmall-hide">Files</span>
               </md-button>
               <md-menu-content>
-                <md-menu-item
-                  v-if="fm && fm.fileManagers.length > 0"
-                  @click="
-                    showFileManagerDialog();
-                    files_expand = false;
-                  "
-                  class="md-button"
-                >
-                  <md-icon>add_to_queue</md-icon>File Manager
-                  <md-tooltip>Load files through file manager</md-tooltip>
-                </md-menu-item>
+                <template v-for="manager in fm.fileManagers">
+                  <md-menu-item
+                    v-if="manager.api && manager.api.showFileDialog"
+                    @click="manager.api.showFileDialog()"
+                    :key="manager.url"
+                    class="md-button"
+                  >
+                    <md-icon>add_to_queue</md-icon>{{ manager.name }}
+                    <md-tooltip>Load files with {{ manager.name }}</md-tooltip>
+                  </md-menu-item>
+                </template>
                 <md-menu-item
                   @click="
                     $refs.file_form.reset();
@@ -394,6 +394,19 @@
                   class="md-button"
                 >
                   <md-icon>folder_open</md-icon>Open Folder
+                </md-menu-item>
+                <md-menu-item
+                  v-if="fm && fm.fileManagers.length > 0"
+                  @click="
+                    showFileManagers();
+                    files_expand = false;
+                  "
+                  class="md-button"
+                >
+                  <md-icon>add_to_queue</md-icon>File Managers
+                  <md-tooltip
+                    >Load files through any of the file managers</md-tooltip
+                  >
                 </md-menu-item>
               </md-menu-content>
             </md-menu>
@@ -2434,7 +2447,7 @@ export default {
       this.status_text = info;
       this.$forceUpdate();
     },
-    showFileManagerDialog() {
+    showFileManagers() {
       this.showFileDialog(null, {
         uri_type: "url",
         root: "./",
@@ -2815,7 +2828,7 @@ export default {
       this.show_snackbar = true;
       this.$forceUpdate();
     },
-    showFileDialog(_plugin, config) {
+    async showFileDialog(_plugin, config) {
       config = config || {};
       if (_plugin && _plugin.id) {
         if (!config.file_manager) {
@@ -2849,6 +2862,9 @@ export default {
           config.return_object =
             config.return_object === undefined ? true : config.return_object;
         }
+      }
+      if (config.file_manager && config.file_manager.api.showFileDialog) {
+        return await config.file_manager.showFileDialog(config);
       }
       if (config.file_manager && config.hide_unselected) {
         this.selected_file_managers = [config.file_manager];
