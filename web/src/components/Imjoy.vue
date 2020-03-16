@@ -2435,7 +2435,7 @@ export default {
       this.$forceUpdate();
     },
     showFileManagerDialog() {
-      this.showFileDialog(this.IMJOY_PLUGIN, {
+      this.showFileDialog(null, {
         uri_type: "url",
         root: "./",
       })
