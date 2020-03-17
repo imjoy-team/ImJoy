@@ -73,7 +73,10 @@ module.exports = {
         //TODO: remove this when the bug is fixed
         'process.platform': 0
       })
-    ]
+    ],
+    resolve: {
+      symlinks: false
+    }
   },
   chainWebpack: config => {
     config.module
