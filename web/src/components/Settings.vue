@@ -10,7 +10,7 @@
 import { SendMessageToServiceWorker } from "../utils.js";
 
 export default {
-  name: "about",
+  name: "settings",
   methods: {
     async clearCache() {
       try {
