@@ -14,14 +14,11 @@ if (workbox) {
 
   const removeQuery = {
     cacheKeyWillBeUsed: ({ request }) => {
-      const newUrl = new URL(request.url);
-      newUrl.search = "";
-      newUrl.hash = "";
-      return newUrl.href;
+      return request.url.split("?")[0];
     },
   };
 
-  workbox.core.setCacheNameDetails({ prefix: "ImJoy.io" });
+  workbox.core.setCacheNameDetails({ prefix: "imjoy" });
   self.__precacheManifest = self.__precacheManifest || [];
 
   workbox.precaching.precacheAndRoute(self.__precacheManifest, {});
@@ -91,18 +88,18 @@ if (workbox) {
 
   var cached_keys = new Set();
   function matchCb(request) {
-    return cached_keys.has(request.url.href);
+    return cached_keys.has(request.url.href.split("?")[0]);
   }
 
   workbox.routing.registerRoute(
     matchCb,
-    new workbox.strategies.StaleWhileRevalidate()
+    new workbox.strategies.StaleWhileRevalidate({ plugins: [removeQuery] })
   );
 
   caches.open(workbox.core.cacheNames.runtime).then(function(cache) {
     cache.keys().then(function(requests) {
       var urls = requests.map(function(request) {
-        return request.url;
+        return request.url.split("?")[0];
       });
       cached_keys = new Set(urls);
       console.log("cached requirements:", cached_keys);
@@ -130,7 +127,6 @@ if (workbox) {
               var urls = requests.map(function(request) {
                 return request.url;
               });
-
               resolve(urls.sort());
             });
             break;
@@ -154,10 +150,11 @@ if (workbox) {
             var request = new Request(event.data.url);
             fetch(request)
               .then(function(response) {
-                cached_keys.add(event.data.url);
+                const normalized_url = event.data.url.split("?")[0];
+                cached_keys.add(normalized_url);
                 console.log("Caching requirement: " + event.data.url);
                 cache
-                  .put(event.data.url, response)
+                  .put(normalized_url, response)
                   .then(resolve)
                   .catch(reject);
               })
@@ -168,13 +165,24 @@ if (workbox) {
             break;
           // This command removes a request/response pair from the cache (assuming it exists).
           case "delete":
-            cached_keys.delete(event.data.url);
-            cache.delete(event.data.url).then(function(success) {
+            cached_keys.delete(event.data.url.split("?")[0]);
+            cache.delete(event.data.url.split("?")[0]).then(function(success) {
               if (success) {
                 resolve();
               } else {
                 reject("Item was not found in the cache.");
               }
+            });
+            break;
+          case "clear":
+            caches.keys().then(function(keyList) {
+              Promise.all(
+                keyList.map(function(key) {
+                  return caches.delete(key);
+                })
+              )
+                .then(resolve)
+                .catch(reject);
             });
             break;
           default:
