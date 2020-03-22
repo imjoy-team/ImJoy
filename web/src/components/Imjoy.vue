@@ -194,7 +194,10 @@
               <md-icon>details</md-icon>
             </md-button>
             <md-menu-content>
-              <md-menu-item @click="showSettingsDialog = true" :disabled="true">
+              <md-menu-item
+                @click="showSettingsDialog = true"
+                class="md-primary"
+              >
                 <md-icon>settings</md-icon>Settings
               </md-menu-item>
               <md-menu-item href="/lite" target="_blank" class="md-primary">
@@ -1135,6 +1138,26 @@
       </md-dialog-title>
       <md-dialog-content>
         <about></about>
+      </md-dialog-content>
+    </md-dialog>
+
+    <md-dialog
+      style="max-width: 800px; width: 100%; height: 100%;"
+      :md-active.sync="showSettingsDialog"
+      :md-click-outside-to-close="false"
+      :md-close-on-esc="false"
+    >
+      <md-dialog-title
+        >Settings
+        <md-button
+          class="md-accent"
+          style="position:absolute; top:8px; right:5px;"
+          @click="showSettingsDialog = false"
+          ><md-icon>clear</md-icon>
+        </md-button>
+      </md-dialog-title>
+      <md-dialog-content>
+        <settings></settings>
       </md-dialog-content>
     </md-dialog>
 

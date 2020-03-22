@@ -22,6 +22,7 @@ import PluginIcon from "@/components/PluginIcon";
 import FileItem from "@/components/FileItem";
 import FileDialog from "@/components/FileDialog";
 import Window from "@/components/Window";
+import Settings from "@/components/Settings";
 import EngineControlPanel from "@/components/EngineControlPanel";
 import "./registerServiceWorker";
 
@@ -42,6 +43,7 @@ Vue.component("plugin-icon", PluginIcon);
 Vue.component("file-item", FileItem);
 Vue.component("file-dialog", FileDialog);
 Vue.component("window", Window);
+Vue.component("settings", Settings);
 Vue.component("grid-layout", VueGridLayout.GridLayout);
 Vue.component("grid-item", VueGridLayout.GridItem);
 Vue.component("engine-control-panel", EngineControlPanel);

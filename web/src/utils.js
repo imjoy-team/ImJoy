@@ -1,5 +1,30 @@
 /*eslint no-useless-escape: "off"*/
 
+export function SendMessageToServiceWorker(message) {
+  return new Promise(function(resolve, reject) {
+    if (!navigator.serviceWorker || !navigator.serviceWorker.register) {
+      reject("Service worker is not supported.");
+      return;
+    }
+    const messageChannel = new MessageChannel();
+    messageChannel.port1.onmessage = function(event) {
+      if (event.data && event.data.error) {
+        reject(event.data.error);
+      } else {
+        resolve(event.data && event.data.result);
+      }
+    };
+
+    if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+      navigator.serviceWorker.controller.postMessage(message, [
+        messageChannel.port2,
+      ]);
+    } else {
+      reject("Service worker controller is not available");
+    }
+  });
+}
+
 export function mobileAndTabletcheck() {
   var check = false;
   (function(a) {
