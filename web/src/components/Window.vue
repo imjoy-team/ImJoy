@@ -301,7 +301,7 @@ export default {
 }
 
 .shorter-container {
-  height: calc(100% - 40px);
+  height: calc(100% - 30px);
 }
 
 .allow-scroll {
