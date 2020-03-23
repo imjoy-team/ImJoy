@@ -3025,6 +3025,7 @@ export default {
       this.dialog_window_config.fullscreen =
         config.fullscreen || config.standalone || false;
       return new Promise((resolve, reject) => {
+        const _selectedWindow = this.wm.selected_window;
         this.pm
           .createWindow(_plugin, config)
           .then(api => {
@@ -3038,6 +3039,7 @@ export default {
             );
             api.on("close", () => {
               this.showPluginDialog = false;
+              this.wm.selectWindow(_selectedWindow);
             });
 
             if (config.type === "imjoy/joy") {
@@ -3056,6 +3058,7 @@ export default {
           .catch(e => {
             this.showAlert(null, e);
             this.showPluginDialog = false;
+            this.wm.selectWindow(_selectedWindow);
             reject(e);
           });
       });
