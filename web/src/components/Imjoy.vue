@@ -3039,7 +3039,7 @@ export default {
             );
             api.on("close", () => {
               this.showPluginDialog = false;
-              this.wm.selectWindow(_selectedWindow);
+              if (_selectedWindow) this.wm.selectWindow(_selectedWindow);
             });
 
             if (config.type === "imjoy/joy") {
@@ -3058,7 +3058,7 @@ export default {
           .catch(e => {
             this.showAlert(null, e);
             this.showPluginDialog = false;
-            this.wm.selectWindow(_selectedWindow);
+            if (_selectedWindow) this.wm.selectWindow(_selectedWindow);
             reject(e);
           });
       });
