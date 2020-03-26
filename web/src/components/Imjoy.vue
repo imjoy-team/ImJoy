@@ -2852,6 +2852,7 @@ export default {
     },
     async showFileDialog(_plugin, config) {
       config = config || {};
+      let _return_array = true;
       if (_plugin && _plugin.id) {
         if (!config.file_manager) {
           if (_plugin.api.FILE_MANAGER_URL) {
@@ -2884,16 +2885,38 @@ export default {
           config.return_object =
             config.return_object === undefined ? true : config.return_object;
         }
+
+        //TODO: remove this in the future
+        if (
+          _plugin.config.api_version &&
+          utils.compareVersions(_plugin.config.api_version, "<", "0.1.8")
+        ) {
+          _return_array = false;
+        }
       }
-      if (config.file_manager && config.file_manager.api.showFileDialog) {
-        return await config.file_manager.showFileDialog(config);
-      }
-      if (config.file_manager && config.hide_unselected) {
-        this.selected_file_managers = [config.file_manager];
+      let ret;
+
+      if (
+        _return_array &&
+        config.file_manager &&
+        config.file_manager.api.showFileDialog
+      ) {
+        ret = await config.file_manager.showFileDialog(config);
       } else {
-        this.selected_file_managers = this.fm.fileManagers;
+        if (config.file_manager && config.hide_unselected) {
+          this.selected_file_managers = [config.file_manager];
+        } else {
+          this.selected_file_managers = this.fm.fileManagers;
+        }
+        ret = this.$refs["file-dialog"].showDialog(_plugin, config);
       }
-      return this.$refs["file-dialog"].showDialog(_plugin, config);
+
+      if (_return_array) {
+        if (!ret) return [];
+        else if (!Array.isArray(ret)) return [ret];
+        else return ret;
+      }
+      return ret;
     },
     uploadFileToUrl(_plugin, config) {
       if (typeof config !== "object" || !config.file || !config.url) {
