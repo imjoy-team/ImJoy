@@ -370,7 +370,7 @@
                 <template v-for="manager in fm.fileManagers">
                   <md-menu-item
                     v-if="manager.api && manager.api.showFileDialog"
-                    @click="manager.api.showFileDialog()"
+                    @click="showFileManagers(manager)"
                     :key="manager.url"
                     class="md-button"
                   >
@@ -2220,6 +2220,7 @@ export default {
         {
           loader_key: "Code Editor (file)",
           schema: ajv.compile({
+            type: "object",
             properties: {
               type: { type: "string" },
               name: {
@@ -2236,6 +2237,7 @@ export default {
         {
           loader_key: "Code Editor (url)",
           schema: ajv.compile({
+            type: "object",
             properties: {
               type: { type: "string", enum: ["imjoy/url"] },
               url: {
@@ -2253,6 +2255,7 @@ export default {
         {
           loader_key: "Image (file)",
           schema: ajv.compile({
+            type: "object",
             properties: {
               type: {
                 type: "string",
@@ -2267,6 +2270,7 @@ export default {
         {
           loader_key: "Image (url)",
           schema: ajv.compile({
+            type: "object",
             properties: {
               type: { type: "string", enum: ["imjoy/url"] },
               url: {
@@ -2464,10 +2468,11 @@ export default {
       this.status_text = info;
       this.$forceUpdate();
     },
-    showFileManagers() {
+    showFileManagers(file_manager) {
       this.showFileDialog(null, {
         uri_type: "url",
         root: "./",
+        file_manager: file_manager,
       })
         .then(selection => {
           if (this.screenWidth <= 800) {
