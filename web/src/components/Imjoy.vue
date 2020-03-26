@@ -2908,7 +2908,7 @@ export default {
         } else {
           this.selected_file_managers = this.fm.fileManagers;
         }
-        ret = this.$refs["file-dialog"].showDialog(_plugin, config);
+        ret = await this.$refs["file-dialog"].showDialog(_plugin, config);
       }
 
       if (_return_array) {
