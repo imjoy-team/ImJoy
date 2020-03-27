@@ -1,4 +1,4 @@
-importScripts("/precache-manifest.94fd651c20a13be77117ecc762bbbf61.js", "https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
+importScripts("/precache-manifest.1e1b24e2bbfe7f77471819a5ac4ed2c1.js", "https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 /* eslint-disable */
 
@@ -59,6 +59,11 @@ if (workbox) {
   workbox.routing.registerRoute(
     new RegExp("https://imjoy-team.github.io/.*"),
     new workbox.strategies.NetworkFirst({ plugins: [removeQuery] })
+  );
+
+  workbox.routing.registerRoute(
+    new RegExp("https://github.com/imjoy-team/.*/badge.svg"),
+    new workbox.strategies.StaleWhileRevalidate()
   );
 
   // manifest.imjoy.json etc.
