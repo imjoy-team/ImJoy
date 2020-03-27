@@ -985,23 +985,18 @@ It contains the following fields:
    you may want to define the path string as raw string using `r"xxxxxx"` syntax,
    we have encountered unrecognised path issue with normal strings.
   - **mode**: String. Modes for file selection. By default, the user can select a single or multiple file (with the `shift` key pressed)
-    - `single`: only a single file or directory can be selected. <!--**[TODO]** what's returned here?-->
+    - `single`: only a single file or directory can be selected.
     - `multiple`: multiple files or directories are selected and are returned in an array or list.
-    - `single|multiple` (default): both single and multiple selection are allowed. <!--**[TODO]** why this additional option?-->
-  - **uri_type**: String. Format of returned file path.
-    - `url` (default for JavaScript plugins): <!--**[TODO]**-->
-    - `path` (default for Python plugins): <!--**[TODO]**-->
+    - `single|multiple` (default): both single and multiple selection are allowed.
   - **file_manager**: String. Specify the file manager via url, in a `native-python` plugin for example, you can get the file manager URL via `api.FILE_MANAGER_URL`.
-  
-  - **hide_unselected**: If you specified file_manager, all other file managers will still show up and if you want to hide them, set `hide_unselected` to `true`.
 
 (Please also consult [this section](api?id=input-arguments) for how arguments can be set.)
 
 **Returns**
-* **ret**: Object (JavaScript) or dictionary (Python). Contains path or url and engine url as specified by `uri_type`.
-  - **path**: String or Array. It will be included for both `uri_type` (`'path'` or `'url'`). If multiple files are selected, it will be an array of paths.
-  - **url**: String or Array. Only available for `uri_type = 'url'`. If multiple files are selected, it will be an array of urls.
-  - **engine**: String. The engine url selected by the user.
+* **selected**: An array of object (JavaScript) or dictionary (Python). It can contain 0 to many selected file/directories. If the returned array is empty, it means the user did not select any file/directory. The file items in the array typically contains (depending on different file manager implementation):
+  - **path**: String. File path.
+  - **url**: String. URL to the file
+  - other fields.
 
 **Examples**
 
@@ -1010,9 +1005,9 @@ user canceled or that the plugin engine was not running.
 
 ```javascript
 
-const ret = await api.showFileDialog({root: '/', uri_type: 'url'})
-if(ret){
-  await api.alert("Selected file " + ret.url)
+const selected = await api.showFileDialog()
+if(selected.length>0){
+  await api.alert("Selected file " + selected[0].url)
 }
 else{
   await api.alert("User cancelled file selection.")
@@ -1021,7 +1016,7 @@ else{
 
 ```
 <!--**[TODO]: update this example to new api**-->
-[Try yourself >>](https://imjoy.io/#/app?plugin=imjoy-team/imjoy-demo-plugins:showFileDialog&w=examples)
+<!-- [Try yourself >>](https://imjoy.io/#/app?plugin=imjoy-team/imjoy-demo-plugins:showFileDialog&w=examples) -->
 
 
 ### api.showMessage
