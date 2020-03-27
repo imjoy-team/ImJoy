@@ -370,7 +370,7 @@
                 <template v-for="manager in fm.fileManagers">
                   <md-menu-item
                     v-if="manager.api && manager.api.showFileDialog"
-                    @click="manager.api.showFileDialog()"
+                    @click="showFileManagers(manager)"
                     :key="manager.url"
                     class="md-button"
                   >
@@ -2220,6 +2220,7 @@ export default {
         {
           loader_key: "Code Editor (file)",
           schema: ajv.compile({
+            type: "object",
             properties: {
               type: { type: "string" },
               name: {
@@ -2236,6 +2237,7 @@ export default {
         {
           loader_key: "Code Editor (url)",
           schema: ajv.compile({
+            type: "object",
             properties: {
               type: { type: "string", enum: ["imjoy/url"] },
               url: {
@@ -2253,6 +2255,7 @@ export default {
         {
           loader_key: "Image (file)",
           schema: ajv.compile({
+            type: "object",
             properties: {
               type: {
                 type: "string",
@@ -2267,6 +2270,7 @@ export default {
         {
           loader_key: "Image (url)",
           schema: ajv.compile({
+            type: "object",
             properties: {
               type: { type: "string", enum: ["imjoy/url"] },
               url: {
@@ -2464,10 +2468,11 @@ export default {
       this.status_text = info;
       this.$forceUpdate();
     },
-    showFileManagers() {
+    showFileManagers(file_manager) {
       this.showFileDialog(null, {
         uri_type: "url",
         root: "./",
+        file_manager: file_manager,
       })
         .then(selection => {
           if (this.screenWidth <= 800) {
@@ -2847,6 +2852,7 @@ export default {
     },
     async showFileDialog(_plugin, config) {
       config = config || {};
+      let _return_array = true;
       if (_plugin && _plugin.id) {
         if (!config.file_manager) {
           if (_plugin.api.FILE_MANAGER_URL) {
@@ -2879,16 +2885,38 @@ export default {
           config.return_object =
             config.return_object === undefined ? true : config.return_object;
         }
+
+        //TODO: remove this in the future
+        if (
+          _plugin.config.api_version &&
+          utils.compareVersions(_plugin.config.api_version, "<", "0.1.8")
+        ) {
+          _return_array = false;
+        }
       }
-      if (config.file_manager && config.file_manager.api.showFileDialog) {
-        return await config.file_manager.showFileDialog(config);
-      }
-      if (config.file_manager && config.hide_unselected) {
-        this.selected_file_managers = [config.file_manager];
+      let ret;
+
+      if (
+        _return_array &&
+        config.file_manager &&
+        config.file_manager.api.showFileDialog
+      ) {
+        ret = await config.file_manager.showFileDialog(config);
       } else {
-        this.selected_file_managers = this.fm.fileManagers;
+        if (config.file_manager && config.hide_unselected) {
+          this.selected_file_managers = [config.file_manager];
+        } else {
+          this.selected_file_managers = this.fm.fileManagers;
+        }
+        ret = await this.$refs["file-dialog"].showDialog(_plugin, config);
       }
-      return this.$refs["file-dialog"].showDialog(_plugin, config);
+
+      if (_return_array) {
+        if (!ret) return [];
+        else if (!Array.isArray(ret)) return [ret];
+        else return ret;
+      }
+      return ret;
     },
     uploadFileToUrl(_plugin, config) {
       if (typeof config !== "object" || !config.file || !config.url) {
