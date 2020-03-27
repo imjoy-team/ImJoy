@@ -59,6 +59,11 @@ if (workbox) {
     new workbox.strategies.NetworkFirst({ plugins: [removeQuery] })
   );
 
+  workbox.routing.registerRoute(
+    new RegExp("https://github.com/imjoy-team/.*/badge.svg"),
+    new workbox.strategies.StaleWhileRevalidate()
+  );
+
   // manifest.imjoy.json etc.
   workbox.routing.registerRoute(
     new RegExp("https://raw.githubusercontent.com/.*"),
