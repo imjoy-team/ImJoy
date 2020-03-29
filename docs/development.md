@@ -149,9 +149,7 @@ In Chrome for example, user can install ImJoy into [chrome://apps/](chrome://app
 You can run all the web plugins (`web-worker`, `window`, `web-python`) with the ImJoy App, however, for native plugins (`native-python`) you will need to connect to a plugin engine running locally or remotely.
 Here are the two options for installing the plugine engine:
 
-1. for basic users and desktop environments, the ImJoy Desktop App which includes the plugine engine can be downloaded [here](https://github.com/imjoy-team/imjoy-app/releases).
-
-2. for more advanced users and server environments, please download and install Anaconda or Miniconda with Python3, then run `pip install imjoy`. The plugin engine can then be launched through the `imjoy` command. More details are available [here](https://github.com/imjoy-team/imjoy-engine/).
+For running plugins with the plugin engine, please download and install Anaconda or Miniconda with Python3, then run `pip install imjoy`. The plugin engine can then be launched through the `imjoy --jupyter` command. More details are available [here](https://github.com/imjoy-team/imjoy-engine/).
 
 
 ## Plugin file format
@@ -479,9 +477,16 @@ To make the window in standalone mode by default (in full screen and detached fr
 
 If you want to show the window as a dialog, then set `"defaults": {"as_dialog": true}`.
 
+
+#### base_frame
+(**for window plugin only:**) defines a custom url to a html page which will be loaded in the window plugin.
+
+It is mendatory to include `<script src="https://lib.imjoy.io/static/jailed/_frame.js"></script>` in the base_frame html file (e.g. inside `<head>`), and this injected script will enable the communication between the window and the core of ImJoy.
+
+This option allows you load an existing html file as the window, but still connected to ImJoy and other plugins.
+
 #### runnable
 Defines whether the plugin can be executed by clicking on the plugin menu (By default, all plugins are `runnable`). For helper plugins which do not run by themselves, (e.g. a `native-python` plugin can be called by a `window` plugin and do not necessarily executed by the user directly), setting `"runnable": false` would move down the plugin to the bottom of the plugin menu and made non-clickable.
-
 
 ### `<docs>` block
 Contains the documentation of the plugin and is written in Markdown language.
@@ -1353,6 +1358,7 @@ Follow these steps, and you will be able to run ImJoy server and the plugin engi
    - if the file manager provide `showFileDialog` function, then ImJoy will use it.
    - remove the key `uri_type` from input arguments, remove `engine` from its result.
    - it will always return an array of items.
+ * support `base_frame` (in `<config>` block) option for `window` plugins to load from a custom html url.
 
 #### api_version: 0.1.7
  * `api.fs` has been deprecated, the browser file system is moved to a separate plugin `BrowserFS`, to use the file system, you can do `const bfs_plugin = await api.getPlugin('BrowserFS'); const bfs = bfs_plugin.fs;`, now `fs` will be equivalent to `api.fs`. Notice: the data saved with `api.fs` will not be accessible with the new API, to get access the old data, please change `api_version` in the plugin config to `0.1.6`.

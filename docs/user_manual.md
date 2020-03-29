@@ -54,16 +54,9 @@ plugin implementations, some plugins may still require internet access to functi
 
 ## Plugin Engine
 For more advanced processing, the **Python Plugin Engine** is required. The Plugin
-Engine allows to run native Python (`native-python`) plugins. We provide two ways
-to obtain this engine:
+Engine allows to run native Python (`native-python`) plugins. 
 
-1.  The plugin engine is included in the ImJoy Desktop App. After installing the
-    [Desktop App](https://github.com/imjoy-team/imjoy-app/releases), you can start the engine
-    with the button `START PLUGINE ENGINE`.
-    
-    ![imjoy-app-start-screen](assets/imjoy-app-start-screen.png ':size=400')
-
-2. You can download and install it with a command line script as described [here](https://github.com/imjoy-team/imjoy-engine).
+To obtain the plugin engine, you need to download and install it with a command line script as described [here](https://github.com/imjoy-team/imjoy-engine).
 
 Once you start the engine, it will automatically check for updates.
 
@@ -107,15 +100,6 @@ The nice thing about using telebit is that you will have a fixed URL. Alternativ
 
 ## FAQs
 
-### Plugin engine doesn't start (anymore)
-When the plugin engine doesn't start, performing an ImJoy upgrade often resolves this
-problem. For this, you can run the following command in your terminal:
-
-```bash
-export PATH=~/ImJoyApp/bin:$PATH
-pip install -U git+https://github.com/imjoy-team/imjoy-engine#egg=imjoy
-```
-
 ### Use existing Python
 This depends whether it's a conda-compatible distribution or not. Try to type `conda -V` command, if you see a version number(e.g:`conda 4.3.30`), it means you can skip the Anaconda/Miniconda installation, and install ImJoy directly with your existing Python.
 
@@ -133,7 +117,7 @@ secured website. So, you will have to switch to the offline version.
 
 Currently, the recommended way to use ImJoy on a remote computer:
  1. Login the remote server with SSH, start the plugin engine with
-    `python -m imjoy --serve --host=0.0.0.0`. The plugin engine will
+    `imjoy --jupyter --host=0.0.0.0`. The plugin engine will
     download a copy of ImJoy app and serve it through `http://YOUR_REMOTE_IP:9527`.
     In the meantime, it will give your a **connection token**, copy it from the
     terminal and you will need it in the next step.
@@ -144,9 +128,6 @@ Currently, the recommended way to use ImJoy on a remote computer:
     get when you start the engine.
 
 Also notice that, the ImJoy web app served from your plugin engine are completely isolated from the one from https://imjoy.io, meaning that the installed plugins, data are not shared.
-
-### Plugin engine error "address already in use"
-If you see something like this: `OSError: [Errno 48] error while attempting to bind on address ('127.0.0.1', 9527): address already in use`, It means you have another instance running which uses the port needed by the Plugin Engine. You need to find this instance  and kill that task if you don't known which one. For example, for port `9527`, you can run `lsof -n -i :9527 | grep LISTEN` in a terminal. This will list all process listening to the `9527` port, e.g. `+python3.6 1095 fmueller    7u  IPv4 0xb4b82ae29cbba843      0t0  TCP 127.0.0.1:http-alt (LISTEN)`. The process ID can be found directly after `python3.6`, in this case `1095`, you can then kill this process with `kill 1095`.
 
 ### CommandNotFoundError with 'conda activate'
 By default, ImJoy uses `conda activate` to activate conda environments if it's available. However, you may need to setup `conda activate` according to here: https://github.com/conda/conda/releases/tag/4.4.0

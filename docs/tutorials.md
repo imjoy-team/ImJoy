@@ -113,7 +113,7 @@ Importantly, we are going to port the above code in our ImJoy plugin.
 ### Preperation
 Before start, you will need to install the ImJoy plugin engine accroding to the instructions here: https://github.com/imjoy-team/imjoy-engine , and we recommend to use Google Chrome or FireFox to perform the experiments (note: Safari won't work). 
 
-Once installed, you need to first start the plugin engine, either through the desktop if you installed, or run `imjoy` command if you chose the command line version of the plugin engine. Either way you will get a connection token string, which we will need to use to connect from the ImJoy web app.
+Once installed, you need to first start the plugin engine, either through the desktop if you installed, or run `imjoy --jupyter` command if you chose the command line version of the plugin engine. Either way you will get a connection token string, which we will need to use to connect from the ImJoy web app.
 
 Open Chrome or Firefox, go to https://imjoy.io and start ImJoy. Click the 🚀 icon in the upper-right corner to add the plugin engine by filling the connection token you got in the previous step.
 
