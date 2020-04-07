@@ -3110,7 +3110,7 @@ export default {
           DOMPurify.sanitize(String(text.content)) || "undefined";
         this.alert_config.confirm_text = text.confirm_text || "OK";
       } else {
-        this.alert_config.content = JSON.stringify(text);
+        this.alert_config.content = String(text);
       }
 
       this.alert_config.show = true;
