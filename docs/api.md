@@ -334,7 +334,7 @@ It contains the following fields:
 
   - **name**: String. Specifies the name of new window.
   - **type**: String. Specifies the window type. This can be either the name of
-   window plugin or an internal ImJoy window type. The following types are
+   window plugin, an internal ImJoy window type or `external`. The following internal window types are
    supported:
 
     - `imjoy/image`. Display an image. Requires `data.src` pointing to an image location.
@@ -346,6 +346,11 @@ It contains the following fields:
     - `imjoy/generic`. Will show all objects in `data`.
     - `imjoy/plugin-editor`. Opens the source code editors. `data.id` is a unique string (preferable random) specifying the window id, `data.code` contains the source code
 
+    If `external` is used, you can load an window from an external url, for example, a web app hosted on Github pages. you can specify the url with the `src` key. Details about how to support ImJoy from an external web app can be found [here](https://github.com/imjoy-team/imjoy-core/).
+  
+    If the external web page has the ImJoy plugin api loaded, you can interact with the external website like a normal ImJoy plugin. However, if the external web page does not support ImJoy, you need to set `passive=true` to tell ImJoy that there will be no plugin api from this window.
+  - **src**: String, only for `type="external"`. Specify the external url for to be used as a base frame for the window plugin.
+  - **passive**: Boolean, only for `type="external"`. Mark whether the plugin is a passive web page (no ImJoy api exposed). Default value is `false`. 
   - **w**: Integer. Window width in grid columns (1 column = 30 pixels).
   - **h**: Integer. Window height in grid rows (1 row = 30 pixels).
   - **data**: Object (JavaScript) or dictionary (Python). Contains data to be transferred to the window.
@@ -355,6 +360,7 @@ It contains the following fields:
 
 * **win**: Object. The API object of the created window. Can be stored in the plugin class
   (`self` for Python, or `this` for JavaScript) for later use, e.g. to update the window.
+  Note: If `type="external"` and `passive=true`, there will be no api exposed from the window, and `win` will be empty.
 
 **Examples**
 
