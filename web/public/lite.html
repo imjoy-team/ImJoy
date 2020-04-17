@@ -98,7 +98,16 @@
         }
         #windows-menu {
             position: absolute;
-            right:0px;
+            top:3px;
+            right:3px;
+        }
+        .more-btn{
+            border: transparent;
+            background-color: transparent;
+        }
+        .more-btn:hover{
+            border: #0a52eeea;
+            background-color: #ffffff91;
         }
     </style>
 </head>
@@ -134,7 +143,7 @@
         </section>
         <section class="navbar-section" id="windows-menu" style="flex: 0 1 0;">
             <div class="dropdown dropdown-right">
-                <a class="btn btn-sm btn-action s-circle dropdown-toggle" tabindex="0"><i class="icon icon-more-horiz"></i></a>
+                <a class="btn btn-sm more-btn dropdown-toggle" tabindex="0"><i class="icon icon-more-horiz"></i></a>
                 <ul class="menu" id="plugin-menu">
                 </ul>
             </div>
@@ -161,8 +170,11 @@
             var results = regex.exec(location.search);
             return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
         }
-
-        function addWindow(title, id){
+        var windows = {}
+        function addWindow(w){
+            windows = windows || {};
+            windows[w.iframe_container] = w;
+            var title = w.name, id=w.iframe_container;
             document.getElementById('windows-menu').innerHTML =`
             <span class="chip pointer window-chip" id="header_${id}" onclick="selectWindow('${id}')">
                 ${title}
@@ -173,28 +185,46 @@
                 <div class="window_container" id="${id}"></div>
             ` + document.getElementById('whiteboard').innerHTML;
             window.onresize();
+            updateWindowChips();
+            selectWindow(id)
+        }
+
+        function updateWindowChips(){
             // only display when there is more than one window open
-            if(windows.length>1){
+            if(Object.keys(windows).length>1){
                 var ws = document.querySelectorAll(".window-chip")
                 for(let w of ws){
                     w.style.display = "inline-flex";
                 }
             }
             else{
+                const keys = Object.keys(windows);
+                if(keys.length>=1 && (windows[keys[0]].standalone || windows[keys[0]].fullscreen) )
                 var ws = document.querySelectorAll(".window-chip")
-                for(let w of ws){
-                    w.style.display = "none";
+                if(ws){
+                    for(let w of ws){
+                        w.style.display = "none";
+                    }
                 }
             }
-            selectWindow(id)
         }
 
-        function removeWindow(id){
+        async function removeWindow(id){
+            if(windows[id]){
+                try{
+                    await windows[id].close()
+                }
+                finally{
+                    delete windows[id];
+                    updateWindowChips();
+                }               
+            }
             document.getElementById('windows-menu').removeChild(document.getElementById('header_'+id));
             document.getElementById('whiteboard').removeChild(document.getElementById(id));
             if(document.getElementById('whiteboard').children.length === 1){
                 document.getElementById('empty-img').style.display = 'block';
             }
+            
         }
 
         function selectWindow(id){
@@ -214,7 +244,7 @@
 
         var selected_window = null
         var imjoy = null
-        var windows = null
+        
         var imjoy_api = {
             showMessage(plugin, info, duration){
                 console.log(info)
@@ -287,7 +317,7 @@
                         document.getElementById("logo").style.display = "none";
                         // document.getElementById("windows-menu").style.display = "none";
                     }
-                    addWindow(w.name, w.iframe_container)
+                    addWindow(w)
                 },
                 update_ui_callback: ()=>{}
             })
@@ -296,7 +326,6 @@
             const engine = getUrlParameter('engine') || getUrlParameter('e');
 
             imjoy.start({workspace: workspace}).then(async ()=>{
-                windows = imjoy.wm.windows
                 console.log('ImJoy started: ', imjoy)
                 let p = getUrlParameter('plugin') || getUrlParameter('p');
                 if(!p && workspace){
@@ -357,13 +386,15 @@
 
             imjoy.event_bus.on("plugin_loaded", (plugin) => {
                 //reload the plugin menu
-                document.getElementById('plugin-menu').innerHTML = ''
+                var plugin_menu = document.getElementById('plugin-menu')
+                plugin_menu.innerHTML = ''
                 for(let pn in imjoy.pm.plugin_names){
-                    document.getElementById('plugin-menu').innerHTML = `
+                    plugin_menu.innerHTML = `
                     <li class="menu-item"><a href="#" onclick="runPlugin('${pn}')">${pn}</a></li>
-                    `+ document.getElementById('plugin-menu').innerHTML
+                    `+ plugin_menu.innerHTML
                 }
-                document.getElementById('plugin-menu').innerHTML = document.getElementById('plugin-menu').innerHTML + '<li class="menu-item"><a href="#" onclick="loadPlugin()">Load Plugin</a></li>'
+                plugin_menu.innerHTML = plugin_menu.innerHTML + '<li class="menu-item"><a href="#" onclick="loadPlugin()"><i class="icon icon-plus"></i>&nbsp;Load Plugin</a></li>'
+                plugin_menu.innerHTML = plugin_menu.innerHTML + '<li class="menu-item"><a href="#"><i class="icon icon-stop"></i>&nbsp;Cancel</a></li>'
             })
 
             window.runPlugin = (name) => {
