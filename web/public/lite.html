@@ -68,7 +68,6 @@
         }
         .whiteboard{
             width: 100%;
-            height: calc(100vh - 36px);
         }
         .window_container{
             width: 100%;
@@ -166,7 +165,7 @@
             document.getElementById('whiteboard').innerHTML =`
                 <div class="window_container" id="${id}"></div>
             ` + document.getElementById('whiteboard').innerHTML;
-
+            window.onresize();
             selectWindow(id)
         }
 
