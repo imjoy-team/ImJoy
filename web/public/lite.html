@@ -337,7 +337,7 @@
         // fix mobile display
         window.onresize = ()=>{
             document.body.height = window.innerHeight;
-            document.getElementById('whiteboard').style.height = (window.innerHeight -46) + 'px!important';
+            document.getElementById('whiteboard').style.setProperty('height',  (window.innerHeight - 46) + 'px', 'important');
         }
         window.onresize();
     </script>
