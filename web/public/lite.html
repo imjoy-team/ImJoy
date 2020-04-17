@@ -335,6 +335,12 @@
                 imjoy.pm.plugin_names[name].api.run({config: {}, data: {}})
             }
         })
+        // fix mobile display
+        window.onresize = ()=>{
+            document.body.height = window.innerHeight;
+            document.getElementById('whiteboard').style.height = (window.innerHeight - 36) + 'px!important';
+        }
+        window.onresize();
     </script>
 </body>
 
