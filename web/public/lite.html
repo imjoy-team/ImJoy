@@ -397,7 +397,7 @@
                     `+ plugin_menu.innerHTML
                 }
                 plugin_menu.innerHTML = plugin_menu.innerHTML + '<li class="menu-item"><a href="#" onclick="loadPlugin()"><i class="icon icon-plus"></i>&nbsp;Load Plugin</a></li>'
-                plugin_menu.innerHTML = plugin_menu.innerHTML + '<li class="menu-item"><a href="#" onclick="onresize()"><i class="icon icon-stop"></i>&nbsp;Cancel</a></li>'
+                plugin_menu.innerHTML = plugin_menu.innerHTML + '<li class="menu-item"><a href="#" onclick="window.onresize()"><i class="icon icon-stop"></i>&nbsp;Cancel</a></li>'
             })
 
             window.runPlugin = (name) => {
