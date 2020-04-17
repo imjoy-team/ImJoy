@@ -134,7 +134,7 @@
         </section>
         <section class="navbar-section" id="windows-menu" style="flex: 0 1 0;">
             <div class="dropdown dropdown-right">
-                <a class="btn btn-link dropdown-toggle" tabindex="0"><i class="icon icon-more-horiz"></i></a>
+                <a class="btn btn-sm btn-action s-circle dropdown-toggle" tabindex="0"><i class="icon icon-more-horiz"></i></a>
                 <ul class="menu" id="plugin-menu">
                 </ul>
             </div>
@@ -164,7 +164,7 @@
 
         function addWindow(title, id){
             document.getElementById('windows-menu').innerHTML =`
-            <span class="chip pointer" id="header_${id}" onclick="selectWindow('${id}')">
+            <span class="chip pointer window-chip" id="header_${id}" onclick="selectWindow('${id}')">
                 ${title}
                 <a href="#" onclick="removeWindow('${id}')" class="btn btn-clear" aria-label="Close" role="button"></a>
             </span>` + document.getElementById('windows-menu').innerHTML;
@@ -173,6 +173,19 @@
                 <div class="window_container" id="${id}"></div>
             ` + document.getElementById('whiteboard').innerHTML;
             window.onresize();
+            // only display when there is more than one window open
+            if(windows.length>1){
+                var ws = document.querySelectorAll(".window-chip")
+                for(let w of ws){
+                    w.style.display = "inline-flex";
+                }
+            }
+            else{
+                var ws = document.querySelectorAll(".window-chip")
+                for(let w of ws){
+                    w.style.display = "none";
+                }
+            }
             selectWindow(id)
         }
 
@@ -270,12 +283,9 @@
                 imjoy_api: imjoy_api,
                 show_message_callback: console.log,
                 add_window_callback: async (w)=>{
-                    if(w.fullscreen){
+                    if(w.fullscreen || w.standalone){
                         document.getElementById("logo").style.display = "none";
-                    }
-                    if(w.standalone){
-                        document.getElementById("logo").style.display = "none";
-                        document.getElementById("windows-menu").style.display = "none";
+                        // document.getElementById("windows-menu").style.display = "none";
                     }
                     addWindow(w.name, w.iframe_container)
                 },
