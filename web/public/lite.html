@@ -63,9 +63,6 @@
             position: fixed;
             overflow-wrap: break-word;
         }
-        .navbar{
-            height: 2px;
-        }
         .navbar .navbar-brand {
             font-size: 1.2rem;
         }
@@ -317,8 +314,13 @@
                 show_message_callback: console.log,
                 add_window_callback: async (w)=>{
                     if(w.fullscreen || w.standalone){
+                        document.querySelector(".navbar").style.height = "2px";
                         document.getElementById("logo").style.display = "none";
                         // document.getElementById("windows-menu").style.display = "none";
+                    }
+                    else{
+                        document.querySelector(".navbar").style.height = "32px";
+                        document.getElementById("logo").style.display = "flex";
                     }
                     addWindow(w)
                 },
