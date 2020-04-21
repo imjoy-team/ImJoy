@@ -6,7 +6,7 @@
       :maxDepth="maxDepth"
       :depth="0"
       path=""
-      :selected="itemSelected"
+      @selected="itemSelected"
       :canSelect="hasSelectedListener"
     />
   </div>

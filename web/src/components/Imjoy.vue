@@ -2505,7 +2505,7 @@ export default {
             }
             const w = {
               name: "Files",
-              type: "imjoy/url_list",
+              type: "imjoy/generic",
               scroll: true,
               data: urls,
             };
@@ -2705,7 +2705,7 @@ export default {
       }
       const w = {
         name: "Files",
-        type: "imjoy/files",
+        type: "imjoy/generic",
         config: {},
         select: -1,
         _op: "__file_loader__",

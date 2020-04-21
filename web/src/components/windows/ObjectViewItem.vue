@@ -6,9 +6,7 @@
     <div
       class="value-key can-select"
       style="justify-content: space-between;display: flex;"
-      v-on:click="clickEvent(data)"
-      @keyup.enter="clickEvent(data)"
-      @keyup.space="clickEvent(data)"
+      @click="clickEvent(data)"
       :role="canSelect ? 'button' : undefined"
       :tabindex="canSelect ? '0' : undefined"
       v-if="isFile(data)"
@@ -43,7 +41,7 @@
       <template v-for="(child, key) in dataValues">
         <object-view-item
           :class="[{ 'root-item': !dataKey }]"
-          v-on:selected="bubbleSelected"
+          @v-on:selected="bubbleSelected"
           :key="key"
           :dataKey="key"
           :data="child"
@@ -64,12 +62,23 @@
       </div>
     </div>
 
+    <!-- Handle image URI -->
+    <div v-else-if="typeof data === 'string' && data.startsWith('data:image/')">
+      <md-card>
+        <md-card-content>
+          <div class="fill-container">
+            <img
+              style="height: 100%; width: 100%; object-fit: contain;"
+              :src="data"
+            />
+          </div>
+        </md-card-content>
+      </md-card>
+    </div>
     <!-- Handle other types -->
     <div
       :class="valueClasses"
-      v-on:click="clickEvent(data)"
-      @keyup.enter="clickEvent(data)"
-      @keyup.space="clickEvent(data)"
+      @click="clickEvent(data)"
       :role="canSelect ? 'button' : undefined"
       :tabindex="canSelect ? '0' : undefined"
       v-else
@@ -219,6 +228,11 @@ export default Vue.extend({
 </script>
 
 <style lang="css" scoped>
+.fill-container {
+  max-width: 100%;
+  max-height: 100%;
+}
+
 .object-view-item:not(.root-item) {
   margin-left: 15px;
 }
