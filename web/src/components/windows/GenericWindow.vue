@@ -3,7 +3,6 @@
     <object-view-item
       :class="[{ 'root-item': true, dark: false }]"
       :data="w.data"
-      dataKey="root"
       :maxDepth="maxDepth"
       :depth="0"
       path=""
@@ -73,7 +72,7 @@ export default {
   overflow: auto !important;
 }
 .root-item {
-  --vjc-key-color: #0977e6;
+  --vjc-key-color: #448aff;
   --vjc-valueKey-color: #073642;
   --vjc-string-color: #268bd2;
   --vjc-number-color: #2aa198;

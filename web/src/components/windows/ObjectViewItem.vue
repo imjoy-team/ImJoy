@@ -14,7 +14,7 @@
       v-if="isFile(data)"
     >
       <div style="line-height: 36px;">
-        <span class="value-key">{{ dataKey }}: </span>
+        <span class="value-key" v-if="dataKey">{{ dataKey }}: </span>
         <span :style="getValueStyle(data)">
           <md-icon>insert_drive_file</md-icon>
           {{ data.name }}
@@ -27,7 +27,7 @@
     <!-- Handle Objects and Arrays-->
     <div v-else-if="typeof data === 'object' || typeof data === 'array'">
       <div
-        v-if="dataKey !== '__root__'"
+        v-if="dataKey"
         class="data-key"
         :aria-expanded="open ? 'true' : 'false'"
       >
@@ -42,7 +42,7 @@
       </div>
       <template v-for="(child, key) in dataValues">
         <object-view-item
-          :class="[{ 'root-item': dataKey === '__root__' }]"
+          :class="[{ 'root-item': !dataKey }]"
           v-on:selected="bubbleSelected"
           :key="key"
           :dataKey="key"
@@ -108,7 +108,7 @@ export default Vue.extend({
       type: Number,
     },
     dataKey: {
-      required: true,
+      required: false,
       type: [String, Number],
     },
     data: {
@@ -253,7 +253,7 @@ export default Vue.extend({
   display: flex;
   align-items: center;
   border-radius: 2px;
-  font-weight: 600;
+  font-weight: 500;
   cursor: pointer;
   white-space: nowrap;
   padding-left: 5px;
