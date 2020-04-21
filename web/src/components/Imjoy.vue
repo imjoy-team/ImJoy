@@ -1433,16 +1433,13 @@ import { version as core_version } from "imjoy-core";
 
 import DOMPurify from "dompurify";
 
-import { ImJoy, Joy, utils } from "imjoy-core";
+import { ImJoy, Joy, utils, ajv } from "imjoy-core";
 
 import { escapeHTML, _clone, assert, url_regex, randId } from "../utils.js";
 
 import _ from "lodash";
 
 import Minibus from "minibus";
-
-import Ajv from "ajv";
-const ajv = new Ajv();
 
 export default {
   name: "imjoy",

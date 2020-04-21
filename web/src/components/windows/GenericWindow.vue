@@ -1,52 +1,23 @@
 <template>
-  <md-list class="allow-scroll">
-    <md-list-item
-      class="md-primary"
-      v-if="loaders && w.loaders && Object.keys(w.loaders).length > 0"
-      @click="loaders[w.loaders[Object.keys(w.loaders)[0]]](w.data)"
-    >
-      <span class="md-list-item-text md-primary"
-        >Open with "{{ Object.keys(w.loaders)[0] }}"</span
-      >
-      <md-tooltip
-        >click to open with "{{ Object.keys(w.loaders)[0] }}".</md-tooltip
-      >
-    </md-list-item>
-    <md-list-item v-else>
-      <span class="md-list-item-text">{{ dataSummary(w) }}</span>
-    </md-list-item>
-    <md-list-item
-      v-for="(v, k) in w.data"
-      v-show="
-        (!isTypedArray(w.data) &&
-          (!k.startsWith || !k.startsWith('_')) &&
-          w.data &&
-          !w.data.length) ||
-          ((w.data.length || w.data.byteLength) &&
-            (w.data.length || w.data.byteLength) > 0 &&
-            k <= 20)
-      "
-      :key="k"
-    >
-      <md-icon>insert_drive_file</md-icon>
-      <span class="md-list-item-text" @click="printObject(k, v)">{{ k }}</span>
-    </md-list-item>
-    <md-list-item
-      v-if="
-        w.data &&
-          (w.data.length || w.data.byteLength) &&
-          (w.data.length || w.data.byteLength) > 20
-      "
-      @click="printObject(w.data)"
-    >
-      <md-icon>insert_drive_file</md-icon>
-      <span class="md-list-item-text">...</span>
-      <md-tooltip>click to print the data in your console.</md-tooltip>
-    </md-list-item>
-  </md-list>
+  <div class="generic-window">
+    <object-view-item
+      :class="[{ 'root-item': true, dark: false }]"
+      :data="w.data"
+      dataKey="root"
+      :maxDepth="maxDepth"
+      :depth="0"
+      path=""
+      :selected="itemSelected"
+      :canSelect="hasSelectedListener"
+    />
+  </div>
 </template>
 
 <script>
+import Vue from "vue";
+import ObjectViewItem from "./ObjectViewItem.vue";
+Vue.component("object-view-item", ObjectViewItem);
+
 export default {
   name: "generic-window",
   type: "imjoy/generic",
@@ -64,31 +35,30 @@ export default {
       },
     },
   },
+  data() {
+    return {
+      colorScheme: "light",
+      maxDepth: 1,
+      rootKey: "__root__",
+    };
+  },
   mounted() {
     this.$emit("init");
   },
+  computed: {
+    hasSelectedListener() {
+      return Boolean(this.$listeners && this.$listeners.selected);
+    },
+  },
   methods: {
-    dataSummary(w) {
-      if (Array.isArray(w.data)) {
-        return `${w.type}, ${typeof w.data}, length: ${w.data.length}`;
-      } else if (
-        w.data.buffer &&
-        Object.prototype.toString.call(w.data.buffer) === "[object ArrayBuffer]"
-      ) {
-        return `${w.type}, typedarray, length: ${w.data.length}`;
-      } else if (typeof w.data === "object") {
-        return `${w.type}, ${typeof w.data}, length: ${
-          Object.keys(w.data).length
-        }`;
-      } else {
-        return `${w.type}`;
-      }
+    isObject: function(val) {
+      return typeof val === "object" && val !== null && !this.isArray(val);
     },
-    printObject(name, obj, obj2) {
-      console.log(name, obj, obj2);
+    isArray: function(val) {
+      return Array.isArray(val);
     },
-    isTypedArray(obj) {
-      return !!obj && obj.byteLength !== undefined;
+    itemSelected: function(data) {
+      console.log(data);
     },
   },
 };
@@ -96,7 +66,31 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+.generic-window > button {
+  margin-left: 0px !important;
+}
 .allow-scroll {
   overflow: auto !important;
+}
+.root-item {
+  --vjc-key-color: #0977e6;
+  --vjc-valueKey-color: #073642;
+  --vjc-string-color: #268bd2;
+  --vjc-number-color: #2aa198;
+  --vjc-boolean-color: #cb4b16;
+  --vjc-null-color: #6c71c4;
+  --vjc-arrow-size: 7px;
+  --vjc-arrow-color: #268bd2;
+  --vjc-hover-color: rgba(0, 0, 0, 0.2);
+  margin-left: 0;
+  width: 100%;
+  height: auto;
+}
+
+.root-item.dark {
+  --vjc-key-color: #80d8ff;
+  --vjc-valueKey-color: #fdf6e3;
+  --vjc-hover-color: rgba(255, 255, 255, 0.2);
+  --vjc-arrow-color: #fdf6e3;
 }
 </style>
