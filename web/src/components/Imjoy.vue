@@ -2092,6 +2092,10 @@ export default {
       });
     },
     createWindow(w) {
+      w.getDataLoaders = data => {
+        const loaders = this.wm.getDataLoaders(data);
+        return loaders;
+      };
       return this.pm.createWindow(null, w);
     },
     async restartImJoy() {
@@ -2217,17 +2221,7 @@ export default {
         {
           loader_key: "Code Editor (file)",
           schema: ajv.compile({
-            type: "object",
-            properties: {
-              type: { type: "string" },
-              name: {
-                type: "string",
-                pattern: ".*\\.imjoy.html$",
-                maxLength: 1024,
-              },
-              size: { type: "number" },
-            },
-            required: ["name", "size", "type"],
+            file: { ext: ["imjoy.html", "js", "txt"] },
           }),
           loader: code_loader,
         },
@@ -2251,17 +2245,7 @@ export default {
         },
         {
           loader_key: "Image (file)",
-          schema: ajv.compile({
-            type: "object",
-            properties: {
-              type: {
-                type: "string",
-                enum: ["image/jpeg", "image/png", "image/gif"],
-              },
-              size: { type: "number" },
-            },
-            required: ["type", "size"],
-          }),
+          schema: ajv.compile({ file: { mime: "image/*" } }),
           loader: image_loader,
         },
         {

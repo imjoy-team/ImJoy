@@ -7,6 +7,7 @@
       :depth="-1"
       path=""
       @selected="itemSelected"
+      @openMenu="openMenu"
       :canSelect="hasSelectedListener"
     />
   </div>
@@ -50,6 +51,12 @@ export default {
     },
   },
   methods: {
+    openMenu: function(event) {
+      const loaders = this.w.getDataLoaders(event.data);
+      if (event.target) {
+        event.target.setLoaders(loaders);
+      }
+    },
     isObject: function(val) {
       return typeof val === "object" && val !== null && !this.isArray(val);
     },

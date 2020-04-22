@@ -19,9 +19,28 @@
           {{ data.name }}
         </span>
       </div>
-      <md-button class="md-primary md-icon-button">
+      <md-button
+        v-if="!loaders"
+        class="md-primary md-icon-button"
+        @click="openMenu()"
+      >
         <md-icon>menu</md-icon>
       </md-button>
+      <md-menu v-else>
+        <md-button class="md-icon-button md-primary" md-menu-trigger>
+          <md-icon>menu</md-icon>
+        </md-button>
+        <md-menu-content>
+          <md-menu-item
+            @click="loader(data)"
+            v-for="(loader, k) in loaders"
+            :key="k"
+            class="md-primary"
+          >
+            {{ k }}
+          </md-menu-item>
+        </md-menu-content>
+      </md-menu>
     </div>
 
     <!-- Handle image URI -->
@@ -38,7 +57,7 @@
           {{ dataKey }}
           <span class="properties">{{ lengthString }}</span>
         </div>
-        <md-button class="md-primary md-icon-button">
+        <md-button class="md-primary md-icon-button" @click="openMenu()">
           <md-icon>menu</md-icon>
         </md-button>
       </div>
@@ -66,13 +85,13 @@
           {{ dataKey }}
           <span class="properties">{{ lengthString }}</span>
         </div>
-        <md-button class="md-primary md-icon-button">
+        <md-button class="md-primary md-icon-button" @click="openMenu()">
           <md-icon>menu</md-icon>
         </md-button>
       </div>
       <template v-for="(child, key) in dataValues">
         <object-view-item
-          @v-on:selected="bubbleSelected"
+          @selected="bubbleSelected"
           :key="key"
           :dataKey="key"
           :data="child"
@@ -81,6 +100,7 @@
           :maxDepth="maxDepth"
           :depth="depth + 1"
           :canSelect="canSelect"
+          @openMenu="openMenu"
         />
       </template>
       <div
@@ -123,6 +143,7 @@ export default Vue.extend({
     return {
       open: this.depth < this.maxDepth,
       maxLength: 100,
+      loaders: null,
     };
   },
   props: {
@@ -161,6 +182,20 @@ export default Vue.extend({
     },
     toggleOpen: function() {
       this.open = !this.open;
+    },
+    setLoaders: function(loaders) {
+      this.loaders = loaders;
+      this.$forceUpdate();
+    },
+    openMenu: function(event) {
+      if (!event) {
+        this.$emit("openMenu", {
+          target: this,
+          data: this.data,
+        });
+      } else {
+        this.$emit("openMenu", event);
+      }
     },
     clickEvent: function(data) {
       this.$emit("selected", {
