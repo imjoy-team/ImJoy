@@ -63,8 +63,24 @@
     </div>
 
     <!-- Handle image URI -->
-    <div v-else-if="typeof data === 'string' && data.startsWith('data:image/')">
-      <md-card>
+    <template
+      v-else-if="typeof data === 'string' && data.startsWith('data:image/')"
+    >
+      <div
+        class="data-key"
+        style="justify-content: space-between;display: flex;"
+      >
+        <div @click.stop="toggleOpen">
+          <div :class="classes"></div>
+          <md-icon>image</md-icon>
+          {{ dataKey }}
+          <span class="properties">{{ lengthString }}</span>
+        </div>
+        <md-button class="md-primary md-icon-button">
+          <md-icon>menu</md-icon>
+        </md-button>
+      </div>
+      <md-card v-if="open">
         <md-card-content>
           <div class="fill-container">
             <img
@@ -74,7 +90,7 @@
           </div>
         </md-card-content>
       </md-card>
-    </div>
+    </template>
     <!-- Handle other types -->
     <div
       :class="valueClasses"
@@ -295,8 +311,8 @@ export default Vue.extend({
 .chevron-arrow {
   display: inline-block;
   flex-shrink: 0;
-  border-right: 4px solid var(--vjc-arrow-color);
-  border-bottom: 4px solid var(--vjc-arrow-color);
+  border-right: 2px solid var(--vjc-arrow-color);
+  border-bottom: 2px solid var(--vjc-arrow-color);
   width: var(--vjc-arrow-size);
   height: var(--vjc-arrow-size);
   margin-right: 20px;
