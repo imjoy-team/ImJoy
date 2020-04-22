@@ -1,10 +1,11 @@
 <!-- This file adapted from: https://github.com/tylerkrupicka/vue-json-component/blob/master/src/JSONViewItem.vue -->
 <!-- License: MIT, Original author: Tyler Krupicka (@tylerkrupicka) -->
 <template>
-  <div class="object-view-item">
+  <div class="object-view-item" :class="[{ 'root-item': depth < 1 }]">
+    <!-- <p>{{depth}}</p> -->
     <!-- Handle files -->
     <div
-      class="value-key can-select"
+      class="data-key can-select"
       style="justify-content: space-between;display: flex;"
       @click="clickEvent(data)"
       :role="canSelect ? 'button' : undefined"
@@ -12,7 +13,7 @@
       v-if="isFile(data)"
     >
       <div style="line-height: 36px;">
-        <span class="value-key" v-if="dataKey">{{ dataKey }}: </span>
+        <span class="value-key" v-if="depth > 0">{{ dataKey }}: </span>
         <span :style="getValueStyle(data)">
           <md-icon>insert_drive_file</md-icon>
           {{ data.name }}
@@ -58,9 +59,9 @@
       <div
         v-if="dataKey"
         class="data-key"
-        :aria-expanded="open && dataValues.length > 0 ? 'true' : 'false'"
+        :aria-expanded="open ? 'true' : 'false'"
       >
-        <div @click.stop="toggleOpen">
+        <div @click.stop="dataLength > 0 ? toggleOpen() : null">
           <div :class="classes"></div>
           {{ dataKey }}
           <span class="properties">{{ lengthString }}</span>
@@ -71,7 +72,6 @@
       </div>
       <template v-for="(child, key) in dataValues">
         <object-view-item
-          :class="[{ 'root-item': !dataKey }]"
           @v-on:selected="bubbleSelected"
           :key="key"
           :dataKey="key"
@@ -85,7 +85,7 @@
       </template>
       <div
         class="data-key"
-        style="margin-left: 40px;"
+        style="margin-left: 32px;"
         v-if="open && dataLength > maxLength"
         @click="loadMore()"
       >
@@ -95,7 +95,7 @@
 
     <!-- Handle other types -->
     <div
-      :class="valueClasses"
+      class="data-key can-select"
       @click="clickEvent(data)"
       :role="canSelect ? 'button' : undefined"
       :tabindex="canSelect ? '0' : undefined"
@@ -135,8 +135,8 @@ export default Vue.extend({
       type: Number,
     },
     dataKey: {
-      required: false,
       type: [String, Number],
+      default: null,
     },
     data: {
       required: true,
@@ -213,12 +213,6 @@ export default Vue.extend({
         opened: this.open,
       };
     },
-    valueClasses: function() {
-      return {
-        "value-key": true,
-        "can-select": true,
-      };
-    },
     lengthString: function() {
       if (Array.isArray(this.data)) {
         return this.data.length === 1
@@ -257,7 +251,7 @@ export default Vue.extend({
 
 .value-key {
   color: var(--vjc-valueKey-color);
-  font-weight: 600;
+  font-weight: 400;
   margin-left: 10px;
   border-radius: 2px;
   white-space: nowrap;

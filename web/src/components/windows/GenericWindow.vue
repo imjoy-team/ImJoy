@@ -4,7 +4,7 @@
       :class="[{ 'root-item': true, dark: false }]"
       :data="w.data"
       :maxDepth="maxDepth"
-      :depth="0"
+      :depth="-1"
       path=""
       @selected="itemSelected"
       :canSelect="hasSelectedListener"
