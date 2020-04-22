@@ -73,7 +73,7 @@ export default {
 }
 .root-item {
   --vjc-key-color: #448aff;
-  --vjc-valueKey-color: #073642;
+  --vjc-valueKey-color: #448aff;
   --vjc-string-color: #268bd2;
   --vjc-number-color: #2aa198;
   --vjc-boolean-color: #cb4b16;

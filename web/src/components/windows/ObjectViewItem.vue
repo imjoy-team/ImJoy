@@ -22,12 +22,43 @@
         <md-icon>menu</md-icon>
       </md-button>
     </div>
+
+    <!-- Handle image URI -->
+    <template
+      v-else-if="typeof data === 'string' && data.startsWith('data:image/')"
+    >
+      <div
+        class="data-key"
+        style="justify-content: space-between;display: flex;"
+      >
+        <div @click.stop="toggleOpen">
+          <div :class="classes"></div>
+          <md-icon>image</md-icon>
+          {{ dataKey }}
+          <span class="properties">{{ lengthString }}</span>
+        </div>
+        <md-button class="md-primary md-icon-button">
+          <md-icon>menu</md-icon>
+        </md-button>
+      </div>
+      <md-card v-if="open">
+        <md-card-content>
+          <div class="fill-container">
+            <img
+              style="height: 100%; width: 100%; object-fit: contain;"
+              :src="data"
+            />
+          </div>
+        </md-card-content>
+      </md-card>
+    </template>
+
     <!-- Handle Objects and Arrays-->
     <div v-else-if="typeof data === 'object' || typeof data === 'array'">
       <div
         v-if="dataKey"
         class="data-key"
-        :aria-expanded="open ? 'true' : 'false'"
+        :aria-expanded="open && dataValues.length > 0 ? 'true' : 'false'"
       >
         <div @click.stop="toggleOpen">
           <div :class="classes"></div>
@@ -62,35 +93,6 @@
       </div>
     </div>
 
-    <!-- Handle image URI -->
-    <template
-      v-else-if="typeof data === 'string' && data.startsWith('data:image/')"
-    >
-      <div
-        class="data-key"
-        style="justify-content: space-between;display: flex;"
-      >
-        <div @click.stop="toggleOpen">
-          <div :class="classes"></div>
-          <md-icon>image</md-icon>
-          {{ dataKey }}
-          <span class="properties">{{ lengthString }}</span>
-        </div>
-        <md-button class="md-primary md-icon-button">
-          <md-icon>menu</md-icon>
-        </md-button>
-      </div>
-      <md-card v-if="open">
-        <md-card-content>
-          <div class="fill-container">
-            <img
-              style="height: 100%; width: 100%; object-fit: contain;"
-              :src="data"
-            />
-          </div>
-        </md-card-content>
-      </md-card>
-    </template>
     <!-- Handle other types -->
     <div
       :class="valueClasses"
