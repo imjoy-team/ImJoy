@@ -1,6 +1,7 @@
 import { expect } from "chai";
 import { shallowMount, createLocalVue } from "@vue/test-utils";
 import VueRouter from "vue-router";
+import VueMaterial from "vue-material";
 import { router_config } from "../src/router";
 import { Joy, version } from "imjoy-core";
 import Imjoy from "@/components/Imjoy.vue";
@@ -15,11 +16,12 @@ import WEB_PYTHON_WINDOW_PLUGIN_TEMPLATE from "../src/plugins/webPythonWindowTem
 import TEST_WEB_WORKER_PLUGIN_1 from "./testWebWorkerPlugin1.imjoy.html";
 import TEST_WEB_WORKER_PLUGIN_2 from "./testWebWorkerPlugin2.imjoy.html";
 import TEST_WINDOW_PLUGIN_1 from "./testWindowPlugin1.imjoy.html";
+const localVue = createLocalVue();
 
 console.log("ImJoy Core version: " + version);
 
 describe("ImJoy.vue", async () => {
-  const localVue = createLocalVue();
+  localVue.use(VueMaterial);
   localVue.use(VueRouter);
   const router = new VueRouter(router_config);
   const wrapper = shallowMount(Imjoy, {
