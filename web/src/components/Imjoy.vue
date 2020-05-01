@@ -1435,16 +1435,13 @@ import { version as core_version } from "imjoy-core";
 
 import DOMPurify from "dompurify";
 
-import { ImJoy, Joy, utils } from "imjoy-core";
+import { ImJoy, Joy, utils, ajv } from "imjoy-core";
 
 import { escapeHTML, _clone, assert, url_regex, randId } from "../utils.js";
 
 import _ from "lodash";
 
 import Minibus from "minibus";
-
-import Ajv from "ajv";
-const ajv = new Ajv();
 
 export default {
   name: "imjoy",
@@ -2105,6 +2102,10 @@ export default {
       });
     },
     createWindow(w) {
+      w.getDataLoaders = data => {
+        const loaders = this.wm.getDataLoaders(data);
+        return loaders;
+      };
       return this.pm.createWindow(null, w);
     },
     async restartImJoy() {
@@ -2230,17 +2231,7 @@ export default {
         {
           loader_key: "Code Editor (file)",
           schema: ajv.compile({
-            type: "object",
-            properties: {
-              type: { type: "string" },
-              name: {
-                type: "string",
-                pattern: ".*\\.imjoy.html$",
-                maxLength: 1024,
-              },
-              size: { type: "number" },
-            },
-            required: ["name", "size", "type"],
+            file: { ext: ["imjoy.html", "js", "txt"] },
           }),
           loader: code_loader,
         },
@@ -2264,17 +2255,7 @@ export default {
         },
         {
           loader_key: "Image (file)",
-          schema: ajv.compile({
-            type: "object",
-            properties: {
-              type: {
-                type: "string",
-                enum: ["image/jpeg", "image/png", "image/gif"],
-              },
-              size: { type: "number" },
-            },
-            required: ["type", "size"],
-          }),
+          schema: ajv.compile({ file: { mime: "image/*" } }),
           loader: image_loader,
         },
         {
@@ -2518,7 +2499,7 @@ export default {
             }
             const w = {
               name: "Files",
-              type: "imjoy/url_list",
+              type: "imjoy/generic",
               scroll: true,
               data: urls,
             };
@@ -2718,7 +2699,7 @@ export default {
       }
       const w = {
         name: "Files",
-        type: "imjoy/files",
+        type: "imjoy/generic",
         config: {},
         select: -1,
         _op: "__file_loader__",

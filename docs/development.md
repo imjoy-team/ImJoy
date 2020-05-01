@@ -413,11 +413,25 @@ Defines the icon used in the plugin menu. You can choose the following formats:
  4. If you set it as `null` or `""`, it will use `extension` in material icon.
 
 #### inputs
-Defines the inputs with json-schema syntax (http://json-schema.org/).
+Defines a file/data matching schema which will be used to trigger the plugin. For example, when the user drag and drop a file to the workspace.
 
-For example, to define that the plugin uses png files, you can specify `"inputs": {"properties": {"type": {"enum": ["image/png"]}}, "type": "object"}` . You can also use the simplified format which assumes the inputs is an object and use json schema to describe the properties: `"inputs": {"type": {"enum": ["image/png"]}}`.
+You can basically use standard json schema(http://json-schema.org/) to validate the input data object. For example, to define that the plugin uses png files, you can specify `"inputs": {"type": "object", "properties": {"name": {"type": "string", "maxLength": 100}}, "required": ["name"]}`. Under the hood, we use the [ajv](https://github.com/epoberezkin/ajv) library to validate the objects. To ease the use of schema, we also extend the standard json schema with the following keywords:
+
+ * `file`: For file objects, use [mime types](https://en.wikipedia.org/wiki/Media_type) or file name extension. You can use one of the following keywords:
+   * `mime`: a common mime type string (or a list). For example `{"file": {"mime": "image/png"}}`. You can also specify a list of mime types: `"mime": ["image/png", "image/jpeg", "image/tiff"]`.
+   * `ext`: a file extension string (or a list). For example `{"file": {"ext": "png"}}`, Or you can specify a list of extensions: `{"file": {"ext": ["png", "jpg", "jpeg"]}}`. 
+
+ * `ndarray`: For example `{"ndarray": {"shape": [10, 10], "dtype": "uint8"}}`.
+   * `shape`: the shape for the array. You need to specify a number for each dimension, or use `null` which means any size for that dimension. For example: `{"type": "ndarray", "shape": [10, 10]}`, or if the first dimension can be any size: `{"type": "ndarray", "shape": [null, 10]}`
+   * `dtype`: the data type of the array. For example: `{"ndarray": {"dtype": "uint8"}}` or if we support both `uint8` and `float32`: `{"ndarray": {"dtype": ["uint8", "float32"]}}`. The supported `dtype` are: `["int8", "int16", "int32", "uint8", "uint16", "uint32", "float32", "float64", "array"]`.
+   * `ndim`: the number of dimension. For example: ` {"ndarray": {"ndim": 2}}` or if we support both 2D and 3D: ` {"ndarray": {"ndim": [2, 3]}}`
+
+ * For remote url which exposed via http or other protocol, `{"type": "url", "extension": "zarr"}`.
+
+
 
 Please also note that if you use a regular expression pattern in the schema to validate an string, you may want to set the `maxLength`, otherwise it will be very slow and can even crash while validating large string. For example, if we want to match an object contains `file_name` which ends with `.tiff`, we can set: `{"properties": {"file_name": {"type": "string","pattern": ".*\\.tiff$", "maxLength": 1024}}}`.
+
 
 #### outputs
 Defines the outputs with json-schema syntax (http://json-schema.org/).
