@@ -68,6 +68,7 @@
             v-if="
               wm.selected_window &&
                 wm.selected_window.standalone &&
+                wm.selected_window.loaders &&
                 wm.selected_window.loaders.length > 0
             "
             md-size="big"
@@ -1018,6 +1019,7 @@
     ></file-dialog>
 
     <md-dialog
+      onselectstart="return false;"
       :class="
         dialog_window_config.fullscreen || dialog_window_config.standalone
           ? 'fullscreen-dialog'
@@ -1596,6 +1598,14 @@ export default {
       localStorage.setItem("imjoy_client_id", this.client_id);
     }
 
+    let jailed_asset_url = "https://lib.imjoy.io/";
+    if (
+      location.hostname === "localhost" ||
+      location.hostname === "127.0.0.1"
+    ) {
+      jailed_asset_url = "/";
+    }
+
     this.imjoy = new ImJoy({
       imjoy_api: imjoy_api,
       event_bus: this.event_bus,
@@ -1605,7 +1615,7 @@ export default {
       },
       add_window_callback: this.addWindowCallback,
       client_id: this.client_id,
-      jailed_asset_url: "https://lib.imjoy.io/static/jailed/",
+      jailed_asset_url: jailed_asset_url,
     });
 
     this.pm = this.imjoy.pm;
@@ -3057,7 +3067,7 @@ export default {
         this.pm
           .createWindow(_plugin, config)
           .then(api => {
-            api.on(
+            config.api.on(
               "window_size_changed",
               rect => {
                 this.dialog_auto_height = `${rect.height + 40}px`;
@@ -3065,7 +3075,7 @@ export default {
               },
               true
             );
-            api.on("close", () => {
+            config.api.on("close", () => {
               this.showPluginDialog = false;
               if (_selectedWindow) this.wm.selectWindow(_selectedWindow);
             });
