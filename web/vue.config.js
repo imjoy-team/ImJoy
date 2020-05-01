@@ -67,10 +67,6 @@ module.exports = {
         to: path.join(__dirname, "dist/static/js/pluginParser.js"),
         toType: "file"
       },{
-        from: path.join(__dirname, "node_modules/imjoy-core/dist/base_frame.html"),
-        to: path.join(__dirname, "dist/base_frame.html"),
-        toType: "file"
-      },{
         from: path.join(__dirname, "node_modules/imjoy-core/dist/imjoy-rpc.js"),
         to: path.join(__dirname, "dist/imjoy-rpc.js"),
         toType: "file"

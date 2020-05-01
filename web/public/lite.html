@@ -42,7 +42,7 @@
     <meta name="msapplication-TileImage" content="static/icons/ms-icon-144x144.png">
     <meta name="theme-color" content="#f5f9ff">
 
-    <script src="https://lib.imjoy.io/imjoy-core.min.js"></script>
+    <script src="https://lib.imjoy.io/imjoy-loader.js"></script>
     <link rel="stylesheet" href="https://lib.imjoy.io/static/joy.css">
     <link rel="stylesheet" href="https://static.imjoy.io/spectre.css/spectre.min.css">
     <link rel="stylesheet" href="https://static.imjoy.io/spectre.css/spectre-exp.min.css">
@@ -308,7 +308,8 @@
             },
         }
 
-        document.addEventListener('DOMContentLoaded', (event) => {
+        document.addEventListener('DOMContentLoaded', async (event) => {
+            window.imjoyCore = await loadImJoyCore()
             imjoy = new imjoyCore.ImJoy({
                 imjoy_api: imjoy_api,
                 show_message_callback: console.log,
@@ -330,64 +331,59 @@
             const token = getUrlParameter('token') || getUrlParameter('t');
             const engine = getUrlParameter('engine') || getUrlParameter('e');
 
-            imjoy.start({workspace: workspace}).then(async ()=>{
-                console.log('ImJoy started: ', imjoy)
-                let p = getUrlParameter('plugin') || getUrlParameter('p');
-                if(!p && workspace){
+            await imjoy.start({workspace: workspace})
+            console.log('ImJoy started: ', imjoy)
+            let p = getUrlParameter('plugin') || getUrlParameter('p');
+            if(!p && workspace){
+                document.getElementById('loading').style.display = 'none';
+                return
+            }
+            window.loadPlugin = function(p){
+                if(!p) p = prompt(`Please type a ImJoy plugin URI to start or pass it with ${window.location.href+'?plugin=PLUGIN_URI'}`, '');
+                if(!p) return;
+                document.getElementById('loading').style.display = 'block';
+                imjoy.pm.reloadPluginRecursively({uri: p}).then(async (plugin)=>{
+                    let config = {};
+                    if (plugin.config.ui && plugin.config.ui.indexOf("{") > -1) {
+                        config = await imjoy.pm.imjoy_api.showDialog(
+                            plugin,
+                            plugin.config
+                        );
+                    }
+                    await plugin.api.run({config: config, data: {}})
                     document.getElementById('loading').style.display = 'none';
-                    return
-                }
-                window.loadPlugin = function(p){
-                    if(!p) p = prompt(`Please type a ImJoy plugin URI to start or pass it with ${window.location.href+'?plugin=PLUGIN_URI'}`, '');
-                    if(!p) return;
-                    document.getElementById('loading').style.display = 'block';
-                    imjoy.pm.reloadPluginRecursively({uri: p}).then(async (plugin)=>{
-                        let config = {};
-                        if (plugin.config.ui && plugin.config.ui.indexOf("{") > -1) {
-                            config = await imjoy.pm.imjoy_api.showDialog(
-                                plugin,
-                                plugin.config
-                            );
-                        }
-                        await plugin.api.run({config: config, data: {}})
-                        document.getElementById('loading').style.display = 'none';
-                    }).catch((e)=>{
-                        console.error(e)
-                        alert(`failed to load the plugin, error: ${e}`)
-                        document.getElementById('loading').style.display = 'none';
-                    })
-                }
+                }).catch((e)=>{
+                    console.error(e)
+                    alert(`failed to load the plugin, error: ${e}`)
+                    document.getElementById('loading').style.display = 'none';
+                })
+            }
 
-                if (engine) {
-                    try{
-                        console.log("Loading ImJoy-Engine from Gist...");
-                        await imjoy.pm
-                        .reloadPluginRecursively({
-                        uri:
-                            "https://gist.githubusercontent.com/oeway/e9282f27d9446bd4536a2a64018624c5/raw/ImJoy-Engine.imjoy.html",
-                        })
-                        console.log("ImJoy-Engine loaded.");
-                        const factory = imjoy.em.getFactory('ImJoy-Engine')
-                        await factory.addEngine({url: engine, token: token})
-                        console.log('plugin engine added:', engine)
-                    }
-                    catch(e){
-                        console.error(e)
-                        alert(`Failed to connect to the engine: ${e}`)
-                    }
-                    
+            if (engine) {
+                try{
+                    console.log("Loading Jupyter-Engine-Manager from Gist...");
+                    await imjoy.pm
+                    .reloadPluginRecursively({
+                    uri:
+                        "https://imjoy-team.github.io/jupyter-engine-manager/Jupyter-Engine-Manager.imjoy.html",
+                    })
+                    console.log("Jupyter-Engine-Manager loaded.");
+                    const factory = imjoy.em.getFactory('Jupyter-Engine')
+                    await factory.addEngine({url: engine, token: token})
+                    console.log('plugin engine added:', engine)
+                }
+                catch(e){
+                    console.error(e)
+                    alert(`Failed to connect to the engine: ${e}`)
                 }
                 
-                p = p || prompt(`Please type a ImJoy plugin URI to start or pass it with ${window.location.href+'?plugin=PLUGIN_URI'}`, 'imjoy-team/imjoy-plugins:Welcome');
-                p = p || 'imjoy-team/imjoy-plugins:Welcome';
-                if(p){
-                    window.loadPlugin(p);
-                }
-            })
-            .catch((e)=>{
-                console.error(e)
-                alert('Error: '+ e)
-            })
+            }
+            
+            p = p || prompt(`Please type a ImJoy plugin URI to start or pass it with ${window.location.href+'?plugin=PLUGIN_URI'}`, 'imjoy-team/imjoy-plugins:Welcome');
+            p = p || 'imjoy-team/imjoy-plugins:Welcome';
+            if(p){
+                window.loadPlugin(p);
+            }
 
             imjoy.event_bus.on("plugin_loaded", (plugin) => {
                 //reload the plugin menu
