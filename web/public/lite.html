@@ -361,14 +361,14 @@
 
             if (engine) {
                 try{
-                    console.log("Loading ImJoy-Engine from Gist...");
+                    console.log("Loading Jupyter-Engine-Manager from Gist...");
                     await imjoy.pm
                     .reloadPluginRecursively({
                     uri:
-                        "https://gist.githubusercontent.com/oeway/e9282f27d9446bd4536a2a64018624c5/raw/ImJoy-Engine.imjoy.html",
+                        "https://imjoy-team.github.io/jupyter-engine-manager/Jupyter-Engine-Manager.imjoy.html",
                     })
-                    console.log("ImJoy-Engine loaded.");
-                    const factory = imjoy.em.getFactory('ImJoy-Engine')
+                    console.log("Jupyter-Engine-Manager loaded.");
+                    const factory = imjoy.em.getFactory('Jupyter-Engine')
                     await factory.addEngine({url: engine, token: token})
                     console.log('plugin engine added:', engine)
                 }
