@@ -336,14 +336,11 @@ It contains the following fields:
   - **type**: String. Specifies the window type. This can be either the name of
    window plugin, an internal ImJoy window type or `external`. The following internal window types are
    supported:
-
+    - `imjoy/generic`. Will show all objects in `data`.
     - `imjoy/image`. Display an image. Requires `data.src` pointing to an image location.
     - `imjoy/image-compare`. Displays two images that can be compared with a slider. Images are passed as `data.first` and `data.second`. See example below.
-    - `imjoy/files`. Display a list of files. `data` is an array of file objects.
-    - `imjoy/url_list`. Display a list of url rendered with HTML tag `<a> </a>`. `data` is an array of urls.
     - `imjoy/panel`. Render the `ui` string in a `<config>` block. <!--****[TODO] what can you do with this?**-->
     - `imjoy/markdown`. Render some markdown text provided in `data.source`.
-    - `imjoy/generic`. Will show all objects in `data`.
     - `imjoy/plugin-editor`. Opens the source code editors. `data.id` is a unique string (preferable random) specifying the window id, `data.code` contains the source code
 
     If `external` is used, you can load an window from an external url, for example, a web app hosted on Github pages. you can specify the url with the `src` key. Details about how to support ImJoy from an external web app can be found [here](https://github.com/imjoy-team/imjoy-core/).
