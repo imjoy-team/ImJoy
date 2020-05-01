@@ -150,7 +150,10 @@ export default {
         this.refresh();
       });
       this.w.api.on("focus", () => {
-        if (!this.w.standalone) this.$el.scrollIntoView(true);
+        if (!this.w.standalone)
+          this.$nextTick(() => {
+            this.$el.scrollIntoView(true);
+          });
       });
       if (this.w.fullscreen) {
         this.fullScreen(this.w);
@@ -186,12 +189,18 @@ export default {
         this.refresh();
       });
       this.w.api.on("focus", () => {
-        if (!this.w.standalone) this.$el.scrollIntoView(true);
+        if (!this.w.standalone)
+          this.$nextTick(() => {
+            this.$el.scrollIntoView(true);
+          });
       });
       this.w.api.on("fullscreen", () => {
         this.fullScreen(this.w);
       });
-      if (!this.w.standalone) this.$el.scrollIntoView(true);
+      if (!this.w.standalone)
+        this.$nextTick(() => {
+          this.$el.scrollIntoView(true);
+        });
       if (this.w.fullscreen) {
         this.fullScreen(this.w);
       }

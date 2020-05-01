@@ -66,6 +66,14 @@ module.exports = {
         from: path.join(__dirname, "src/pluginParser.js"),
         to: path.join(__dirname, "dist/static/js/pluginParser.js"),
         toType: "file"
+      },{
+        from: path.join(__dirname, "node_modules/imjoy-core/dist/base_frame.html"),
+        to: path.join(__dirname, "dist/base_frame.html"),
+        toType: "file"
+      },{
+        from: path.join(__dirname, "node_modules/imjoy-core/dist/imjoy-rpc.js"),
+        to: path.join(__dirname, "dist/imjoy-rpc.js"),
+        toType: "file"
       }]),
       new MonacoWebpackPlugin({output: 'static/vs', languages: ['javascript', 'html', 'css', 'python'], features: ['accessibilityHelp', 'bracketMatching', 'caretOperations', 'clipboard', 'codeAction', 'codelens', 'colorDetector', 'comment', 'contextmenu', 'coreCommands', 'cursorUndo', 'dnd', 'find', 'folding', 'fontZoom', 'format', 'goToDefinitionCommands', 'goToDefinitionMouse', 'gotoError', 'gotoLine', 'hover', 'inPlaceReplace', 'inspectTokens', 'iPadShowKeyboard', 'linesOperations', 'links', 'multicursor', 'parameterHints', 'quickCommand', 'quickOutline', 'referenceSearch', 'rename', 'smartSelect', 'snippets', 'suggest', 'toggleHighContrast', 'toggleTabFocusMode', 'transpose', 'wordHighlighter', 'wordOperations', 'wordPartOperations']}),
       new webpack.DefinePlugin({
@@ -90,9 +98,22 @@ module.exports = {
     karma: {
       karmaConfig: {
         frameworks: ['mocha'],
+
+        // list of files / patterns to load in the browser
         files: [
-          'tests/*.spec.js',
+            // only specify one entry point
+            // and require all tests in there
+            'tests/*.spec.js',
+            { pattern: 'node_modules/imjoy-core/dist/*', watched: false, included: false, served: true, nocache: false },
+            { pattern: 'src/*.js', watched: false, included: false, served: true, nocache: false },
         ],
+
+        proxies: {
+            "/base_frame.html": '/base/node_modules/imjoy-core/dist/base_frame.html',
+            "/imjoy-rpc.js": '/base/node_modules/imjoy-core/dist/imjoy-rpc.js',
+            "/plugin-service-worker.js": "/base/node_modules/imjoy-core/dist/plugin-service-worker.js"
+        },
+
         preprocessors: {
           '**/*.spec.js': ['webpack', 'sourcemap']
         },
