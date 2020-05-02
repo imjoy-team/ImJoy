@@ -14,7 +14,7 @@
         url(/static/iconfont/MaterialIcons-Regular.woff2) format('woff2'),
         url(/static/iconfont/MaterialIcons-Regular.woff) format('woff'),
         url(/static/iconfont/MaterialIcons-Regular.ttf) format('truetype');
-}
+} 
 
 
 body {
@@ -401,4 +401,15 @@ footer {
 
 .mdl-mini-footer {
     background-color: #42424214;
+}
+
+.columns {
+    max-width: 2048px;
+    padding: 20px;
+}
+
+@media screen and (max-width: 640px) {
+    .columns {
+        padding: 1px!important;
+    }
 }
