@@ -38,6 +38,9 @@
   <link rel="icon" href="/static/icons/favicon.ico" type="image/x-icon" />
   <script src="/repo/assets/vue.js"></script>
   <script src="/repo/assets/dialog-polyfill.min.js"></script>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.4.2/css/bulma.min.css" />
   <link rel="stylesheet" href="/repo/assets/dialog-polyfill.min.css" />
   <link rel="stylesheet" href="/repo/assets/material.blue-pink.min.css" />
   <script defer src="/repo/assets/material.min.js"></script>
@@ -75,7 +78,7 @@
 
         </div>
       </header>
-      <main class="mdl-layout__content" id="particles-js">
+      <main class="mdl-layout__content" style="display: flex; justify-content: center;" id="particles-js">
         <div class="page-content">
           <!-- Your content goes here -->
           <div class="mdl-grid">
@@ -113,91 +116,98 @@
             </div>
           </div>
 
-
-          <ul class="mdl-grid">
-            <li class="mdl-cell mdl-cell--4-col" v-for="(plugin, id) in filteredPlugins">
-              <div class="demo-card-wide mdl-card mdl-shadow--2dp">
-                <div class="background" :style="{backgroundImage: 'url(' + plugin.thumbnail + ')'}">
-                  <div class="mdl-card__menu">
-                    <a :href="plugin.url" target="_blank" :id="id + 'repo'" v-if="plugin.url">
-                      <button class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect">
-                        <i class="material-icons">code</i>
-                      </button>
-                    </a>
-                    <div class="mdl-tooltip" :data-mdl-for="id + 'repo'">
-                      source code
-                    </div>
-
-                    <a :href="plugin.install_url" :id="id + 'www'" v-if="plugin.install_url">
-                      <button class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect">
-                        <i class="material-icons">cloud_download</i>
-                      </button>
-                    </a>
-                    <div class="mdl-tooltip" :data-mdl-for="id + 'www'">
-                      Install {{plugin.name}}
-                    </div>
-
-                    <a @click="share(plugin)" :id="id + 'share'">
-                      <button class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect">
-                        <i class="material-icons">share</i>
-                      </button>
-                    </a>
-                    <div class="mdl-tooltip" :data-mdl-for="id + 'share'">
-                      Share {{plugin.name}}
+          <div class="columns is-multiline">
+            <div class="column is-one-quarter-desktop is-half-tablet" v-for="(plugin, id) in filteredPlugins" :key="id">
+              <div class="card">
+                <div class="card-image">
+                  <figure class="image is-3by2">
+                    <img loading="lazy" :src="plugin.thumbnail" alt="">
+                  </figure>
+                  <div class="card-content is-overlay is-clipped">
+                    <!-- <span class="tag is-info">
+                      Photo Title That is really long to show the clipping
+                    </span> -->
+                    <div class="mdl-card__menu">
+                      <a :href="plugin.url" target="_blank" :id="id + 'repo'" v-if="plugin.url">
+                        <button class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect">
+                          <i class="material-icons">code</i>
+                        </button>
+                      </a>
+                      <div class="mdl-tooltip" :data-mdl-for="id + 'repo'">
+                        source code
+                      </div>
+  
+                      <a :href="plugin.install_url" :id="id + 'www'" v-if="plugin.install_url">
+                        <button class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect">
+                          <i class="material-icons">cloud_download</i>
+                        </button>
+                      </a>
+                      <div class="mdl-tooltip" :data-mdl-for="id + 'www'">
+                        Install {{plugin.name}}
+                      </div>
+  
+                      <a @click="share(plugin)" :id="id + 'share'">
+                        <button class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect">
+                          <i class="material-icons">share</i>
+                        </button>
+                      </a>
+                      <div class="mdl-tooltip" :data-mdl-for="id + 'share'">
+                        Share {{plugin.name}}
+                      </div>
                     </div>
                   </div>
-                </div>
-                <div class="mdl-card__supporting-text">
-                  <span class="authors">
-                    {{ plugin.authors ? 'by ' + etAl(plugin.authors) : '' }}
-                  </span>
-                  <div class="mdl-grid">
-                    <div v-if="plugin.labels">
-                      <i class="material-icons" :id="id + 'labelIcon'">label</i>
-                      <div class="mdl-tooltip" :data-mdl-for="id + 'labelIcon'">
-                        Labels
+                  <div class="mdl-card__supporting-text">
+                    <span class="authors">
+                      {{ plugin.authors ? 'by ' + etAl(plugin.authors) : '' }}
+                    </span>
+                    <div class="mdl-grid">
+                      <div v-if="plugin.labels">
+                        <i class="material-icons" :id="id + 'labelIcon'">label</i>
+                        <div class="mdl-tooltip" :data-mdl-for="id + 'labelIcon'">
+                          Labels
+                        </div>
+                        <span v-for="label in plugin.labels">
+                          <a class="label" @click="addRemoveToFilters(label)"
+                            v-bind:class="{ active: checkActive(label) }">{{ label }}</a>
+                        </span>
                       </div>
-                      <span v-for="label in plugin.labels">
-                        <a class="label" @click="addRemoveToFilters(label)"
-                          v-bind:class="{ active: checkActive(label) }">{{ label }}</a>
-                      </span>
-                    </div>
-                    <div v-if="plugin.license">
-                      <i class="material-icons" :id="id + 'labelLicense'">copyright</i>
-                      <div class="mdl-tooltip" :data-mdl-for="id + 'labelLicense'">
-                        License
+                      <div v-if="plugin.license">
+                        <i class="material-icons" :id="id + 'labelLicense'">copyright</i>
+                        <div class="mdl-tooltip" :data-mdl-for="id + 'labelLicense'">
+                          License
+                        </div>
+                        <span>
+                          <a class="label" @click="addRemoveToFilters(plugin.license)"
+                            v-bind:class="{ active: checkActive(plugin.license) }">{{ plugin.license }}</a>
+                        </span>
                       </div>
-                      <span>
-                        <a class="label" @click="addRemoveToFilters(plugin.license)"
-                          v-bind:class="{ active: checkActive(plugin.license) }">{{ plugin.license }}</a>
-                      </span>
-                    </div>
-                    <div v-if="plugin.type">
-                      <i class="material-icons" :id="id + 'labelType'">bookmark_border</i>
-                      <div class="mdl-tooltip" :data-mdl-for="id + 'labelType'">
-                        Type
+                      <div v-if="plugin.type">
+                        <i class="material-icons" :id="id + 'labelType'">bookmark_border</i>
+                        <div class="mdl-tooltip" :data-mdl-for="id + 'labelType'">
+                          Type
+                        </div>
+                        <span>
+                          <a class="label" @click="addRemoveToFilters(plugin.type)"
+                            v-bind:class="{ active: checkActive(plugin.type) }">{{ plugin.type }}</a>
+                        </span>
                       </div>
-                      <span>
-                        <a class="label" @click="addRemoveToFilters(plugin.type)"
-                          v-bind:class="{ active: checkActive(plugin.type) }">{{ plugin.type }}</a>
-                      </span>
                     </div>
                   </div>
+                  <div class="mdl-card__actions mdl-card--border mdl-card--bottom">
+                    <h3 class="mdl-card__title-text">
+                      <a @click="showInfo(plugin)" style="color: #ffffff">
+                        <i v-if="plugin.icon" class="material-icons">{{plugin.icon}}</i>
+                        <i v-else class="material-icons">extension</i>
+                        {{ plugin.name + " " + plugin.badges }}
+                      </a>
+                    </h3>
+                    <span v-if="plugin.description"> {{ plugin.description.slice(0, 100) }}</span><br>
+                    <!-- <span class="mdl-chip__text">{{plugin.repo}}</span></div> -->
+                  </div>      
+                  </div>
                 </div>
-                <div class="mdl-card__actions mdl-card--border mdl-card--bottom">
-                  <h3 class="mdl-card__title-text">
-                    <a @click="showInfo(plugin)" style="color: #ffffff">
-                      <i v-if="plugin.icon" class="material-icons">{{plugin.icon}}</i>
-                      <i v-else class="material-icons">extension</i>
-                      {{ plugin.name + " " + plugin.badges }}
-                    </a>
-                  </h3>
-                  <span v-if="plugin.description"> {{ plugin.description.slice(0, 100) }}</span><br>
-                  <!-- <span class="mdl-chip__text">{{plugin.repo}}</span></div> -->
-
-                </div>
-            </li>
-          </ul>
+            </div>
+          </div>
 
           <footer class="mdl-mini-footer">
             <div class="mdl-mini-footer__left-section">
