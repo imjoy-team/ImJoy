@@ -25,6 +25,8 @@ import Window from "@/components/Window";
 import Settings from "@/components/Settings";
 import EngineControlPanel from "@/components/EngineControlPanel";
 import "./registerServiceWorker";
+import vmodal from "vue-js-modal";
+Vue.use(vmodal);
 
 Vue.config.productionTip = false;
 
