@@ -228,14 +228,6 @@ describe("ImJoy.vue", async () => {
       expect(await plugin1.api.test_close_window()).to.be.true;
     });
 
-    it("should close dialog", async () => {
-      expect(await plugin1.api.test_close_dialog()).to.be.true;
-    });
-
-    it("should hide window", async () => {
-      expect(await plugin1.api.test_hide_window()).to.be.true;
-    });
-
     it("should run plugin", async () => {
       expect(await plugin1.api.test_run()).to.be.true;
     });
