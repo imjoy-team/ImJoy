@@ -66,10 +66,6 @@ module.exports = {
         from: path.join(__dirname, "src/pluginParser.js"),
         to: path.join(__dirname, "dist/static/js/pluginParser.js"),
         toType: "file",
-      },{
-        from: path.join(__dirname, "node_modules/imjoy-core/dist/base_frame.html"),
-        to: path.join(__dirname, "dist/base_frame.html"),
-        toType: "file"
       }]),
       new MonacoWebpackPlugin({output: 'static/vs', languages: ['javascript', 'html', 'css', 'python'], features: ['accessibilityHelp', 'bracketMatching', 'caretOperations', 'clipboard', 'codeAction', 'codelens', 'colorDetector', 'comment', 'contextmenu', 'coreCommands', 'cursorUndo', 'dnd', 'find', 'folding', 'fontZoom', 'format', 'goToDefinitionCommands', 'goToDefinitionMouse', 'gotoError', 'gotoLine', 'hover', 'inPlaceReplace', 'inspectTokens', 'iPadShowKeyboard', 'linesOperations', 'links', 'multicursor', 'parameterHints', 'quickCommand', 'quickOutline', 'referenceSearch', 'rename', 'smartSelect', 'snippets', 'suggest', 'toggleHighContrast', 'toggleTabFocusMode', 'transpose', 'wordHighlighter', 'wordOperations', 'wordPartOperations']}),
       new webpack.DefinePlugin({
@@ -94,7 +90,6 @@ module.exports = {
     karma: {
       karmaConfig: {
         frameworks: ['mocha'],
-
         // list of files / patterns to load in the browser
         files: [
             // only specify one entry point
