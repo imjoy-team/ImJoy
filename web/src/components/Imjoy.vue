@@ -2105,11 +2105,12 @@ export default {
             w.api.show = w.show = () => {
               this.showWindowDialog(w);
               this.wm.selectWindow(w);
-              w.api.emit("focus");
+              w.api.emit("show");
             };
             w.api.hide = w.hide = () => {
               w.selected = false;
               this.hideWindowDialog(w);
+              w.api.emit("hide");
             };
             w.api.show();
           }

@@ -135,6 +135,57 @@ class ImJoyPlugin {
     })
   }
 
+  async test_close_dialog() {
+    return new Promise(async (resolve)=>{
+      const dialog = await api.showDialog({ name: 'new dialog',
+        type: 'Test Window Plugin',
+        data: {}
+      })
+      dialog.on('close', ()=>{
+        console.log('closing dialog')
+        resolve(true)
+      })
+      setTimeout(()=>{
+        dialog.close()
+      }, 500)
+      setTimeout(()=>{
+        resolve(false)
+      }, 800)
+    })
+  }
+
+  async test_hide_dialog() {
+    return new Promise(async (resolve)=>{
+      const dialog = await api.showDialog({ name: 'new dialog',
+        type: 'Test Window Plugin',
+        data: {}
+      })
+      let hided = false;
+      dialog.on('hide', ()=>{
+        console.log('hiding dialog')
+        hided = true;
+      })
+
+      dialog.on('show', ()=>{
+        console.log('showing again')
+        if(hided) resolve(true)
+        else resolve(false)
+      })
+
+      setTimeout(()=>{
+        dialog.hide()
+      }, 500)
+
+      setTimeout(()=>{
+        dialog.show()
+      }, 900)
+
+      setTimeout(()=>{
+        resolve(false)
+      }, 1200)
+    })
+  }
+
   async test_run() {
     const ret = await api.run('Test Web Worker Plugin 2', 199)
     assert(ret === 199)
