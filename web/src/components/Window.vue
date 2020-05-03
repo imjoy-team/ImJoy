@@ -11,10 +11,20 @@
       @click.native="selectWindow(w, $event)"
       @dblclick.native="w.fullscreen ? normalSize(w) : fullScreen(w)"
     >
-      <md-button class="md-icon-button md-accent no-drag" @click="close(w)">
-        <md-icon>close</md-icon>
-        <md-tooltip>Close window</md-tooltip>
-      </md-button>
+      <div>
+        <md-button class="md-icon-button md-accent no-drag" @click="close(w)">
+          <md-icon>close</md-icon>
+          <md-tooltip>Close window</md-tooltip>
+        </md-button>
+        <md-button
+          v-if="w.dialog"
+          class="md-icon-button md-accent no-drag"
+          @click="hide(w)"
+        >
+          <md-icon>remove</md-icon>
+          <md-tooltip>Hide window</md-tooltip>
+        </md-button>
+      </div>
       <div class="window-title noselect">
         {{ w.name.slice(0, 30) + "(#" + (w.index || "") + ")" }}
       </div>
@@ -51,6 +61,10 @@
             <md-menu-item @click="duplicate(w)">
               <md-icon>filter</md-icon>
               <span>Duplicate</span>
+            </md-menu-item>
+            <md-menu-item @click="hide(w)">
+              <md-icon>remove</md-icon>
+              <span>Hide</span>
             </md-menu-item>
             <md-menu-item @click="close(w)">
               <md-icon>close</md-icon>
@@ -226,6 +240,9 @@ export default {
     },
     refresh() {
       this.$forceUpdate();
+    },
+    hide(w) {
+      this.$emit("hide", w);
     },
     close(w) {
       this.$emit("close", w);
