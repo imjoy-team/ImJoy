@@ -2077,41 +2077,44 @@ export default {
     },
     addWindowCallback(w) {
       return new Promise((resolve, reject) => {
-        if (!this.wm.window_ids[w.id]) {
+        if (!w || !this.wm.window_ids[w.id]) {
           reject("window was closed");
           return;
         }
         try {
+          const me = this;
           w.api = w.api || {};
-          w.api.on(
-            "refresh",
-            (() => {
-              this.$forceUpdate();
-            }).bind(this)
-          );
+          w.api.on("refresh", () => {
+            me.$forceUpdate();
+          });
           //move refresh to next tick
           const _refresh = w.refresh;
           if (_refresh) {
-            w.refresh = (() => {
-              this.$nextTick(() => {
+            w.refresh = () => {
+              me.$nextTick(() => {
                 _refresh();
               });
-            }).bind(this);
+            };
           }
           if (w.dialog) {
-            w.api.show = w.show = (() => {
-              this.showWindowDialog(w);
-              this.wm.selectWindow(w);
+            w.api.show = w.show = () => {
+              me.showWindowDialog(w);
+              me.wm.selectWindow(w);
               w.api.emit("show");
-            }).bind(this);
-            w.api.hide = w.hide = (() => {
+            };
+
+            w.api.hide = w.hide = () => {
               w.selected = false;
-              this.hideWindowDialog(w);
+              me.hideWindowDialog(w);
               w.api.emit("hide");
-            }).bind(this);
+            };
 
             setTimeout(() => {
-              w.api.show();
+              try {
+                w.show();
+              } catch (e) {
+                console.error(e);
+              }
             }, 500);
           }
           this.$nextTick(() => {
