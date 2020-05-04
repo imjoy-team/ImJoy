@@ -990,7 +990,7 @@
       :minHeight="150"
       :fullscreen="dialog_window_config.fullscreen"
       style="max-width: 100%; max-height:100%;"
-      :draggable="dialog_window_config.fullscreen ? false : '.drag-handle'"
+      draggable=".drag-handle"
       :scrollable="true"
     >
       <p v-if="!selected_dialog_window">No dialog window available to show</p>
@@ -2061,7 +2061,6 @@ export default {
       });
     },
     showWindowDialog(w) {
-      w.selected = true;
       this.selected_dialog_window = w;
       this.$modal.show("window-modal-dialog");
       if (this.screenWidth < 600 || w.fullscreen || w.standalone) {
@@ -2069,7 +2068,6 @@ export default {
       } else {
         this.normalWindowDialog(w);
       }
-      this.$forceUpdate();
     },
     activateWindow(w) {
       if (w.dialog) w.api.show();
@@ -2077,36 +2075,45 @@ export default {
     },
     addWindowCallback(w) {
       return new Promise((resolve, reject) => {
-        if (!this.wm.window_ids[w.id]) {
+        if (!w || !this.wm.window_ids[w.id]) {
           reject("window was closed");
           return;
         }
         try {
+          const me = this;
           w.api = w.api || {};
           w.api.on("refresh", () => {
-            this.$forceUpdate();
+            me.$forceUpdate();
           });
           //move refresh to next tick
           const _refresh = w.refresh;
           if (_refresh) {
             w.refresh = () => {
-              this.$nextTick(() => {
+              me.$nextTick(() => {
                 _refresh();
+                me.$forceUpdate();
               });
             };
           }
           if (w.dialog) {
             w.api.show = w.show = () => {
-              this.showWindowDialog(w);
-              this.wm.selectWindow(w);
+              me.showWindowDialog(w);
+              me.wm.selectWindow(w);
               w.api.emit("show");
             };
+
             w.api.hide = w.hide = () => {
-              w.selected = false;
-              this.hideWindowDialog(w);
+              me.hideWindowDialog(w);
               w.api.emit("hide");
             };
-            w.api.show();
+
+            setTimeout(() => {
+              try {
+                w.show();
+              } catch (e) {
+                console.error(e);
+              }
+            }, 500);
           }
           this.$nextTick(() => {
             this.$forceUpdate();
@@ -3095,35 +3102,42 @@ export default {
       });
     },
     async hideWindowDialog(w) {
-      w.selected = false;
-      this.$modal.hide("window-modal-dialog");
+      if (this.selected_dialog_window === w) {
+        this.$modal.hide("window-modal-dialog");
+      }
     },
     async closeWindowDialog(w) {
-      this.selected_dialog_window = null;
-
-      this.$modal.hide("window-modal-dialog");
       if (w.fullscreen) {
         this.normalWindowDialog(w);
       }
+      if (this.selected_dialog_window === w) {
+        this.selected_dialog_window = null;
+        this.$modal.hide("window-modal-dialog");
+      }
       if (!w.closing) {
-        w.selected = false;
         if (w.close) await w.close();
         w.closing = true;
       }
     },
     fullscreenWindowDialog(w) {
-      this.dialog_window_config.fullscreen = true;
+      this.wm.selectWindow(w);
       w.fullscreen = true;
-      this.$forceUpdate();
+      if (this.selected_dialog_window === w) {
+        this.dialog_window_config.fullscreen = true;
+        this.$forceUpdate();
+      }
     },
     normalWindowDialog(w) {
       // disable normal view on small screen
       if (this.screenWidth < 600) {
         return;
       }
-      this.dialog_window_config.fullscreen = false;
+      this.wm.selectWindow(w);
       w.fullscreen = false;
-      this.$forceUpdate();
+      if (this.selected_dialog_window === w) {
+        this.dialog_window_config.fullscreen = false;
+        this.$forceUpdate();
+      }
     },
     showAlert(_plugin, text) {
       console.log("alert: ", text);
