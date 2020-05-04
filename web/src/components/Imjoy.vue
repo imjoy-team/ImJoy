@@ -2109,12 +2109,10 @@ export default {
               this.hideWindowDialog(w);
               w.api.emit("hide");
             }).bind(this);
-            setTimeout(
-              (() => {
-                w.api.show();
-              }).bind(this),
-              500
-            );
+
+            setTimeout(() => {
+              w.api.show();
+            }, 500);
           }
           this.$nextTick(() => {
             this.$forceUpdate();
