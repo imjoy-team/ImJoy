@@ -2083,30 +2083,38 @@ export default {
         }
         try {
           w.api = w.api || {};
-          w.api.on("refresh", () => {
-            this.$forceUpdate();
-          });
+          w.api.on(
+            "refresh",
+            (() => {
+              this.$forceUpdate();
+            }).bind(this)
+          );
           //move refresh to next tick
           const _refresh = w.refresh;
           if (_refresh) {
-            w.refresh = () => {
+            w.refresh = (() => {
               this.$nextTick(() => {
                 _refresh();
               });
-            };
+            }).bind(this);
           }
           if (w.dialog) {
-            w.api.show = w.show = () => {
+            w.api.show = w.show = (() => {
               this.showWindowDialog(w);
               this.wm.selectWindow(w);
               w.api.emit("show");
-            };
-            w.api.hide = w.hide = () => {
+            }).bind(this);
+            w.api.hide = w.hide = (() => {
               w.selected = false;
               this.hideWindowDialog(w);
               w.api.emit("hide");
-            };
-            w.api.show();
+            }).bind(this);
+            setTimeout(
+              (() => {
+                w.api.show();
+              }).bind(this),
+              500
+            );
           }
           this.$nextTick(() => {
             this.$forceUpdate();
@@ -3096,12 +3104,16 @@ export default {
     },
     async hideWindowDialog(w) {
       w.selected = false;
-      this.$modal.hide("window-modal-dialog");
+      if (this.selected_dialog_window === w) {
+        this.$modal.hide("window-modal-dialog");
+      }
     },
     async closeWindowDialog(w) {
-      this.selected_dialog_window = null;
+      if (this.selected_dialog_window === w) {
+        this.selected_dialog_window = null;
+        this.$modal.hide("window-modal-dialog");
+      }
 
-      this.$modal.hide("window-modal-dialog");
       if (w.fullscreen) {
         this.normalWindowDialog(w);
       }
@@ -3112,18 +3124,22 @@ export default {
       }
     },
     fullscreenWindowDialog(w) {
-      this.dialog_window_config.fullscreen = true;
       w.fullscreen = true;
-      this.$forceUpdate();
+      if (this.selected_dialog_window === w) {
+        this.dialog_window_config.fullscreen = true;
+        this.$forceUpdate();
+      }
     },
     normalWindowDialog(w) {
-      // disable normal view on small screen
-      if (this.screenWidth < 600) {
-        return;
-      }
-      this.dialog_window_config.fullscreen = false;
       w.fullscreen = false;
-      this.$forceUpdate();
+      if (this.selected_dialog_window === w) {
+        // disable normal view on small screen
+        if (this.screenWidth < 600) {
+          return;
+        }
+        this.dialog_window_config.fullscreen = false;
+        this.$forceUpdate();
+      }
     },
     showAlert(_plugin, text) {
       console.log("alert: ", text);
