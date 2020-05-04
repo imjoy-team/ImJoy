@@ -990,7 +990,7 @@
       :minHeight="150"
       :fullscreen="dialog_window_config.fullscreen"
       style="max-width: 100%; max-height:100%;"
-      :draggable="dialog_window_config.fullscreen ? false : '.drag-handle'"
+      draggable=".drag-handle"
       :scrollable="true"
     >
       <p v-if="!selected_dialog_window">No dialog window available to show</p>
@@ -3110,13 +3110,12 @@ export default {
       }
     },
     async closeWindowDialog(w) {
+      if (w.fullscreen) {
+        this.normalWindowDialog(w);
+      }
       if (this.selected_dialog_window === w) {
         this.selected_dialog_window = null;
         this.$modal.hide("window-modal-dialog");
-      }
-
-      if (w.fullscreen) {
-        this.normalWindowDialog(w);
       }
       if (!w.closing) {
         w.selected = false;
@@ -3132,12 +3131,12 @@ export default {
       }
     },
     normalWindowDialog(w) {
+      // disable normal view on small screen
+      if (this.screenWidth < 600) {
+        return;
+      }
       w.fullscreen = false;
       if (this.selected_dialog_window === w) {
-        // disable normal view on small screen
-        if (this.screenWidth < 600) {
-          return;
-        }
         this.dialog_window_config.fullscreen = false;
         this.$forceUpdate();
       }
