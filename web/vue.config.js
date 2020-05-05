@@ -25,8 +25,6 @@ const nojekyll_file = {
   content: ""
 };
 
-const isDevServer = process.env.WEBPACK_DEV_SERVER;
-
 module.exports = {
   runtimeCompiler: true,
   outputDir: './dist',
