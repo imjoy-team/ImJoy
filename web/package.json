@@ -78,6 +78,7 @@
     "eslint-plugin-vue": "^5.0.0-0",
     "gh-pages": "^2.0.1",
     "husky": "^4.2.3",
+    "imjoy-rpc": "^0.1.12",
     "lint-staged": "^10.0.8",
     "mocha": "^5.0.5",
     "mocha-webpack": "^2.0.0-beta.0",
