@@ -1589,7 +1589,7 @@ export default {
       localStorage.setItem("imjoy_client_id", this.client_id);
     }
 
-    let jailed_asset_url = "/";
+    let jailed_asset_url = "https://lib.imjoy.io/";
 
     this.imjoy = new ImJoy({
       imjoy_api: imjoy_api,
