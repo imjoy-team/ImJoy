@@ -63,6 +63,18 @@ const _backends = {
     lang: "web-python",
     icon: "🐍",
   },
+  "rpc-window": {
+    type: "external",
+    name: "RPC Window",
+    lang: "*",
+    icon: "🌟",
+  },
+  "rpc-worker": {
+    type: "external",
+    name: "RPC Worker",
+    lang: "*",
+    icon: "⚙️",
+  },
   collection: {
     type: "-",
     name: "Collection",

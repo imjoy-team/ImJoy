@@ -993,7 +993,6 @@
       draggable=".drag-handle"
       :scrollable="true"
     >
-      <p v-if="!selected_dialog_window">No dialog window available to show</p>
       <template v-for="wdialog in dialogWindows">
         <window
           :key="wdialog.id"
@@ -3061,7 +3060,6 @@ export default {
     },
     showDialog(_plugin, config) {
       config.dialog = true;
-      config.type = config.type || "imjoy/joy";
       return new Promise((resolve, reject) => {
         const _selectedWindow = this.wm.selected_window;
         this.pm

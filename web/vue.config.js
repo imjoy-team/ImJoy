@@ -25,8 +25,6 @@ const nojekyll_file = {
   content: ""
 };
 
-const isDevServer = process.env.WEBPACK_DEV_SERVER;
-
 module.exports = {
   runtimeCompiler: true,
   outputDir: './dist',
@@ -68,12 +66,6 @@ module.exports = {
         from: path.join(__dirname, "src/pluginParser.js"),
         to: path.join(__dirname, "dist/static/js/pluginParser.js"),
         toType: "file",
-      },{
-        from: path.join(__dirname, "node_modules/imjoy-core/src/base_frame.html"),
-        to: path.join(__dirname, "dist/base_frame.html"),
-        toType: "file",
-        // only copy base_frame if when dev server is on
-        test: isDevServer? /base_frame\.html$/: /no_base_frame\.html$/
       }]),
       new MonacoWebpackPlugin({output: 'static/vs', languages: ['javascript', 'html', 'css', 'python'], features: ['accessibilityHelp', 'bracketMatching', 'caretOperations', 'clipboard', 'codeAction', 'codelens', 'colorDetector', 'comment', 'contextmenu', 'coreCommands', 'cursorUndo', 'dnd', 'find', 'folding', 'fontZoom', 'format', 'goToDefinitionCommands', 'goToDefinitionMouse', 'gotoError', 'gotoLine', 'hover', 'inPlaceReplace', 'inspectTokens', 'iPadShowKeyboard', 'linesOperations', 'links', 'multicursor', 'parameterHints', 'quickCommand', 'quickOutline', 'referenceSearch', 'rename', 'smartSelect', 'snippets', 'suggest', 'toggleHighContrast', 'toggleTabFocusMode', 'transpose', 'wordHighlighter', 'wordOperations', 'wordPartOperations']}),
       new webpack.DefinePlugin({
@@ -103,12 +95,10 @@ module.exports = {
             // only specify one entry point
             // and require all tests in there
             'tests/*.spec.js',
-            { pattern: 'node_modules/imjoy-core/dist/*', watched: false, included: false, served: true, nocache: false },
             { pattern: 'src/*.js', watched: false, included: false, served: true, nocache: false },
         ],
 
         proxies: {
-            "/base_frame.html": '/base/node_modules/imjoy-core/dist/base_frame.html',
             "/plugin-service-worker.js": "/base/node_modules/imjoy-core/dist/plugin-service-worker.js"
         },
 
