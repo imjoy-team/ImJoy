@@ -495,9 +495,11 @@ If you want to show the window as a dialog, then set `"defaults": {"as_dialog": 
 #### base_frame
 (**for window plugin only:**) defines a custom url to a html page which will be loaded in the window plugin.
 
-It is mendatory to include `<script src="https://lib.imjoy.io/static/jailed/_frame.js"></script>` in the base_frame html file (e.g. inside `<head>`), and this injected script will enable the communication between the window and the core of ImJoy.
+While you can use any other website url as the `base_frame`, it needs to fullfil the following criterion before Imjoy core can communicate with your custom `base_frame`:
+ 1. The site needs allow embedding, and this is not always enabled because they may have strict [Content Security Policy](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP), by a `X-Content-Security-Policy` header, or a `<meta>` element in the page. To solve it, you need to add `*.imjoy.io` to the header if you have control over the site.
+ 2. Inside the `base_frame`, `imjoy-rpc` protocol need to be enabled. This can be easily done by following the instructions in the [imjoy-core](https://github.com/imjoy-team/ImJoy-core) repo. Please follow the part about "ImJoy RPC library to your website", you basically need to import the `imjoy-loader`, and load the imjoy RPC library, then export your api which you would like to expose to other ImJoy plugins.
 
-This option allows you load an existing html file as the window, but still connected to ImJoy and other plugins.
+Once you have the above fulfilled, you can integrate a third party website as an ImJoy plugin.
 
 #### runnable
 Defines whether the plugin can be executed by clicking on the plugin menu (By default, all plugins are `runnable`). For helper plugins which do not run by themselves, (e.g. a `native-python` plugin can be called by a `window` plugin and do not necessarily executed by the user directly), setting `"runnable": false` would move down the plugin to the bottom of the plugin menu and made non-clickable.
