@@ -44,20 +44,6 @@ class ImJoyPlugin {
     console.log('running in the plugin.')
   }
 
-  _rpcDecode(d){
-    if(d.__rpc_dtype__ === 'my_special_number'){
-      return 'adsfwe02303'
-    }
-    return d
-  }
-
-  async test_encoding_decoding() {
-    const p = await api.getPlugin('Test Web Worker Plugin 2')
-    const ret = await p.square(99)
-    assert(ret === 'adsfwe02303', `The anwser should have been encoded into "adsfwe02303" by _rpcDecode(), not ${ret}`)
-    return true
-  }
-
   async test_register() {
     await api.register({
          "name": "LUT",

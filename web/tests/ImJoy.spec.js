@@ -251,9 +251,5 @@ describe("ImJoy.vue", async () => {
     it("should read and write with BrowserFS plugin", async () => {
       expect(await plugin1.api.test_fs()).to.be.true;
     });
-
-    it("should work with custom encoding and decoding", async () => {
-      expect(await plugin1.api.test_encoding_decoding()).to.be.true;
-    });
   });
 });
