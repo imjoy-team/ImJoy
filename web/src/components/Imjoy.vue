@@ -1468,7 +1468,7 @@ export default {
       selected_dialog_window: {},
       dialog_window_config: {
         width: "800px",
-        height: "500px",
+        height: "670px",
         draggable: true,
       },
       progress: 0,
@@ -1589,8 +1589,6 @@ export default {
       localStorage.setItem("imjoy_client_id", this.client_id);
     }
 
-    let jailed_asset_url = "https://lib.imjoy.io/";
-
     this.imjoy = new ImJoy({
       imjoy_api: imjoy_api,
       event_bus: this.event_bus,
@@ -1600,7 +1598,6 @@ export default {
       },
       add_window_callback: this.addWindowCallback,
       client_id: this.client_id,
-      jailed_asset_url: jailed_asset_url,
     });
 
     this.pm = this.imjoy.pm;
@@ -2824,7 +2821,7 @@ export default {
         .execute(mw.target)
         .then(my => {
           const w = this.pm.joy2plugin(my);
-          if (w && !my.__as_interface__) {
+          if (w && !my._rintf) {
             w.name = w.name || "result";
             w.type = w.type || "imjoy/generic";
             this.createWindow(w);
