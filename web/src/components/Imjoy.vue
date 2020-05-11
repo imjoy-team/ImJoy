@@ -1228,7 +1228,7 @@
         >
           <div style="padding-right: 30px;" class="loading loading-lg"></div>
         </div>
-        <h2 v-if="downloading_error">&nbsp;&nbsp;{{ downloading_error }}</h2>
+        <p v-if="downloading_error">&nbsp;&nbsp;{{ downloading_error }}</p>
         <md-card v-if="plugin4install">
           <md-card-media
             v-if="
@@ -2399,7 +2399,7 @@ export default {
         return config;
       } catch (e) {
         this.downloading_plugin = false;
-        this.downloading_error = `Failed to fetch plugin, error: ${e}`;
+        this.downloading_error = `${e}`;
         this.showMessage(this.downloading_error);
         throw e;
       }
