@@ -35,12 +35,6 @@ class ImJoyPlugin {
     return arg*arg
   }
 
-  _rpcEncode(d){
-    if(d === 99*99){
-      return {__rpc_dtype__: 'my_special_number'}
-    }
-    return d
-  }
 }
 
 api.export(new ImJoyPlugin())

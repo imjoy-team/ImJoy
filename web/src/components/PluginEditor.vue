@@ -493,6 +493,7 @@ export default {
         (plugin.config && plugin.config.type === "window") ||
         plugin.config.type === "web-python-window"
       ) {
+        // TODO: seems __id__ is not assigned anywhere
         this.window_plugin_id = w && w.__id__;
         this.window_plugin_config = config;
       }

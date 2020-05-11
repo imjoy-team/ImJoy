@@ -34,13 +34,13 @@ module.exports = {
     port: 8000
   },
   pwa: {
-      // configure the workbox plugin
-      workboxPluginMode: 'InjectManifest',
-      workboxOptions: {
-          // swSrc is required in InjectManifest mode.
-          swSrc: 'src/service-worker.js',
-          exclude: [new RegExp('^[.].*'), new RegExp('.*[.]map$')]
-      }
+    // configure the workbox plugin
+    workboxPluginMode: 'InjectManifest',
+    workboxOptions: {
+      // swSrc is required in InjectManifest mode.
+      swSrc: 'src/service-worker.js',
+      exclude: [new RegExp('^[.].*'), new RegExp('.*[.]map$')]
+    }
   },
   configureWebpack: {
     devtool: 'source-map',
@@ -58,16 +58,20 @@ module.exports = {
         from: path.join(__dirname, "../docs"),
         to: path.join(__dirname, "dist/docs"),
         toType: "dir"
-      },{
+      }, {
         from: path.join(__dirname, "../repo"),
         to: path.join(__dirname, "dist/repo"),
         toType: "dir"
-      },{
+      }, {
         from: path.join(__dirname, "src/pluginParser.js"),
         to: path.join(__dirname, "dist/static/js/pluginParser.js"),
         toType: "file",
       }]),
-      new MonacoWebpackPlugin({output: 'static/vs', languages: ['javascript', 'html', 'css', 'python'], features: ['accessibilityHelp', 'bracketMatching', 'caretOperations', 'clipboard', 'codeAction', 'codelens', 'colorDetector', 'comment', 'contextmenu', 'coreCommands', 'cursorUndo', 'dnd', 'find', 'folding', 'fontZoom', 'format', 'goToDefinitionCommands', 'goToDefinitionMouse', 'gotoError', 'gotoLine', 'hover', 'inPlaceReplace', 'inspectTokens', 'iPadShowKeyboard', 'linesOperations', 'links', 'multicursor', 'parameterHints', 'quickCommand', 'quickOutline', 'referenceSearch', 'rename', 'smartSelect', 'snippets', 'suggest', 'toggleHighContrast', 'toggleTabFocusMode', 'transpose', 'wordHighlighter', 'wordOperations', 'wordPartOperations']}),
+      new MonacoWebpackPlugin({
+        output: 'static/vs',
+        languages: ['javascript', 'html', 'css', 'python'],
+        features: ['accessibilityHelp', 'bracketMatching', 'caretOperations', 'clipboard', 'codeAction', 'codelens', 'colorDetector', 'comment', 'contextmenu', 'coreCommands', 'cursorUndo', 'dnd', 'find', 'folding', 'fontZoom', 'format', 'goToDefinitionCommands', 'goToDefinitionMouse', 'gotoError', 'gotoLine', 'hover', 'inPlaceReplace', 'inspectTokens', 'iPadShowKeyboard', 'linesOperations', 'links', 'multicursor', 'parameterHints', 'quickCommand', 'quickOutline', 'referenceSearch', 'rename', 'smartSelect', 'snippets', 'suggest', 'toggleHighContrast', 'toggleTabFocusMode', 'transpose', 'wordHighlighter', 'wordOperations', 'wordPartOperations']
+      }),
       new webpack.DefinePlugin({
         //bypass process check, https://github.com/Microsoft/monaco-editor-webpack-plugin/issues/28
         //TODO: remove this when the bug is fixed
@@ -92,14 +96,20 @@ module.exports = {
         frameworks: ['mocha'],
         // list of files / patterns to load in the browser
         files: [
-            // only specify one entry point
-            // and require all tests in there
-            'tests/*.spec.js',
-            { pattern: 'src/*.js', watched: false, included: false, served: true, nocache: false },
+          // only specify one entry point
+          // and require all tests in there
+          'tests/*.spec.js',
+          {
+            pattern: 'src/*.js',
+            watched: false,
+            included: false,
+            served: true,
+            nocache: false
+          },
         ],
 
         proxies: {
-            "/plugin-service-worker.js": "/base/node_modules/imjoy-core/dist/plugin-service-worker.js"
+          "/plugin-service-worker.js": "/base/node_modules/imjoy-core/dist/plugin-service-worker.js"
         },
 
         preprocessors: {
@@ -118,7 +128,15 @@ module.exports = {
         // test results reporter to use
         // possible values: 'dots', 'progress'
         // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-        reporters: ['progress'],
+        reporters: ["spec"],
+        specReporter: {
+          maxLogLines: 5, // limit number of lines logged per test
+          suppressErrorSummary: true, // do not print error summary
+          suppressFailed: false, // do not print information about failed tests
+          suppressPassed: false, // do not print information about passed tests
+          suppressSkipped: true, // do not print information about skipped tests
+          showSpecTiming: false // print the time elapsed for each spec
+        },
 
         // web server port
         port: 9876,
@@ -139,8 +157,8 @@ module.exports = {
 
         captureTimeout: 60000,
         browserDisconnectTolerance: 2,
-        browserDisconnectTimeout : 60000,
-        browserNoActivityTimeout : 60000,
+        browserDisconnectTimeout: 60000,
+        browserNoActivityTimeout: 60000,
       }
     }
   }
