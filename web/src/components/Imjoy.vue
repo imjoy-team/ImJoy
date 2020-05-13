@@ -1598,7 +1598,7 @@ export default {
       },
       add_window_callback: this.addWindowCallback,
       client_id: this.client_id,
-      jailed_asset_url: "https://lib.imjoy.io/",
+      asset_url: "https://lib.imjoy.io/",
     });
 
     this.pm = this.imjoy.pm;
