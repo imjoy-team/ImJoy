@@ -145,7 +145,7 @@ describe("ImJoy.vue", async () => {
     expect(typeof plugin.api.run).to.equal("function");
     await plugin.api.run({});
     plugin.terminate();
-  }).timeout(20000);
+  }).timeout(100000);
 
   describe("Test ImJoy API", async () => {
     let plugin1;
