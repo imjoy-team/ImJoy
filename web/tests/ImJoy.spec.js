@@ -3,7 +3,7 @@ import { shallowMount, createLocalVue } from "@vue/test-utils";
 import VueRouter from "vue-router";
 import VueMaterial from "vue-material";
 import { router_config } from "../src/router";
-import { Joy, version } from "imjoy-core";
+import { version } from "imjoy-core";
 import Imjoy from "@/components/Imjoy.vue";
 import _ from "lodash";
 
@@ -13,9 +13,6 @@ import WINDOW_PLUGIN_TEMPLATE from "../src/plugins/windowTemplate.imjoy.html";
 import WEB_PYTHON_PLUGIN_TEMPLATE from "../src/plugins/webPythonTemplate.imjoy.html";
 import WEB_PYTHON_WINDOW_PLUGIN_TEMPLATE from "../src/plugins/webPythonWindowTemplate.imjoy.html";
 
-import TEST_WEB_WORKER_PLUGIN_1 from "./testWebWorkerPlugin1.imjoy.html";
-import TEST_WEB_WORKER_PLUGIN_2 from "./testWebWorkerPlugin2.imjoy.html";
-import TEST_WINDOW_PLUGIN_1 from "./testWindowPlugin1.imjoy.html";
 const localVue = createLocalVue();
 
 console.log("ImJoy Core version: " + version);
