@@ -152,7 +152,7 @@ describe("ImJoy.vue", async () => {
     let plugin2;
     let pluginw;
     before(function(done) {
-      this.timeout(20000);
+      this.timeout(50000);
       pm.reloadPlugin({ code: _.clone(TEST_WEB_WORKER_PLUGIN_1) }).then(p1 => {
         plugin1 = p1;
         expect(plugin1.name).to.equal("Test Web Worker Plugin 1");
