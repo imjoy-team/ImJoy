@@ -34,7 +34,7 @@ describe("ImJoy.vue", async () => {
   const pm = vm.pm; //plugin_manager
 
   before(function(done) {
-    this.timeout(10000);
+    this.timeout(30000);
     vm.event_bus.on("imjoy_ready", () => {
       expect(vm.plugin_loaded).to.be.true;
       done();
