@@ -1598,7 +1598,8 @@ export default {
       },
       add_window_callback: this.addWindowCallback,
       client_id: this.client_id,
-      asset_url: "https://lib.imjoy.io/",
+      default_base_frame: "https://lib.imjoy.io/default_base_frame.html",
+      default_rpc_base_url: null,
     });
 
     this.pm = this.imjoy.pm;
@@ -3110,9 +3111,9 @@ export default {
         this.selected_dialog_window = null;
         this.$modal.hide("window-modal-dialog");
       }
-      if (!w.closing) {
-        if (w.close) await w.close();
+      if (w.close && !w.closing) {
         w.closing = true;
+        await w.close();
       }
     },
     fullscreenWindowDialog(w) {
