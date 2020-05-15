@@ -1592,15 +1592,15 @@ export default {
     this.imjoy = new ImJoy({
       imjoy_api: imjoy_api,
       event_bus: this.event_bus,
-      show_message_callback: this.showMessage,
-      update_ui_callback: () => {
-        this.$forceUpdate();
-      },
-      add_window_callback: this.addWindowCallback,
       client_id: this.client_id,
       default_base_frame: "https://lib.imjoy.io/default_base_frame.html",
       default_rpc_base_url: null,
     });
+    this.imjoy.event_bus.on("show_message", msg => {
+      this.showMessage(msg);
+    });
+    this.imjoy.event_bus.on("add_window", w => this.addWindowCallback(w));
+    this.imjoy.event_bus.on("update_ui", () => this.$forceUpdate());
 
     this.pm = this.imjoy.pm;
     this.em = this.imjoy.em;
