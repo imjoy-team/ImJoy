@@ -5,8 +5,7 @@
     <title>ImJoy-Lite</title>
 
     <meta charset="utf-8">
-    <meta name="viewport"
-        content="width=device-width, height=device-height, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, maximum-scale=1, user-scalable=no">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
@@ -31,7 +30,7 @@
     <link rel="apple-touch-icon" sizes="144x144" href="/static/icons/apple-icon-144x144.png">
     <link rel="apple-touch-icon" sizes="152x152" href="/static/icons/apple-icon-152x152.png">
     <link rel="apple-touch-icon" sizes="180x180" href="/static/icons/apple-icon-180x180.png">
-    <link rel="icon" type="image/png" sizes="192x192" href="/static/icons/android-icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="192x192"  href="/static/icons/android-icon-192x192.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/static/icons/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="96x96" href="/static/icons/favicon-96x96.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/static/icons/favicon-16x16.png">
@@ -64,59 +63,49 @@
             position: fixed;
             overflow-wrap: break-word;
         }
-
         .navbar .navbar-brand {
             font-size: 1.2rem;
         }
-
-        .whiteboard {
+        .whiteboard{
             width: 100%;
             max-width: 100%;
             max-height: 100%;
             min-height: 50vh;
         }
-
-        .window_container {
+        .window_container{
             width: 100%;
             height: 100%;
         }
-
-        .site-title-small {
+        .site-title-small{
             vertical-align: bottom;
             margin-left: 3px;
             height: 32px;
         }
-
-        .pointer {
+        .pointer{
             cursor: pointer;
         }
-
         #empty-img {
             width: 128px;
             position: absolute !important;
             left: calc(50% - 64px) !important;
             top: calc(40% - 64px) !important;
         }
-
         .floating {
             position: absolute !important;
             left: calc(50% - 2px) !important;
             top: calc(39% - 100px) !important;
             z-index: 999;
         }
-
         #windows-menu {
             position: absolute;
-            top: 3px;
-            right: 3px;
+            top:3px;
+            right:3px;
         }
-
-        .more-btn {
+        .more-btn{
             border: transparent;
             background-color: transparent;
         }
-
-        .more-btn:hover {
+        .more-btn:hover{
             border: #0a52eeea;
             background-color: #ffffff91;
         }
@@ -128,7 +117,8 @@
         <a href="#" class="modal-overlay" aria-label="Close"></a>
         <div class="modal-container">
             <div class="modal-header">
-                <a href="#" class="btn btn-clear float-right" aria-label="Close" onclick="closeDialog()"></a>
+                <a href="#" class="btn btn-clear float-right" aria-label="Close"
+                    onclick="closeDialog()"></a>
                 <div class="modal-title h5" id="window-dialog-title">Dialog</div>
             </div>
             <div class="modal-body">
@@ -142,7 +132,11 @@
     <header class="navbar">
         <section class="navbar-section" id="logo">
             <a href="/">
-                <img class="site-title-small" src="static/img/imjoy-logo-black.svg" alt="ImJoy" />
+                <img
+                class="site-title-small"
+                src="static/img/imjoy-logo-black.svg"
+                alt="ImJoy"
+                />
             </a>
             <!-- <a href="https://imjoy.io/docs" target="_blank" class="btn btn-link">Docs</a>
             <a href="https://github.com/imjoy-team/ImJoy" target="_blank" class="btn btn-link">GitHub</a> -->
@@ -177,19 +171,17 @@
             return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
         }
         var windows = {}
-
-        function addWindow(w) {
+        function addWindow(w){
             windows = windows || {};
             windows[w.iframe_container] = w;
-            var title = w.name,
-                id = w.iframe_container;
-            document.getElementById('windows-menu').innerHTML = `
+            var title = w.name, id=w.iframe_container;
+            document.getElementById('windows-menu').innerHTML =`
             <span class="chip pointer window-chip" id="header_${id}" onclick="selectWindow('${id}')">
                 ${title}
                 <a href="#" onclick="removeWindow('${id}')" class="btn btn-clear" aria-label="Close" role="button"></a>
             </span>` + document.getElementById('windows-menu').innerHTML;
 
-            document.getElementById('whiteboard').innerHTML = `
+            document.getElementById('whiteboard').innerHTML =`
                 <div class="window_container" id="${id}"></div>
             ` + document.getElementById('whiteboard').innerHTML;
             window.onresize();
@@ -197,70 +189,73 @@
             selectWindow(id)
         }
 
-        function updateWindowChips() {
+        function updateWindowChips(){
             // only display when there is more than one window open
-            if (Object.keys(windows).length > 1) {
+            if(Object.keys(windows).length>1){
                 var ws = document.querySelectorAll(".window-chip")
-                for (let w of ws) {
+                for(let w of ws){
                     w.style.display = "inline-flex";
                 }
-            } else {
+            }
+            else{
                 const keys = Object.keys(windows);
-                if (keys.length >= 1 && (windows[keys[0]].standalone || windows[keys[0]].fullscreen))
-                    var ws = document.querySelectorAll(".window-chip")
-                if (ws) {
-                    for (let w of ws) {
+                if(keys.length>=1 && (windows[keys[0]].standalone || windows[keys[0]].fullscreen) )
+                var ws = document.querySelectorAll(".window-chip")
+                if(ws){
+                    for(let w of ws){
                         w.style.display = "none";
                     }
                 }
             }
         }
 
-        async function removeWindow(id) {
-            if (windows[id]) {
-                try {
+        async function removeWindow(id){
+            if(windows[id]){
+                try{
                     await windows[id].close()
-                } finally {
+                }
+                finally{
                     delete windows[id];
                     updateWindowChips();
-                }
+                }               
             }
-            document.getElementById('windows-menu').removeChild(document.getElementById('header_' + id));
+            document.getElementById('windows-menu').removeChild(document.getElementById('header_'+id));
             document.getElementById('whiteboard').removeChild(document.getElementById(id));
-            if (document.getElementById('whiteboard').children.length === 1) {
+            if(document.getElementById('whiteboard').children.length === 1){
                 document.getElementById('empty-img').style.display = 'block';
             }
-
+            
         }
 
-        function selectWindow(id) {
-            if (!document.getElementById(id))
-                return
-            for (let c of document.getElementById('whiteboard').children) {
-                if (c.id !== 'site-title') {
+        function selectWindow(id){
+            if(!document.getElementById(id))
+            return
+            for(let c of document.getElementById('whiteboard').children){
+                if(c.id !== 'site-title'){
                     c.style.display = "none";
                 }
-            }
-            for (let c of document.getElementById('windows-menu').children)
+            } 
+            for(let c of document.getElementById('windows-menu').children)
                 c.classList.remove('active')
             selected_window = id;
             document.getElementById(id).style.display = "block";
-            document.getElementById('header_' + id).classList.add('active')
+            document.getElementById('header_'+id).classList.add('active')
         }
 
         var selected_window = null
         var imjoy = null
-
+        
         var imjoy_api = {
-            showMessage(plugin, info, duration) {
+            showMessage(plugin, info, duration){
                 console.log(info)
             },
-            showProgress(plugin, progress) {
-                if (progress < 1) progress = progress * 100;
+            showProgress(plugin, progress){
+                if (progress < 1) progress =  progress * 100;
                 document.getElementById('progress').value = progress
-                if (progress <= 0) {
+                if(progress <= 0){
                     document.getElementById('progress').style.display = "none";
-                } else {
+                }
+                else{
                     document.getElementById('progress').style.display = "block";
                 }
             },
@@ -270,9 +265,8 @@
                     if (config.ui) {
                         openDialog()
                         const joy_config = {
-                            container: document.getElementById('window-dialog-container'),
-                            init: config.ui ||
-                            "", //"{id:'localizationWorkflow', type:'ops'} " + // a list of ops
+                            container:  document.getElementById('window-dialog-container'),
+                            init: config.ui || "", //"{id:'localizationWorkflow', type:'ops'} " + // a list of ops
                             data: config.data, // || Joy.loadFromURL(),
                             modules: config.modules || ["instructions", "math"],
                             onexecute: config.onexecute,
@@ -286,25 +280,26 @@
                             new imjoyCore.Joy(joy_config);
                             throw e;
                         }
-
+                 
                     } else if (config.type) {
                         openDialog()
                         config.window_container = "window-dialog-container";
                         config.standalone = true;
                         if (config.type.startsWith("imjoy/")) {
-                            config.render = wconfig => {};
+                            config.render = wconfig => {
+                            };
                         }
                         setTimeout(() => {
                             imjoy.pm.createWindow(null, config)
-                                .then(api => {
-                                    const _close = api.close;
-                                    api.close = async () => {
-                                        await _close();
-                                        closeDialog();
-                                    };
-                                    resolve(api);
-                                })
-                                .catch(reject);
+                            .then(api => {
+                                const _close = api.close;
+                                api.close = async () => {
+                                    await _close();
+                                    closeDialog();
+                                };
+                                resolve(api);
+                            })
+                            .catch(reject);
                         }, 0);
                     } else {
                         alert("Unsupported dialog type.");
@@ -314,46 +309,40 @@
         }
 
         document.addEventListener('DOMContentLoaded', async (event) => {
-            window.imjoyCore = await loadImJoyCore({
-                version: '0.13.6'
-            })
+            window.imjoyCore = await loadImJoyCore({version: '0.13.5'})
             imjoy = new imjoyCore.ImJoy({
                 imjoy_api: imjoy_api,
-            })
-            imjoy.event_bus.on('show_message', console.log)
-            imjoy.event_bus.on("add_window", async (w) => {
-                if (w.fullscreen || w.standalone) {
-                    document.querySelector(".navbar").style.height = "2px";
-                    document.getElementById("logo").style.display = "none";
-                    // document.getElementById("windows-menu").style.display = "none";
-                } else {
-                    document.querySelector(".navbar").style.height = "32px";
-                    document.getElementById("logo").style.display = "flex";
-                }
-                addWindow(w);
+                show_message_callback: console.log,
+                add_window_callback: async (w)=>{
+                    if(w.fullscreen || w.standalone){
+                        document.querySelector(".navbar").style.height = "2px";
+                        document.getElementById("logo").style.display = "none";
+                        // document.getElementById("windows-menu").style.display = "none";
+                    }
+                    else{
+                        document.querySelector(".navbar").style.height = "32px";
+                        document.getElementById("logo").style.display = "flex";
+                    }
+                    addWindow(w)
+                },
+                update_ui_callback: ()=>{}
             })
             const workspace = getUrlParameter('workspace') || getUrlParameter('w');
             const token = getUrlParameter('token') || getUrlParameter('t');
             const engine = getUrlParameter('engine') || getUrlParameter('e');
 
-            await imjoy.start({
-                workspace: workspace
-            })
+            await imjoy.start({workspace: workspace})
             console.log('ImJoy started: ', imjoy)
             let p = getUrlParameter('plugin') || getUrlParameter('p');
-            if (!p && workspace) {
+            if(!p && workspace){
                 document.getElementById('loading').style.display = 'none';
                 return
             }
-            window.loadPlugin = function (p) {
-                if (!p) p = prompt(
-                    `Please type a ImJoy plugin URI to start or pass it with ${window.location.href+'?plugin=PLUGIN_URI'}`,
-                    '');
-                if (!p) return;
+            window.loadPlugin = function(p){
+                if(!p) p = prompt(`Please type a ImJoy plugin URI to start or pass it with ${window.location.href+'?plugin=PLUGIN_URI'}`, '');
+                if(!p) return;
                 document.getElementById('loading').style.display = 'block';
-                imjoy.pm.reloadPluginRecursively({
-                    uri: p
-                }).then(async (plugin) => {
+                imjoy.pm.reloadPluginRecursively({uri: p}).then(async (plugin)=>{
                     let config = {};
                     if (plugin.config.ui && plugin.config.ui.indexOf("{") > -1) {
                         config = await imjoy.pm.imjoy_api.showDialog(
@@ -361,12 +350,9 @@
                             plugin.config
                         );
                     }
-                    await plugin.api.run({
-                        config: config,
-                        data: {}
-                    })
+                    await plugin.api.run({config: config, data: {}})
                     document.getElementById('loading').style.display = 'none';
-                }).catch((e) => {
+                }).catch((e)=>{
                     console.error(e)
                     alert(`failed to load the plugin, error: ${e}`)
                     document.getElementById('loading').style.display = 'none';
@@ -374,31 +360,28 @@
             }
 
             if (engine) {
-                try {
+                try{
                     console.log("Loading Jupyter-Engine-Manager from Gist...");
                     await imjoy.pm
-                        .reloadPluginRecursively({
-                            uri: "https://imjoy-team.github.io/jupyter-engine-manager/Jupyter-Engine-Manager.imjoy.html",
-                        })
+                    .reloadPluginRecursively({
+                    uri:
+                        "https://imjoy-team.github.io/jupyter-engine-manager/Jupyter-Engine-Manager.imjoy.html",
+                    })
                     console.log("Jupyter-Engine-Manager loaded.");
                     const factory = imjoy.em.getFactory('Jupyter-Engine')
-                    await factory.addEngine({
-                        url: engine,
-                        token: token
-                    })
+                    await factory.addEngine({url: engine, token: token})
                     console.log('plugin engine added:', engine)
-                } catch (e) {
+                }
+                catch(e){
                     console.error(e)
                     alert(`Failed to connect to the engine: ${e}`)
                 }
-
+                
             }
-
-            p = p || prompt(
-                `Please type a ImJoy plugin URI to start or pass it with ${window.location.href+'?plugin=PLUGIN_URI'}`,
-                'imjoy-team/imjoy-plugins:Welcome');
+            
+            p = p || prompt(`Please type a ImJoy plugin URI to start or pass it with ${window.location.href+'?plugin=PLUGIN_URI'}`, 'imjoy-team/imjoy-plugins:Welcome');
             p = p || 'imjoy-team/imjoy-plugins:Welcome';
-            if (p) {
+            if(p){
                 window.loadPlugin(p);
             }
 
@@ -406,29 +389,23 @@
                 //reload the plugin menu
                 var plugin_menu = document.getElementById('plugin-menu')
                 plugin_menu.innerHTML = ''
-                for (let pn in imjoy.pm.plugin_names) {
+                for(let pn in imjoy.pm.plugin_names){
                     plugin_menu.innerHTML = `
                     <li class="menu-item"><a href="#" onclick="runPlugin('${pn}')">${pn}</a></li>
-                    ` + plugin_menu.innerHTML
+                    `+ plugin_menu.innerHTML
                 }
-                plugin_menu.innerHTML = plugin_menu.innerHTML +
-                    '<li class="menu-item"><a href="#" onclick="loadPlugin()"><i class="icon icon-plus"></i>&nbsp;Load Plugin</a></li>'
-                plugin_menu.innerHTML = plugin_menu.innerHTML +
-                    '<li class="menu-item"><a href="#" onclick="window.onresize()"><i class="icon icon-stop"></i>&nbsp;Cancel</a></li>'
+                plugin_menu.innerHTML = plugin_menu.innerHTML + '<li class="menu-item"><a href="#" onclick="loadPlugin()"><i class="icon icon-plus"></i>&nbsp;Load Plugin</a></li>'
+                plugin_menu.innerHTML = plugin_menu.innerHTML + '<li class="menu-item"><a href="#" onclick="window.onresize()"><i class="icon icon-stop"></i>&nbsp;Cancel</a></li>'
             })
 
             window.runPlugin = (name) => {
-                imjoy.pm.plugin_names[name].api.run({
-                    config: {},
-                    data: {}
-                })
+                imjoy.pm.plugin_names[name].api.run({config: {}, data: {}})
             }
         })
         // fix mobile display
-        window.onresize = () => {
+        window.onresize = ()=>{
             document.body.height = window.innerHeight;
-            document.getElementById('whiteboard').style.setProperty('height', (window.innerHeight) + 'px',
-                'important');
+            document.getElementById('whiteboard').style.setProperty('height',  (window.innerHeight) + 'px', 'important');
         }
         window.onresize();
     </script>
