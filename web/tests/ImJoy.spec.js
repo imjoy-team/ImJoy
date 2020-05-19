@@ -36,6 +36,12 @@ describe("ImJoy.vue", async () => {
       expect(vm.plugin_loaded).to.be.true;
       done();
     });
+    // We need this because the vue components is not properly setup in the tests.
+    vm.event_bus.on("add_window", w => {
+      const elem = document.createElement("DIV");
+      elem.id = w.iframe_container;
+      document.body.appendChild(elem);
+    });
   });
 
   it("should load default repositories", async () => {
