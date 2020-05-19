@@ -1428,7 +1428,14 @@ import DOMPurify from "dompurify";
 
 import { ImJoy, Joy, utils, ajv } from "imjoy-core";
 
-import { escapeHTML, _clone, assert, url_regex, randId } from "../utils.js";
+import {
+  escapeHTML,
+  _clone,
+  assert,
+  url_regex,
+  randId,
+  mobileAndTabletcheck,
+} from "../utils.js";
 
 import _ from "lodash";
 
@@ -3058,7 +3065,9 @@ export default {
       }
     },
     showDialog(_plugin, config) {
-      config.dialog = true;
+      // TODO: remove this when we fix the close dialog button on mobile devices
+      if (mobileAndTabletcheck()) config.dialog = false;
+      else config.dialog = true;
       return new Promise((resolve, reject) => {
         const _selectedWindow = this.wm.selected_window;
         this.pm
