@@ -36,7 +36,8 @@ describe("ImJoy.vue", async () => {
       expect(vm.plugin_loaded).to.be.true;
       done();
     });
-    // We need this because the vue components is not properly setup in the tests.
+    // We need this because the vue components are not properly setup in the tests.
+    // TODO: remove this when we import all the global components
     vm.event_bus.on("add_window", w => {
       const elem = document.createElement("DIV");
       elem.id = w.iframe_container;
