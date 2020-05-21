@@ -1676,7 +1676,7 @@ export default {
           if (item && item.isFile) {
             // Get file
             item.file(file => {
-              file.relativePath = path + file.name;
+              file._path = path + file.name;
               file.loaders = getDataLoaders(file);
               filelist.push(file);
               if (end) resolve(filelist);
@@ -2852,7 +2852,7 @@ export default {
       //normalize relative path
       for (let i = 0; i < event.target.files.length; i++) {
         const file = event.target.files[i];
-        file.relativePath = file.webkitRelativePath;
+        file._path = file.webkitRelativePath;
         file.loaders = this.wm.getDataLoaders(file);
       }
       this.loadFiles(this.selected_files);

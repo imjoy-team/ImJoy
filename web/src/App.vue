@@ -68,6 +68,10 @@ body {
   padding: 0px;
 }
 
+.vm--modal {
+  max-height: 100%;
+}
+
 @media screen and (max-width: 800px) {
   .md-content {
     padding: 4px;
