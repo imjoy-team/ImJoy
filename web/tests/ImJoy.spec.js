@@ -40,7 +40,7 @@ describe("ImJoy.vue", async () => {
     // TODO: remove this when we import all the global components
     vm.event_bus.on("add_window", w => {
       const elem = document.createElement("DIV");
-      elem.id = w.iframe_container;
+      elem.id = w.window_id;
       document.body.appendChild(elem);
     });
   });

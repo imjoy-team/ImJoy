@@ -24,6 +24,22 @@
           <md-icon>remove</md-icon>
           <md-tooltip>Hide window</md-tooltip>
         </md-button>
+        <md-button
+          v-if="!w.fullscreen"
+          class="md-icon-button md-accent no-drag"
+          @click="fullScreen(w)"
+        >
+          <md-icon>fullscreen</md-icon>
+          <md-tooltip>Maximize window</md-tooltip>
+        </md-button>
+        <md-button
+          v-if="w.fullscreen"
+          class="md-icon-button md-accent no-drag"
+          @click="normalSize(w)"
+        >
+          <md-icon>fullscreen_exit</md-icon>
+          <md-tooltip>Exit fullscreen</md-tooltip>
+        </md-button>
       </div>
       <div class="window-title noselect">
         {{ w.name.slice(0, 30) + "(#" + (w.index || "") + ")" }}
@@ -92,6 +108,7 @@
       class="plugin-iframe-container allow-scroll"
     >
       <div class="loading loading-lg floating" v-show="w.loading"></div>
+      <div v-if="componentNames[w.type]" :id="w.window_id" v-show="false"></div>
       <component
         ref="window-content"
         v-if="componentNames[w.type] && w.type.startsWith('imjoy/')"
@@ -108,7 +125,7 @@
         md-description=""
       />
       <div v-else class="plugin-iframe">
-        <div :id="w.iframe_container" class="plugin-iframe"></div>
+        <div :id="w.window_id" class="plugin-iframe"></div>
       </div>
     </md-card-content>
   </md-card>
@@ -249,12 +266,18 @@ export default {
     },
     fullScreen(w) {
       this.$emit("fullscreen", w);
+      this.$nextTick(() => {
+        this.$forceUpdate();
+      });
     },
     detach(w) {
       this.$emit("detach", w);
     },
     normalSize(w) {
       this.$emit("normalsize", w);
+      this.$nextTick(() => {
+        this.$forceUpdate();
+      });
     },
     duplicate(w) {
       this.$emit("duplicate", w);
@@ -309,6 +332,12 @@ export default {
 .window-title {
   font-size: 1.2em;
   white-space: nowrap;
+}
+
+.md-icon-button {
+  width: 32px;
+  min-width: 32px;
+  height: 32px;
 }
 
 .plugin-iframe-container {
