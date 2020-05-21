@@ -176,7 +176,7 @@ export default {
       this.status_text = "requesting upload url from the file_manager...";
       const url = await this.selected_file_manager.requestUploadUrl({
         dir: this.root,
-        path: f.relativePath,
+        path: f._path,
         overwrite: true,
         file_manager: this.selected_file_manager.url,
       });
@@ -200,7 +200,7 @@ export default {
       try {
         for (let i = 0; i < files.length; i++) {
           if (files[i].name.startsWith(".")) {
-            console.log("skipping file: " + files[i].relativePath);
+            console.log("skipping file: " + files[i]._path);
             continue;
           }
           if (this.selected_file_manager.putFile) {
