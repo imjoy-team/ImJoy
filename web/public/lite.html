@@ -180,18 +180,20 @@
 
         function addWindow(w) {
             windows = windows || {};
-            windows[w.iframe_container] = w;
+            windows[w.window_id] = w;
             var title = w.name,
-                id = w.iframe_container;
+                id = w.window_id;
             document.getElementById('windows-menu').innerHTML = `
             <span class="chip pointer window-chip" id="header_${id}" onclick="selectWindow('${id}')">
                 ${title}
                 <a href="#" onclick="removeWindow('${id}')" class="btn btn-clear" aria-label="Close" role="button"></a>
             </span>` + document.getElementById('windows-menu').innerHTML;
 
-            document.getElementById('whiteboard').innerHTML = `
-                <div class="window_container" id="${id}"></div>
-            ` + document.getElementById('whiteboard').innerHTML;
+
+            const newWindow = document.createElement('div')
+            newWindow.classList.add("window_container")
+            newWindow.id = id;
+            document.getElementById('whiteboard').appendChild(newWindow)
             window.onresize();
             updateWindowChips();
             selectWindow(id)
@@ -225,12 +227,15 @@
                     updateWindowChips();
                 }
             }
+
             document.getElementById('windows-menu').removeChild(document.getElementById('header_' + id));
             document.getElementById('whiteboard').removeChild(document.getElementById(id));
+            if (selected_window === id) {
+                selectWindow(Object.keys(windows)[0])
+            }
             if (document.getElementById('whiteboard').children.length === 1) {
                 document.getElementById('empty-img').style.display = 'block';
             }
-
         }
 
         function selectWindow(id) {
@@ -272,7 +277,7 @@
                         const joy_config = {
                             container: document.getElementById('window-dialog-container'),
                             init: config.ui ||
-                            "", //"{id:'localizationWorkflow', type:'ops'} " + // a list of ops
+                                "", //"{id:'localizationWorkflow', type:'ops'} " + // a list of ops
                             data: config.data, // || Joy.loadFromURL(),
                             modules: config.modules || ["instructions", "math"],
                             onexecute: config.onexecute,
@@ -289,7 +294,7 @@
 
                     } else if (config.type) {
                         openDialog()
-                        config.window_container = "window-dialog-container";
+                        config.window_id = "window-dialog-container";
                         config.standalone = true;
                         if (config.type.startsWith("imjoy/")) {
                             config.render = wconfig => {};
@@ -315,7 +320,7 @@
 
         document.addEventListener('DOMContentLoaded', async (event) => {
             window.imjoyCore = await loadImJoyCore({
-                version: '0.13.8'
+                version: '0.13.9'
             })
             imjoy = new imjoyCore.ImJoy({
                 imjoy_api: imjoy_api,
