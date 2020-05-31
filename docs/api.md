@@ -460,6 +460,127 @@ api.error('Error occurred during processing.')
 ```
 
 
+### api.echo
+
+```javascript
+api.echo(obj)
+```
+
+An echo function that returns the same object as passed in, used for testing purposes.
+
+This is useful for testing the encoding / decoding object.
+
+
+**Arguments**
+
+* **obj**: Any.
+
+**Examples**
+
+```javascript
+ret = await api.echo('hi')
+console.log(ret) // should get 'hi'
+```
+
+### api.registerCodec
+
+```javascript
+api.registerCodec(config)
+```
+
+Register a custom codec for sending and receiving remote object.
+
+**Arguments**
+
+* **config**: Object (JavaScript) or dictionary (Python). Options for the codec.
+It contains the following fields:
+  - **name**: String. Name of the codec
+  - **type**: Class. A class object that used to match the object for encoding. In Javascript, `instanceof` will be used to match the type. In Python `isinstance()` will be used, that also means in Python, `type` can be an tuple of classes.
+  - **encoder**: Function. The encoder function which take an object (matched via `type`) as input and should return the encoded object (represended with Object/dict, Array/list, and primitive types).
+  - **decoder**: Function. The decoder function that converts the encoded object into the actual object.
+
+**Examples**
+
+```javascript
+class Cat{
+  constructor(name, color, age, clean){
+    this.name = name
+    this.color = color
+    this.age = age
+    this.clean = clean
+  }
+}
+
+api.registerCodec({
+    'name': 'cat', 
+    'type': Cat, 
+    'encoder': (obj)=>{
+        // convert the Cat instance as a dictionary with all the properties
+        return {_ctype: 'cat', name: obj.name, color: obj.color, age: obj.age, clean: obj.clean}
+    },
+    'decoder': (encoded_obj)=>{
+        // recover the Cat instance
+        return new Cat(encoded_obj.name, encoded_obj.color, encoded_obj.age, encoded_obj.clean)
+    }
+})
+
+class Plugin {
+    async setup(){
+    }
+    async run(){
+        const dirtyCat = new Cat('boboshu', 'mixed', 0.67, false)
+        // assuming we have a shower plugin
+        const showerPlugin = await api.getPlugin('catShower')
+        // now pass a cat into the shower plugin, and we should get a clean cat, the name should be the same
+        // note that the other plugin is running in another sandboxed iframe or in Python
+        // because we have the cat codec registered, we can send the Cat object to the other plugin
+        // Also notice that the other plugin should also define custom encoding decoding following the same representation
+        const cleanCat = await showerPlugin.wash(dirtyCat)
+        if(cleanCat.clean) api.alert(cleanCat.name + ' is clean.')
+    }
+};
+api.export(new Plugin())
+```
+
+
+### api.echo
+
+```javascript
+api.echo(obj)
+```
+
+An echo function that returns the same object as passed in, used for testing purposes.
+
+This is useful for testing the encoding / decoding object.
+
+
+**Arguments**
+
+* **obj**: Any.
+
+**Examples**
+
+```javascript
+ret = await api.echo('hi')
+console.log(ret) // should get 'hi'
+```
+
+### api.disposeObject
+
+```javascript
+api.disposeObject(obj)
+```
+
+Remove the remote object from its object store, such that it can be recycled by the garbage collector.
+
+It is important that this function is called when you don't need a remote object anymore, 
+otherwise, it will cause memory leak since the object will remain in its object store.
+
+**Arguments**
+
+* **obj**: Object. To remote object to be disposed.
+
+
 ### api.export
 
 Exports funcstions defined by the plugin as `Plugin API`.
