@@ -496,8 +496,8 @@ Register a custom codec for sending and receiving remote object.
 It contains the following fields:
   - **name**: String. Name of the codec
   - **type**: Class. A class object that used to match the object for encoding. In Javascript, `instanceof` will be used to match the type. In Python `isinstance()` will be used, that also means in Python, `type` can be an tuple of classes.
-  - **encoder**: Function. The encoder function which take an object (matched via `type`) as input and should return the encoded object (represended with Object/dict, Array/list, and primitive types).
-  - **decoder**: Function. The decoder function that converts the encoded object into the actual object.
+  - **encoder**: Function. The `encoder` function take an object as input and you need to return the represented object/dictionary. Note that, you can only use primitive types plus array/list and object/dict in the represented object. By default, if your returned object does not contain a key `_rtype`, the codec `name` will be used as `_rtype`. You can also assign a different `_rtype` name, that allows the conversion between different types.
+  - **decoder**: Function. The `decoder` function converts the encoded object into the actual object. It will only be called when the `_rtype` of an object matches the `name` of the codec.
 
 **Examples**
 
@@ -516,7 +516,7 @@ api.registerCodec({
     'type': Cat, 
     'encoder': (obj)=>{
         // convert the Cat instance as a dictionary with all the properties
-        return {_ctype: 'cat', name: obj.name, color: obj.color, age: obj.age, clean: obj.clean}
+        return {name: obj.name, color: obj.color, age: obj.age, clean: obj.clean}
     },
     'decoder': (encoded_obj)=>{
         // recover the Cat instance
