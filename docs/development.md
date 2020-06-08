@@ -58,6 +58,8 @@ Congratulations! You just made your first ImJoy plugin.
 
 Feel free to modify the code, save and run again. To understand more, please proceed further.
 
+For development in Python, you can use the [jupyter notebook extension](https://github.com/imjoy-team/imjoy-jupyter-extension).
+
 If you are new to web development (Javascript, HTML, CSS etc.), you may want to take a look at a few tutorials on [W3School](https://www.w3schools.com/).
 
 Specifically, we recommend to go through the following tutorials:
