@@ -18,25 +18,17 @@
           class="octo-body"
         ></path></svg
     ></a>
-    <section class="cover show" style="background: black!important;">
+    <section class="cover show" style="background: rgb(209, 220, 239);">
       <div id="particles-js"></div>
       <div class="cover-main">
         <!-- _coverpage.md -->
         <p>
           <img
-            src="/static/img/imjoy-logo-white.svg?sanitize=true"
+            src="/static/img/imjoy-logo-black.svg?sanitize=true"
             width="380"
           />
         </p>
-        <h1 style="color:white!important;">
-          We support
-          <a
-            style="display: inline!important;"
-            target="_blank"
-            href="https://www.shutdownstem.com/"
-            >#ShutDownSTEM</a
-          >!
-        </h1>
+        <h1>Deep Learning Made Easy!</h1>
         <p class="badges">
           <a href="https://github.com/imjoy-team/ImJoy" target="_blank"
             ><img
