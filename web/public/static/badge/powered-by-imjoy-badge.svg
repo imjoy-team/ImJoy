@@ -18,7 +18,7 @@
     <path d="M 74.622 0 L 109 0 L 109 20 L 74.622 20 Z" style="fill: rgb(68, 138, 255);"></path>
     <path fill="url(#b)" d="M0 0h109v20H0z"></path>
   </g>
-  <g transform="matrix(0.062678, 0, 0, 0.062678, 4.0, 2.875613)">
+  <g transform="matrix(0.062678, 0, 0, 0.062678, 4.0, 2.9)">
     <g transform="matrix(1, 0, 0, 1, -0.347278, 17.216295)">
       <path d="M31.44 5.19C84.19 5.19 136.98 5.19 189.73 5.19C203.3 5.19 213.22 13.65 215.42 27C215.68 28.4 215.63 29.79 215.63 31.24C215.63 84 215.63 136.75 215.63 189.49C215.63 205.49 204.4 215.69 188.02 215.64C136.24 215.54 84.5 215.49 32.7 215.64C16.33 215.69 4.8 205.59 4.75 189.49C4.8 163.1 4.8 136.69 4.8 110.24C4.8 84.1 4.8 57.9 4.8 31.74C4.8 15.69 15.37 5.19 31.44 5.19Z" transform="matrix(1, 0, 0, 1, 0, 0)" opacity="1" fill-opacity="1" style="fill: rgba(2, 3, 5, 0.27);"></path>
       <g>
@@ -51,8 +51,8 @@
     </g>
   </g>
   <g fill="#fff" text-anchor="middle" font-family="DejaVu Sans,Verdana,Geneva,sans-serif" font-size="110" transform="matrix(1, 0, 0, 1, 27.382076, -0.080815)">
-   <text transform="scale(.1)" textLength="700" style="fill: rgb(3, 3, 3); fill-opacity: 0.3; white-space: pre;" x="275" y="150">Powered by</text>
-    <text transform="scale(.1)" textLength="700" x="275" y="140" style="white-space: pre;">Powered by</text>
+   <text transform="scale(.1)" textLength="700" style="fill: rgb(3, 3, 3); fill-opacity: 0.3; white-space: pre;" x="275" y="150">powered by</text>
+    <text transform="scale(.1)" textLength="700" x="275" y="140" style="white-space: pre;">powered by</text>
     <text x="855" y="150" fill="#010101" fill-opacity=".3" textLength="350" style="white-space: pre;" transform="scale(.1)">ImJoy</text>
     <text x="855" y="140" textLength="350" style="white-space: pre;" transform="scale(.1)">ImJoy</text>
   </g>
