@@ -1308,13 +1308,13 @@ The following url parameters are currently supported:
  *   `load` or `l`: define an URL for making a http GET request, this parameter should only used when you defined a startup plugin with `start` or `s`. The data fetched from the URL will be passed to the startup plugin `run(ctx)` function as `ctx.data.loaded`.
 
 ### Use an ImJoy badge
-If you use ImJoy in your project, it is recommended to add the ImJoy badge to your project repository (e.g. on Github) or website. We have two official badges: ![Launch ImJoy](https://imjoy.io/static/badge/launch-imjoy-badge.svg) and ![Powered by ImJoy](https://imjoy.io/static/badge/powered-by-imjoy-badge.svg).
+If you use ImJoy in your project, it is recommended to add the ImJoy badge to your project repository (e.g. on Github) or website. We have two official badges: ![launch ImJoy](https://imjoy.io/static/badge/launch-imjoy-badge.svg) and ![powered by ImJoy](https://imjoy.io/static/badge/powered-by-imjoy-badge.svg).
 
-For a repository with an ImJoy plugin, you can use the ![Launch ImJoy](https://imjoy.io/static/badge/launch-imjoy-badge.svg) badge.
+For a repository with an ImJoy plugin, you can use the ![launch ImJoy](https://imjoy.io/static/badge/launch-imjoy-badge.svg) badge.
 
 Markdown:
 ```
-[![Launch ImJoy](https://imjoy.io/static/badge/launch-imjoy-badge.svg)](https://imjoy.io/#/app?plugin=<YOUR PLUGIN URL>)
+[![launch ImJoy](https://imjoy.io/static/badge/launch-imjoy-badge.svg)](https://imjoy.io/#/app?plugin=<YOUR PLUGIN URL>)
 ```
 
 reStructuredText:
@@ -1323,12 +1323,12 @@ reStructuredText:
  :target: https://imjoy.io/#/app?plugin=<YOUR PLUGIN URL>
 ```
 
-For other cases, for example, if you simply want to acknowledge the use of ImJoy, you can use the ![Powered by ImJoy](https://imjoy.io/static/badge/powered-by-imjoy-badge.svg).
+For other cases, for example, if you simply want to acknowledge the use of ImJoy, you can use the ![powered by ImJoy](https://imjoy.io/static/badge/powered-by-imjoy-badge.svg).
 
 
 Markdown:
 ```
-[![Powered by ImJoy](https://imjoy.io/static/badge/powered-by-imjoy-badge.svg)](https://imjoy.io/)
+[![powered by ImJoy](https://imjoy.io/static/badge/powered-by-imjoy-badge.svg)](https://imjoy.io/)
 ```
 
 reStructuredText:
