@@ -94,7 +94,9 @@ To learn more details about ImJoy, please go to [ImJoy Docs](https://imjoy.io/do
 ## Repositories
 
 Currently, ImJoy consists of the following repositories:
- - [ImJoy Web App (core)](https://github.com/imjoy-team/ImJoy/) (this repository)
+ - [ImJoy RPC](https://github.com/imjoy-team/imjoy-rpc/)
+ - [ImJoy Core](https://github.com/imjoy-team/imjoy-core/)
+ - [ImJoy Web App](https://github.com/imjoy-team/ImJoy/) (this repository)
  - [ImJoy Plugin Engine](https://github.com/imjoy-team/imjoy-engine)
  - [ImJoy Plugin Repository](https://github.com/imjoy-team/imjoy-plugins)
 
