@@ -20,6 +20,14 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/robots.txt"
   },
   {
+    "revision": "bb270d78a2f7c7710e3569402bf904a9",
+    "url": "/static/badge/launch-imjoy-badge.svg"
+  },
+  {
+    "revision": "2ef5b46d8f01e0229c88b89a785170b3",
+    "url": "/static/badge/powered-by-imjoy-badge.svg"
+  },
+  {
     "revision": "5bfad52dc3f944fc7315",
     "url": "/static/css/app.ee4f63c5.css"
   },
