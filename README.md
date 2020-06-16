@@ -126,7 +126,7 @@ We thank all the authors for offering these excellent work to the open-source co
 
 Please star the ImJoy GitHub repository to support ImJoy.
 
-If you use ImJoy in your project, please add one of the badges to your code repository or website: ![Powered by ImJoy](https://imjoy.io/static/badge/powered-by-imjoy-badge.svg) ![Launch ImJoy](https://imjoy.io/static/badge/launch-imjoy-badge.svg), see how to [add an ImJoy badge](https://imjoy.io/docs/#/development?id=use-an-imjoy-badge).
+If you use ImJoy in your project, please add one of the badges to your code repository or website: ![Powered by ImJoy](https://imjoy.io/static/badge/powered-by-imjoy-badge.svg) ![Launch ImJoy](https://imjoy.io/static/badge/launch-imjoy-badge.svg), see how to [add an ImJoy badge](https://imjoy.io/docs/#/development?id=add-an-imjoy-badge).
 
 We would like ImJoy to be a community driven framework, everyone is welcome to
 contribute your idea, feedback, plugins and code to the project.
