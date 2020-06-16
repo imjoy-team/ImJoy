@@ -1,7 +1,7 @@
+![Powered by ImJoy](https://imjoy.io/static/badge/powered-by-imjoy-badge.svg)
 ![License](https://img.shields.io/github/license/imjoy-team/imjoy-engine.svg)
 [![ImJoy Version](https://img.shields.io/badge/dynamic/json.svg?color=success&label=imjoy&prefix=v&query=version&url=https://raw.githubusercontent.com/imjoy-team/ImJoy/master/web/package.json)](https://imjoy.io/#/app) 
 [![Build Site](https://github.com/imjoy-team/ImJoy/workflows/Build%20Site/badge.svg)](https://github.com/imjoy-team/ImJoy/actions)
-[![Netlify Status](https://api.netlify.com/api/v1/badges/3aa71748-2778-4c31-a9ea-f7fdf5445fd1/deploy-status)](https://app.netlify.com/sites/imjoy/deploys) 
 [![Join the chat at https://gitter.im/imjoy-dev/community](https://badges.gitter.im/imjoy-dev/community.svg)](https://gitter.im/imjoy-dev/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![image.sc forum](https://img.shields.io/badge/dynamic/json.svg?label=forum&url=https%3A%2F%2Fforum.image.sc%2Ftags%2Fimjoy.json&query=%24.topic_list.tags.0.topic_count&colorB=brightgreen&suffix=%20topics&logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAOCAYAAAAfSC3RAAABPklEQVR42m3SyyqFURTA8Y2BER0TDyExZ+aSPIKUlPIITFzKeQWXwhBlQrmFgUzMMFLKZeguBu5y+//17dP3nc5vuPdee6299gohUYYaDGOyyACq4JmQVoFujOMR77hNfOAGM+hBOQqB9TjHD36xhAa04RCuuXeKOvwHVWIKL9jCK2bRiV284QgL8MwEjAneeo9VNOEaBhzALGtoRy02cIcWhE34jj5YxgW+E5Z4iTPkMYpPLCNY3hdOYEfNbKYdmNngZ1jyEzw7h7AIb3fRTQ95OAZ6yQpGYHMMtOTgouktYwxuXsHgWLLl+4x++Kx1FJrjLTagA77bTPvYgw1rRqY56e+w7GNYsqX6JfPwi7aR+Y5SA+BXtKIRfkfJAYgj14tpOF6+I46c4/cAM3UhM3JxyKsxiOIhH0IO6SH/A1Kb1WBeUjbkAAAAAElFTkSuQmCC)](https://forum.image.sc/tags/imjoy)
 
@@ -127,6 +127,8 @@ We thank all the authors for offering these excellent work to the open-source co
 ## Support ImJoy
 
 Please star the ImJoy GitHub repository to support ImJoy.
+
+If you use ImJoy in your project, please add one of the badges to your code repository or website: ![Powered by ImJoy](https://imjoy.io/static/badge/powered-by-imjoy-badge.svg) ![Launch ImJoy](https://imjoy.io/static/badge/launch-imjoy-badge.svg), see how to [add an ImJoy badge](https://imjoy.io/docs/#/development?id=use-an-imjoy-badge).
 
 We would like ImJoy to be a community driven framework, everyone is welcome to
 contribute your idea, feedback, plugins and code to the project.
