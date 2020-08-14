@@ -161,12 +161,13 @@ export default {
       });
     },
     standaloneWindows: function() {
-      return this.windows.filter(w => {
-        return !w.dialog && (this.mode !== "grid" || w.standalone);
-      });
+      return this.windows.filter(this.isStandaloneWindow);
     },
   },
   methods: {
+    isStandaloneWindow(w) {
+      return !w.dialog && (this.mode !== "grid" || w.standalone);
+    },
     overlayMousemove(e) {
       const bbox = this.$refs.whiteboard.getBoundingClientRect();
       const top = bbox.y;
@@ -308,12 +309,14 @@ export default {
         }
         this.active_windows = [];
         this.wm.active_windows = this.active_windows;
-        //this.wm.selected_window = null
         this.$emit("select", this.active_windows, null);
         this.$forceUpdate();
       }
     },
     selectWindow(w, evt) {
+      if (!this.isStandaloneWindow(w)) {
+        this.wm.selected_window = null;
+      }
       w.selected = true;
       w.refresh && w.refresh();
       if (
