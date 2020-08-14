@@ -222,7 +222,6 @@ export default {
         this.refresh();
       });
       this.w.api.on("focus", () => {
-        debugger;
         if (!this.w.standalone)
           this.$nextTick(() => {
             this.$el.scrollIntoView(true);
