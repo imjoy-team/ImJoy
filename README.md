@@ -133,7 +133,7 @@ If you use ImJoy in your project, please add one of the badges to your code repo
 We would like ImJoy to be a community driven framework, everyone is welcome to
 contribute your idea, feedback, plugins and code to the project.
 
-We don't have a guideline for that yet, for now please feel free to use the [issues](https://github.com/imjoy-team/ImJoy/issues) and fork the project.
+If you are interested in contributing to the project, please read our guideline [here](https://github.com/imjoy-team/ImJoy/blob/master/docs/CONTRIBUTING.md).
 
 ## Citation
 
