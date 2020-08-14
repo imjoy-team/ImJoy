@@ -4,7 +4,7 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/404.html"
   },
   {
-    "revision": "0453bd8da78bf07736e88a0c1f83412c",
+    "revision": "b3dd69cc022fa324ff68e7718d0d4a4a",
     "url": "/index.html"
   },
   {
@@ -28,7 +28,7 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/badge/powered-by-imjoy-badge.svg"
   },
   {
-    "revision": "77ab4f96d0965bd6e010",
+    "revision": "5b2447b13d3dd0a2d45e",
     "url": "/static/css/app.b76fb16f.css"
   },
   {
@@ -256,8 +256,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/img/twitter.svg"
   },
   {
-    "revision": "77ab4f96d0965bd6e010",
-    "url": "/static/js/app.9da256cf.js"
+    "revision": "5b2447b13d3dd0a2d45e",
+    "url": "/static/js/app.4d25b085.js"
   },
   {
     "revision": "9d9efb43042e7c212697",
