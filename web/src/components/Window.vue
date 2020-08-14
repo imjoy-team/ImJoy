@@ -181,7 +181,7 @@ export default {
         this.refresh();
       });
       this.w.api.on("focus", () => {
-        this.selectWindow(this.w);
+        this.selectWindow(this.w, {});
         if (!this.w.standalone)
           this.$nextTick(() => {
             this.$el.scrollIntoView(true);
