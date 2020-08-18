@@ -2549,9 +2549,35 @@ export default {
         console.error("permission handler not found.");
       }
     },
-    showDoc(pid) {
+    async showDoc(pid) {
       const plugin = this.pm.plugins[pid];
       const pconfig = plugin.config;
+      let source;
+      if (pconfig.docs && typeof pconfig.docs === "string") {
+        if (pconfig.docs.startsWith("http") && pconfig.docs.endsWith(".md")) {
+          try {
+            const response = await axios.get(pconfig.docs);
+            if (!response || !response.data) {
+              alert("failed to get plugin documentation from " + pconfig.docs);
+              return;
+            }
+            source = response.data;
+          } catch (e) {
+            alert(
+              "failed to get plugin documentation from " +
+                pconfig.docs +
+                ":" +
+                e.toString()
+            );
+            return;
+          }
+        } else {
+          this.createWindow({ src: pconfig.docs });
+          return;
+        }
+      } else {
+        source = pconfig && pconfig.docs && pconfig.docs.content;
+      }
       const w = {
         name: "About " + pconfig.name,
         type: "imjoy/markdown",
@@ -2562,7 +2588,7 @@ export default {
           name: pconfig.name,
           id: plugin.id,
           plugin_info: pconfig,
-          source: pconfig && pconfig.docs[0] && pconfig.docs[0].content,
+          source: source,
         },
       };
       this.createWindow(w);

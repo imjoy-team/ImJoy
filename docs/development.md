@@ -282,6 +282,12 @@ URL for the plugin project repository
 #### website
 URL for the plugin project website
 
+#### docs
+URL for the plugin documentation, either to a markdown file (e.g. raw Github URL ends with `.md`),
+or a any web page. 
+
+Note: if you also provide a `<docs>` block, then this field will be ignored.
+
 #### tags
 List of supported tags which configures the plugin after installed. 
 
@@ -510,6 +516,9 @@ Defines whether the plugin can be executed by clicking on the plugin menu (By de
 Contains the documentation of the plugin and is written in Markdown language.
 Please consulte this document for an introduction to [Markdown](https://guides.github.com/features/mastering-markdown/).
 Please note that if you provide links that these will be opened in another tab, leaving the ImJoy instance running.
+
+Optionally, you can also skip the `<docs>` block, but pass a url to the `docs` field in `<config>`.
+The content at the url can be a markdown file or a regular web page.
 
 ### `<window>` block
 Defines the HTML code for the display in the plugin window.

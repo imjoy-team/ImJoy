@@ -172,10 +172,11 @@
 
     <md-dialog :md-active.sync="showDocsDialog">
       <md-dialog-content>
+        <iframe v-if="typeof docs === 'string'" :src="docs"></iframe>
         <div
           style="padding-left: 10px; padding-right: 5px;"
-          v-if="docs && docs.trim() != ''"
-          v-html="sanitizedMarked(docs)"
+          v-else-if="docs && docs.content && docs.content.trim() != ''"
+          v-html="sanitizedMarked(docs.content)"
         ></div>
         <h3 v-else>Oops, this plugin has no documentation!</h3>
       </md-dialog-content>
@@ -196,8 +197,6 @@ import marked from "marked";
 import DOMPurify from "dompurify";
 import _ from "lodash";
 import { randId } from "../utils.js";
-
-import { parseComponent } from "../pluginParser.js";
 
 export default {
   name: "plugin-list",
@@ -390,40 +389,22 @@ export default {
       });
       saveAs(file, filename);
     },
-    showDocs(plugin) {
+    async showDocs(plugin) {
       if (plugin.installed) {
-        this.pm
-          .getPluginDocs(plugin._id)
-          .then(docs => {
-            this.docs = docs;
-            this.showDocsDialog = true;
-            this.$forceUpdate();
-          })
-          .catch(err => {
-            console.log("error occured when editing ", plugin.name, err);
-          });
+        const docs = await this.pm.getPluginDocs(plugin._id);
+        this.docs = docs;
       } else {
         let uri = plugin.uri;
-        //if the file is from github or gist, then add random query string to avoid browser caching
-        if (
-          (uri.startsWith("https://raw.githubusercontent.com") ||
-            uri.startsWith("https://gist.githubusercontent.com")) &&
-          uri.indexOf("?") === -1
-        ) {
-          uri = uri + "?" + randId();
+        const response = await axios.get(uri);
+        if (!response || !response.data) {
+          alert("failed to get plugin code from " + uri);
+          return;
         }
-        axios.get(uri).then(response => {
-          if (!response || !response.data) {
-            alert("failed to get plugin code from " + uri);
-            return;
-          }
-          const pluginComp = parseComponent(response.data);
-          this.docs =
-            pluginComp.docs && pluginComp.docs[0] && pluginComp.docs[0].content;
-          this.showDocsDialog = true;
-          this.$forceUpdate();
-        });
+        const config = this.pm.parsePluginCode(response.data);
+        this.docs = config.docs;
       }
+      this.showDocsDialog = true;
+      this.$forceUpdate();
     },
     showCode(plugin) {
       if (plugin.installed) {
