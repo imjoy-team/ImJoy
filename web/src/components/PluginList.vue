@@ -390,19 +390,43 @@ export default {
       saveAs(file, filename);
     },
     async showDocs(plugin) {
+      let docs;
       if (plugin.installed) {
-        const docs = await this.pm.getPluginDocs(plugin._id);
-        this.docs = docs;
+        docs = await this.pm.getPluginDocs(plugin._id);
       } else {
-        let uri = plugin.uri;
-        const response = await axios.get(uri);
+        const response = await axios.get(plugin.uri);
         if (!response || !response.data) {
-          alert("failed to get plugin code from " + uri);
+          alert("failed to get plugin source from " + docs);
           return;
         }
-        const config = this.pm.parsePluginCode(response.data);
-        this.docs = config.docs;
+        const source = response.data;
+        const config = this.pm.parsePluginCode(source);
+        docs = config.docs;
       }
+      let source;
+      if (docs && typeof docs === "string") {
+        if (docs.startsWith("http") && docs.endsWith(".md")) {
+          try {
+            const response = await axios.get(docs);
+            if (!response || !response.data) {
+              alert("failed to get plugin documentation from " + docs);
+              return;
+            }
+            source = response.data;
+          } catch (e) {
+            console.error(e);
+            source = docs;
+            return;
+          }
+        } else {
+          source = docs;
+          return;
+        }
+      } else {
+        source = docs;
+      }
+      this.docs = source;
+
       this.showDocsDialog = true;
       this.$forceUpdate();
     },

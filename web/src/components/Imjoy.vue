@@ -550,7 +550,7 @@
                         >
                         <md-icon v-else>info</md-icon>Log
                       </md-menu-item>
-                      <md-menu-item @click="showDoc(plugin.id)">
+                      <md-menu-item @click="showDocs(plugin.id)">
                         <md-icon>description</md-icon>Docs
                       </md-menu-item>
                       <md-menu-item
@@ -794,7 +794,7 @@
                         >
                         <md-icon v-else>info</md-icon>Log
                       </md-menu-item>
-                      <md-menu-item @click="showDoc(plugin.id)">
+                      <md-menu-item @click="showDocs(plugin.id)">
                         <md-icon>description</md-icon>Docs
                       </md-menu-item>
                       <md-menu-item
@@ -2549,7 +2549,7 @@ export default {
         console.error("permission handler not found.");
       }
     },
-    async showDoc(pid) {
+    async showDocs(pid) {
       const plugin = this.pm.plugins[pid];
       const pconfig = plugin.config;
       let source;
@@ -2563,12 +2563,8 @@ export default {
             }
             source = response.data;
           } catch (e) {
-            alert(
-              "failed to get plugin documentation from " +
-                pconfig.docs +
-                ":" +
-                e.toString()
-            );
+            console.error(e);
+            this.createWindow({ src: pconfig.docs });
             return;
           }
         } else {
@@ -2580,7 +2576,7 @@ export default {
       }
       const w = {
         name: "About " + pconfig.name,
-        type: "imjoy/markdown",
+        type: "imjoy/docs",
         w: 20,
         h: 10,
         scroll: true,
