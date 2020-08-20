@@ -343,11 +343,12 @@ It contains the following fields:
     - `imjoy/markdown`. Render some markdown text provided in `data.source`.
     - `imjoy/plugin-editor`. Opens the source code editors. `data.id` is a unique string (preferable random) specifying the window id, `data.code` contains the source code
 
-    If `external` is used, you can load an window from an external url, for example, a web app hosted on Github pages. you can specify the url with the `src` key. Details about how to support ImJoy from an external web app can be found [here](https://github.com/imjoy-team/imjoy-core/).
+    The value of `type` if you create the window from an external url, for example, a web app hosted on Github pages. In that case you need to specify the url with the `src` key. Details about how to support ImJoy from an external web app can be found [here](https://github.com/imjoy-team/imjoy-core/).
   
     If the external web page has the ImJoy plugin api loaded, you can interact with the external website like a normal ImJoy plugin. However, if the external web page does not support ImJoy, you need to set `passive=true` to tell ImJoy that there will be no plugin api from this window.
-  - **src**: String, only for `type="external"`. Specify the external url for to be used as a base frame for the window plugin.
-  - **passive**: Boolean, only for `type="external"`. Mark whether the plugin is a passive web page (no ImJoy api exposed). Default value is `false`. 
+  
+  - **src**: String, specify source code to the window plugin, the url to the window plugin source code, or a url to a web app that optionally support `imjoy-rpc`. The url will treated as source code if the url ends with `.imjoy.html`, is a `gist` url or a github source code page url. Passing source code to create a window allows, for example store the source code of a window plugin inside a Python plugin, and instantiate it when needed.
+  - **passive**: Boolean, only used when `src` is specified. Mark whether the plugin is a passive web page (no ImJoy api exposed). Default value is `false`. 
   - **w**: Integer. Window width in grid columns (1 column = 30 pixels).
   - **h**: Integer. Window height in grid rows (1 row = 30 pixels).
   - **data**: Object (JavaScript) or dictionary (Python). Contains data to be transferred to the window.
@@ -719,10 +720,10 @@ sigma = await api.getConfig('sigma')
 
 ### api.getPlugin
 ```javascript
-plugin = await api.getPlugin(plugin_name)
+plugin = await api.getPlugin(src)
 ```
 
-Gets the API object of another plugin.
+Gets the API object of another plugin by its name, url or plugin source code.
 
 **Note 1:** If the plugin is terminated and you try to call its function, you will get an error. One solution to this is to use `try ... catch `(JavaScript) or `try: ... except: ...`(Python) statement to capture the error. <!--(TODO: this does not work for `native-python` plugin yet.)-->
 
@@ -735,7 +736,9 @@ plugin occasionally, you can also use `api.call`
 
 **Arguments**
 
-* **plugin_name**: String. Name of another plugin.
+* **src**: String. Name, url or source code of another plugin. If the plugin is already loaded, then use its name, otherwise, pass a valid plugin URI or its source code. By passing the source code, it allows the flexibility of 
+embedding one or more plugin source code inside another plugin. For example, a Python plugin can dynamically populate 
+a window plugin in HTML.
 
 **Returns**
 * **plugin**: Object. An object which can be used to access the plugin API functions.
