@@ -1410,6 +1410,7 @@ Follow these steps, and you will be able to run ImJoy server and the plugin engi
  * support `base_frame` (in `<config>` block) option for `window` plugins to load from a custom html url.
  * support creating window or dialog from an external web page, for example:  `api.createWindow({type: "external", src: "https://kitware.github.io/itk-vtk-viewer/app", passive: true})`.
  * fix `api.alert` display when passing an object
+ * support passing plugin url or source code to `api.getPlugin`, `api.createWindow`, `api.showDialog`, which enables dynamic plugin loading
  
 #### api_version: 0.1.7
  * `api.fs` has been deprecated, the browser file system is moved to a separate plugin `BrowserFS`, to use the file system, you can do `const bfs_plugin = await api.getPlugin('BrowserFS'); const bfs = bfs_plugin.fs;`, now `fs` will be equivalent to `api.fs`. Notice: the data saved with `api.fs` will not be accessible with the new API, to get access the old data, please change `api_version` in the plugin config to `0.1.6`.
