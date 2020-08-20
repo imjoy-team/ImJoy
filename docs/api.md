@@ -347,7 +347,7 @@ It contains the following fields:
   
     If the external web page has the ImJoy plugin api loaded, you can interact with the external website like a normal ImJoy plugin. However, if the external web page does not support ImJoy, you need to set `passive=true` to tell ImJoy that there will be no plugin api from this window.
   
-  - **src**: String, specify source code to the window plugin, the url to the window plugin source code, or a url to a web app that optionally support `imjoy-rpc`. The url will treated as source code if the url ends with `.imjoy.html`, is a `gist` url or a github source code page url.
+  - **src**: String, specify source code to the window plugin, the url to the window plugin source code, or a url to a web app that optionally support `imjoy-rpc`. The url will treated as source code if the url ends with `.imjoy.html`, is a `gist` url or a github source code page url. Passing source code to create a window allows, for example store the source code of a window plugin inside a Python plugin, and instantiate it when needed.
   - **passive**: Boolean, only used when `src` is specified. Mark whether the plugin is a passive web page (no ImJoy api exposed). Default value is `false`. 
   - **w**: Integer. Window width in grid columns (1 column = 30 pixels).
   - **h**: Integer. Window height in grid rows (1 row = 30 pixels).
