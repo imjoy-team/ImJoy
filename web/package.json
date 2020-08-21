@@ -1,6 +1,6 @@
 {
   "name": "imjoy",
-  "version": "0.11.12",
+  "version": "0.11.13",
   "private": false,
   "description": "ImJoy -- deep learning made easy.",
   "author": "imjoy-team <imjoy.team@gmail.com>",
@@ -51,7 +51,7 @@
     "vue-form-generator": "^2.3.4",
     "vue-grid-layout": "github:jbaysolutions/vue-grid-layout#9e13ea9",
     "vue-js-modal": "github:imjoy-team/vue-js-modal#2.0.0-rc.3g",
-    "vue-material": "^1.0.0-beta-12",
+    "vue-material": "^1.0.0-beta-15",
     "vue-router": "^3.0.1",
     "xterm": "^3.13.1"
   },
