@@ -57,6 +57,10 @@ body {
   overscroll-behavior-x: none;
   position: fixed;
   overflow-wrap: break-word;
+  font-size: 0.8rem;
+  font-weight: 400;
+  font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", sans-serif;
 }
 
 .md-app {
