@@ -79,8 +79,15 @@
       testing, contributing valuable feedbacks and suggestions for improving
       ImJoy.
     </p>
-    <p>This project is mainly funded by</p>
+    <p>This project is mainly supported by</p>
     <p>
+      <a href="https://cellprofiling.org/" target="_blank">
+        <img
+          style="width: 160px; margin: 10px;"
+          src="static/img/lundberg-lab-logo.png"
+          alt="Cell Profiling Group"
+        />
+      </a>
       <a href="https://www.pasteur.fr" target="_blank">
         <img
           style="width: 150px; margin: 10px;"
@@ -88,9 +95,13 @@
           alt="Institut Pasteur"
         />
         &nbsp;&nbsp;
+      </a>
+
+      <a href="https://kaw.wallenberg.org/" target="_blank">
         <img
           style="width: 150px; margin: 10px;"
           src="static/img/logga-KAW-300x155.png"
+          alt="Knut and Alice Wallenberg Foundation"
         />
       </a>
     </p>
