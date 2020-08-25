@@ -226,14 +226,6 @@ ul>li {
     text-align: right;
 }
 
-.particles-js-canvas-el {
-    position: fixed;
-    pointer-events: none;
-    top: 0;
-    left: 0;
-    z-index: -1;
-}
-
 .illustration {
     background: url(./illustration.svg);
     min-width: 100%;

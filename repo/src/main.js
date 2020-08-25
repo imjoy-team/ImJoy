@@ -1,9 +1,3 @@
-document.addEventListener('DOMContentLoaded', function () {
-  /* particlesJS.load(@dom-id, @path-json, @callback (optional)); */
-  particlesJS.load('particles-js', '/static/js/particlesjs-config.json', function () {
-    console.log('particles.js config loaded');
-  });
-});
 
 Vue.component('label-selector', {
   props: ['all-labels'],
