@@ -1403,6 +1403,7 @@ Follow these steps, and you will be able to run ImJoy server and the plugin engi
 
 ### API changes
 #### api_version: 0.1.8
+ * add `api.getWindow` to obtain an existing window instance.
  * `api.showFileDialog`:
    - if the file manager provide `showFileDialog` function, then ImJoy will use it.
    - remove the key `uri_type` from input arguments, remove `engine` from its result.
