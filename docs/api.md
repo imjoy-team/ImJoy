@@ -319,7 +319,9 @@ another plugin. Each window in the workspace is then a new instance of the `wind
 When `api.getPlugin` is called, it will return the api of the proxy plugin, e.g.
 `proxy = await api.getPlugin('Image Window')`). Every time the `run` function
 is executed, a new window will be created. For example, if you run `proxy.run({data: ...})`
-for 10 times, 10 windows will be created.
+for 10 times, 10 windows will be created. 
+
+To retrieve the window created with `api.createWindow` (or `api.showDialog`), you can use `api.getWindow`.
 
 When `api.createWindow` is used, it will return an instance of the window plugin,
 e.g. `win = await api.createWindow({'name': 'new window', 'type': 'Image Window', 'data': {...}})`).
@@ -733,7 +735,6 @@ functions of this plugin with `api.getPlugin`. Then you can access them
 through the returned object. If you only access the API function in another
 plugin occasionally, you can also use `api.call`
 
-
 **Arguments**
 
 * **src**: String. Name, url or source code of another plugin. If the plugin is already loaded, then use its name, otherwise, pass a valid plugin URI or its source code. By passing the source code, it allows the flexibility of 
@@ -756,6 +757,35 @@ await pluginX.funcX()
 ```
 [Try yourself >>](https://imjoy.io/#/app?plugin=imjoy-team/imjoy-demo-plugins:getPlugin&w=examples)
 
+
+### api.getWindow
+```javascript
+w = await api.getWindow(config)
+```
+
+Get an existing window by its name or type.
+
+
+**Arguments**
+
+* **config**: String or Object. It can be a window name string, or an object that optinally consists of the several fields (at least one):
+  - `name`: String. Name of window.
+  - `type`: String. Type of the window.
+
+**Returns**
+* **w**: Object. An windowobject which can be used to access the window API functions.
+
+
+**Example**
+
+Get an existing [Kaibu](https://kaibu.org) window and access it.
+
+```javascript
+await createWindow({name: "My Kaibu Window", src: "https://kaibu.org"})
+
+w = await api.getWindow("My Kaibu Window")
+await w.open("https://imjoy.io/static/img/imjoy-icon.png")
+```
 
 
 ### api.getEngine
