@@ -319,9 +319,7 @@
         }
 
         document.addEventListener('DOMContentLoaded', async (event) => {
-            window.imjoyCore = await loadImJoyCore({
-                version: '0.13.31'
-            })
+            window.imjoyCore = await loadImJoyCore()
             imjoy = new imjoyCore.ImJoy({
                 imjoy_api: imjoy_api,
             })
