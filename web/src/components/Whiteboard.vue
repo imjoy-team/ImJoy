@@ -29,6 +29,7 @@
       ref="window_grid"
     >
       <grid-item
+        v-show="!w.hidden"
         :key="w.id"
         v-for="w in gridWindows"
         drag-allow-from=".drag-handle"
@@ -61,6 +62,7 @@
           @close="close"
           @fullscreen="fullScreen"
           @normalsize="normalSize"
+          @hide="hide"
         ></window>
       </grid-item>
     </grid-layout>
@@ -80,7 +82,7 @@
       @detach="detach"
       v-for="w in standaloneWindows"
       :key="w.id + '_standalone'"
-      v-show="wm.selected_window === w"
+      v-show="wm.selected_window === w && !w.hidden"
       :loaders="wm.registered_loaders"
       :withDragHandle="false"
       @duplicate="duplicate"
@@ -88,6 +90,7 @@
       @close="close"
       @fullscreen="fullScreen"
       @normalsize="normalSize"
+      @hide="hide"
     ></window>
   </div>
 </template>
@@ -249,6 +252,13 @@ export default {
     isTypedArray(obj) {
       return !!obj && obj.byteLength !== undefined;
     },
+    hide(w) {
+      w.hidden = true;
+      w.__h = w.h;
+      w.__w = w.w;
+      w.w = 0;
+      w.h = 0;
+    },
     fullScreen(w) {
       w.fullscreen = true;
       this.col_num = parseInt(
@@ -354,6 +364,7 @@ export default {
     focusWindow(w) {
       this.show_overlay = false;
       this.selectWindow(w, {});
+      window.dispatchEvent(new Event("resize"));
     },
     stopDragging() {
       setTimeout(() => {
