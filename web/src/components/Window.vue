@@ -16,11 +16,7 @@
           <md-icon>close</md-icon>
           <md-tooltip>Close window</md-tooltip>
         </md-button>
-        <md-button
-          v-if="w.dialog"
-          class="md-icon-button md-accent no-drag"
-          @click="hide(w)"
-        >
+        <md-button class="md-icon-button md-accent no-drag" @click="hide(w)">
           <md-icon>remove</md-icon>
           <md-tooltip>Hide window</md-tooltip>
         </md-button>
@@ -181,6 +177,12 @@ export default {
         this.refresh();
       });
       this.w.api.on("focus", () => {
+        if (this.w.hidden) {
+          this.w.hidden = false;
+          this.w.w = this.w.__w;
+          this.w.h = this.w.__h;
+        }
+
         this.selectWindow(this.w, {});
         if (!this.w.standalone)
           this.$nextTick(() => {
