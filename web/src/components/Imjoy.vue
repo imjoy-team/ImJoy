@@ -1503,6 +1503,7 @@ export default {
       confirm_config: { show: false, confirm: () => {}, cancel: () => {} },
       prompt_config: { show: false, confirm: () => {}, cancel: () => {} },
       selected_file_managers: [],
+      selected_windows_stack: [],
     };
   },
   watch: {
@@ -2085,6 +2086,9 @@ export default {
           return;
         }
         try {
+          if (w.dialog) {
+            this.selected_windows_stack.push(w);
+          }
           const me = this;
           w.api = w.api || {};
           w.api.on("refresh", () => {
@@ -3113,13 +3117,25 @@ export default {
       }
     },
     async closeWindowDialog(w) {
-      if (w.fullscreen) {
-        this.normalWindowDialog(w);
-      }
       if (this.selected_dialog_window === w) {
-        this.selected_dialog_window = null;
-        this.$modal.hide("window-modal-dialog");
+        this.selected_windows_stack.pop();
+        this.selected_dialog_window = this.selected_windows_stack[
+          this.selected_windows_stack.length - 1
+        ];
+        if (!this.selected_dialog_window) {
+          if (w.fullscreen) {
+            this.normalWindowDialog(w);
+          }
+          this.$modal.hide("window-modal-dialog");
+        } else {
+          if (this.selected_dialog_window.fullscreen) {
+            this.fullscreenWindowDialog(this.selected_dialog_window);
+          } else {
+            this.normalWindowDialog(this.selected_dialog_window);
+          }
+        }
       }
+
       if (w.close && !w.closing) {
         w.closing = true;
         await w.close();

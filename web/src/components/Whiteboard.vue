@@ -238,6 +238,8 @@ export default {
       });
     },
     close(w) {
+      // hide it to make it more responsive
+      this.hide(w);
       const ai = this.active_windows.indexOf(w);
       if (ai >= 0) {
         this.active_windows[ai].selected = false;
