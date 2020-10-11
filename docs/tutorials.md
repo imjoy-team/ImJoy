@@ -1,20 +1,5 @@
 # Tutorials
 
-## Building a workflow
-
-Plugins within a workspace can also be composed into a workflow, where multiple plugins are chained to perform more complex data analysis and visualization tasks. 
-Note that these workflows can also be stored and shared with other users via a single URL. 
-Follow the step and you will make a simple workflow where a JavaScript plugin asking the user to provide a number is executed first, then this number is used by a second plugin to perform calculations. 
-
- 1. click [here](https://imjoy.io/#/app?plugin=imjoy-team/imjoy-demo-plugins:Calculator&workspace=workflow-demo) to install two demo plugins.
- 2. click `WORKFLOW` in the left panel
- 3. press the + circled button and select `GetNumber` to add it 
- 4. then add `Calculator`
- 5. press the `run` button
-
-
-![imjoy-basic-workflow](assets/imjoy-basic-workflow.png ':size=800')
-
 ## Calling Python from Javascript
 
 ImJoy provides a remote procedure call (RPC) mechanism which enables transparent function calls between plugins.
@@ -27,20 +12,22 @@ Then define a function called `calc_exp` which use numpy to calculate the natura
 ```python
 import numpy as np
 from imjoy import api
-import asyncio
 
 class ImJoyPlugin():
     def setup(self):
         pass
 
-    async def run(self, ctx):
+    def run(self, ctx):
         pass
 
-    async def calc_exp(x):
+    def calc_exp(self, x):
         return np.exp(x)
 
 api.export(ImJoyPlugin())
 ```
+
+(Note: you cannot use asyncio/async/await in plugins with type=`web-python`, see [here](https://github.com/iodide-project/pyodide/issues/245))
+
 Change the plugin name to `calculator` and save the plugin, you should be able to see `calculator` in the menu item in the left panel.
 
 After that, create another plugin with the `web-worker` template. In the `run` function, we will call `await api.getPlugin('calculator')` to obtain the plugin object of the Python plugin object we defined in the previous step. Then we can call `await calc.calc_exp(x)` to run the function.
