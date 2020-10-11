@@ -26,7 +26,7 @@ class ImJoyPlugin():
 api.export(ImJoyPlugin())
 ```
 
-(Note: you cannot use asyncio/async/await in plugins with type=`web-python`, see [here](https://github.com/iodide-project/pyodide/issues/245))
+(Note: `asyncio`(async/await) is not supported yet for plugins with `type="web-python"`, see [here](https://github.com/iodide-project/pyodide/issues/245))
 
 Change the plugin name to `calculator` and save the plugin, you should be able to see `calculator` in the menu item in the left panel.
 
