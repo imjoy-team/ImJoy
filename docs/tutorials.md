@@ -1,15 +1,40 @@
 # Tutorials
 
 ## Calling Python from Javascript
+The most common design pattern in ImJoy is to make user interface with HTML/Javascript/CSS and do computation in Python. This tutorial shows how to make a window plugin to get user input, and pass to a Python plugin to perform computation with numpy.
 
 ImJoy provides a remote procedure call (RPC) mechanism which enables transparent function calls between plugins.
 
 This tutorial show how can call a function defined in Python in another Javascript plugin.
 
-First, let's create a plugin by using the `web-python` or `native-python`(plugin engine required) template.
+First, let's create a plugin by using the `web-python` template, add `numpy` as one of the requirements (`"requirements": ["numpy"]`) in the `<config>` block. We also set `runnable` to `false` since we are going to execute this plugin from another one.
 
 Then define a function called `calc_exp` which use numpy to calculate the natural exponential of input `x`:
-```python
+```html
+<config lang="json">
+{
+  "name": "calculator",
+  "type": "web-python",
+  "version": "0.1.0",
+  "description": "A simple calculator demo use numpy to calculate exp(x)",
+  "tags": [],
+  "ui": "Calculator",
+  "cover": "",
+  "inputs": null,
+  "outputs": null,
+  "flags": [],
+  "icon": "extension",
+  "api_version": "0.1.5",
+  "env": "",
+  "permissions": [],
+  "requirements": ["numpy"],
+  "dependencies": [],
+  "runnable": false
+}
+</config>
+
+<script lang="python">
+
 import numpy as np
 from imjoy import api
 
@@ -17,46 +42,78 @@ class ImJoyPlugin():
     def setup(self):
         pass
 
-    def run(self, ctx):
-        pass
-
     def calc_exp(self, x):
         return np.exp(x)
 
 api.export(ImJoyPlugin())
+</script>
 ```
-
-(Note: `asyncio`(async/await) is not supported yet for plugins with `type="web-python"`, see [here](https://github.com/iodide-project/pyodide/issues/245))
 
 Change the plugin name to `calculator` and save the plugin, you should be able to see `calculator` in the menu item in the left panel.
 
-After that, create another plugin with the `web-worker` template. In the `run` function, we will call `await api.getPlugin('calculator')` to obtain the plugin object of the Python plugin object we defined in the previous step. Then we can call `await calc.calc_exp(x)` to run the function.
 
-```javascript
+After that, create another plugin with the `window` template. In the plugin source code below, we first added an input box (id=`x-input`) and a button (id=`calc-btn`). Then in the `setup` function, we setup a `onclick` function for the button which will be called when the button is clicked. Inside the `onclick` function, we use `await api.getPlugin('calculator')` to obtain the plugin object of the Python plugin object we defined in the previous step. And finally, we can call `await calc.calc_exp(x)` to run the function and use `api.alert` to show the result.
+
+```html
+<config lang="json">
+{
+  "name": "CallPythonFromJS",
+  "type": "window",
+  "tags": [],
+  "ui": "",
+  "version": "0.1.0",
+  "cover": "",
+  "description": "[TODO: describe this plugin with one sentence.]",
+  "icon": "extension",
+  "inputs": null,
+  "outputs": null,
+  "api_version": "0.1.8",
+  "env": "",
+  "permissions": [],
+  "requirements": [],
+  "dependencies": [],
+  "defaults": {"w": 20, "h": 10}
+}
+</config>
+
+<script lang="javascript">
 class ImJoyPlugin {
   async setup() {
-
+    // setup a callback function for the button
+    document.getElementById('calc-btn').onclick = async function() {
+      // obtain the number from the input box
+      const x = parseFloat(document.getElementById('x-input').value)
+      // get the calculator plugin object (in Python)
+      const calc = await api.getPlugin('calculator')
+      const result = await calc.calc_exp(x)
+      console.log(result)
+      await api.alert("Exp of " + x + " is " + result)
+    }
   }
 
   async run(ctx) {
-    const x = 9
-    const calc = await api.getPlugin('calculator')
-    const result = await calc.calc_exp(x)
-    await api.alert("Exp of " + x + " is " + result)
+    
   }
 }
 
 api.export(new ImJoyPlugin())
+</script>
+
+<window lang="html">
+  <div>
+    <input id="x-input" value="9" type="number">
+    <button id="calc-btn">Calculate</button>
+  </div>
+</window>
 ```
 
-Name the plugin as `getPlugin-demo` and save the plugin. If you now click `getPlugin-demo` in the plugin menu, then you will be able to call a Python plugin in Javascript.
+Name the plugin as `CallPythonFromJS` and save the plugin. If you now click `CallPythonFromJS` in the plugin menu, then you will be able to call a Python plugin in Javascript.
 
-![imjoy-basic-workflow](assets/imjoy-function-call.png ':size=800')
+![imjoy-function-call](assets/imjoy-function-call.png ':size=800')
 
+Note: we didn't use `async/await` syntax in this example because `asyncio` is not supported yet for plugins with `type="web-python"`, see [here](https://github.com/iodide-project/pyodide/issues/245)
 
 As a quiz, You can also try the opposite example by defining a plugin in Javascript and call it in Python.
-
-
 
 ## Making a plugin for segmentation with U-net
 [U-net](https://lmb.informatik.uni-freiburg.de/people/ronneber/u-net/) is one of the most widely used neural network for image segmentation, especially for biomedical images.
