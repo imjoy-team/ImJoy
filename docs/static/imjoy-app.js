@@ -508,12 +508,12 @@ animation: spin 2s linear infinite;
                                 if (_plugin && _plugin.config.namespace) {
                                     if (_plugin.config.namespace) {
                                         const statusElem = document.getElementById('status_' + _plugin.config.namespace)
-                                        statusElem.innerHTML = msg;
+                                        statusElem.innerHTML = msg.slice(0, 128);
                                         return
                                     }
                                 }
                                 $.snackbar({
-                                    content: msg,
+                                    content: msg.slice(0, 128),
                                     timeout: 5 * 1000
                                 });
                             },
@@ -537,7 +537,7 @@ animation: spin 2s linear infinite;
                                     }
                                 }
                                 $.snackbar({
-                                    content: msg,
+                                    content: msg.slice(0, 128),
                                     timeout: duration * 1000
                                 });
                             },
@@ -552,6 +552,10 @@ animation: spin 2s linear infinite;
                     this.imjoy = imjoy;
                     startImJoy(this, this.imjoy).then(() => {
                         console.log('ImJoy started.')
+                        imjoy.pm.reloadPluginRecursively({
+                            uri:
+                              "https://imjoy-team.github.io/jupyter-engine-manager/Jupyter-Engine-Manager.imjoy.html"
+                        });
                         document.getElementById('loading').style.display = 'none';
                     })
                 });
@@ -657,7 +661,7 @@ animation: spin 2s linear infinite;
                 showMessage(msg, duration) {
                     duration = duration || 5
                     $.snackbar({
-                        content: msg,
+                        content: msg.slice(0, 128),
                         timeout: duration * 1000
                     });
                 },
