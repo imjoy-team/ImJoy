@@ -177,12 +177,12 @@ require(['jquery'], function () {
 
     async function startImJoy(app, imjoy) {
         await imjoy.start()
-        imjoy.event_bus.on("show_message", msg => {
-            $.snackbar({
-                content: msg,
-                timeout: 5000
-            });
-        });
+        // imjoy.event_bus.on("show_message", msg => {
+        //     $.snackbar({
+        //         content: msg,
+        //         timeout: 5000
+        //     });
+        // });
         imjoy.event_bus.on("close_window", w => {
             app.closeWindow(w)
             app.$forceUpdate()
@@ -481,7 +481,7 @@ animation: spin 2s linear infinite;
                         let output;
                         if (_plugin && _plugin.config.namespace) {
                             if (_plugin.config.namespace) {
-                                const outputContainer = document.getElementById(_plugin.config.namespace)
+                                const outputContainer = document.getElementById('output_' + _plugin.config.namespace)
                                 // make sure we clear windows for new plugins
                                 if (!_plugin.__isOld) {
                                     outputContainer.innerHTML = ""
@@ -504,8 +504,38 @@ animation: spin 2s linear infinite;
                     }
                     const imjoy = new imjoyCore.ImJoy({
                         imjoy_api: {
+                            async showStatus(_plugin, msg){
+                                if (_plugin && _plugin.config.namespace) {
+                                    if (_plugin.config.namespace) {
+                                        const statusElem = document.getElementById('status_' + _plugin.config.namespace)
+                                        statusElem.innerHTML = msg;
+                                        return
+                                    }
+                                }
+                                $.snackbar({
+                                    content: msg,
+                                    timeout: 5 * 1000
+                                });
+                            },
+                            async showProgress(_plugin, progress){
+                                if (_plugin && _plugin.config.namespace) {
+                                    if (_plugin.config.namespace) {
+                                        const progressElem = document.getElementById('progress_' + _plugin.config.namespace)
+                                        if(progress<1) progress = progress * 100;
+                                        if(progress>100) progress = 100;
+                                        progressElem.style.width = `${progress}%`;
+                                        return
+                                    }
+                                }
+                            },
                             async showMessage(_plugin, msg, duration) {
                                 duration = duration || 5
+                                if (_plugin && _plugin.config.namespace) {
+                                    if (_plugin.config.namespace) {
+                                        const statusElem = document.getElementById('status_' + _plugin.config.namespace)
+                                        statusElem.innerHTML = msg;
+                                    }
+                                }
                                 $.snackbar({
                                     content: msg,
                                     timeout: duration * 1000
@@ -564,7 +594,7 @@ animation: spin 2s linear infinite;
                             cfg.lang = 'html'
                         }
                         await this.imjoy.pm.imjoy_api.createWindow(null, {
-                            src: 'https://if.imjoy.io/',
+                            src: 'http://localhost:8094/',
                             config: cfg,
                             data: {
                                 code: src,
@@ -589,9 +619,6 @@ animation: spin 2s linear infinite;
                                 tag: config.tag
                             })
                             try {
-                                if (plugin.setup) {
-                                    await plugin.setup();
-                                }
                                 if (plugin.run) {
                                     await plugin.run({
                                         config: {},

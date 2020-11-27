@@ -50,9 +50,13 @@
     .docsify-run-button,.docsify-edit-button{z-index:1;height: 35px;margin-right: 6px;overflow:visible;padding:.65em .8em;border:0;border-radius:0;outline:0;font-size:1em;background:var(--theme-color,grey);color:#fff;opacity:0.7}
     .docsify-run-button span, .docsify-edit-button span{border-radius:3px;background:inherit;pointer-events:none}
     .docsify-run-button:focus,pre:hover .docsify-run-button, .docsify-edit-button:focus,pre:hover .docsify-edit-button{opacity:1}
-    .docsify-close-button{position: absolute;right: 4px;top: 4px;z-index:3;cursor:pointer;padding:.65em .8em;border:0;border-radius:0;outline:0;font-size:1em;background:var(--theme-color,grey);color:#fff;}
-    .docsify-loader {position: absolute;left: 123px;bottom: 4px;display: inline-block;transform: translate(-50%, -50%);transform: -webkit-translate(-50%, -50%);transform: -moz-translate(-50%, -50%);transform: -ms-translate(-50%, -50%);border: 6px solid #f3f3f3; /* Light grey */border-top: 6px solid #448aff; /* Blue */border-radius: 50%;width: 30px;height: 30px;animation: spin 2s linear infinite;}
-    @keyframes spin {0% { transform: rotate(0deg); }100% { transform: rotate(360deg); }}`;
+    .docsify-close-button{position: absolute;right: 4px;top: 4px;height: 42px;z-index:3;cursor:pointer;padding:.65em .8em;border:0;border-radius:0;outline:0;font-size:1em;background:var(--theme-color,grey);color:#fff;}
+    .docsify-fullscreen-button{position: absolute;right: 42px;top: 4px;height: 42px;z-index:3;cursor:pointer;padding:.65em .8em;border:0;border-radius:0;outline:0;font-size:1em;background:var(--theme-color,grey);color:#fff;}
+    .docsify-loader {position: absolute;left: 123px;margin-top: 5px;display: inline-block;transform: translate(-50%, -50%);transform: -webkit-translate(-50%, -50%);transform: -moz-translate(-50%, -50%);transform: -ms-translate(-50%, -50%);border: 6px solid #f3f3f3; /* Light grey */border-top: 6px solid #448aff; /* Blue */border-radius: 50%;width: 30px;height: 30px;animation: spin 2s linear infinite;}
+    @keyframes spin {0% { transform: rotate(0deg); }100% { transform: rotate(360deg); }}
+    .docsify-status {position: absolute;left: 160px;display: inline-block;font-size:13px;}
+    .docsify-progressbar-container{display: inline-block;position: absolute; width: 100%;left: 0; height:3px;color:#000!important;background-color:#f1f1f1!important};
+    `;
     styleInject(css);
 
     function docsifyRunCode(hook, vm) {
@@ -121,11 +125,14 @@
                         const id = randId();
                         preElm.pluginConfig = preElm.pluginConfig || {};
                         preElm.pluginConfig.window_id = 'code_' + id;
-                        preElm.pluginConfig.namespace = 'output_' + id;
+                        preElm.pluginConfig.namespace = id;
                         preElm.pluginConfig.lang = preElm.getAttribute('data-lang');
                         let mode = "run";
                         if (isEditCodeButton) {
                             mode = 'edit'
+                            // remove the github corner in edit mode
+                            const githubCorner = document.querySelector('.github-corner')
+                            if (githubCorner) githubCorner.parentNode.removeChild(githubCorner);
                         }
                         const customElements = preElm.querySelectorAll(":scope > div[id]")
                         for (const elm of customElements) {
@@ -136,28 +143,86 @@
                             for (const elm of customElements) {
                                 elm.style.display = "none";
                             }
+
                             preElm.insertAdjacentHTML('afterBegin', `<div id="${'code_' + id}"></div><div id="${'output_' + id}"></div>`)
                             codeElm.style.display = "none";
-                            preElm.insertAdjacentHTML('afterBegin', `<button class="docsify-close-button" id="${'close_' + id}">X</button>`);
+                            preElm.insertAdjacentHTML('afterBegin', `<button class="docsify-close-button" id="${'close_' + id}">x</button>`);
+                            preElm.insertAdjacentHTML('afterBegin', `<button class="docsify-fullscreen-button" id="${'fullscreen_' + id}">+</button>`);
+                            preElm.insertAdjacentHTML('afterBegin', `<div id="${'progress_container_' + id}" style="top: 1px;" class="docsify-progressbar-container"><div class="docsify-progressbar" style="background-color:#2196F3!important;height:3px;" id="${'progress_' + id}"> </div></div><div class="docsify-status" style="font-size:13px;top: 580px;left: 4px;" id="${'status_' + id}"/>`)
 
-                            document.getElementById('close_' + id).onclick = function () {
-                                const editorElem = document.getElementById('code_' + id);
+                            const closeElem = document.getElementById('close_' + id)
+                            const fullscreenElm = document.getElementById('fullscreen_' + id);
+                            const statusElem = document.getElementById('status_' + id);
+                            const editorElem = document.getElementById('code_' + id);
+                            const outputElem = document.getElementById('output_' + id);
+                            closeElem.onclick = function () {
+
                                 editorElem.parentNode.removeChild(editorElem)
-                                const outputElem = document.getElementById('output_' + id);
+
                                 outputElem.parentNode.removeChild(outputElem)
                                 codeElm.style.display = "block";
                                 for (const elm of customElements) {
                                     elm.style.display = "inline-block";
                                 }
                                 this.parentNode.removeChild(this)
+                                fullscreenElm.parentNode.removeChild(fullscreenElm);
                             }
+                            fullscreenElm.onclick = function () {
+                                if (preElm.requestFullscreen) {
+                                    preElm.requestFullscreen();
+                                } else if (preElm.webkitRequestFullscreen) {
+                                    /* Safari */
+                                    preElm.webkitRequestFullscreen();
+                                } else if (preElm.msRequestFullscreen) {
+                                    /* IE11 */
+                                    preElm.msRequestFullscreen();
+                                }
+                            }
+
+                            preElm.style.overflow = "hidden";
+                            outputElem.style.overflow = "auto";
+                            document.addEventListener("fullscreenchange", function (e) {
+                                const fullScreenMode = document.fullScreen || document.mozFullScreen || document.webkitIsFullScreen;
+                                if (e.target === preElm) {
+                                    if (fullScreenMode) {
+                                        closeElem.style.display = "none";
+                                        fullscreenElm.style.display = "none";
+                                        preElm.style.padding = "0";
+                                        editorElem.style.height = "calc( 100vh - 4px )";
+                                        editorElem.style.width = "50%";
+                                        editorElem.style.display = "inline-block";
+                                        outputElem.style.width = "50%";
+                                        outputElem.style.height = "calc( 100vh - 4px )";
+                                        outputElem.style.display = "inline-block";
+                                        statusElem.style.top = null
+                                        statusElem.style.bottom = "1px";
+                                    } else {
+                                        closeElem.style.display = "inline-block";
+                                        fullscreenElm.style.display = "inline-block";
+                                        preElm.style.padding = "3px";
+                                        editorElem.style.height = "600px";
+                                        editorElem.style.width = "100%";
+                                        editorElem.style.display = "block";
+                                        outputElem.style.width = "100%";
+                                        outputElem.style.height = "600px";
+                                        outputElem.style.display = "block";
+                                        statusElem.style.bottom = null
+                                        statusElem.style.top = "580px";
+                                        setTimeout(() => {
+                                            preElm.scrollIntoView();
+                                        }, 500)
+                                    }
+                                }
+                            });
                         } else {
+                            // run mode
+                            preElm.insertAdjacentHTML('beforeEnd', `<div id="${'progress_container_' + id}" class="docsify-progressbar-container"><div class="docsify-progressbar" style="background-color:#2196F3!important;height:3px;" id="${'progress_' + id}"> </div></div><div class="docsify-status" style="margin-top: 8px;" id="${'status_' + id}"/>`)
                             preElm.insertAdjacentHTML('beforeEnd', `<div id="${'code_' + id}"></div><div id="${'output_' + id}"></div>`)
                             codeElm.style.display = "block";
                         }
                         if (window.imjoyApp) {
                             const loader = preElm.querySelector(".docsify-loader")
-                            loader.style.display = "block";
+                            loader.style.display = "inline-block";
                             window.imjoyApp.runCode(mode, preElm.pluginConfig, code).finally(() => {
                                 loader.style.display = "none";
                             })
