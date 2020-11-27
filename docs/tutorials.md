@@ -10,6 +10,8 @@ This tutorial show how can call a function defined in Python in another Javascri
 First, let's create a plugin by using the `web-python` template, add `numpy` as one of the requirements (`"requirements": ["numpy"]`) in the `<config>` block. We also set `runnable` to `false` since we are going to execute this plugin from another one.
 
 Then define a function called `calc_exp` which use numpy to calculate the natural exponential of input `x`:
+
+<!-- ImJoyPlugin: {"fold": [0]} -->
 ```html
 <config lang="json">
 {
@@ -54,11 +56,12 @@ Change the plugin name to `calculator` and save the plugin, you should be able t
 
 After that, create another plugin with the `window` template. In the plugin source code below, we first added an input box (id=`x-input`) and a button (id=`calc-btn`). Then in the `setup` function, we setup a `onclick` function for the button which will be called when the button is clicked. Inside the `onclick` function, we use `await api.getPlugin('calculator')` to obtain the plugin object of the Python plugin object we defined in the previous step. And finally, we can call `await calc.calc_exp(x)` to run the function and use `api.alert` to show the result.
 
+<!-- ImJoyPlugin: {"fold": [0]} -->
 ```html
 <config lang="json">
 {
   "name": "CallPythonFromJS",
-  "type": "window",
+  "type": "web-worker",
   "tags": [],
   "ui": "",
   "version": "0.1.0",
@@ -71,40 +74,30 @@ After that, create another plugin with the `window` template. In the plugin sour
   "env": "",
   "permissions": [],
   "requirements": [],
-  "dependencies": [],
-  "defaults": {"w": 20, "h": 10}
+  "dependencies": []
 }
 </config>
 
 <script lang="javascript">
 class ImJoyPlugin {
   async setup() {
-    // setup a callback function for the button
-    document.getElementById('calc-btn').onclick = async function() {
-      // obtain the number from the input box
-      const x = parseFloat(document.getElementById('x-input').value)
+  }
+  async run(ctx) {
+	 // obtain the number from the user
+      const x = await api.prompt("please type a number:", 10)
+      // convert x (a string) to float
+      const xf = parseFloat(x)
+
       // get the calculator plugin object (in Python)
       const calc = await api.getPlugin('calculator')
-      const result = await calc.calc_exp(x)
-      console.log(result)
-      await api.alert("Exp of " + x + " is " + result)
-    }
-  }
+      const result = await calc.calc_exp(xf)
 
-  async run(ctx) {
-    
+      await api.alert("Exp of " + x + " is " + result)
   }
 }
 
 api.export(new ImJoyPlugin())
 </script>
-
-<window lang="html">
-  <div>
-    <input id="x-input" value="9" type="number">
-    <button id="calc-btn">Calculate</button>
-  </div>
-</window>
 ```
 
 Name the plugin as `CallPythonFromJS` and save the plugin. If you now click `CallPythonFromJS` in the plugin menu, then you will be able to call a Python plugin in Javascript.
