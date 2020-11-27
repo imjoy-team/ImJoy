@@ -594,7 +594,7 @@ animation: spin 2s linear infinite;
                             cfg.lang = 'html'
                         }
                         await this.imjoy.pm.imjoy_api.createWindow(null, {
-                            src: 'http://localhost:8094/',
+                            src: 'https://if.imjoy.io/',
                             config: cfg,
                             data: {
                                 code: src,
