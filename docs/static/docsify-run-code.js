@@ -58,6 +58,7 @@
     .docsify-progressbar-container{display: inline-block;position: absolute; width: 100%;left: 0; height:3px;color:#000!important;background-color:#f1f1f1!important}
     .docsify-status .tooltiptext {visibility: hidden; width: 120px;background-color: black;color: #fff;text-align: center;border-radius: 6px;padding: 5px 0;position: absolute;z-index: 1;}
     .docsify-status:hover .tooltiptext {visibility: visible!important;}
+    .show-code-button{text-align: center; color: var(--docsifytabs-tab-highlight-color); cursor: pointer;}
     `;
     styleInject(css);
 
@@ -70,23 +71,22 @@
 
     function execute(preElm, mode, disableScrollIntoView) {
         mode = mode || 'run';
-        var range = document.createRange();
         var codeElm = preElm.querySelector("code");
-        var selection = window.getSelection();
-        range.selectNode(codeElm);
-        selection.removeAllRanges();
-        selection.addRange(range);
+        const code = codeElm.code;
+        const showCodeBtn = preElm.querySelector('.show-code-button');
+
+        showCodeBtn.style.display = 'none';
         try {
-            const code = selection.toString();
+
             const id = randId();
             preElm.pluginConfig = preElm.pluginConfig || {};
             preElm.pluginConfig.window_id = 'code_' + id;
             preElm.pluginConfig.namespace = id;
             preElm.pluginConfig.lang = preElm.getAttribute('data-lang');
-            let replaceCodeBlock = preElm.pluginConfig.replace_code_block;
+            let hideCodeBlock = preElm.pluginConfig.hide_code_block;
             if (mode === 'edit') {
-                if (replaceCodeBlock !== false)
-                    replaceCodeBlock = true;
+                if (hideCodeBlock !== false)
+                    hideCodeBlock = true;
                 // remove the github corner in edit mode
                 const githubCorner = document.querySelector('.github-corner')
                 if (githubCorner) githubCorner.parentNode.removeChild(githubCorner);
@@ -101,7 +101,6 @@
                 for (const elm of customElements) {
                     elm.style.display = "none";
                 }
-
                 preElm.insertAdjacentHTML('afterBegin', `<div id="${'code_' + id}"></div><div id="${'output_' + id}"></div>`)
                 preElm.insertAdjacentHTML('afterBegin', `<button class="docsify-close-button" id="${'close_' + id}">x</button>`);
                 preElm.insertAdjacentHTML('afterBegin', `<button class="docsify-fullscreen-button" id="${'fullscreen_' + id}">+</button>`);
@@ -117,7 +116,14 @@
                     editorElem.parentNode.removeChild(editorElem)
 
                     outputElem.parentNode.removeChild(outputElem)
-                    codeElm.style.display = "block";
+                    if (hideCodeBlock) {
+                        showCodeBtn.style.display = "block";
+                        codeElm.style.display = "none";
+                    } else {
+                        showCodeBtn.style.display = "none";
+                        codeElm.style.display = "block";
+                    }
+
                     for (const elm of customElements) {
                         elm.style.display = "inline-block";
                     }
@@ -177,6 +183,7 @@
                 preElm.insertAdjacentHTML('beforeEnd', `<div class="docsify-status" style="margin-top: 8px;" id="${'status_' + id}"/>`);
                 preElm.insertAdjacentHTML('beforeEnd', `<div id="${'code_' + id}"></div><div id="${'output_' + id}"></div>`)
                 codeElm.style.display = "block";
+                showCodeBtn.style.display = 'none';
             }
             const loader = preElm.querySelector(".docsify-loader")
             loader.style.display = "inline-block";
@@ -197,17 +204,18 @@
                     })
                 })
             }
-            if (replaceCodeBlock)
+
+            if (hideCodeBlock) {
                 codeElm.style.display = "none";
+                showCodeBtn.style.display = "block";
+                showCodeBtn.onclick = () => {
+                    codeElm.style.display = 'block';
+                    showCodeBtn.style.display = 'none';
+                }
+            }
+
         } catch (err) {
             console.error("docsify-run-code: ".concat(err));
-        }
-
-        selection = window.getSelection();
-        if (typeof selection.removeRange === "function") {
-            selection.removeRange(range);
-        } else if (typeof selection.removeAllRanges === "function") {
-            selection.removeAllRanges();
         }
     }
 
@@ -247,6 +255,27 @@
 
                         elm.querySelector(".docsify-loader").style.display = "none";
 
+                        const codeElm = elm.querySelector("code");
+                        codeElm.insertAdjacentHTML('beforeBegin', `<div class="show-code-button">+ show source code</div>`);
+                        const showCodeBtn = elm.querySelector('.show-code-button');
+                        const selection = window.getSelection();
+                        const range = document.createRange();
+                        range.selectNode(codeElm);
+                        selection.removeAllRanges();
+                        selection.addRange(range);
+                        const code = selection.toString();
+                        codeElm.code = code;
+                        if (typeof selection.removeRange === "function") {
+                            selection.removeRange(range);
+                        } else if (typeof selection.removeAllRanges === "function") {
+                            selection.removeAllRanges();
+                        }
+                        if (elm.pluginConfig.hide_code_block) {
+
+                            codeElm.style.display = 'none';
+                        } else {
+                            showCodeBtn.style.display = 'none'
+                        }
                         if (elm.pluginConfig.startup_mode) {
                             const mode = elm.pluginConfig.startup_mode;
                             execute(elm, mode, true)
