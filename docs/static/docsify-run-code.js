@@ -85,8 +85,6 @@
             preElm.pluginConfig.lang = preElm.getAttribute('data-lang');
             let hideCodeBlock = preElm.pluginConfig.hide_code_block;
             if (mode === 'edit') {
-                if (hideCodeBlock !== false)
-                    hideCodeBlock = true;
                 // remove the github corner in edit mode
                 const githubCorner = document.querySelector('.github-corner')
                 if (githubCorner) githubCorner.parentNode.removeChild(githubCorner);
@@ -112,7 +110,6 @@
                 const editorElem = document.getElementById('code_' + id);
                 const outputElem = document.getElementById('output_' + id);
                 closeElem.onclick = function () {
-
                     editorElem.parentNode.removeChild(editorElem)
 
                     outputElem.parentNode.removeChild(outputElem)
@@ -205,7 +202,7 @@
                 })
             }
 
-            if (hideCodeBlock) {
+            if (hideCodeBlock || mode === 'edit') {
                 codeElm.style.display = "none";
                 if (mode !== 'edit') {
                     showCodeBtn.style.display = "block";
