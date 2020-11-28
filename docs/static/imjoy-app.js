@@ -559,7 +559,7 @@ animation: spin 2s linear infinite;
                         });
                         window.document.dispatchEvent(event)
                         imjoy.pm.reloadPluginRecursively({
-                            uri: "http://localhost:9090/Jupyter-Engine-Manager.imjoy.html"
+                            uri: "https://imjoy-team.github.io/jupyter-engine-manager/Jupyter-Engine-Manager.imjoy.html"
                         });
                         document.getElementById('loading').style.display = 'none';
                     })
@@ -587,42 +587,108 @@ animation: spin 2s linear infinite;
                 },
                 async runCode(mode, config, code, disableScrollIntoView) {
                     this.disableScrollIntoView = disableScrollIntoView;
-                    let src = code;
-                    if (config.lang !== 'html') {
-                        const cfg = Object.assign({}, config)
-                        cfg.api_version = cfg.api_version || "0.1.8";
-                        cfg.name = cfg.name || randId();
-                        src = `<config lang="json">\n${JSON.stringify(cfg, null, 1)}\n</config>\n<script lang="${config.lang}">\n${code}</script>`;
-                    }
                     if (mode === 'edit') {
                         const wElem = document.getElementById(config.window_id)
                         if (wElem) wElem.classList.add("imjoy-window");
                         const cfg = Object.assign({}, config)
                         delete cfg.passive
-                        if (config.lang !== 'html') {
-                            cfg.fold = [0]
-                            cfg.lang = 'html'
+                        let editorWindow;
+                        let pluginInEditor;
+                        let stopped;
+                        const api = this.imjoy.pm.imjoy_api;
+                        cfg.ui_elements = {
+                            save: {
+                                _rintf: true,
+                                type: 'button',
+                                label: "Save",
+                                visible: false,
+                                icon: "content-save",
+                                callback(content) {
+                                    console.log(content)
+                                }
+                            },
+                            run: {
+                                _rintf: true,
+                                type: 'button',
+                                label: "Run",
+                                icon: "play",
+                                visible: true,
+                                async callback(content) {
+                                    try {
+                                        let src = content;
+                                        if (config.lang !== 'html') {
+                                            const cfg = Object.assign({}, config)
+                                            cfg.api_version = cfg.api_version || "0.1.8";
+                                            cfg.name = cfg.name || randId();
+                                            src = `<config lang="json">\n${JSON.stringify(cfg, null, 1)}\n</config>\n<script lang="${config.lang}">\n${content}</script>`;
+                                        }
+                                        editorWindow.setLoader(true);
+                                        editorWindow.updateUIElement('stop', {
+                                            visible: true
+                                        })
+                                        api.showProgress(editorWindow, 0);
+                                        pluginInEditor = await api.getPlugin(editorWindow, src, {
+                                            namespace: cfg.namespace
+                                        });
+                                        if (stopped) {
+                                            pluginInEditor = null;
+                                            return;
+                                        }
+                                        if (pluginInEditor.run) {
+                                            return await pluginInEditor.run({
+                                                config: {},
+                                                data: {}
+                                            });
+                                        }
+                                        if (stopped) {
+                                            pluginInEditor = null;
+                                            return;
+                                        }
+                                    } catch (e) {
+                                        api.showMessage(editorWindow, "Failed to load plugin, error: " + e.toString());
+                                    } finally {
+                                        editorWindow.updateUIElement('stop', {
+                                            visible: false
+                                        })
+                                        editorWindow.setLoader(false);
+                                        api.showProgress(editorWindow, 100);
+                                    }
+                                }
+                            },
+                            stop: {
+                                _rintf: true,
+                                type: 'button',
+                                label: "Stop",
+                                style: "color: #ff0080cf;",
+                                icon: "stop",
+                                visible: false,
+                                async callback() {
+                                    stopped = true;
+                                    await editorWindow.setLoader(false);
+                                    await editorWindow.updateUIElement('stop', {
+                                        visible: false
+                                    })
+                                }
+                            }
                         }
-                        // cfg.ui_elements = [
-                        //     {
-                        //         _rintf: true,
-                        //         type: 'button',
-                        //         label: "Save",
-                        //         icon: "content-save",
-                        //         callback (content){
-                        //     console.log(content)
-                        // }}]
-                        await this.imjoy.pm.imjoy_api.createWindow(null, {
-                            src: 'http://localhost:8094/',
+                        editorWindow = await this.imjoy.pm.imjoy_api.createWindow(null, {
+                            src: 'https://if.imjoy.io/',
                             config: cfg,
                             data: {
-                                code: src,
+                                code,
                             },
                             window_id: cfg.window_id,
                             namespace: cfg.namespace
                         })
                         if (wElem && !this.disableScrollIntoView) wElem.scrollIntoView()
                     } else if (mode === 'run') {
+                        let src = code;
+                        if (config.lang !== 'html') {
+                            const cfg = Object.assign({}, config)
+                            cfg.api_version = cfg.api_version || "0.1.8";
+                            cfg.name = cfg.name || randId();
+                            src = `<config lang="json">\n${JSON.stringify(cfg, null, 1)}\n</config>\n<script lang="${config.lang}">\n${code}</script>`;
+                        }
                         const progressElem = document.getElementById('progress_' + config.namespace)
                         progressElem.style.width = `0%`;
                         try {

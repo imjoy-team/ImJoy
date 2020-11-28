@@ -207,10 +207,12 @@
 
             if (hideCodeBlock) {
                 codeElm.style.display = "none";
-                showCodeBtn.style.display = "block";
-                showCodeBtn.onclick = () => {
-                    codeElm.style.display = 'block';
-                    showCodeBtn.style.display = 'none';
+                if (mode !== 'edit') {
+                    showCodeBtn.style.display = "block";
+                    showCodeBtn.onclick = () => {
+                        codeElm.style.display = 'block';
+                        showCodeBtn.style.display = 'none';
+                    }
                 }
             }
 
