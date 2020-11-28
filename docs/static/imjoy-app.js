@@ -468,6 +468,7 @@ animation: spin 2s linear infinite;
                 fullscreen: false,
                 imjoy: null,
                 active_plugin: null,
+                disableScrollIntoView: false,
             },
             mounted() {
                 document.getElementById("imjoy-app").style.display = "block";
@@ -477,6 +478,7 @@ animation: spin 2s linear infinite;
                     version: '0.13.42'
                 }).then(imjoyCore => {
                     console.log(`ImJoy Core (v${imjoyCore.VERSION}) loaded.`)
+                    const me = this;
                     async function createWindow(_plugin, config) {
                         let output;
                         if (_plugin && _plugin.config.namespace) {
@@ -487,7 +489,7 @@ animation: spin 2s linear infinite;
                                     outputContainer.innerHTML = ""
                                 }
                                 _plugin.__isOld = true;
-                                if (!config.dialog && !config.window_id) {
+                                if (!config.dialog && (!config.window_id || !document.getElementById(config.window_id))) {
                                     output = document.createElement('div')
                                     output.id = randId();
                                     output.classList.add('imjoy-window');
@@ -497,7 +499,7 @@ animation: spin 2s linear infinite;
                             }
                         }
                         const w = await imjoy.pm.createWindow(_plugin, config)
-                        if (output) {
+                        if (output && !me.disableScrollIntoView) {
                             output.scrollIntoView();
                         }
                         return w
@@ -508,7 +510,7 @@ animation: spin 2s linear infinite;
                                 if (_plugin && _plugin.config.namespace) {
                                     if (_plugin.config.namespace) {
                                         const statusElem = document.getElementById('status_' + _plugin.config.namespace)
-                                        statusElem.innerHTML = msg.slice(0, 128);
+                                        statusElem.innerHTML = `${msg.slice(0, 128)}<span class="tooltiptext">${msg}</div>`;
                                         return
                                     }
                                 }
@@ -533,7 +535,7 @@ animation: spin 2s linear infinite;
                                 if (_plugin && _plugin.config.namespace) {
                                     if (_plugin.config.namespace) {
                                         const statusElem = document.getElementById('status_' + _plugin.config.namespace)
-                                        statusElem.innerHTML = msg;
+                                        statusElem.innerHTML = `${msg.slice(0, 128)}<span class="tooltiptext">${msg}</div>`;
                                     }
                                 }
                                 $.snackbar({
@@ -552,9 +554,12 @@ animation: spin 2s linear infinite;
                     this.imjoy = imjoy;
                     startImJoy(this, this.imjoy).then(() => {
                         console.log('ImJoy started.')
+                        const event = new CustomEvent('imjoy_app_started', {
+                            detail: imjoy
+                        });
+                        window.document.dispatchEvent(event)
                         imjoy.pm.reloadPluginRecursively({
-                            uri:
-                              "https://imjoy-team.github.io/jupyter-engine-manager/Jupyter-Engine-Manager.imjoy.html"
+                            uri: "http://localhost:9090/Jupyter-Engine-Manager.imjoy.html"
                         });
                         document.getElementById('loading').style.display = 'none';
                     })
@@ -580,7 +585,8 @@ animation: spin 2s linear infinite;
                         passive: true,
                     })
                 },
-                async runCode(mode, config, code) {
+                async runCode(mode, config, code, disableScrollIntoView) {
+                    this.disableScrollIntoView = disableScrollIntoView;
                     let src = code;
                     if (config.lang !== 'html') {
                         const cfg = Object.assign({}, config)
@@ -597,6 +603,15 @@ animation: spin 2s linear infinite;
                             cfg.fold = [0]
                             cfg.lang = 'html'
                         }
+                        // cfg.ui_elements = [
+                        //     {
+                        //         _rintf: true,
+                        //         type: 'button',
+                        //         label: "Save",
+                        //         icon: "content-save",
+                        //         callback (content){
+                        //     console.log(content)
+                        // }}]
                         await this.imjoy.pm.imjoy_api.createWindow(null, {
                             src: 'http://localhost:8094/',
                             config: cfg,
@@ -606,7 +621,7 @@ animation: spin 2s linear infinite;
                             window_id: cfg.window_id,
                             namespace: cfg.namespace
                         })
-                        if (wElem) wElem.scrollIntoView()
+                        if (wElem && !this.disableScrollIntoView) wElem.scrollIntoView()
                     } else if (mode === 'run') {
                         const progressElem = document.getElementById('progress_' + config.namespace)
                         progressElem.style.width = `0%`;
@@ -639,11 +654,13 @@ animation: spin 2s linear infinite;
                             }
                         } finally {
                             progressElem.style.width = `100%`;
-                        }
 
+                        }
                     } else {
+                        this.disableScrollIntoView = false;
                         throw "Unsupported mode: " + mode
                     }
+                    this.disableScrollIntoView = false;
                 },
                 async run(plugin) {
                     let config = {};
