@@ -166,7 +166,7 @@
                             editorElem.style.width = "100%";
                             editorElem.style.display = "block";
                             outputElem.style.width = "100%";
-                            outputElem.style.height = "600px";
+                            outputElem.style.height = null;
                             outputElem.style.display = "block";
                             statusElem.style.bottom = null
                             const editorHeight = parseInt(preElm.pluginConfig.editor_height || "600px")
