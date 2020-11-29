@@ -45,7 +45,7 @@
             style.appendChild(document.createTextNode(css));
         }
     }
-    var css = `.imjoy-window{width: 100%; height: 600px;}
+    var css = `.imjoy-window{border-style: solid;border-width: 1px;color: #b3b3b3;width: 100%; height: 600px;}
     .docsify-run-button,.docsify-run-button span, .docsify-edit-button,.docsify-edit-button span{cursor:pointer;transition:all .25s ease}
     .docsify-run-button,.docsify-edit-button{z-index:1;height: 35px;margin-right: 6px;overflow:visible;padding:.65em .8em;border:0;border-radius:0;outline:0;font-size:1em;background:var(--theme-color,grey);color:#fff;opacity:0.7}
     .docsify-run-button span, .docsify-edit-button span{border-radius:3px;background:inherit;pointer-events:none}

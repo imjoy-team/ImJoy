@@ -484,11 +484,6 @@ animation: spin 2s linear infinite;
                         if (_plugin && _plugin.config.namespace) {
                             if (_plugin.config.namespace) {
                                 const outputContainer = document.getElementById('output_' + _plugin.config.namespace)
-                                // make sure we clear windows for new plugins
-                                if (!_plugin.__isOld) {
-                                    outputContainer.innerHTML = ""
-                                }
-                                _plugin.__isOld = true;
                                 if (!config.dialog && (!config.window_id || !document.getElementById(config.window_id))) {
                                     output = document.createElement('div')
                                     output.id = randId();
@@ -587,6 +582,71 @@ animation: spin 2s linear infinite;
                 },
                 async runCode(mode, config, code, disableScrollIntoView) {
                     this.disableScrollIntoView = disableScrollIntoView;
+                    if (config.lang === 'js') config.lang = 'javascript';
+                    if (config.lang === 'py') config.lang = 'python';
+                    const makePluginSource = (src) => {
+                        if (config.type) {
+                            const cfg = Object.assign({}, config)
+                            cfg.api_version = cfg.api_version || "0.1.8";
+                            cfg.name = cfg.name || "Plugin-" + randId();
+                            cfg.description = "[TODO: describe this plugin with one sentence.]"
+                            cfg.tags = []
+                            cfg.version = "0.1.0"
+                            cfg.ui = ""
+                            cfg.cover = ""
+                            cfg.icon = "extension"
+                            cfg.inputs = null
+                            cfg.outputs = null
+                            cfg.env = ""
+                            cfg.permissions = []
+                            cfg.requirements = []
+                            cfg.dependencies = []
+                            if (config.type === 'window') {
+                                cfg.defaults = {}
+                            }
+                            if (config.lang !== 'html')
+                                src = `<config lang="json">\n${JSON.stringify(cfg, null, 1)}\n</config>\n<script lang="${config.lang}">\n${src}</script>`;
+                            else
+                                src = `<config lang="json">\n${JSON.stringify(cfg, null, 1)}\n</config>\n${src}`;
+                        }
+                        return src
+                    }
+                    const runPluginSource = async (code, initPlugin, windowId)=>{
+                        const src = makePluginSource(code);
+                        const progressElem = document.getElementById('progress_' + config.namespace)
+                        progressElem.style.width = `0%`;
+                        try {
+                            if (config.type === 'window') {
+                                const wElem = document.getElementById(windowId)
+                                if (wElem) wElem.classList.add("imjoy-window");
+                                await this.imjoy.pm.imjoy_api.createWindow(initPlugin, {
+                                    src,
+                                    namespace: config.namespace,
+                                    tag: config.tag,
+                                    window_id: windowId
+                                })
+                            } else {
+                                const plugin = await this.imjoy.pm.imjoy_api.getPlugin(null, src, {
+                                    namespace: config.namespace,
+                                    tag: config.tag
+                                })
+                                try {
+                                    if (plugin.run) {
+                                        await plugin.run({
+                                            config: {},
+                                            data: {}
+                                        });
+                                    }
+                                } catch (e) {
+                                    this.showMessage(e.toString())
+                                }
+
+                            }
+                        } finally {
+                            progressElem.style.width = `100%`;
+
+                        }
+                    }
                     if (mode === 'edit') {
                         const wElem = document.getElementById(config.window_id)
                         if (wElem) wElem.classList.add("imjoy-window");
@@ -615,21 +675,15 @@ animation: spin 2s linear infinite;
                                 visible: true,
                                 async callback(content) {
                                     try {
-                                        let src = content;
-                                        if (config.lang !== 'html') {
-                                            const cfg = Object.assign({}, config)
-                                            cfg.api_version = cfg.api_version || "0.1.8";
-                                            cfg.name = cfg.name || randId();
-                                            src = `<config lang="json">\n${JSON.stringify(cfg, null, 1)}\n</config>\n<script lang="${config.lang}">\n${content}</script>`;
-                                        }
+                                        
                                         editorWindow.setLoader(true);
                                         editorWindow.updateUIElement('stop', {
                                             visible: true
                                         })
                                         api.showProgress(editorWindow, 0);
-                                        pluginInEditor = await api.getPlugin(editorWindow, src, {
-                                            namespace: cfg.namespace
-                                        });
+                                        const outputContainer = document.getElementById('output_' + config.namespace)
+                                        outputContainer.innerHTML = "";
+                                        pluginInEditor = await runPluginSource(content, editorWindow, null)
                                         if (stopped) {
                                             pluginInEditor = null;
                                             return;
@@ -669,6 +723,16 @@ animation: spin 2s linear infinite;
                                         visible: false
                                     })
                                 }
+                            },
+                            export: {
+                                _rintf: true,
+                                type: 'button',
+                                label: "Export",
+                                icon: "file-download-outline",
+                                visible: true,
+                                async callback(content) {
+                                    await api.exportFile(editorWindow, makePluginSource(content), (pluginInEditor && pluginInEditor.config.name) || "myPlugin.imjoy.html");
+                                }
                             }
                         }
                         editorWindow = await this.imjoy.pm.imjoy_api.createWindow(null, {
@@ -682,46 +746,7 @@ animation: spin 2s linear infinite;
                         })
                         if (wElem && !this.disableScrollIntoView) wElem.scrollIntoView()
                     } else if (mode === 'run') {
-                        let src = code;
-                        if (config.lang !== 'html') {
-                            const cfg = Object.assign({}, config)
-                            cfg.api_version = cfg.api_version || "0.1.8";
-                            cfg.name = cfg.name || randId();
-                            src = `<config lang="json">\n${JSON.stringify(cfg, null, 1)}\n</config>\n<script lang="${config.lang}">\n${code}</script>`;
-                        }
-                        const progressElem = document.getElementById('progress_' + config.namespace)
-                        progressElem.style.width = `0%`;
-                        try {
-                            if (config.type === 'window') {
-                                const wElem = document.getElementById(config.window_id)
-                                if (wElem) wElem.classList.add("imjoy-window");
-                                await this.imjoy.pm.imjoy_api.createWindow(null, {
-                                    src,
-                                    namespace: config.namespace,
-                                    tag: config.tag,
-                                    window_id: config.window_id
-                                })
-                            } else {
-                                const plugin = await this.imjoy.pm.imjoy_api.getPlugin(null, src, {
-                                    namespace: config.namespace,
-                                    tag: config.tag
-                                })
-                                try {
-                                    if (plugin.run) {
-                                        await plugin.run({
-                                            config: {},
-                                            data: {}
-                                        });
-                                    }
-                                } catch (e) {
-                                    this.showMessage(e.toString())
-                                }
-
-                            }
-                        } finally {
-                            progressElem.style.width = `100%`;
-
-                        }
+                        runPluginSource(code, null, config.window_id)
                     } else {
                         this.disableScrollIntoView = false;
                         throw "Unsupported mode: " + mode
