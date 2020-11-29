@@ -506,7 +506,7 @@ animation: spin 2s linear infinite;
                                 if (_plugin && _plugin.config.namespace) {
                                     if (_plugin.config.namespace) {
                                         const statusElem = document.getElementById('status_' + _plugin.config.namespace)
-                                        statusElem.innerHTML = `${msg.slice(0, 128)}<span class="tooltiptext">${msg}</div>`;
+                                        statusElem.innerHTML = `${msg.slice(0, 128)}`;
                                         return
                                     }
                                 }
@@ -531,7 +531,7 @@ animation: spin 2s linear infinite;
                                 if (_plugin && _plugin.config.namespace) {
                                     if (_plugin.config.namespace) {
                                         const statusElem = document.getElementById('status_' + _plugin.config.namespace)
-                                        statusElem.innerHTML = `${msg.slice(0, 128)}<span class="tooltiptext">${msg}</div>`;
+                                        statusElem.innerHTML = `${msg.slice(0, 128)}`;
                                     }
                                 }
                                 $.snackbar({
