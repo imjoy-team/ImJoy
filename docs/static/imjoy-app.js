@@ -488,6 +488,7 @@ animation: spin 2s linear infinite;
                                     output = document.createElement('div')
                                     output.id = randId();
                                     output.classList.add('imjoy-window');
+
                                     outputContainer.appendChild(output)
                                     config.window_id = output.id
                                 }
@@ -611,7 +612,7 @@ animation: spin 2s linear infinite;
                         }
                         return src
                     }
-                    const runPluginSource = async (code, initPlugin, windowId)=>{
+                    const runPluginSource = async (code, initPlugin, windowId) => {
                         const src = makePluginSource(code);
                         const progressElem = document.getElementById('progress_' + config.namespace)
                         progressElem.style.width = `0%`;
@@ -623,7 +624,9 @@ animation: spin 2s linear infinite;
                                     src,
                                     namespace: config.namespace,
                                     tag: config.tag,
-                                    window_id: windowId
+                                    window_id: windowId,
+                                    w: config.w,
+                                    h: config.h
                                 })
                             } else {
                                 const plugin = await this.imjoy.pm.imjoy_api.getPlugin(null, src, {
@@ -652,6 +655,7 @@ animation: spin 2s linear infinite;
                         if (wElem) wElem.classList.add("imjoy-window");
                         const cfg = Object.assign({}, config)
                         delete cfg.passive
+                        delete cfg.editor_height
                         let editorWindow;
                         let pluginInEditor;
                         let stopped;
@@ -675,7 +679,7 @@ animation: spin 2s linear infinite;
                                 visible: true,
                                 async callback(content) {
                                     try {
-                                        
+
                                         editorWindow.setLoader(true);
                                         editorWindow.updateUIElement('stop', {
                                             visible: true
@@ -688,7 +692,7 @@ animation: spin 2s linear infinite;
                                             pluginInEditor = null;
                                             return;
                                         }
-                                        if (pluginInEditor.run) {
+                                        if (pluginInEditor && pluginInEditor.run) {
                                             return await pluginInEditor.run({
                                                 config: {},
                                                 data: {}
@@ -744,7 +748,9 @@ animation: spin 2s linear infinite;
                             window_id: cfg.window_id,
                             namespace: cfg.namespace
                         })
+
                         if (wElem && !this.disableScrollIntoView) wElem.scrollIntoView()
+                        if (config.editor_height) document.getElementById(editorWindow.config.window_id).style.height = config.editor_height;
                     } else if (mode === 'run') {
                         runPluginSource(code, null, config.window_id)
                     } else {

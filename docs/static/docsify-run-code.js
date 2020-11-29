@@ -45,7 +45,7 @@
             style.appendChild(document.createTextNode(css));
         }
     }
-    var css = `.imjoy-window{border-style: solid;border-width: 1px;color: #b3b3b3;width: 100%; height: 600px;}
+    var css = `.imjoy-window{border-style: solid;border-width: 1px;color: #b3b3b3; width: 100%; max-width:100%; max-height:200vh; height: 600px;}
     .docsify-run-button,.docsify-run-button span, .docsify-edit-button,.docsify-edit-button span{cursor:pointer;transition:all .25s ease}
     .docsify-run-button,.docsify-edit-button{z-index:1;height: 35px;margin-right: 6px;overflow:visible;padding:.65em .8em;border:0;border-radius:0;outline:0;font-size:1em;background:var(--theme-color,grey);color:#fff;opacity:0.7}
     .docsify-run-button span, .docsify-edit-button span{border-radius:3px;background:inherit;pointer-events:none}
@@ -103,12 +103,14 @@
                 preElm.insertAdjacentHTML('afterBegin', `<button class="docsify-close-button" id="${'close_' + id}">x</button>`);
                 preElm.insertAdjacentHTML('afterBegin', `<button class="docsify-fullscreen-button" id="${'fullscreen_' + id}">+</button>`);
                 preElm.insertAdjacentHTML('afterBegin', `<div id="${'progress_container_' + id}" style="top: 1px;" class="docsify-progressbar-container"><div class="docsify-progressbar" style="background-color:#2196F3!important;height:3px;" id="${'progress_' + id}"> </div></div>`)
-                preElm.insertAdjacentHTML('beforeEnd', `<div class="docsify-status" style="font-size:13px;top: 580px;left: 4px;" id="${'status_' + id}"></div>`);
+                preElm.insertAdjacentHTML('beforeEnd', `<div class="docsify-status" style="font-size:13px;left: 4px;" id="${'status_' + id}"></div>`);
                 const closeElem = document.getElementById('close_' + id)
                 const fullscreenElm = document.getElementById('fullscreen_' + id);
                 const statusElem = document.getElementById('status_' + id);
                 const editorElem = document.getElementById('code_' + id);
                 const outputElem = document.getElementById('output_' + id);
+                const editorHeight = parseInt(preElm.pluginConfig.editor_height || "600px")
+                statusElem.style.top = `${editorHeight-20}px`;
                 closeElem.onclick = function () {
                     editorElem.parentNode.removeChild(editorElem)
 
@@ -160,14 +162,15 @@
                             closeElem.style.display = "inline-block";
                             fullscreenElm.style.display = "inline-block";
                             preElm.style.padding = "3px";
-                            editorElem.style.height = "600px";
+                            editorElem.style.height = preElm.pluginConfig.editor_height || "600px";
                             editorElem.style.width = "100%";
                             editorElem.style.display = "block";
                             outputElem.style.width = "100%";
                             outputElem.style.height = "600px";
                             outputElem.style.display = "block";
                             statusElem.style.bottom = null
-                            statusElem.style.top = "580px";
+                            const editorHeight = parseInt(preElm.pluginConfig.editor_height || "600px")
+                            statusElem.style.top = `${editorHeight-20}px`;
                             setTimeout(() => {
                                 preElm.scrollIntoView();
                             }, 500)
