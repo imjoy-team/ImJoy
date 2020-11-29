@@ -56,7 +56,7 @@ Change the plugin name to `calculator` and save the plugin, you should be able t
 
 After that, create another plugin with the `window` template. In the plugin source code below, we first added an input box (id=`x-input`) and a button (id=`calc-btn`). Then in the `setup` function, we setup a `onclick` function for the button which will be called when the button is clicked. Inside the `onclick` function, we use `await api.getPlugin('calculator')` to obtain the plugin object of the Python plugin object we defined in the previous step. And finally, we can call `await calc.calc_exp(x)` to run the function and use `api.alert` to show the result.
 
-<!-- ImJoyPlugin: {"fold": [0], "startup_mode": "edit"} -->
+<!-- ImJoyPlugin: {"fold": [0]} -->
 ```html
 <config lang="json">
 {
