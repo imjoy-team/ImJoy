@@ -1085,14 +1085,173 @@ class ImJoyPlugin():
 api.export(ImJoyPlugin())
 ```
 
-### Connect the GUI with computation
+### TODO: Process images with Scikit-Image
 
 
+#### Build a segmentation plugin with CellPose
 
-### Use existing plugins
+!> This is a WIP!
+
+<!-- ImJoyPlugin: { "hide_code_block": true} -->
+```python
+<docs lang="markdown">
+# CellPose
+ 
+A generalist algorithm for cell and nucleus segmentation.
+
+https://github.com/MouseLand/cellpose
+  
+</docs>
+
+<config lang="json">
+{
+  "name": "HPA-CellPose",
+  "type": "native-python",
+  "version": "0.1.3",
+  "description": "A generalist algorithm for cell and nucleus segmentation.",
+  "tags": [],
+  "ui": "",
+  "cover": "",
+  "inputs": null,
+  "outputs": null,
+  "flags": [],
+  "icon": "extension",
+  "api_version": "0.1.7",
+  "env": [{"type": "binder", "spec": "oeway/cellpose/master", "skip_requirements": true}],
+  "permissions": [],
+  "requirements": ["cmd: pip install .", "Pillow"],
+  "dependencies": ["oeway/ImJoy-Plugins:HPA-Image-Selection"]
+}
+</config>
+
+<script lang="python">
+from imjoy import api
+
+import numpy as np
+import time, os, sys
+import mxnet as mx
+from skimage.io import imread
+import glob
+import sys
+from cellpose import models, utils
+from skimage.transform import rescale
+import cv2
+
+from urllib import request
+import base64
+from io import BytesIO
+from PIL import Image
+from skimage.color import label2rgb
+from skimage.color import rgb2gray
+from skimage import exposure
+import random
+from matplotlib import cm
+jet_colors = [cm.jet(i)[:3] for i in range(256)]
+random.shuffle(jet_colors)
 
 
-### Build your own image viewer
+# check if GPU working, and if so use it
+use_gpu = utils.use_gpu()
+if use_gpu:
+    device = mx.gpu()
+else:
+    device = mx.cpu()
+
+def encodeImage(im):
+    if im.ndim == 3 and im.shape[2] == 1:
+        im = im[:,:,0]
+    im = im.astype(np.uint8)
+    api.log('type and shape:'+str(im.dtype)+str(im.shape))
+    im = Image.fromarray(im)
+    buffered = BytesIO()
+    im.save(buffered, format="PNG")
+    img_str = base64.b64encode(buffered.getvalue()).decode('ascii')
+    imgurl = 'data:image/png;base64,' + img_str
+    return imgurl
+
+async def showImage(im, title):
+    imgurl = encodeImage(im)
+    viewer = await api.showDialog(src="https://kaibu.org/#/app", name=title)
+    await viewer.view_image(imgurl, name=title)
+
+
+async def showCompare(im1, im2, title):
+    imgurl1 = encodeImage(im1)
+    imgurl2 = encodeImage(im2)
+    viewer = await api.showDialog(src="https://kaibu.org/#/app", name=title)
+    await viewer.view_image(imgurl1, name=title+"_input")
+    await viewer.view_image(imgurl2, name=title+"_output")
+
+
+class ImJoyPlugin():
+    def setup(self):
+        # model_type='cyto' or model_type='nuclei'
+        self.model = models.Cellpose(device, model_type='cyto', net_avg=True)
+        api.log('initialized')
+        self.w = None
+        if 'cpu' in str(device):
+            api.showMessage('Note: CellPose model will be running on CPU which has lower performance, so please be patient! \n\n You can also run it with your own Jupyter notebook if you have a GPU on your computer.')
+
+    async def run(self, ctx):
+        #await self.segment('./1020_A10_1.png', scale_factor=0.25)
+        message = "This is a CellPose demo in ImJoy, you can select an image from the HPA data base, and segment with CellPose.\n\n"
+        if 'cpu' in str(device):
+            message += 'Note that you are running it without a GPU, so please be patient. Or, you can run it on a local jupyter notebook'
+        await api.alert(message)
+
+        self.w = await api.showDialog({'type': 'HPA-Image-Selection', 'name': 'Select An Image', 'data': {'select_callback': self.segmentHPAImage}})
+
+    async def segmentHPAImage(self, image_id):
+        api.showMessage('selected HPA image ' + image_id)
+        self.w.close()
+        s = image_id.split('_')
+        image_id = s[0] + '/' + s[1] + '_' + s[2] + '_' + s[3]
+        file_url = 'https://images.proteinatlas.org/'+image_id+'_blue_red_green.jpg'
+        file_url = file_url or 'https://images.proteinatlas.org/19661/221_G2_1_blue_red_green.jpg';
+        file_path = self.downloadImage(file_url)
+        await self.segment(file_path, scale_factor=0.25)
+
+    def downloadImage(self, url, dir='./'):
+        file_name = url.split('/')[-1]
+        file_path = os.path.join(dir, file_name.split('?')[0])
+        api.showMessage('Downloading ' + url)
+        with open(file_path,'wb') as f:
+            f.write(request.urlopen(url).read())
+        return file_path
+
+    async def segment(self, file_path, scale_factor=0.25):
+        api.showMessage('Running cellpose segmentation, please wait, this may take a while (e.g. >1 minute)...')
+        img_origin = imread(file_path)
+        img0 = (exposure.equalize_adapthist(rescale(img_origin[:,:, 0], scale_factor, anti_aliasing=True), clip_limit=0.03)*255).astype(np.uint8) 
+        img1 = (exposure.equalize_adapthist(rescale(img_origin[:,:, 1], scale_factor, anti_aliasing=True), clip_limit=0.03)*255).astype(np.uint8)
+        img2 = (exposure.equalize_adapthist(rescale(img_origin[:,:, 2], scale_factor, anti_aliasing=True), clip_limit=0.03)*255).astype(np.uint8) 
+        
+        img = np.zeros([img0.shape[0], img0.shape[1], 3], dtype=np.uint8)
+        img[:, :, 0] = np.clip((img0 + img2)/2, 0, 255)
+        img[:, :, 1] = img1
+        img[:, :, 2] = img2
+
+
+        # define CHANNELS to run segementation on
+        # grayscale=0, R=1, G=2, B=3
+        # channels = [cytoplasm, nucleus]
+        # if NUCLEUS channel does not exist, set the second channel to 0
+        channels = [[1, 3]]
+
+        start = time.time()
+        masks, flows, styles, diams = self.model.eval([img], rescale=None, channels=channels, net_avg=False)
+        mask = masks[0]
+        end = time.time()
+        api.showMessage('CellPose model takes ' + str(round(end - start, 2))+ 's to segment one image (device: ' + str(device)+').')
+        mask_rgb = label2rgb(mask, bg_label=0, bg_color=(0.8, 0.8, 0.8), colors=jet_colors)
+        mask_rgb = mask_rgb*255 
+        await showCompare(img_origin, mask_rgb, "CellPose segmentation results")
+
+api.export(ImJoyPlugin())
+</script>
+```
+
+### Connect with your viewer
 
 
 ## Use ImJoy in Juptyer notebooks and Colab
