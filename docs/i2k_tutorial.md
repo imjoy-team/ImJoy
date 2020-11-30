@@ -43,10 +43,12 @@ You can also click the **Edit** button, you should see a code editor. Now you ca
 
 ?> If you cannot run see the run button or you don't see the popup message, please check: **1)** Make sure you are reading this tutorial from https://imjoy.io/docs, it won't work if you read directly from Github; **2)** Make sure you use the latest Chrome or FireFox, with javascript enabled.
 
+
+
 ### Using ImJoy API
 The above example uses the native javascript function `alert`, but it only works in ImJoy plugins with `"type": "window"` in Javascript (it won't work for example in plugins written in Python).
 
-?> ImJoy currently support several types of plugins: 1) `window` in HTML/CSS/Javascript for building web UI; 2) `web-worker` in Javascript for browser based computation, runs in a separate thread 3) `web-python` in Python for browser based computation, powered by [WebAssembly](https://webassembly.org/)/[Pyodide](https://github.com/iodide-project/pyodide); 4) `native-python` in Python for heavy computation with local workstations or remote servers. See [here](https://imjoy.io/docs/#/development?id=plugin-types-and-configurations) for more details.
+?> ImJoy currently support several types of plugins: 1) `window` in for building web UI with HTML/CSS and Javascript; 2) `web-worker` in Javascript for browser based computation, runs in a separate thread 3) `web-python` in Python for browser based computation, powered by [WebAssembly](https://webassembly.org/)/[Pyodide](https://github.com/iodide-project/pyodide); 4) `native-python` in Python for heavy computation with local workstations or remote servers. See [here](https://imjoy.io/docs/#/development?id=plugin-types-and-configurations) for more details.
 
 In order to perform basic user interactions, ImJoy provide a set of API which can be used consistently across all the plugin types and supported programming language.
 
@@ -72,6 +74,8 @@ from imjoy import api
 # use it 
 api.alert("Hello from ImJoy!")
 ```
+
+?> In this tutorial we will show ImJoy API usage mostly in Javascript, but the Python code are similar except written in a different syntax.
 
 ### Remote Procedure Calls in ImJoy
 
@@ -383,7 +387,7 @@ Now you can construct an URL for sharing with others, just add the URL after `ht
 
 If a user click your plugin URL, it will open the plugin directly in ImJoy and ask the user to install it.
 
-## 3. Build plugins for image analysis
+## 3. Build web-based plugins for image analysis
 
 In this section let's start by making a plugin for image analysis. We will build image analysis tools with interactive interface.
 
@@ -479,7 +483,7 @@ api.export(new ImJoyPlugin())
 </script>
 <window>
     <div>
-        <h1>Please select an image (jpg/png/gif)</h1>
+        <h1>Please open an image (jpg/png/gif)</h1>
         <input  id="file-input" accept="image/*" capture="camera" type="file"/>
         <canvas id="input-canvas" style="width: 100%; object-fit: cover;"></canvas>
     </div>
@@ -492,7 +496,7 @@ api.export(new ImJoyPlugin())
 As an exercise, you can try to add a `<button>` which will trigger the open file dialog so we can use the button to select the file. (Why we want to do that? Because we can later customize the appearance of the button easily.)
 
 You edit the code above by doing:
- 1. below the `<input>` tag, add a line: `<button id="select-button">Select an image</button>`
+ 1. below the `<input>` tag, add a line: `<button id="select-button">Open an image</button>`
  2. in the `setup` function, add:
     ```js
     // trigger the file dialog when the button is clicked
@@ -604,9 +608,9 @@ api.export(new ImJoyPlugin())
 </script>
 <window>
     <div>
-        <h1>Please select an image (jpg/png/gif)</h1>
+        <h1>Please Open an image (jpg/png/gif)</h1>
         <input  id="file-input" accept="image/*" capture="camera" type="file"/>
-        <button id="select-button">Select an image</button>
+        <button id="select-button">Open an image</button>
         <canvas id="input-canvas" style="width: 100%; object-fit: cover;"></canvas>
     </div>
 </window>
@@ -728,9 +732,9 @@ api.export(new ImJoyPlugin())
 </script>
 <window>
     <div>
-        <h1 class="title">Please select an image (jpg/png/gif)</h1>
+        <h1 class="title">Please Open an image (jpg/png/gif)</h1>
         <input  id="file-input" accept="image/*" capture="camera" type="file"/>
-        <button id="select-button" class="button is-primary">Select an image</button>
+        <button id="select-button" class="button is-primary">Open an image</button>
         <canvas id="input-canvas" style="width: 100%; object-fit: cover;"></canvas>
     </div>
 </window>
@@ -840,7 +844,7 @@ api.export(new ImJoyPlugin())
         </p>
         <div class="panel-block">
             <button id="select-button" class="button is-link is-outlined is-fullwidth">
-            Select an image
+            Open an image
             </button>
         </div>
         <div class="panel-block">
@@ -856,18 +860,214 @@ api.export(new ImJoyPlugin())
 ```
 
 
-#### Support TIFF format
+### Support TIFF format
 
+TIFF is a more common image format for bioimage, so let's support reading tiff file.
+
+We will use an existing ImJoy plugin called "Tif File Importer", the source code is [here](https://github.com/imjoy-team/imjoy-plugins/blob/master/repository/tifFileImporter.imjoy.html).
+
+We can now add it as part of the `dependencies` under `<config>`:
+```json
+{
+    ...
+    "dependencies": ["https://github.com/imjoy-team/imjoy-plugins/blob/master/repository/tifFileImporter.imjoy.html"]
+}
+```
+
+In addition to the long url, you can also use the short plugin URI format: `imjoy-team/imjoy-plugins:Tif File Importer`.
+
+?> To support short plugin URI format, the git repository should contain a file named `manifest.imjoy.json` with the mapping of plugin names to its actual file path in the repository. For example: [imjoy-team/imjoy-plugins](https://github.com/imjoy-team/imjoy-plugins/blob/master/manifest.imjoy.json)
+
+
+Now we can use the plugin api functions (`open`, `readAsURL`) like this:
+```js
+const file = fileInput.files[0]
+const p = await api.getPlugin('Tif File Importer')
+const tiffObj = await p.open(file)
+// locate the first frame
+tiffObj.seek(0)
+img = await tiffObj.readAsURL()
+```
+
+Please try it yourself and use the following code block as reference:
+<!-- ImJoyPlugin: {"hide_code_block": true, "fold": [21, 39, 61], "editor_height": "500px"} -->
+```html
+<config lang="json">
+{
+  "name": "Image Viewer",
+  "type": "window",
+  "tags": [],
+  "ui": "",
+  "version": "0.1.2",
+  "cover": "",
+  "description": "This is a demo plugin for displaying image",
+  "icon": "extension",
+  "inputs": null,
+  "outputs": null,
+  "api_version": "0.1.8",
+  "env": "",
+  "permissions": [],
+  "requirements": ["https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css", "https://use.fontawesome.com/releases/v5.14.0/js/all.js"],
+  "dependencies": ["https://github.com/imjoy-team/imjoy-plugins/blob/master/repository/tifFileImporter.imjoy.html"]
+}
+</config>
+<script lang="javascript">
+// draw a base64 encoded image to the canvas
+const drawImage = (canvas, base64Image)=>{
+    return new Promise((resolve, reject)=>{
+        var img = new Image()
+        img.crossOrigin = "anonymous"
+        img.onload = function(){
+            const ctx = canvas.getContext("2d");
+            canvas.width = Math.min(this.width, 512);
+            canvas.height= Math.min(this.height, parseInt(512*this.height/this.width), 1024);
+            // draw the img into canvas
+            ctx.drawImage(this, 0, 0, canvas.width, canvas.height);
+            resolve(canvas);
+        }
+        img.onerror = reject;
+        img.src = base64Image;
+    })
+}
+
+// read the file and return as a base64 string
+const readImageFile = (file)=>{
+    return new Promise((resolve, reject)=>{
+        const U = window.URL || window.webkitURL;
+        // this works for safari
+        if(U.createObjectURL){
+            resolve(U.createObjectURL(file))
+        }
+        // fallback
+        else{
+            var fr = new FileReader();
+            // when image is loaded, set the src of the image where you want to display it
+            fr.onload = function(e) {
+                resolve(e.target.result)
+            };
+            fr.onerror = reject
+            // fill fr with image data
+            fr.readAsDataURL(file);
+        }
+    })
+}
+
+class ImJoyPlugin{
+    async setup(){
+         // Display image when a file is selected.
+        const fileInput = document.getElementById("file-input");
+        const canvas = document.getElementById("input-canvas");
+        fileInput.addEventListener("change", async ()=>{
+            const file = fileInput.files[0]
+            let img;
+            if(file.name.endsWith('.tiff') || file.name.endsWith('.tif')){
+              const p = await api.getPlugin('Tif File Importer')
+              const tiffObj = await p.open(file)
+              // locate the first frame
+              tiffObj.seek(0)
+              img = await tiffObj.readAsURL()
+            }
+            else{
+              img = await readImageFile(file);
+            }
+            await drawImage(canvas, img);
+        }, true);
+        // trigger the file dialog when the button is clicked
+        const selectButton = document.getElementById("select-button");
+        selectButton.addEventListener("click", async ()=>{
+            // simulate a click on the <input> tag
+            fileInput.click()
+        }, true);
+        await api.log("plugin initialized")
+    }
+    async run(ctx){
+
+    }
+}
+api.export(new ImJoyPlugin())
+</script>
+<window>
+    <div>
+        <input  id="file-input" accept="image/*" capture="camera" type="file"/>
+        <nav class="panel">
+        <p class="panel-heading">
+            <i class="fas fa-eye" aria-hidden="true"></i> My Image Viewer
+        </p>
+        <div class="panel-block">
+            <button id="select-button" class="button is-link is-outlined is-fullwidth">
+            Open an image
+            </button>
+        </div>
+        <div class="panel-block">
+            <canvas id="input-canvas" style="width: 100%; object-fit: cover;"></canvas>
+        </div> 
+    </div>
+</window>
+<style>
+#file-input{
+    display: none;
+}
+</style>
+```
+
+
+### Process images with OpenCV.js
+
+
+?> Exercise 2: Run Tensorflow.js models
+https://gist.github.com/oeway/95025b000242ead88b06460b27cdf938
 
 
 ?> Exercise 1: Use OpenCV.js to process images
 
-?> Exercise 2: Run Tensorflow.js models
+OpenCV is a commonly used library for computer vision written in C++, it has been now compiled with WebAssembly to run in the browser.
 
-### Build computation plugin in Python
+The opencv.js has intensive documentation for many function, but for this tutorial, the following two parts will be enough:
+ 1. understand how to load and save images with opencv.js, read [here](https://docs.opencv.org/3.4/df/d24/tutorial_js_image_display.html)
+ 2. choose one of the image processing tutorials from this list [here](https://docs.opencv.org/3.4/d2/df0/tutorial_js_table_of_contents_imgproc.html) and integrate it to your image viewer plugin. For example, [image thresholding](https://docs.opencv.org/3.4/d7/dd0/tutorial_js_thresholding.html), [smooth images](https://docs.opencv.org/3.4/dd/d6a/tutorial_js_filtering.html), [canny edge detection](https://docs.opencv.org/3.4/d7/de1/tutorial_js_canny.html), or [segmentation with watershed](https://docs.opencv.org/3.4/d7/d1c/tutorial_js_watershed.html).
+ 
+ You need to basically to do it in three steps:
+  1. add the opencv.js library `"https://docs.opencv.org/master/opencv.js"` to `"requirements"` under `<config>`
+  2. take the image process part from the tutorial and wrap it as a function (e.g. `processImage`)
+  3. add a button and call the function when clicked
+
+
+
+?> Tips: you can pass the id of the canvas (e.g. we have already defined `input-canvas`) to `cv.imread`, for displaying the result, we can use the same canvas id or create another one as with `id="output-canvas"`.
+
+Here is a template for the processImage function:
+```js
+function processImage(inputCanvasId, outputCanvasId){
+    let src = cv.imread(inputCanvasId);
+    let out;
+    // add your opencv code here and use src as input image, save the result as out
+    cv.imshow(outputCanvasId, out);
+}
+```
+
+
+ As a reference, this is how such a plugin looks like: [OpenCVSegmentation](http://imjoy.io/lite?plugin=https://gist.github.com/oeway/02a5736d552383df9b43930cbc75b168).
+
+
+### Deep learning in the browser with Tensorflow.js
+
+[Tensorflow](https://www.tensorflow.org/) is a widely used deep learning library, it has been ported to javascript to run in the browser and the library is called [Tensorflow.js](https://www.tensorflow.org/js/).
+
+Let's make a plugin for analyzing images with Tensorflow.js.
+
+
+As another exercise, please take the relevant parts from [this plugin](https://gist.github.com/oeway/95025b000242ead88b06460b27cdf938) and integrate it as another button to your image viewer plugin.
+
+
+!> While browser-based plugins can already be useful and becoming more powerful with new techniques such as WebAssembly and the incoming [WebGPU](https://en.wikipedia.org/wiki/WebGPU), it cannot do heavy computation and have many restrictions due to its security model.
+
+## 4. Build computation plugin in Python
+
+In this section, we will move on to use Python running in a Jupyter notebook server.
+
+Let's first try the Pokémon Chooser plugin as you see in javascript. If you click **Run**, you will need to wait for a while because we will spin up a remote server on MyBinder.org for you to run the Python plugin.
 
 <!-- ImJoyPlugin: { "type": "native-python", "name": "my-python-plugin"} -->
-
 ```python
 from imjoy import api
 
