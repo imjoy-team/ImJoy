@@ -963,7 +963,8 @@ class ImJoyPlugin{
             if(file.name.endsWith('.tiff') || file.name.endsWith('.tif')){
               const p = await api.getPlugin('Tif File Importer')
               const tiffObj = await p.open(file)
-              // locate the first frame
+              // TODO: we can add a slider to browse through other tiff pages
+              // For now let's only show the first page
               tiffObj.seek(0)
               img = await tiffObj.readAsURL()
             }
@@ -1010,6 +1011,8 @@ api.export(new ImJoyPlugin())
 </style>
 ```
 
+?> Exercise option 1, you can try to also add a slider to show other pages of a multi-tiff files.
+?> Exercise option 2, [ITK/VTK Viewer](https://kitware.github.io/itk-vtk-viewer/) to replace the canvas for image display, you can integrate code in [this plugin](https://gist.github.com/oeway/ed0a164ebcea5fc48d040f39f2ead5e0) to your viewer.
 
 ### Process images with OpenCV.js
 
@@ -1049,6 +1052,11 @@ function processImage(inputCanvasId, outputCanvasId){
  As a reference, this is how such a plugin looks like: [OpenCVSegmentation](http://imjoy.io/lite?plugin=https://gist.github.com/oeway/02a5736d552383df9b43930cbc75b168).
 
 
+?> If you want to compare two images (input and output) with a slider to reveal the output images, try to use this simple [ CompareImage plugin](https://gist.github.com/oeway/f09955746ec01a20053793aba83c3545). You can basically do `api.showDialog({src:"https://gist.github.com/oeway/f09955746ec01a20053793aba83c3545", data:{first: inputCanvas.toDataURL(), second: outputCanvas.toDataURL()}})`.
+
+?> Here is another [image compare plugin](https://imjoy.io/lite?plugin=https://gist.github.com/oeway/ffb6f0efae8a68d497202137820f68e8) made with itk-vtk-viewer, the source code is [here](https://gist.github.com/oeway/ffb6f0efae8a68d497202137820f68e8).
+
+
 ### Deep learning in the browser with Tensorflow.js
 
 [Tensorflow](https://www.tensorflow.org/) is a widely used deep learning library, it has been ported to javascript to run in the browser and the library is called [Tensorflow.js](https://www.tensorflow.org/js/).
@@ -1060,6 +1068,7 @@ As another exercise, please take the relevant parts from [this plugin](https://g
 
 
 !> While browser-based plugins can already be useful and becoming more powerful with new techniques such as WebAssembly and the incoming [WebGPU](https://en.wikipedia.org/wiki/WebGPU), it cannot do heavy computation and have many restrictions due to its security model.
+
 
 ## 4. Build computation plugin in Python
 
@@ -1085,12 +1094,108 @@ class ImJoyPlugin():
 api.export(ImJoyPlugin())
 ```
 
-### TODO: Process images with Scikit-Image
+### Display an image with ITK/VTK Viewer, Vizarr and Kaibu
+
+Let's use the ITK/VTK Viewer to visualize images, before start, please read through the documentation [here](https://kitware.github.io/itk-vtk-viewer/docs/imjoy.html).
+
+It's rather easy, we can basically create a viewer by calling `api.createWindow(...)` (or `api.showDialog(...)` if you want a popup window), then we call `viewer.setImage()` by passing a numpy array (2D or 3D).
+
+See the example below:
+<!-- ImJoyPlugin: { "type": "native-python", "name": "itk-vtk-viewer-plugin", "requirements": ["imageio"]} -->
+```python
+from imjoy import api
+
+# we will use imageio to read image
+# you will need to add imageio to `requirements` (did it already here)
+import imageio
+
+class ImJoyPlugin():
+    async def setup(self):
+        pass
+
+    async def run(self, ctx):
+        # let's ask the user to type a file path, otherwise we will use a URL to an example image on the Human Protein Atlas
+        path = await api.prompt("Please give me an image file path or URL", "https://images.proteinatlas.org/19661/221_G2_1_red_green.jpg")
+        image = imageio.imread(path)
+        # create a viewer
+        viewer = await api.showDialog(type="itk-vtk-viewer", src="https://oeway.github.io/itk-vtk-viewer/")
+        # show an image
+        viewer.setImage(image)
+
+api.export(ImJoyPlugin())
+```
+
+While ITK/VTK Viewer can display 3D volume, another viewer [Vizarr](https://github.com/hms-dbmi/vizarr) can visualize massive multi-resolution images in [Zarr format](https://zarr.readthedocs.io/en/stable/). You can find examples [here](https://github.com/hms-dbmi/vizarr/tree/master/example).
+
+Similarly, we can show the image with another plugin [Kaibu](https://kaibu.org) which integrates ITK/VTK Viewer with [OpenLayers](https://openlayers.org/) and provide a [napari](https://github.com/napari/napari)-like layered interface.
+
+Based on the ITK/VTK Viewer example, we only need to change `src` to `https://kaibu.org/#/app` and use `viewer.view_image()` function instead of `viewer.setImage()`.
+
+In the example below, we also show how to add a shape layer with polygons and points.
+
+To allow more user interactions, you can also add buttons to the interface by calling `viewer.add_widget`
+
+<!-- ImJoyPlugin: { "type": "native-python", "name": "kaibu-plugin", "requirements": ["imageio", "numpy"]} -->
+```python
+from imjoy import api
+
+# we will use imageio to read image
+# you will need to add imageio to `requirements` (did it already here)
+import imageio
+import numpy as np
+
+class ImJoyPlugin():
+    async def setup(self):
+        pass
+
+    async def run(self, ctx):
+        # let's ask the user to type a file path, otherwise we will use a URL to an example image on the Human Protein Atlas
+        path = await api.prompt("Please give me an image file path or URL", "https://images.proteinatlas.org/19661/221_G2_1_red_green.jpg")
+        image = imageio.imread(path)
+        # create a viewer
+        viewer = await api.showDialog(type="itk-vtk-viewer", src="https://kaibu.org/#/app")
+        # show an image
+        viewer.view_image(image)
+
+        # add polygon to a vector layer
+        triangle = np.array([[11, 13], [111, 113], [22, 246]], dtype='uint16')
+        await viewer.add_shapes([ triangle ], shape_type="polygon", edge_color="red", name="triangle")
+
+        # add points to a vector layer
+        points = np.random.randint(0, 500, [100, 2], dtype='uint16')
+        await viewer.add_points(points, face_color="purple", name="points")
+
+        def say_hello():
+            api.alert("Hello from Python!")
+
+        await viewer.add_widget({
+            "_rintf": True, 
+            "name": "Control",
+            "type": "control",
+            "elements": [
+                {
+                    "type": "button",
+                    "label": "Say Hello",
+                    "callback": say_hello,
+                },
+            ]
+        })
+
+api.export(ImJoyPlugin())
+```
+
+?> In the example above, we set a special key `_rintf` to `True`, this is necessary because we are sending callback functions to the viewer and we want the function to be send as `interface` that can be called again and again, rather than a one-time function.
+
+### Connect your image viewer with the Python plugin
+
+
+
+
+?> As an exercise, you can use a popular python library [scikit-image](https://scikit-image.org/) to process the image.
+
 
 
 #### Build a segmentation plugin with CellPose
-
-!> This is a WIP!
 
 <!-- ImJoyPlugin: { "hide_code_block": true} -->
 ```python
