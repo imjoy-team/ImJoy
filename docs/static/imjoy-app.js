@@ -1,4 +1,3 @@
-document.getElementById("imjoy-app").style.display = "none";
 
 require.config({
     baseUrl: "js",
@@ -450,6 +449,33 @@ animation: spin 2s linear infinite;
 }
 </style>`
 
+const HTMLTempate = `
+<div class="loader" id="loading"></div>
+  <div id="imjoy-app" style="height: 80px;">
+    <modal name="window-modal-dialog" height="500px" style="max-height: 100%; max-width: 100%" :fullscreen="fullscreen"
+      :resizable="true" draggable=".drag-handle" :scrollable="true">
+      <div v-if="selected_dialog_window" @dblclick="maximizeWindow()" class="navbar-collapse collapse drag-handle"
+        style="cursor:move; background-color: #448aff; color: white; text-align: center;">
+        <span class="noselect">{{ selected_dialog_window.name}}</span>
+        <button @click="closeWindow(selected_dialog_window)" class="noselect dialog-control"
+          style="background:#ff0000c4;left:1px;">
+          X
+        </button>
+        <button @click="minimizeWindow()" class="noselect dialog-control" style="background:#00cdff61;left:25px;">
+          -
+        </button>
+        <button @click="maximizeWindow()" class="noselect dialog-control" style="background:#00cdff61;left:45px;">
+          {{fullscreen?'=': '+'}}
+        </button>
+      </div>
+      <template v-for="wdialog in dialogWindows">
+        <div :key="wdialog.window_id" v-show="wdialog === selected_dialog_window" style="height: calc(100% - 18px);">
+          <div :id="wdialog.window_id" style="width: 100%;height: 100%;"></div>
+        </div>
+      </template>
+    </modal>
+  </div>
+`
     require(["imjoyLoader", "vue", "vue-js-modal", "snackbar"], function (
         imjoyLoder,
         Vue,
@@ -458,6 +484,9 @@ animation: spin 2s linear infinite;
     ) {
         Vue.use(vuejsmodal.default);
         document.head.insertAdjacentHTML("beforeend", CSStyle)
+        document.body.insertAdjacentHTML("beforeend", HTMLTempate)
+        document.getElementById("imjoy-app").style.display = "none";
+
         const app = new Vue({
             el: "#imjoy-app",
             data: {
