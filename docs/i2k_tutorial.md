@@ -25,10 +25,10 @@ This tutorial assumes you have basic programming skills in any of the mainstream
     - [Async + Await in JavaScript, talk from Wes Bos](https://www.youtube.com/watch?v=DwQJ_NPQWWo)
     - [Asynchronous programming in Python](https://www.youtube.com/watch?v=6kNzG0T44SI)
 
- - Since Remote Procedure Calls is a key technique used in ImJoy, we recommended reading this blog post: [RPCs, Life and All](http://tomerfiliba.com/blog/RPCs-Life-And-All/)
+ - Since Remote Procedure Calls is a key technique used in ImJoy, we recommend reading this blog post: [RPCs, Life and All](http://tomerfiliba.com/blog/RPCs-Life-And-All/)
 
 
-## Getting started
+## Understanding key concepts in ImJoy
 
 Let's start by introducing you the live execution feature of this tutorial. We have loaded the core of ImJoy into this tutorial such that you can edit or run ImJoy plugin code directly in this page.
 
@@ -88,7 +88,7 @@ When calling an ImJoy API function from a plugin, the function will be executed 
 
 For example, when calling `api.alert()` from a Python plugin in a remote server, the popup dialog will be initiated by the ImJoy core in the user's browser (implemented in Javascript). You will also learn later that plugins can call each other via RPC.
 
-?> RPCs allows distribute tasks to different plugins running in different languages and locations. For example, we can build user interface with powerful UI libraries (e.g. [D3](https://d3js.org/) and [itk-vtk-viewer](https://kitware.github.io/itk-vtk-viewer/) ) in Javascript/HTML/CSS and run deep learning model in a [Web Worker](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Using_web_workers) in [Tensorflow.js](https://www.tensorflow.org/js). For training models with GPUs, Python plugins can run on Jupyter notebook servers (a.k.a. Plugin Engine) locally or remotely, e.g. on a GPU cluster or lab workstation.
+?> RPCs allows distribute tasks to different plugins running in different languages and locations. For example, we can build user interface with powerful UI libraries (e.g. [D3](https://d3js.org/) and [ITK/VTK Viewer](https://kitware.github.io/itk-vtk-viewer/) ) in Javascript/HTML/CSS and run deep learning model in a [Web Worker](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Using_web_workers) in [Tensorflow.js](https://www.tensorflow.org/js). For training models with GPUs, Python plugins can run on Jupyter notebook servers (a.k.a. Plugin Engine) locally or remotely, e.g. on a GPU cluster or lab workstation.
 
 ?> If you haven't read, this blog post ([RPCs, Life and All](http://tomerfiliba.com/blog/RPCs-Life-And-All/)) explains the idea behind a Python library ([RPyC](https://rpyc.readthedocs.io/en/latest/)) which is similar to the one in ImJoy.
 
@@ -146,6 +146,24 @@ async function choosePokemon(){
     await api.showMessage("Your have chose " + pokemon + " as your Pokémon.")
 }
 choosePokemon()
+```
+
+?> For development in Javascript, you can also use other functions such as `console.log(<ANY OBJECT>)` to print a message or object to the console. you can also insert the keyword `debugger` to your code to instruct the browser to pause the execution when hit the corresponding line.
+
+With the develop tool open, try to run the following code:
+<!-- ImJoyPlugin: {"type": "web-worker", "passive": true, "editor_height": "250px"} -->
+```javascript
+console.log("Hello world!");
+
+var myObj = { firstname : "John", lastname : "Doe" };
+console.log(myObj);
+
+debugger
+
+var myArr = ["Orange", "Banana", "Mango", "Kiwi" ];
+console.log(myArr);
+
+console.error("this is an error")
 ```
 
 ### Async/Await in Python
@@ -235,11 +253,22 @@ Lets assume we have taskA (takes 10 minutes), taskB (takes 5 minutes) and taskC 
         return await doTaskC(resultA, resultB) 
     ```
 
-### Make your first ImJoy plugin
+## Make your first ImJoy plugin
 
-So far, we have been using simplified code snippets for illustration.
+With these key concepts, we can proceed to build actual ImJoy plugins.
 
-Let's first place these functions in a plugin class:
+We have been already mentioning different types of plugins in the previous section without defining what is an ImJoy plugin. 
+
+### What is an ImJoy plugin
+
+?> In a nutshell, an ImJoy plugin is a script that produce a set of service functions (a.k.a plugin API functions) that can be called by the ImJoy core or other plugins. While loading the plugin, an `api` object contains all the ImJoy API functions will be passed to the the plugin, the plugin can then build the service functions and register them via a `api.export(...)` function call.
+
+?> There are currently 4 common plugin types: `window`, `web-worker`, `web-python`, `native-python`. Plugin types can be further extended with plugins, for example, we can make a new plugin type for executing Fiji/Scijava scripts, see [this post](https://forum.image.sc/t/making-imjoy-plugins-with-fiji-scripts-for-running-remotely/39503).
+
+
+?> Most plugins will at least export two special functions named `setup` (for initialization ) and `run` (called when user click the plugin menu button).
+
+For example, the following script block defines 3 plugin API functions: an empty `setup` function, the same `choosePokemon` function we wrote previously, and a `run` function which can be called (by the ImJoy core or the user when clicking the plugin menu):
 <!-- ImJoyPlugin: {"type": "web-worker", "editor_height": "400px"} -->
 ```js
 class ImJoyPlugin{
@@ -255,21 +284,29 @@ class ImJoyPlugin{
 }
 api.export(new ImJoyPlugin())
 ```
+
+
 ?> In Javascript, there are different way of writing functions, you can do: 1) `function MyFunction() {...}` 2) `const MyFunction = ()=>{...}` 3) when defining a member function of a class or an object, you can simply do `MyFunction() {...}` (see the example above).
 
-In order to make an full ImJoy plugin, we will need to place the plugin class into a `<script>` tag and set the `lang` property to `javascript`(or `python`). In addition, we also need a `<config>` block to provide meta information:
+### ImJoy plugin file format
 
+An ImJoy plugin is typically a text file with the extension `*.imjoy.html`. We use HTML/XML tags such as `<config>`, `<script>`, `<window>` to store code blocks. 
+
+?> Most plugin types requires at least two code blocks: `<config>` and `<script>`, for example `web-worker`, `web-python` and `native-python`. For `window` plugin, another `<window>` block is required for the HTML code, as well as an optional `<style>` block for CSS code. Detailed description about ImJoy plugin file can be found here: [plugin file format](https://imjoy.io/docs/#/development?id=plugin-file-format).
+
+
+### Your first ImJoy plugin
 <!-- ImJoyPlugin: {"startup_mode": "edit"} -->
 ```html
 <config lang="json">
 {
-  "name": "Untitled Plugin",
+  "name": "Pokémon Chooser",
   "type": "web-worker",
   "tags": [],
   "ui": "",
   "version": "0.1.0",
   "cover": "",
-  "description": "[TODO: describe this plugin with one sentence.]",
+  "description": "This is a demo plugin for choosing Pokémons",
   "icon": "extension",
   "inputs": null,
   "outputs": null,
@@ -283,6 +320,7 @@ In order to make an full ImJoy plugin, we will need to place the plugin class in
 <script lang="javascript">
 class ImJoyPlugin{
     async setup(){
+        await api.log("plugin initialized")
     }
     async choosePokemon(){
         const pokemon = await api.prompt("What is your favorite Pokémon?", "Pikachu")
@@ -295,12 +333,34 @@ class ImJoyPlugin{
 api.export(new ImJoyPlugin())
 </script>
 ```
-In the above code editor, you can click **Export** and it will download as an ImJoy plugin file (with extension `*.imjoy.html`).
 
-This plugin file can be used in the standalone ImJoy app: 1) go to https://imjoy.io/#/app 2) drag and drop the downloaded file into the browser.
+In the above code editor, you can click **Export** and it will download as an ImJoy plugin file (with extension `*.imjoy.html`). This plugin file can be used in the standalone ImJoy app: 1) go to https://imjoy.io/#/app 2) drag and drop the downloaded file into the browser.
 
-### TODO:Make Graphical Interface with HTML/CSS/Javascript
+### Deploy and share your plugin
+If you want to share your plugin with others, you can either send the plugin file directly, or upload your plugins to Github/Gist. The later is recommended if you want to publish your plugins and share with the rest of the world.
 
+You can [fork the imjoy-starter repo](https://github.com/imjoy-team/imjoy-starter/fork) (or create an empty one if you prefer) on Github.
+
+
+Now you can name your plugin as, for example, `PokemonChooser.imjoy.html` and upload it to the `plugins` folder of your forked repo by using git commands or upload directly to the repo. You can organize upload the plugin file in any kind of folder organization.
+
+After that, you can click the plugin file and copy the url in your address bar, it should be something like: `https://github.com/<YOUR-GITHUB-USERNAME>/imjoy-starter/blob/master/plugins/PokemonChooser.imjoy.html`
+
+This URL can be used to install plugins in ImJoy, you can click **Run** to open the ImJoy app. To install the plugin, click `+PLUGINS` and paste the URL to the `Install from URL` input box and press Enter.
+
+<!-- ImJoyPlugin: {"type": "web-worker", "hide_code_block": true, "passive": true} -->
+```js
+api.showDialog({src: "https://imjoy.io/#/app?w=i2k", passive: true, fullscreen: true})
+```
+
+
+Now you can construct an URL for sharing with others, just add the URL after `https://imjoy.io/#/app?plugin=` so it becomes something like: `https://imjoy.io/#/app?plugin=https://github.com/<YOUR-GITHUB-USERNAME>/imjoy-starter/blob/master/plugins/PokemonChooser.imjoy.html`.
+
+If a user click your plugin URL, it will open the plugin directly in ImJoy and ask the user to install it.
+
+## Build plugins for image analysis
+
+### Make GUI plugins with HTML/CSS/JS
 
 <!-- ImJoyPlugin: {"type": "window", "passive": true, "w": 1, "h": 1, "editor_height": "300px"} -->
 ```html
@@ -319,10 +379,14 @@ window.hello = ()=>{
 </style>
 ```
 
+?> Exercise 1: Use OpenCV.js to process images
 
-### TODO: Run Python Plugins
+?> Exercise 2: Run Tensorflow.js models
+
+### Build computation plugin in Python
 
 <!-- ImJoyPlugin: {"type": "native-python", "name": "my-python-plugin"} -->
+
 ```python
 from imjoy import api
 
@@ -338,13 +402,48 @@ class ImJoyPlugin():
         await self.choosePokemon()
 
 api.export(ImJoyPlugin())
-``` 
+```
+
+### Connect the GUI with computation
 
 
-<!-- ImJoyPlugin: {"type": "web-worker", "hide_code_block": true, "passive": true} -->
-<!-- ```js
-api.createWindow({src: "https://imjoy.io/#/app?w=i2k", "passive": true})
-``` -->
+## Open integration with ImJoy
+The ImJoy plugin ecosystem meant to be open in two ways: 1) other software tools and website should be able to easily use ImJoy and its plugins 2) other software tools should be easily used in ImJoy, typically as a plugin.
+
+In general, any software that uses ImJoy RPC protocol to expose service functions can be treated as an ImJoy plugin. This includes the ImJoy web app itself which can read plugin files and produces plugin API. Meanwhile, we provide the [imjoy-rpc](https://github.com/imjoy-team/imjoy-rpc) library which currently support Python and Javascirpt for other software or web applications to directly communicate with the ImJoy core.
+
+Recently, there is already several web applications that can run in standalone mode but also as an ImJoy plugin, [ITK/VTK Viewer](https://kitware.github.io/itk-vtk-viewer/docs/imjoy.html)(by [Matt McCormick](https://github.com/thewtex) et al.), [vizarr](https://github.com/hms-dbmi/vizarr)(by [Trevor Manz](https://github.com/manzt) et al.), , [Kaibu](https://kaibu.org/#/app) and [ImageJ.JS](https://ij.imjoy.io)(by the ImJoy Team).
+
+For example, [ITK/VTK Viewer](https://kitware.github.io/itk-vtk-viewer/docs/imjoy.html) is an open-source software system for medical and scientific image, mesh, and point set visualization. While it can run [as a standalone app](https://kitware.github.io/itk-vtk-viewer/app/?fileToLoad=https://data.kitware.com/api/v1/file/564a65d58d777f7522dbfb61/download/data.nrrd), it can also run [as an ImJoy plugin](https://kitware.github.io/itk-vtk-viewer/docs/imjoy.html). If you can try the viewer by clicking the **Run** button below and you can use it to visualize your local files (e.g.: [download example file](https://data.kitware.com/api/v1/file/564a65d58d777f7522dbfb61/download/data.nrrd)):
+<!-- ImJoyPlugin: {"type": "web-worker", "hide_code_block": true} -->
+```js
+api.showDialog({src: "https://kitware.github.io/itk-vtk-viewer/app/", name: "ITK/VTK Viewer"})
+```
+
+This is another example for the [vizarr](https://hms-dbmi.github.io/vizarr) which is a WebGL-based viewer for visualizing Zarr-based images. We loads it as an ImJoy plugin and call its `add_image` api function to visualize ome-zarr HCS data (a new feature implemented by [Will Moore](https://github.com/will-moore) recently).
+<!-- ImJoyPlugin: {"type": "web-worker", "hide_code_block": true} -->
+```js
+api.showDialog({src: "https://hms-dbmi.github.io/vizarr", name: "visualizating HCS zarr images with vizarr"}).then((viewer)=>{
+    viewer.add_image({source: "https://minio-dev.openmicroscopy.org/idr/idr0001-graml-sysgro/JL_120731_S6A/pr_45/2551.zarr", name: "Demo Image"})
+})
+```
+
+?> While standalone web applications are more powerful, building them requires more advanced tooling and higher-level programming skills. For beginners, using basic imjoy plugin files can already solve many tasks. Therefore, in this tutorial, let's first focus on how to make basic ImJoy plugins.
+
+### Use existing plugins
+
+
+### Build your own image viewer
+
+
+## Use ImJoy in Juptyer notebooks and Colab
+
+### Use the Jupyter extension
+
+### Try the Micro-Manager plugin
+
+### Train a deep learning model
+
 
 
 
