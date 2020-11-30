@@ -76,6 +76,7 @@
         const showCodeBtn = preElm.querySelector('.show-code-button');
 
         showCodeBtn.style.display = 'none';
+
         try {
 
             const id = randId();
@@ -209,10 +210,7 @@
                 codeElm.style.display = "none";
                 if (mode !== 'edit') {
                     showCodeBtn.style.display = "block";
-                    showCodeBtn.onclick = () => {
-                        codeElm.style.display = 'block';
-                        showCodeBtn.style.display = 'none';
-                    }
+                    
                 }
             }
 
@@ -260,6 +258,10 @@
                         const codeElm = elm.querySelector("code");
                         codeElm.insertAdjacentHTML('beforeBegin', `<div class="show-code-button">+ show source code</div>`);
                         const showCodeBtn = elm.querySelector('.show-code-button');
+                        showCodeBtn.onclick = () => {
+                            codeElm.style.display = 'block';
+                            showCodeBtn.style.display = 'none';
+                        }
                         const selection = window.getSelection();
                         const range = document.createRange();
                         range.selectNode(codeElm);

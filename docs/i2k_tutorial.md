@@ -28,13 +28,13 @@ This tutorial assumes you have basic programming skills in any of the mainstream
  - Since Remote Procedure Calls is a key technique used in ImJoy, we recommend reading this blog post: [RPCs, Life and All](http://tomerfiliba.com/blog/RPCs-Life-And-All/)
 
 
-## Understanding key concepts in ImJoy
+## 1. Understanding key concepts in ImJoy
 
 Let's start by introducing you the live execution feature of this tutorial. We have loaded the core of ImJoy into this tutorial such that you can edit or run ImJoy plugin code directly in this page.
 
 ### Hello from ImJoy
 See the following code block with one line in Javascript, if you click the **Run** button, you should see a popup message saying `Hello from ImJoy!`.
-<!-- ImJoyPlugin: {"type": "iframe", "passive": true, "editor_height": "200px"} -->
+<!-- ImJoyPlugin: { "type": "iframe", "passive": true, "editor_height": "200px"} -->
 ```js
 alert("Hello from ImJoy!")
 ```
@@ -59,7 +59,7 @@ For example, the equivalent ImJoy API function to `alert()` in javascript is `ap
 ?> If you want to share the definition of a specific api function to someone, you can simply click on the function name and copy the url in the address bar (e.g.: https://imjoy.io/docs/#/api?id=apialert).
 
 You can directly access the `api` object in Javascript plugins (with type=`window` or `web-worker`):
-<!-- ImJoyPlugin: {"type": "web-worker", "passive": true,"editor_height": "200px"} -->
+<!-- ImJoyPlugin: { "type": "web-worker", "passive": true,"editor_height": "200px"} -->
 ```js
 api.alert("Hello from ImJoy!")
 ```
@@ -107,7 +107,7 @@ If the API function has returned value, for example, [`api.prompt`](https://imjo
 ### Debugging with Chrome developer tool
 
 The recommended way of running ImJoy API function is to add `await`. However, if you run the following code, nothing will happen because of a syntax error:
-<!-- ImJoyPlugin: {"type": "web-worker", "passive": true, "editor_height": "200px"} -->
+<!-- ImJoyPlugin: { "type": "web-worker", "passive": true, "editor_height": "200px"} -->
 ```js
 await api.alert("Hello from ImJoy!")
 ```
@@ -124,7 +124,7 @@ pluginIframe.js:194 failed to execute scripts:  {type: "script", content: "↵aw
 ```
 
 To fix the error, we need to wrap it in an async function:
-<!-- ImJoyPlugin: {"type": "web-worker", "passive": true, "editor_height": "250px"} -->
+<!-- ImJoyPlugin: { "type": "web-worker", "passive": true, "editor_height": "250px"} -->
 ```js
 // async/await example in Javascript
 async function sayHello(){
@@ -139,7 +139,7 @@ Another simplified rule for using `async/await` is:
 
 
 As another example, we can use another ImJoy API function [`api.prompt`](https://imjoy.io/docs/#/api?id=apiprompt) to get input from the user in a popup dialog and show the message with [`api.showMessage`](https://imjoy.io/docs/#/api?id=apishowmessage).
-<!-- ImJoyPlugin: {"type": "web-worker", "passive": true, "editor_height": "250px"} -->
+<!-- ImJoyPlugin: { "type": "web-worker", "passive": true, "editor_height": "250px"} -->
 ```js
 async function choosePokemon(){
     const pokemon = await api.prompt("What is your favorite Pokémon?", "Pikachu")
@@ -151,7 +151,7 @@ choosePokemon()
 ?> For development in Javascript, you can also use other functions such as `console.log(<ANY OBJECT>)` to print a message or object to the console. you can also insert the keyword `debugger` to your code to instruct the browser to pause the execution when hit the corresponding line.
 
 With the develop tool open, try to run the following code:
-<!-- ImJoyPlugin: {"type": "web-worker", "passive": true, "editor_height": "250px"} -->
+<!-- ImJoyPlugin: { "type": "web-worker", "passive": true, "editor_height": "250px"} -->
 ```javascript
 console.log("Hello world!");
 
@@ -253,7 +253,32 @@ Lets assume we have taskA (takes 10 minutes), taskB (takes 5 minutes) and taskC 
         return await doTaskC(resultA, resultB) 
     ```
 
-## Make your first ImJoy plugin
+
+### Open integration with ImJoy
+The ImJoy plugin ecosystem meant to be open in two ways: 1) other software tools and website should be able to easily use ImJoy and its plugins 2) other software tools should be easily used in ImJoy, typically as a plugin.
+
+In general, any software that uses ImJoy RPC protocol to expose service functions can be treated as an ImJoy plugin. This includes the ImJoy web app itself which can read plugin files and produces plugin API. Meanwhile, we provide the [imjoy-rpc](https://github.com/imjoy-team/imjoy-rpc) library which currently support Python and Javascirpt for other software or web applications to directly communicate with the ImJoy core.
+
+Recently, there is already several web applications that can run in standalone mode but also as an ImJoy plugin, [ITK/VTK Viewer](https://kitware.github.io/itk-vtk-viewer/docs/imjoy.html)(by [Matt McCormick](https://github.com/thewtex) et al.), [vizarr](https://github.com/hms-dbmi/vizarr)(by [Trevor Manz](https://github.com/manzt) et al.), , [Kaibu](https://kaibu.org/#/app) and [ImageJ.JS](https://ij.imjoy.io)(by the ImJoy Team).
+
+For example, [ITK/VTK Viewer](https://kitware.github.io/itk-vtk-viewer/docs/imjoy.html) is an open-source software system for medical and scientific image, mesh, and point set visualization. While it can run [as a standalone app](https://kitware.github.io/itk-vtk-viewer/app/?fileToLoad=https://data.kitware.com/api/v1/file/564a65d58d777f7522dbfb61/download/data.nrrd), it can also run [as an ImJoy plugin](https://kitware.github.io/itk-vtk-viewer/docs/imjoy.html). If you can try the viewer by clicking the **Run** button below and you can use it to visualize your local files (e.g.: [download example file](https://data.kitware.com/api/v1/file/564a65d58d777f7522dbfb61/download/data.nrrd)):
+<!-- ImJoyPlugin: { "type": "web-worker", "hide_code_block": true} -->
+```js
+api.showDialog({src: "https://kitware.github.io/itk-vtk-viewer/app/", name: "ITK/VTK Viewer"})
+```
+
+This is another example for the [vizarr](https://hms-dbmi.github.io/vizarr) which is a WebGL-based viewer for visualizing Zarr-based images. We loads it as an ImJoy plugin and call its `add_image` api function to visualize ome-zarr HCS data (a new feature implemented by [Will Moore](https://github.com/will-moore) recently).
+<!-- ImJoyPlugin: { "type": "web-worker", "hide_code_block": true} -->
+```js
+api.showDialog({src: "https://hms-dbmi.github.io/vizarr", name: "visualizating HCS zarr images with vizarr"}).then((viewer)=>{
+    viewer.add_image({source: "https://minio-dev.openmicroscopy.org/idr/idr0001-graml-sysgro/JL_120731_S6A/pr_45/2551.zarr", name: "Demo Image"})
+})
+```
+
+?> While standalone web applications are more powerful, building them requires more advanced tooling and higher-level programming skills. For beginners, using basic imjoy plugin files can already solve many tasks. Therefore, in this tutorial, let's first focus on how to make basic ImJoy plugins.
+
+
+## 2. Make your first ImJoy plugin
 
 With these key concepts, we can proceed to build actual ImJoy plugins.
 
@@ -269,7 +294,7 @@ We have been already mentioning different types of plugins in the previous secti
 ?> Most plugins will at least export two special functions named `setup` (for initialization ) and `run` (called when user click the plugin menu button).
 
 For example, the following script block defines 3 plugin API functions: an empty `setup` function, the same `choosePokemon` function we wrote previously, and a `run` function which can be called (by the ImJoy core or the user when clicking the plugin menu):
-<!-- ImJoyPlugin: {"type": "web-worker", "editor_height": "400px"} -->
+<!-- ImJoyPlugin: { "type": "web-worker", "editor_height": "400px"} -->
 ```js
 class ImJoyPlugin{
     async setup(){
@@ -348,7 +373,7 @@ After that, you can click the plugin file and copy the url in your address bar, 
 
 This URL can be used to install plugins in ImJoy, you can click **Run** to open the ImJoy app. To install the plugin, click `+PLUGINS` and paste the URL to the `Install from URL` input box and press Enter.
 
-<!-- ImJoyPlugin: {"type": "web-worker", "hide_code_block": true, "passive": true} -->
+<!-- ImJoyPlugin: { "type": "web-worker", "hide_code_block": true, "passive": true} -->
 ```js
 api.showDialog({src: "https://imjoy.io/#/app?w=i2k", passive: true, fullscreen: true})
 ```
@@ -358,20 +383,105 @@ Now you can construct an URL for sharing with others, just add the URL after `ht
 
 If a user click your plugin URL, it will open the plugin directly in ImJoy and ask the user to install it.
 
-## Build plugins for image analysis
+## 3. Build plugins for image analysis
+
+In this section let's start by making a plugin for image analysis. We will build image analysis tools with interactive interface.
+
+
+?> A typical plugin design pattern in ImJoy is to separate a tool into the the compute part and the UI part (either build a plugin or reuse existing ones).
 
 ### Make GUI plugins with HTML/CSS/JS
 
-<!-- ImJoyPlugin: {"type": "window", "passive": true, "w": 1, "h": 1, "editor_height": "300px"} -->
+Let's first look into how to use HTM/CSS/JS to build a simple interface that read a local image file and display it.
+
+We will use the `<input>` tag for selecting the file and use its `change` event to trigger a display function. In the display function, we can use `img` tag to display the image.
+
+See the code below:
+
+<!-- ImJoyPlugin: {"startup_mode": "edit", "fold": [0, 21, 39], "editor_height": "500px"} -->
 ```html
-<script lang="javascript">
-window.hello = ()=>{
-    api.showMessage('hello')
+<config lang="json">
+{
+  "name": "Image Viewer",
+  "type": "window",
+  "tags": [],
+  "ui": "",
+  "version": "0.1.0",
+  "cover": "",
+  "description": "This is a demo plugin for displaying image",
+  "icon": "extension",
+  "inputs": null,
+  "outputs": null,
+  "api_version": "0.1.8",
+  "env": "",
+  "permissions": [],
+  "requirements": [],
+  "dependencies": []
 }
+</config>
+<script lang="javascript">
+// draw a base64 encoded image to the canvas
+const drawImage = (canvas, base64Image)=>{
+    return new Promise((resolve, reject)=>{
+        var img = new Image()
+        img.crossOrigin = "anonymous"
+        img.onload = function(){
+            const ctx = canvas.getContext("2d");
+            canvas.width = Math.min(this.width, 512);
+            canvas.height= Math.min(this.height, parseInt(512*this.height/this.width), 1024);
+            // draw the img into canvas
+            ctx.drawImage(this, 0, 0, canvas.width, canvas.height);
+            resolve(canvas);
+        }
+        img.onerror = reject;
+        img.src = base64Image;
+    })
+}
+
+// read the file and return as a base64 string
+const readImageFile = (file)=>{
+    return new Promise((resolve, reject)=>{
+        const U = window.URL || window.webkitURL;
+        // this works for safari
+        if(U.createObjectURL){
+            resolve(U.createObjectURL(file))
+        }
+        // fallback
+        else{
+            var fr = new FileReader();
+            // when image is loaded, set the src of the image where you want to display it
+            fr.onload = function(e) {
+                resolve(e.target.result)
+            };
+            fr.onerror = reject
+            // fill fr with image data
+            fr.readAsDataURL(file);
+        }
+    })
+}
+
+class ImJoyPlugin{
+    async setup(){
+         // Display image when a file is selected.
+        const fileInput = document.getElementById("file-input");
+        const canvas = document.getElementById("input-canvas");
+        fileInput.addEventListener("change", async ()=>{
+            const img = await readImageFile(fileInput.files[0]);
+            await drawImage(canvas, img);
+        }, true);
+        await api.log("plugin initialized")
+    }
+    async run(ctx){
+
+    }
+}
+api.export(new ImJoyPlugin())
 </script>
 <window>
     <div>
-        <button onclick="hello()">Hello</button>
+        <h1>Please select an image (jpg/png/gif)</h1>
+        <input  id="file-input" accept="image/*" capture="camera" type="file"/>
+        <canvas id="input-canvas" style="width: 100%; object-fit: cover;"></canvas>
     </div>
 </window>
 <style>
@@ -379,13 +489,384 @@ window.hello = ()=>{
 </style>
 ```
 
+As an exercise, you can try to add a `<button>` which will trigger the open file dialog so we can use the button to select the file. (Why we want to do that? Because we can later customize the appearance of the button easily.)
+
+You edit the code above by doing:
+ 1. below the `<input>` tag, add a line: `<button id="select-button">Select an image</button>`
+ 2. in the `setup` function, add:
+    ```js
+    // trigger the file dialog when the button is clicked
+    const selectButton = document.getElementById("select-button");
+    selectButton.addEventListener("click", async ()=>{
+        // simulate a click on the <input> tag
+        fileInput.click()
+    }, true);
+    ```
+ 3. now we can hide the `<input>` element by add a css style in the `<style>` block:
+   ```css
+   #file-input{
+       display: none;
+   }
+   ```
+ 4. Optionally, you can change the style of title text, by adding more css:
+   ```css
+   h1{
+       color: pink;
+   }
+   ```
+
+Please try it yourself in the editor above, and you can click "Show Source Code" below to see the reference implementation:
+
+<!-- ImJoyPlugin: {"hide_code_block": true, "fold": [0, 21, 39], "editor_height": "500px"} -->
+```html
+<config lang="json">
+{
+  "name": "Image Viewer",
+  "type": "window",
+  "tags": [],
+  "ui": "",
+  "version": "0.1.0",
+  "cover": "",
+  "description": "This is a demo plugin for displaying image",
+  "icon": "extension",
+  "inputs": null,
+  "outputs": null,
+  "api_version": "0.1.8",
+  "env": "",
+  "permissions": [],
+  "requirements": [],
+  "dependencies": []
+}
+</config>
+<script lang="javascript">
+// draw a base64 encoded image to the canvas
+const drawImage = (canvas, base64Image)=>{
+    return new Promise((resolve, reject)=>{
+        var img = new Image()
+        img.crossOrigin = "anonymous"
+        img.onload = function(){
+            const ctx = canvas.getContext("2d");
+            canvas.width = Math.min(this.width, 512);
+            canvas.height= Math.min(this.height, parseInt(512*this.height/this.width), 1024);
+            // draw the img into canvas
+            ctx.drawImage(this, 0, 0, canvas.width, canvas.height);
+            resolve(canvas);
+        }
+        img.onerror = reject;
+        img.src = base64Image;
+    })
+}
+
+// read the file and return as a base64 string
+const readImageFile = (file)=>{
+    return new Promise((resolve, reject)=>{
+        const U = window.URL || window.webkitURL;
+        // this works for safari
+        if(U.createObjectURL){
+            resolve(U.createObjectURL(file))
+        }
+        // fallback
+        else{
+            var fr = new FileReader();
+            // when image is loaded, set the src of the image where you want to display it
+            fr.onload = function(e) {
+                resolve(e.target.result)
+            };
+            fr.onerror = reject
+            // fill fr with image data
+            fr.readAsDataURL(file);
+        }
+    })
+}
+
+class ImJoyPlugin{
+    async setup(){
+         // Display image when a file is selected.
+        const fileInput = document.getElementById("file-input");
+        const canvas = document.getElementById("input-canvas");
+        fileInput.addEventListener("change", async ()=>{
+            const img = await readImageFile(fileInput.files[0]);
+            await drawImage(canvas, img);
+        }, true);
+        // trigger the file dialog when the button is clicked
+        const selectButton = document.getElementById("select-button");
+        selectButton.addEventListener("click", async ()=>{
+            // simulate a click on the <input> tag
+            fileInput.click()
+        }, true);
+        await api.log("plugin initialized")
+    }
+    async run(ctx){
+
+    }
+}
+api.export(new ImJoyPlugin())
+</script>
+<window>
+    <div>
+        <h1>Please select an image (jpg/png/gif)</h1>
+        <input  id="file-input" accept="image/*" capture="camera" type="file"/>
+        <button id="select-button">Select an image</button>
+        <canvas id="input-canvas" style="width: 100%; object-fit: cover;"></canvas>
+    </div>
+</window>
+<style>
+#file-input{
+    display: none;
+}
+h1 {
+    color: pink;
+}
+</style>
+```
+
+### Using a CSS library
+Handcrafting CSS style is time consuming and requires deep understanding of UI design principle and CSS itself.
+Luckly there is already so many UI libraries ([Bootstrap](https://getbootstrap.com/), [https://materializecss.com/](https://materializecss.com/) etc.) which we can just use. There are also more powerful js libraries and framework for build more professional UI, for example: [React](https://reactjs.org/), [Vuejs](https://vuejs.org/) and [Angular](https://angular.io/). In this tutorial, we will choose a small CSS called [**Bulma**](https://bulma.io/) for the purpose of illustration, but feel free to try other libraries or framework if you are interested.
+
+Let's first take a look at the documentation of Bulma [here](https://bulma.io/documentation/overview/start/). We basically need to load one CSS file.
+
+?> In ImJoy plugins, the way to load third-party CSS or Javascript libraries is to add the url to the `requirements`(a list) field in the `<config>` block.
+
+Therefore we will change the `requirements` to:
+```json
+{
+    ...
+    "requirements": ["https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css"],
+}
+```
+
+Now we read a bit further on how to use the style, Bulma support a whole bunch of different elements and layout in the documentation, you can read about [buttons](https://bulma.io/documentation/elements/button/).
+
+Basically, we just need to add a class(e.g. `class="button is-primary"`) to the button tag and it will change how it looks. Similarly, we can also add `class="title"` to the `<h1>` title.
+
+Please try it yourself, and you can take the code block below as reference:
+<!-- ImJoyPlugin: {"hide_code_block": true, "fold": [21, 39, 61], "editor_height": "500px"} -->
+```html
+<config lang="json">
+{
+  "name": "Image Viewer",
+  "type": "window",
+  "tags": [],
+  "ui": "",
+  "version": "0.1.0",
+  "cover": "",
+  "description": "This is a demo plugin for displaying image",
+  "icon": "extension",
+  "inputs": null,
+  "outputs": null,
+  "api_version": "0.1.8",
+  "env": "",
+  "permissions": [],
+  "requirements": ["https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css"],
+  "dependencies": []
+}
+</config>
+<script lang="javascript">
+// draw a base64 encoded image to the canvas
+const drawImage = (canvas, base64Image)=>{
+    return new Promise((resolve, reject)=>{
+        var img = new Image()
+        img.crossOrigin = "anonymous"
+        img.onload = function(){
+            const ctx = canvas.getContext("2d");
+            canvas.width = Math.min(this.width, 512);
+            canvas.height= Math.min(this.height, parseInt(512*this.height/this.width), 1024);
+            // draw the img into canvas
+            ctx.drawImage(this, 0, 0, canvas.width, canvas.height);
+            resolve(canvas);
+        }
+        img.onerror = reject;
+        img.src = base64Image;
+    })
+}
+
+// read the file and return as a base64 string
+const readImageFile = (file)=>{
+    return new Promise((resolve, reject)=>{
+        const U = window.URL || window.webkitURL;
+        // this works for safari
+        if(U.createObjectURL){
+            resolve(U.createObjectURL(file))
+        }
+        // fallback
+        else{
+            var fr = new FileReader();
+            // when image is loaded, set the src of the image where you want to display it
+            fr.onload = function(e) {
+                resolve(e.target.result)
+            };
+            fr.onerror = reject
+            // fill fr with image data
+            fr.readAsDataURL(file);
+        }
+    })
+}
+
+class ImJoyPlugin{
+    async setup(){
+         // Display image when a file is selected.
+        const fileInput = document.getElementById("file-input");
+        const canvas = document.getElementById("input-canvas");
+        fileInput.addEventListener("change", async ()=>{
+            const img = await readImageFile(fileInput.files[0]);
+            await drawImage(canvas, img);
+        }, true);
+        // trigger the file dialog when the button is clicked
+        const selectButton = document.getElementById("select-button");
+        selectButton.addEventListener("click", async ()=>{
+            // simulate a click on the <input> tag
+            fileInput.click()
+        }, true);
+        await api.log("plugin initialized")
+    }
+    async run(ctx){
+
+    }
+}
+api.export(new ImJoyPlugin())
+</script>
+<window>
+    <div>
+        <h1 class="title">Please select an image (jpg/png/gif)</h1>
+        <input  id="file-input" accept="image/*" capture="camera" type="file"/>
+        <button id="select-button" class="button is-primary">Select an image</button>
+        <canvas id="input-canvas" style="width: 100%; object-fit: cover;"></canvas>
+    </div>
+</window>
+<style>
+#file-input{
+    display: none;
+}
+</style>
+```
+
+As another exercise, you can try to use a [panel](https://bulma.io/documentation/components/panel/) to contain the `button` and `<canvas>`.
+
+?> To use icons in Bulma, we need to also add `https://use.fontawesome.com/releases/v5.14.0/js/all.js` the the `requirements`. Then search the icons from here: https://fontawesome.com/icons. For example, if you find an icon named `eye`, you can use add the icon to your html as `<i class="fas fa-eye"></i>`.
+
+Please try it yourself, and you can take the code block below as reference:
+<!-- ImJoyPlugin: {"hide_code_block": true, "fold": [21, 39, 61], "editor_height": "500px"} -->
+```html
+<config lang="json">
+{
+  "name": "Image Viewer",
+  "type": "window",
+  "tags": [],
+  "ui": "",
+  "version": "0.1.0",
+  "cover": "",
+  "description": "This is a demo plugin for displaying image",
+  "icon": "extension",
+  "inputs": null,
+  "outputs": null,
+  "api_version": "0.1.8",
+  "env": "",
+  "permissions": [],
+  "requirements": ["https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css", "https://use.fontawesome.com/releases/v5.14.0/js/all.js"],
+  "dependencies": []
+}
+</config>
+<script lang="javascript">
+// draw a base64 encoded image to the canvas
+const drawImage = (canvas, base64Image)=>{
+    return new Promise((resolve, reject)=>{
+        var img = new Image()
+        img.crossOrigin = "anonymous"
+        img.onload = function(){
+            const ctx = canvas.getContext("2d");
+            canvas.width = Math.min(this.width, 512);
+            canvas.height= Math.min(this.height, parseInt(512*this.height/this.width), 1024);
+            // draw the img into canvas
+            ctx.drawImage(this, 0, 0, canvas.width, canvas.height);
+            resolve(canvas);
+        }
+        img.onerror = reject;
+        img.src = base64Image;
+    })
+}
+
+// read the file and return as a base64 string
+const readImageFile = (file)=>{
+    return new Promise((resolve, reject)=>{
+        const U = window.URL || window.webkitURL;
+        // this works for safari
+        if(U.createObjectURL){
+            resolve(U.createObjectURL(file))
+        }
+        // fallback
+        else{
+            var fr = new FileReader();
+            // when image is loaded, set the src of the image where you want to display it
+            fr.onload = function(e) {
+                resolve(e.target.result)
+            };
+            fr.onerror = reject
+            // fill fr with image data
+            fr.readAsDataURL(file);
+        }
+    })
+}
+
+class ImJoyPlugin{
+    async setup(){
+         // Display image when a file is selected.
+        const fileInput = document.getElementById("file-input");
+        const canvas = document.getElementById("input-canvas");
+        fileInput.addEventListener("change", async ()=>{
+            const img = await readImageFile(fileInput.files[0]);
+            await drawImage(canvas, img);
+        }, true);
+        // trigger the file dialog when the button is clicked
+        const selectButton = document.getElementById("select-button");
+        selectButton.addEventListener("click", async ()=>{
+            // simulate a click on the <input> tag
+            fileInput.click()
+        }, true);
+        await api.log("plugin initialized")
+    }
+    async run(ctx){
+
+    }
+}
+api.export(new ImJoyPlugin())
+</script>
+<window>
+    <div>
+        <input  id="file-input" accept="image/*" capture="camera" type="file"/>
+        <nav class="panel">
+        <p class="panel-heading">
+            <i class="fas fa-eye" aria-hidden="true"></i> My Image Viewer
+        </p>
+        <div class="panel-block">
+            <button id="select-button" class="button is-link is-outlined is-fullwidth">
+            Select an image
+            </button>
+        </div>
+        <div class="panel-block">
+            <canvas id="input-canvas" style="width: 100%; object-fit: cover;"></canvas>
+        </div> 
+    </div>
+</window>
+<style>
+#file-input{
+    display: none;
+}
+</style>
+```
+
+
+#### Support TIFF format
+
+
+
 ?> Exercise 1: Use OpenCV.js to process images
 
 ?> Exercise 2: Run Tensorflow.js models
 
 ### Build computation plugin in Python
 
-<!-- ImJoyPlugin: {"type": "native-python", "name": "my-python-plugin"} -->
+<!-- ImJoyPlugin: { "type": "native-python", "name": "my-python-plugin"} -->
 
 ```python
 from imjoy import api
@@ -407,28 +888,6 @@ api.export(ImJoyPlugin())
 ### Connect the GUI with computation
 
 
-## Open integration with ImJoy
-The ImJoy plugin ecosystem meant to be open in two ways: 1) other software tools and website should be able to easily use ImJoy and its plugins 2) other software tools should be easily used in ImJoy, typically as a plugin.
-
-In general, any software that uses ImJoy RPC protocol to expose service functions can be treated as an ImJoy plugin. This includes the ImJoy web app itself which can read plugin files and produces plugin API. Meanwhile, we provide the [imjoy-rpc](https://github.com/imjoy-team/imjoy-rpc) library which currently support Python and Javascirpt for other software or web applications to directly communicate with the ImJoy core.
-
-Recently, there is already several web applications that can run in standalone mode but also as an ImJoy plugin, [ITK/VTK Viewer](https://kitware.github.io/itk-vtk-viewer/docs/imjoy.html)(by [Matt McCormick](https://github.com/thewtex) et al.), [vizarr](https://github.com/hms-dbmi/vizarr)(by [Trevor Manz](https://github.com/manzt) et al.), , [Kaibu](https://kaibu.org/#/app) and [ImageJ.JS](https://ij.imjoy.io)(by the ImJoy Team).
-
-For example, [ITK/VTK Viewer](https://kitware.github.io/itk-vtk-viewer/docs/imjoy.html) is an open-source software system for medical and scientific image, mesh, and point set visualization. While it can run [as a standalone app](https://kitware.github.io/itk-vtk-viewer/app/?fileToLoad=https://data.kitware.com/api/v1/file/564a65d58d777f7522dbfb61/download/data.nrrd), it can also run [as an ImJoy plugin](https://kitware.github.io/itk-vtk-viewer/docs/imjoy.html). If you can try the viewer by clicking the **Run** button below and you can use it to visualize your local files (e.g.: [download example file](https://data.kitware.com/api/v1/file/564a65d58d777f7522dbfb61/download/data.nrrd)):
-<!-- ImJoyPlugin: {"type": "web-worker", "hide_code_block": true} -->
-```js
-api.showDialog({src: "https://kitware.github.io/itk-vtk-viewer/app/", name: "ITK/VTK Viewer"})
-```
-
-This is another example for the [vizarr](https://hms-dbmi.github.io/vizarr) which is a WebGL-based viewer for visualizing Zarr-based images. We loads it as an ImJoy plugin and call its `add_image` api function to visualize ome-zarr HCS data (a new feature implemented by [Will Moore](https://github.com/will-moore) recently).
-<!-- ImJoyPlugin: {"type": "web-worker", "hide_code_block": true} -->
-```js
-api.showDialog({src: "https://hms-dbmi.github.io/vizarr", name: "visualizating HCS zarr images with vizarr"}).then((viewer)=>{
-    viewer.add_image({source: "https://minio-dev.openmicroscopy.org/idr/idr0001-graml-sysgro/JL_120731_S6A/pr_45/2551.zarr", name: "Demo Image"})
-})
-```
-
-?> While standalone web applications are more powerful, building them requires more advanced tooling and higher-level programming skills. For beginners, using basic imjoy plugin files can already solve many tasks. Therefore, in this tutorial, let's first focus on how to make basic ImJoy plugins.
 
 ### Use existing plugins
 

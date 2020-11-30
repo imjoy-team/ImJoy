@@ -1,4 +1,3 @@
-
 require.config({
     baseUrl: "js",
     paths: {
@@ -449,7 +448,7 @@ animation: spin 2s linear infinite;
 }
 </style>`
 
-const HTMLTempate = `
+    const HTMLTempate = `
 <div class="loader" id="loading"></div>
   <div id="imjoy-app" style="height: 80px;">
     <modal name="window-modal-dialog" height="500px" style="max-height: 100%; max-width: 100%" :fullscreen="fullscreen"
@@ -614,23 +613,24 @@ const HTMLTempate = `
                     this.disableScrollIntoView = disableScrollIntoView;
                     if (config.lang === 'js') config.lang = 'javascript';
                     if (config.lang === 'py') config.lang = 'python';
-                    const makePluginSource = (src) => {
-                        if (config.type) {
+
+                    const makePluginSource = (src, config) => {
+                        if (config.type && !config._parsed) {
                             const cfg = Object.assign({}, config)
                             cfg.api_version = cfg.api_version || "0.1.8";
                             cfg.name = cfg.name || "Plugin-" + randId();
-                            cfg.description = "[TODO: describe this plugin with one sentence.]"
-                            cfg.tags = []
-                            cfg.version = "0.1.0"
-                            cfg.ui = ""
-                            cfg.cover = ""
-                            cfg.icon = "extension"
-                            cfg.inputs = null
-                            cfg.outputs = null
-                            cfg.env = ""
-                            cfg.permissions = []
-                            cfg.requirements = []
-                            cfg.dependencies = []
+                            cfg.description = cfg.description || "[TODO: describe this plugin with one sentence.]"
+                            cfg.tags = cfg.tags || []
+                            cfg.version = cfg.version || "0.1.0"
+                            cfg.ui = cfg.ui || ""
+                            cfg.cover = cfg.cover || ""
+                            cfg.icon = cfg.icon || "extension"
+                            cfg.inputs = cfg.inputs || null
+                            cfg.outputs = cfg.outputs || null
+                            cfg.env = cfg.env || ""
+                            cfg.permissions = cfg.permissions || []
+                            cfg.requirements = cfg.requirements || []
+                            cfg.dependencies = cfg.dependencies || []
                             if (config.type === 'window') {
                                 cfg.defaults = {}
                             }
@@ -642,7 +642,13 @@ const HTMLTempate = `
                         return src
                     }
                     const runPluginSource = async (code, initPlugin, windowId) => {
-                        const src = makePluginSource(code);
+                        if (config.lang === 'html' && !config.type) {
+                            const source_config = await this.imjoy.pm.parsePluginCode(code)
+                            config.type = source_config.type;
+                            config.passive = source_config.passive || config.passive;
+                            config._parsed = true;
+                        }
+                        const src = makePluginSource(code, config);
                         const progressElem = document.getElementById('progress_' + config.namespace)
                         progressElem.style.width = `0%`;
                         try {
@@ -706,9 +712,9 @@ const HTMLTempate = `
                                 label: "Run",
                                 icon: "play",
                                 visible: true,
+                                shortcut: 'Shift-Enter',
                                 async callback(content) {
                                     try {
-
                                         editorWindow.setLoader(true);
                                         editorWindow.updateUIElement('stop', {
                                             visible: true
@@ -764,7 +770,7 @@ const HTMLTempate = `
                                 icon: "file-download-outline",
                                 visible: true,
                                 async callback(content) {
-                                    await api.exportFile(editorWindow, makePluginSource(content), (pluginInEditor && pluginInEditor.config.name) || "myPlugin.imjoy.html");
+                                    await api.exportFile(editorWindow, makePluginSource(content, config), (pluginInEditor && pluginInEditor.config.name) || "myPlugin.imjoy.html");
                                 }
                             }
                         }
