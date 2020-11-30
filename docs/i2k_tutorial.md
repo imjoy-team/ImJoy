@@ -325,7 +325,7 @@ An ImJoy plugin is typically a text file with the extension `*.imjoy.html`. We u
 
 
 ### Your first ImJoy plugin
-<!-- ImJoyPlugin: {"startup_mode": "edit"} -->
+<!-- ImJoyPlugin: {} -->
 ```html
 <config lang="json">
 {
@@ -398,11 +398,11 @@ In this section let's start by making a plugin for image analysis. We will build
 
 Let's first look into how to use HTM/CSS/JS to build a simple interface that read a local image file and display it.
 
-We will use the `<input>` tag for selecting the file and use its `change` event to trigger a display function. In the display function, we can use `img` tag to display the image.
+We will use the `<input>` tag for selecting the file and use its `change` event to trigger a display function. In the display function, we can use `<canvas>` tag to display the image.
 
 See the code below:
 
-<!-- ImJoyPlugin: {"startup_mode": "edit", "fold": [0, 21, 39], "editor_height": "500px"} -->
+<!-- ImJoyPlugin: {"fold": [0, 21, 39], "editor_height": "500px"} -->
 ```html
 <config lang="json">
 {
@@ -1186,16 +1186,169 @@ api.export(ImJoyPlugin())
 
 ?> In the example above, we set a special key `_rintf` to `True`, this is necessary because we are sending callback functions to the viewer and we want the function to be send as `interface` that can be called again and again, rather than a one-time function.
 
-### Connect your image viewer with the Python plugin
-
-
-
 
 ?> As an exercise, you can use a popular python library [scikit-image](https://scikit-image.org/) to process the image.
 
 
+### Connect your image viewer with the Python plugin
+
+In addition to ITK/VTK Viewer, Vizarr and Kaibu, we can also connect the image viewer we build in the previous sections to the Python plugin.
+
+?> In this setup, there will be the UI plugin and the compute plugin. In general, there are two ways to connect the two parts: 1) You can do like the example above, first instantiate the UI plugin from the compute plugin with `api.createWindow(...)`, then interact with the returned viewer object; 2) Or you can directly start the UI plugin, then you can do `api.getPlugin()` to get the api provided by the compute plugin. It will depend on the actual need of your application, but we recommended way the first one for Python plugins because it make it easier to debug in Jupyter notebooks.
+
+In this tutorial, let's adjust the our image viewer so we can provide some API functions to allow the Python plugin to interact with.
+
+Let's assume we want use the Python plugin to process our images, when we do `api.createWindow` to instantiate the viewer, we need to pass a `process` function defined in Python. 
+
+Therefore we need to change the image viewer to be able to use the process function. We can use the `ctx` (stands for context) variable passed to the run function to get the `process` function:
+
+```js
+    // the run funciton of the image viewer
+    async run(ctx){
+        // check if there is a process function passed in
+        if(ctx.data && ctx.data.process){
+            // show an additional "Process in Python" button
+            // and set the call back to use this process function
+        }
+    }
+```
+
+Now in the Python plugin we can do `await api.createWindow(type="Image Viewer", data={"process": self.process})` (assuming you have defined a function in the plugin class named `process`).
+
+?> When calling `api.createWindow`, there are two ways to refer to another window plugin: 1) set the `type` key to the window plugin name, this is typically done by setting the window plugin as one of the `dependencies` 2) if the window plugin is available as source code or served from a public server, you can set `src` as the plugin source code or the plugin URL. In this case, the plugin will be dynamically populated. It allows for example storing the window plugin as a string in Python or even dynamically generate window plugin based on templates.
+
+The following code is for a simplified version of the image viewer, please adjust your full image viewer by taking it as a reference. 
+
+(To try it, you will need to run the following two plugins sequentially and the button shown in the first one will be disabled)
+<!-- ImJoyPlugin: {"fold": [0], "editor_height": "500px"} -->
+```html
+<config lang="json">
+{
+  "name": "Image Viewer",
+  "type": "window",
+  "tags": [],
+  "ui": "",
+  "version": "0.1.0",
+  "cover": "",
+  "description": "This is a demo plugin for displaying image",
+  "icon": "extension",
+  "inputs": null,
+  "outputs": null,
+  "api_version": "0.1.8",
+  "env": "",
+  "permissions": [],
+  "requirements": [],
+  "dependencies": []
+}
+</config>
+<script lang="javascript">
+class ImJoyPlugin{
+    async setup(){
+    }
+    async run(ctx){
+        if(ctx.data && ctx.data.process){
+            const btn = document.getElementById('process')
+            btn.disabled = false;
+            btn.addEventListener("click", async ()=>{
+                ctx.data.process()
+            }, true);
+        }
+    }
+}
+api.export(new ImJoyPlugin())
+</script>
+<window>
+    <div>
+        <button id="process" disabled>Process</button>
+    </div>
+</window>
+```
+
+<!-- ImJoyPlugin: { "type": "native-python", "name": "my-python-plugin"} -->
+```python
+from imjoy import api
+
+class ImJoyPlugin():
+    async def setup(self):
+        pass
+
+    async def process(self):
+        await api.alert('I am on it!')
+
+    async def run(self, ctx):
+        await api.createWindow(type="Image Viewer", data={"process": self.process})
+
+api.export(ImJoyPlugin())
+```
+If you click the "Process" button, you are actually calling a function from Javascript to Python. 
+
+!> However, you may notice that if you click the button for the second time, it doesn't work anymore, and if you go to your browser console, you will see an error saying `Callback function can only called once, if you want to call a function for multiple times, please make it as a plugin api function.`. This is because the `process` function is removed from the window after the first call. To explicitly tell the window to keep the `process` function, we can pass set a special key `_rintf` to `True`. THerefore, you will need to change the code above so it becomes `data={"process": self.process, "_rintf": True}`.
+
+
+Also note that in this example, we didn't pass any parameter to the process function. For an actual image processing function, we will need to pass at least an image and return the output image. However, because Javascript and Python have different ways to store images, we will need to do encoding and decoding to make them compatible. The easiest way to do is to encode an image as a base64 string. Here are some code snippets:
+
+```python
+import re
+import base64
+import io
+import imageio
+
+def image_to_base64(image_array):
+    '''This function takes a numpy image array as input
+    and encode it into a base64 string
+    '''
+    buf = io.BytesIO()
+    imageio.imwrite(buf, image_array, "PNG")
+    buf.seek(0)
+    img_bytes = buf.getvalue()
+    base64_string = base64.b64encode(img_bytes)
+    return 'data:image/png;base64,' + base64_string
+
+def base64_to_image(base64_string):
+    '''This function takes a base64 string as input
+    and decode it into an numpy array image
+    '''
+    base64_string = re.sub("^data:image/.+;base64,", "", base64_string)
+    image_file = io.BytesIO(base64.b64decode(base64_string))
+    return imageio.imread(image_file)
+```
+
+In Javascript, this is how the base64 encoding works:
+```js
+const canvas = document.getElementById('canvas-id')
+
+// get base64 encoded image from a canvas
+base64String = canvas.toDataURL()
+
+// draw a base64 encoded image to the canvas
+const drawImage = (canvas, base64Image)=>{
+    return new Promise((resolve, reject)=>{
+        var img = new Image()
+        img.crossOrigin = "anonymous"
+        img.onload = function(){
+            const ctx = canvas.getContext("2d");
+            canvas.width = Math.min(this.width, 512);
+            canvas.height= Math.min(this.height, parseInt(512*this.height/this.width), 1024);
+            // draw the img into canvas
+            ctx.drawImage(this, 0, 0, canvas.width, canvas.height);
+            resolve(canvas);
+        }
+        img.onerror = reject;
+        img.src = base64Image;
+    })
+}
+```
+
+As an exercise, please use the encoding and decoding functions above to:
+ 1. get a base64 string from the canvas in the image viewer
+ 2. call `process` and pass the base64 string
+ 3. in the Python plugin, decode the base64 string into an image and process the image, for example, with [scikit-image](https://scikit-image.org/docs/stable/auto_examples/index.html) (e.g. [watershed](https://scikit-image.org/docs/stable/auto_examples/segmentation/plot_watershed.html#sphx-glr-auto-examples-segmentation-plot-watershed-py)).
+ 4. encode the result image into base64 string and return it
+ 5. show the base64 string as an image on a canvas in the image viewer plugin
+
 
 #### Build a segmentation plugin with CellPose
+
 
 <!-- ImJoyPlugin: { "hide_code_block": true} -->
 ```python
@@ -1366,6 +1519,15 @@ api.export(ImJoyPlugin())
 ### Try the Micro-Manager plugin
 
 ### Train a deep learning model
+
+
+
+## Plugin Gallery
+
+[Placeholder for plugins made by students]
+
+
+## FAQ
 
 
 
