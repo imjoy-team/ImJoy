@@ -1,4 +1,4 @@
-# I2K Workshop Tutorial
+# [WIP] I2K Workshop Tutorial
 
 This tutorial is presented as part of the [I2K workshop 2020](https://www.janelia.org/you-janelia/conferences/from-images-to-knowledge-with-imagej-friends)
 
