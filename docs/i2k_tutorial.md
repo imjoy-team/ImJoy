@@ -27,14 +27,13 @@ This tutorial assumes you have basic programming skills in any of the mainstream
 
  - Since **Remote Procedure Calls** is a key technique used in ImJoy, we recommend reading this blog post: [RPCs, Life and All](http://tomerfiliba.com/blog/RPCs-Life-And-All/)
 
-
 ## 1. Understanding key concepts in ImJoy
 
 ### Live execution feature
 Let's start by introducing the **live execution feature** of this tutorial. We have loaded the ImJOy core into this tutorial such that you can run and edit ImJoy plugin code directly on this page.
 
 ### Hello from ImJoy
-The the following code block contains one line in Javascript. If click the **Run** button, you should see a popup message saying `Hello from ImJoy!`.
+The following code block contains one line in Javascript. If click the **Run** button, you should see a popup message saying `Hello from ImJoy!`.
 <!-- ImJoyPlugin: { "type": "iframe", "passive": true, "editor_height": "200px"} -->
 ```js
 alert("Hello from ImJoy!")
@@ -42,25 +41,25 @@ alert("Hello from ImJoy!")
 
 You can also click the **Edit** button, you should see a code editor. Now you can change `Hello from ImJoy!` to `Hello, <YOUR NAME>`, then click the **Run** button in the toolbar of the code editor
 
-?> If you cannot see the run button or you don't see the popup message, you can try the following steps: **1)** Make sure you are reading this tutorial from https://imjoy.io/docs, it won't work if you read directly from Github; **2)** Make sure you use the latest Chrome or FireFox, with Javascript enabled.
+?> If you cannot see the run button or you don't see the popup message, you can try the following steps: **1)** Make sure you are reading this tutorial from https://imjoy.io/docs, it won't work if you read directly from Github; **2)** Make sure you are using the latest Chrome or FireFox, with Javascript enabled.
 
 ### ImJoy plugin types
 
-?> ImJoy currently support several **plugin types**: 1) `window` in for building web UI with HTML/CSS and Javascript; 2) `web-worker` in Javascript for browser based computation, runs in a separate thread 3) `web-python` in Python for browser based computation, powered by [WebAssembly](https://webassembly.org/)/[Pyodide](https://github.com/iodide-project/pyodide); 4) `native-python` in Python for heavy computation with local workstations or remote servers. See [here](https://imjoy.io/docs/#/development?id=plugin-types-and-configurations) for more details.
+?> ImJoy currently supports several **plugin types**: 1) `window` in for building web UI with HTML/CSS and Javascript; 2) `web-worker` in Javascript for browser-based computation, runs in a separate thread 3) `web-python` in Python for browser-based computation, powered by [WebAssembly](https://webassembly.org/)/[Pyodide](https://github.com/iodide-project/pyodide); 4) `native-python` in Python for heavy computation with local workstations or remote servers. See [here](https://imjoy.io/docs/#/development?id=plugin-types-and-configurations) for more details.
 
 The above example is a `window` plugin and you can use Javascript/HTML/CSS. To show the popup message we used the native Javascript function `alert`. PLease note that this won't work for example in plugins written in Python.
 
 ### Using ImJoy API
 
-To permit basic user interactions, ImJoy provide a set of API (application programming interface ) functions which can be used consistently across all plugin types and supported programming language.
+To permit basic user interactions, ImJoy provides a set of API (application programming interface ) functions which can be used consistently across all plugin types and supported programming language.
 
-For example, the equivalent ImJoy API function to the Javascript function `alert()` is `api.alert()`. 
+For example, the equivalent ImJoy API function to the Javascript function `alert()` is `api.alert()`.
 
-?> You can find detailed description of all the ImJoy API [here](https://imjoy.io/docs/#/api). 
+?> You can find detailed description of all ImJoy API functions [here](https://imjoy.io/docs/#/api).
 
-?> You can use `Ctrl+F` or `Command+F` to search api functions in the page. For example, type `api.alert` and you can easily find the definition of `api.alert` [here](https://imjoy.io/docs/#/api?id=apialert). 
+?> You can use `Ctrl+F` or `Command+F` to search api functions on the page. For example, type `api.alert` and you can find the definition of `api.alert` [here](https://imjoy.io/docs/#/api?id=apialert).
 
-?> If you want to share the definition of a specific api function to someone, you can simply click on the function name and copy the url in the address bar (e.g.: https://imjoy.io/docs/#/api?id=apialert).
+?> If you want to share the definition of a specific api function with someone, you can click on the function name and copy the url in the address bar (e.g.: https://imjoy.io/docs/#/api?id=apialert).
 
 You can directly access the `api` object in Javascript plugins (with type=`window` or `web-worker`):
 <!-- ImJoyPlugin: { "type": "web-worker", "passive": true,"editor_height": "200px"} -->
@@ -68,31 +67,30 @@ You can directly access the `api` object in Javascript plugins (with type=`windo
 api.alert("Hello from ImJoy!")
 ```
 
-In Python plugins (type=`web-python` or `native-python`), you will need to do `from imjoy import api` before you can access the `api` object.
+In Python plugins (type=`web-python` or `native-python`), you will need to add `from imjoy import api` before you can access the `api` object.
 ```python
-# import it 
+# import api object
 from imjoy import api
 ...
-# use it 
+# use api object 
 api.alert("Hello from ImJoy!")
 ```
 
-?> In this tutorial we will show ImJoy API usage mostly in Javascript, but the Python code are similar except written in a different syntax.
+?> In this tutorial we will show ImJoy API usage mostly for Javascript, but the Python code will be similar except some smaller differences in the syntax.
 
 ### Remote Procedure Calls in ImJoy
 
-Although calling `alert()` and `api.alert()` appears the same, the underlying processes are different. While calling `alert()`, the popup dialog is initiated from the plugin, calling `api.alert()` means the popup dialog is initiated by the ImJoy core.
+Although calling `alert()` and `api.alert()` produces the same results (a popup message), it is important to understand that the underlying processes are different. When calling `alert()`, the popup dialog is initiated from the plugin directly, while calling `api.alert()` results in the ImJoy core initating the popup dialog.
 
-
-Keep in mind that ImJoy run each plugin in isolated or sandboxed environment (i.e. sandboxed iframe, webworker, conda virtual environment or docker container).
+Keep in mind that ImJoy run each plugin in and isolated or sandboxed environment (i.e. sandboxed iframe, webworker, conda virtual environment or docker container).
 
 When calling an ImJoy API function from a plugin, the function will be executed in the ImJoy core. The plugin runs in a different environment, all the functions defined in the ImJoy core are "remote" functions. In comparison, all the functions defined in the same plugin are "local".
 
-?> Therefore, calling ImJoy API functions means doing **Remote Procedure Calls (RPC)**.
+?> Therefore, calling ImJoy API functions means performing a **Remote Procedure Calls (RPC)**.
 
 ?> ImJoy supports bidirectional RPCs, not only between the plugin and the ImJoy core, but also between plugins. This can be consistently done across programming languages and hosting computers.
 
-For example, when calling `api.alert()` from a Python plugin in a remote server, the popup dialog will be initiated by the ImJoy core in the user's browser (implemented in Javascript). You will also learn later that plugins can call each other via RPC.
+For example, when calling `api.alert()` from a Python plugin running on a remote server, the popup dialog will be initiated by the ImJoy core in the user's browser (implemented in Javascript). You will also learn later that plugins can call each other via RPC.
 
 ?> RPCs allows distribute tasks to different plugins running in different languages and locations. For example, we can build user interface with powerful UI libraries (e.g. [D3](https://d3js.org/) and [ITK/VTK Viewer](https://kitware.github.io/itk-vtk-viewer/) ) in Javascript/HTML/CSS and run deep learning model in a [Web Worker](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Using_web_workers) in [Tensorflow.js](https://www.tensorflow.org/js). For training models with GPUs, Python plugins can run on Jupyter notebook servers (a.k.a. Plugin Engine) locally or remotely, e.g. on a GPU cluster or lab workstation.
 
@@ -1034,11 +1032,9 @@ The opencv.js has intensive documentation for many function, but for this tutori
  2. choose one of the image processing tutorials from this list [here](https://docs.opencv.org/3.4/d2/df0/tutorial_js_table_of_contents_imgproc.html) and integrate it to your image viewer plugin. For example, [image thresholding](https://docs.opencv.org/3.4/d7/dd0/tutorial_js_thresholding.html), [smooth images](https://docs.opencv.org/3.4/dd/d6a/tutorial_js_filtering.html), [canny edge detection](https://docs.opencv.org/3.4/d7/de1/tutorial_js_canny.html), or [segmentation with watershed](https://docs.opencv.org/3.4/d7/d1c/tutorial_js_watershed.html).
  
  You need to basically to do it in three steps:
-  1. add the opencv.js library `"https://docs.opencv.org/master/opencv.js"` to `"requirements"` under `<config>`
-  2. take the image process part from the tutorial and wrap it as a function (e.g. `processImage`)
-  3. add a button and call the function when clicked
-
-
+  1. Add the opencv.js library `"https://docs.opencv.org/master/opencv.js"` to `"requirements"` under `<config>`
+  2. Take the image process part from the tutorial and wrap it as a function (e.g. `processImage`)
+  3. Add a `button` that calls the function when clicked.
 
 ?> Tips: you can pass the id of the canvas (e.g. we have already defined `input-canvas`) to `cv.imread`, for displaying the result, we can use the same canvas id or create another one as with `id="output-canvas"`.
 
@@ -1052,9 +1048,7 @@ function processImage(inputCanvasId, outputCanvasId){
 }
 ```
 
-
  As a reference, this is how such a plugin looks like: [OpenCVSegmentation](http://imjoy.io/lite?plugin=https://gist.github.com/oeway/02a5736d552383df9b43930cbc75b168).
-
 
 ?> If you want to compare two images (input and output) with a slider to reveal the output images, try to use this simple [ CompareImage plugin](https://gist.github.com/oeway/f09955746ec01a20053793aba83c3545). You can basically do `api.showDialog({src:"https://gist.github.com/oeway/f09955746ec01a20053793aba83c3545", data:{first: inputCanvas.toDataURL(), second: outputCanvas.toDataURL()}})`.
 
@@ -1067,9 +1061,7 @@ function processImage(inputCanvasId, outputCanvasId){
 
 Let's make a plugin for analyzing images with Tensorflow.js.
 
-
 As another exercise, please take the relevant parts from [this plugin](https://gist.github.com/oeway/95025b000242ead88b06460b27cdf938) and integrate it as another button to your image viewer plugin.
-
 
 !> While browser-based plugins can already be useful and becoming more powerful with new techniques such as WebAssembly and the incoming [WebGPU](https://en.wikipedia.org/wiki/WebGPU), it cannot do heavy computation and have many restrictions due to its security model.
 
@@ -1100,7 +1092,7 @@ api.export(ImJoyPlugin())
 
 ### Display an image with ITK/VTK Viewer, Vizarr and Kaibu
 
-Let's use the ITK/VTK Viewer to visualize images, before start, please read through the documentation [here](https://kitware.github.io/itk-vtk-viewer/docs/imjoy.html).
+Let's use the ITK/VTK Viewer to visualize images. Please read read through the documentation [here](https://kitware.github.io/itk-vtk-viewer/docs/imjoy.html) before starting using it.
 
 It's rather easy, we can basically create a viewer by calling `api.createWindow(...)` (or `api.showDialog(...)` if you want a popup window), then we call `viewer.setImage()` by passing a numpy array (2D or 3D).
 
@@ -1131,7 +1123,7 @@ api.export(ImJoyPlugin())
 
 While ITK/VTK Viewer can display 3D volume, another viewer [Vizarr](https://github.com/hms-dbmi/vizarr) can visualize massive multi-resolution images in [Zarr format](https://zarr.readthedocs.io/en/stable/). You can find examples [here](https://github.com/hms-dbmi/vizarr/tree/master/example).
 
-Similarly, we can show the image with another plugin [Kaibu](https://kaibu.org) which integrates ITK/VTK Viewer with [OpenLayers](https://openlayers.org/) and provide a [napari](https://github.com/napari/napari)-like layered interface.
+Similarly, we can show the image with another plugin [Kaibu](https://kaibu.org) which integrates ITK/VTK Viewer with [OpenLayers](https://openlayers.org/) and provides a [napari](https://github.com/napari/napari)-like layered interface.
 
 Based on the ITK/VTK Viewer example, we only need to change `src` to `https://kaibu.org/#/app` and use `viewer.view_image()` function instead of `viewer.setImage()`.
 
@@ -1188,11 +1180,9 @@ class ImJoyPlugin():
 api.export(ImJoyPlugin())
 ```
 
-?> In the example above, we set a special key `_rintf` to `True`, this is necessary because we are sending callback functions to the viewer and we want the function to be send as `interface` that can be called again and again, rather than a one-time function.
-
+?> In the example above, we set a special key `_rintf` to `True`. This is necessary because we are sending callback functions to the viewer and we want the function to be sent as an `interface` that can be called again and again, rather than a one-time function.
 
 ?> As an exercise, you can use a popular python library [scikit-image](https://scikit-image.org/) to process the image.
-
 
 ### Connect your image viewer to the Python plugin
 
