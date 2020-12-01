@@ -400,13 +400,13 @@ If a user click your plugin URL, it will open the plugin directly in ImJoy and a
 
 ## 3. Build web-based plugins for image analysis
 
-In this section let's start by making a plugin for image analysis. We will build image analysis tools with interactive interface.
+In this section, let's start by making a interactive plugins for image analysis.
 
-?> A typical plugin design pattern in ImJoy is to separate a tool into the the compute part and the UI part (either build a plugin or reuse existing ones).
+?> A typical plugin design pattern in ImJoy is to separate a tool into a computational part and the UI part (either build a plugin or reuse existing ones).
 
 ### Make GUI plugins with HTML/CSS/JS
 
-Let's first look into how to use HTM/CSS/JS to build a simple interface that read a local image file and display it.
+Let's first look into how to use HTM/CSS/JS to build a simple interface that reads a local image file and displays it.
 
 We will use the `<input>` tag for selecting the file and use its `change` event to trigger a display function. In the display function, we can use `<canvas>` tag to display the image.
 
@@ -506,8 +506,10 @@ api.export(new ImJoyPlugin())
 As an exercise, you can try to add a `<button>` which will trigger the open file dialog so we can use the button to select the file. (Why we want to do that? Because we can later customize the appearance of the button easily.)
 
 You edit the code above by doing:
- 1. below the `<input>` tag, add a line: `<button id="select-button">Open an image</button>`
- 2. in the `setup` function, add:
+
+ 1. Below the `<input>` tag, add a line: `<button id="select-button">Open an image</button>`
+ 2. In the `setup` function, add:
+
     ```js
     // trigger the file dialog when the button is clicked
     const selectButton = document.getElementById("select-button");
@@ -516,13 +518,17 @@ You edit the code above by doing:
         fileInput.click()
     }, true);
     ```
+
  3. now we can hide the `<input>` element by add a css style in the `<style>` block:
+
    ```css
    #file-input{
        display: none;
    }
    ```
- 4. Optionally, you can change the style of title text, by adding more css:
+
+4. Optionally, you can change the style of title text, by adding more css:
+
    ```css
    h1{
        color: pink;
@@ -635,6 +641,7 @@ h1 {
 ```
 
 ### Using a CSS library
+
 Handcrafting CSS style is time consuming and requires deep understanding of UI design principle and CSS itself.
 Luckly there is already so many UI libraries ([Bootstrap](https://getbootstrap.com/), [https://materializecss.com/](https://materializecss.com/) etc.) which we can just use. There are also more powerful js libraries and framework for build more professional UI, for example: [React](https://reactjs.org/), [Vuejs](https://vuejs.org/) and [Angular](https://angular.io/). In this tutorial, we will choose a small CSS called [**Bulma**](https://bulma.io/) for the purpose of illustration, but feel free to try other libraries or framework if you are interested.
 
@@ -643,6 +650,7 @@ Let's first take a look at the documentation of Bulma [here](https://bulma.io/do
 ?> In ImJoy plugins, the way to load third-party CSS or Javascript libraries is to add the url to the `requirements`(a list) field in the `<config>` block.
 
 Therefore we will change the `requirements` to:
+
 ```json
 {
     ...
@@ -650,7 +658,7 @@ Therefore we will change the `requirements` to:
 }
 ```
 
-Now we read a bit further on how to use the style, Bulma support a whole bunch of different elements and layout in the documentation, you can read about [buttons](https://bulma.io/documentation/elements/button/).
+Now we read a bit further on how to use the style, Bulma support a large number of different elements and layouts in the documentation, you can read about buttons [here](https://bulma.io/documentation/elements/button/).
 
 Basically, we just need to add a class(e.g. `class="button is-primary"`) to the button tag and it will change how it looks. Similarly, we can also add `class="title"` to the `<h1>` title.
 
@@ -755,9 +763,9 @@ api.export(new ImJoyPlugin())
 </style>
 ```
 
-As another exercise, you can try to use a [panel](https://bulma.io/documentation/components/panel/) to contain the `button` and `<canvas>`.
+As another exercise, you can try to use a [panel](https://bulma.io/documentation/components/panel/) to group the `button` and `<canvas>`.
 
-?> To use icons in Bulma, we need to also add `https://use.fontawesome.com/releases/v5.14.0/js/all.js` the the `requirements`. Then search the icons from here: https://fontawesome.com/icons. For example, if you find an icon named `eye`, you can use add the icon to your html as `<i class="fas fa-eye"></i>`.
+?> To use icons in Bulma, we need to add `https://use.fontawesome.com/releases/v5.14.0/js/all.js` the `requirements`. Then search the icons from [here](https://fontawesome.com/icons). For example, if you find an icon named `eye`, you can use add the icon to your html as `<i class="fas fa-eye"></i>`.
 
 Please try it yourself, and you can take the code block below as reference:
 <!-- ImJoyPlugin: {"hide_code_block": true, "fold": [21, 39, 61], "editor_height": "500px"} -->
@@ -869,14 +877,14 @@ api.export(new ImJoyPlugin())
 </style>
 ```
 
-
 ### Support TIFF format
 
-TIFF is a more common image format for bioimage, so let's support reading tiff file.
+TIFF is one of the most common file formats for bioimages, so let's support reading tiff file.
 
 We will use an existing ImJoy plugin called "Tif File Importer", the source code is [here](https://github.com/imjoy-team/imjoy-plugins/blob/master/repository/tifFileImporter.imjoy.html).
 
 We can now add it as part of the `dependencies` under `<config>`:
+
 ```json
 {
     ...
@@ -884,12 +892,12 @@ We can now add it as part of the `dependencies` under `<config>`:
 }
 ```
 
-In addition to the long url, you can also use the short plugin URI format: `imjoy-team/imjoy-plugins:Tif File Importer`.
+Instead of using this long url, you can also use the shorter plugin URI format: `imjoy-team/imjoy-plugins:Tif File Importer`.
 
 ?> To support short plugin URI format, the git repository should contain a file named `manifest.imjoy.json` with the mapping of plugin names to its actual file path in the repository. For example: [imjoy-team/imjoy-plugins](https://github.com/imjoy-team/imjoy-plugins/blob/master/manifest.imjoy.json)
 
-
 Now we can use the plugin api functions (`open`, `readAsURL`) like this:
+
 ```js
 const file = fileInput.files[0]
 const p = await api.getPlugin('Tif File Importer')
