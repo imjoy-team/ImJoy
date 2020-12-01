@@ -181,6 +181,7 @@ async def say_hello():
 
 !> **For python plugin with type=`web-python`, we have no support for `async/await` yet. We are current waiting for the [asyncio support](https://github.com/iodide-project/pyodide/issues/245) in the Pyodide project.** For now, you have to switch the type to `native-python` or use callback style (see below) in `web-python` plugins.
 
+!> When using asyncio in Python, a good practice is to avoid running heavy computation directly in the main thread, instead, you can [use executors](https://pymotw.com/3/asyncio/executors.html) (Threads and Processes). You can also use the default thread executor by doing: `loop.run_in_executor(None, my_heavy_computation, arg1, arg2...)`.
 
 #### Callback, Promise and Async/Await
 
@@ -370,6 +371,7 @@ If you want to share your plugin with others, you can either send the plugin fil
 
 You can [fork the imjoy-starter repo](https://github.com/imjoy-team/imjoy-starter/fork) (or create an empty one if you prefer) on Github.
 
+?> The imjoy-starter repo contains a [docs folder](https://github.com/imjoy-team/imjoy-starter/tree/master/docs) which you can take notes and it will rendered as an interactive web site like this: https://imjoy-team.github.io/imjoy-starter/. You can add your plugin code with some special markup in the markdown, you can then see the **Run** and **Edit** button.
 
 Now you can name your plugin as, for example, `PokemonChooser.imjoy.html` and upload it to the `plugins` folder of your forked repo by using git commands or upload directly to the repo. You can organize upload the plugin file in any kind of folder organization.
 
@@ -1514,6 +1516,7 @@ In your forked imjoy-starter repo, you can find [a list of notebook examples](ht
 
 !> Although we support running in Colab, there is an issue with the asyncio support in Colab we reported [here](https://github.com/googlecolab/colabtools/issues/1648), we will need to wait for the fix from the colab team. It might also help if you give add a 👍 to the issue.
 
+
 ### Use imjoy-elfinder to manage your remote files
 
 To manage your files, we made [imjoy-elfinder](https://github.com/imjoy-team/imjoy-elfinder).
@@ -1545,7 +1548,7 @@ class ImJoyPlugin():
 api.export(ImJoyPlugin())
 ```
 
-## Training deep learning model
+### Training deep learning model
 
 We also provide a demo plugin for interactive training of deep learning models during annotation, here is the [project repo](https://github.com/imjoy-team/imjoy-interactive-segmentation).
 
@@ -1557,13 +1560,39 @@ Nevertheless, you can try them locally or using MyBinder or Colab:
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/imjoy-team/imjoy-interactive-segmentation/blob/master/Tutorial.ipynb)
 
 
+### Deploy your models and plugin to BioImage.IO
+
+There are many advantages to share pretrained deep learning models, not only the models can be used directly by others to process data (e.g. the cellpose model), but also pretrained models can be used to reduce training time, and also good for the environment (keep in mind that the carbon footprint of training models are high!). 
+
+We are currently working with several other groups in the bioimage community to build a bioimage model zoo at [BioImage.IO](http://bioimage.io/). The initiative covers a common [model description file format](https://github.com/bioimage-io/configuration), the website powered by ImJoy and plugins (called `BioEngine`).
+
+
+## Integrate ImJoy to your software/web site
+
+With the idea of open integration in mind, ImJoy and its plugins can be used in many different ways:
+
+ * ImJoy plugins can not only be used in the [ImJoy app](https://imjoy-team.github.io/imjoy-starter/#/), but also in [ImJoy lite](https://imjoy.io/lite), [ImageJ.JS](https://ij.imjoy.io), [BioImage.IO](http://bioimage.io/) and more recently the interactive [ImJoy docs](https://imjoy.io/docs/) which we are using now for this tutorial.
+ * Other software, web applications and website can also support[imjoy-rpc](https://github.com/imjoy-team/imjoy-rpc) which will further make it accessible to the entire ImJoy ecosystem. This includes: ITK/VTK Viewer, Vizarr, Kaibu, ImageJ.JS and CellPose.
+
+If you are interested in integrating ImJoy to your project, please see instructions [here](https://github.com/imjoy-team/imjoy-core/blob/master/docs/integration.md)
+
+
+### Two-way integration with ImageJ.JS
+
+[ImageJ.JS](https://ij.imjoy.io) is a standalone web app that support ImJoy in two-way: 1) most plugins can run direclty in ImageJ.JS; 2) ImageJ.JS can be used a s a plugin via its URL.
+
+See the [project repo](https://github.com/imjoy-team/imagej.js) for more details.
+
+As an exercise, you can load your image viewer plugin into ImageJ.JS by click the ImJoy icon, then choose load plugin and paste your plugin URL on Github/Gist.
+
+
+
 ## Plugin Gallery
 
 [Placeholder for plugins made by students]
 
 
 ## FAQ
-
 
 
 
