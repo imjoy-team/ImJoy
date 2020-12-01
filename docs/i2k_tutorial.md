@@ -1031,6 +1031,142 @@ api.export(new ImJoyPlugin())
 
 ?> Exercise option 1, you can try to also add a slider to show other pages of a multi-tiff files.
 
+<!-- ImJoyPlugin: {"hide_code_block": true, "fold": [21, 39, 61], "editor_height": "500px"} -->
+```html
+<config lang="json">
+{
+  "name": "Image Viewer",
+  "type": "window",
+  "tags": [],
+  "ui": "",
+  "version": "0.1.3",
+  "cover": "",
+  "description": "This is a demo plugin for displaying image",
+  "icon": "extension",
+  "inputs": null,
+  "outputs": null,
+  "api_version": "0.1.8",
+  "env": "",
+  "permissions": [],
+  "requirements": ["https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css", "https://use.fontawesome.com/releases/v5.14.0/js/all.js"],
+  "dependencies": ["https://github.com/imjoy-team/imjoy-plugins/blob/master/repository/tifFileImporter.imjoy.html"]
+}
+</config>
+<script lang="javascript">
+// draw a base64 encoded image to the canvas
+const drawImage = (canvas, base64Image)=>{
+    return new Promise((resolve, reject)=>{
+        var img = new Image()
+        img.crossOrigin = "anonymous"
+        img.onload = function(){
+            const ctx = canvas.getContext("2d");
+            canvas.width = Math.min(this.width, 512);
+            canvas.height= Math.min(this.height, parseInt(512*this.height/this.width), 1024);
+            // draw the img into canvas
+            ctx.drawImage(this, 0, 0, canvas.width, canvas.height);
+            resolve(canvas);
+        }
+        img.onerror = reject;
+        img.src = base64Image;
+    })
+}
+
+// read the file and return as a base64 string
+const readImageFile = (file)=>{
+    return new Promise((resolve, reject)=>{
+        const U = window.URL || window.webkitURL;
+        // this works for safari
+        if(U.createObjectURL){
+            resolve(U.createObjectURL(file))
+        }
+        // fallback
+        else{
+            var fr = new FileReader();
+            // when image is loaded, set the src of the image where you want to display it
+            fr.onload = function(e) {
+                resolve(e.target.result)
+            };
+            fr.onerror = reject
+            // fill fr with image data
+            fr.readAsDataURL(file);
+        }
+    })
+}
+
+class ImJoyPlugin{
+    async setup(){
+         // Display image when a file is selected.
+        const fileInput = document.getElementById("file-input");
+        const canvas = document.getElementById("input-canvas");
+        const frameSlider = document.getElementById("frame-slider");
+
+        fileInput.addEventListener("change", async ()=>{
+            const file = fileInput.files[0]
+            let img;
+            if(file.name.endsWith('.tiff') || file.name.endsWith('.tif')){
+              const p = await api.getPlugin('Tif File Importer')
+              const tiffObj = await p.open(file)
+              tiffObj.seek(0)
+              img = await tiffObj.readAsURL()
+              frameSlider.max = tiffObj.n_frames
+              frameSlider.value = 0
+              frameSlider.onchange = async ()=>{
+                tiffObj.seek(parseInt(frameSlider.value))
+                img = await tiffObj.readAsURL()
+                await drawImage(canvas, img);
+              }
+            }
+            else{
+              img = await readImageFile(file);
+            }
+            await drawImage(canvas, img);
+        }, true);
+        // trigger the file dialog when the button is clicked
+        const selectButton = document.getElementById("select-button");
+        selectButton.addEventListener("click", async ()=>{
+            // simulate a click on the <input> tag
+            fileInput.click()
+        }, true);
+        await api.log("plugin initialized")
+    }
+    async run(ctx){
+
+    }
+}
+api.export(new ImJoyPlugin())
+</script>
+<window>
+    <div>
+        <input  id="file-input" accept="image/*" capture="camera" type="file"/>
+        <nav class="panel">
+        <p class="panel-heading">
+            <i class="fas fa-eye" aria-hidden="true"></i> My Image Viewer
+        </p>
+        <div class="panel-block">
+            <button id="select-button" class="button is-link is-outlined is-fullwidth">
+            Open an image
+            </button>
+        </div>
+        
+        <div class="panel-block">
+            <input id="frame-slider" class="slider is-fullwidth" step="1" min="0" max="1" value="0" type="range">
+        </div>
+        
+        <div class="panel-block">
+            <canvas id="input-canvas" style="width: 100%; object-fit: cover;"></canvas>
+        </div> 
+    </div>
+</window>
+<style>
+#file-input{
+    display: none;
+}
+.slider{
+  width: 100%;
+}
+</style>
+```
+
 ?> Exercise option 2, [ITK/VTK Viewer](https://kitware.github.io/itk-vtk-viewer/) to replace the canvas for image display, you can integrate code in [this plugin](https://gist.github.com/oeway/ed0a164ebcea5fc48d040f39f2ead5e0) to your viewer.
 
 ### Process images with OpenCV.js
