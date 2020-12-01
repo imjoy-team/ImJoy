@@ -1295,7 +1295,6 @@ import base64
 import io
 import imageio
 
-
 def image_to_base64(image_array):
     '''This function takes a numpy image array as input
     and encode it into a base64 string
@@ -1389,7 +1388,7 @@ https://github.com/MouseLand/cellpose
   "flags": [],
   "icon": "extension",
   "api_version": "0.1.8",
-  "env": [{"type": "binder", "spec": "MouseLand/cellpose_web/master", "skip_requirements": true}],
+  "env": [{"type": "binder", "spec": "MouseLand/cellpose_web/main", "skip_requirements": true}],
   "permissions": [],
   "requirements": ["repo: https://github.com/MouseLand/cellpose_web", "cmd: pip install -r cellpose_web/requirements.txt"],
   "dependencies": []
