@@ -1575,7 +1575,7 @@ We are currently working with several other groups in the bioimage community to 
 With the idea of open integration in mind, ImJoy and its plugins can be used in many different ways:
 
 - ImJoy plugins can not only be used in the [ImJoy app](https://imjoy-team.github.io/imjoy-starter/#/), but also in [ImJoy lite](https://imjoy.io/lite), [ImageJ.JS](https://ij.imjoy.io), [BioImage.IO](http://bioimage.io/) and more recently the interactive [ImJoy docs](https://imjoy.io/docs/) which we are using now for this tutorial.
-- Other software packages, web applications and website can also support[imjoy-rpc](https://github.com/imjoy-team/imjoy-rpc) which will further make it accessible to the entire ImJoy ecosystem. This includes: ITK/VTK Viewer, Vizarr, Kaibu, ImageJ.JS and CellPose.
+- Other software packages, web applications and website can also support[imjoy-rpc](https://github.com/imjoy-team/imjoy-rpc). THis will allow ImJoy to directly comminucate with these tools, and make them accessible to the entire ImJoy ecosystem. Several examples already exist where such a communication is possible: ITK/VTK Viewer, Vizarr, Kaibu, ImageJ.JS and CellPose.
 
 If you are interested in integrating ImJoy to your project, please see instructions [here](https://github.com/imjoy-team/imjoy-core/blob/master/docs/integration.md)
 
