@@ -59,6 +59,8 @@ jobs:
           path: ./web/dist
       - name: Deploy ImJoy to https://imjoy.io
         uses: peaceiris/actions-gh-pages@v3.5.0
+        env:
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
         with:
           deploy_key: ${{ secrets.ACTION_DEPLOY_KEY }}
           publish_dir: ./web/dist
