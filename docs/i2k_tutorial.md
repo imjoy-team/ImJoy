@@ -1079,11 +1079,33 @@ As another exercise, please take the relevant parts from [this plugin](https://g
 
 !> While browser-based plugins can already be useful and becoming more powerful with new techniques such as WebAssembly and the incoming [WebGPU](https://en.wikipedia.org/wiki/WebGPU), it cannot do heavy computation and have many restrictions due to its security model.
 
-## 4. Build a computation plugin in Python
 
-In this section, we will use Python running on a Jupyter notebook server. For the demo purpose here, the plugin will run on a remote server on MyBinder.org, but you can eventually also can  run them on local Python server on your own machine.
+## 4. Build computation plugin in Python
 
-Let's first try the Pokemon Chooser plugin that we already saw in Javascript. If you click **Run**, you will first need to confirm that you want to execute the plugin. Then you need to wait for a while because spinning up the remote server takes a bit of time.
+Let's first see a simple hello world example in `web-python` mode.
+
+Note, when you run the following plugin, it will take a while because it needs to load the python libraries into the browser:
+<!-- ImJoyPlugin: { "type": "web-python", "name": "my-web-python-plugin"} -->
+```python
+from imjoy import api
+
+class ImJoyPlugin():
+    async def setup(self):
+        pass
+
+    def run(self, ctx):
+        api.alert("Hello from web-python plugin")
+
+api.export(ImJoyPlugin())
+```
+
+In this section, we will move on to use Python running in a Jupyter notebook server. 
+
+Let's first try to setup a local Jupyter notebook, and install the [imjoy-jupyter-extension](https://github.com/imjoy-team/imjoy-jupyter-extension). Instead of installing directly Jupyter notebooks, we recommend our a wrapper library called [ImJoy-Engine](https://github.com/imjoy-team/imjoy-engine), this will allow us apply some settings to the Jupyter server which can be useful for ImJoy, and you don't need to install imjoy-jupyter-extension separately.
+
+In short, you just need to run `pip install imjoy` to install and then start it via `imjoy --jupyter`.
+
+Let's first try the Pokémon Chooser plugin as you see in javascript. You don't need to setup anything locally yet. If you click **Run**, you will need to wait for a while because we will spin up a remote server on MyBinder.org for you to run the Python plugin.
 
 <!-- ImJoyPlugin: { "type": "native-python", "name": "my-python-plugin"} -->
 ```python
@@ -1101,6 +1123,27 @@ class ImJoyPlugin():
         await self.choosePokemon()
 
 api.export(ImJoyPlugin())
+```
+
+If you want to switch to your own locally installed Jupyter server, you need to **Run** the following code block:
+<!-- ImJoyPlugin: { "type": "web-worker", "hide_code_block": true, "passive": true,"editor_height": "200px"} -->
+```js
+api.prompt("Please copy and paste your Jupyter notebook URL with token here").then(async (nbUrl)=>{
+    if(nbUrl){
+        try{
+            const engine = await api.getPlugin("Jupyter-Engine-Manager")
+            const config = {}
+            config.nbUrl = nbUrl
+            config.url = config.nbUrl.split("?")[0];
+            config.connected = true;
+            config.name = "MyJupyterNotebook"
+            await engine.createEngine(config)
+        }
+        catch(e){
+            await api.alert("Failed to add Jupyter notebook engine, error: " + e.toString())
+        }
+    }
+})
 ```
 
 ### Display an image with ITK/VTK Viewer, Vizarr and Kaibu
