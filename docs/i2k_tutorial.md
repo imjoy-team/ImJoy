@@ -30,7 +30,7 @@ This tutorial assumes you have basic programming skills in any of the mainstream
 ## 1. Understanding key concepts in ImJoy
 
 ### Live execution feature
-Let's start by introducing the **live execution feature** of this tutorial. We have loaded the ImJOy core into this tutorial such that you can run and edit ImJoy plugin code directly on this page.
+Let's start by introducing the **live execution feature** of this tutorial. We have loaded the ImJoy core into this tutorial such that you can run and edit ImJoy plugin code directly on this page.
 
 ### Hello from ImJoy
 The following code block contains one line in Javascript. If click the **Run** button, you should see a popup message saying `Hello from ImJoy!`.
@@ -47,7 +47,7 @@ You can also click the **Edit** button, you should see a code editor. Now you ca
 
 ?> ImJoy currently supports several **plugin types**: 1) `window` in for building web UI with HTML/CSS and Javascript; 2) `web-worker` in Javascript for browser-based computation, runs in a separate thread 3) `web-python` in Python for browser-based computation, powered by [WebAssembly](https://webassembly.org/)/[Pyodide](https://github.com/iodide-project/pyodide); 4) `native-python` in Python for heavy computation with local workstations or remote servers. See [here](https://imjoy.io/docs/#/development?id=plugin-types-and-configurations) for more details.
 
-The above example is a `window` plugin and you can use Javascript/HTML/CSS. To show the popup message we used the native Javascript function `alert`. PLease note that this won't work for example in plugins written in Python.
+The above example is a `window` plugin and you can use Javascript/HTML/CSS. To show the popup message we used the native Javascript function `alert`. Please note that this won't work for example in plugins written in Python.
 
 ### Using ImJoy API
 
@@ -183,7 +183,7 @@ async def say_hello():
     await api.alert("Hello from ImJoy!")
 ```
 
-!> **For python plugin with type=`web-python`, we have no support for `async/await` yet. We are current waiting for the [asyncio support](https://github.com/iodide-project/pyodide/issues/245) in the Pyodide project.** For now, you have to switch the type to `native-python` or use callback style (see below) in `web-python` plugins.
+!> **For Python plugin with type=`web-python`, we have no support for `async/await` yet. We are current waiting for the [asyncio support](https://github.com/iodide-project/pyodide/issues/245) in the Pyodide project.** For now, you have to switch the type to `native-python` or use callback style (see below) in `web-python` plugins.
 
 !> When using asyncio in Python, a good practice is to avoid running heavy computation directly in the main thread, instead, you can [use executors](https://pymotw.com/3/asyncio/executors.html) (Threads and Processes). You can also use the default thread executor by doing: `loop.run_in_executor(None, my_heavy_computation, arg1, arg2...)`.
 
@@ -191,19 +191,20 @@ async def say_hello():
 
 Now let's go back to understand a bit more about asynchronous programming.
 
-As we mentioned that one advantage of distributing tasks to different plugins via RPC is that we can schedule and run tasks in parallel.Conventionally, there are many other techniques to achieve concurrency including parallelization with multiple threads or processes in Python, Java and many other programming languages. Asynchronous programming is an increasingly popular way of achieving concurrency in a more scalable fashion. 
+As we mentioned before, one advantage of distributing tasks to different plugins via RPC is that we can **schedule and run tasks in parallel**. Conventionally, there are many other techniques to achieve concurrency including parallelization with multiple threads or processes in Python, Java and many other programming languages. Asynchronous programming is an increasingly popular way of achieving concurrency in a more scalable fashion.
 
-The basic idea is that we don't have to always wait for one task to finish until we can move to the next. For example, you go to a coffee shop, order a cup of cappuccino and get a ticket, while the coffee is in the making, you can make a phone call or read a newspaper. After some minutes, you can get your cappuccino by showing your ticket number.
+The basic idea is that we don't have to always wait for one task to finish until we can move to the next. For example, you go to a coffee shop, order a cup of cappuccino and get a ticket. While the coffee is in the making, you can make a phone call or read a newspaper. After some minutes, you can get your cappuccino by showing your ticket number.
 
 ?> One big difference between asynchronous programming and other techniques such as multi-threading is that the program runs in one thread and process. Therefore, in ImJoy, asynchronous programming is often used to schedule tasks to other plugins, rather than run heavy computation tasks in parallel within the same plugin.
 
-`async/await` is not the only way to do asynchronous programming, in fact, it becomes more popular only in recent years. For example, Python introduces it only after Python 3. To really appreciate `async/await` as a life-saver programming pattern, you can watch this video: [Async + Await in JavaScript, talk from Wes Bos](https://www.youtube.com/watch?v=DwQJ_NPQWWo). It covers **callback style**, **promise style** and **async/await** style.
+`async/await` is not the only way to do asynchronous programming, but it became more popular recently. For example, Python introduced it only after Python 3. To really appreciate `async/await` as a life-saver programming pattern, you can watch this video: [Async + Await in JavaScript, talk from Wes Bos](https://www.youtube.com/watch?v=DwQJ_NPQWWo). It covers **callback style**, **promise style** and **async/await** style.
 
 ### Combining RPC with Async/Await
 
 ?> Another way to see `await` and async functions is: 1) async function will return immediately once called 2) the returned the object is not the actual result, but a special object called `Promise` in Javascript or `Future` in Python. Intuitively, it's like the ticket you get after ordering a coffee. 3) if you apply `await` to the `Promise` or `Future` object, you will get the actual result.
 
 See two equivalent async functions below:
+
 ```js
 async function choosePokemon1(){
     // apply await directly and we will get the actual result
@@ -267,7 +268,7 @@ Lets assume we have taskA (takes 10 minutes), taskB (takes 5 minutes) and taskC 
 
 ### Open integration with ImJoy
 
-The ImJoy plugin ecosystem meant to be open in two ways: 1) other software tools and website should be able to easily use ImJoy and its plugins 2) other software tools should be easily used in ImJoy, typically as a plugin.
+The ImJoy plugin ecosystem is designed to be open in two ways: 1) other software tools and website should be able to easily use ImJoy and its plugins 2) other software tools should be easily used in ImJoy, typically as a plugin.
 
 In general, any software that uses ImJoy RPC protocol to expose service functions can be treated as an ImJoy plugin. This includes the ImJoy web app itself which can read plugin files and produces plugin API. Meanwhile, we provide the [imjoy-rpc](https://github.com/imjoy-team/imjoy-rpc) library which currently support Python and Javascirpt for other software or web applications to directly communicate with the ImJoy core.
 
@@ -1095,7 +1096,7 @@ api.export(ImJoyPlugin())
 
 ### Display an image with ITK/VTK Viewer, Vizarr and Kaibu
 
-Let's use the ITK/VTK Viewer to visualize images. Please read read through the documentation [here](https://kitware.github.io/itk-vtk-viewer/docs/imjoy.html) before starting using it.
+Let's use the ITK/VTK Viewer to visualize images. Please read through the documentation [here](https://kitware.github.io/itk-vtk-viewer/docs/imjoy.html) before starting using it.
 
 It's rather easy, we can basically create a viewer by calling `api.createWindow(...)` (or `api.showDialog(...)` if you want a popup window), then we call `viewer.setImage()` by passing a numpy array (2D or 3D).
 
