@@ -1030,31 +1030,30 @@ api.export(new ImJoyPlugin())
 ```
 
 ?> Exercise option 1, you can try to also add a slider to show other pages of a multi-tiff files.
+
 ?> Exercise option 2, [ITK/VTK Viewer](https://kitware.github.io/itk-vtk-viewer/) to replace the canvas for image display, you can integrate code in [this plugin](https://gist.github.com/oeway/ed0a164ebcea5fc48d040f39f2ead5e0) to your viewer.
 
 ### Process images with OpenCV.js
 
-
-?> Exercise 2: Run Tensorflow.js models
-https://gist.github.com/oeway/95025b000242ead88b06460b27cdf938
-
-
-?> Exercise 1: Use OpenCV.js to process images
-
 OpenCV is a commonly used library for computer vision written in C++, it has been now compiled with WebAssembly to run in the browser.
 
 The opencv.js has intensive documentation for many function, but for this tutorial, the following two parts will be enough:
- 1. understand how to load and save images with opencv.js, read [here](https://docs.opencv.org/3.4/df/d24/tutorial_js_image_display.html)
- 2. choose one of the image processing tutorials from this list [here](https://docs.opencv.org/3.4/d2/df0/tutorial_js_table_of_contents_imgproc.html) and integrate it to your image viewer plugin. For example, [image thresholding](https://docs.opencv.org/3.4/d7/dd0/tutorial_js_thresholding.html), [smooth images](https://docs.opencv.org/3.4/dd/d6a/tutorial_js_filtering.html), [canny edge detection](https://docs.opencv.org/3.4/d7/de1/tutorial_js_canny.html), or [segmentation with watershed](https://docs.opencv.org/3.4/d7/d1c/tutorial_js_watershed.html).
- 
- You need to basically to do it in three steps:
-  1. Add the opencv.js library `"https://docs.opencv.org/master/opencv.js"` to `"requirements"` under `<config>`
-  2. Take the image process part from the tutorial and wrap it as a function (e.g. `processImage`)
-  3. Add a `button` that calls the function when clicked.
+
+ 1. Understand how to load and save images with opencv.js, read [here](https://docs.opencv.org/3.4/df/d24/tutorial_js_image_display.html)
+ 2. Choose one of the image processing tutorials from this list [here](https://docs.opencv.org/3.4/d2/df0/tutorial_js_table_of_contents_imgproc.html) and integrate it to your image viewer plugin. For example, [image thresholding](https://docs.opencv.org/3.4/d7/dd0/tutorial_js_thresholding.html), [smooth images](https://docs.opencv.org/3.4/dd/d6a/tutorial_js_filtering.html), [canny edge detection](https://docs.opencv.org/3.4/d7/de1/tutorial_js_canny.html), or [segmentation with watershed](https://docs.opencv.org/3.4/d7/d1c/tutorial_js_watershed.html).
+
+?> Exercise: Use OpenCV.js to process images
+
+You need to basically to do this in three steps:
+
+1. Add the opencv.js library `"https://docs.opencv.org/master/opencv.js"` to `"requirements"` under `<config>`
+2. Take the image process part from the tutorial and wrap it as a function (e.g. `processImage`)
+3. Add a `button` that calls the function when clicked.
 
 ?> Tips: you can pass the id of the canvas (e.g. we have already defined `input-canvas`) to `cv.imread`, for displaying the result, we can use the same canvas id or create another one as with `id="output-canvas"`.
 
 Here is a template for the processImage function:
+
 ```js
 function processImage(inputCanvasId, outputCanvasId){
     let src = cv.imread(inputCanvasId);
@@ -1070,7 +1069,6 @@ function processImage(inputCanvasId, outputCanvasId){
 
 ?> Here is another [image compare plugin](https://imjoy.io/lite?plugin=https://gist.github.com/oeway/ffb6f0efae8a68d497202137820f68e8) made with itk-vtk-viewer, the source code is [here](https://gist.github.com/oeway/ffb6f0efae8a68d497202137820f68e8).
 
-
 ### Deep learning in the browser with Tensorflow.js
 
 [Tensorflow](https://www.tensorflow.org/) is a widely used deep learning library, it has been ported to javascript to run in the browser and the library is called [Tensorflow.js](https://www.tensorflow.org/js/).
@@ -1081,12 +1079,12 @@ As another exercise, please take the relevant parts from [this plugin](https://g
 
 !> While browser-based plugins can already be useful and becoming more powerful with new techniques such as WebAssembly and the incoming [WebGPU](https://en.wikipedia.org/wiki/WebGPU), it cannot do heavy computation and have many restrictions due to its security model.
 
+## Build a computation plugin in Python
 
-## 4. Build computation plugin in Python
+In this section, we will use Python running on a Jupyter notebook server. For the demo purpose here, the plugin will run on a remote server on MyBinder.org, but you can eventually also can  run them on local Python server on your own machine.
 
-In this section, we will move on to use Python running in a Jupyter notebook server.
-
-Let's first try the Pokémon Chooser plugin as you see in javascript. If you click **Run**, you will need to wait for a while because we will spin up a remote server on MyBinder.org for you to run the Python plugin.
+Let's first try the Pokemon Chooser plugin that we already saw in Javascript. If you click **Run**, you will need to wait for a while because spinning up the remote
+server takes a bit of time.
 
 <!-- ImJoyPlugin: { "type": "native-python", "name": "my-python-plugin"} -->
 ```python
