@@ -1,342 +1,118 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <title>ImJoy.io | Documentation</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="description" content="ImJoy -- Deep Learning Made Easy!">
-    <meta name="author" content="Wei OUYANG">
-    <meta name="keywords" content="Bioimaging, image processing">
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:site" content="@weioyang" />
-    <meta name="twitter:creator" content="@weioyang" />
-    <meta name="twitter:image" content="https://imjoy.io/static/img/imjoy-card-plain.png" />
-    <meta property="og:url" content="https://imjoy.io" />
-    <meta property="og:title" content="ImJoy" />
-    <meta property="og:description" content="ImJoy -- Deep Learning Made Easy!" />
-    <meta property="og:image" content="https://imjoy.io/static/img/imjoy-card-plain.png" />
-    <meta name="format-detection" content="telephone=no">
-    <link rel="apple-touch-icon" sizes="57x57" href="/static/icons/apple-icon-57x57.png">
-    <link rel="apple-touch-icon" sizes="60x60" href="/static/icons/apple-icon-60x60.png">
-    <link rel="apple-touch-icon" sizes="72x72" href="/static/icons/apple-icon-72x72.png">
-    <link rel="apple-touch-icon" sizes="76x76" href="/static/icons/apple-icon-76x76.png">
-    <link rel="apple-touch-icon" sizes="114x114" href="/static/icons/apple-icon-114x114.png">
-    <link rel="apple-touch-icon" sizes="120x120" href="/static/icons/apple-icon-120x120.png">
-    <link rel="apple-touch-icon" sizes="144x144" href="/static/icons/apple-icon-144x144.png">
-    <link rel="apple-touch-icon" sizes="152x152" href="/static/icons/apple-icon-152x152.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="/static/icons/apple-icon-180x180.png">
-    <link rel="icon" type="image/png" sizes="192x192"  href="/static/icons/android-icon-192x192.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/static/icons/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="96x96" href="/static/icons/favicon-96x96.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/static/icons/favicon-16x16.png">
-    <link rel="shortcut icon" href="/static/icons/favicon.ico" type="image/x-icon" />
-    <link rel="icon" href="/static/icons/favicon.ico" type="image/x-icon" />
-    <link rel="apple-touch-startup-image" href="/launch.png">
-    <link rel="manifest" href="/manifest.json">
-    <meta name="msapplication-TileColor" content="#ffffff">
-    <meta name="msapplication-TileImage" content="static/icons/ms-icon-144x144.png">
-    <meta name="theme-color" content="#ffffff">
-    <link rel="stylesheet" href="/docs/static/vue.css" />
-    <link rel="stylesheet" href="/docs/static/prism-github.css" />
-    <style>
-      /****CSS adapted from https://github.com/Netflix/pollyjs ***/
-      :root {
-        --theme-color: #448aff;
-        --theme-color-dark: #053484;
 
-        --text-color-base: #2E2E46;
-        --text-color-secondary: #646473;
-        --text-color-tertiary: #81818E;
+<head>
+  <title>ImJoy.io | Documentation</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="description" content="ImJoy -- Deep Learning Made Easy!">
+  <meta name="author" content="Wei OUYANG">
+  <meta name="keywords" content="Bioimaging, image processing">
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:site" content="@weioyang" />
+  <meta name="twitter:creator" content="@weioyang" />
+  <meta name="twitter:image" content="https://imjoy.io/static/img/imjoy-card-plain.png" />
+  <meta property="og:url" content="https://imjoy.io" />
+  <meta property="og:title" content="ImJoy" />
+  <meta property="og:description" content="ImJoy -- Deep Learning Made Easy!" />
+  <meta property="og:image" content="https://imjoy.io/static/img/imjoy-card-plain.png" />
+  <meta name="format-detection" content="telephone=no">
+  <link rel="apple-touch-icon" sizes="57x57" href="/docs/static/icons/apple-icon-57x57.png">
+  <link rel="apple-touch-icon" sizes="60x60" href="/docs/static/icons/apple-icon-60x60.png">
+  <link rel="apple-touch-icon" sizes="72x72" href="/docs/static/icons/apple-icon-72x72.png">
+  <link rel="apple-touch-icon" sizes="76x76" href="/docs/static/icons/apple-icon-76x76.png">
+  <link rel="apple-touch-icon" sizes="114x114" href="/docs/static/icons/apple-icon-114x114.png">
+  <link rel="apple-touch-icon" sizes="120x120" href="/docs/static/icons/apple-icon-120x120.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="/docs/static/icons/apple-icon-144x144.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="/docs/static/icons/apple-icon-152x152.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/docs/static/icons/apple-icon-180x180.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="/docs/static/icons/android-icon-192x192.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/docs/static/icons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="96x96" href="/docs/static/icons/favicon-96x96.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/docs/static/icons/favicon-16x16.png">
+  <link rel="shortcut icon" href="/docs/static/icons/favicon.ico" type="image/x-icon" />
+  <link rel="icon" href="/docs/static/icons/favicon.ico" type="image/x-icon" />
+  <link rel="apple-touch-startup-image" href="/launch.png">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="msapplication-TileColor" content="#ffffff">
+  <meta name="msapplication-TileImage" content="static/icons/ms-icon-144x144.png">
+  <meta name="theme-color" content="#ffffff">
+  <link rel="stylesheet" href="/docs/static/vue.css" />
+  <link rel="stylesheet" href="/docs/static/style.css" />
+ 
+</head>
 
-        --docsifytabs-border-color: #ededed;
-        --docsifytabs-tab-highlight-color: #448aff;
-        --docsifytabs-content-padding: 0.05rem 0.05rem;
-        --docsifytabs-tab-padding: 0.5em 0.8em;
+<body>
+  <div id="app"></div>
+  <script src="/docs/static/docsify-edit-on-github.js"></script>
+  <script>
+    window.$docsify = {
+      name: "ImJoy",
+      nameLink: '/',
+      logo: "https://imjoy.io/static/img/imjoy-logo-black.svg",
+      basePath: '/docs/',
+      loadSidebar: true,
+      coverpage: false,
+      auto2top: true,
+      autoHeader: false,
+      subMaxLevel: 4,
+      maxLevel: 5,
+      alias: {
+        '/api': 'https://raw.githubusercontent.com/imjoy-team/imjoy-core/master/docs/api.md'
+      },
+      repo: 'https://github.com/imjoy-team/ImJoy',
+      homepage: 'https://raw.githubusercontent.com/imjoy-team/ImJoy/master/README.md',
+      search: {
+        paths: 'auto',
+        placeholder: 'Search',
+        noData: 'No Results.',
+        depth: 2
+      },
+      plugins: [
+        EditOnGithubPlugin.create(
+          'https://github.com/imjoy-team/ImJoy/blob/master/docs/'
+        )
+      ],
+      tabs: {
+        persist: true, // default
+        sync: true, // default
+        theme: 'classic', // default
+        tabComments: true, // default
+        tabHeadings: true // default
       }
+    };
+  </script>
+  <script src="/docs/static/docsify.min.js"></script>
+  <script src="/docs/static/prism-bash.min.js"></script>
+  <script src="/docs/static/prism-json.min.js"></script>
+  <script src="/docs/static/prism-python.min.js"></script>
+  <script src="/docs/static/search.min.js"></script>
+  <script src="/docs/static/external-script.min.js"></script>
+  <script src="/docs/static/docsify-run-code.js"></script>
+  <script src="/docs/static/docsify-copy-code.min.js"></script>
+  <script src="/docs/static/docsify-pagination.min.js"></script>
+  <script src="/docs/static/docsify-tabs@1.js"></script>
+  <script src="/docs/static/zoom-image.min.js"></script>
+  <script src="/docs/static/docsify-sidebar-collapse.min.js"></script>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-134837258-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
 
-      body {
-        font-size: 100%;
-        line-height: 1.5;
-        color: var(--text-color-base);
-      }
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+    gtag('js', new Date());
+    gtag('config', 'UA-134837258-1', {
+      'page_location': location.protocol + '//' + location.hostname + (location.port ? ':' + location.port : ''),
+      'page_path': '/docs'
+    });
+  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js"></script>
+  <script src="/docs/static/imjoy-app.js"></script>
+</body>
 
-      * {
-        text-decoration: none !important;
-      }
-
-      a {
-        transition: all 0.3s linear;
-      }
-
-      .github-corner {
-        z-index: 5;
-      }
-
-      /****** Sidebar ******/
-      .sidebar .app-name img {
-        width: 200px;
-      }
-
-      .sidebar ul li a {
-        font-size: 15px;
-      }
-
-      .sidebar ul li a:hover {
-        color: var(--theme-color);
-      }
-
-      .app-sub-sidebar li:before {
-        display: none;
-      }
-
-      .sidebar .search .clear-button {
-        cursor: pointer;
-      }
-
-      /****** Sidebar Toggle ******/
-      .sidebar-toggle {
-        cursor: pointer;
-      }
-
-      body .sidebar-toggle {
-        background: none;
-        top: 1.5rem;
-        left: calc(300px + 1.5rem);
-        cursor: pointer;
-        width: 1.5rem;
-        height: 1.5rem;
-        padding: 0;
-        transition: left 0.25s ease-out;
-      }
-
-      body .sidebar-toggle span {
-        background-color: var(--theme-color);
-        height: 0.2rem;
-        width: 1.5rem;
-        position: absolute;
-        left: 0;
-        margin: 0;
-        transform-origin: 0;
-        border-radius: 1px;
-      }
-
-      body.close .sidebar-toggle {
-        transition: left 0.25s ease-out;
-        width: 1.5rem;
-        height: 1.5rem;
-        left: 1.5rem;
-      }
-
-      body.close .sidebar-toggle span {
-        transform-origin: center;
-      }
-
-      body .sidebar-toggle span:nth-child(1) {
-        top: 0;
-      }
-      body .sidebar-toggle span:nth-child(2) {
-        top: 0.5rem;
-      }
-      body .sidebar-toggle span:nth-child(3) {
-        top: 1rem;
-      }
-
-      .sidebar-toggle:hover {
-        opacity: 0.8;
-      }
-      .sidebar-toggle .sidebar-toggle-button:hover {
-        opacity: 1;
-      }
-
-      @media screen and (max-width: 768px) {
-        body .sidebar-toggle {
-          left: 1rem;
-        }
-
-        body.close .sidebar-toggle {
-          left: calc(300px + 1.5rem);
-        }
-      }
-
-      /****** Markdown General ******/
-      .markdown-section pre{
-        margin: 3px;
-        padding: 3px;
-      }
-
-      .markdown-section {
-        padding: 30px 30px 40px;
-      }
-
-      @media screen and (max-width: 768px) {
-        .markdown-section {
-          padding: 20px 20px 25px;
-        }
-      }
-
-      .markdown-section pre>code {
-        padding: 10px;
-        overflow-wrap: normal;
-      }
-
-      .markdown-section code {
-        overflow-wrap: break-word;
-        padding: 1px 1px;
-        margin: 0px 0px;
-        color: #262a4e!important;
-        background-color: #efeeee!important;
-      }
-
-      .markdown-section code:after, .markdown-section code:before {
-        letter-spacing: 0.01rem!important;
-      }
-
-      .markdown-section a {
-        text-decoration: none;
-        border-bottom: 0.1rem solid var(--theme-color);
-        transition: all 0.3s ease;
-      }
-
-      .markdown-section a:hover {
-        border-color: var(--theme-color-dark);
-        color: var(--theme-color-dark);
-      }
-
-      .markdown-section a.anchor {
-        border: none;
-      }
-
-      /****** Markdown Table ******/
-      .markdown-section table {
-        display: table;
-      }
-
-      .markdown-section table tr {
-        border-width: 0.15rem 0;
-        border-style: solid;
-        border-color: #f1f1f2;
-      }
-
-      .markdown-section table thead tr {
-        text-transform: uppercase;
-        font-size: 90%;
-        border-top: none;
-      }
-
-      .markdown-section table tbody tr:last-of-type {
-        border-bottom: none;
-      }
-
-      .markdown-section table tr:nth-child(2n) {
-        background-color: transparent;
-      }
-
-      .markdown-section table td,
-      .markdown-section table th {
-        border: none;
-        padding: 1.1rem 0.5rem;
-        text-align: left;
-      }
-
-      .markdown-section table td p {
-        margin: 0;
-      }
-
-      .markdown-section blockquote {
-        margin: 1em 0;
-      }
-
-      .markdown-section blockquote > p {
-        font-weight: 500;
-      }
-
-      .markdown-section em,
-      .markdown-section blockquote {
-        color: var(--text-color-tertiary);
-      }
-
-      a > span > code {
-        font-size: inherit !important;
-      }
-
-      /* no outline for non-keyboard-inputs elements */
-      button:focus,
-      select:focus {
-        outline: none;
-      }
-
-      .docsify-tabs__tab button{
-        font-size: 18px;
-      }
-      .docsify-copy-code-button, .docsify-copy-code-button:after {
-        background: #cccccc87!important;
-        color: #696161!important;
-      }
-
-    </style>
-  </head>
-
-  <body>
-    <div id="app"></div>
-    <script src="/docs/static/docsify-edit-on-github.js"></script>
-    <script>
-      window.$docsify = {
-        name: "ImJoy",
-        nameLink: '/',
-        logo: "../static/img/imjoy-logo-black.svg",
-        basePath: '/docs/',
-        loadSidebar: true,
-        coverpage: false,
-        auto2top: true,
-        autoHeader: false,
-        subMaxLevel: 4,
-        maxLevel: 5,
-        alias: {
-          '/api': 'https://raw.githubusercontent.com/imjoy-team/imjoy-core/master/docs/api.md'
-        },
-        repo: 'https://github.com/imjoy-team/ImJoy',
-        homepage: 'https://raw.githubusercontent.com/imjoy-team/ImJoy/master/README.md',
-        search: {
-          paths: 'auto',
-          placeholder: 'Search',
-          noData: 'No Results.',
-          depth: 2
-        },
-        plugins: [
-          EditOnGithubPlugin.create(
-            'https://github.com/imjoy-team/ImJoy/blob/master/docs/'
-          )
-        ],
-        tabs: {
-            persist    : true,      // default
-            sync       : true,      // default
-            theme      : 'classic', // default
-            tabComments: true,      // default
-            tabHeadings: true       // default
-          }
-      };
-    </script>
-    <script src="/docs/static/docsify.js"></script>
-    <script src="/docs/static/prism-bash.min.js"></script>
-    <script src="/docs/static/prism-json.min.js"></script>
-    <script src="/docs/static/prism-python.min.js"></script>
-    <script src="/docs/static/search.min.js"></script>
-    <script src="/docs/static/external-script.min.js"></script>
-    <script src="/docs/static/docsify-copy-code.min.js"></script>
-    <script src="/docs/static/docsify-pagination.min.js"></script>
-    <script src="/docs/static/docsify-tabs@1.js"></script>
-    <script src="/docs/static/zoom-image.min.js"></script>
-    <script src="/docs/static/docsify-sidebar-collapse.min.js"></script>
-    <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-134837258-1"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'UA-134837258-1', {'page_location': location.protocol+'//'+location.hostname+(location.port ? ':'+location.port: ''), 'page_path': '/docs'});
-    </script>
-  </body>
 </html>
