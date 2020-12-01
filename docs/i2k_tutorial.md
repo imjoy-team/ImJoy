@@ -1567,7 +1567,7 @@ There are many advantages to share pretrained deep learning models, not only the
 We are currently working with several other groups in the bioimage community to build a bioimage model zoo at [BioImage.IO](http://bioimage.io/). The initiative covers a common [model description file format](https://github.com/bioimage-io/configuration), the website powered by ImJoy and plugins (called `BioEngine`).
 
 
-## Integrate ImJoy to your software/web site
+## 6. Integrate ImJoy to your software/web site
 
 With the idea of open integration in mind, ImJoy and its plugins can be used in many different ways:
 
