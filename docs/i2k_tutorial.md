@@ -1,6 +1,6 @@
 # [WIP] I2K Workshop Tutorial
 
-This tutorial is presented as part of the [I2K workshop 2020](https://www.janelia.org/you-janelia/conferences/from-images-to-knowledge-with-imagej-friends)
+This tutorial is presented as part of the [I2K workshop 2020](https://www.janelia.org/you-janelia/conferences/from-images-to-knowledge-with-imagej-friends).
 
 <img src="https://www.janelia.org/sites/default/files/styles/adaptive/public/You%20%2B%20Janelia/Conferences/social%20card%20I2K.jpg?itok=EKdWiSld" style="width: 50%;"></img>
 
@@ -11,48 +11,50 @@ You can find more details about this tutorial here: [ImJoying Interactive Bioima
 ## Recommendations for beginners
 This tutorial assumes you have basic programming skills in any of the mainstream programming language including Python, Java, C/C++ and Javascript.
 
- - Please read and run this tutorial in [Chrome](https://www.google.com/chrome/) or [FireFox](https://www.mozilla.org/en-US/firefox/new/)
- - If you don't know how [Github](https://github.com/join) or git in general works, please take a look at [here](https://guides.github.com/activities/hello-world/).
- -  If you want to use your own GPU workstation, please install [conda](https://docs.conda.io/en/latest/miniconda.html) and [ImJoy-Engine](https://github.com/imjoy-team/imjoy-engine).
- - If you never used HTML/CSS/Javascript:
+ - Please read and run this tutorial in [Chrome](https://www.google.com/chrome/) or [FireFox](https://www.mozilla.org/en-US/firefox/new/).
+ - If you don't know how [**Github**](https://github.com/join) or **git** in general work, please take a look [here](https://guides.github.com/activities/hello-world/).
+ -  If you want to use **your own GPU workstation**, please install [conda](https://docs.conda.io/en/latest/miniconda.html) and the [ImJoy-Engine](https://github.com/imjoy-team/imjoy-engine).
+ - If you never used **HTML/CSS/Javascript**:
      - [Basic HTML (14 minutes)](https://www.youtube.com/watch?v=3JluqTojuME)
      - [Basic CSS (16 minutes)](https://www.youtube.com/watch?v=gBi8Obib0tw)
      - [Javascript for Beginners (48 minutes)](https://www.youtube.com/watch?v=W6NZfCO5SIk)
- - If you never used Python:
-    - [Python Crash Course For Beginners](https://www.youtube.com/watch?v=JJmcL1N2KQs) (Install [VSCode](https://code.visualstudio.com/) if you want to follow the code examples in the video)
+ - If you never used **Python**:
+    - [Python Crash Course For Beginners](https://www.youtube.com/watch?v=JJmcL1N2KQs) (Install [VSCode](https://code.visualstudio.com/) if you want to follow the code examples in the video).
 
- - If you are not familiar with asynchronous programming, you might find the following tutorial useful:
+ - If you are not familiar with **asynchronous programming**, you might find the following tutorial useful:
     - [Async + Await in JavaScript, talk from Wes Bos](https://www.youtube.com/watch?v=DwQJ_NPQWWo)
     - [Asynchronous programming in Python](https://www.youtube.com/watch?v=6kNzG0T44SI)
 
- - Since Remote Procedure Calls is a key technique used in ImJoy, we recommend reading this blog post: [RPCs, Life and All](http://tomerfiliba.com/blog/RPCs-Life-And-All/)
+ - Since **Remote Procedure Calls** is a key technique used in ImJoy, we recommend reading this blog post: [RPCs, Life and All](http://tomerfiliba.com/blog/RPCs-Life-And-All/)
 
 
 ## 1. Understanding key concepts in ImJoy
 
-Let's start by introducing you the live execution feature of this tutorial. We have loaded the core of ImJoy into this tutorial such that you can edit or run ImJoy plugin code directly in this page.
+### Live execution feature
+Let's start by introducing the **live execution feature** of this tutorial. We have loaded the ImJOy core into this tutorial such that you can run and edit ImJoy plugin code directly on this page.
 
 ### Hello from ImJoy
-See the following code block with one line in Javascript, if you click the **Run** button, you should see a popup message saying `Hello from ImJoy!`.
+The the following code block contains one line in Javascript. If click the **Run** button, you should see a popup message saying `Hello from ImJoy!`.
 <!-- ImJoyPlugin: { "type": "iframe", "passive": true, "editor_height": "200px"} -->
 ```js
 alert("Hello from ImJoy!")
 ```
+
 You can also click the **Edit** button, you should see a code editor. Now you can change `Hello from ImJoy!` to `Hello, <YOUR NAME>`, then click the **Run** button in the toolbar of the code editor
 
+?> If you cannot see the run button or you don't see the popup message, you can try the following steps: **1)** Make sure you are reading this tutorial from https://imjoy.io/docs, it won't work if you read directly from Github; **2)** Make sure you use the latest Chrome or FireFox, with Javascript enabled.
 
-?> If you cannot run see the run button or you don't see the popup message, please check: **1)** Make sure you are reading this tutorial from https://imjoy.io/docs, it won't work if you read directly from Github; **2)** Make sure you use the latest Chrome or FireFox, with javascript enabled.
+### ImJoy plugin types
 
+?> ImJoy currently support several **plugin types**: 1) `window` in for building web UI with HTML/CSS and Javascript; 2) `web-worker` in Javascript for browser based computation, runs in a separate thread 3) `web-python` in Python for browser based computation, powered by [WebAssembly](https://webassembly.org/)/[Pyodide](https://github.com/iodide-project/pyodide); 4) `native-python` in Python for heavy computation with local workstations or remote servers. See [here](https://imjoy.io/docs/#/development?id=plugin-types-and-configurations) for more details.
 
+The above example is a `window` plugin and you can use Javascript/HTML/CSS. To show the popup message we used the native Javascript function `alert`. PLease note that this won't work for example in plugins written in Python.
 
 ### Using ImJoy API
-The above example uses the native javascript function `alert`, but it only works in ImJoy plugins with `"type": "window"` in Javascript (it won't work for example in plugins written in Python).
 
-?> ImJoy currently support several types of plugins: 1) `window` in for building web UI with HTML/CSS and Javascript; 2) `web-worker` in Javascript for browser based computation, runs in a separate thread 3) `web-python` in Python for browser based computation, powered by [WebAssembly](https://webassembly.org/)/[Pyodide](https://github.com/iodide-project/pyodide); 4) `native-python` in Python for heavy computation with local workstations or remote servers. See [here](https://imjoy.io/docs/#/development?id=plugin-types-and-configurations) for more details.
+To permit basic user interactions, ImJoy provide a set of API (application programming interface ) functions which can be used consistently across all plugin types and supported programming language.
 
-In order to perform basic user interactions, ImJoy provide a set of API which can be used consistently across all the plugin types and supported programming language.
-
-For example, the equivalent ImJoy API function to `alert()` in javascript is `api.alert()`. 
+For example, the equivalent ImJoy API function to the Javascript function `alert()` is `api.alert()`. 
 
 ?> You can find detailed description of all the ImJoy API [here](https://imjoy.io/docs/#/api). 
 
