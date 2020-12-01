@@ -1083,8 +1083,7 @@ As another exercise, please take the relevant parts from [this plugin](https://g
 
 In this section, we will use Python running on a Jupyter notebook server. For the demo purpose here, the plugin will run on a remote server on MyBinder.org, but you can eventually also can  run them on local Python server on your own machine.
 
-Let's first try the Pokemon Chooser plugin that we already saw in Javascript. If you click **Run**, you will need to wait for a while because spinning up the remote
-server takes a bit of time.
+Let's first try the Pokemon Chooser plugin that we already saw in Javascript. If you click **Run**, you will first need to confirm that you want to execute the plugin. Then you need to wait for a while because spinning up the remote server takes a bit of time.
 
 <!-- ImJoyPlugin: { "type": "native-python", "name": "my-python-plugin"} -->
 ```python
@@ -1106,11 +1105,11 @@ api.export(ImJoyPlugin())
 
 ### Display an image with ITK/VTK Viewer, Vizarr and Kaibu
 
-Let's use the ITK/VTK Viewer to visualize images. Please read through the documentation [here](https://kitware.github.io/itk-vtk-viewer/docs/imjoy.html) before starting using it.
+Let's use the ITK/VTK Viewer to visualize images. Please read through the documentation [here](https://kitware.github.io/itk-vtk-viewer/docs/imjoy.html) before you start using it.
 
 It's rather easy, we can basically create a viewer by calling `api.createWindow(...)` (or `api.showDialog(...)` if you want a popup window), then we call `viewer.setImage()` by passing a numpy array (2D or 3D).
 
-See the example below:
+See the example below (loading the default image might be a bit slow, just wait until the image is shown):
 <!-- ImJoyPlugin: { "type": "native-python", "name": "itk-vtk-viewer-plugin", "requirements": ["imageio"]} -->
 ```python
 from imjoy import api
@@ -1137,13 +1136,13 @@ api.export(ImJoyPlugin())
 
 While ITK/VTK Viewer can display 3D volume, another viewer [Vizarr](https://github.com/hms-dbmi/vizarr) can visualize massive multi-resolution images in [Zarr format](https://zarr.readthedocs.io/en/stable/). You can find examples [here](https://github.com/hms-dbmi/vizarr/tree/master/example).
 
-Similarly, we can show the image with another plugin [Kaibu](https://kaibu.org) which integrates ITK/VTK Viewer with [OpenLayers](https://openlayers.org/) and provides a [napari](https://github.com/napari/napari)-like layered interface.
+Similarly, we can show the image with another plugin [Kaibu](https://kaibu.org) which integrates the ITK/VTK Viewer with [OpenLayers](https://openlayers.org/) and providing in interface where different layers can be displayed.
 
 Based on the ITK/VTK Viewer example, we only need to change `src` to `https://kaibu.org/#/app` and use `viewer.view_image()` function instead of `viewer.setImage()`.
 
-In the example below, we also show how to add a shape layer with polygons and points.
+In the example below, we also show how to add a **shape layer** with polygons and points to annotate images.
 
-To allow more user interactions, you can also add buttons to the interface by calling `viewer.add_widget`
+To allow **more user interactions**, you can also add buttons to the interface by calling `viewer.add_widget`
 
 <!-- ImJoyPlugin: { "type": "native-python", "name": "kaibu-plugin", "requirements": ["imageio", "numpy"]} -->
 ```python
@@ -1168,11 +1167,11 @@ class ImJoyPlugin():
         viewer.view_image(image)
 
         # add polygon to a vector layer
-        triangle = np.array([[11, 13], [111, 113], [22, 246]], dtype='uint16')
+        triangle = np.array([[11, 13], [1801, 413], [22, 246]], dtype='uint16')
         await viewer.add_shapes([ triangle ], shape_type="polygon", edge_color="red", name="triangle")
 
         # add points to a vector layer
-        points = np.random.randint(0, 500, [100, 2], dtype='uint16')
+        points = np.random.randint(0, 2000, [100, 2], dtype='uint16')
         await viewer.add_points(points, face_color="purple", name="points")
 
         def say_hello():
@@ -1200,9 +1199,9 @@ api.export(ImJoyPlugin())
 
 ### Connect your image viewer to the Python plugin
 
-In addition to ITK/VTK Viewer, Vizarr and Kaibu, we can also connect the image viewer we build in the previous sections to the Python plugin.
+In addition to ITK/VTK Viewer, Vizarr and Kaibu, we can also connect the image viewer from the previous sections to the Python plugin.
 
-?> In this setup, there will be the UI plugin and the compute plugin. In general, there are two ways to connect the two parts: 1) You can do like the example above, first instantiate the UI plugin from the compute plugin with `api.createWindow(...)`, then interact with the returned viewer object; 2) Or you can directly start the UI plugin, then you can do `api.getPlugin()` to get the api provided by the compute plugin. It will depend on the actual need of your application, but we recommended way the first one for Python plugins because it make it easier to debug in Jupyter notebooks.
+?> In this configuration, we have two plugins: the UI plugin and the compute plugin. In general, there are two ways to connect them: 1) You can do like the example above, first instantiate the UI plugin from the compute plugin with `api.createWindow(...)`, then interact with the returned viewer object; 2) Or you can directly start the UI plugin, then you can do `api.getPlugin()` to get the api provided by the compute plugin. It will depend on the actual need of your application, but we recommended way the first one for Python plugins because it make it easier to debug in Jupyter notebooks.
 
 In this tutorial, let's adjust the our image viewer so we can provide some API functions to allow the Python plugin to interact with.
 
