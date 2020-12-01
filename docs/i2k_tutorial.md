@@ -1519,9 +1519,9 @@ In your forked imjoy-starter repo, you can find [a list of notebook examples](ht
 ### Use imjoy-elfinder to manage your remote files
 
 To manage your files, we made [imjoy-elfinder](https://github.com/imjoy-team/imjoy-elfinder).
-You can try it directly on Google Colab: [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/imjoy-team/imjoy-elfinder/blob/master/example-data/ImJoy_elFinder_Colab.ipynb)
+You can try it by [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/imjoy-team/imjoy-elfinder/blob/master/example-data/ImJoy_elFinder_Colab.ipynb) or [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/imjoy-team/imjoy-elfinder/master?urlpath=elfinder).
 
-!> The example on Binder or Jupyter notebook is broken at the moment, due some security changes in the latest Chrome ([this issue](https://github.com/imjoy-team/ImJoy/issues/401)), you will need to use Firefox to try it.
+!> While you can use it normally as a standalone interface or within the Jupyter notebook, it fails to work in the Imjoy app, possibly due to some security changes in the latest Chrome ([this issue](https://github.com/imjoy-team/ImJoy/issues/401)), but you can try it with Firefox.
 
 We also encourage you to try run it locally. Here are the steps:
  1. Install it via `pip install -U imjoy-elfinder`
