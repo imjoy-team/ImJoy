@@ -645,6 +645,7 @@ animation: spin 2s linear infinite;
                         if (config.lang === 'html' && !config.type) {
                             const source_config = await this.imjoy.pm.parsePluginCode(code)
                             config.type = source_config.type;
+                            config.name = source_config.name;
                             config.passive = source_config.passive || config.passive;
                             config._parsed = true;
                         }
@@ -770,7 +771,8 @@ animation: spin 2s linear infinite;
                                 icon: "file-download-outline",
                                 visible: true,
                                 async callback(content) {
-                                    await api.exportFile(editorWindow, makePluginSource(content, config), (pluginInEditor && pluginInEditor.config.name) || "myPlugin.imjoy.html");
+                                    const fileName =  (pluginInEditor && pluginInEditor.config.name && pluginInEditor.config.name+'.imjoy.html') || config.name+'.imjoy.html' || "myPlugin.imjoy.html";
+                                    await api.exportFile(editorWindow, makePluginSource(content, config), fileName);
                                 }
                             }
                         }

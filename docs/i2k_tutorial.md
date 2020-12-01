@@ -1190,7 +1190,7 @@ api.export(ImJoyPlugin())
 ?> As an exercise, you can use a popular python library [scikit-image](https://scikit-image.org/) to process the image.
 
 
-### Connect your image viewer with the Python plugin
+### Connect your image viewer to the Python plugin
 
 In addition to ITK/VTK Viewer, Vizarr and Kaibu, we can also connect the image viewer we build in the previous sections to the Python plugin.
 
@@ -1293,6 +1293,7 @@ import base64
 import io
 import imageio
 
+
 def image_to_base64(image_array):
     '''This function takes a numpy image array as input
     and encode it into a base64 string
@@ -1301,16 +1302,16 @@ def image_to_base64(image_array):
     imageio.imwrite(buf, image_array, "PNG")
     buf.seek(0)
     img_bytes = buf.getvalue()
-    base64_string = base64.b64encode(img_bytes)
+    base64_string = base64.b64encode(img_bytes).decode('ascii')
     return 'data:image/png;base64,' + base64_string
 
-def base64_to_image(base64_string):
+def base64_to_image(base64_string, format=None):
     '''This function takes a base64 string as input
     and decode it into an numpy array image
     '''
     base64_string = re.sub("^data:image/.+;base64,", "", base64_string)
-    image_file = io.BytesIO(base64.b64decode(base64_string))
-    return imageio.imread(image_file)
+    image_file = io.BytesIO(base64.b64decode(base64_string.encode('ascii')))
+    return imageio.imread(image_file, format)
 ```
 
 In Javascript, this is how the base64 encoding works:
@@ -1347,25 +1348,36 @@ As an exercise, please use the encoding and decoding functions above to:
  5. show the base64 string as an image on a canvas in the image viewer plugin
 
 
-#### Build a segmentation plugin with CellPose
+### Build deep learning based segmentation plugin with CellPose
+CellPose is a deep learning model developed by Stringer et al.,2020 ([paper](https://www.biorxiv.org/content/10.1101/2020.02.02.931238v1), [source code](https://github.com/MouseLand/cellpose)).
 
+It also provide an [server version](https://github.com/MouseLand/cellpose_web) for running inference from a remote server, for example the [cellpose demo website](https://cellpose.org/).
 
+Recently, we submitted [a Pull Request](https://github.com/MouseLand/cellpose_web/pull/1) to cellpose_web repo to support the ImJoy RPC communication, such that cellpose website itself can be used as a plugin.
+
+This further enables the CellPose segmentation feature in [ImageJ.JS](https://ij.imjoy.io/)(ImageJ compiled into javascript and running in the browser). This is [the plugin](https://gist.github.com/oeway/c9592f23c7ee147085f0504d2f3e993a) that calls the CellPose plugin and run segmentation with the https://cellpose.org server. You can also find an annoucement [here](https://forum.image.sc/t/new-imagej-js-release-with-3d-viewer-and-cellpose-segmentation/44842) about the cellpose feature.
+
+?> While a cellpose runs on the server-side makes it much easier for users to try, users will need to upload images to a server maintained by others (even though cellpose.org don't store users' images). Besides that, you cannot rely on that to process large amount of data.
+
+Therefore, let's make a ImJoy plugin in Python to run the cellpose segmentaiton model locally (or on Google Colab with free GPU).
+
+Here is the code for the CellPose plugin:
 <!-- ImJoyPlugin: { "hide_code_block": true} -->
-```python
+```html
 <docs lang="markdown">
 # CellPose
  
 A generalist algorithm for cell and nucleus segmentation.
 
 https://github.com/MouseLand/cellpose
-  
+
 </docs>
 
 <config lang="json">
 {
-  "name": "HPA-CellPose",
+  "name": "CellPose-Segmentation",
   "type": "native-python",
-  "version": "0.1.3",
+  "version": "0.1.0",
   "description": "A generalist algorithm for cell and nucleus segmentation.",
   "tags": [],
   "ui": "",
@@ -1374,152 +1386,175 @@ https://github.com/MouseLand/cellpose
   "outputs": null,
   "flags": [],
   "icon": "extension",
-  "api_version": "0.1.7",
-  "env": [{"type": "binder", "spec": "oeway/cellpose/master", "skip_requirements": true}],
+  "api_version": "0.1.8",
+  "env": [{"type": "binder", "spec": "MouseLand/cellpose_web/master", "skip_requirements": true}],
   "permissions": [],
-  "requirements": ["cmd: pip install .", "Pillow"],
-  "dependencies": ["oeway/ImJoy-Plugins:HPA-Image-Selection"]
+  "requirements": ["repo: https://github.com/MouseLand/cellpose_web", "cmd: pip install -r cellpose_web/requirements.txt"],
+  "dependencies": []
 }
 </config>
 
 <script lang="python">
-from imjoy import api
+import os
+# for Jupyter notebooks
+if os.path.exists('cellpose_web'):
+    os.chdir('cellpose_web')
 
-import numpy as np
-import time, os, sys
-import mxnet as mx
-from skimage.io import imread
-import glob
-import sys
-from cellpose import models, utils
-from skimage.transform import rescale
-import cv2
-
-from urllib import request
+import re
 import base64
-from io import BytesIO
-from PIL import Image
-from skimage.color import label2rgb
-from skimage.color import rgb2gray
-from skimage import exposure
-import random
-from matplotlib import cm
-jet_colors = [cm.jet(i)[:3] for i in range(256)]
-random.shuffle(jet_colors)
+import io
+import imageio
+import cv2
+from imjoy import api
+from main import *
 
+def image_to_base64(image_array):
+    '''This function takes a numpy image array as input
+    and encode it into a base64 string
+    '''
+    buf = io.BytesIO()
+    imageio.imwrite(buf, image_array, "PNG")
+    buf.seek(0)
+    img_bytes = buf.getvalue()
+    base64_string = base64.b64encode(img_bytes).decode('ascii')
+    return 'data:image/png;base64,' + base64_string
 
-# check if GPU working, and if so use it
-use_gpu = utils.use_gpu()
-if use_gpu:
-    device = mx.gpu()
-else:
-    device = mx.cpu()
-
-def encodeImage(im):
-    if im.ndim == 3 and im.shape[2] == 1:
-        im = im[:,:,0]
-    im = im.astype(np.uint8)
-    api.log('type and shape:'+str(im.dtype)+str(im.shape))
-    im = Image.fromarray(im)
-    buffered = BytesIO()
-    im.save(buffered, format="PNG")
-    img_str = base64.b64encode(buffered.getvalue()).decode('ascii')
-    imgurl = 'data:image/png;base64,' + img_str
-    return imgurl
-
-async def showImage(im, title):
-    imgurl = encodeImage(im)
-    viewer = await api.showDialog(src="https://kaibu.org/#/app", name=title)
-    await viewer.view_image(imgurl, name=title)
-
-
-async def showCompare(im1, im2, title):
-    imgurl1 = encodeImage(im1)
-    imgurl2 = encodeImage(im2)
-    viewer = await api.showDialog(src="https://kaibu.org/#/app", name=title)
-    await viewer.view_image(imgurl1, name=title+"_input")
-    await viewer.view_image(imgurl2, name=title+"_output")
-
+def base64_to_image(base64_string, format=None):
+    '''This function takes a base64 string as input
+    and decode it into an numpy array image
+    '''
+    base64_string = re.sub("^data:image/.+;base64,", "", base64_string)
+    image_file = io.BytesIO(base64.b64decode(base64_string.encode('ascii')))
+    return imageio.imread(image_file, format)
 
 class ImJoyPlugin():
     def setup(self):
-        # model_type='cyto' or model_type='nuclei'
-        self.model = models.Cellpose(device, model_type='cyto', net_avg=True)
         api.log('initialized')
-        self.w = None
-        if 'cpu' in str(device):
-            api.showMessage('Note: CellPose model will be running on CPU which has lower performance, so please be patient! \n\n You can also run it with your own Jupyter notebook if you have a GPU on your computer.')
+
+    def segment(self, config):
+        input64 = config["input"]
+        original_img = base64_to_image(input64, config.get('format'))
+        mask, flow, img = cellpose_segment(original_img, config)
+        results = {"success": True, "input_shape": original_img.shape}
+        outputs = config.get("outputs", "mask").split(",")
+        if "geojson" in outputs:
+            geojson_features = mask_to_geojson(mask)
+            results["geojson"] = geojson_features
+        if "img" in outputs:
+            _, buffer = cv2.imencode('.png', img)
+            img64 = base64.b64encode(buffer).decode()
+            results["img"] = img64
+        if "flow" in outputs:
+            _, buffer = cv2.imencode('.png', flow)
+            flow64 = base64.b64encode(buffer).decode()
+            results["flow"] = flow64
+        if "mask" in outputs:
+            _, buffer = cv2.imencode('.png', mask.astype('uint16'))
+            mask64 = base64.b64encode(buffer).decode()
+            results["mask"] = mask64
+        if "outline_plot" in outputs:
+            outpix = plot_outlines(mask)
+            results["outline_plot"] = img_to_html(img, outpix=outpix)
+        if "overlay_plot" in outputs:
+            overlay = plot_overlay(img, mask)
+            results["overlay_plot"] = img_to_html(overlay)
+        if "flow_plot" in outputs:
+            results["flow_plot"] = img_to_html(flow)
+        if "img_plot" in outputs:
+            results["img_plot"] = img_to_html(img)
+        return results
 
     async def run(self, ctx):
-        #await self.segment('./1020_A10_1.png', scale_factor=0.25)
-        message = "This is a CellPose demo in ImJoy, you can select an image from the HPA data base, and segment with CellPose.\n\n"
-        if 'cpu' in str(device):
-            message += 'Note that you are running it without a GPU, so please be patient. Or, you can run it on a local jupyter notebook'
-        await api.alert(message)
-
-        self.w = await api.showDialog({'type': 'HPA-Image-Selection', 'name': 'Select An Image', 'data': {'select_callback': self.segmentHPAImage}})
-
-    async def segmentHPAImage(self, image_id):
-        api.showMessage('selected HPA image ' + image_id)
-        self.w.close()
-        s = image_id.split('_')
-        image_id = s[0] + '/' + s[1] + '_' + s[2] + '_' + s[3]
-        file_url = 'https://images.proteinatlas.org/'+image_id+'_blue_red_green.jpg'
-        file_url = file_url or 'https://images.proteinatlas.org/19661/221_G2_1_blue_red_green.jpg';
-        file_path = self.downloadImage(file_url)
-        await self.segment(file_path, scale_factor=0.25)
-
-    def downloadImage(self, url, dir='./'):
-        file_name = url.split('/')[-1]
-        file_path = os.path.join(dir, file_name.split('?')[0])
-        api.showMessage('Downloading ' + url)
-        with open(file_path,'wb') as f:
-            f.write(request.urlopen(url).read())
-        return file_path
-
-    async def segment(self, file_path, scale_factor=0.25):
-        api.showMessage('Running cellpose segmentation, please wait, this may take a while (e.g. >1 minute)...')
-        img_origin = imread(file_path)
-        img0 = (exposure.equalize_adapthist(rescale(img_origin[:,:, 0], scale_factor, anti_aliasing=True), clip_limit=0.03)*255).astype(np.uint8) 
-        img1 = (exposure.equalize_adapthist(rescale(img_origin[:,:, 1], scale_factor, anti_aliasing=True), clip_limit=0.03)*255).astype(np.uint8)
-        img2 = (exposure.equalize_adapthist(rescale(img_origin[:,:, 2], scale_factor, anti_aliasing=True), clip_limit=0.03)*255).astype(np.uint8) 
-        
-        img = np.zeros([img0.shape[0], img0.shape[1], 3], dtype=np.uint8)
-        img[:, :, 0] = np.clip((img0 + img2)/2, 0, 255)
-        img[:, :, 1] = img1
-        img[:, :, 2] = img2
-
-
-        # define CHANNELS to run segementation on
-        # grayscale=0, R=1, G=2, B=3
-        # channels = [cytoplasm, nucleus]
-        # if NUCLEUS channel does not exist, set the second channel to 0
-        channels = [[1, 3]]
-
-        start = time.time()
-        masks, flows, styles, diams = self.model.eval([img], rescale=None, channels=channels, net_avg=False)
-        mask = masks[0]
-        end = time.time()
-        api.showMessage('CellPose model takes ' + str(round(end - start, 2))+ 's to segment one image (device: ' + str(device)+').')
-        mask_rgb = label2rgb(mask, bg_label=0, bg_color=(0.8, 0.8, 0.8), colors=jet_colors)
-        mask_rgb = mask_rgb*255 
-        await showCompare(img_origin, mask_rgb, "CellPose segmentation results")
+        if ctx.data and 'input' in ctx.data:
+            return self.segment(ctx.data)
+        else:
+            try:
+                path = await api.prompt("Please input an image file path or URL", "http://www.cellpose.org/static/images/img00.png")
+                api.showStatus('Loading example image...')
+                image = imageio.imread(path)
+                api.showStatus('Running segmentation with cellpose...')
+                outputs = self.segment({'input': image_to_base64(image), "diam": 30, "net": "cyto", "chan1": 0, "chan2": 0, "outputs": "flow,mask,outline_plot,overlay_plot"})
+                api.showStatus('Displaying result...')
+                outline_plot = base64_to_image(outputs['outline_plot'])
+                await api.showDialog(src="https://kitware.github.io/itk-vtk-viewer/app/", name="CellPose Segmentation Result", data={"image": outline_plot})
+                api.showStatus('Done.')
+            except Exception as e:
+                api.showMessage("Failed to run cellpose: " + str(e))
+                raise e
 
 api.export(ImJoyPlugin())
 </script>
 ```
 
-### Connect with your viewer
+As an exercise, we can integrate your image viewer with cellpose. This time, let's try to use `api.getPlugin()` to interact with the plugin.
 
+Here is a code snippet for reference:
+```js
+async function segmentWithCellPose(){
+    const canvas = document.getElementById("input-canvas")
+    const fileBase64 = canvas.toDataURL()
+    const cellpose = await api.getPlugin('CellPose-Segmentation')
+    const outputs = await cellpose.segment({input: fileBase64, outputs: "mask,img_plot,overlay_plot,outline_plot,flow_plot"})
+    // let's assume you want to overwrite the input image canvas
+    await drawImage(canvas, outputs.outline_plot)
+}
+```
 
-## Use ImJoy in Juptyer notebooks and Colab
+?> If you get it working, you can also change easily switch to sever-side segmentation by changing the line `const cellpose = await api.getPlugin('CellPose-Segmentation')` into `const cellpose = await api.showDialog({src: 'https://cellpose.org/'})`. This is doable, because they share the same plugin API (e.g. `segment` with the same function signature).
 
-### Use the Jupyter extension
+## 5. Use ImJoy in Juptyer notebooks and Colab
 
-### Try the Micro-Manager plugin
+Another way to use ImJoy is to run it in Jupyter notebooks and Colab.
 
-### Train a deep learning model
+Let's first try to setup a local Jupyter notebook, and install the [imjoy-jupyter-extension](https://github.com/imjoy-team/imjoy-jupyter-extension). Instead of installing directly Jupyter notebooks, we recommend our a wrapper library called [ImJoy-Engine](https://github.com/imjoy-team/imjoy-engine), this will allow us apply some settings to the Jupyter server which can be useful for ImJoy, and you don't need to install imjoy-jupyter-extension separately.
 
+In short, you just need to run `pip install imjoy` to install and then start it via `imjoy --jupyter`.
+
+In your forked imjoy-starter repo, you can find [a list of notebook examples](https://github.com/imjoy-team/imjoy-starter/tree/master/notebooks), please feel free to go through and play with them.
+
+!> Although we support running in Colab, there is an issue with the asyncio support in Colab we reported [here](https://github.com/googlecolab/colabtools/issues/1648), we will need to wait for the fix from the colab team. It might also help if you give add a 👍 to the issue.
+
+### Use imjoy-elfinder to manage your remote files
+
+To manage your files, we made [imjoy-elfinder](https://github.com/imjoy-team/imjoy-elfinder).
+You can try it directly on Google Colab: [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/imjoy-team/imjoy-elfinder/blob/master/example-data/ImJoy_elFinder_Colab.ipynb)
+
+!> The example on Binder or Jupyter notebook is broken at the moment, due some security changes in the latest Chrome ([this issue](https://github.com/imjoy-team/ImJoy/issues/401)), you will need to use Firefox to try it.
+
+We also encourage you to try run it locally. Here are the steps:
+ 1. Install it via `pip install -U imjoy-elfinder`
+ 2. Run it via `imjoy-elfinder --thumbnail` and keep the terminal open
+ 3. Try to open http://127.0.0.1:8765 in your browser
+ 3. Use it as a file browser plugin in ImJoy:
+
+<!-- ImJoyPlugin: { "type": "native-python", "name": "show-image-plugin"} -->
+```python
+from imjoy import api
+import imageio
+
+class ImJoyPlugin():
+    async def setup(self):
+        api.log('initialized')
+
+    async def run(self, ctx):
+        fileDialog = await api.showDialog(src="http://127.0.0.1:8765")
+        files = await fileDialog.getSelections()
+        image = imageio.imread(files[0].path)
+        await api.showDialog(src="https://kitware.github.io/itk-vtk-viewer/app/", data={"image": image})
+
+api.export(ImJoyPlugin())
+```
+
+## Training deep learning model
+
+We also provide a demo plugin for interactive training of deep learning models during annotation, here is the [project repo](https://github.com/imjoy-team/imjoy-interactive-segmentation).
+
+!> imjoy-interactive-segmentation is a work-in-progress project, due to the bug in Google Colab, the current implemetation is not straight forward -- we had to send the async task into background thread and pool the result.
+
+Nevertheless, you can try them locally or using MyBinder or Colab:
+[![launch ImJoy](https://imjoy.io/static/badge/launch-imjoy-badge.svg)](https://imjoy.io/#/app?workspace=kaibu&plugin=https://raw.githubusercontent.com/imjoy-team/imjoy-interactive-segmentation/master/interactive_trainer.py)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/imjoy-team/imjoy-interactive-segmentation/master?filepath=Tutorial.ipynb)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/imjoy-team/imjoy-interactive-segmentation/blob/master/Tutorial.ipynb)
 
 
 ## Plugin Gallery
@@ -1528,6 +1563,7 @@ api.export(ImJoyPlugin())
 
 
 ## FAQ
+
 
 
 
