@@ -1079,7 +1079,7 @@ As another exercise, please take the relevant parts from [this plugin](https://g
 
 !> While browser-based plugins can already be useful and becoming more powerful with new techniques such as WebAssembly and the incoming [WebGPU](https://en.wikipedia.org/wiki/WebGPU), it cannot do heavy computation and have many restrictions due to its security model.
 
-## Build a computation plugin in Python
+## 4. Build a computation plugin in Python
 
 In this section, we will use Python running on a Jupyter notebook server. For the demo purpose here, the plugin will run on a remote server on MyBinder.org, but you can eventually also can  run them on local Python server on your own machine.
 
@@ -1201,11 +1201,11 @@ api.export(ImJoyPlugin())
 
 In addition to ITK/VTK Viewer, Vizarr and Kaibu, we can also connect the image viewer from the previous sections to the Python plugin.
 
-?> In this configuration, we have two plugins: the UI plugin and the compute plugin. In general, there are two ways to connect them: 1) You can do like the example above, first instantiate the UI plugin from the compute plugin with `api.createWindow(...)`, then interact with the returned viewer object; 2) Or you can directly start the UI plugin, then you can do `api.getPlugin()` to get the api provided by the compute plugin. It will depend on the actual need of your application, but we recommended way the first one for Python plugins because it make it easier to debug in Jupyter notebooks.
+?> In this configuration, we have **two plugins**: the UI plugin and the computation plugin. In general, there are two ways to connect them: 1) You can do like the example above, first instantiate the UI plugin from the compute plugin with `api.createWindow(...)`, then interact with the returned viewer object; 2) Or you can directly start the UI plugin, then you can do `api.getPlugin()` to get the api provided by the compute plugin. It will depend on the actual need of your application, but we recommended way the first one for Python plugins because it make it easier to debug in Jupyter notebooks.
 
-In this tutorial, let's adjust the our image viewer so we can provide some API functions to allow the Python plugin to interact with.
+In this tutorial, let's adjust the our image viewerto provide some API functions to allow the Python plugin to interact with it.
 
-Let's assume we want use the Python plugin to process our images, when we do `api.createWindow` to instantiate the viewer, we need to pass a `process` function defined in Python. 
+Let's assume we want use the Python plugin to process our images, when we call `api.createWindow` to instantiate the viewer, we need to pass a `process` function defined in Python.
 
 Therefore we need to change the image viewer to be able to use the process function. We can use the `ctx` (stands for context) variable passed to the run function to get the `process` function:
 
@@ -1224,9 +1224,8 @@ Now in the Python plugin we can do `await api.createWindow(type="Image Viewer", 
 
 ?> When calling `api.createWindow`, there are two ways to refer to another window plugin: 1) set the `type` key to the window plugin name, this is typically done by setting the window plugin as one of the `dependencies` 2) if the window plugin is available as source code or served from a public server, you can set `src` as the plugin source code or the plugin URL. In this case, the plugin will be dynamically populated. It allows for example storing the window plugin as a string in Python or even dynamically generate window plugin based on templates.
 
-The following code is for a simplified version of the image viewer, please adjust your full image viewer by taking it as a reference. 
+The following code is for a simplified version of the image viewer, please adjust your full image viewer by taking it as a reference. To try it, you will need to run the following two plugins sequentially and the button `Proces` shown in the first plugin will be disabled.
 
-(To try it, you will need to run the following two plugins sequentially and the button shown in the first one will be disabled)
 <!-- ImJoyPlugin: {"fold": [0], "editor_height": "500px"} -->
 ```html
 <config lang="json">
@@ -1287,10 +1286,10 @@ class ImJoyPlugin():
 
 api.export(ImJoyPlugin())
 ```
+
 If you click the "Process" button, you are actually calling a function from Javascript to Python. 
 
 !> However, you may notice that if you click the button for the second time, it doesn't work anymore, and if you go to your browser console, you will see an error saying `Callback function can only called once, if you want to call a function for multiple times, please make it as a plugin api function.`. This is because the `process` function is removed from the window after the first call. To explicitly tell the window to keep the `process` function, we can pass set a special key `_rintf` to `True`. THerefore, you will need to change the code above so it becomes `data={"process": self.process, "_rintf": True}`.
-
 
 Also note that in this example, we didn't pass any parameter to the process function. For an actual image processing function, we will need to pass at least an image and return the output image. However, because Javascript and Python have different ways to store images, we will need to do encoding and decoding to make them compatible. The easiest way to do is to encode an image as a base64 string. Here are some code snippets:
 
@@ -1347,25 +1346,26 @@ const drawImage = (canvas, base64Image)=>{
 ```
 
 As an exercise, please use the encoding and decoding functions above to:
- 1. get a base64 string from the canvas in the image viewer
- 2. call `process` and pass the base64 string
- 3. in the Python plugin, decode the base64 string into an image and process the image, for example, with [scikit-image](https://scikit-image.org/docs/stable/auto_examples/index.html) (e.g. [watershed](https://scikit-image.org/docs/stable/auto_examples/segmentation/plot_watershed.html#sphx-glr-auto-examples-segmentation-plot-watershed-py)).
- 4. encode the result image into base64 string and return it
- 5. show the base64 string as an image on a canvas in the image viewer plugin
 
+ 1. Get a base64 string from the canvas in the image viewer
+ 2. Call `process` and pass the base64 string
+ 3. In the Python plugin, decode the base64 string into an image and process the image, for example, with [scikit-image](https://scikit-image.org/docs/stable/auto_examples/index.html) (e.g. [watershed](https://scikit-image.org/docs/stable/auto_examples/segmentation/plot_watershed.html#sphx-glr-auto-examples-segmentation-plot-watershed-py)).
+ 4. Cncode the result image into base64 string and return it
+ 5. Show the base64 string as an image on a canvas in the image viewer plugin
 
 ### Build deep learning based segmentation plugin with CellPose
-CellPose is a deep learning model developed by Stringer et al.,2020 ([paper](https://www.biorxiv.org/content/10.1101/2020.02.02.931238v1), [source code](https://github.com/MouseLand/cellpose)).
 
-It also provide an [server version](https://github.com/MouseLand/cellpose_web) for running inference from a remote server, for example the [cellpose demo website](https://cellpose.org/).
+CellPose is a deep learning model developed by Stringer et al., 2020 ([paper](https://www.biorxiv.org/content/10.1101/2020.02.02.931238v1), [source code](https://github.com/MouseLand/cellpose)).
 
-Recently, we submitted [a Pull Request](https://github.com/MouseLand/cellpose_web/pull/1) to cellpose_web repo to support the ImJoy RPC communication, such that cellpose website itself can be used as a plugin.
+It also provide a [server version](https://github.com/MouseLand/cellpose_web) for running inference from a remote server, for example the [cellpose demo website](https://cellpose.org/).
+
+Cellpose now supports the [ImJoy RPC communication]([a Pull Request](https://github.com/MouseLand/cellpose_web/pull/1)), such that Cellpose website itself can be used as a plugin.
 
 This further enables the CellPose segmentation feature in [ImageJ.JS](https://ij.imjoy.io/)(ImageJ compiled into javascript and running in the browser). This is [the plugin](https://gist.github.com/oeway/c9592f23c7ee147085f0504d2f3e993a) that calls the CellPose plugin and run segmentation with the https://cellpose.org server. You can also find an annoucement [here](https://forum.image.sc/t/new-imagej-js-release-with-3d-viewer-and-cellpose-segmentation/44842) about the cellpose feature.
 
-?> While a cellpose runs on the server-side makes it much easier for users to try, users will need to upload images to a server maintained by others (even though cellpose.org don't store users' images). Besides that, you cannot rely on that to process large amount of data.
+?> While Cellpose running on a server makes it much easier for users to try. However, users will need to upload images to a server maintained by others (even though cellpose.org don't store users' images). Besides that, you cannot rely on that to process large amount of data.
 
-Therefore, let's make a ImJoy plugin in Python to run the cellpose segmentaiton model locally (or on Google Colab with free GPU).
+Therefore, let's make a ImJoy plugin in Python to run the Cellpose segmentaiton model locally (or on Google Colab with free GPU).
 
 Here is the code for the CellPose plugin:
 <!-- ImJoyPlugin: { "hide_code_block": true} -->
@@ -1495,6 +1495,7 @@ api.export(ImJoyPlugin())
 As an exercise, we can integrate your image viewer with cellpose. This time, let's try to use `api.getPlugin()` to interact with the plugin.
 
 Here is a code snippet for reference:
+
 ```js
 async function segmentWithCellPose(){
     const canvas = document.getElementById("input-canvas")
@@ -1506,7 +1507,7 @@ async function segmentWithCellPose(){
 }
 ```
 
-?> If you get it working, you can also change easily switch to sever-side segmentation by changing the line `const cellpose = await api.getPlugin('CellPose-Segmentation')` into `const cellpose = await api.showDialog({src: 'https://cellpose.org/'})`. This is doable, because they share the same plugin API (e.g. `segment` with the same function signature).
+?> If you get it working, you can also easily switch to sever-side segmentation by changing the line `const cellpose = await api.getPlugin('CellPose-Segmentation')` into `const cellpose = await api.showDialog({src: 'https://cellpose.org/'})`. This is doable, because they share the same plugin API (e.g. `segment` with the same function signature).
 
 ## 5. Use ImJoy in Juptyer notebooks and Colab
 
@@ -1520,19 +1521,19 @@ In your forked imjoy-starter repo, you can find [a list of notebook examples](ht
 
 !> Although we support running in Colab, there is an issue with the asyncio support in Colab we reported [here](https://github.com/googlecolab/colabtools/issues/1648), we will need to wait for the fix from the colab team. It might also help if you give add a 👍 to the issue.
 
-
 ### Use imjoy-elfinder to manage your remote files
 
-To manage your files, we made [imjoy-elfinder](https://github.com/imjoy-team/imjoy-elfinder).
+To better manage files, we implemented [imjoy-elfinder](https://github.com/imjoy-team/imjoy-elfinder).
 You can try it by [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/imjoy-team/imjoy-elfinder/blob/master/example-data/ImJoy_elFinder_Colab.ipynb) or [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/imjoy-team/imjoy-elfinder/master?urlpath=elfinder).
 
 !> While you can use it normally as a standalone interface or within the Jupyter notebook, it fails to work in the Imjoy app, possibly due to some security changes in the latest Chrome ([this issue](https://github.com/imjoy-team/ImJoy/issues/401)), but you can try it with Firefox.
 
 We also encourage you to try run it locally. Here are the steps:
+
  1. Install it via `pip install -U imjoy-elfinder`
  2. Run it via `imjoy-elfinder --thumbnail` and keep the terminal open
  3. Try to open http://127.0.0.1:8765 in your browser
- 3. Use it as a file browser plugin in ImJoy:
+ 4. Use it as a file browser plugin in ImJoy:
 
 <!-- ImJoyPlugin: { "type": "native-python", "name": "show-image-plugin"} -->
 ```python
@@ -1552,34 +1553,31 @@ class ImJoyPlugin():
 api.export(ImJoyPlugin())
 ```
 
-### Training deep learning model
+### Training deep learning models
 
 We also provide a demo plugin for interactive training of deep learning models during annotation, here is the [project repo](https://github.com/imjoy-team/imjoy-interactive-segmentation).
 
-!> imjoy-interactive-segmentation is a work-in-progress project, due to the bug in Google Colab, the current implemetation is not straight forward -- we had to send the async task into background thread and pool the result.
+!> imjoy-interactive-segmentation is a work-in-progress project, due to the bug in Google Colab, the current implementation is not straight-forward -- we had to send the async task into background thread and pool the result.
 
 Nevertheless, you can try them locally or using MyBinder or Colab:
 [![launch ImJoy](https://imjoy.io/static/badge/launch-imjoy-badge.svg)](https://imjoy.io/#/app?workspace=kaibu&plugin=https://raw.githubusercontent.com/imjoy-team/imjoy-interactive-segmentation/master/interactive_trainer.py)
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/imjoy-team/imjoy-interactive-segmentation/master?filepath=Tutorial.ipynb)
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/imjoy-team/imjoy-interactive-segmentation/blob/master/Tutorial.ipynb)
 
-
 ### Deploy your models and plugin to BioImage.IO
 
-There are many advantages to share pretrained deep learning models, not only the models can be used directly by others to process data (e.g. the cellpose model), but also pretrained models can be used to reduce training time, and also good for the environment (keep in mind that the carbon footprint of training models are high!). 
+There are many advantages to share pretrained deep learning models, not only the models can be used directly by others to process data (e.g. the cellpose model), but also pretrained models can be used to reduce training time, and also good for the environment (keep in mind that the carbon footprint of training models are high!).
 
 We are currently working with several other groups in the bioimage community to build a bioimage model zoo at [BioImage.IO](http://bioimage.io/). The initiative covers a common [model description file format](https://github.com/bioimage-io/configuration), the website powered by ImJoy and plugins (called `BioEngine`).
-
 
 ## 6. Integrate ImJoy to your software/web site
 
 With the idea of open integration in mind, ImJoy and its plugins can be used in many different ways:
 
- * ImJoy plugins can not only be used in the [ImJoy app](https://imjoy-team.github.io/imjoy-starter/#/), but also in [ImJoy lite](https://imjoy.io/lite), [ImageJ.JS](https://ij.imjoy.io), [BioImage.IO](http://bioimage.io/) and more recently the interactive [ImJoy docs](https://imjoy.io/docs/) which we are using now for this tutorial.
- * Other software, web applications and website can also support[imjoy-rpc](https://github.com/imjoy-team/imjoy-rpc) which will further make it accessible to the entire ImJoy ecosystem. This includes: ITK/VTK Viewer, Vizarr, Kaibu, ImageJ.JS and CellPose.
+- ImJoy plugins can not only be used in the [ImJoy app](https://imjoy-team.github.io/imjoy-starter/#/), but also in [ImJoy lite](https://imjoy.io/lite), [ImageJ.JS](https://ij.imjoy.io), [BioImage.IO](http://bioimage.io/) and more recently the interactive [ImJoy docs](https://imjoy.io/docs/) which we are using now for this tutorial.
+- Other software packages, web applications and website can also support[imjoy-rpc](https://github.com/imjoy-team/imjoy-rpc) which will further make it accessible to the entire ImJoy ecosystem. This includes: ITK/VTK Viewer, Vizarr, Kaibu, ImageJ.JS and CellPose.
 
 If you are interested in integrating ImJoy to your project, please see instructions [here](https://github.com/imjoy-team/imjoy-core/blob/master/docs/integration.md)
-
 
 ### Two-way integration with ImageJ.JS
 
@@ -1589,15 +1587,8 @@ See the [project repo](https://github.com/imjoy-team/imagej.js) for more details
 
 As an exercise, you can load your image viewer plugin into ImageJ.JS by click the ImJoy icon, then choose load plugin and paste your plugin URL on Github/Gist.
 
-
-
 ## Plugin Gallery
 
 [Placeholder for plugins made by students]
 
-
 ## FAQ
-
-
-
-
