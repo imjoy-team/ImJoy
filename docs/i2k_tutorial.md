@@ -268,19 +268,24 @@ Lets assume we have taskA (takes 10 minutes), taskB (takes 5 minutes) and taskC 
 
 ### Open integration with ImJoy
 
-The ImJoy plugin ecosystem is designed to be open in two ways: 1) other software tools and website should be able to easily use ImJoy and its plugins 2) other software tools should be easily used in ImJoy, typically as a plugin.
+The ImJoy plugin ecosystem is designed to be **open in two ways**: 1) other software tools and website should be able to easily use ImJoy and its plugins 2) other software tools should be easily used in ImJoy, typically as a plugin.
 
-In general, any software that uses ImJoy RPC protocol to expose service functions can be treated as an ImJoy plugin. This includes the ImJoy web app itself which can read plugin files and produces plugin API. Meanwhile, we provide the [imjoy-rpc](https://github.com/imjoy-team/imjoy-rpc) library which currently support Python and Javascirpt for other software or web applications to directly communicate with the ImJoy core.
+In general, any software that **uses the ImJoy RPC protocol** to expose service functions can be treated as an ImJoy plugin. This includes the ImJoy web app itself which can read plugin files and produces plugin API. Meanwhile, we provide the [imjoy-rpc](https://github.com/imjoy-team/imjoy-rpc) library which currently support Python and Javascirpt for other software or web applications to directly communicate with the ImJoy core.
 
-Recently, there is already several web applications that can run in standalone mode but also as an ImJoy plugin, [ITK/VTK Viewer](https://kitware.github.io/itk-vtk-viewer/docs/imjoy.html)(by [Matt McCormick](https://github.com/thewtex) et al.), [vizarr](https://github.com/hms-dbmi/vizarr)(by [Trevor Manz](https://github.com/manzt) et al.), , [Kaibu](https://kaibu.org/#/app) and [ImageJ.JS](https://ij.imjoy.io)(by the ImJoy Team).
+Tere are already several **web applications that can run in standalone mode but also as an ImJoy plugin**: 
 
-For example, [ITK/VTK Viewer](https://kitware.github.io/itk-vtk-viewer/docs/imjoy.html) is an open-source software system for medical and scientific image, mesh, and point set visualization. While it can run [as a standalone app](https://kitware.github.io/itk-vtk-viewer/app/?fileToLoad=https://data.kitware.com/api/v1/file/564a65d58d777f7522dbfb61/download/data.nrrd), it can also run [as an ImJoy plugin](https://kitware.github.io/itk-vtk-viewer/docs/imjoy.html). If you can try the viewer by clicking the **Run** button below and you can use it to visualize your local files (e.g.: [download example file](https://data.kitware.com/api/v1/file/564a65d58d777f7522dbfb61/download/data.nrrd)):
+- [ITK/VTK Viewer](https://kitware.github.io/itk-vtk-viewer/docs/imjoy.html) by [Matt McCormick](https://github.com/thewtex) et al.
+- [vizarr](https://github.com/hms-dbmi/vizarr) by [Trevor Manz](https://github.com/manzt) et al.
+- [Kaibu](https://kaibu.org/#/app) by the ImJoy Team.
+- [ImageJ.JS](https://ij.imjoy.io) by the ImJoy Team.
+
+For example, the [ITK/VTK Viewer](https://kitware.github.io/itk-vtk-viewer/docs/imjoy.html) is an open-source software system for medical and scientific image, mesh, and point set visualization. While it can run [as a standalone app](https://kitware.github.io/itk-vtk-viewer/app/?fileToLoad=https://data.kitware.com/api/v1/file/564a65d58d777f7522dbfb61/download/data.nrrd), it can also run [as an ImJoy plugin](https://kitware.github.io/itk-vtk-viewer/docs/imjoy.html). You can try the viewer by clicking the **Run** button below. By clicking anywhere in the window, you can use it to visualize your local files (e.g.: [download example file](https://data.kitware.com/api/v1/file/564a65d58d777f7522dbfb61/download/data.nrrd)):
 <!-- ImJoyPlugin: { "type": "web-worker", "hide_code_block": true} -->
 ```js
 api.showDialog({src: "https://kitware.github.io/itk-vtk-viewer/app/", name: "ITK/VTK Viewer"})
 ```
 
-This is another example for the [vizarr](https://hms-dbmi.github.io/vizarr) which is a WebGL-based viewer for visualizing Zarr-based images. We loads it as an ImJoy plugin and call its `add_image` api function to visualize ome-zarr HCS data (a new feature implemented by [Will Moore](https://github.com/will-moore) recently).
+This is another example for the [vizarr](https://hms-dbmi.github.io/vizarr) which is a WebGL-based viewer for visualizing Zarr-based images (The Zarr format is used for storage of chunked, compressed, N-dimensional arrays). We load it as an ImJoy plugin and call its `add_image` api function to visualize ome-zarr HCS data (a new feature implemented by [Will Moore](https://github.com/will-moore) recently).
 <!-- ImJoyPlugin: { "type": "web-worker", "hide_code_block": true} -->
 ```js
 api.showDialog({src: "https://hms-dbmi.github.io/vizarr", name: "visualizating HCS zarr images with vizarr"}).then((viewer)=>{
@@ -292,15 +297,15 @@ api.showDialog({src: "https://hms-dbmi.github.io/vizarr", name: "visualizating H
 
 ## 2. Make your first ImJoy plugin
 
-With these key concepts, we can proceed to build actual ImJoy plugins.
+With these key concepts established, we can proceed to build actual ImJoy plugins.
 
 We have been already mentioning different types of plugins in the previous section without defining what is an ImJoy plugin. 
 
 ### What is an ImJoy plugin
 
-?> In a nutshell, an ImJoy plugin is a script that produce a set of service functions (a.k.a plugin API functions) that can be called by the ImJoy core or other plugins. While loading the plugin, an `api` object contains all the ImJoy API functions will be passed to the the plugin, the plugin can then build the service functions and register them via a `api.export(...)` function call.
+?> In a nutshell, an ImJoy plugin is a script that produce a set of service functions (a.k.a plugin API functions) that can be called by the ImJoy core or other plugins. While loading the plugin, an `api` object containing all ImJoy API functions will be passed to the the plugin, the plugin can then build the service functions and register them via a `api.export(...)` function call.
 
-?> There are currently 4 common plugin types: `window`, `web-worker`, `web-python`, `native-python`. Plugin types can be further extended with plugins, for example, we can make a new plugin type for executing Fiji/Scijava scripts, see [this post](https://forum.image.sc/t/making-imjoy-plugins-with-fiji-scripts-for-running-remotely/39503).
+?> There are currently 4 common plugin types: `window`, `web-worker`, `web-python`, `native-python`. Plugin types can be further extended with plugins. For example, we can make a new plugin type for executing Fiji/Scijava scripts, see [this post](https://forum.image.sc/t/making-imjoy-plugins-with-fiji-scripts-for-running-remotely/39503).
 
 ?> Most plugins will at least export two special functions named `setup` (for initialization ) and `run` (called when user click the plugin menu button).
 
@@ -321,8 +326,7 @@ class ImJoyPlugin{
 api.export(new ImJoyPlugin())
 ```
 
-
-?> In Javascript, there are different way of writing functions, you can do: 1) `function MyFunction() {...}` 2) `const MyFunction = ()=>{...}` 3) when defining a member function of a class or an object, you can simply do `MyFunction() {...}` (see the example above).
+?> In Javascript, there are different ways of writing functions, you can do: 1) `function MyFunction() {...}`. 2) `const MyFunction = ()=>{...}`. 3) when defining a member function of a class or an object, you can simply do `MyFunction() {...}` (see the example above).
 
 ### ImJoy plugin file format
 
@@ -369,15 +373,15 @@ api.export(new ImJoyPlugin())
 </script>
 ```
 
-In the above code editor, you can click **Export** and it will download as an ImJoy plugin file (with extension `*.imjoy.html`). This plugin file can be used in the standalone ImJoy app: 1) go to https://imjoy.io/#/app 2) drag and drop the downloaded file into the browser.
+To obtain the plugin file from the code above, click on `Edi` and then press the `Export` button. This code will then download as an ImJoy plugin file (with the extension `*.imjoy.html`). This plugin file can be used in the standalone ImJoy app: 1) go to https://imjoy.io/#/app 2) drag and drop the downloaded file into the browser.
 
 ### Deploy and share your plugin
 
-If you want to share your plugin with others, you can either send the plugin file directly, or upload your plugins to Github/Gist. The later is recommended if you want to publish your plugins and share with the rest of the world.
+If you want to share your plugin with others, you can either send directly the plugin file, or upload your plugins to Github/Gist. The later is recommended if you want to publish your plugins and share with the rest of the world.
 
 You can [fork the imjoy-starter repo](https://github.com/imjoy-team/imjoy-starter/fork) (or create an empty one if you prefer) on Github.
 
-?> The imjoy-starter repo contains a [docs folder](https://github.com/imjoy-team/imjoy-starter/tree/master/docs) which you can take notes and it will rendered as an interactive web site like this: https://imjoy-team.github.io/imjoy-starter/. You can add your plugin code with some special markup in the markdown, you can then see the **Run** and **Edit** button.
+?> The imjoy-starter repo contains a [docs folder](https://github.com/imjoy-team/imjoy-starter/tree/master/docs) which you can take notes in markdown and it will rendered as an interactive web site like this: https://imjoy-team.github.io/imjoy-starter/. For more information see [**here**](https://docsify.js.org/#/). You can add your plugin code with some special markup in the markdown, you can then see the **Run** and **Edit** button.
 
 Now you can name your plugin as, for example, `PokemonChooser.imjoy.html` and upload it to the `plugins` folder of your forked repo by using git commands or upload directly to the repo. You can organize upload the plugin file in any kind of folder organization.
 
