@@ -272,7 +272,7 @@ The ImJoy plugin ecosystem is designed to be **open in two ways**: 1) other soft
 
 In general, any software that **uses the ImJoy RPC protocol** to expose service functions can be treated as an ImJoy plugin. This includes the ImJoy web app itself which can read plugin files and produces plugin API. Meanwhile, we provide the [imjoy-rpc](https://github.com/imjoy-team/imjoy-rpc) library which currently support Python and Javascirpt for other software or web applications to directly communicate with the ImJoy core.
 
-Tere are already several **web applications that can run in standalone mode but also as an ImJoy plugin**: 
+There are already several **web applications that can run in standalone mode but also as an ImJoy plugin**: 
 
 - [ITK/VTK Viewer](https://kitware.github.io/itk-vtk-viewer/docs/imjoy.html) by [Matt McCormick](https://github.com/thewtex) et al.
 - [vizarr](https://github.com/hms-dbmi/vizarr) by [Trevor Manz](https://github.com/manzt) et al.
@@ -904,7 +904,7 @@ const p = await api.getPlugin('Tif File Importer')
 const tiffObj = await p.open(file)
 // locate the first frame
 tiffObj.seek(0)
-img = await tiffObj.readAsURL()
+const img = await tiffObj.readAsURL()
 ```
 
 Please try it yourself and use the following code block as reference:
@@ -1075,14 +1075,14 @@ function processImage(inputCanvasId, outputCanvasId){
 
 Let's make a plugin for analyzing images with Tensorflow.js.
 
-As another exercise, please take the relevant parts from [this plugin](https://gist.github.com/oeway/95025b000242ead88b06460b27cdf938) and integrate it as another button to your image viewer plugin.
+As another exercise, please take the relevant parts from this [M2Unet plugin](https://gist.githubusercontent.com/oeway/95025b000242ead88b06460b27cdf938/raw/M2Unet-BF-Kaibu.imjoy.html) ([source](https://gist.github.com/oeway/95025b000242ead88b06460b27cdf938#file-m2unet-bf-kaibu-imjoy-html)) and integrate it as another button to your image viewer plugin.
 
 !> While browser-based plugins can already be useful and becoming more powerful with new techniques such as WebAssembly and the incoming [WebGPU](https://en.wikipedia.org/wiki/WebGPU), it cannot do heavy computation and have many restrictions due to its security model.
 
 
 ## 4. Build computation plugin in Python
 
-Let's first see a simple hello world example in `web-python` mode.
+Let's first see a simple hello world example in `web-python` mode, which will run Python code entirely in the browser.
 
 Note, when you run the following plugin, it will take a while because it needs to load the python libraries into the browser:
 <!-- ImJoyPlugin: { "type": "web-python", "name": "my-web-python-plugin"} -->
@@ -1100,10 +1100,6 @@ api.export(ImJoyPlugin())
 ```
 
 In this section, we will move on to use Python running in a Jupyter notebook server. 
-
-Let's first try to setup a local Jupyter notebook, and install the [imjoy-jupyter-extension](https://github.com/imjoy-team/imjoy-jupyter-extension). Instead of installing directly Jupyter notebooks, we recommend our a wrapper library called [ImJoy-Engine](https://github.com/imjoy-team/imjoy-engine), this will allow us apply some settings to the Jupyter server which can be useful for ImJoy, and you don't need to install imjoy-jupyter-extension separately.
-
-In short, you just need to run `pip install imjoy` to install and then start it via `imjoy --jupyter`.
 
 Let's first try the Pokémon Chooser plugin as you see in javascript. You don't need to setup anything locally yet. If you click **Run**, you will need to wait for a while because we will spin up a remote server on MyBinder.org for you to run the Python plugin.
 
@@ -1125,7 +1121,12 @@ class ImJoyPlugin():
 api.export(ImJoyPlugin())
 ```
 
-If you want to switch to your own locally installed Jupyter server, you need to **Run** the following code block:
+### Use your own Jupyter notebook server
+Let's first try to setup a local Jupyter notebook, and install the [imjoy-jupyter-extension](https://github.com/imjoy-team/imjoy-jupyter-extension). Instead of installing directly Jupyter notebooks, we recommend our a wrapper library called [ImJoy-Engine](https://github.com/imjoy-team/imjoy-engine), this will allow us apply some settings to the Jupyter server which can be useful for ImJoy, and you don't need to install imjoy-jupyter-extension separately.
+
+In short, you just need to run `pip install imjoy` to install and then start it via `imjoy --jupyter`.
+
+Now, if you want to switch to your own locally installed Jupyter server, you need to **Run** the following code block:
 <!-- ImJoyPlugin: { "type": "web-worker", "hide_code_block": true, "passive": true,"editor_height": "200px"} -->
 ```js
 api.prompt("Please copy and paste your Jupyter notebook URL with token here").then(async (nbUrl)=>{
@@ -1170,7 +1171,7 @@ class ImJoyPlugin():
         path = await api.prompt("Please give me an image file path or URL", "https://images.proteinatlas.org/19661/221_G2_1_red_green.jpg")
         image = imageio.imread(path)
         # create a viewer
-        viewer = await api.showDialog(type="itk-vtk-viewer", src="https://oeway.github.io/itk-vtk-viewer/")
+        viewer = await api.showDialog(src="https://kitware.github.io/itk-vtk-viewer/app/")
         # show an image
         viewer.setImage(image)
 
@@ -1246,7 +1247,7 @@ In addition to ITK/VTK Viewer, Vizarr and Kaibu, we can also connect the image v
 
 ?> In this configuration, we have **two plugins**: the UI plugin and the computation plugin. In general, there are two ways to connect them: 1) You can do like the example above, first instantiate the UI plugin from the compute plugin with `api.createWindow(...)`, then interact with the returned viewer object; 2) Or you can directly start the UI plugin, then you can do `api.getPlugin()` to get the api provided by the compute plugin. It will depend on the actual need of your application, but we recommended way the first one for Python plugins because it make it easier to debug in Jupyter notebooks.
 
-In this tutorial, let's adjust the our image viewerto provide some API functions to allow the Python plugin to interact with it.
+In this tutorial, let's adjust the our image viewer to provide some API functions to allow the Python plugin to interact with it.
 
 Let's assume we want use the Python plugin to process our images, when we call `api.createWindow` to instantiate the viewer, we need to pass a `process` function defined in Python.
 
@@ -1332,7 +1333,7 @@ api.export(ImJoyPlugin())
 
 If you click the "Process" button, you are actually calling a function from Javascript to Python. 
 
-!> However, you may notice that if you click the button for the second time, it doesn't work anymore, and if you go to your browser console, you will see an error saying `Callback function can only called once, if you want to call a function for multiple times, please make it as a plugin api function.`. This is because the `process` function is removed from the window after the first call. To explicitly tell the window to keep the `process` function, we can pass set a special key `_rintf` to `True`. THerefore, you will need to change the code above so it becomes `data={"process": self.process, "_rintf": True}`.
+!> However, you may notice that if you click the button for the second time, it doesn't work anymore, and if you go to your browser console, you will see an error saying `Callback function can only called once, if you want to call a function for multiple times, please make it as a plugin api function.`. This is because the `process` function is removed from the window after the first call. To explicitly tell the window to keep the `process` function, we can pass set a special key `_rintf` to `True`. Therefore, you will need to change the code above so it becomes `data={"process": self.process, "_rintf": True}`.
 
 Also note that in this example, we didn't pass any parameter to the process function. For an actual image processing function, we will need to pass at least an image and return the output image. However, because Javascript and Python have different ways to store images, we will need to do encoding and decoding to make them compatible. The easiest way to do is to encode an image as a base64 string. Here are some code snippets:
 
@@ -1556,9 +1557,7 @@ async function segmentWithCellPose(){
 
 Another way to use ImJoy is to run it in Jupyter notebooks and Colab.
 
-Let's first try to setup a local Jupyter notebook, and install the [imjoy-jupyter-extension](https://github.com/imjoy-team/imjoy-jupyter-extension). Instead of installing directly Jupyter notebooks, we recommend our a wrapper library called [ImJoy-Engine](https://github.com/imjoy-team/imjoy-engine), this will allow us apply some settings to the Jupyter server which can be useful for ImJoy, and you don't need to install imjoy-jupyter-extension separately.
-
-In short, you just need to run `pip install imjoy` to install and then start it via `imjoy --jupyter`.
+As mentioned previously, you need to run `pip install imjoy` to install and then start the Jupyter notebook via `imjoy --jupyter`.
 
 In your forked imjoy-starter repo, you can find [a list of notebook examples](https://github.com/imjoy-team/imjoy-starter/tree/master/notebooks), please feel free to go through and play with them.
 
@@ -1618,7 +1617,7 @@ We are currently working with several other groups in the bioimage community to 
 With the idea of open integration in mind, ImJoy and its plugins can be used in many different ways:
 
 - ImJoy plugins can not only be used in the [ImJoy app](https://imjoy-team.github.io/imjoy-starter/#/), but also in [ImJoy lite](https://imjoy.io/lite), [ImageJ.JS](https://ij.imjoy.io), [BioImage.IO](http://bioimage.io/) and more recently the interactive [ImJoy docs](https://imjoy.io/docs/) which we are using now for this tutorial.
-- Other software packages, web applications and website can also support[imjoy-rpc](https://github.com/imjoy-team/imjoy-rpc). THis will allow ImJoy to directly comminucate with these tools, and make them accessible to the entire ImJoy ecosystem. Several examples already exist where such a communication is possible: ITK/VTK Viewer, Vizarr, Kaibu, ImageJ.JS and CellPose.
+- Other software packages, web applications and website can also support[imjoy-rpc](https://github.com/imjoy-team/imjoy-rpc). This will allow ImJoy to directly comminucate with these tools, and make them accessible to the entire ImJoy ecosystem. Several examples already exist where such a communication is possible: ITK/VTK Viewer, Vizarr, Kaibu, ImageJ.JS and CellPose.
 
 If you are interested in integrating ImJoy to your project, please see instructions [here](https://github.com/imjoy-team/imjoy-core/blob/master/docs/integration.md)
 
