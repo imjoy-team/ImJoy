@@ -1,4 +1,4 @@
-# [WIP] I2K Workshop Tutorial
+# I2K Workshop Tutorial
 
 This tutorial is presented as part of the [I2K workshop 2020](https://www.janelia.org/you-janelia/conferences/from-images-to-knowledge-with-imagej-friends).
 
@@ -291,6 +291,17 @@ This is another example for the [vizarr](https://hms-dbmi.github.io/vizarr) whic
 api.showDialog({src: "https://hms-dbmi.github.io/vizarr", name: "visualizating HCS zarr images with vizarr"}).then((viewer)=>{
     viewer.add_image({source: "https://minio-dev.openmicroscopy.org/idr/idr0001-graml-sysgro/JL_120731_S6A/pr_45/2551.zarr", name: "Demo Image"})
 })
+```
+
+[ImageJ.JS](https://ij.imjoy.io) is a standalone web app that support ImJoy in two-way: 1) most plugins can run direclty in ImageJ.JS; 2) ImageJ.JS can be used a s a plugin via its URL.
+
+See the [project repo](https://github.com/imjoy-team/imagej.js) for more details.
+
+As an exercise, you can load your image viewer plugin into ImageJ.JS by click the ImJoy icon, then choose load plugin and paste your plugin URL on Github/Gist.
+
+<!-- ImJoyPlugin: { "type": "web-worker", "hide_code_block": true} -->
+```js
+api.showDialog({src: "https://ij.imjoy.io/", name: "ImageJ.JS"})
 ```
 
 ?> While standalone web applications are more powerful, building them requires more advanced tooling and higher-level programming skills. For beginners, using basic imjoy plugin files can already solve many tasks. Therefore, in this tutorial, let's first focus on how to make basic ImJoy plugins.
@@ -1167,7 +1178,7 @@ api.export(new ImJoyPlugin())
 </style>
 ```
 
-?> Exercise option 2, [ITK/VTK Viewer](https://kitware.github.io/itk-vtk-viewer/) to replace the canvas for image display, you can integrate code in [this plugin](https://gist.github.com/oeway/ed0a164ebcea5fc48d040f39f2ead5e0) to your viewer.
+?> Exercise option 2, use [ITK/VTK Viewer](https://kitware.github.io/itk-vtk-viewer/) to replace the canvas for image display, you can integrate code in [this plugin](https://gist.github.com/oeway/ed0a164ebcea5fc48d040f39f2ead5e0) to your viewer.
 
 ### Process images with OpenCV.js
 
@@ -1257,8 +1268,13 @@ class ImJoyPlugin():
 api.export(ImJoyPlugin())
 ```
 
-### Use your own Jupyter notebook server
-Let's first try to setup a local Jupyter notebook, and install the [imjoy-jupyter-extension](https://github.com/imjoy-team/imjoy-jupyter-extension). Instead of installing directly Jupyter notebooks, we recommend our a wrapper library called [ImJoy-Engine](https://github.com/imjoy-team/imjoy-engine), this will allow us apply some settings to the Jupyter server which can be useful for ImJoy, and you don't need to install imjoy-jupyter-extension separately.
+### Use your own Jupyter notebook server (optional)
+
+?> Since MyBinder.org is a free service, it typically used for demonstration purposes. For many application, users should setup their own Jupyter server. In this tutorial, this is an optional step.
+
+There are two ways to setup a local Jupyter server: 1) Install Jupyter notebook (via `pip install jupyter`), then install the [imjoy-jupyter-extension](https://github.com/imjoy-team/imjoy-jupyter-extension). 2) Instead of installing directly Jupyter notebooks, you can install our a wrapper library called [ImJoy-Engine](https://github.com/imjoy-team/imjoy-engine) via `pip install imjoy`. 
+
+The later is recommended because this will allow us apply some settings to the Jupyter server which can be useful for ImJoy, and you don't need to install imjoy-jupyter-extension separately. 
 
 In short, you just need to run `pip install imjoy` to install and then start it via `imjoy --jupyter`.
 
@@ -1701,19 +1717,11 @@ In your forked imjoy-starter repo, you can find [a list of notebook examples](ht
 
 ### Use imjoy-elfinder to manage your remote files
 
-To better manage files, we implemented [imjoy-elfinder](https://github.com/imjoy-team/imjoy-elfinder).
+To better manage remote files, we implemented [imjoy-elfinder](https://github.com/imjoy-team/imjoy-elfinder).
 You can try it by [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/imjoy-team/imjoy-elfinder/blob/master/example-data/ImJoy_elFinder_Colab.ipynb) or [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/imjoy-team/imjoy-elfinder/master?urlpath=elfinder).
 
-!> While you can use it normally as a standalone interface or within the Jupyter notebook, it fails to work in the Imjoy app, possibly due to some security changes in the latest Chrome ([this issue](https://github.com/imjoy-team/ImJoy/issues/401)), but you can try it with Firefox.
-
-We also encourage you to try run it locally. Here are the steps:
-
- 1. Install it via `pip install -U imjoy-elfinder`
- 2. Run it via `imjoy-elfinder --thumbnail` and keep the terminal open
- 3. Try to open http://127.0.0.1:8765 in your browser
- 4. Use it as a file browser plugin in ImJoy:
-
-<!-- ImJoyPlugin: { "type": "native-python", "name": "show-image-plugin"} -->
+Please try the following code block in a Jupyter notebook:
+<!-- ImJoyPlugin: { "type": "native-python", "name": "elfinder-plugin"} -->
 ```python
 from imjoy import api
 import imageio
@@ -1723,13 +1731,16 @@ class ImJoyPlugin():
         api.log('initialized')
 
     async def run(self, ctx):
-        fileDialog = await api.showDialog(src="http://127.0.0.1:8765")
+        fileDialog = await api.showDialog(type="ImJoy elFinder")
         files = await fileDialog.getSelections()
         image = imageio.imread(files[0].path)
         await api.showDialog(src="https://kitware.github.io/itk-vtk-viewer/app/", data={"image": image})
 
 api.export(ImJoyPlugin())
 ```
+
+
+!> While you can use it normally as a standalone interface or within the Jupyter notebook, it fails to work in the ImJoy app, possibly due to some security changes in the latest Chrome ([this issue](https://github.com/imjoy-team/ImJoy/issues/401)), but you can try it with Firefox.
 
 ### Training deep learning models
 
@@ -1757,13 +1768,6 @@ With the idea of open integration in mind, ImJoy and its plugins can be used in 
 
 If you are interested in integrating ImJoy to your project, please see instructions [here](https://github.com/imjoy-team/imjoy-core/blob/master/docs/integration.md)
 
-### Two-way integration with ImageJ.JS
-
-[ImageJ.JS](https://ij.imjoy.io) is a standalone web app that support ImJoy in two-way: 1) most plugins can run direclty in ImageJ.JS; 2) ImageJ.JS can be used a s a plugin via its URL.
-
-See the [project repo](https://github.com/imjoy-team/imagej.js) for more details.
-
-As an exercise, you can load your image viewer plugin into ImageJ.JS by click the ImJoy icon, then choose load plugin and paste your plugin URL on Github/Gist.
 
 ## Plugin Gallery
 
