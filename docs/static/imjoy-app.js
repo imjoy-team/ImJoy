@@ -424,6 +424,10 @@ display: block;
 .snackbar{
   font-size: 17px;
 }
+#snackbar-container {
+    right: 20px!important;
+    left: unset!important;
+}
 
 .loader {
 position: fixed;
