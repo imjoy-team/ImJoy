@@ -368,7 +368,7 @@ height: 600px;
 user-select: none;
 }
 .dialog-control{
-height: 24px;
+height: 22px;
 border:0px;
 font-size:1rem;
 position:absolute;
