@@ -1767,9 +1767,12 @@ With the idea of open integration in mind, ImJoy and its plugins can be used in 
 
 If you are interested in integrating ImJoy to your project, please see instructions [here](https://github.com/imjoy-team/imjoy-core/blob/master/docs/integration.md)
 
-
 ## Plugin Gallery
 
 [Placeholder for plugins made by students]
 
 ## FAQ
+
+### How to make interactive documentation for ImJoy
+
+[TODO]
