@@ -25,7 +25,7 @@ This tutorial assumes you have basic programming skills in any of the mainstream
     - [Async + Await in JavaScript, talk from Wes Bos](https://www.youtube.com/watch?v=DwQJ_NPQWWo)
     - [Asynchronous programming in Python](https://www.youtube.com/watch?v=6kNzG0T44SI)
 
- - Since **Remote Procedure Calls** is a key technique used in ImJoy, we recommend reading this blog post: [RPCs, Life and All](http://tomerfiliba.com/blog/RPCs-Life-And-All/)
+ - Since **Remote Procedure Calls** is a key technique used in ImJoy, this blog post, [RPCs, Life and All](http://tomerfiliba.com/blog/RPCs-Life-And-All/), should give you better idea of the motivation of this type of design choice.
 
 ## 1. Understanding key concepts in ImJoy
 
