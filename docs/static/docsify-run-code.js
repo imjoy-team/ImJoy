@@ -72,7 +72,7 @@
     function execute(preElm, mode, disableScrollIntoView) {
         mode = mode || 'run';
         var codeElm = preElm.querySelector("code");
-        const code = codeElm.code;
+        const code = codeElm.textContent || codeElm.innerText;
         const showCodeBtn = preElm.querySelector('.show-code-button');
 
         showCodeBtn.style.display = 'none';
@@ -210,7 +210,7 @@
                 codeElm.style.display = "none";
                 if (mode !== 'edit') {
                     showCodeBtn.style.display = "block";
-                    
+
                 }
             }
 
@@ -261,18 +261,6 @@
                         showCodeBtn.onclick = () => {
                             codeElm.style.display = 'block';
                             showCodeBtn.style.display = 'none';
-                        }
-                        const selection = window.getSelection();
-                        const range = document.createRange();
-                        range.selectNode(codeElm);
-                        selection.removeAllRanges();
-                        selection.addRange(range);
-                        const code = selection.toString();
-                        codeElm.code = code;
-                        if (typeof selection.removeRange === "function") {
-                            selection.removeRange(range);
-                        } else if (typeof selection.removeAllRanges === "function") {
-                            selection.removeAllRanges();
                         }
                         if (elm.pluginConfig.hide_code_block) {
 
