@@ -1721,7 +1721,6 @@ To better manage remote files, we implemented [imjoy-elfinder](https://github.co
 You can try it by [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/imjoy-team/imjoy-elfinder/blob/master/example-data/ImJoy_elFinder_Colab.ipynb) or [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/imjoy-team/imjoy-elfinder/master?urlpath=elfinder).
 
 Please try the following code block in a Jupyter notebook:
-<!-- ImJoyPlugin: { "type": "native-python", "name": "elfinder-plugin"} -->
 ```python
 from imjoy import api
 import imageio
