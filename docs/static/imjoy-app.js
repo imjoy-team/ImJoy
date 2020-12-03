@@ -615,7 +615,12 @@ animation: spin 2s linear infinite;
                     this.disableScrollIntoView = disableScrollIntoView;
                     if (config.lang === 'js') config.lang = 'javascript';
                     if (config.lang === 'py') config.lang = 'python';
-
+                    // automatically set passive mode if there is no export statement
+                    if(config.passive===undefined){
+                        if(code && !code.includes("api.export(")){
+                            config.passive = true;
+                        }
+                    }
                     const makePluginSource = (src, config) => {
                         if (config.type && !config._parsed) {
                             const cfg = Object.assign({}, config)
@@ -643,6 +648,7 @@ animation: spin 2s linear infinite;
                         }
                         return src
                     }
+
                     const runPluginSource = async (code, initPlugin, windowId) => {
                         if (config.lang === 'html' && !config.type) {
                             const source_config = await this.imjoy.pm.parsePluginCode(code)
