@@ -16,6 +16,12 @@ all the functionality needed to process data.
 
 ![imjoy-interface](assets/imjoy-interface.png ':size=800')
 
+Optionally, you can click the "Run" button below and it will load ImJoy app directly:
+<!-- ImJoyPlugin: { "type": "web-worker", "hide_code_block": true, "passive": true} -->
+```js
+api.createWindow({src: "https://imjoy.io/#/app", passive: true, fullscreen: true})
+```
+
 ## Plugins
 The entire functionality of ImJoy is provided by plugins. To install new plugins
 from the [Plugin Repository](https://github.com/imjoy-team/imjoy-plugins), click **+ PLUGINS**.
@@ -61,35 +67,3 @@ the window itself.
 You can run this plugin even on your **mobile phone**. Here, rather than uploading
 and image, you will be able to snap an image and perform a prediction.
 
-### Digit classification
-Here, we describe how to install and use an ImJoy plugin to perform digit classification
-with TensorFlow.js. This plugin runs directly in the browser. You can train a
-convolution neural network (CNN) to recognize digits. Once the network is trained,
-you can classify hand drawn numbers. It is based on [tfjs-vis](https://github.com/tensorflow/tfjs-vis)
-- a small library for in browser visualization for use with TensorFlow.js.
-
-This plugin can be obtained by installing the plugin `MNIST-CNN` from
-the ImJoy plugin repository. Alternatively, you can also use this
-<a href="https://imjoy.io/#/app?plugin=imjoy-team/imjoy-plugins:MNIST-CNN&w=getting-started" target="_blank">**link**</a>,
-which will open ImJoy and provide a dialog where you can confirm the installation.
-
-Once the plugin is install, it will appear in the plugin dialog on the left.
-You can start the plugin by pressing on its name. This will open a window with
-the different controls, where you can perform training, inspect training progress
-and the final results, and perform prediction. The usual workflow consists of a few steps
-illustrated in the screen shots and the text below:
-
-![imjoy-MNIST-training](assets/imjoy-MNIST-training.png ':size=800')
-
-1.  Adding training data with the button `Add Training Data`. Each time you press on the
-    button more data is added. Adding more data increases the accuracy of the trained model.
-0.  Perform training with the button `Start training`. Training will be performed for 80 batches.
-0.  Once the training is finished, you can inspect the per-digit accuracy and the confusion matrix
-    with the respective buttons.
-0.  You can perform predictions on hand drawn digits. For this, select the panel `Prediction` and draw
-    a digit. Once you release the mouse button, the network will predict the digit. Press clear to
-
-    ![imjoy-MNIST-prediction](assets/imjoy-MNIST-prediction.png ':size=400')
-
-Note that you retrain you model by adding more training data. This allows to appreciate
-improved performance when adding more training data.

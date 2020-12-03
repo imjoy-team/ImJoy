@@ -368,7 +368,7 @@ height: 600px;
 user-select: none;
 }
 .dialog-control{
-height: 24px;
+height: 22px;
 border:0px;
 font-size:1rem;
 position:absolute;
@@ -423,6 +423,10 @@ display: block;
 
 .snackbar{
   font-size: 17px;
+}
+#snackbar-container {
+    right: 20px!important;
+    left: unset!important;
 }
 
 .loader {
