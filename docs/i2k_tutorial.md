@@ -34,7 +34,7 @@ Let's start by introducing the **live execution feature** of this tutorial. We h
 
 ### Hello from ImJoy
 The following code block contains one line in Javascript. If click the **Run** button, you should see a popup message saying `Hello from ImJoy!`.
-<!-- ImJoyPlugin: { "type": "iframe", "passive": true, "editor_height": "200px"} -->
+<!-- ImJoyPlugin: { "type": "iframe", "editor_height": "200px"} -->
 ```js
 alert("Hello from ImJoy!")
 ```
@@ -62,7 +62,7 @@ For example, the equivalent ImJoy API function to the Javascript function `alert
 ?> If you want to share the definition of a specific api function with someone, you can click on the function name and copy the url in the address bar (e.g.: https://imjoy.io/docs/#/api?id=apialert).
 
 You can directly access the `api` object in Javascript plugins (with type=`window` or `web-worker`):
-<!-- ImJoyPlugin: { "type": "web-worker", "passive": true,"editor_height": "200px"} -->
+<!-- ImJoyPlugin: { "type": "web-worker","editor_height": "200px"} -->
 ```js
 api.alert("Hello from ImJoy!")
 ```
@@ -112,7 +112,7 @@ If the API function has returned value, for example, [`api.prompt`](https://imjo
 ### Debugging with Chrome developer tool
 
 The recommended way of running ImJoy API function is to add `await`. However, if you run the following code, nothing will happen because of a syntax error:
-<!-- ImJoyPlugin: { "type": "web-worker", "passive": true, "editor_height": "200px"} -->
+<!-- ImJoyPlugin: { "type": "web-worker", "editor_height": "200px"} -->
 ```js
 await api.alert("Hello from ImJoy!")
 ```
@@ -130,7 +130,7 @@ pluginIframe.js:194 failed to execute scripts:  {type: "script", content: "↵aw
 ```
 
 To fix the error, we need to wrap the code in an async function:
-<!-- ImJoyPlugin: { "type": "web-worker", "passive": true, "editor_height": "250px"} -->
+<!-- ImJoyPlugin: { "type": "web-worker", "editor_height": "250px"} -->
 ```js
 // async/await example in Javascript
 async function sayHello(){
@@ -144,7 +144,7 @@ Another simple rule for using `async/await` is:
 ?> **When using `await` in a function, add `async` before the function definition**
 
 As an example, we can use another ImJoy API function [`api.prompt`](https://imjoy.io/docs/#/api?id=apiprompt) to get input from the user in a popup dialog and show the message with [`api.showMessage`](https://imjoy.io/docs/#/api?id=apishowmessage).
-<!-- ImJoyPlugin: { "type": "web-worker", "passive": true, "editor_height": "250px"} -->
+<!-- ImJoyPlugin: { "type": "web-worker", "editor_height": "250px"} -->
 ```js
 async function choosePokemon(){
     const pokemon = await api.prompt("What is your favorite Pokémon?", "Pikachu")
@@ -156,7 +156,7 @@ choosePokemon()
 ?> For development in Javascript, you can also use other functions such as `console.log(<ANY OBJECT>)` to print a message or object to the console. you can also insert the keyword `debugger` to your code to instruct the browser to pause the execution when hit the corresponding line.
 
 With the develop tool open, try to run the following code:
-<!-- ImJoyPlugin: { "type": "web-worker", "passive": true, "editor_height": "250px"} -->
+<!-- ImJoyPlugin: { "type": "web-worker", "editor_height": "250px"} -->
 ```javascript
 console.log("Hello world!");
 
@@ -400,7 +400,7 @@ After that, you can click the plugin file and copy the url in your address bar, 
 
 This URL can be used to install plugins in ImJoy, you can click **Run** to open the ImJoy app. To install the plugin, click `+PLUGINS` and paste the URL to the `Install from URL` input box and press Enter.
 
-<!-- ImJoyPlugin: { "type": "web-worker", "hide_code_block": true, "passive": true} -->
+<!-- ImJoyPlugin: { "type": "web-worker", "hide_code_block": true} -->
 ```js
 api.showDialog({src: "https://imjoy.io/#/app?w=i2k", passive: true, fullscreen: true})
 ```
@@ -1279,7 +1279,7 @@ The later is recommended because this allows us to fix some settings on the Jupy
 In short, to install Jupyter notebook for ImJoy and the Jupyter extension, you need to run `pip install imjoy` and then start it via `imjoy --jupyter`.
 
 Now, if you want to switch to your own locally installed Jupyter server, you need to **Run** the following code block:
-<!-- ImJoyPlugin: { "type": "web-worker", "hide_code_block": true, "passive": true,"editor_height": "200px"} -->
+<!-- ImJoyPlugin: { "type": "web-worker", "hide_code_block": true,"editor_height": "200px"} -->
 ```js
 api.prompt("Please copy and paste your Jupyter notebook URL with token here").then(async (nbUrl)=>{
     if(nbUrl){
