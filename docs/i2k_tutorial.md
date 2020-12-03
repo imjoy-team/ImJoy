@@ -160,12 +160,12 @@ With the develop tool open, try to run the following code:
 ```javascript
 console.log("Hello world!");
 
-var myObj = { firstname : "John", lastname : "Doe" };
+const myObj = { firstname : "John", lastname : "Doe" };
 console.log(myObj);
 
 debugger
 
-var myArr = ["Orange", "Banana", "Mango", "Kiwi" ];
+let myArr = ["Orange", "Banana", "Mango", "Kiwi" ];
 console.log(myArr);
 
 console.error("this is an error")
@@ -448,7 +448,7 @@ See the code below:
 // draw a base64 encoded image to the canvas
 const drawImage = (canvas, base64Image)=>{
     return new Promise((resolve, reject)=>{
-        var img = new Image()
+        const img = new Image()
         img.crossOrigin = "anonymous"
         img.onload = function(){
             const ctx = canvas.getContext("2d");
@@ -473,7 +473,7 @@ const readImageFile = (file)=>{
         }
         // fallback
         else{
-            var fr = new FileReader();
+            const fr = new FileReader();
             // when image is loaded, set the src of the image where you want to display it
             fr.onload = function(e) {
                 resolve(e.target.result)
@@ -573,7 +573,7 @@ Please try it yourself in the editor above, and you can click "Show Source Code"
 // draw a base64 encoded image to the canvas
 const drawImage = (canvas, base64Image)=>{
     return new Promise((resolve, reject)=>{
-        var img = new Image()
+        const img = new Image()
         img.crossOrigin = "anonymous"
         img.onload = function(){
             const ctx = canvas.getContext("2d");
@@ -598,7 +598,7 @@ const readImageFile = (file)=>{
         }
         // fallback
         else{
-            var fr = new FileReader();
+            const fr = new FileReader();
             // when image is loaded, set the src of the image where you want to display it
             fr.onload = function(e) {
                 resolve(e.target.result)
@@ -699,7 +699,7 @@ Please try it yourself, and you can take the code block below as reference:
 // draw a base64 encoded image to the canvas
 const drawImage = (canvas, base64Image)=>{
     return new Promise((resolve, reject)=>{
-        var img = new Image()
+        const img = new Image()
         img.crossOrigin = "anonymous"
         img.onload = function(){
             const ctx = canvas.getContext("2d");
@@ -724,7 +724,7 @@ const readImageFile = (file)=>{
         }
         // fallback
         else{
-            var fr = new FileReader();
+            const fr = new FileReader();
             // when image is loaded, set the src of the image where you want to display it
             fr.onload = function(e) {
                 resolve(e.target.result)
@@ -804,7 +804,7 @@ Please try it yourself, and you can take the code block below as reference:
 // draw a base64 encoded image to the canvas
 const drawImage = (canvas, base64Image)=>{
     return new Promise((resolve, reject)=>{
-        var img = new Image()
+        const img = new Image()
         img.crossOrigin = "anonymous"
         img.onload = function(){
             const ctx = canvas.getContext("2d");
@@ -829,7 +829,7 @@ const readImageFile = (file)=>{
         }
         // fallback
         else{
-            var fr = new FileReader();
+            const fr = new FileReader();
             // when image is loaded, set the src of the image where you want to display it
             fr.onload = function(e) {
                 resolve(e.target.result)
@@ -944,7 +944,7 @@ Please try it yourself and use the following code block as reference:
 // draw a base64 encoded image to the canvas
 const drawImage = (canvas, base64Image)=>{
     return new Promise((resolve, reject)=>{
-        var img = new Image()
+        const img = new Image()
         img.crossOrigin = "anonymous"
         img.onload = function(){
             const ctx = canvas.getContext("2d");
@@ -969,7 +969,7 @@ const readImageFile = (file)=>{
         }
         // fallback
         else{
-            var fr = new FileReader();
+            const fr = new FileReader();
             // when image is loaded, set the src of the image where you want to display it
             fr.onload = function(e) {
                 resolve(e.target.result)
@@ -1067,7 +1067,7 @@ api.export(new ImJoyPlugin())
 // draw a base64 encoded image to the canvas
 const drawImage = (canvas, base64Image)=>{
     return new Promise((resolve, reject)=>{
-        var img = new Image()
+        const img = new Image()
         img.crossOrigin = "anonymous"
         img.onload = function(){
             const ctx = canvas.getContext("2d");
@@ -1092,7 +1092,7 @@ const readImageFile = (file)=>{
         }
         // fallback
         else{
-            var fr = new FileReader();
+            const fr = new FileReader();
             // when image is loaded, set the src of the image where you want to display it
             fr.onload = function(e) {
                 resolve(e.target.result)
@@ -1418,9 +1418,9 @@ Therefore we need to change the image viewer to be able to use the process funct
 
 Now in the Python plugin we can do `await api.createWindow(type="Image Viewer", data={"process": self.process})` (assuming you have defined a function in the plugin class named `process`).
 
-?> When calling `api.createWindow`, there are two ways to refer to another window plugin: 1) set the `type` key to the window plugin name, e.g. if your window plugin is called `mywindowplugin` you will set this as `type`. Important this name is obtained from the `name` definition in the `<config>` block. Further you will need to set it as a dependencies, e.g. “dependencies”: [“https://github.com/imjoy-team/imjoy-plugins/blob/master/repositorymywindowplugin.imjoy.html”]. 2) if the window plugin is available as source code or served from a public server, you can set `src` as the plugin source code or the plugin URL. In this case, the plugin will be dynamically populated. It allows for example storing the window plugin as a string in Python or even dynamically generate window plugin based on templates.
+?> When calling `api.createWindow`, there are two ways to refer to another window plugin: 1) set the `type` key to the window plugin name, e.g. if your window plugin is called `My Window Plugin` you will set this as `type`. Important this name is obtained from the `name` definition in the `<config>` block. Further you will need to set it as a dependencies, e.g. “dependencies”: [“https://github.com/imjoy-team/imjoy-plugins/blob/master/repository/my-window-plugin.imjoy.html”]. 2) if the window plugin is available as source code or served from a public server, you can set `src` as the plugin source code or the plugin URL. In this case, the plugin will be dynamically populated. It allows for example storing the window plugin as a string in Python or even dynamically generate window plugin based on templates.
 
-The following code is for a simplified version of the image viewer, please adjust your full image viewer by taking it as a reference. To try it, you will need to run the following two plugins sequentially and the button `Proces` shown in the first plugin will be disabled.
+The following code is for a simplified version of the image viewer, please adjust your full image viewer by taking it as a reference. To try it, you will need to run the following two plugins sequentially and the button `Process` shown in the first plugin will be disabled.
 
 <!-- ImJoyPlugin: {"fold": [0], "editor_height": "500px"} -->
 ```html
@@ -1520,12 +1520,12 @@ In Javascript, this is how the base64 encoding works:
 const canvas = document.getElementById('canvas-id')
 
 // get base64 encoded image from a canvas
-base64String = canvas.toDataURL()
+const base64String = canvas.toDataURL()
 
 // draw a base64 encoded image to the canvas
 const drawImage = (canvas, base64Image)=>{
     return new Promise((resolve, reject)=>{
-        var img = new Image()
+        const img = new Image()
         img.crossOrigin = "anonymous"
         img.onload = function(){
             const ctx = canvas.getContext("2d");
@@ -1546,22 +1546,22 @@ As an exercise, please use the encoding and decoding functions above to:
  1. Get a base64 string from the canvas in the image viewer
  2. Call `process` and pass the base64 string
  3. In the Python plugin, decode the base64 string into an image and process the image, for example, with [scikit-image](https://scikit-image.org/docs/stable/auto_examples/index.html) (e.g. [watershed](https://scikit-image.org/docs/stable/auto_examples/segmentation/plot_watershed.html#sphx-glr-auto-examples-segmentation-plot-watershed-py)).
- 4. Cncode the result image into base64 string and return it
+ 4. Encode the result image into base64 string and return it
  5. Show the base64 string as an image on a canvas in the image viewer plugin
 
 ### Build deep learning based segmentation plugin with CellPose
 
 CellPose is a deep learning model developed by Stringer et al., 2020 ([paper](https://www.biorxiv.org/content/10.1101/2020.02.02.931238v1), [source code](https://github.com/MouseLand/cellpose)).
 
-It also provide a [server version](https://github.com/MouseLand/cellpose_web) for running inference from a remote server, for example the [cellpose demo website](https://cellpose.org/).
+It also provide a [server version](https://github.com/MouseLand/cellpose_web) for running inference from a remote server, for example the [CellPose demo website](https://cellpose.org/).
 
-Cellpose now supports the [ImJoy RPC communication]([a Pull Request](https://github.com/MouseLand/cellpose_web/pull/1)), such that Cellpose website itself can be used as a plugin.
+Cellpose now supports the [ImJoy RPC communication]([a Pull Request](https://github.com/MouseLand/cellpose_web/pull/1)), such that CellPose website itself can be used as a plugin.
 
-This further enables the CellPose segmentation feature in [ImageJ.JS](https://ij.imjoy.io/)(ImageJ compiled into javascript and running in the browser). This is [the plugin](https://gist.github.com/oeway/c9592f23c7ee147085f0504d2f3e993a) that calls the CellPose plugin and run segmentation with the https://cellpose.org server. You can also find an annoucement [here](https://forum.image.sc/t/new-imagej-js-release-with-3d-viewer-and-cellpose-segmentation/44842) about the cellpose feature.
+This further enables the CellPose segmentation feature in [ImageJ.JS](https://ij.imjoy.io/)(ImageJ compiled into javascript and running in the browser). This is [the plugin](https://gist.github.com/oeway/c9592f23c7ee147085f0504d2f3e993a) that calls the CellPose plugin and run segmentation with the https://cellpose.org server. You can also find an announcement [here](https://forum.image.sc/t/new-imagej-js-release-with-3d-viewer-and-cellpose-segmentation/44842) about the cellpose feature.
 
-?> While Cellpose running on a server makes it much easier for users to try. However, users will need to upload images to a server maintained by others (even though cellpose.org don't store users' images). Besides that, you cannot rely on that to process large amount of data.
+?> While CellPose running on a server makes it much easier for users to try. However, users will need to upload images to a server maintained by others (even though cellpose.org don't store users' images). Besides that, you cannot rely on that to process large amount of data.
 
-Therefore, let's make a ImJoy plugin in Python to run the Cellpose segmentaiton model locally (or on Google Colab with free GPU).
+Therefore, let's make a ImJoy plugin in Python to run the CellPose segmentation model locally (or on Google Colab with free GPU).
 
 Here is the code for the CellPose plugin:
 <!-- ImJoyPlugin: { "hide_code_block": true} -->
