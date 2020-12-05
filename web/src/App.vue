@@ -57,6 +57,10 @@ body {
   overscroll-behavior-x: none;
   position: fixed;
   overflow-wrap: break-word;
+  font-size: 18px;
+  font-weight: 400;
+  font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", sans-serif;
 }
 
 .md-app {
@@ -217,6 +221,27 @@ canvas.decorationsOverviewRuler {
 
 .hide-badge > .md-badge {
   display: none !important;
+}
+
+h1 {
+  font-size: 32px;
+}
+
+h2 {
+  color: #555;
+  font-size: 30px;
+}
+
+h3 {
+  font-size: 28px;
+}
+
+h4 {
+  font-size: 24px;
+}
+
+h5 {
+  font-size: 22px;
 }
 
 h1,
