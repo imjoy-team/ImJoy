@@ -105,7 +105,6 @@ Name the plugin as `CallPythonFromJS` and save the plugin. If you now click `Cal
 
 ![imjoy-function-call](assets/imjoy-function-call.png ':size=800')
 
-Note: we didn't use `async/await` syntax in this example because `asyncio` is not supported yet for plugins with `type="web-python"`, see [here](https://github.com/iodide-project/pyodide/issues/245)
 
 As a quiz, You can also try the opposite example by defining a plugin in Javascript and call it in Python.
 
