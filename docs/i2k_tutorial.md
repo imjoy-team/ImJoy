@@ -183,7 +183,7 @@ async def say_hello():
     await api.alert("Hello from ImJoy!")
 ```
 
-!> **For Python plugin with type=`web-python`, we have no support for `async/await` yet. We are current waiting for the [asyncio support](https://github.com/iodide-project/pyodide/issues/245) in the Pyodide project.** For now, you have to switch the type to `native-python` or use callback style (see below) in `web-python` plugins.
+!> ~~**For Python plugin with type=`web-python`, we have no support for `async/await` yet. We are current waiting for the [asyncio support](https://github.com/iodide-project/pyodide/issues/245) in the Pyodide project.** For now, you have to switch the type to `native-python` or use callback style (see below) in `web-python` plugins.~~ Update: `async/await` syntax is supported after PR [imjoy-team/imjoy-core#91](https://github.com/imjoy-team/imjoy-core/pull/91).
 
 !> When using asyncio in Python, a good practice is to avoid running heavy computation directly in the main thread, instead, you can [use executors](https://pymotw.com/3/asyncio/executors.html) (Threads and Processes). You can also use the default thread executor by doing: `loop.run_in_executor(None, my_heavy_computation, arg1, arg2...)`.
 
@@ -384,7 +384,7 @@ api.export(new ImJoyPlugin())
 </script>
 ```
 
-To obtain the plugin file from the code above, click on `Edi` and then press the `Export` button. This code will then download as an ImJoy plugin file (with the extension `*.imjoy.html`). This plugin file can be used in the standalone ImJoy app: 1) go to https://imjoy.io/#/app 2) drag and drop the downloaded file into the browser.
+To obtain the plugin file from the code above, click on `Edit` and then press the `Export` button. This code will then download as an ImJoy plugin file (with the extension `*.imjoy.html`). This plugin file can be used in the standalone ImJoy app: 1) go to https://imjoy.io/#/app 2) drag and drop the downloaded file into the browser.
 
 ### Deploy and share your plugin
 
