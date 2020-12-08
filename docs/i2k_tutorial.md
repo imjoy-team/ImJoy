@@ -1589,7 +1589,7 @@ https://github.com/MouseLand/cellpose
   "flags": [],
   "icon": "extension",
   "api_version": "0.1.8",
-  "env": [{"type": "binder", "spec": "MouseLand/cellpose_web/main", "skip_requirements": true}],
+  "env": [{"type": "binder", "spec": "oeway/cellpose_web/binder", "skip_requirements": true}],
   "permissions": [],
   "requirements": ["repo: https://github.com/MouseLand/cellpose_web", "cmd: pip install -r cellpose_web/requirements.txt"],
   "dependencies": []
@@ -1688,6 +1688,8 @@ api.export(ImJoyPlugin())
 </script>
 ```
 
+?>  CellPose requires some configuration, for example, you need to define chan1 and chan2 to run segementation on grayscale=0 or R=1, G=2, B=3, chan1=cytoplasm, chan2=nucleus. If NUCLEUS channel does not exist, set the second channel to 0. Here are some examples: 1) chan1=0, chan2=0 if you have grayscale; 2) chan1=2, chan2=3 if you have G=cytoplasm and B=nucleus; 3) chan1=2, chan2=1 if you have G=cytoplasm and R=nucleus.
+
 As an exercise, we can integrate your image viewer with cellpose. This time, let's try to use `api.getPlugin()` to interact with the plugin.
 
 Here is a code snippet for reference:
@@ -1703,7 +1705,27 @@ async function segmentWithCellPose(){
 }
 ```
 
-?> If you get it working, you can also easily switch to the sever-side segmentation by changing the line `const cellpose = await api.getPlugin('CellPose-Segmentation')` into `const cellpose = await api.showDialog({src: 'https://cellpose.org/'})`. This is doable, because they share the same plugin API (e.g. `segment` with the same function signature).
+?> If you get it working, you can also easily switch to the sever-side segmentation by changing the line `const cellpose = await api.getPlugin('CellPose-Segmentation')` into `const cellpose = await api.showDialog({src: 'https://cellpose.org/'})`. This is doable, because they share the same plugin API (e.g. `segment` with the same function signature). See the following code snippet:
+```python
+from imjoy import api
+
+class ImJoyPlugin():
+    async def setup(self):
+        pass
+
+    async def run(self, ctx):
+        # load the ImageJ.JS window
+        cellpose = await api.showDialog(src="https://cellpose.imjoy.io")
+        # read the image
+        image = ...
+        result = await cellpose.segment({"input": image, "diam": 300, "net": "cyto", "chan1": 1, "chan2": 3, "keep_size": True, "outputs": "flow,mask,outline_plot,flow_plot"})
+        # we will get mask and flow as numpy array
+        flow = result["flow"]
+        mask = result["mask"]
+        await api.alert(str(result["mask"].shape))
+
+api.export(ImJoyPlugin())
+```
 
 ## 5. Use ImJoy in Juptyer notebooks and Colab
 
