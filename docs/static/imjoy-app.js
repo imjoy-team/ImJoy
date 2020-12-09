@@ -506,7 +506,7 @@ animation: spin 2s linear infinite;
                 document.getElementById("imjoy-app").style.display = "block";
                 window.imjoyApp = this;
                 window.dispatchEvent(new Event('resize'));
-                imjoyLoder.loadImJoyCore().then(imjoyCore => {
+                imjoyLoder.loadImJoyCore({version: "0.13.46" }).then(imjoyCore => {
                     console.log(`ImJoy Core (v${imjoyCore.VERSION}) loaded.`)
                     const me = this;
                     async function createWindow(_plugin, config) {
@@ -797,7 +797,7 @@ animation: spin 2s linear infinite;
                         if (wElem && !this.disableScrollIntoView) wElem.scrollIntoView()
                         if (config.editor_height) document.getElementById(editorWindow.config.window_id).style.height = config.editor_height;
                     } else if (mode === 'run') {
-                        runPluginSource(code, null, config.window_id)
+                        await runPluginSource(code, null, config.window_id)
                     } else {
                         this.disableScrollIntoView = false;
                         throw "Unsupported mode: " + mode
