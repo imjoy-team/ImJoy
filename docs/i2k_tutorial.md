@@ -1332,7 +1332,7 @@ api.export(ImJoyPlugin())
 
 While ITK/VTK Viewer can display 3D volume, another viewer [Vizarr](https://github.com/hms-dbmi/vizarr) can visualize massive multi-resolution images in [Zarr format](https://zarr.readthedocs.io/en/stable/). You can find examples [here](https://github.com/hms-dbmi/vizarr/tree/master/example).
 
-Similarly, we can show the image with another plugin [Kaibu](https://kaibu.org) which integrates the ITK/VTK Viewer with [OpenLayers](https://openlayers.org/) and providing in interface where different layers can be displayed.
+Similarly, we can show the image with another plugin [Kaibu](https://kaibu.org) which integrates the ITK/VTK Viewer with [OpenLayers](https://openlayers.org/). It supports adding annotation and providing interface where different layers can be displayed.
 
 Based on the ITK/VTK Viewer example, we only need to change `src` to `https://kaibu.org/#/app` and use `viewer.view_image()` function instead of `viewer.setImage()`.
 
@@ -1358,7 +1358,7 @@ class ImJoyPlugin():
         path = await api.prompt("Please give me an image file path or URL", "https://images.proteinatlas.org/19661/221_G2_1_red_green.jpg")
         image = imageio.imread(path)
         # create a viewer
-        viewer = await api.showDialog(type="itk-vtk-viewer", src="https://kaibu.org/#/app")
+        viewer = await api.showDialog(name="Kaibu", src="https://kaibu.org/#/app")
         # show an image
         viewer.view_image(image)
 
