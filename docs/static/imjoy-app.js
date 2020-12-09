@@ -424,8 +424,10 @@ display: block;
 .snackbar{
   font-size: 17px;
 }
+
 #snackbar-container {
-    right: 20px!important;
+    max-width: 100vw;
+    right: 0px!important;
     left: unset!important;
 }
 
