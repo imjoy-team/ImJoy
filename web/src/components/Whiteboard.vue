@@ -404,12 +404,14 @@ export default {
 }
 
 .window-selected {
+  overflow: hidden;
   color: var(--md-theme-default-text-accent-on-primary, #fff) !important;
   background-color: var(--md-theme-default-primary, #448aff) !important;
   height: 30px !important;
 }
 
 .window-header {
+  overflow: hidden;
   color: var(--md-theme-default-text-primary-on-primary, #fff) !important;
   background-color: #ddd !important;
   height: 30px !important;

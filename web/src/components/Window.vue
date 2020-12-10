@@ -1,7 +1,65 @@
 <template>
   <md-card v-if="w">
+    <div class="no-drag" v-if="w.hide_title_bar">
+      <md-menu
+        style="position:absolute; left:0"
+        md-size="big"
+        md-direction="bottom-end"
+        :md-active.sync="options_menu_open"
+      >
+        <md-button class="md-icon-button" md-menu-trigger>
+          <md-icon>more_vert</md-icon>
+        </md-button>
+
+        <md-menu-content>
+          <md-menu-item @click="options_menu_open = false">
+            <md-icon>highlight_off</md-icon>
+            <span>Cancel</span>
+          </md-menu-item>
+          <md-menu-item
+            @click="normalSize(w)"
+            v-if="!w.standalone && w.fullscreen"
+          >
+            <md-icon>fullscreen</md-icon>
+            <span>Normal view</span>
+          </md-menu-item>
+          <md-menu-item @click="fullScreen(w)" v-else-if="!w.standalone">
+            <md-icon>fullscreen</md-icon>
+            <span>Fullscreen</span>
+          </md-menu-item>
+          <md-menu-item @click="detach(w)" v-if="!w.standalone">
+            <md-icon>launch</md-icon>
+            <span>Detach</span>
+          </md-menu-item>
+          <md-menu-item @click="duplicate(w)">
+            <md-icon>filter</md-icon>
+            <span>Duplicate</span>
+          </md-menu-item>
+          <md-menu-item @click="hide(w)">
+            <md-icon>remove</md-icon>
+            <span>Hide</span>
+          </md-menu-item>
+          <md-menu-item @click="close(w)">
+            <md-icon>close</md-icon>
+            <span>Close</span>
+          </md-menu-item>
+          <md-menu-item @click="printObject(w.type, w.data, w)">
+            <md-icon>bug_report</md-icon>
+            <span>Console.log</span>
+          </md-menu-item>
+          <md-menu-item
+            v-for="(loader, name) in w.loaders"
+            :key="name"
+            @click="loaders && loaders[loader](w.data)"
+          >
+            <md-icon>play_arrow</md-icon>
+            <span>{{ name }}</span>
+          </md-menu-item>
+        </md-menu-content>
+      </md-menu>
+    </div>
     <md-card-actions
-      v-if="!w.standalone"
+      v-else-if="!w.standalone"
       :class="{
         'drag-handle': withDragHandle,
         'window-selected': w.selected,
@@ -100,7 +158,11 @@
     </md-card-actions>
 
     <md-card-content
-      :class="w.standalone ? 'taller-container' : 'shorter-container'"
+      :class="
+        w.standalone || w.hide_title_bar
+          ? 'taller-container'
+          : 'shorter-container'
+      "
       class="plugin-iframe-container allow-scroll"
     >
       <div class="loading loading-lg floating" v-show="w.loading"></div>
@@ -322,12 +384,14 @@ export default {
 }
 
 .window-selected {
+  overflow: hidden;
   color: var(--md-theme-default-text-accent-on-primary, #fff) !important;
   background-color: var(--md-theme-default-primary, #448aff) !important;
   height: 30px !important;
 }
 
 .window-header {
+  overflow: hidden;
   color: var(--md-theme-default-text-primary-on-primary, #fff) !important;
   background-color: #ddd !important;
   height: 30px !important;
@@ -356,7 +420,7 @@ export default {
 }
 
 .taller-container {
-  height: calc(100% - 5px);
+  height: 100%;
 }
 
 .shorter-container {
