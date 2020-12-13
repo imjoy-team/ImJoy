@@ -5,4 +5,4 @@
 * [Development](development.md)
 * [ImJoy API](/api)
 * [Tutorials](tutorials.md)
-* [Demos](demos.md)
+* [Gallery](gallery.md)
