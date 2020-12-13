@@ -13,10 +13,13 @@
 ## ImJoy - Deep Learning Made Easy!
 
 ---
+**New**: We now provide [ImJoy Docs](https://imjoy-team.github.io/imjoy-docs/), so you can now easily make interactive documentation for your ImJoy plugins.
 
-**New**: The ImJoy paper is out [on Nature Methods](https://www.nature.com/articles/s41592-019-0627-0), check it out via the [free link](https://rdcu.be/bYbGO).
+**New**: [Kaibu](http://kaibu.org/) is a web application for visualizing and annotating multi-dimensional images, we provide [interactive documentation](https://kaibu.org/docs/#/api) for the developers to use it.
 
-**New**: We are working actively on supporting Jupyter notebook based engines, ImJoy now comes with a `Jupyter Engine Manager`, which enables running Python plugins via [MyBinder.org](https://mybinder.org) or your own Jupyter notebook server. With the preview version, you will be able to try and test ImJoy Python plugins without additional setup. Stay tuned, more enhanced features will come soon.
+**New**: [ImJoy Grid](https://grid.imjoy.io/docs/#/api) is a A draggable, resizable grid container for ImJoy windows.
+
+**New**: [ImageJ.JS](https://ij.imjoy.io) is our recent effort to make ImageJ running in the browser and integrated with ImJoy.
 
 ---
 

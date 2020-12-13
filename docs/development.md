@@ -1,5 +1,7 @@
 # Developing Plugins for ImJoy
 
+?> If you are new to ImJoy plugin development, we recommend this tutorial: https://imjoy.io/docs/#/i2k_tutorial
+
 ## Overview
 
 Developing plugins for ImJoy is easy and fast with the built-in code editor which runs directly in the web app, no additional IDE or compiler is needed for development.
@@ -1338,63 +1340,3 @@ reStructuredText:
 .. image:: https://imjoy.io/static/badge/powered-by-imjoy-badge.svg
  :target: https://imjoy.io/
 ```
-
-
-
-## Access Plugin Engine from command line
-The installation of the Plugin Engine will setup an **Miniconda environment**
-located in `~/ImJoyApp`. You can access this Miniconda environment from the
-command line interface.
-
-For **Linux or MacOS**, you need to add `~/ImJoyApp/bin` to your `$PATH`:
-```bash
-export PATH=~/ImJoyApp/bin:$PATH
-
-# now you can use `conda`, `pip`, `python` provided from ~/ImJoyApp
-which conda
-
-# start the plugin engine
-python -m imjoy
-
-```
-
-For **Windows**, you can use a powershell and add the ImJoyApp to `$env.Path`:
-```bash
-$env:Path = '%systemdrive%%homepath%\ImJoyApp;%systemdrive%%homepath%\ImJoyApp\Scripts;' + $env:Path;
-
-# now you can use `conda`, `pip`, `python` provided from ~/ImJoyApp
-(Get-Command conda.exe).Path
-
-# start the plugin engine
-python -m imjoy
-```
-
-## Setup your own server for ImJoy App and the Plugin Engine
-
-While you can run the plugin engine to run computation tasks, you can also use it to serve a mirrored version of ImJoy app (with the `--serve` option).
-Follow these steps, and you will be able to run ImJoy server and the plugin engine yourself:
-
-1. Install Python plugin engine on the remote computer. If this remote machine is
-  running under Linux, you can connect with SSH, and run a provided installation
-  script: `wget https://raw.githubusercontent.com/imjoy-team/imjoy-engine/master/utils/Linux_Install.sh  -O - | bash`.
-  Otherwise, download it from [GitHub](https://github.com/imjoy-team/imjoy-app/releases).
-
-0. Update the `$PATH` settings as explained [above](#access-the-plugin-engine-from-a-command-line-interface).
-  For Linux or Mac, use `export PATH=~/ImJoyApp/bin:$PATH`
-
-0. Launch Python plugin engine on remote computer and allow access. We recommend
-  to login the remote server with SSH, start the plugin engine with `python -m imjoy --serve --host=0.0.0.0`.
-  By default, the host is to `127.0.0.1`, which allows only local connections. For remote access, the host is set to `0.0.0.0`.
-  The plugin engine will be launched and serve a copy of the ImJoy app through `http://YOUR_REMOTE_IP:9527`.
-  At the end of the initialisation process, it will display the **connection token**.
-  Copy it from the terminal, since you will need it in the next step. **KEEP THIS TOKEN PRIVATE!!!!**
-
-0. If you have a domain name or host name configured to your host, you can specify it by using `--base_url=YOUR_REMOTE_HOST`. For example:  `python -m imjoy --serve --host=0.0.0.0 --base_url=https://hello-imjoy.com`. With this approach, you can also configure a `https` proxy with [nginx for example](https://docs.nginx.com/nginx/admin-guide/security-controls/securing-http-traffic-upstream/), and then your will be able to use your server with `https://imjoy.io`.
-
-0. On your local machine, use your web browser to access the ImJoy app on the remote machine
-  with `http://YOUR_REMOTE_IP:9527` (instead of `https://imjoy.io` ). Then connect
-  to the plugin engine by using `http://YOUR_REMOTE_IP:9527` as host and
-  the **connection token** you get when you start the engine. If you have `base_url` configured, please replace `YOUR_REMOTE_IP` to your actual domain name or host name.
-
-0. Importantly, the ImJoy app served from https://imjoy.io won't be able to connect a remote plugin engine served with http. You will need to setup your own https proxy, or use an existing one such as [Telebit](https://telebit.cloud/) or [ngrok](https://ngrok.com/).
-
