@@ -17,8 +17,6 @@
 
 **New**: [Kaibu](http://kaibu.org/) is a web application for visualizing and annotating multi-dimensional images, we provide [interactive documentation](https://kaibu.org/docs/#/api) for the developers to use it.
 
-**New**: [ImJoy Grid](https://grid.imjoy.io/docs/#/api) is a A draggable, resizable grid container for ImJoy windows.
-
 **New**: [ImageJ.JS](https://ij.imjoy.io) is our recent effort to make ImageJ running in the browser and integrated with ImJoy.
 
 ---
