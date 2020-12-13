@@ -23,7 +23,7 @@ describe("ImJoy.vue", async () => {
   const wrapper = shallowMount(Imjoy, {
     localVue,
     router,
-    propsData: { exposeAPI: false },
+    propsData: { exposeAPI: false }, // the test will run in an iframe so we need to disable it
   });
   const vm = wrapper.vm; //vm of ImJoy
   const wm = vm.wm; //window_manager
