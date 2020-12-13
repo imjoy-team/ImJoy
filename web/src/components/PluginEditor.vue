@@ -489,10 +489,7 @@ export default {
         config: config,
         data: {},
       });
-      if (
-        (plugin.config && plugin.config.type === "window") ||
-        plugin.config.type === "web-python-window"
-      ) {
+      if (plugin.config && plugin.config.type === "window") {
         // TODO: seems __id__ is not assigned anywhere
         this.window_plugin_id = w && w.__id__;
         this.window_plugin_config = config;

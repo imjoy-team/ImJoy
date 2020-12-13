@@ -1506,6 +1506,9 @@ export default {
       flags: [],
     };
   },
+  props: {
+    exposeAPI: { type: Boolean, default: true },
+  },
   watch: {
     // menuVisible() {
     //   this.wm.resizeAll();
@@ -1609,7 +1612,7 @@ export default {
       client_id: this.client_id,
       default_base_frame: "https://lib.imjoy.io/default_base_frame.html",
       default_rpc_base_url: null,
-      expose_api: true,
+      expose_api: this.exposeAPI,
       flags: this.flags,
     });
     this.imjoy.event_bus.on("show_message", msg => {
