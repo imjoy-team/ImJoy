@@ -1306,7 +1306,7 @@ Let's use the ITK/VTK Viewer to visualize images. Please read through the docume
 It's rather easy, we can basically create a viewer by calling `api.createWindow(...)` (or `api.showDialog(...)` if you want a popup window), then we call `viewer.setImage()` by passing a numpy array (2D or 3D).
 
 See the example below (loading the default image might be a bit slow, just wait until the image is shown):
-<!-- ImJoyPlugin: { "type": "native-python", "name": "itk-vtk-viewer-plugin", "requirements": ["imageio"]} -->
+<!-- ImJoyPlugin: { "type": "native-python", "name": "itk-vtk-viewer-plugin", "requirements": ["numpy", "imageio"]} -->
 ```python
 from imjoy import api
 

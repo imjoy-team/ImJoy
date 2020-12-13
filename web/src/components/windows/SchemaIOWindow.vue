@@ -122,7 +122,12 @@ export default {
         this.ioPanels.push(this.w.data);
       }
     }
-    this.$emit("init");
+    this.$emit("init", {
+      append: this.append,
+      remove: this.remove,
+      appendDataPoint: this.appendDataPoint,
+      getData: this.getData,
+    });
   },
   created() {
     //open link in a new tab

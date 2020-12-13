@@ -1481,7 +1481,6 @@ export default {
       progress: 0,
       status_text: "",
       showWorkspaceDialog: false,
-      showWelcomeDialog: false,
       show_file_dialog: false,
       plugins: null,
       registered: null,
@@ -1504,7 +1503,11 @@ export default {
       prompt_config: { show: false, confirm: () => {}, cancel: () => {} },
       selected_file_managers: [],
       selected_windows_stack: [],
+      flags: [],
     };
+  },
+  props: {
+    exposeAPI: { type: Boolean, default: true },
   },
   watch: {
     // menuVisible() {
@@ -1597,12 +1600,20 @@ export default {
       localStorage.setItem("imjoy_client_id", this.client_id);
     }
 
+    if (this.$route.query.flags) {
+      this.flags = this.$route.query.flags.split(",");
+    } else {
+      this.flags = [];
+    }
+
     this.imjoy = new ImJoy({
       imjoy_api: imjoy_api,
       event_bus: this.event_bus,
       client_id: this.client_id,
       default_base_frame: "https://lib.imjoy.io/default_base_frame.html",
       default_rpc_base_url: null,
+      expose_api: this.exposeAPI,
+      flags: this.flags,
     });
     this.imjoy.event_bus.on("show_message", msg => {
       this.showMessage(msg);
@@ -1781,36 +1792,33 @@ export default {
     setInterval(() => {
       this.$forceUpdate();
     }, 5000);
-
-    if (this.welcome) {
-      this.showWelcomeDialog = true;
-    } else {
-      this.startImJoy(this.$route).then(() => {
-        if (
-          !this.showAddPluginDialog &&
-          (!this.pm.plugins || Object.keys(this.pm.plugins) <= 0)
-        ) {
-          this.pm
-            .reloadPluginRecursively({
-              uri: "imjoy-team/imjoy-plugins:Welcome",
-            })
-            .then(() => {
-              this.showDialog(null, {
-                type: "Welcome",
-                name: "Welcome to ImJoy",
-              });
+    this.startImJoy(this.$route).then(() => {
+      if (
+        // Do not show the welcome dialog in quite mode
+        !this.flags.includes("quite") &&
+        !this.showAddPluginDialog &&
+        (!this.pm.plugins || Object.keys(this.pm.plugins) <= 0)
+      ) {
+        this.pm
+          .reloadPluginRecursively({
+            uri: "imjoy-team/imjoy-plugins:Welcome",
+          })
+          .then(() => {
+            this.showDialog(null, {
+              type: "Welcome",
+              name: "Welcome to ImJoy",
             });
-        }
-        /* global window */
-        if (window.gtag) {
-          // CAREFUL: DO NOT SEND ANY QUERY STRING, ONLY LOCATION AND PATH
-          window.gtag("config", "UA-134837258-1", {
-            page_location: location.href.split("#")[0],
-            page_path: "/#/app",
           });
-        }
-      });
-    }
+      }
+      /* global window */
+      if (window.gtag) {
+        // CAREFUL: DO NOT SEND ANY QUERY STRING, ONLY LOCATION AND PATH
+        window.gtag("config", "UA-134837258-1", {
+          page_location: location.href.split("#")[0],
+          page_path: "/#/app",
+        });
+      }
+    });
   },
   beforeDestroy() {
     this.imjoy.destroy();
@@ -1887,10 +1895,12 @@ export default {
       this.pm.selected_repository = this.repository_list[0];
 
       try {
-        if (route.query.start || route.query.s) {
-          this.menuVisible = false;
-        } else {
-          this.menuVisible = true;
+        if (!this.flags.includes("quite")) {
+          if (route.query.start || route.query.s) {
+            this.menuVisible = false;
+          } else {
+            this.menuVisible = true;
+          }
         }
 
         const selected_workspace =

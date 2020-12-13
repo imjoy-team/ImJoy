@@ -1,14 +1,24 @@
 <template>
   <md-card v-if="w">
-    <div class="no-drag" v-if="w.hide_title_bar">
+    <div
+      v-if="w.hide_title_bar && w.menu_button_location !== 'none'"
+      :class="{
+        'drag-handle': withDragHandle,
+        'floating-upper-left': w.menu_button_location === 'upper-left',
+        'floating-upper-right': w.menu_button_location === 'upper-right',
+        'floating-lower-left': w.menu_button_location === 'lower-left',
+        'floating-lower-right': w.menu_button_location === 'lower-right',
+      }"
+      style="height:20px;width:20px;"
+    >
       <md-menu
-        style="position:absolute; left:0"
+        class="floating-button"
         md-size="big"
         md-direction="bottom-end"
         :md-active.sync="options_menu_open"
       >
-        <md-button class="md-icon-button" md-menu-trigger>
-          <md-icon>more_vert</md-icon>
+        <md-button class="md-icon-button md-primary md-raised" md-menu-trigger>
+          <md-icon>more_horiz</md-icon>
         </md-button>
 
         <md-menu-content>
@@ -234,6 +244,7 @@ export default {
   },
   mounted() {
     if (this.w) {
+      this.w.menu_button_location = this.w.menu_button_location || "upper-left";
       this.w.$el = this.$el;
       this.w.api.on("refresh", () => {
         this.refresh();
@@ -304,20 +315,11 @@ export default {
     },
   },
   methods: {
-    setAPI() {
-      const comp = this.$refs["window-content"];
-      if (comp) {
-        this.w.api = this.w.api || {};
-        for (let k in comp) {
-          if (
-            comp.hasOwnProperty(k) &&
-            !k.startsWith("$") &&
-            !k.startsWith("_") &&
-            typeof comp[k] === "function"
-          ) {
-            this.w.api[k] = comp[k];
-          }
-        }
+    setAPI(exportedAPI) {
+      exportedAPI = exportedAPI || {};
+      this.w.api = this.w.api || {};
+      for (let k of Object.keys(exportedAPI)) {
+        this.w.api[k] = exportedAPI[k];
       }
       this.w.api.emit("ready");
     },
@@ -360,6 +362,35 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+.drag-handle > .floating-button {
+  width: 20px;
+  height: 20px;
+  display: none;
+}
+.drag-handle:hover > .floating-button {
+  display: inline-block !important;
+}
+
+.floating-upper-left {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+.floating-upper-right {
+  position: absolute;
+  right: 6px;
+  top: 0;
+}
+.floating-lower-left {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+}
+.floating-lower-right {
+  position: absolute;
+  right: 6px;
+  bottom: 0;
+}
 .whiteboard {
   height: calc(100% - 8px);
   position: relative;
@@ -425,6 +456,10 @@ export default {
 
 .shorter-container {
   height: calc(100% - 30px);
+}
+
+.md-card-content:last-of-type {
+  padding-bottom: 2px;
 }
 
 .allow-scroll {
