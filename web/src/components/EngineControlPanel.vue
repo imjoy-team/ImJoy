@@ -65,7 +65,7 @@
           </md-menu-item>
           <md-menu-item
             v-else-if="engine.getEngineStatus"
-            @click.stop="engine.connect(false)"
+            @click.stop="connectEngine(engine)"
             :key="engine.name"
           >
             <span class="md-list-item-content" style="cursor: pointer;">
@@ -429,6 +429,9 @@ export default {
     },
     async connectEngine(engine) {
       try {
+        if (engine.enable) {
+          await engine.enable();
+        }
         if (!engine.connected) {
           engine.connecting = true;
           await engine.connect();
@@ -443,6 +446,10 @@ export default {
       if (engine.connected) {
         await engine.disconnect();
         engine.connected = false;
+      }
+      // disable the plugin
+      if (engine.disable) {
+        await engine.disable();
       }
       this.$forceUpdate();
     },
