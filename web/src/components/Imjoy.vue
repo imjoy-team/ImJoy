@@ -1794,8 +1794,8 @@ export default {
     }, 5000);
     this.startImJoy(this.$route).then(() => {
       if (
-        // Do not show the welcome dialog in quite mode
-        !this.flags.includes("quite") &&
+        // Do not show the welcome dialog in quiet mode
+        !this.flags.includes("quiet") &&
         !this.showAddPluginDialog &&
         (!this.pm.plugins || Object.keys(this.pm.plugins) <= 0)
       ) {
@@ -1895,7 +1895,7 @@ export default {
       this.pm.selected_repository = this.repository_list[0];
 
       try {
-        if (!this.flags.includes("quite")) {
+        if (!this.flags.includes("quiet")) {
           if (route.query.start || route.query.s) {
             this.menuVisible = false;
           } else {
@@ -2655,6 +2655,8 @@ export default {
       //TODO: this is a temporary fix for the reloading bug, the reloading sometimes causing "RangeError: Maximum call stack size exceeded"
       this.pm.unloadPlugin(config);
       this.$nextTick(() => {
+        // disable hot reloading
+        config.hot_reloading = false;
         this.pm.reloadPlugin(config).finally(() => {
           this.$forceUpdate();
         });
@@ -2726,7 +2728,7 @@ export default {
         const keys = Object.keys(loaders);
         if (keys.length === 1) {
           try {
-            return this.wm.registered_loaders[loaders[keys[0]]](file);
+            return loaders[keys[0]](file);
           } catch (e) {
             console.error(
               `Failed to load with the matched loader ${loaders[0]}`,

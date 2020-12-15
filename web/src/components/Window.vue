@@ -79,7 +79,7 @@
       @click.native="selectWindow(w, $event)"
       @dblclick.native="w.fullscreen ? normalSize(w) : fullScreen(w)"
     >
-      <div>
+      <div style="position: absolute; left:0px;">
         <md-button class="md-icon-button md-accent no-drag" @click="close(w)">
           <md-icon>close</md-icon>
           <md-tooltip>Close window</md-tooltip>
@@ -105,10 +105,13 @@
           <md-tooltip>Exit fullscreen</md-tooltip>
         </md-button>
       </div>
-      <div class="window-title noselect">
+      <div
+        class="window-title noselect"
+        style="position: absolute; left: 50%;transform: translate(-50%, 0);"
+      >
         {{ w.name.slice(0, 30) + "(#" + (w.index || "") + ")" }}
       </div>
-      <div class="no-drag">
+      <div class="no-drag" style="position: absolute; right:0px;">
         <md-menu
           md-size="big"
           md-direction="bottom-end"
