@@ -42,7 +42,7 @@
           </md-menu-content>
         </md-menu>
 
-        <md-switch
+        <!-- <md-switch
           v-if="code_origin || lastModified"
           v-model="watch_file"
           @change="watchModeChanged"
@@ -51,19 +51,19 @@
             >Watch content change automatically.
           </md-tooltip>
           Watch
-        </md-switch>
+        </md-switch> -->
 
-        <md-switch v-if="watch_file" v-model="run_changed_file">
+        <!-- <md-switch v-if="watch_file" v-model="run_changed_file">
           <md-tooltip class="md-medium-hide"
             >Run automatically when code changes.
           </md-tooltip>
           AutoRun
-        </md-switch>
+        </md-switch> -->
 
         <md-button @click="run()" class="md-icon-button">
           <md-icon>play_arrow</md-icon>
           <md-tooltip class="md-medium-hide"
-            >Save and run this plugin (Ctrl+E)</md-tooltip
+            >Save and run this plugin (Shift+Enter)</md-tooltip
           >
         </md-button>
         <md-button @click="save()" class="md-icon-button">
@@ -245,6 +245,12 @@ export default {
       }
     );
     this.editor.addCommand(
+      window.monaco.KeyMod.Shift | window.monaco.KeyCode.Enter,
+      () => {
+        this.run();
+      }
+    );
+    this.editor.addCommand(
       window.monaco.KeyMod.CtrlCmd | window.monaco.KeyCode.KEY_E,
       () => {
         this.run();
@@ -360,7 +366,12 @@ export default {
             this.lastModified = file.lastModified;
             this.loading = true;
             this.$forceUpdate();
-            this.window.plugin_manager.parsePluginCode(code);
+            try {
+              this.window.plugin_manager.parsePluginCode(code);
+            } catch (e) {
+              console.error(e);
+            }
+
             this.editor.setValue(code);
             if (this.run_changed_file) {
               this.run();
@@ -486,6 +497,7 @@ export default {
       }
       const w = await plugin.api.run({
         id: this.window_plugin_id,
+        window_id: this.window_plugin_id,
         config: config,
         data: {},
       });
@@ -538,6 +550,8 @@ export default {
               name: this.window.data._name,
               code: this.codeValue,
               origin: this.window.config && this.window.config.origin,
+              id: this.window.plugin && this.window.plugin.id,
+              hot_reloading: !!this.window.plugin,
             })
             .then(plugin => {
               this.window.config = plugin.config;
