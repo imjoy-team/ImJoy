@@ -53,16 +53,18 @@
       name: "ImJoy",
       nameLink: '/',
       logo: "https://imjoy.io/static/img/imjoy-logo-black.svg",
-      basePath: '/docs/',
+      basePath: '/',
       loadSidebar: true,
       coverpage: false,
       auto2top: true,
       autoHeader: false,
-      subMaxLevel: 4,
+      subMaxLevel: 3,
       maxLevel: 5,
       alias: {
+        // '/.*/_sidebar.md': '/_sidebar.md',
         '/demos': '/gallery',
-        '/api': 'https://raw.githubusercontent.com/imjoy-team/imjoy-core/master/docs/api.md'
+        '/api': '/plugin_development/api',
+        '/plugin_development/api': 'https://raw.githubusercontent.com/imjoy-team/imjoy-core/master/docs/api.md'
       },
       repo: 'https://github.com/imjoy-team/ImJoy',
       homepage: 'https://raw.githubusercontent.com/imjoy-team/ImJoy/master/README.md',
