@@ -1,4 +1,4 @@
-importScripts("/precache-manifest.708c15bada124d99c70b7855abb4d6e1.js", "https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
+importScripts("/precache-manifest.00f5286184dfd1325364b32bf1bfc214.js", "https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 /* eslint-disable */
 
@@ -54,6 +54,16 @@ if (workbox) {
   workbox.routing.registerRoute(
     new RegExp("https://static.imjoy.io/.*"),
     new workbox.strategies.StaleWhileRevalidate()
+  );
+
+  workbox.routing.registerRoute(
+    new RegExp("https://cdn.jsdelivr.net/pyodide/v.*"),
+    new workbox.strategies.CacheFirst()
+  );
+
+  workbox.routing.registerRoute(
+    new RegExp("https://files.pythonhosted.org/packages/.*"),
+    new workbox.strategies.CacheFirst()
   );
 
   workbox.routing.registerRoute(
