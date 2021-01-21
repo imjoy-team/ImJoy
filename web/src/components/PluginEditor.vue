@@ -42,24 +42,12 @@
           </md-menu-content>
         </md-menu>
 
-        <!-- <md-switch
-          v-if="code_origin || lastModified"
-          v-model="watch_file"
-          @change="watchModeChanged"
-        >
+        <md-button @click="reload(true)" class="md-icon-button">
+          <md-icon>autorenew</md-icon>
           <md-tooltip class="md-medium-hide"
-            >Watch content change automatically.
-          </md-tooltip>
-          Watch
-        </md-switch> -->
-
-        <!-- <md-switch v-if="watch_file" v-model="run_changed_file">
-          <md-tooltip class="md-medium-hide"
-            >Run automatically when code changes.
-          </md-tooltip>
-          AutoRun
-        </md-switch> -->
-
+            >Reload this plugin (Ctrl+L)</md-tooltip
+          >
+        </md-button>
         <md-button @click="run()" class="md-icon-button">
           <md-icon>play_arrow</md-icon>
           <md-tooltip class="md-medium-hide"
@@ -84,65 +72,6 @@
           <md-icon>delete</md-icon>
           <md-tooltip>Remove this plugin</md-tooltip>
         </md-button>
-        <md-field
-          style="max-width: 100px;"
-          v-if="
-            this.editor &&
-              window &&
-              window.config &&
-              window.config.tags &&
-              window.config.tags.length > 0
-          "
-        >
-          <md-select
-            id="tag"
-            @md-selected="
-              window.config.tags.includes(window.config.tag) && reload()
-            "
-            v-model="window.config.tag"
-            name="tag"
-          >
-            <md-option
-              :value="tag"
-              v-for="tag in window.config.tags"
-              :key="tag"
-              >{{ tag }}</md-option
-            >
-          </md-select>
-          <md-tooltip
-            >Select a tag for testing, the plugin will be reloaded.</md-tooltip
-          >
-        </md-field>
-        <md-field
-          style="max-width: 220px;"
-          v-if="
-            this.editor &&
-              window &&
-              window.config &&
-              window.config.engine_mode &&
-              window.engine_manager
-          "
-        >
-          <md-select
-            id="engine_mode"
-            @md-selected="reload()"
-            v-model="window.config.engine_mode"
-            name="tag"
-          >
-            <md-option value="auto">auto</md-option>
-            <md-option
-              :value="e.name"
-              v-for="e in window.engine_manager.matchEngineByType(
-                window.config.type
-              )"
-              :key="e.name"
-              >{{ e.name }}</md-option
-            >
-          </md-select>
-          <md-tooltip
-            >Select an engine, the plugin will be reloaded.</md-tooltip
-          >
-        </md-field>
       </div>
     </md-toolbar>
     <div
@@ -259,7 +188,7 @@ export default {
     this.editor.addCommand(
       window.monaco.KeyMod.CtrlCmd | window.monaco.KeyCode.KEY_L,
       () => {
-        this.loadCodeFromURL();
+        this.reload(true);
       }
     );
   },
@@ -517,7 +446,7 @@ export default {
         this.window.plugin = null;
       });
     },
-    reload() {
+    reload(disableHotReloading) {
       assert(this.window.plugin_manager);
       this.$forceUpdate();
       return new Promise((resolve, reject) => {
@@ -551,7 +480,7 @@ export default {
               code: this.codeValue,
               origin: this.window.config && this.window.config.origin,
               id: this.window.plugin && this.window.plugin.id,
-              hot_reloading: !!this.window.plugin,
+              hot_reloading: !disableHotReloading && !!this.window.plugin,
             })
             .then(plugin => {
               this.window.config = plugin.config;

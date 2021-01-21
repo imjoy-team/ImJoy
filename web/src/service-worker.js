@@ -55,6 +55,16 @@ if (workbox) {
   );
 
   workbox.routing.registerRoute(
+    new RegExp("https://cdn.jsdelivr.net/pyodide/v.*"),
+    new workbox.strategies.CacheFirst()
+  );
+
+  workbox.routing.registerRoute(
+    new RegExp("https://files.pythonhosted.org/packages/.*"),
+    new workbox.strategies.CacheFirst()
+  );
+
+  workbox.routing.registerRoute(
     new RegExp("https://imjoy-team.github.io/.*"),
     new workbox.strategies.NetworkFirst({ plugins: [removeQuery] })
   );
