@@ -1420,7 +1420,6 @@
 import { saveAs } from "file-saver";
 import axios from "axios";
 import { plugin_templates } from "../plugins";
-import JUPYTER_NOTEBOOK_TEMPLATE from "../plugins/jupyterNotebookTemplate.imjoy.html";
 import { version } from "../../package.json";
 import { version as core_version } from "imjoy-core";
 
@@ -1430,7 +1429,6 @@ import { ImJoy, Joy, utils, ajv } from "imjoy-core";
 
 import {
   escapeHTML,
-  _clone,
   assert,
   url_regex,
   randId,
@@ -1789,9 +1787,9 @@ export default {
     }
 
     // Make sure the GUI is refreshed
-    setInterval(() => {
-      this.$forceUpdate();
-    }, 5000);
+    // setInterval(() => {
+    //   this.$forceUpdate();
+    // }, 5000);
     this.startImJoy(this.$route).then(() => {
       if (
         // Do not show the welcome dialog in quiet mode
@@ -1907,162 +1905,84 @@ export default {
           route.query.workspace || route.query.w || this.pm.workspace_list[0];
 
         await this.pm.loadWorkspace(selected_workspace);
+        this.plugin_loaded = true;
         await this.pm.reloadPlugins();
 
-        if (route.query.jupyter_plugin) {
-          const pn = "Jupyter-Notebook";
-          if (!this.pm.plugin_names[pn]) {
-            console.log(`Loading internal plugin "${pn}"...`);
-            try {
-              await this.pm.reloadPluginRecursively(
-                {
-                  uri: this.pm.internal_plugins[pn].uri,
-                },
-                null,
-                "eval is evil"
-              );
-              console.log(`${pn} plugin loaded.`);
-            } catch (e) {
-              console.error(e);
-            }
-          }
-
-          this.pm
-            .reloadPlugin({
-              code: JUPYTER_NOTEBOOK_TEMPLATE.replace(
-                /Untitled Plugin/g,
-                route.query.jupyter_plugin
-              ),
-            })
-            .catch(e => {
-              console.error(e);
-            });
-        }
-
-        if (route.query.engine && route.query.start) {
-          const en = this.em.getEngineByUrl(route.query.engine);
-          const pl = this.pm.plugin_names[route.query.start];
-          if (en && pl) {
-            console.log(`setting plugin engine of ${pl.name} to ${en.name}`);
-            pl.engine_mode = en.name;
-            pl.config.engine_mode = en.name;
-          }
-          if (!en) {
-            this.showMessage(`Plugin engine ${route.query.engine} not found.`);
-          }
-          if (!pl) {
-            this.showMessage(`Plugin ${route.query.start} not found.`);
-          }
-        }
-
-        let connection_token = null;
-        if (route.query.token || route.query.t) {
-          connection_token = (route.query.token || route.query.t).trim();
-          // const query = Object.assign({}, route.query);
-          // delete query.token;
-          // delete query.t;
-          // route.replace({ query });
-        }
-        if (route.query.engine || route.query.e) {
-          const engine_url = (route.query.engine || route.query.e).trim();
-          try {
-            this.em.addEngine(
-              { type: "default", url: engine_url, token: connection_token },
-              false
-            );
-          } finally {
-            this.em.getEngineByUrl(engine_url).connect();
-            this.$forceUpdate();
-          }
-        }
-
-        this.plugin_loaded = true;
         this.event_bus.emit("plugins_loaded", this.pm.plugins);
         try {
-          const manifest = this.pm.reloadRepository();
+          const manifest = await this.pm.reloadRepository();
           this.event_bus.emit("repositories_loaded", manifest);
         } finally {
-          if (route.query.start || route.query.s) {
-            const pname = route.query.start || route.query.s;
-            const ps = this.pm.installed_plugins.filter(p => {
-              return p.name === pname;
-            });
-            if (!this.showAddPluginDialog && ps.length <= 0) {
-              alert(`Plugin "${pname}" cannot be started, please install it.`);
-            } else {
-              const data = _clone(route.query);
-              const load_data = route.query.load || route.query.l;
-              if (load_data) {
-                try {
-                  const response = await axios.get(load_data);
-                  data.loaded = response.data;
-                } catch (e) {
-                  console.error(e);
-                  this.showMessage(
-                    "Failed to load data from:" +
-                      load_data +
-                      " Error:" +
-                      e.toString()
-                  );
-                  data.loaded = null;
-                }
-              }
-              //load data
-              if (
-                !this.showAddPluginDialog &&
-                (this.pm.registered.windows[pname] ||
-                  pname.startsWith("imjoy/"))
-              ) {
-                try {
-                  const template = this.pm.registered.windows[pname] || {};
-                  const c = _clone(template.defaults) || {};
-                  c.type = pname;
-                  c.name = pname;
-                  c.w = c.w || route.query.w;
-                  c.h = c.h || route.query.h;
-                  c.tag = template.tag;
-                  c.fullscreen =
-                    route.query.fullscreen || c.fullscreen || false;
-                  c.standalone =
-                    route.query.standalone || c.standalone || false;
-                  c.data = data;
-                  c.config = {};
-                  await this.createWindow(c);
-                } catch (e) {
-                  console.error(`Plugin ${pname} failed to load data.`, e);
-                }
-              } else {
-                let started_plugin = null;
-                const plugin_loaded_handler = plugin => {
-                  if (plugin.name === pname) {
-                    try {
-                      plugin.api.run({ data: data, config: {} });
-                    } catch (e) {
-                      console.error(`Plugin ${pname} failed to load data.`, e);
-                    }
-                    this.event_bus.off("plugin_loaded", plugin_loaded_handler);
-                  }
-                  // close it if it already started.
-                  if (started_plugin && started_plugin.api.close) {
-                    started_plugin.api.close();
-                  }
-                  started_plugin = plugin;
-                };
-                const start_when_loaded = p => {
-                  if (p.name !== pname) {
-                    return;
-                  }
-                  this.event_bus.on("plugin_loaded", plugin_loaded_handler);
-                  this.event_bus.off("plugin_installed", start_when_loaded);
-                };
-                this.event_bus.on("plugin_installed", start_when_loaded);
-              }
-            }
-          }
-
           this.$nextTick(() => {
             this.event_bus.emit("imjoy_ready");
           });
+        }
+
+        if (route.query.engine) {
+          try {
+            const engineUrl = route.query.engine;
+            const en = this.em.getEngineByUrl(engineUrl);
+            if (en) {
+              if (!(await en.heartbeat())) {
+                await en.connect();
+              }
+            } else {
+              const engineManager = await this.pm.imjoy_api.getPlugin(
+                null,
+                "Jupyter-Engine-Manager"
+              );
+              if (
+                !route.query.engineType ||
+                route.query.engineType === "jupyter"
+              ) {
+                await engineManager.createEngine({
+                  name: "MyJupyterEngine",
+                  url: engineUrl.split("?")[0],
+                  nbUrl: engineUrl,
+                });
+              } else if (
+                route.query.engineType &&
+                route.query.engineType === "binder"
+              ) {
+                await engineManager.createEngine({
+                  name: "MyBinderEngine",
+                  url: "https://mybinder.org",
+                  spec: route.query.spec || "oeway/imjoy-binder-image/master",
+                });
+              }
+            }
+          } catch (e) {
+            this.showMessage("Failed to connect to the specified engine");
+            console.error("Failed to connect to engine", e);
+          }
+        }
+
+        if (route.query.start) {
+          let plugin;
+          for (let k in this.plugins) {
+            if (this.plugins[k].name === route.query.start) {
+              plugin = this.plugins[k];
+            }
+          }
+          if (plugin) {
+            await plugin.connected;
+            if (plugin.api && plugin.api.run) {
+              await plugin.api.run({ config: {}, data: route.query });
+            }
+          } else {
+            console.error(`Plugin ${route.query.start} is not found.`);
+            const start_when_loaded = async plugin => {
+              if (plugin.name !== route.query.start) {
+                return;
+              }
+              this.event_bus.off("plugin_loaded", start_when_loaded);
+              await plugin.connected;
+              if (plugin.api && plugin.api.run) {
+                await plugin.api.run({ config: {}, data: route.query });
+              }
+            };
+            this.event_bus.on("plugin_loaded", start_when_loaded);
+          }
         }
       } catch (e) {
         this.showMessage(e);
