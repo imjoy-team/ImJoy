@@ -1,0 +1,33 @@
+<html>
+<head>
+  <title>Login Helper</title>
+  <script>
+    const parseParams = (queryString) => {
+      // parse query string
+      const params = new URLSearchParams(queryString);
+      const obj = {};
+      // iterate over all keys
+      for (const key of params.keys()) {
+        if (params.getAll(key).length > 1) {
+          obj[key] = params.getAll(key);
+        } else {
+          obj[key] = params.get(key);
+        }
+      }
+      return obj;
+    };
+
+    if (window.opener) {
+      const params = parseParams(window.location.search || window.location.hash.slice(1));
+      // send them to the opening window
+      window.opener.postMessage(params, "*");
+    }
+
+  </script>
+</head>
+
+<body>
+  <h2>Forwarding data to the main window...</h2>
+</body>
+
+</html>
