@@ -130,13 +130,13 @@ describe("ImJoy.vue", async () => {
   //   plugin.api.run({})
   // }).timeout(10000)
 
-  it("should load the new web-python plugin", async () => {
-    const code = _.clone(WEB_PYTHON_PLUGIN_TEMPLATE);
-    const plugin = await pm.reloadPlugin({ code: code });
-    expect(plugin.name).to.equal("Untitled Plugin");
-    expect(plugin.type).to.equal("web-python");
-    expect(typeof plugin.api.run).to.equal("function");
-    await plugin.api.run({});
-    plugin.terminate();
-  }).timeout(100000);
+  // it("should load the new web-python plugin", async () => {
+  //   const code = _.clone(WEB_PYTHON_PLUGIN_TEMPLATE);
+  //   const plugin = await pm.reloadPlugin({ code: code });
+  //   expect(plugin.name).to.equal("Untitled Plugin");
+  //   expect(plugin.type).to.equal("web-python");
+  //   expect(typeof plugin.api.run).to.equal("function");
+  //   await plugin.api.run({});
+  //   plugin.terminate();
+  // }).timeout(100000);
 });
