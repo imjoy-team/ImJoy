@@ -42,399 +42,51 @@
     <meta name="msapplication-TileColor" content="#f5f9ff">
     <meta name="msapplication-TileImage" content="static/icons/ms-icon-144x144.png">
     <meta name="theme-color" content="#f5f9ff">
-
     <script src="https://lib.imjoy.io/imjoy-loader.js"></script>
-    <link rel="stylesheet" href="https://lib.imjoy.io/static/joy.css">
-    <link rel="stylesheet" href="https://static.imjoy.io/spectre.css/spectre.min.css">
-    <link rel="stylesheet" href="https://static.imjoy.io/spectre.css/spectre-exp.min.css">
-    <link rel="stylesheet" href="https://static.imjoy.io/spectre.css/spectre-icons.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.15.3/axios.min.js"></script>
-    <style>
-        html,
-        body {
-            height: 100%;
-            width: 100%;
-            overflow-y: hidden;
-            overflow-x: hidden;
-            -webkit-overflow-scrolling: touch;
-            -webkit-transform: translate3d(0, 0, 0);
-            /* Disables pull-to-refresh but allows overscroll glow effects. */
-            overscroll-behavior-y: contain;
-            overscroll-behavior-x: none;
-            position: fixed;
-            overflow-wrap: break-word;
-        }
-
-        .navbar .navbar-brand {
-            font-size: 1.2rem;
-        }
-
-        .whiteboard {
-            width: 100%;
-            max-width: 100%;
-            max-height: 100%;
-            min-height: 50vh;
-        }
-
-        .window_container {
-            width: 100%;
-            height: 100%;
-        }
-
-        .site-title-small {
-            vertical-align: bottom;
-            margin-left: 3px;
-            height: 32px;
-        }
-
-        .pointer {
-            cursor: pointer;
-        }
-
-        #empty-img {
-            width: 128px;
-            position: absolute !important;
-            left: calc(50% - 64px) !important;
-            top: calc(40% - 64px) !important;
-        }
-
-        .floating {
-            position: absolute !important;
-            left: calc(50% - 2px) !important;
-            top: calc(39% - 100px) !important;
-            z-index: 999;
-        }
-
-        #windows-menu {
-            position: absolute;
-            top: 3px;
-            right: 3px;
-        }
-
-        .more-btn {
-            border: transparent;
-            background-color: transparent;
-        }
-
-        .more-btn:hover {
-            border: #0a52eeea;
-            background-color: #ffffff91;
-        }
-    </style>
 </head>
 
-<body>
-    <div class="modal" id="dialog-container">
-        <a href="#" class="modal-overlay" aria-label="Close"></a>
-        <div class="modal-container">
-            <div class="modal-header">
-                <a href="#" class="btn btn-clear float-right" aria-label="Close" onclick="closeDialog()"></a>
-                <div class="modal-title h5" id="window-dialog-title">Dialog</div>
-            </div>
-            <div class="modal-body">
-                <div class="content">
-                    <div id="window-dialog-container">
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <header class="navbar">
-        <section class="navbar-section" id="logo">
-            <a href="/">
-                <img class="site-title-small" src="static/img/imjoy-logo-black.svg" alt="ImJoy" />
-            </a>
-            <!-- <a href="https://imjoy.io/docs" target="_blank" class="btn btn-link">Docs</a>
-            <a href="https://github.com/imjoy-team/ImJoy" target="_blank" class="btn btn-link">GitHub</a> -->
-        </section>
-        <section class="navbar-section" id="windows-menu" style="flex: 0 1 0;">
-            <div class="dropdown dropdown-right">
-                <a class="btn btn-sm more-btn dropdown-toggle" tabindex="0"><i class="icon icon-more-horiz"></i></a>
-                <ul class="menu" id="plugin-menu">
-                </ul>
-            </div>
-        </section>
-        <progress class="progress" style="display: none;" id="progress" value="100" max="100"></progress>
-    </header>
-    <div class="loading loading-lg floating" id="loading"></div>
-    <div class="whiteboard" id="whiteboard">
-        <img src="static/img/imjoy-io-icon.svg" id="empty-img">
-    </div>
-
+<body style="width:100%;height:100vh;">
+    <div id="menu-container" style="position: absolute; right: 0; top: 4px; z-index: 999"></div>
+    <div id="window-container" style="height: 100vh"></div>
     <script>
-        function openDialog() {
-            document.getElementById('dialog-container').classList.add('active')
-        }
-
-        function closeDialog() {
-            document.getElementById('dialog-container').classList.remove('active')
-        }
-
-        function getUrlParameter(name) {
-            name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
-            var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
-            var results = regex.exec(location.search);
-            return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
-        }
-        var windows = {}
-
-        function addWindow(w) {
-            windows = windows || {};
-            windows[w.window_id] = w;
-            var title = w.name,
-                id = w.window_id;
-            document.getElementById('windows-menu').innerHTML = `
-            <span class="chip pointer window-chip" id="header_${id}" onclick="selectWindow('${id}')">
-                ${title}
-                <a href="#" onclick="removeWindow('${id}')" class="btn btn-clear" aria-label="Close" role="button"></a>
-            </span>` + document.getElementById('windows-menu').innerHTML;
-
-
-            const newWindow = document.createElement('div')
-            newWindow.classList.add("window_container")
-            newWindow.id = id;
-            document.getElementById('whiteboard').appendChild(newWindow)
-            window.onresize();
-            updateWindowChips();
-            selectWindow(id)
-        }
-
-        function updateWindowChips() {
-            // only display when there is more than one window open
-            if (Object.keys(windows).length > 1) {
-                var ws = document.querySelectorAll(".window-chip")
-                for (let w of ws) {
-                    w.style.display = "inline-flex";
-                }
-            } else {
-                const keys = Object.keys(windows);
-                if (keys.length >= 1 && (windows[keys[0]].standalone || windows[keys[0]].fullscreen))
-                    var ws = document.querySelectorAll(".window-chip")
-                if (ws) {
-                    for (let w of ws) {
-                        w.style.display = "none";
-                    }
-                }
+      loadImJoyBasicApp({
+        process_url_query: true,
+        show_window_title: false,
+        show_progress_bar: true,
+        show_empty_window: true,
+        menu_container: "menu-container",
+        menu_style: {},
+        window_style: { width: "100%", height: "100%" },
+        main_container: null,
+        window_manager_container: "window-container",
+        imjoy_api: {},
+      }).then(async app => {
+        const api = app.imjoy.api;
+        app.addMenuItem({
+          label: "➕ Load Plugin",
+          callback() {
+            const uri = prompt(
+              `Please type a ImJoy plugin URL`,
+              "https://github.com/imjoy-team/imjoy-plugins/blob/master/repository/ImageAnnotator.imjoy.html"
+            );
+            if (uri){
+              app.loadPlugin(uri).then((plugin)=>{
+                app.runPlugin(plugin)
+              })
             }
-        }
-
-        async function removeWindow(id) {
-            if (windows[id]) {
-                try {
-                    await windows[id].close()
-                } finally {
-                    delete windows[id];
-                    updateWindowChips();
-                }
-            }
-
-            document.getElementById('windows-menu').removeChild(document.getElementById('header_' + id));
-            document.getElementById('whiteboard').removeChild(document.getElementById(id));
-            if (selected_window === id) {
-                selectWindow(Object.keys(windows)[0])
-            }
-            if (document.getElementById('whiteboard').children.length === 1) {
-                document.getElementById('empty-img').style.display = 'block';
-            }
-        }
-
-        function selectWindow(id) {
-            if (!document.getElementById(id))
-                return
-            for (let c of document.getElementById('whiteboard').children) {
-                if (c.id !== 'site-title') {
-                    c.style.display = "none";
-                }
-            }
-            for (let c of document.getElementById('windows-menu').children)
-                c.classList.remove('active')
-            selected_window = id;
-            document.getElementById(id).style.display = "block";
-            document.getElementById('header_' + id).classList.add('active')
-        }
-
-        var selected_window = null
-        var imjoy = null
-
-        var imjoy_api = {
-            showMessage(plugin, info, duration) {
-                console.log(info)
-            },
-            showProgress(plugin, progress) {
-                if (progress < 1) progress = progress * 100;
-                document.getElementById('progress').value = progress
-                if (progress <= 0) {
-                    document.getElementById('progress').style.display = "none";
-                } else {
-                    document.getElementById('progress').style.display = "block";
-                }
-            },
-            showDialog(_plugin, config) {
-                return new Promise((resolve, reject) => {
-                    document.getElementById('window-dialog-container').innerHTML = '';
-                    if (config.ui) {
-                        openDialog()
-                        const joy_config = {
-                            container: document.getElementById('window-dialog-container'),
-                            init: config.ui ||
-                                "",
-                            data: config.data,
-                            modules: config.modules || ["instructions", "math"],
-                            onexecute: config.onexecute,
-                            onupdate: config.onupdate,
-                        };
-                        try {
-                            new imjoyCore.Joy(joy_config);
-                        } catch (e) {
-                            console.error("error occured when loading the workflow", e);
-                            joy_config.data = "";
-                            new imjoyCore.Joy(joy_config);
-                            throw e;
-                        }
-
-                    } else if (config.type) {
-                        openDialog()
-                        config.window_id = "window-dialog-container";
-                        config.standalone = true;
-                        if (config.type.startsWith("imjoy/")) {
-                            config.render = wconfig => {};
-                        }
-                        setTimeout(() => {
-                            imjoy.pm.createWindow(null, config)
-                                .then(api => {
-                                    const _close = api.close;
-                                    api.close = async () => {
-                                        await _close();
-                                        closeDialog();
-                                    };
-                                    resolve(api);
-                                })
-                                .catch(reject);
-                        }, 0);
-                    } else {
-                        alert("Unsupported dialog type.");
-                    }
-                });
-            },
-        }
-
-        document.addEventListener('DOMContentLoaded', async (event) => {
-            window.imjoyCore = await loadImJoyCore()
-            imjoy = new imjoyCore.ImJoy({
-                imjoy_api: imjoy_api,
-            })
-            imjoy.event_bus.on('show_message', console.log)
-            imjoy.event_bus.on("add_window", async (w) => {
-                if (w.fullscreen || w.standalone) {
-                    document.querySelector(".navbar").style.height = "2px";
-                    document.getElementById("logo").style.display = "none";
-                    // document.getElementById("windows-menu").style.display = "none";
-                } else {
-                    document.querySelector(".navbar").style.height = "32px";
-                    document.getElementById("logo").style.display = "flex";
-                }
-                addWindow(w);
-            })
-            const workspace = getUrlParameter('workspace') || getUrlParameter('w');
-            const token = getUrlParameter('token') || getUrlParameter('t');
-            const engine = getUrlParameter('engine') || getUrlParameter('e');
-
-            await imjoy.start({
-                workspace: workspace
-            })
-            console.log('ImJoy started: ', imjoy)
-            let p = getUrlParameter('plugin') || getUrlParameter('p');
-            if (!p && workspace) {
-                document.getElementById('loading').style.display = 'none';
-                return
-            }
-            window.loadPlugin = function (p) {
-                if (!p) p = prompt(
-                    `Please type a ImJoy plugin URI to start or pass it with ${window.location.href+'?plugin=PLUGIN_URI'}`,
-                    '');
-                if (!p) return;
-                document.getElementById('loading').style.display = 'block';
-                imjoy.pm.reloadPluginRecursively({
-                    uri: p
-                }).then(async (plugin) => {
-                    let config = {};
-                    if (plugin.config.ui && plugin.config.ui.indexOf("{") > -1) {
-                        config = await imjoy.pm.imjoy_api.showDialog(
-                            plugin,
-                            plugin.config
-                        );
-                    }
-                    await plugin.api.run({
-                        config: config,
-                        data: {}
-                    })
-                    document.getElementById('loading').style.display = 'none';
-                }).catch((e) => {
-                    console.error(e)
-                    alert(`failed to load the plugin, error: ${e}`)
-                    document.getElementById('loading').style.display = 'none';
-                })
-            }
-
-            if (engine) {
-                try {
-                    console.log("Loading Jupyter-Engine-Manager from Gist...");
-                    await imjoy.pm
-                        .reloadPluginRecursively({
-                            uri: "https://imjoy-team.github.io/jupyter-engine-manager/Jupyter-Engine-Manager.imjoy.html",
-                        })
-                    console.log("Jupyter-Engine-Manager loaded.");
-                    const factory = imjoy.em.getFactory('Jupyter-Engine')
-                    await factory.addEngine({
-                        url: engine,
-                        token: token
-                    })
-                    console.log('plugin engine added:', engine)
-                } catch (e) {
-                    console.error(e)
-                    alert(`Failed to connect to the engine: ${e}`)
-                }
-
-            }
-
-            p = p || prompt(
-                `Please type a ImJoy plugin URI to start or pass it with ${window.location.href+'?plugin=PLUGIN_URI'}`,
-                'imjoy-team/imjoy-plugins:Welcome');
-            p = p || 'imjoy-team/imjoy-plugins:Welcome';
-            if (p) {
-                window.loadPlugin(p);
-            }
-
-            imjoy.event_bus.on("plugin_loaded", (plugin) => {
-                //reload the plugin menu
-                var plugin_menu = document.getElementById('plugin-menu')
-                plugin_menu.innerHTML = ''
-                for (let pn in imjoy.pm.plugin_names) {
-                    plugin_menu.innerHTML = `
-                    <li class="menu-item"><a href="#" onclick="runPlugin('${pn}')">${pn}</a></li>
-                    ` + plugin_menu.innerHTML
-                }
-                plugin_menu.innerHTML = plugin_menu.innerHTML +
-                    '<li class="menu-item"><a href="#" onclick="loadPlugin()"><i class="icon icon-plus"></i>&nbsp;Load Plugin</a></li>'
-                plugin_menu.innerHTML = plugin_menu.innerHTML +
-                    '<li class="menu-item"><a href="#" onclick="window.onresize()"><i class="icon icon-stop"></i>&nbsp;Cancel</a></li>'
-            })
-
-            window.runPlugin = (name) => {
-                imjoy.pm.plugin_names[name].api.run({
-                    config: {},
-                    data: {}
-                })
-            }
-        })
-        // fix mobile display
-        window.onresize = () => {
-            document.body.height = window.innerHeight;
-            document.getElementById('whiteboard').style.setProperty('height', (window.innerHeight) + 'px',
-                'important');
-        }
-        window.onresize();
+          },
+        });
+        
+      });
     </script>
+    <style>
+      #menu-container{
+        opacity: 0.4;
+      }
+      #menu-container:hover{
+        opacity: 1.0;
+      }
+    </style>
 </body>
 
 </html>
