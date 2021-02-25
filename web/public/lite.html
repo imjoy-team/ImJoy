@@ -2,91 +2,103 @@
 <html lang="en">
 
 <head>
-    <title>ImJoy-Lite</title>
+  <title>ImJoy-Lite</title>
 
-    <meta charset="utf-8">
-    <meta name="viewport"
-        content="width=device-width, height=device-height, initial-scale=1, maximum-scale=1, user-scalable=no">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="description" content="ImJoy -- Deep Learning Made Easy!">
-    <meta name="author" content="Wei OUYANG">
-    <meta name="keywords" content="Bioimaging, image processing">
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:site" content="@weioyang" />
-    <meta name="twitter:creator" content="@weioyang" />
-    <meta name="twitter:image" content="https://imjoy.io/static/img/imjoy-card-plain.png" />
-    <meta property="og:url" content="https://imjoy.io" />
-    <meta property="og:title" content="ImJoy" />
-    <meta property="og:description" content="ImJoy -- Deep Learning Made Easy!" />
-    <meta property="og:image" content="https://imjoy.io/static/img/imjoy-card-plain.png" />
-    <meta name="format-detection" content="telephone=no">
-    <link rel="apple-touch-icon" sizes="57x57" href="/static/icons/apple-icon-57x57.png">
-    <link rel="apple-touch-icon" sizes="60x60" href="/static/icons/apple-icon-60x60.png">
-    <link rel="apple-touch-icon" sizes="72x72" href="/static/icons/apple-icon-72x72.png">
-    <link rel="apple-touch-icon" sizes="76x76" href="/static/icons/apple-icon-76x76.png">
-    <link rel="apple-touch-icon" sizes="114x114" href="/static/icons/apple-icon-114x114.png">
-    <link rel="apple-touch-icon" sizes="120x120" href="/static/icons/apple-icon-120x120.png">
-    <link rel="apple-touch-icon" sizes="144x144" href="/static/icons/apple-icon-144x144.png">
-    <link rel="apple-touch-icon" sizes="152x152" href="/static/icons/apple-icon-152x152.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="/static/icons/apple-icon-180x180.png">
-    <link rel="icon" type="image/png" sizes="192x192" href="/static/icons/android-icon-192x192.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/static/icons/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="96x96" href="/static/icons/favicon-96x96.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/static/icons/favicon-16x16.png">
-    <link rel="shortcut icon" href="static/icons/favicon.ico" type="image/x-icon" />
-    <link rel="icon" href="static/icons/favicon.ico" type="image/x-icon" />
-    <link rel="apple-touch-startup-image" href="/launch.png">
-    <link rel="manifest" href="manifest.json">
-    <meta name="msapplication-TileColor" content="#f5f9ff">
-    <meta name="msapplication-TileImage" content="static/icons/ms-icon-144x144.png">
-    <meta name="theme-color" content="#f5f9ff">
-    <script src="https://lib.imjoy.io/imjoy-loader.js"></script>
+  <meta charset="utf-8">
+  <meta name="viewport"
+    content="width=device-width, height=device-height, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="description" content="ImJoy -- Deep Learning Made Easy!">
+  <meta name="author" content="Wei OUYANG">
+  <meta name="keywords" content="Bioimaging, image processing">
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:site" content="@weioyang" />
+  <meta name="twitter:creator" content="@weioyang" />
+  <meta name="twitter:image" content="https://imjoy.io/static/img/imjoy-card-plain.png" />
+  <meta property="og:url" content="https://imjoy.io" />
+  <meta property="og:title" content="ImJoy" />
+  <meta property="og:description" content="ImJoy -- Deep Learning Made Easy!" />
+  <meta property="og:image" content="https://imjoy.io/static/img/imjoy-card-plain.png" />
+  <meta name="format-detection" content="telephone=no">
+  <link rel="apple-touch-icon" sizes="57x57" href="/static/icons/apple-icon-57x57.png">
+  <link rel="apple-touch-icon" sizes="60x60" href="/static/icons/apple-icon-60x60.png">
+  <link rel="apple-touch-icon" sizes="72x72" href="/static/icons/apple-icon-72x72.png">
+  <link rel="apple-touch-icon" sizes="76x76" href="/static/icons/apple-icon-76x76.png">
+  <link rel="apple-touch-icon" sizes="114x114" href="/static/icons/apple-icon-114x114.png">
+  <link rel="apple-touch-icon" sizes="120x120" href="/static/icons/apple-icon-120x120.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="/static/icons/apple-icon-144x144.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="/static/icons/apple-icon-152x152.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/static/icons/apple-icon-180x180.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="/static/icons/android-icon-192x192.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/static/icons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="96x96" href="/static/icons/favicon-96x96.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/static/icons/favicon-16x16.png">
+  <link rel="shortcut icon" href="static/icons/favicon.ico" type="image/x-icon" />
+  <link rel="icon" href="static/icons/favicon.ico" type="image/x-icon" />
+  <link rel="apple-touch-startup-image" href="/launch.png">
+  <link rel="manifest" href="manifest.json">
+  <meta name="msapplication-TileColor" content="#f5f9ff">
+  <meta name="msapplication-TileImage" content="static/icons/ms-icon-144x144.png">
+  <meta name="theme-color" content="#f5f9ff">
+  <script src="https://lib.imjoy.io/imjoy-loader.js"></script>
 </head>
 
 <body style="width:100%;height:100vh;">
-    <div id="menu-container" style="position: absolute; right: 0; top: 4px; z-index: 999"></div>
-    <div id="window-container" style="height: 100vh"></div>
-    <script>
-      loadImJoyBasicApp({
-        process_url_query: true,
-        show_window_title: false,
-        show_progress_bar: true,
-        show_empty_window: true,
-        menu_container: "menu-container",
-        menu_style: {},
-        window_style: { width: "100%", height: "100%" },
-        main_container: null,
-        window_manager_container: "window-container",
-        imjoy_api: {},
-      }).then(async app => {
-        const api = app.imjoy.api;
-        app.addMenuItem({
-          label: "➕ Load Plugin",
-          callback() {
-            const uri = prompt(
-              `Please type a ImJoy plugin URL`,
-              "https://github.com/imjoy-team/imjoy-plugins/blob/master/repository/ImageAnnotator.imjoy.html"
-            );
-            if (uri){
-              app.loadPlugin(uri).then((plugin)=>{
-                app.runPlugin(plugin)
-              })
-            }
-          },
-        });
-        
+  <div id="menu-container" style="position: absolute; right: 0; top: 4px; z-index: 999"></div>
+  <div id="window-container" style="height: 100vh"></div>
+  <script>
+    loadImJoyBasicApp({
+      process_url_query: true,
+      show_window_title: false,
+      show_progress_bar: true,
+      show_empty_window: true,
+      menu_container: "menu-container",
+      menu_style: {},
+      window_style: {
+        width: "100%",
+        height: "100%"
+      },
+      main_container: null,
+      window_manager_container: "window-container",
+      imjoy_api: {},
+    }).then(async app => {
+      const api = app.imjoy.api;
+      app.addMenuItem({
+        label: "➕ Load Plugin",
+        callback() {
+          const uri = prompt(
+            `Please type a ImJoy plugin URL`,
+            "https://raw.githubusercontent.com/imjoy-team/imjoy-plugins/master/repository/welcome.imjoy.html"
+          );
+          if (uri) {
+            app.loadPlugin(uri).then((plugin) => {
+              app.runPlugin(plugin)
+            })
+          }
+        },
       });
-    </script>
-    <style>
-      #menu-container{
-        opacity: 0.4;
-      }
-      #menu-container:hover{
-        opacity: 1.0;
-      }
-    </style>
+      app.addMenuItem({
+        label: "🧩 ImJoy Fiddle",
+        async callback() {
+          const plugin = await app.loadPlugin("https://if.imjoy.io")
+          await app.runPlugin(plugin)
+          app.removeMenuItem("🧩 ImJoy Fiddle")
+        },
+      });
+
+    });
+  </script>
+  <style>
+    #menu-container {
+      opacity: 0.4;
+    }
+
+    #menu-container:hover {
+      opacity: 1.0;
+    }
+  </style>
 </body>
 
 </html>
