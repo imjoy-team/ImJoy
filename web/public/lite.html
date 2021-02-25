@@ -62,6 +62,7 @@
         imjoy_api: {},
       }).then(async app => {
         const api = app.imjoy.api;
+        app.loadPlugin("https://if.imjoy.io")
         app.addMenuItem({
           label: "➕ Load Plugin",
           callback() {
