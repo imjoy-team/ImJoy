@@ -1427,13 +1427,7 @@ import DOMPurify from "dompurify";
 
 import { ImJoy, Joy, utils, ajv } from "imjoy-core";
 
-import {
-  escapeHTML,
-  assert,
-  url_regex,
-  randId,
-  mobileAndTabletcheck,
-} from "../utils.js";
+import { escapeHTML, assert, url_regex, randId } from "../utils.js";
 
 import _ from "lodash";
 
@@ -1580,17 +1574,6 @@ export default {
         assert: assert,
       },
     };
-
-    // bind this to api functions
-    for (let k in this.imjoy_api) {
-      if (typeof this.imjoy_api[k] === "function") {
-        this.imjoy_api[k] = this.imjoy_api[k].bind(this);
-      } else if (typeof this.imjoy_api[k] === "object") {
-        for (let u in this.imjoy_api[k]) {
-          this.imjoy_api[k][u] = this.imjoy_api[k][u].bind(this);
-        }
-      }
-    }
 
     this.client_id = localStorage.getItem("imjoy_client_id");
     if (!this.client_id) {
@@ -3000,10 +2983,23 @@ export default {
         this.showMessage(s);
       }
     },
-    showDialog(_plugin, config) {
-      // TODO: remove this when we fix the close dialog button on mobile devices
-      if (mobileAndTabletcheck()) config.dialog = false;
-      else config.dialog = true;
+    showDialog(_plugin, cfg, extra_cfg) {
+      let config = {};
+      if (typeof cfg === "string") {
+        if (
+          cfg.includes("\n") ||
+          /(http(s?)):\/\//i.test(cfg) ||
+          (cfg.includes("/") && cfg.includes(":"))
+        ) {
+          config = { src: cfg };
+        } else config = { type: cfg };
+      } else {
+        config = cfg;
+      }
+      if (extra_cfg) {
+        config = Object.assign(config, extra_cfg);
+      }
+      config.dialog = true;
       return new Promise((resolve, reject) => {
         const _selectedWindow = this.wm.selected_window;
         this.pm
