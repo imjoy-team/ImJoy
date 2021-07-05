@@ -3302,7 +3302,7 @@ export default {
 }
 
 #api-snackbar {
-  z-index: 14 !important;
+  z-index: 9999 !important;
 }
 
 @media screen and (max-height: 900px) {
