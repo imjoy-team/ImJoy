@@ -555,6 +555,8 @@ The `lang` property of the `<script>` block is used to specify the used programm
  * for Javascript, use `<script lang="javascript"> ... </script>`
  * for Python, use `<script lang="python"> ... </script>`
 
+For Javascript plugins, we also support ES Modules, to enable that, add `type="module"` to the script tag. For example: `<script type="module" lang="javascript">...</script>`.
+
 `<script>` also supports `tags`. For more information, see the dedicated section for [`tags`](development?id=tags).
 
 ## Specifying requirements
@@ -609,6 +611,7 @@ You can also add additional resources (e.g. images, font files) to the offline c
 
 Notice that the offline caching process won't trace the dependent resources, you will need to add them as requirements manually in order to be cached.
 
+When importing ES Modules in the script tag (with `type="module"`), it is recommended to add explicitly add the es module URLs into the `requirements` and prefix the url with `cache:`. This will allow ImJoy to cache your dynamic scripts for offline usage.
 ### Web Python
 Requirements are specified as a list of strings specifying the required python modules. For instance,
 
