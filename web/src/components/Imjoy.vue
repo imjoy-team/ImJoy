@@ -1499,7 +1499,7 @@ export default {
     };
   },
   props: {
-    exposeAPI: { type: Boolean, default: true },
+    exposeAPI: { type: Boolean, default: false },
   },
   watch: {
     // menuVisible() {
@@ -1575,10 +1575,15 @@ export default {
       },
     };
 
-    this.client_id = localStorage.getItem("imjoy_client_id");
-    if (!this.client_id) {
-      this.client_id = "imjoy_web_" + randId();
-      localStorage.setItem("imjoy_client_id", this.client_id);
+    // localStorage won't be accessible in incognito mode
+    try {
+      this.client_id = localStorage.getItem("imjoy_client_id");
+      if (!this.client_id) {
+        this.client_id = "imjoy_web_" + randId();
+        localStorage.setItem("imjoy_client_id", this.client_id);
+      }
+    } catch (e) {
+      console.error(e);
     }
 
     if (this.$route.query.flags) {
@@ -1587,13 +1592,17 @@ export default {
       this.flags = [];
     }
 
+    const expose_api =
+      this.$route.query.expose !== undefined
+        ? this.$route.query.expose
+        : this.exposeAPI;
     this.imjoy = new ImJoy({
       imjoy_api: imjoy_api,
       event_bus: this.event_bus,
       client_id: this.client_id,
       default_base_frame: "https://lib.imjoy.io/default_base_frame.html",
       default_rpc_base_url: null,
-      expose_api: this.exposeAPI,
+      expose_api: expose_api,
       flags: this.flags,
     });
     this.imjoy.event_bus.on("show_message", msg => {
@@ -1900,6 +1909,10 @@ export default {
             this.event_bus.emit("imjoy_ready");
           });
         }
+        const engineManager = await this.pm.reloadPluginRecursively({
+          uri:
+            "https://imjoy-team.github.io/jupyter-engine-manager/Jupyter-Engine-Manager.imjoy.html",
+        });
 
         if (route.query.engine) {
           try {
@@ -1910,10 +1923,6 @@ export default {
                 await en.connect();
               }
             } else {
-              const engineManager = await this.pm.imjoy_api.getPlugin(
-                null,
-                "Jupyter-Engine-Manager"
-              );
               if (
                 !route.query.engineType ||
                 route.query.engineType === "jupyter"

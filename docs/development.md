@@ -1314,6 +1314,8 @@ The following url parameters are currently supported:
 
  *   `load` or `l`: define an URL for making a http GET request, this parameter should only used when you defined a startup plugin with `start` or `s`. The data fetched from the URL will be passed to the startup plugin `run(ctx)` function as `ctx.data.loaded`.
 
+ *   `expose`: when imjoy is embedded in an iframe, whether it should expose its API to the outter context (by default it will not be exposed). To enable, you can add `expose=1` to the URL query.  
+
 ### Add an ImJoy badge
 If you use ImJoy in your project, it is recommended to add one of our ImJoy badge to your project repository (e.g. on Github) or website. We have two official badges: ![launch ImJoy](https://imjoy.io/static/badge/launch-imjoy-badge.svg) and ![powered by ImJoy](https://imjoy.io/static/badge/powered-by-imjoy-badge.svg).
 
