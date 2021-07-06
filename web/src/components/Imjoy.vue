@@ -1499,7 +1499,7 @@ export default {
     };
   },
   props: {
-    exposeAPI: { type: Boolean, default: true },
+    exposeAPI: { type: Boolean, default: false },
   },
   watch: {
     // menuVisible() {
@@ -1592,13 +1592,17 @@ export default {
       this.flags = [];
     }
 
+    const expose_api =
+      this.$route.query.expose !== undefined
+        ? this.$route.query.expose
+        : this.exposeAPI;
     this.imjoy = new ImJoy({
       imjoy_api: imjoy_api,
       event_bus: this.event_bus,
       client_id: this.client_id,
       default_base_frame: "https://lib.imjoy.io/default_base_frame.html",
       default_rpc_base_url: null,
-      expose_api: this.exposeAPI,
+      expose_api: expose_api,
       flags: this.flags,
     });
     this.imjoy.event_bus.on("show_message", msg => {
