@@ -1807,7 +1807,11 @@ export default {
   methods: {
     async startImJoy(route) {
       await this.imjoy.init();
-
+      const engineManager = await this.pm.reloadPluginRecursively({
+        // uri: "http://localhost:9090/Jupyter-Engine-Manager.imjoy.html"
+        uri:
+          "https://imjoy-team.github.io/jupyter-engine-manager/Jupyter-Engine-Manager.imjoy.html",
+      });
       const r = (route.query.repo || route.query.r || "").trim();
       if (r) {
         this.plugin_url = null;
@@ -1910,10 +1914,6 @@ export default {
                 await en.connect();
               }
             } else {
-              const engineManager = await this.pm.imjoy_api.getPlugin(
-                null,
-                "Jupyter-Engine-Manager"
-              );
               if (
                 !route.query.engineType ||
                 route.query.engineType === "jupyter"
