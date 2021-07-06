@@ -1575,10 +1575,15 @@ export default {
       },
     };
 
-    this.client_id = localStorage.getItem("imjoy_client_id");
-    if (!this.client_id) {
-      this.client_id = "imjoy_web_" + randId();
-      localStorage.setItem("imjoy_client_id", this.client_id);
+    // localStorage won't be accessible in incognito mode
+    try {
+      this.client_id = localStorage.getItem("imjoy_client_id");
+      if (!this.client_id) {
+        this.client_id = "imjoy_web_" + randId();
+        localStorage.setItem("imjoy_client_id", this.client_id);
+      }
+    } catch (e) {
+      console.error(e);
     }
 
     if (this.$route.query.flags) {
@@ -1807,11 +1812,7 @@ export default {
   methods: {
     async startImJoy(route) {
       await this.imjoy.init();
-      const engineManager = await this.pm.reloadPluginRecursively({
-        // uri: "http://localhost:9090/Jupyter-Engine-Manager.imjoy.html"
-        uri:
-          "https://imjoy-team.github.io/jupyter-engine-manager/Jupyter-Engine-Manager.imjoy.html",
-      });
+
       const r = (route.query.repo || route.query.r || "").trim();
       if (r) {
         this.plugin_url = null;
@@ -1904,6 +1905,10 @@ export default {
             this.event_bus.emit("imjoy_ready");
           });
         }
+        const engineManager = await this.pm.reloadPluginRecursively({
+          uri:
+            "https://imjoy-team.github.io/jupyter-engine-manager/Jupyter-Engine-Manager.imjoy.html",
+        });
 
         if (route.query.engine) {
           try {
