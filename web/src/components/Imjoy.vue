@@ -1836,48 +1836,6 @@ export default {
         this.showAddPluginDialog = true;
       }
 
-      const p = (route.query.plugin || route.query.p || "").trim();
-      let plugin_config = null;
-      if (p) {
-        if (p.match(url_regex) || (p.includes("/") && p.includes(":"))) {
-          this.plugin_url = p;
-          this.init_plugin_search = null;
-          this.show_plugin_store = false;
-          this.show_plugin_url = false;
-          try {
-            plugin_config = await this.getPlugin4Install(p);
-            //check if the same plugin is already installed
-            if (
-              !this.pm.plugin_names[plugin_config.name] ||
-              route.query.upgrade ||
-              plugin_config.version !==
-                this.pm.plugin_names[plugin_config.name].config.version
-            ) {
-              this.show_plugin_templates = false;
-              this.showAddPluginDialog = true;
-            } else {
-              this.showMessage(
-                `Plugin "${plugin_config.name}" is already installed.`
-              );
-            }
-          } catch (e) {
-            console.error(e);
-            await this.showAlert(null, e);
-          }
-        } else {
-          this.plugin_url = null;
-          this.init_plugin_search = p;
-          this.show_plugin_store = true;
-          this.show_plugin_url = false;
-          this.show_plugin_templates = false;
-          this.showAddPluginDialog = true;
-        }
-      } else {
-        if (route.query.workflow) {
-          this.loadWorkfowFromUrl();
-        }
-      }
-
       for (let inputs of this.getDefaultInputLoaders()) {
         this.wm.registerInputLoader(inputs.loader_key, inputs, inputs.loader);
       }
@@ -1899,21 +1857,13 @@ export default {
         await this.pm.loadWorkspace(selected_workspace);
         this.plugin_loaded = true;
         await this.pm.reloadPlugins();
-
-        this.event_bus.emit("plugins_loaded", this.pm.plugins);
-        try {
-          const manifest = await this.pm.reloadRepository();
-          this.event_bus.emit("repositories_loaded", manifest);
-        } finally {
-          this.$nextTick(() => {
-            this.event_bus.emit("imjoy_ready");
-          });
-        }
-        const engineManager = await this.pm.reloadPluginRecursively({
-          uri:
-            "https://imjoy-team.github.io/jupyter-engine-manager/Jupyter-Engine-Manager.imjoy.html",
-        });
-
+        const engineManager =
+          (await this.imjoy.api.getPlugin("Jupyter-Engine-Manager")) ||
+          (await this.imjoy.api.getPlugin({
+            src:
+              "https://imjoy-team.github.io/jupyter-engine-manager/Jupyter-Engine-Manager.imjoy.html",
+          }));
+        debugger;
         if (route.query.engine) {
           try {
             const engineUrl = route.query.engine;
@@ -1947,6 +1897,57 @@ export default {
             this.showMessage("Failed to connect to the specified engine");
             console.error("Failed to connect to engine", e);
           }
+        }
+
+        const p = (route.query.plugin || route.query.p || "").trim();
+        let plugin_config = null;
+        if (p) {
+          if (p.match(url_regex) || (p.includes("/") && p.includes(":"))) {
+            this.plugin_url = p;
+            this.init_plugin_search = null;
+            this.show_plugin_store = false;
+            this.show_plugin_url = false;
+            try {
+              plugin_config = await this.getPlugin4Install(p);
+              //check if the same plugin is already installed
+              if (
+                !this.pm.plugin_names[plugin_config.name] ||
+                route.query.upgrade ||
+                plugin_config.version !==
+                  this.pm.plugin_names[plugin_config.name].config.version
+              ) {
+                this.show_plugin_templates = false;
+                this.showAddPluginDialog = true;
+              } else {
+                this.showMessage(
+                  `Plugin "${plugin_config.name}" is already installed.`
+                );
+              }
+            } catch (e) {
+              console.error(e);
+              await this.showAlert(null, e);
+            }
+          } else {
+            this.plugin_url = null;
+            this.init_plugin_search = p;
+            this.show_plugin_store = true;
+            this.show_plugin_url = false;
+            this.show_plugin_templates = false;
+            this.showAddPluginDialog = true;
+          }
+        } else {
+          if (route.query.workflow) {
+            this.loadWorkfowFromUrl();
+          }
+        }
+        this.event_bus.emit("plugins_loaded", this.pm.plugins);
+        try {
+          const manifest = await this.pm.reloadRepository();
+          this.event_bus.emit("repositories_loaded", manifest);
+        } finally {
+          this.$nextTick(() => {
+            this.event_bus.emit("imjoy_ready");
+          });
         }
 
         if (route.query.start) {
