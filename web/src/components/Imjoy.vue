@@ -1863,7 +1863,6 @@ export default {
             src:
               "https://imjoy-team.github.io/jupyter-engine-manager/Jupyter-Engine-Manager.imjoy.html",
           }));
-        debugger;
         if (route.query.engine) {
           try {
             const engineUrl = route.query.engine;
