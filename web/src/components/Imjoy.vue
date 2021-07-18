@@ -1856,7 +1856,6 @@ export default {
 
         await this.pm.loadWorkspace(selected_workspace);
         this.plugin_loaded = true;
-        await this.pm.reloadPlugins();
         const engineManager =
           (await this.imjoy.api.getPlugin("Jupyter-Engine-Manager")) ||
           (await this.imjoy.api.getPlugin({
@@ -1897,6 +1896,8 @@ export default {
             console.error("Failed to connect to engine", e);
           }
         }
+
+        await this.pm.reloadPlugins();
 
         const p = (route.query.plugin || route.query.p || "").trim();
         let plugin_config = null;
