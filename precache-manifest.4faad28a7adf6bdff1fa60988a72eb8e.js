@@ -4,7 +4,7 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/404.html"
   },
   {
-    "revision": "858d19fe1902f38b974d6642c19a9275",
+    "revision": "7a5c2e69ec786263a87ab270295794e0",
     "url": "/index.html"
   },
   {
@@ -32,7 +32,7 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/badge/powered-by-imjoy-badge.svg"
   },
   {
-    "revision": "b44ed41bcb6619212958",
+    "revision": "edc9b965bac6724a291e",
     "url": "/static/css/app.44876b67.css"
   },
   {
@@ -208,43 +208,43 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/img/github.svg"
   },
   {
-    "revision": "6927c75e85be261a4e36e189576c505d",
+    "revision": "a45b25b04fa29127e61070446a99eeef",
     "url": "/static/img/imjoy-card-plain.png"
   },
   {
-    "revision": "5729dc069431278b12e8100500dff158",
+    "revision": "89bf7fb05bd2fcd0584e6fe76cd96630",
     "url": "/static/img/imjoy-icon-white.png"
   },
   {
-    "revision": "0cc69c2a860acde29e9411275ca4bb8d",
+    "revision": "06d4bf376f1492672e7f0833f09f4381",
     "url": "/static/img/imjoy-icon-white.svg"
   },
   {
-    "revision": "e37c947f86aa593ba9e34029c119257a",
+    "revision": "4b9463aab679a2cace4f5d62a0150a8f",
     "url": "/static/img/imjoy-icon.png"
   },
   {
-    "revision": "0c8de05e92e480a948f58cb8e808f67b",
+    "revision": "e3933644e765a999703cac079cec6355",
     "url": "/static/img/imjoy-icon.svg"
   },
   {
-    "revision": "a69cb9dddcaa24d000d61a2a83328518",
+    "revision": "1e3572699b9e9381c5da2b04a96fa759",
     "url": "/static/img/imjoy-io-icon.svg"
   },
   {
-    "revision": "4ff3745dada38b925281e4fe03330cf7",
+    "revision": "a94c04fc78ac13283152d406ada8eec2",
     "url": "/static/img/imjoy-logo-black.png"
   },
   {
-    "revision": "a0e93a89173b2a0fc62b45edf5e8b4aa",
+    "revision": "29997a1a42a49f370e5a29ea7300ec40",
     "url": "/static/img/imjoy-logo-black.svg"
   },
   {
-    "revision": "26dfd76132f659f0ef33a27e46307bda",
+    "revision": "a99a6d4940bb765ccc18e5e3571ad0b8",
     "url": "/static/img/imjoy-logo-white.png"
   },
   {
-    "revision": "8e7b1b80a4458be8a27eac659447e42d",
+    "revision": "8a88485f772282068202c65309416bfa",
     "url": "/static/img/imjoy-logo-white.svg"
   },
   {
@@ -260,8 +260,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/img/twitter.svg"
   },
   {
-    "revision": "b44ed41bcb6619212958",
-    "url": "/static/js/app.20144557.js"
+    "revision": "edc9b965bac6724a291e",
+    "url": "/static/js/app.baf443ab.js"
   },
   {
     "revision": "9d9efb43042e7c212697",
