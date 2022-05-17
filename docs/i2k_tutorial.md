@@ -1323,7 +1323,7 @@ class ImJoyPlugin():
         path = await api.prompt("Please give me an image file path or URL", "https://images.proteinatlas.org/19661/221_G2_1_red_green.jpg")
         image = imageio.imread(path)
         # create a viewer
-        viewer = await api.showDialog(src="https://kitware.github.io/itk-vtk-viewer/app/")
+        viewer = await api.showDialog(src="https://oeway.github.io/itk-vtk-viewer/")
         # show an image
         viewer.setImage(image)
 
@@ -1678,7 +1678,7 @@ class ImJoyPlugin():
                 outputs = self.segment({'input': image_to_base64(image), "diam": 30, "net": "cyto", "chan1": 0, "chan2": 0, "outputs": "flow,mask,outline_plot,overlay_plot"})
                 api.showStatus('Displaying result...')
                 outline_plot = base64_to_image(outputs['outline_plot'])
-                await api.showDialog(src="https://kitware.github.io/itk-vtk-viewer/app/", name="CellPose Segmentation Result", data={"image": outline_plot})
+                await api.showDialog(src="https://oeway.github.io/itk-vtk-viewer/", name="CellPose Segmentation Result", data={"image": outline_plot})
                 api.showStatus('Done.')
             except Exception as e:
                 api.showMessage("Failed to run cellpose: " + str(e))
@@ -1755,7 +1755,7 @@ class ImJoyPlugin():
         fileDialog = await api.showDialog(type="ImJoy elFinder")
         files = await fileDialog.getSelections()
         image = imageio.imread(files[0].path)
-        await api.showDialog(src="https://kitware.github.io/itk-vtk-viewer/app/", data={"image": image})
+        await api.showDialog(src="https://oeway.github.io/itk-vtk-viewer/", data={"image": image})
 
 api.export(ImJoyPlugin())
 ```
