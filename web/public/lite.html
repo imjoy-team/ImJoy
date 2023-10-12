@@ -97,19 +97,30 @@
       const token = urlParams.get('token');
       const service_id = urlParams.get('service_id');
       if(service_id){
-        const server = await hyphaWebsocketClient.connectToServer({"server_url": server_url, "workspace": workspace, "token": token})
-        await server.registerService({
-            "name": service_id,
-            "id": service_id,
-            "type": "imjoy-client",
-            "config": {
-                "visibility": "protected"
-            },
-            "api": api
-        }, {overwrite: true, _rkwargs: true})
-
-        app.imjoy.expose_api = true
-        await app.imjoy.init()
+        await app.showLoader(true)
+        try{
+          const server = await hyphaWebsocketClient.connectToServer({"server_url": server_url, "workspace": workspace, "token": token})
+          await server.registerService({
+              "name": service_id,
+              "id": service_id,
+              "type": "imjoy-client",
+              "config": {
+                  "visibility": "protected"
+              },
+              "api": api
+          }, {overwrite: true, _rkwargs: true})
+  
+          app.imjoy.expose_api = true
+          await app.imjoy.init()
+          await api.showMessage(`🎉Connected to the server (${server_url}) successfully! Workspace: ${workspace}, Service ID: ${service_id}`)
+        }
+        catch(e){
+          console.error(e)
+          alert(`Failed to connect to the server: ${e}`)
+        }
+        finally{
+          await app.showLoader(false)
+        }
       }
     });
   </script>
