@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-  <title>ImJoy-Lite</title>
+  <title>ImJoy Lite</title>
 
   <meta charset="utf-8">
   <meta name="viewport"
@@ -43,6 +43,7 @@
   <meta name="msapplication-TileImage" content="static/icons/ms-icon-144x144.png">
   <meta name="theme-color" content="#f5f9ff">
   <script src="https://lib.imjoy.io/imjoy-loader.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/imjoy-rpc@latest/dist/hypha-rpc-websocket.min.js"></script>
 </head>
 
 <body style="width:100%;height:100vh;">
@@ -50,7 +51,7 @@
   <div id="window-container" style="height: 100vh"></div>
   <script>
     loadImJoyBasicApp({
-      version: "0.14.4",
+      version: "0.14.3",
       process_url_query: true,
       show_window_title: false,
       show_progress_bar: true,
@@ -89,6 +90,27 @@
         },
       });
 
+      // parse the url query to get `server_url`, `workspace` and `token`
+      const urlParams = new URLSearchParams(window.location.search);
+      const server_url = urlParams.get('server_url') || "https://ai.imjoy.io";
+      const workspace = urlParams.get('workspace');
+      const token = urlParams.get('token');
+      const service_id = urlParams.get('service_id');
+      if(service_id){
+        const server = await hyphaWebsocketClient.connectToServer({"server_url": server_url, "workspace": workspace, "token": token})
+        await server.registerService({
+            "name": service_id,
+            "id": service_id,
+            "type": "imjoy-client",
+            "config": {
+                "visibility": "protected"
+            },
+            "api": api
+        }, {overwrite: true, _rkwargs: true})
+
+        app.imjoy.expose_api = true
+        await app.imjoy.init()
+      }
     });
   </script>
   <style>
